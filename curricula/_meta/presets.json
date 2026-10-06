@@ -82,6 +82,14 @@
     "physics": {
      "pack": "phy-cambridge",
      "track": "extended"
+    },
+    "chemistry": {
+     "pack": "chem-cambridge",
+     "track": "extended"
+    },
+    "biology": {
+     "pack": "bio-cambridge",
+     "track": "extended"
     }
    }
   }

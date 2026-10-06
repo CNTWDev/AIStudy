@@ -133,6 +133,8 @@ class Catalog:
             for p in kp["prereqs"]:
                 if p["id"] not in self.kps:
                     self.errors.append(f"{kp['pack']}: {kid} 的前置 {p['id']} 不存在")
+                elif p.get("strength") == "必须" and stage_rank(self.kps[p["id"]]["stage"]) > stage_rank(kp["stage"]):
+                    self.errors.append(f"{kp['pack']}: {kid} 的必须前置 {p['id']} 学段更晚（改成「有帮助」或调整学段）")
                 self.children.setdefault(p["id"], []).append(kid)
         self._load_links(directory / "_links")
         for pr in self.presets:

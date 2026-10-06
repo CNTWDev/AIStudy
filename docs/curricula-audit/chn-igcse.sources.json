@@ -1,0 +1,292 @@
+{
+ "sources": [
+  {
+   "url": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf",
+   "what": "IGCSE First Language Chinese 0509 大纲 2028–2029（v1, 2025-09）：试卷结构、AO、各部分题型与字数",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/697185-2026-2027-syllabus.pdf",
+   "what": "0509 大纲 2026–2027（v1, 2023-09），与 2028–2029 版结构相同",
+   "level": "官方"
+  },
+  {
+   "url": "https://cambridgeinternational.org/images/414856-2020-specimen-paper-1.pdf",
+   "what": "0509 Paper 1 样卷（2020 年起适用）：现代文、指导写作、文言文具体题型",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/670263-june-2022-mark-scheme-paper-21.pdf",
+   "what": "0509/21 2022 年 6 月 Paper 2 评分方案：每篇 25 分 = Style and Accuracy 12 + Content and Structure 13，顶档/中档描述",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf",
+   "what": "IGCSE Chinese as a Second Language 0523 大纲 2028–2029（v1, 2025-09）：试卷结构、AO、练习、口语评分、Part 3 话题 A–D",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf",
+   "what": "0523 大纲 2026–2027（v1, 2023-09），结构与 2028–2029 版相同",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf",
+   "what": "IGCSE Mandarin Chinese 0547 大纲 2028–2030（v2, 2025-10）：变化说明、四卷结构、话题 A–E、语法 Part 1/2",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf",
+   "what": "0547 大纲 2025–2027（v1, 2022-09）：旧版写作 45 分、语法与词汇表",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-lower-secondary/curriculum/",
+   "what": "Lower Secondary 科目列表：无中文专门框架，只有通用 Modern Foreign Language 0771",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-primary/curriculum/",
+   "what": "Primary 科目列表：无中文专门框架",
+   "level": "官方"
+  },
+  {
+   "url": "https://collins.co.uk/products/9780008780623",
+   "what": "Collins 0547 学生用书注明 for examination from 2028，佐证新版大纲",
+   "level": "佐证"
+  }
+ ],
+ "coverage": [
+  {
+   "section": "0509 Assessment overview / AO1 R1–R5 / AO2 W1–W5",
+   "kp_ids": [
+    "CIG-EX-01",
+    "CIG-EX-04",
+    "CIG-EX-05"
+   ]
+  },
+  {
+   "section": "0509 Paper 1 Section 1 现代文阅读（23 分）",
+   "kp_ids": [
+    "CIG-REA-01",
+    "CIG-REA-02",
+    "CIG-REA-03",
+    "CIG-REA-04",
+    "CIG-REA-05",
+    "CIG-REA-06",
+    "CIG-REA-07"
+   ]
+  },
+  {
+   "section": "0509 Paper 1 Section 2 指导写作（25 分）",
+   "kp_ids": [
+    "CIG-REA-08",
+    "CIG-REA-09",
+    "CIG-WRI-07"
+   ]
+  },
+  {
+   "section": "0509 Paper 1 Section 3 文言文（12 分）",
+   "kp_ids": [
+    "CIG-CLA-01",
+    "CIG-CLA-02",
+    "CIG-CLA-03",
+    "CIG-CLA-04",
+    "CIG-CLA-05",
+    "CIG-CLA-06"
+   ]
+  },
+  {
+   "section": "0509 Paper 2 Section 1 议论/讨论",
+   "kp_ids": [
+    "CIG-WRI-08",
+    "CIG-WRI-09"
+   ]
+  },
+  {
+   "section": "0509 Paper 2 Section 2 描写/记叙",
+   "kp_ids": [
+    "CIG-WRI-10",
+    "CIG-WRI-11"
+   ]
+  },
+  {
+   "section": "0509 写作评分（Style and Accuracy / Content and Structure）",
+   "kp_ids": [
+    "CIG-WRI-01",
+    "CIG-WRI-02",
+    "CIG-WRI-03",
+    "CIG-WRI-04",
+    "CIG-WRI-06",
+    "CIG-LAN-01",
+    "CIG-LAN-02"
+   ]
+  },
+  {
+   "section": "0523 Assessment overview / AO1–AO4",
+   "kp_ids": [
+    "CIG-EX-02",
+    "CIG-EX-04",
+    "CIG-EX-05"
+   ]
+  },
+  {
+   "section": "0523 Paper 1 Ex1–3 阅读",
+   "kp_ids": [
+    "CIG-REA-10",
+    "CIG-REA-11",
+    "CIG-REA-12"
+   ]
+  },
+  {
+   "section": "0523 Paper 1 Ex4–5 写作",
+   "kp_ids": [
+    "CIG-WRI-05",
+    "CIG-WRI-12",
+    "CIG-WRI-13",
+    "CIG-LAN-03"
+   ]
+  },
+  {
+   "section": "0523 Paper 2 听力 Ex1–4",
+   "kp_ids": [
+    "CIG-LIS-01",
+    "CIG-LIS-02",
+    "CIG-LIS-03",
+    "CIG-LIS-04",
+    "CIG-LIS-05"
+   ]
+  },
+  {
+   "section": "0523 Component 3 口语 Part 1–3",
+   "kp_ids": [
+    "CIG-SPK-01",
+    "CIG-SPK-02",
+    "CIG-SPK-03",
+    "CIG-SPK-04",
+    "CIG-SPK-05",
+    "CIG-SPK-08"
+   ]
+  },
+  {
+   "section": "0523 Part 3 话题 Areas A–D",
+   "kp_ids": [
+    "CIG-VOC-11",
+    "CIG-VOC-12",
+    "CIG-VOC-13",
+    "CIG-VOC-14"
+   ]
+  },
+  {
+   "section": "0547 Assessment overview 与 2028 变化",
+   "kp_ids": [
+    "CIG-EX-03",
+    "CIG-EX-05"
+   ]
+  },
+  {
+   "section": "0547 Paper 1 听力 Q1–30",
+   "kp_ids": [
+    "CIG-LIS-01",
+    "CIG-LIS-06",
+    "CIG-LIS-07",
+    "CIG-LIS-08"
+   ]
+  },
+  {
+   "section": "0547 Paper 2 阅读 第 1–7 组",
+   "kp_ids": [
+    "CIG-REA-13",
+    "CIG-REA-14",
+    "CIG-REA-15"
+   ]
+  },
+  {
+   "section": "0547 Paper 3 口语（角色扮演、话题会话）",
+   "kp_ids": [
+    "CIG-SPK-01",
+    "CIG-SPK-02",
+    "CIG-SPK-06",
+    "CIG-SPK-07",
+    "CIG-SPK-08"
+   ]
+  },
+  {
+   "section": "0547 Paper 4 写作 Q1–3",
+   "kp_ids": [
+    "CIG-WRI-14",
+    "CIG-WRI-15",
+    "CIG-WRI-16",
+    "CIG-WRI-05"
+   ]
+  },
+  {
+   "section": "0547 Topic areas A–E",
+   "kp_ids": [
+    "CIG-VOC-01",
+    "CIG-VOC-02",
+    "CIG-VOC-03",
+    "CIG-VOC-04",
+    "CIG-VOC-05"
+   ]
+  },
+  {
+   "section": "0547 Grammar and structures Part 1",
+   "kp_ids": [
+    "CIG-GR-01",
+    "CIG-GR-02",
+    "CIG-GR-03",
+    "CIG-GR-04",
+    "CIG-GR-05",
+    "CIG-GR-06",
+    "CIG-GR-07",
+    "CIG-GR-08",
+    "CIG-GR-11"
+   ]
+  },
+  {
+   "section": "0547 Grammar and structures Part 2",
+   "kp_ids": [
+    "CIG-GR-09",
+    "CIG-GR-10"
+   ]
+  },
+  {
+   "section": "0547 Vocabulary list – Conjunctions / Auxiliary verbs / Adverbs",
+   "kp_ids": [
+    "CIG-LAN-03",
+    "CIG-GR-11"
+   ]
+  }
+ ],
+ "unverified": [
+  {
+   "what": "Cambridge Primary / Lower Secondary 中文框架（G6–G8 前置点）",
+   "why": "官网科目列表中没有中文专门框架，只有不分语种的 Modern Foreign Language（Lower Secondary 为 0771），其框架原文需登录；因此未设 G6–G8 点。"
+  },
+  {
+   "what": "0509 Paper 2 及指导写作的完整评分细则",
+   "why": "大纲只给出分值（指导写作 内容 15 + 写作质量 10）；Paper 2 的 12+13 分拆分和档位描述取自 2022 年 6 月 0509/21 评分方案，2026 年后的评分方案未逐一核对。"
+  },
+  {
+   "what": "0509 大纲中文版 744812（2028–2029）",
+   "why": "检索到链接但未逐页核对，内容以英文版 744811 为准。"
+  },
+  {
+   "what": "0547 2028–2030 版词汇表全文和语法 Part 1/Part 2 分别在哪些卷考查",
+   "why": "词汇表是单独文件，大纲只列了增删词；大纲说 Part 1/2 的考查范围见第 3 节，抓取到的文本没有明确给出，所以只按 Part 1 / Part 2 标注 unit，没有写哪卷考哪部分。"
+  },
+  {
+   "what": "0547 是否繁简体并印",
+   "why": "0547 大纲里没找到繁简体的说明（示例都是简体），所以 CIG-EX-04 只适用于 0509 和 0523。"
+  },
+  {
+   "what": "文言实词/虚词/特殊句式、修辞种类、书信格式、讨论文与议论文的写法细节",
+   "why": "大纲没有逐条列出这些，是依据大纲题型和 0509 样卷题型整理的通用中文知识；desc 中带“样卷”的点有官方依据，CIG-CLA-04 等已在 source 中注明是支撑知识。"
+  },
+  {
+   "what": "0523 Exercise 4/5 写作的分项评分（内容 vs 语言分数）",
+   "why": "抓取到的大纲文本没给分项，只列了 W1–W5，所以未写分项。"
+  }
+ ]
+}

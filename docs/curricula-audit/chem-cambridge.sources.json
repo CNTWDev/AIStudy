@@ -1,0 +1,725 @@
+{
+ "sources": [
+  {
+   "url": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf",
+   "what": "Cambridge IGCSE Chemistry 0620 syllabus for examination in 2026, 2027 and 2028（WebFetch 读取：评估概览、1.1–12.5 全部 Core/Supplement 学习目标、Practical assessment 技能清单、qualitative analysis notes 表题、CLEAPSS 危害代码、末页 changes 说明）",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/663781-syllabus-changes-international-.pdf",
+   "what": "Cambridge Syllabus Changes (International) September 2026 v1：0620 列为 2027 年 3 月起 version 2 修订、2027–2029 年 3/6/11 月考季可用",
+   "level": "官方"
+  },
+  {
+   "url": "https://help.cambridgeinternational.org/hc/en-gb/articles/360000055018-Which-age-group-of-learners-is-the-Cambridge-Lower-Secondary-Checkpoint-for",
+   "what": "Cambridge 帮助中心：Lower Secondary Checkpoint 适用年龄（Stage 7–9 约 11–14 岁），用于 Stage→年级对应",
+   "level": "官方"
+  },
+  {
+   "url": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf",
+   "what": "Cambridge Lower Secondary Science Curriculum Framework 0893（Version 1, Sept 2020）学校公开全文镜像：Stage 7–9 Chemistry 全部学习目标 7Cm/7Cp/7Cc…9Cc",
+   "level": "佐证"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/595428-2023-2025-syllabus.pdf",
+   "what": "0620 2023–2025 旧版大纲（仅在搜索结果中确认存在，未作内容依据）",
+   "level": "官方"
+  }
+ ],
+ "coverage": [
+  {
+   "section": "0893 7Cm.01",
+   "kp_ids": [
+    "CHEM-LS-7-01"
+   ]
+  },
+  {
+   "section": "0893 7Cm.02",
+   "kp_ids": [
+    "CHEM-LS-7-01"
+   ]
+  },
+  {
+   "section": "0893 7Cm.03",
+   "kp_ids": [
+    "CHEM-LS-7-02"
+   ]
+  },
+  {
+   "section": "0893 7Cm.04",
+   "kp_ids": [
+    "CHEM-LS-7-03"
+   ]
+  },
+  {
+   "section": "0893 7Cm.05",
+   "kp_ids": [
+    "CHEM-LS-7-01"
+   ]
+  },
+  {
+   "section": "0893 7Cm.06",
+   "kp_ids": [
+    "SCI-PRE-PART"
+   ]
+  },
+  {
+   "section": "0893 7Cm.07",
+   "kp_ids": [
+    "CHEM-LS-7-03"
+   ]
+  },
+  {
+   "section": "0893 7Cp.01",
+   "kp_ids": [
+    "CHEM-LS-7-04"
+   ]
+  },
+  {
+   "section": "0893 7Cp.02",
+   "kp_ids": [
+    "CHEM-LS-7-05"
+   ]
+  },
+  {
+   "section": "0893 7Cp.03",
+   "kp_ids": [
+    "CHEM-LS-7-05"
+   ]
+  },
+  {
+   "section": "0893 7Cp.04",
+   "kp_ids": [
+    "CHEM-LS-7-06"
+   ]
+  },
+  {
+   "section": "0893 7Cp.05",
+   "kp_ids": [
+    "CHEM-LS-7-02"
+   ]
+  },
+  {
+   "section": "0893 7Cp.06",
+   "kp_ids": [
+    "CHEM-LS-7-07"
+   ]
+  },
+  {
+   "section": "0893 7Cp.07",
+   "kp_ids": [
+    "CHEM-LS-7-07"
+   ]
+  },
+  {
+   "section": "0893 7Cc.01",
+   "kp_ids": [
+    "CHEM-LS-7-08"
+   ]
+  },
+  {
+   "section": "0893 7Cc.02",
+   "kp_ids": [
+    "CHEM-LS-7-09"
+   ]
+  },
+  {
+   "section": "0893 7Cc.03",
+   "kp_ids": [
+    "CHEM-LS-7-08"
+   ]
+  },
+  {
+   "section": "0893 7Cc.04",
+   "kp_ids": [
+    "CHEM-LS-7-10"
+   ]
+  },
+  {
+   "section": "0893 8Cm.01",
+   "kp_ids": [
+    "CHEM-LS-8-01"
+   ]
+  },
+  {
+   "section": "0893 8Cm.02",
+   "kp_ids": [
+    "CHEM-LS-8-01"
+   ]
+  },
+  {
+   "section": "0893 8Cm.03",
+   "kp_ids": [
+    "CHEM-LS-8-01"
+   ]
+  },
+  {
+   "section": "0893 8Cm.04",
+   "kp_ids": [
+    "CHEM-LS-8-02"
+   ]
+  },
+  {
+   "section": "0893 8Cp.01",
+   "kp_ids": [
+    "CHEM-LS-8-03"
+   ]
+  },
+  {
+   "section": "0893 8Cp.02",
+   "kp_ids": [
+    "CHEM-LS-8-05"
+   ]
+  },
+  {
+   "section": "0893 8Cc.01",
+   "kp_ids": [
+    "CHEM-LS-8-06"
+   ]
+  },
+  {
+   "section": "0893 8Cc.02",
+   "kp_ids": [
+    "CHEM-LS-8-07"
+   ]
+  },
+  {
+   "section": "0893 8Cc.03",
+   "kp_ids": [
+    "CHEM-LS-8-08"
+   ]
+  },
+  {
+   "section": "0893 8Cc.04",
+   "kp_ids": [
+    "CHEM-LS-8-02"
+   ]
+  },
+  {
+   "section": "0893 8Cc.05",
+   "kp_ids": [
+    "CHEM-LS-8-04"
+   ]
+  },
+  {
+   "section": "0893 8Cc.06",
+   "kp_ids": [
+    "CHEM-LS-8-08"
+   ]
+  },
+  {
+   "section": "0893 9Cm.01",
+   "kp_ids": [
+    "CHEM-LS-9-01"
+   ]
+  },
+  {
+   "section": "0893 9Cm.02",
+   "kp_ids": [
+    "CHEM-LS-9-02"
+   ]
+  },
+  {
+   "section": "0893 9Cm.03",
+   "kp_ids": [
+    "CHEM-LS-9-02"
+   ]
+  },
+  {
+   "section": "0893 9Cm.04",
+   "kp_ids": [
+    "CHEM-LS-9-03"
+   ]
+  },
+  {
+   "section": "0893 9Cm.05",
+   "kp_ids": [
+    "CHEM-LS-9-03"
+   ]
+  },
+  {
+   "section": "0893 9Cp.01",
+   "kp_ids": [
+    "CHEM-LS-9-04"
+   ]
+  },
+  {
+   "section": "0893 9Cp.02",
+   "kp_ids": [
+    "SCI-PRE-DENS"
+   ]
+  },
+  {
+   "section": "0893 9Cp.03",
+   "kp_ids": [
+    "SCI-PRE-DENS"
+   ]
+  },
+  {
+   "section": "0893 9Cp.04",
+   "kp_ids": [
+    "CHEM-LS-9-05"
+   ]
+  },
+  {
+   "section": "0893 9Cc.01",
+   "kp_ids": [
+    "CHEM-LS-9-06"
+   ]
+  },
+  {
+   "section": "0893 9Cc.02",
+   "kp_ids": [
+    "CHEM-LS-9-07"
+   ]
+  },
+  {
+   "section": "0893 9Cc.03",
+   "kp_ids": [
+    "CHEM-LS-9-08"
+   ]
+  },
+  {
+   "section": "0893 9Cc.04",
+   "kp_ids": [
+    "CHEM-LS-9-09"
+   ]
+  },
+  {
+   "section": "0893 9Cc.05",
+   "kp_ids": [
+    "CHEM-LS-9-10"
+   ]
+  },
+  {
+   "section": "0620 1.1 Solids, liquids and gases",
+   "kp_ids": [
+    "CHEM-IG-1.1-01",
+    "CHEM-IG-1.1-02",
+    "CHEM-IG-1.1-03"
+   ]
+  },
+  {
+   "section": "0620 1.2 Diffusion",
+   "kp_ids": [
+    "CHEM-IG-1.2-01",
+    "CHEM-IG-1.2-02"
+   ]
+  },
+  {
+   "section": "0620 2.1 Elements, compounds and mixtures",
+   "kp_ids": [
+    "CHEM-IG-2.1-01"
+   ]
+  },
+  {
+   "section": "0620 2.2 Atomic structure and the Periodic Table",
+   "kp_ids": [
+    "CHEM-IG-2.2-01",
+    "CHEM-IG-2.2-02"
+   ]
+  },
+  {
+   "section": "0620 2.3 Isotopes",
+   "kp_ids": [
+    "CHEM-IG-2.3-01",
+    "CHEM-IG-2.3-02"
+   ]
+  },
+  {
+   "section": "0620 2.4 Ions and ionic bonds",
+   "kp_ids": [
+    "CHEM-IG-2.4-01",
+    "CHEM-IG-2.4-02",
+    "CHEM-IG-2.4-03"
+   ]
+  },
+  {
+   "section": "0620 2.5 Simple molecules and covalent bonds",
+   "kp_ids": [
+    "CHEM-IG-2.5-01",
+    "CHEM-IG-2.5-02",
+    "CHEM-IG-2.5-03"
+   ]
+  },
+  {
+   "section": "0620 2.6 Giant covalent structures",
+   "kp_ids": [
+    "CHEM-IG-2.6-01",
+    "CHEM-IG-2.6-02"
+   ]
+  },
+  {
+   "section": "0620 2.7 Metallic bonding",
+   "kp_ids": [
+    "CHEM-IG-2.7-01"
+   ]
+  },
+  {
+   "section": "0620 3.1 Formulae",
+   "kp_ids": [
+    "CHEM-IG-3.1-01",
+    "CHEM-IG-3.1-02",
+    "CHEM-IG-3.1-03",
+    "CHEM-IG-3.1-04"
+   ]
+  },
+  {
+   "section": "0620 3.2 Relative masses of atoms and molecules",
+   "kp_ids": [
+    "CHEM-IG-3.2-01",
+    "CHEM-IG-3.2-02"
+   ]
+  },
+  {
+   "section": "0620 3.3 The mole and the Avogadro constant",
+   "kp_ids": [
+    "CHEM-IG-3.3-01",
+    "CHEM-IG-3.3-02",
+    "CHEM-IG-3.3-03",
+    "CHEM-IG-3.3-04",
+    "CHEM-IG-3.3-05",
+    "CHEM-IG-3.3-06",
+    "CHEM-IG-3.3-07",
+    "CHEM-IG-3.3-08"
+   ]
+  },
+  {
+   "section": "0620 4.1 Electrolysis",
+   "kp_ids": [
+    "CHEM-IG-4.1-01",
+    "CHEM-IG-4.1-02",
+    "CHEM-IG-4.1-03",
+    "CHEM-IG-4.1-04",
+    "CHEM-IG-4.1-05",
+    "CHEM-IG-4.1-06",
+    "CHEM-IG-4.1-07"
+   ]
+  },
+  {
+   "section": "0620 4.2 Hydrogen–oxygen fuel cells",
+   "kp_ids": [
+    "CHEM-IG-4.2-01",
+    "CHEM-IG-4.2-02"
+   ]
+  },
+  {
+   "section": "0620 5.1 Exothermic and endothermic reactions",
+   "kp_ids": [
+    "CHEM-IG-5.1-01",
+    "CHEM-IG-5.1-02",
+    "CHEM-IG-5.1-03",
+    "CHEM-IG-5.1-04",
+    "CHEM-IG-5.1-05"
+   ]
+  },
+  {
+   "section": "0620 6.1 Physical and chemical changes",
+   "kp_ids": [
+    "CHEM-IG-6.1-01"
+   ]
+  },
+  {
+   "section": "0620 6.2 Rate of reaction",
+   "kp_ids": [
+    "CHEM-IG-6.2-01",
+    "CHEM-IG-6.2-02",
+    "CHEM-IG-6.2-03"
+   ]
+  },
+  {
+   "section": "0620 6.3 Reversible reactions and equilibrium",
+   "kp_ids": [
+    "CHEM-IG-6.3-01",
+    "CHEM-IG-6.3-02",
+    "CHEM-IG-6.3-03",
+    "CHEM-IG-6.3-04"
+   ]
+  },
+  {
+   "section": "0620 6.4 Redox",
+   "kp_ids": [
+    "CHEM-IG-6.4-01",
+    "CHEM-IG-6.4-02",
+    "CHEM-IG-6.4-03"
+   ]
+  },
+  {
+   "section": "0620 7.1 The characteristic properties of acids and bases",
+   "kp_ids": [
+    "CHEM-IG-7.1-01",
+    "CHEM-IG-7.1-02",
+    "CHEM-IG-7.1-03",
+    "CHEM-IG-7.1-04",
+    "CHEM-IG-7.1-05"
+   ]
+  },
+  {
+   "section": "0620 7.2 Oxides",
+   "kp_ids": [
+    "CHEM-IG-7.2-01",
+    "CHEM-IG-7.2-02"
+   ]
+  },
+  {
+   "section": "0620 7.3 Preparation of salts",
+   "kp_ids": [
+    "CHEM-IG-7.3-01",
+    "CHEM-IG-7.3-02",
+    "CHEM-IG-7.3-03",
+    "CHEM-IG-7.3-04",
+    "CHEM-IG-7.3-05"
+   ]
+  },
+  {
+   "section": "0620 8.1 Arrangement of elements",
+   "kp_ids": [
+    "CHEM-IG-8.1-01",
+    "CHEM-IG-8.1-02"
+   ]
+  },
+  {
+   "section": "0620 8.2 Group I properties",
+   "kp_ids": [
+    "CHEM-IG-8.2-01"
+   ]
+  },
+  {
+   "section": "0620 8.3 Group VII properties",
+   "kp_ids": [
+    "CHEM-IG-8.3-01",
+    "CHEM-IG-8.3-02"
+   ]
+  },
+  {
+   "section": "0620 8.4 Transition elements",
+   "kp_ids": [
+    "CHEM-IG-8.4-01"
+   ]
+  },
+  {
+   "section": "0620 8.5 Noble gases",
+   "kp_ids": [
+    "CHEM-IG-8.5-01"
+   ]
+  },
+  {
+   "section": "0620 9.1 Properties of metals",
+   "kp_ids": [
+    "CHEM-IG-9.1-01",
+    "CHEM-IG-9.1-02"
+   ]
+  },
+  {
+   "section": "0620 9.2 Uses of metals",
+   "kp_ids": [
+    "CHEM-IG-9.2-01"
+   ]
+  },
+  {
+   "section": "0620 9.3 Alloys and their properties",
+   "kp_ids": [
+    "CHEM-IG-9.3-01",
+    "CHEM-IG-9.3-02"
+   ]
+  },
+  {
+   "section": "0620 9.4 Reactivity series",
+   "kp_ids": [
+    "CHEM-IG-9.4-01",
+    "CHEM-IG-9.4-02",
+    "CHEM-IG-9.4-03"
+   ]
+  },
+  {
+   "section": "0620 9.5 Corrosion of metals",
+   "kp_ids": [
+    "CHEM-IG-9.5-01",
+    "CHEM-IG-9.5-02"
+   ]
+  },
+  {
+   "section": "0620 9.6 Extraction of metals",
+   "kp_ids": [
+    "CHEM-IG-9.6-01",
+    "CHEM-IG-9.6-02",
+    "CHEM-IG-9.6-03"
+   ]
+  },
+  {
+   "section": "0620 10.1 Water",
+   "kp_ids": [
+    "CHEM-IG-10.1-01",
+    "CHEM-IG-10.1-02",
+    "CHEM-IG-10.1-03"
+   ]
+  },
+  {
+   "section": "0620 10.2 Fertilisers",
+   "kp_ids": [
+    "CHEM-IG-10.2-01"
+   ]
+  },
+  {
+   "section": "0620 10.3 Air quality and climate",
+   "kp_ids": [
+    "CHEM-IG-10.3-01",
+    "CHEM-IG-10.3-02",
+    "CHEM-IG-10.3-03",
+    "CHEM-IG-10.3-04",
+    "CHEM-IG-10.3-05",
+    "CHEM-IG-10.3-06"
+   ]
+  },
+  {
+   "section": "0620 11.1 Formulae, functional groups and terminology",
+   "kp_ids": [
+    "CHEM-IG-11.1-01",
+    "CHEM-IG-11.1-02",
+    "CHEM-IG-11.1-03",
+    "CHEM-IG-11.1-04"
+   ]
+  },
+  {
+   "section": "0620 11.2 Naming organic compounds",
+   "kp_ids": [
+    "CHEM-IG-11.2-01",
+    "CHEM-IG-11.2-02",
+    "CHEM-IG-11.2-03"
+   ]
+  },
+  {
+   "section": "0620 11.3 Fuels",
+   "kp_ids": [
+    "CHEM-IG-11.3-01",
+    "CHEM-IG-11.3-02"
+   ]
+  },
+  {
+   "section": "0620 11.4 Alkanes",
+   "kp_ids": [
+    "CHEM-IG-11.4-01",
+    "CHEM-IG-11.4-02"
+   ]
+  },
+  {
+   "section": "0620 11.5 Alkenes",
+   "kp_ids": [
+    "CHEM-IG-11.5-01",
+    "CHEM-IG-11.5-02",
+    "CHEM-IG-11.5-03"
+   ]
+  },
+  {
+   "section": "0620 11.6 Alcohols",
+   "kp_ids": [
+    "CHEM-IG-11.6-01",
+    "CHEM-IG-11.6-02"
+   ]
+  },
+  {
+   "section": "0620 11.7 Carboxylic acids",
+   "kp_ids": [
+    "CHEM-IG-11.7-01",
+    "CHEM-IG-11.7-02",
+    "CHEM-IG-11.7-03"
+   ]
+  },
+  {
+   "section": "0620 11.8 Polymers",
+   "kp_ids": [
+    "CHEM-IG-11.8-01",
+    "CHEM-IG-11.8-02",
+    "CHEM-IG-11.8-03",
+    "CHEM-IG-11.8-04",
+    "CHEM-IG-11.8-05"
+   ]
+  },
+  {
+   "section": "0620 12.1 Experimental design",
+   "kp_ids": [
+    "CHEM-IG-12.1-01",
+    "CHEM-IG-12.1-02",
+    "CHEM-IG-12.1-03"
+   ]
+  },
+  {
+   "section": "0620 12.2 Acid–base titrations",
+   "kp_ids": [
+    "CHEM-IG-12.2-01"
+   ]
+  },
+  {
+   "section": "0620 12.3 Chromatography",
+   "kp_ids": [
+    "CHEM-IG-12.3-01",
+    "CHEM-IG-12.3-02"
+   ]
+  },
+  {
+   "section": "0620 12.4 Separation and purification",
+   "kp_ids": [
+    "CHEM-IG-12.4-01",
+    "CHEM-IG-12.4-02",
+    "CHEM-IG-12.4-03"
+   ]
+  },
+  {
+   "section": "0620 12.5 Identification of ions and gases",
+   "kp_ids": [
+    "CHEM-IG-12.5-01",
+    "CHEM-IG-12.5-02",
+    "CHEM-IG-12.5-03",
+    "CHEM-IG-12.5-04"
+   ]
+  },
+  {
+   "section": "0620 Practical assessment (Paper 5/6, AO3)",
+   "kp_ids": [
+    "CHEM-IG-PRAC-01",
+    "CHEM-IG-PRAC-02",
+    "CHEM-IG-PRAC-03",
+    "CHEM-IG-PRAC-04",
+    "CHEM-IG-PRAC-05"
+   ]
+  }
+ ],
+ "unverified": [
+  {
+   "what": "0620 2.7 Metallic bonding 的 Core/Supplement 归属",
+   "why": "WebFetch 抽取的 PDF 文本中该小节标题后连续出现“Core Supplement”再接 1–2 条，无法直接看到两栏版面；对照 2.2（Supplement 栏为空时“Supplement”出现在条目之后）的模式推断 Core 栏为空、条目属 Supplement，故标 supp。若家长/老师核对 PDF 原件发现在 Core 栏，应改为 core 并去掉 tracks。"
+  },
+  {
+   "what": "0620 12.5 第 2、3 条（阳离子 NaOH/氨水检验、气体检验）为 Core，第 4 条（焰色反应）为 Supplement",
+   "why": "该小节跨页，抽取文本中“Supplement”标题出现位置有歧义；一次结构化抽取明确给出焰色反应在 Supplement 栏第 4 条，按此标注，未能目视 PDF 版面复核。"
+  },
+  {
+   "what": "0620 2026–2028 大纲的版本号与发布日期",
+   "why": "同一 PDF 两次抽取分别得到“Version 2, September 2023”和“version 2, published August 2026”；《Syllabus Changes September 2026》称 0620 自 2027 年 3 月起为 version 2。仅确认学习目标编号/内容未变，具体版本日期未能定论。"
+  },
+  {
+   "what": "是否已有 0620 的 2029 年起新大纲",
+   "why": "cambridgeinternational.org 搜索只找到 2023–2025 与 2026–2028 两版，课程页抓取不到文档列表；Syllabus Changes 文件显示 0620 2027–2029 年仍可考，但未确认 2029 年是否换用新版大纲。"
+  },
+  {
+   "what": "Lower Secondary 0893 框架原文",
+   "why": "官方全文在 Cambridge 教师支持站需登录，本次读取的是学校公开转载镜像（sktjosef.com），作为佐证级来源；框架代码与文字未与官方原件逐字核对。"
+  },
+  {
+   "what": "Stage 7/8/9 与 G6/G7/G8 的对应",
+   "why": "按委托方要求设定（Stage 7≈G6），Cambridge 官方只给出 11–14 岁年龄段；上海各国际学校实际年级安排可能不同。另注意：已有 SCI-PRE-PART 在其它包中标为 G7，而它对应的 0893 代码 7Cm.06 属 Stage 7（本包为 G6），因此本包 G6 的点不能把它列为前置。"
+  },
+  {
+   "what": "Practical assessment 技能清单的逐字原文",
+   "why": "WebFetch 拒绝逐字复制该段，只给出逐条意译清单；CHEM-IG-PRAC-01~05 依据意译清单编写，五个技能大标题为原文。"
+  },
+  {
+   "what": "知识点 desc 中的具体实验现象颜色、工业细节（如哈伯法氢气来源为甲烷、Contact 法 SO₂ 来源、乙烯水化用磷酸催化等）",
+   "why": "大纲只写“State the sources …”或给出条件，未在大纲中逐字列出全部来源/颜色；这些细节以 0620 大纲附的 qualitative analysis notes 表题及通行教材内容为准，未逐字核对 notes 表格内容。"
+  },
+  {
+   "what": "hot 标记",
+   "why": "未找到 Cambridge 公开的真题考点频次统计；hot 只按大纲明确要求的 Paper 5/6 实验技能与 qualitative analysis notes 相关内容、以及基础计算/方程式标注，不代表考试频率。"
+  }
+ ]
+}
