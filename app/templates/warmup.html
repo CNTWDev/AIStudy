@@ -34,14 +34,14 @@ function show() {
   }
   const it = items[idx];
   const box = document.createElement('div');
-  const tag = it.word ? `🔤 单词闪测 · ${esc(it.word.title)}` : `🔀 ${esc(it.probe.subject)} · ${esc(it.probe.name)}`;
+  const tag = it.word ? (it.word.recheck ? `✍️ 单词复查：上次认出了它，这次写出来` : `🔤 单词闪测 · ${esc(it.word.title)}`) : `🔀 ${esc(it.probe.subject)} · ${esc(it.probe.name)}`;
   $('#wbox').innerHTML = `<div class="probe-tag">${tag}</div><div class="muted small">第 ${idx + 1}/${items.length} 题</div>`;
   $('#wbox').appendChild(box);
   if (it.word) {
     renderItem(box, it, {
-      submit: (answer) => api('/api/warmup/word', {word: it.word.w, list: it.word.list, choice: it.options[+answer]})
+      submit: (answer) => api('/api/warmup/word', {word: it.word.w, list: it.word.list, recheck: !!it.word.recheck, choice: it.type === 'mcq' ? it.options[+answer] : answer})
         .then(r => ({correct: r.correct, answer: r.answer, explain: r.correct ? '' : (r.added ? '已放进单词复习，明天开始记。' : '')})),
-      dontKnow: () => api('/api/warmup/word', {word: it.word.w, list: it.word.list, dont_know: true})
+      dontKnow: () => api('/api/warmup/word', {word: it.word.w, list: it.word.list, recheck: !!it.word.recheck, dont_know: true})
         .then(r => ({dont_know: true, answer: r.answer, explain: '已放进单词复习，明天开始记。'})),
       onDone: res => { if (res.correct) right++; else found++; Run.hit(!!res.correct); Combo.hit(!!res.correct, box); if (res.correct) say(it.word.w); next(box); },
     });

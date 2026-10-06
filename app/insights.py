@@ -108,18 +108,13 @@ def detect(user_id: int) -> list[dict]:
         out.append({"kind": "lookup_repeat", "key": ",".join(sorted(added))[:200], "kp_id": None, "severity": 1, "action": "words",
                     "for_kid": 1, "title": f"查了好几次的词已经放进单词本", "detail": "、".join(added[:6])})
 
-    # 7. 学过、掌握过，但很久没练：可能在悄悄遗忘
-    old = _since(30)
-    learned = set()
-    for e in db.q("SELECT * FROM enrollments WHERE user_id=? AND active=1", user_id):
-        if e["pack_id"] in catalog.packs:
-            learned |= set(engine.progress_view(user_id, e)["learned"])
-    stale = [v for k, v in m.items() if v["status"] == "mastered" and (v["updated_at"] or "") < old
-             and (k in learned or not learned) and catalog.kp(k)]
-    stale.sort(key=lambda v: (-(catalog.kp(v["kp_id"]) or {}).get("hot", False), v["updated_at"] or ""))
-    for v in stale[:2]:
+    # 7. 学会过，但按遗忘模型估算，现在记得的概率已经掉到 85% 以下：该复查了
+    from . import evidence
+    for v in [v for v in evidence.due_checks(m, limit=6) if catalog.kp(v["kp_id"])][:2]:
+        days = int(evidence.days_since(v["last_ev"]))
         out.append({"kind": "decay", "key": v["kp_id"], "kp_id": v["kp_id"], "severity": 1, "action": "check", "for_kid": 1,
-                    "title": f"「{_name(v['kp_id'])}」很久没练了", "detail": "一个多月前掌握的，做一道小题看看还记得吗"})
+                    "title": f"「{_name(v['kp_id'])}」该复查了",
+                    "detail": f"{days} 天前学会的，按遗忘规律估计现在还记得 {int(v['recall'] * 100)}%，做一道小题巩固一下"})
 
     # 8. 考试会做却丢分（原卷错、重做对）
     careless = db.q("SELECT i.kp_id, COUNT(*) AS n FROM paper_items i JOIN papers p ON p.id=i.paper_id "

@@ -6,6 +6,13 @@
 <p class="muted small">{% if kp.name_en %}{{ kp.name_en }} · {% endif %}{{ stage_label(kp.stage) }} · {{ strand }} {% if kp.hot %}· <span style="color:var(--warn)">高频考点</span>{% endif %}
  · <span class="pill st-{{ st }}">{{ STATUS_LABEL[st] }}{% if me and me.attempts %} {{ (me.score*100)|int }}%{% endif %}</span></p>
 
+{% if ev %}<div class="evline small">
+  <span title="根据每次作答估算（选择题蒙对、粗心都算进去了）">🎯 真懂的概率 <b>{{ ev.p }}%</b></span>
+  {% if ev.recall is not none %}<span title="按遗忘规律估算">🧠 现在还记得约 <b>{{ ev.recall }}%</b></span>{% endif %}
+  <span>✅ 答对过 {{ ev['items'] }} 道不同的题 · {{ ev.days }} 天 · {{ ev.fmts }} 种题型</span>
+  {% if ev.missing %}<span class="muted">还差：{{ ev.missing|join('，') }}</span>{% elif ev.next %}<span class="muted">约 {{ ev.next }} 天后再复查一次</span>{% endif %}
+</div>{% endif %}
+
 {% set weak_pre = pre|selectattr('strength','equalto','必须')|rejectattr('m')|list + pre|selectattr('strength','equalto','必须')|selectattr('m')|selectattr('m.status','equalto','weak')|list %}
 {% if weak_pre %}
 <div class="hint">🧱 先打地基：这个知识点要用到 {% for p in weak_pre %}<a href="/learn/{{ p.id }}">{{ p.name }}</a>{{ '、' if not loop.last }}{% endfor %}。如果下面的题做不出来，先去补它。</div>

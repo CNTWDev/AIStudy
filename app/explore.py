@@ -208,10 +208,19 @@ def word_lists(user_id: int) -> list[dict]:
 
 def word_stats(user_id: int) -> dict:
     """每个词表测了几个、认识几个，估算词汇量（拉普拉斯平滑，测得越多越准）。"""
-    rows = db.q("SELECT kp_id, result FROM probes WHERE user_id=? AND kind='word' AND status='done'", user_id)
-    per: dict[str, list[int]] = {}
+    rows = db.q("SELECT kp_id, ref, reason, result FROM probes WHERE user_id=? AND kind='word' AND status='done' ORDER BY id", user_id)
+    # 每个词一个结果：认出来算认识；之后复查没写出来，就改回不认识（交叉验证）
+    by_word: dict[tuple, int] = {}
     for r in rows:
-        per.setdefault(r["kp_id"], []).append(r["result"] or 0)
+        key = (r["kp_id"], r["ref"])
+        if r["reason"] == "recheck":
+            if key in by_word and not r["result"]:
+                by_word[key] = 0
+        else:
+            by_word[key] = r["result"] or 0
+    per: dict[str, list[int]] = {}
+    for (lid, _), v in by_word.items():
+        per.setdefault(lid, []).append(v)
     lists, est, tested = [], 0.0, 0
     for wl in word_lists(user_id):
         res = per.get(wl["id"], [])
@@ -236,7 +245,21 @@ def pick_words(user_id: int, n: int) -> list[dict]:
     weight = lambda wl: (1 + 0.5 * (_list_hi(wl["stage"]) == top) + 0.3 * (_list_hi(wl["stage"]) >= top - 2)) \
         / (1 + stats[wl["id"]]["tested"])  # noqa: E731
     out = []
-    for _ in range(n):
+    # 交叉验证：三天前四选一认出来、还没复查过的词，抽一个换成「看中文写英文」
+    since = (db.today() - timedelta(days=3)).isoformat()
+    rechecked = {r["ref"] for r in db.q("SELECT ref FROM probes WHERE user_id=? AND kind='word' AND reason='recheck'", user_id)}
+    known = [r for r in db.q("SELECT kp_id, ref FROM probes WHERE user_id=? AND kind='word' AND result=1 AND COALESCE(reason,'')<>'recheck' "
+                             "AND done_at<? ORDER BY id DESC LIMIT 50", user_id, since) if r["ref"] not in rechecked]
+    from .content import content
+    for r in known:
+        wl = content.word_lists.get(r["kp_id"])
+        w = next((x for x in (wl or {}).get("words", []) if x["w"] == r["ref"]), None)
+        if w and w.get("zh") and n > 1:
+            out.append({"id": "w:" + w["w"], "type": "fill", "q": f"「{w['zh']}」用英文怎么写？",
+                        "zh": f"{w.get('pos', '')} · {len(w['w'])} 个字母 · 首字母 {w['w'][0]}",
+                        "word": {"w": w["w"], "list": wl["id"], "pos": w.get("pos", ""), "title": wl["title"], "recheck": 1}})
+            break
+    for _ in range(n - len(out)):
         wl = max(lists, key=lambda x: weight(x) + random.random() * 0.05)
         pool = [w for w in wl["words"] if w["w"].lower() not in have and w["w"] not in done and w.get("zh")]
         if len(pool) < 4:
@@ -255,20 +278,24 @@ def pick_words(user_id: int, n: int) -> list[dict]:
     return out
 
 
-def answer_word(user_id: int, word: str, list_id: str, choice, dont_know=False) -> dict:
+def answer_word(user_id: int, word: str, list_id: str, choice, dont_know=False, recheck=False) -> dict:
+    """recheck：几天前四选一认出了这个词，这次看中文写英文（换一种题型交叉验证）。"""
     from .content import content
     wl = content.word_lists.get(list_id)
     w = next((x for x in (wl or {}).get("words", []) if x["w"] == word), None)
     if not w:
         return {"error": "没有这个词"}
-    ok = (not dont_know) and str(choice or "").strip() == w["zh"]
+    if recheck:
+        ok = (not dont_know) and str(choice or "").strip().lower() == w["w"].lower()
+    else:
+        ok = (not dont_know) and str(choice or "").strip() == w["zh"]
     now = db.now()
     db.run("INSERT INTO probes(user_id,kind,kp_id,ref,reason,status,result,created_at,done_at) VALUES(?,'word',?,?,?,'done',?,?,?)",
-           user_id, list_id, word, wl["title"], 1 if ok else 0, now, now)
+           user_id, list_id, word, "recheck" if recheck else wl["title"], 1 if ok else 0, now, now)
     added = False
     if not ok:  # 不认识的词：明天开始进单词复习
         added = bool(engine.add_card(user_id, "word", w["w"], w["zh"], {"pos": w.get("pos", ""), "list": list_id, "probe": 1}))
-    return {"correct": ok, "answer": w["zh"], "word": w["w"], "pos": w.get("pos", ""), "added": added}
+    return {"correct": ok, "answer": w["w"] if recheck else w["zh"], "word": w["w"], "pos": w.get("pos", ""), "added": added}
 
 
 # ------------------------------------------------------------------ 前方：接下来学什么、准备好了没有

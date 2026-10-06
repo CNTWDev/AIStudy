@@ -4,7 +4,7 @@ import random
 import uuid
 from datetime import date, timedelta
 
-from . import bank, db, llm
+from . import bank, db, evidence, llm
 from .catalog import catalog, stage_rank
 
 # ------------------------------------------------------------------ 掌握度
@@ -12,50 +12,28 @@ from .catalog import catalog, stage_rank
 STATUS_LABEL = {"unknown": "未测", "weak": "薄弱", "learning": "学习中", "mastered": "已掌握"}
 
 
-def _status(score: float, attempts: int, correct: int) -> str:
-    if attempts == 0:
-        return "unknown"
-    if score >= 0.8 and correct >= 2:
-        return "mastered"
-    if score < 0.4:
-        return "weak"
-    return "learning"
-
-
 def get_mastery(user_id: int) -> dict[str, dict]:
     return {r["kp_id"]: dict(r) for r in db.q("SELECT * FROM mastery WHERE user_id=?", user_id)}
 
 
-def update_mastery(user_id: int, kp_id: str, correct: bool, weight=1.0, source="practice"):
-    row = db.one("SELECT * FROM mastery WHERE user_id=? AND kp_id=?", user_id, kp_id)
-    score = row["score"] if row else 0.3
-    attempts = (row["attempts"] if row else 0) + 1
-    ncorrect = (row["correct"] if row else 0) + (1 if correct else 0)
-    if correct:
-        score = score + (1 - score) * 0.35 * weight
-    else:
-        score = score - score * 0.45 * weight
-    status = _status(score, attempts, ncorrect)
-    db.run(
-        "INSERT INTO mastery(user_id,kp_id,score,attempts,correct,status,source,updated_at) VALUES(?,?,?,?,?,?,?,?) "
-        "ON CONFLICT(user_id,kp_id) DO UPDATE SET score=excluded.score, attempts=excluded.attempts, "
-        "correct=excluded.correct, status=excluded.status, source=excluded.source, updated_at=excluded.updated_at",
-        user_id, kp_id, score, attempts, ncorrect, status, source, db.now())
-    return status
+def update_mastery(user_id: int, kp_id: str, correct: bool, weight=1.0, source="practice", item=None, fmt=None,
+                   dont_know=False) -> str:
+    """一次作答证据进来，重新估算真懂的概率和状态（见 app/evidence.py：BKT + 遗忘模型 + 交叉验证）。"""
+    return evidence.update(user_id, kp_id, correct, item=item, mode=source, fmt=fmt, weight=weight, dont_know=dont_know)
 
 
 def set_mastery(user_id: int, kp_id: str, score: float, status: str, source: str):
+    """没有作答的推断（同一概念、前置、自评、导入）：只给一个概率，不算交叉验证的证据，所以不会直接变成「掌握」。"""
+    status = "learning" if status == "mastered" else status
     db.run(
-        "INSERT INTO mastery(user_id,kp_id,score,attempts,correct,status,source,updated_at) VALUES(?,?,?,1,?,?,?,?) "
+        "INSERT INTO mastery(user_id,kp_id,score,attempts,correct,status,source,updated_at,last_ev,evidence) "
+        "VALUES(?,?,?,0,0,?,?,?,?,?) "
         "ON CONFLICT(user_id,kp_id) DO UPDATE SET score=excluded.score, status=excluded.status, "
         "source=excluded.source, updated_at=excluded.updated_at",
-        user_id, kp_id, score, 1 if status == "mastered" else 0, status, source, db.now())
+        user_id, kp_id, score, status, source, db.now(), db.now(), '{"days":[],"items":[],"fmts":[],"wrong":[],"dk":0}')
 
 
 # ------------------------------------------------------------------ 间隔复习卡片
-
-INTERVALS = [1, 2, 4, 7, 15, 30, 60]
-
 
 def add_card(user_id: int, kind: str, front: str, back: str, extra=None, kp_id=None, starred=0, due=None) -> int | None:
     front = front.strip()[:300]
@@ -72,22 +50,24 @@ def add_card(user_id: int, kind: str, front: str, back: str, extra=None, kp_id=N
 
 
 def review_card(user_id: int, card_id: int, grade: str):
-    """grade: again(忘了) / hard(模糊) / good(记得)"""
+    """grade: again(忘了) / hard(模糊) / good(记得)。下次复习按遗忘模型排在「记得的概率」降到 85% 的那天。"""
     c = db.one("SELECT * FROM cards WHERE id=? AND user_id=?", card_id, user_id)
     if not c:
         return None
-    box = c["box"]
+    s0, d0 = c["stability"] or 0, c["difficulty"] or 5
+    r = evidence.recall(evidence.days_since(c["last_review"]), s0) if c["last_review"] else 1.0
+    s, d = evidence.next_state(s0, d0, r, grade) if s0 else evidence.init_state(grade)
+    lapses = c["lapses"] + (1 if grade == "again" else 0)
     if grade == "again":
-        box, lapses = 0, c["lapses"] + 1
-        due = db.today()  # 今天再来一次
+        box, due = 0, db.today()  # 今天再来一次
     else:
-        lapses = c["lapses"]
-        box = box + 1 if grade == "good" else max(box, 1)
-        due = db.today() + timedelta(days=INTERVALS[min(box, len(INTERVALS) - 1)] if grade == "good" else 1)
-    db.run("UPDATE cards SET box=?, due=?, lapses=?, reviews=reviews+1, last_review=? WHERE id=?",
-           box, due.isoformat(), lapses, db.now(), card_id)
+        box = c["box"] + 1 if grade == "good" else max(c["box"], 1)
+        due = db.today() + timedelta(days=evidence.interval(s))
+    db.run("UPDATE cards SET box=?, due=?, lapses=?, reviews=reviews+1, last_review=?, stability=?, difficulty=? WHERE id=?",
+           box, due.isoformat(), lapses, db.now(), round(s, 3), round(d, 3), card_id)
     if c["kp_id"]:
-        update_mastery(user_id, c["kp_id"], grade == "good", weight=0.5, source="review")
+        update_mastery(user_id, c["kp_id"], grade != "again", weight={"again": 0.6, "hard": 0.3, "good": 0.6}[grade],
+                       source="review", fmt="recall")
     return {"box": box, "due": due.isoformat()}
 
 
@@ -132,7 +112,10 @@ def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="G3") -> 
     rows = bank.candidates(user_id, kp_id)
     fresh = [r for r in rows if r["done"] == 0]
     redo = [r for r in rows if r["done"] > 0 and r["ok"] == 0]  # 做错过的题，换个时间再做
-    pool = sorted(fresh, key=lambda r: (r["other"] or 0, r["difficulty"])) + redo
+    # 交叉验证：优先没用过的题型（已经用选择题答对过，就先给填空 / 计算）
+    m = db.one("SELECT evidence FROM mastery WHERE user_id=? AND kp_id=?", user_id, kp_id)
+    seen_fmts = set(db.jload(m["evidence"], {}).get("fmts", [])) if m and m["evidence"] else set()
+    pool = sorted(fresh, key=lambda r: (r["other"] or 0, evidence.FMT.get(r["type"]) in seen_fmts, r["difficulty"])) + redo
     if purpose == "diagnose":
         pool = sorted(rows, key=lambda r: (r["done"] > 0, r["other"] or 0, abs(r["difficulty"] - 2)))
     picked = [{**bank.row_to_item(r), "kp_id": kp_id} for r in pool[:n]]  # 共用的题，这次记在正在学的知识点上
@@ -202,12 +185,9 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
            1 if dont_know else 0, ms, db.now())
     if item and item.get("id"):
         bank.record(item["id"], correct, dont_know, ms)
-    if mode in ("diagnose", "probe") and correct:  # 诊断 / 摸底答对：直接算掌握
-        set_mastery(user_id, kp_id, 0.8, "mastered", mode)
-        status = "mastered"
-    else:
-        status = update_mastery(user_id, kp_id, correct, weight=0.5 if dont_know else 1.0, source=mode)
-    if status == "mastered":
+    # 诊断、摸底答对也只是一条证据：概率升高，要隔天换题再对才算掌握
+    status = update_mastery(user_id, kp_id, correct, source=mode, item=item, dont_know=dont_know)
+    if correct and status in ("mastered", "learning"):  # 别的教材里同一概念、还没测过的：推断为「学习中」
         infer_equivalents(user_id, kp_id)
     if item and not correct and mode in ("practice", "diagnose", "probe", "paper", "exam"):
         # 错题自动进错题本（以卡片形式参与间隔复习）
@@ -696,6 +676,19 @@ def build_plan(user_id: int) -> list[dict]:
     back_all = auto["backfill"] + [t for t in back_all if t["kp"] not in auto_kps]
     weak_all = auto["weak"] + [t for t in weak_all if t["kp"] not in auto_kps]
     check_all = auto["check"] + [t for t in check_all if t["kp"] not in auto_kps]
+    # 交叉验证：昨天以前答对过、还差「隔天再对 / 换一种题型」的，今天换一道题确认（最多 2 个）
+    mine = {k for e in enrolls if e["pack_id"] in catalog.packs for k in catalog.ids_for(e["pack_id"], e["track"])}
+    confirm = [m for k, m in mastery.items() if k in mine and m["status"] == "learning" and (m["score"] or 0) >= 0.6
+               and m.get("last_ev") and evidence.days_since(m["last_ev"]) >= 0.5 and m["attempts"]]
+    confirm.sort(key=lambda m: -(m["score"] or 0))
+    planned = {t["kp"] for t in check_all}
+    for m in confirm[:2]:
+        if m["kp_id"] not in planned and catalog.kp(m["kp_id"]):
+            need = "、".join(evidence.missing(m)[:2])
+            check_all.insert(0, {"type": "check", "kp": m["kp_id"], "title": f"确认一下：{catalog.kps[m['kp_id']]['name']}",
+                                 "why": f"上次答对了，{need}才算真的掌握", "minutes": 5,
+                                 "pack": catalog.kp_pack[m["kp_id"]]})
+            planned.add(m["kp_id"])
 
     flex: list[dict] = []
     # 顺序：跟上学校 → 摸底诊断 → 补弱 / 补前置（交替）→ 回顾小检查 → 预习
