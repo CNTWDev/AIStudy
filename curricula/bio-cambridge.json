@@ -1,0 +1,6674 @@
+{
+ "pack": {
+  "id": "bio-cambridge",
+  "subject": "biology",
+  "subject_name": "生物",
+  "edition": "Cambridge LS Science 0893 → IGCSE Biology 0610",
+  "region": "国际学校",
+  "stages": [
+   "G6",
+   "G7",
+   "G8",
+   "IGCSE"
+  ],
+  "version": 1,
+  "generated": "2026-10-06",
+  "verified": "2026-10-06",
+  "sources": [
+   "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf",
+   "https://www.cambridgeinternational.org/Images/748912-2026-2028-syllabus-update.pdf",
+   "https://www.cambridgeinternational.org/Images/663781-syllabus-changes-international-.pdf",
+   "Cambridge Lower Secondary Science Curriculum Framework 0893 (2020, first teaching 2021) — 官方全文在教师支持站；公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf",
+   "https://help.cambridgeinternational.org/hc/en-gb/articles/360000055018-Which-age-group-of-learners-is-the-Cambridge-Lower-Secondary-Checkpoint-for"
+  ],
+  "notes": "知识图谱：从 Cambridge Lower Secondary Science 0893 的 Biology 子领域（Stage 7、8、9，约 11–14 岁，对应 G6、G7、G8；按 0893 框架编码 7Bs/7Bp/7Be 等，id 为 BIO-LS-<框架编码>，合并的目标在 syllabus 字段用 / 列出）到 Cambridge IGCSE Biology 0610（14–16 岁，约 G9–G10，stage 记为 IGCSE）全部 21 个主题、50 个小节及实验技能（AO3，Paper 5/6）。IGCSE 部分依据 2026–2028 大纲（697203，version 1 首版 2023-09；更新文件 748912 显示 version 2 于 2025-12 仅改第 59 页链接、version 3 于 2026-08 仅改第 9 页 Assessment Overview，学习目标不变）；Cambridge 2026-09 发布的 Syllabus Changes 文件把 0610 列为 2029 年“Republished”（重新发布，非修订），按同系列 0620/0625 2029 版的说明应无影响教学的变化，2029 版 PDF 本次未取到。考试结构：Core 考生 Paper 1（选择题 45 min，40 分，30%）+ Paper 3（理论 75 min，80 分，50%）+ Paper 5 实验或 Paper 6 替代实验（20%），等级 C–G；Extended 考生 Paper 2（选择题，Core+Supplement）+ Paper 4（理论，Core+Supplement）+ Paper 5/6，等级 A*–G。level=core 表示 Core 内容；level=supp 表示 Supplement（仅 Extended）；core 点 desc 中标「（补充）」的部分属于 Supplement；LS 点 level=pre。syllabus 字段写大纲学习目标编号（如 3.2.4/3.2.5 = 小节 3.2 第 4、5 条），实验技能点写 AO3。hot 仅在该点内容属于大纲 Practical assessment 中列明的实验情境（diffusion、osmosis、food tests、酶反应速率、光合速率、蒸腾、心率与呼吸频率、呼吸作用、向性、花与种子、萌发、连续/不连续变异、生物绘图与放大倍数）或 AO3 实验技能时设为 true；官方不公布考点频率。prereqs 中 strength 取 必须 / 有帮助。",
+  "tracks": [
+   {
+    "id": "extended",
+    "name": "IGCSE 0610 Core + Supplement（可冲 A*）"
+   },
+   {
+    "id": "core",
+    "name": "IGCSE 0610 只考 Core（最高 C）"
+   }
+  ],
+  "default_track": "extended",
+  "system": "cambridge",
+  "school_types": [
+   "international",
+   "private"
+  ]
+ },
+ "strands": [
+  {
+   "id": "B1",
+   "name": "生物的特征与分类"
+  },
+  {
+   "id": "B2",
+   "name": "细胞与物质进出细胞"
+  },
+  {
+   "id": "B3",
+   "name": "生物分子与酶"
+  },
+  {
+   "id": "B4",
+   "name": "植物的营养与运输"
+  },
+  {
+   "id": "B5",
+   "name": "人体营养、循环与气体交换"
+  },
+  {
+   "id": "B6",
+   "name": "呼吸作用、排泄、协调与稳态"
+  },
+  {
+   "id": "B7",
+   "name": "疾病、免疫与药物"
+  },
+  {
+   "id": "B8",
+   "name": "生殖、遗传与进化"
+  },
+  {
+   "id": "B9",
+   "name": "生态与人类对生态系统的影响"
+  },
+  {
+   "id": "B10",
+   "name": "生物技术与基因改造"
+  },
+  {
+   "id": "PRAC",
+   "name": "实验技能与数学要求"
+  }
+ ],
+ "kps": [
+  {
+   "id": "BIO-LS-7Bp.01",
+   "strand": "B1",
+   "stage": "G6",
+   "unit": "Biology: Life processes",
+   "syllabus": "7Bp.01",
+   "level": "pre",
+   "name": "生命的七个特征",
+   "name_en": "Characteristics of living organisms",
+   "desc": "生物的七个特征：运动、呼吸作用、感应性、生长、生殖、排泄、营养（英文首字母口诀 MRS GREN）；能据此判断一个物体是否是生物",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "movement",
+    "respiration",
+    "sensitivity",
+    "growth",
+    "reproduction",
+    "excretion",
+    "nutrition",
+    "living",
+    "non-living"
+   ],
+   "method": "用 MRS GREN 记七个特征，再拿汽车、火焰、种子逐条对照。常见错误：把 respiration 当成 breathing（呼吸作用是细胞里释放能量的化学反应）。",
+   "probe": "问：火焰会“长大”、需要氧气、会产生废气，为什么不是生物？看她能否指出它不能生殖、没有细胞、不具备全部七个特征。",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 7 Biology 7Bp.01"
+  },
+  {
+   "id": "BIO-LS-7Bp.02",
+   "strand": "B1",
+   "stage": "G6",
+   "unit": "Biology: Life processes",
+   "syllabus": "7Bp.02",
+   "level": "pre",
+   "name": "病毒算不算生物",
+   "name_en": "Are viruses living?",
+   "desc": "病毒没有细胞结构，只能在宿主细胞内复制，在细胞外不表现营养、呼吸、排泄等特征；能用七个特征讨论把病毒归为生物或非生物的理由",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bp.01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "virus",
+    "host cell",
+    "reproduce",
+    "non-cellular",
+    "characteristic"
+   ],
+   "method": "列一张表：七个特征中病毒具备哪些、不具备哪些；结论写成“支持/反对”两面论证。常见错误：说“病毒是最小的细菌”。",
+   "probe": "问：为什么有科学家说病毒不是生物？要求至少给出一条支持、一条反对的理由。",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 7 Biology 7Bp.02"
+  },
+  {
+   "id": "BIO-LS-7Bp.03",
+   "strand": "B1",
+   "stage": "G6",
+   "unit": "Biology: Life processes",
+   "syllabus": "7Bp.03/7Bp.04",
+   "level": "pre",
+   "name": "物种与二歧检索表",
+   "name_en": "Species and dichotomous keys",
+   "desc": "物种是能相互交配并产生可育后代的一群生物；会使用和编写二歧检索表（每一步只用一个可观察特征分成两组）对物种和相关类群分类",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bp.01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "species",
+    "fertile offspring",
+    "dichotomous key",
+    "classify",
+    "feature"
+   ],
+   "method": "编检索表的规则：每步只问一个“是/否”可观察特征（不用“大/小”这类相对词）。常见错误：骡子是马和驴的后代但不育，所以马和驴是两个物种。",
+   "probe": "给 5 种叶片图，让她编一个检索表，再用它鉴定一片新叶。",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 7 Biology 7Bp.03/7Bp.04"
+  },
+  {
+   "id": "BIO-LS-7Bs.01",
+   "strand": "B2",
+   "stage": "G6",
+   "unit": "Biology: Structure and function",
+   "syllabus": "7Bs.01",
+   "level": "pre",
+   "name": "细胞是生物体的基本单位",
+   "name_en": "Cells and microorganisms",
+   "desc": "所有生物都由细胞构成；微生物（如细菌、酵母、部分藻类）通常是单细胞生物；细胞要用显微镜才能看到",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "cell",
+    "organism",
+    "microorganism",
+    "single-celled",
+    "microscope"
+   ],
+   "method": "把单细胞（细菌、酵母）和多细胞（人、植物）例子各列三个。常见错误：认为“微生物都是有害的细菌”。",
+   "probe": "问：一个细菌和一片叶子在“细胞数量”上有什么不同？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 7 Biology 7Bs.01"
+  },
+  {
+   "id": "BIO-LS-7Bs.02",
+   "strand": "B2",
+   "stage": "G6",
+   "unit": "Biology: Structure and function",
+   "syllabus": "7Bs.02/7Bs.04",
+   "level": "pre",
+   "name": "细胞结构与功能；动植物细胞比较",
+   "name_en": "Cell structures and functions; plant vs animal cells",
+   "desc": "识别并描述细胞膜（控制物质进出）、细胞质（化学反应场所）、细胞核（含遗传物质、控制细胞）、细胞壁（支持）、叶绿体（光合作用）、线粒体（有氧呼吸）、液泡（储存细胞液、维持膨压）；植物细胞有细胞壁、叶绿体、大液泡，动物细胞没有",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bs.01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "cell membrane",
+    "cytoplasm",
+    "nucleus",
+    "cell wall",
+    "chloroplast",
+    "mitochondria",
+    "sap vacuole"
+   ],
+   "method": "画动、植物细胞对照图并在旁边写功能。常见错误：说“植物细胞没有线粒体”或“根细胞有叶绿体”。",
+   "probe": "给一张未标注的细胞图，让她判断是动物还是植物细胞并说出两条依据。",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 7 Biology 7Bs.02/7Bs.04"
+  },
+  {
+   "id": "BIO-LS-7Bs.03",
+   "strand": "B2",
+   "stage": "G6",
+   "unit": "Biology: Structure and function",
+   "syllabus": "7Bs.03",
+   "level": "pre",
+   "name": "特化细胞（初中）",
+   "name_en": "Specialised cells (Lower Secondary)",
+   "desc": "说明特化细胞结构与功能的关系：红细胞（无核、双凹形，运氧）、神经元（长突起，传导冲动）、纤毛细胞（纤毛摆动移动黏液）、根毛细胞（增大吸收面积）、栅栏细胞（多叶绿体，光合作用）",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bs.02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "specialised cell",
+    "red blood cell",
+    "neurone",
+    "ciliated cell",
+    "root hair cell",
+    "palisade cell"
+   ],
+   "method": "用“结构 → 所以 → 功能”句式写每种细胞。常见错误：只背功能、说不出结构特点。",
+   "probe": "问：根毛细胞为什么没有叶绿体？它的形状对吸水有什么好处？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 7 Biology 7Bs.03"
+  },
+  {
+   "id": "BIO-LS-7Bs.05",
+   "strand": "B2",
+   "stage": "G6",
+   "unit": "Biology: Structure and function",
+   "syllabus": "7Bs.05",
+   "level": "pre",
+   "name": "细胞、组织、器官、系统（初中）",
+   "name_en": "Cells, tissues, organs and organ systems",
+   "desc": "相似细胞组成组织，多种组织组成器官，多个器官组成器官系统，器官系统组成生物体；能为每一层次举例（如肌肉组织—心脏—循环系统）",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bs.02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "tissue",
+    "organ",
+    "organ system",
+    "organism",
+    "level of organisation"
+   ],
+   "method": "画“俄罗斯套娃”层级图并各举一例。常见错误：把血液、叶片的层次判断错（叶是器官）。",
+   "probe": "给出 cell/tissue/organ/system 词卡和例子（胃、上皮、消化系统、神经元），让她排序配对。",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 7 Biology 7Bs.05"
+  },
+  {
+   "id": "BIO-LS-7Be.01",
+   "strand": "B9",
+   "stage": "G6",
+   "unit": "Biology: Ecosystems",
+   "syllabus": "7Be.01/7Be.02",
+   "level": "pre",
+   "name": "分解者与食物链（初中）",
+   "name_en": "Decomposers in food chains and webs",
+   "desc": "某些微生物（细菌、真菌）作为分解者分解死亡生物和排泄物，使营养物质回到环境；会构建并解读包含分解者的食物链和食物网（箭头表示能量/食物流向）",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bs.01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "decomposer",
+    "microorganism",
+    "food chain",
+    "food web",
+    "producer",
+    "consumer"
+   ],
+   "method": "箭头一律从“被吃者”指向“吃者”。常见错误：箭头方向画反；忘记分解者能处理所有营养级的遗体。",
+   "probe": "给一个池塘食物网，问如果分解者消失会怎样。",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 7 Biology 7Be.01/7Be.02"
+  },
+  {
+   "id": "BIO-LS-8Bs.01",
+   "strand": "B5",
+   "stage": "G7",
+   "unit": "Biology: Structure and function",
+   "syllabus": "8Bs.01",
+   "level": "pre",
+   "name": "关节与拮抗肌",
+   "name_en": "Joints and antagonistic muscles",
+   "desc": "识别球窝关节（肩、髋，可多方向转动）和屈戌关节（肘、膝，单方向）；肌肉只能收缩牵拉，因此成对拮抗工作：肱二头肌收缩、肱三头肌舒张时前臂弯曲，反之伸直",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-FORCE",
+     "strength": "有帮助"
+    },
+    {
+     "id": "BIO-LS-7Bs.05",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "ball-and-socket joint",
+    "hinge joint",
+    "antagonistic muscles",
+    "biceps",
+    "triceps",
+    "contract",
+    "relax"
+   ],
+   "method": "自己弯曲手臂摸上臂肌肉感受变化。常见错误：说“肌肉推动骨头”——肌肉只能拉。",
+   "probe": "问：伸直手臂时哪块肌肉收缩？为什么肌肉必须成对？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 8 Biology 8Bs.01"
+  },
+  {
+   "id": "BIO-LS-8Bs.02",
+   "strand": "B5",
+   "stage": "G7",
+   "unit": "Biology: Structure and function",
+   "syllabus": "8Bs.02",
+   "level": "pre",
+   "name": "血液的成分（初中）",
+   "name_en": "Components of blood (Lower Secondary)",
+   "desc": "红细胞运输氧，白细胞抵御病原体，血浆运输血细胞、营养物质和二氧化碳",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bs.03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "red blood cell",
+    "white blood cell",
+    "plasma",
+    "pathogen",
+    "oxygen"
+   ],
+   "method": "三栏表：成分—外观—功能。常见错误：以为氧气溶在血浆里运输（主要由红细胞运）。",
+   "probe": "问：贫血的人为什么容易疲劳？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 8 Biology 8Bs.02"
+  },
+  {
+   "id": "BIO-LS-8Bs.03",
+   "strand": "B5",
+   "stage": "G7",
+   "unit": "Biology: Structure and function",
+   "syllabus": "8Bs.03",
+   "level": "pre",
+   "name": "呼吸系统结构与呼吸运动",
+   "name_en": "Human respiratory system and breathing",
+   "desc": "气管→支气管→细支气管→肺泡的结构与气体交换功能相适应；吸气时膈肌收缩下降、肋间肌收缩使肋骨上抬，胸腔体积增大、气压降低；区分呼吸运动（breathing，通气）与呼吸作用（respiration，细胞释放能量）",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bs.05",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-PRESS",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "trachea",
+    "bronchus",
+    "alveoli",
+    "diaphragm",
+    "intercostal muscles",
+    "breathing",
+    "respiration"
+   ],
+   "method": "用钟罩模型（气球+橡皮膜）演示。常见错误：说“肺把空气吸进来”——是胸腔体积变化导致气压差。",
+   "probe": "问：吸气时膈肌和胸腔体积、气压分别怎么变化？breathing 和 respiration 有什么区别？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 8 Biology 8Bs.03"
+  },
+  {
+   "id": "BIO-LS-8Bs.04",
+   "strand": "B5",
+   "stage": "G7",
+   "unit": "Biology: Structure and function",
+   "syllabus": "8Bs.04",
+   "level": "pre",
+   "name": "肺泡中的气体扩散（初中）",
+   "name_en": "Gas diffusion in the lungs",
+   "desc": "氧气从肺泡空气扩散进入血液，二氧化碳从血液扩散进入肺泡，方向由浓度高到浓度低决定",
+   "prereqs": [
+    {
+     "id": "BIO-LS-8Bs.03",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-PART",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-PRESS",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "diffusion",
+    "alveolus",
+    "capillary",
+    "concentration",
+    "oxygen",
+    "carbon dioxide"
+   ],
+   "method": "画肺泡和毛细血管，用两种颜色箭头标 O₂ 与 CO₂。常见错误：把扩散方向说成“肺把氧气推进血液”。",
+   "probe": "问：为什么血液流过肺泡后含氧量升高？用“浓度”一词解释。",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 8 Biology 8Bs.04"
+  },
+  {
+   "id": "BIO-LS-8Bp.01",
+   "strand": "B5",
+   "stage": "G7",
+   "unit": "Biology: Life processes",
+   "syllabus": "8Bp.01/8Bp.02",
+   "level": "pre",
+   "name": "平衡膳食与营养素（初中）",
+   "name_en": "Balanced diet and nutrients (Lower Secondary)",
+   "desc": "平衡膳食包括蛋白质（生长修复）、碳水化合物（能量）、脂肪和油（能量储存、保温）、水、矿物质（钙—骨骼牙齿，铁—血红蛋白）、维生素（A、C、D）；碳水化合物和脂肪是动物体内的能量储存，动物进食获取能量和营养",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "balanced diet",
+    "protein",
+    "carbohydrate",
+    "fat",
+    "vitamin",
+    "mineral",
+    "calcium",
+    "iron",
+    "energy store"
+   ],
+   "method": "做“营养素—食物来源—作用—缺乏症”四栏表。常见错误：认为脂肪“没有用”；混淆钙和铁的作用。",
+   "probe": "给一份只有米饭和可乐的午餐，问缺了哪些营养素、可能导致什么问题。",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 8 Biology 8Bp.01/8Bp.02"
+  },
+  {
+   "id": "BIO-LS-8Bp.03",
+   "strand": "B7",
+   "stage": "G7",
+   "unit": "Biology: Life processes",
+   "syllabus": "8Bp.03",
+   "level": "pre",
+   "name": "生活方式与健康",
+   "name_en": "Lifestyle, growth and health",
+   "desc": "饮食（过量/不足、肥胖、营养缺乏）和吸烟（尼古丁成瘾、焦油致癌、一氧化碳降低运氧能力）等生活方式影响人的生长、发育与健康",
+   "prereqs": [
+    {
+     "id": "BIO-LS-8Bp.01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "lifestyle",
+    "obesity",
+    "smoking",
+    "nicotine",
+    "tar",
+    "carbon monoxide",
+    "malnutrition"
+   ],
+   "method": "把香烟成分和危害一一对应。常见错误：把焦油和尼古丁的作用混淆。",
+   "probe": "问：吸烟者运动时为什么更容易喘？提示 CO 与红细胞。",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 8 Biology 8Bp.03"
+  },
+  {
+   "id": "BIO-LS-8Bp.04",
+   "strand": "B6",
+   "stage": "G7",
+   "unit": "Biology: Life processes",
+   "syllabus": "8Bp.04/8Bp.05",
+   "level": "pre",
+   "name": "有氧呼吸（初中）",
+   "name_en": "Aerobic respiration (Lower Secondary)",
+   "desc": "有氧呼吸在动植物细胞的线粒体中进行，可控地释放能量；文字方程：葡萄糖 + 氧气 → 二氧化碳 + 水",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bs.02",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-ENERGY",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "aerobic respiration",
+    "mitochondria",
+    "glucose",
+    "oxygen",
+    "carbon dioxide",
+    "water",
+    "energy"
+   ],
+   "method": "背方程时与光合作用方程对照（恰好反过来）。常见错误：说“植物只进行光合作用，不呼吸”；说呼吸“产生能量”（应为释放）。",
+   "probe": "问：植物晚上是否进行呼吸作用？写出有氧呼吸文字方程。",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 8 Biology 8Bp.04/8Bp.05"
+  },
+  {
+   "id": "BIO-LS-8Be.01",
+   "strand": "B9",
+   "stage": "G7",
+   "unit": "Biology: Ecosystems",
+   "syllabus": "8Be.01",
+   "level": "pre",
+   "name": "生态系统与栖息地",
+   "name_en": "Ecosystems and habitats",
+   "desc": "识别地球上的不同生态系统（雨林、沙漠、珊瑚礁、苔原等），认识一个生态系统中存在多种栖息地",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Be.01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "ecosystem",
+    "habitat",
+    "community",
+    "environment",
+    "biome"
+   ],
+   "method": "举一个生态系统（如校园池塘），列出其中至少 3 个栖息地。常见错误：把 habitat 和 ecosystem 当同义词。",
+   "probe": "问：一片森林里，树冠层和落叶层是同一个栖息地吗？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 8 Biology 8Be.01"
+  },
+  {
+   "id": "BIO-LS-8Be.02",
+   "strand": "B9",
+   "stage": "G7",
+   "unit": "Biology: Ecosystems",
+   "syllabus": "8Be.02",
+   "level": "pre",
+   "name": "生物富集",
+   "name_en": "Bioaccumulation of toxic substances",
+   "desc": "难以分解的有毒物质（如杀虫剂 DDT、汞）在生物体内积累，沿食物链逐级升高浓度，顶级消费者受害最重",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Be.01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "bioaccumulation",
+    "toxic",
+    "pesticide",
+    "DDT",
+    "mercury",
+    "top consumer"
+   ],
+   "method": "画食物链并在各级标浓度数值，看浓度逐级放大。常见错误：以为生产者体内浓度最高。",
+   "probe": "给 DDT 在浮游植物、小鱼、大鱼、鱼鹰体内的浓度数据，问为什么鱼鹰受害最大。",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 8 Biology 8Be.02"
+  },
+  {
+   "id": "BIO-LS-8Be.03",
+   "strand": "B9",
+   "stage": "G7",
+   "unit": "Biology: Ecosystems",
+   "syllabus": "8Be.03",
+   "level": "pre",
+   "name": "入侵物种的影响",
+   "name_en": "Invasive species",
+   "desc": "新物种或入侵物种进入生态系统后可能缺少天敌、与本地物种竞争食物和空间、捕食本地物种或传播疾病，导致本地种群下降甚至灭绝",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Be.01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "invasive species",
+    "native species",
+    "competition",
+    "predator",
+    "introduced species"
+   ],
+   "method": "用实例（如甘蔗蟾蜍、福寿螺）分析“竞争/捕食/没有天敌”三条路径。常见错误：只说“入侵物种很坏”而不说机制。",
+   "probe": "给一个引入新捕食者的食物网，问哪些物种数量会变化、为什么。",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 8 Biology 8Be.03"
+  },
+  {
+   "id": "BIO-LS-9Bs.01",
+   "strand": "B4",
+   "stage": "G8",
+   "unit": "Biology: Structure and function",
+   "syllabus": "9Bs.01",
+   "level": "pre",
+   "name": "植物体内水和无机盐的运输（初中）",
+   "name_en": "Water and mineral transport in plants (Lower Secondary)",
+   "desc": "水和无机盐由根毛细胞吸收，经木质部运到茎和叶，水最后从叶表面通过蒸腾散失",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bs.03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "root hair cell",
+    "xylem",
+    "transpiration",
+    "mineral salts",
+    "stomata"
+   ],
+   "method": "用芹菜插红墨水实验观察木质部。常见错误：说水由韧皮部运输。",
+   "probe": "问：把芹菜插入染色水，切开茎会看到哪里变红？为什么？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 9 Biology 9Bs.01"
+  },
+  {
+   "id": "BIO-LS-9Bs.02",
+   "strand": "B6",
+   "stage": "G8",
+   "unit": "Biology: Structure and function",
+   "syllabus": "9Bs.02",
+   "level": "pre",
+   "name": "泌尿系统（初中）",
+   "name_en": "The human excretory (renal) system",
+   "desc": "肾脏过滤血液，去除尿素，形成尿液排出；结构：肾、输尿管、膀胱、尿道",
+   "prereqs": [
+    {
+     "id": "BIO-LS-8Bs.02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "kidney",
+    "ureter",
+    "bladder",
+    "urethra",
+    "urea",
+    "urine",
+    "filter"
+   ],
+   "method": "按尿液流动顺序背四个结构。常见错误：混淆 ureter 和 urethra。",
+   "probe": "给泌尿系统图，标出四个结构并说出尿素从哪里来、到哪里去。",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 9 Biology 9Bs.02"
+  },
+  {
+   "id": "BIO-LS-9Bs.03",
+   "strand": "B8",
+   "stage": "G8",
+   "unit": "Biology: Structure and function",
+   "syllabus": "9Bs.03",
+   "level": "pre",
+   "name": "染色体、基因与 DNA（初中）",
+   "name_en": "Chromosomes, genes and DNA (Lower Secondary)",
+   "desc": "染色体含有基因，基因由 DNA 构成，基因参与决定生物的性状",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bs.02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "chromosome",
+    "gene",
+    "DNA",
+    "nucleus",
+    "characteristic"
+   ],
+   "method": "画“细胞核 → 染色体 → DNA → 基因”的放大图。常见错误：把基因和染色体当成同一个东西。",
+   "probe": "问：基因、DNA、染色体三者的大小和包含关系是什么？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 9 Biology 9Bs.03"
+  },
+  {
+   "id": "BIO-LS-9Bp.01",
+   "strand": "B8",
+   "stage": "G8",
+   "unit": "Biology: Life processes",
+   "syllabus": "9Bp.01",
+   "level": "pre",
+   "name": "配子融合与受精（初中）",
+   "name_en": "Fusion of gametes",
+   "desc": "精子和卵细胞（配子）融合形成受精卵，受精卵具有来自双亲的新的 DNA 组合",
+   "prereqs": [
+    {
+     "id": "BIO-LS-9Bs.03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "gamete",
+    "sperm",
+    "egg",
+    "fertilisation",
+    "zygote"
+   ],
+   "method": "强调“一半来自父亲、一半来自母亲”。常见错误：认为孩子的 DNA 全部来自母亲。",
+   "probe": "问：为什么兄弟姐妹长得不完全一样？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 9 Biology 9Bp.01"
+  },
+  {
+   "id": "BIO-LS-9Bp.02",
+   "strand": "B8",
+   "stage": "G8",
+   "unit": "Biology: Life processes",
+   "syllabus": "9Bp.02",
+   "level": "pre",
+   "name": "人类的性别决定（初中）",
+   "name_en": "Inheritance of sex",
+   "desc": "女性性染色体为 XX，男性为 XY；卵细胞都含 X，精子含 X 或 Y，因此生男生女概率各 1/2",
+   "prereqs": [
+    {
+     "id": "BIO-LS-9Bp.01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "sex chromosome",
+    "X chromosome",
+    "Y chromosome",
+    "XX",
+    "XY"
+   ],
+   "method": "画一个 2×2 遗传方格算出 1:1。常见错误：说“性别由母亲决定”。",
+   "probe": "问：一对夫妇已经有三个女儿，第四个孩子是男孩的概率是多少？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 9 Biology 9Bp.02"
+  },
+  {
+   "id": "BIO-LS-9Bp.03",
+   "strand": "B8",
+   "stage": "G8",
+   "unit": "Biology: Life processes",
+   "syllabus": "9Bp.03",
+   "level": "pre",
+   "name": "种内变异（初中）",
+   "name_en": "Variation within a species",
+   "desc": "同一物种个体之间存在差异（身高、血型、眼睛颜色等），部分源于个体间遗传差异",
+   "prereqs": [
+    {
+     "id": "BIO-LS-9Bs.03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "variation",
+    "species",
+    "genetic",
+    "inherited",
+    "environmental"
+   ],
+   "method": "收集全班身高或手掌跨度做直方图。常见错误：认为所有差异都由基因决定。",
+   "probe": "问：同卵双胞胎体重不同的原因可能是什么？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 9 Biology 9Bp.03"
+  },
+  {
+   "id": "BIO-LS-9Bp.04",
+   "strand": "B8",
+   "stage": "G8",
+   "unit": "Biology: Life processes",
+   "syllabus": "9Bp.04",
+   "level": "pre",
+   "name": "自然选择（初中）",
+   "name_en": "Natural selection (Lower Secondary)",
+   "desc": "自然选择理论：个体存在变异 → 适应环境的个体更容易生存和繁殖 → 把有利基因传给后代 → 多代后种群的遗传组成改变",
+   "prereqs": [
+    {
+     "id": "BIO-LS-9Bp.03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "natural selection",
+    "evolution",
+    "adaptation",
+    "survive",
+    "reproduce",
+    "Darwin"
+   ],
+   "method": "用桦尺蛾（工业黑化）例子按步骤讲。常见错误：说“动物为了适应而主动改变”（拉马克式表述）。",
+   "probe": "问：为什么长期使用同一种杀虫剂后，害虫越来越难杀？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 9 Biology 9Bp.04"
+  },
+  {
+   "id": "BIO-LS-9Bp.05",
+   "strand": "B4",
+   "stage": "G8",
+   "unit": "Biology: Life processes",
+   "syllabus": "9Bp.05",
+   "level": "pre",
+   "name": "植物需要的矿质元素（初中）",
+   "name_en": "Minerals for plant growth",
+   "desc": "植物需要矿质元素维持健康生长：镁用于合成叶绿素（缺镁叶片发黄），硝酸盐用于合成蛋白质（缺氮生长矮小）",
+   "prereqs": [
+    {
+     "id": "BIO-LS-9Bs.01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "mineral",
+    "magnesium",
+    "nitrate",
+    "chlorophyll",
+    "protein",
+    "deficiency"
+   ],
+   "method": "两元素各配一个“缺乏症状”。常见错误：说植物从土壤中“吸收食物”。",
+   "probe": "问：叶片发黄最可能缺哪种矿质？为什么？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 9 Biology 9Bp.05"
+  },
+  {
+   "id": "BIO-LS-9Bp.06",
+   "strand": "B4",
+   "stage": "G8",
+   "unit": "Biology: Life processes",
+   "syllabus": "9Bp.06/9Bp.07",
+   "level": "pre",
+   "name": "光合作用（初中）",
+   "name_en": "Photosynthesis (Lower Secondary)",
+   "desc": "光合作用在叶绿体中进行，植物利用光能把二氧化碳和水合成碳水化合物；文字方程：二氧化碳 + 水 → 葡萄糖 + 氧气（条件：光和叶绿素）",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bs.02",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-ENERGY",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "photosynthesis",
+    "chloroplast",
+    "chlorophyll",
+    "light energy",
+    "glucose",
+    "carbon dioxide",
+    "oxygen"
+   ],
+   "method": "把光和叶绿素写在箭头上方（条件，不是反应物）。常见错误：说植物从土壤里获得食物。",
+   "probe": "问：写出光合作用文字方程，并指出能量从哪里来。",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 9 Biology 9Bp.06/9Bp.07"
+  },
+  {
+   "id": "BIO-LS-9Bp.08",
+   "strand": "B8",
+   "stage": "G8",
+   "unit": "Biology: Life processes",
+   "syllabus": "9Bp.08",
+   "level": "pre",
+   "name": "母亲健康与胎儿发育",
+   "name_en": "Mother's health and fetal development",
+   "desc": "母亲的饮食、吸烟、饮酒和药物会影响胎儿发育：营养不足影响生长，吸烟导致低出生体重，酒精和某些药物可通过胎盘损伤胎儿",
+   "prereqs": [
+    {
+     "id": "BIO-LS-9Bp.01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-LS-8Bp.03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "fetus",
+    "placenta",
+    "diet",
+    "smoking",
+    "alcohol",
+    "drugs",
+    "low birth weight"
+   ],
+   "method": "从“胎盘让物质通过”理解为什么母亲摄入的物质会影响胎儿。常见错误：以为胎盘能挡住所有有害物质。",
+   "probe": "问：为什么孕妇吸烟会导致婴儿出生体重偏低？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 9 Biology 9Bp.08"
+  },
+  {
+   "id": "BIO-LS-9Be.01",
+   "strand": "B9",
+   "stage": "G8",
+   "unit": "Biology: Ecosystems",
+   "syllabus": "9Be.01",
+   "level": "pre",
+   "name": "环境变化与种群、灭绝",
+   "name_en": "Environmental change, populations and extinction",
+   "desc": "环境变化（气候、栖息地丧失、污染、新物种）可能使物种种群数量下降，若无法适应或迁移则会灭绝",
+   "prereqs": [
+    {
+     "id": "BIO-LS-8Be.03",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-LS-9Bp.04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "population",
+    "environmental change",
+    "extinction",
+    "adaptation",
+    "habitat loss"
+   ],
+   "method": "分析一种环境变化后，用“能否适应 / 能否迁移 / 繁殖速度”判断结局。常见错误：认为个体在一生中会“进化”来适应。",
+   "probe": "问：北极气温升高可能对北极熊种群产生什么影响？",
+   "source": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（Cambridge Lower Secondary Science 0893 Curriculum Framework v1, 2020 学校公开转载，佐证）Stage 9 Biology 9Be.01"
+  },
+  {
+   "id": "BIO-IG-1.1-01",
+   "strand": "B1",
+   "stage": "IGCSE",
+   "unit": "1 Characteristics and classification of living organisms",
+   "syllabus": "1.1.1",
+   "level": "core",
+   "name": "生命特征的定义",
+   "name_en": "Characteristics of living organisms",
+   "desc": "七个特征的规范定义：movement（生物或其部分改变位置）；respiration（细胞内分解营养分子、为新陈代谢释放能量的化学反应）；sensitivity（感知并对内外环境变化作出反应）；growth（大小和干重的永久增加）；reproduction（产生同类生物）；excretion（排出代谢废物及超过需要的物质）；nutrition（摄入用于能量、生长和发育的物质）",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bp.01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "movement",
+    "respiration",
+    "sensitivity",
+    "growth",
+    "dry mass",
+    "reproduction",
+    "excretion",
+    "metabolism",
+    "nutrition"
+   ],
+   "method": "每个定义的关键词要原样记：growth 必须写 permanent 和 dry mass；excretion 要写 waste products of metabolism。常见错误：把 excretion 与 egestion 混淆。",
+   "probe": "问：为什么生长要用“干重”而不是“质量”定义？excretion 和 egestion 有什么区别？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 1.1 Core 1"
+  },
+  {
+   "id": "BIO-IG-1.2-01",
+   "strand": "B1",
+   "stage": "IGCSE",
+   "unit": "1 Characteristics and classification of living organisms",
+   "syllabus": "1.2.1/1.2.2/1.2.3",
+   "level": "core",
+   "name": "分类、物种与双名法",
+   "name_en": "Classification, species and the binomial system",
+   "desc": "生物按共有特征分类；物种是能交配产生可育后代的一群生物；双名法：学名由属名（大写开头）+ 种名（小写）两部分组成，是国际通用命名系统（如 Homo sapiens）",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bp.03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "classification",
+    "species",
+    "fertile offspring",
+    "binomial system",
+    "genus",
+    "species name"
+   ],
+   "method": "书写规范：Genus 首字母大写、species 全小写、手写时下划线（印刷斜体）。常见错误：两部分都大写。",
+   "probe": "给 Panthera leo 和 Panthera tigris，问二者哪部分相同、说明了什么。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 1.2 Core 1–3"
+  },
+  {
+   "id": "BIO-IG-1.2-02",
+   "strand": "B1",
+   "stage": "IGCSE",
+   "unit": "1 Characteristics and classification of living organisms",
+   "syllabus": "1.2.4",
+   "level": "core",
+   "name": "二歧检索表的构建与使用",
+   "name_en": "Constructing and using dichotomous keys",
+   "desc": "根据可识别特征构建并使用二歧检索表；每一步两选一，特征需可观察、不含相对比较",
+   "prereqs": [
+    {
+     "id": "BIO-IG-1.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-LS-7Bp.03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "dichotomous key",
+    "identifiable feature",
+    "couplet",
+    "identify"
+   ],
+   "method": "先列特征对照表，再找能一分为二的特征逐步拆分。常见错误：使用“较大/较小”或同一步用两个特征。",
+   "probe": "给 6 种昆虫图，要求编检索表；再给一个现成检索表让她鉴定一个陌生生物。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 1.2 Core 4"
+  },
+  {
+   "id": "BIO-IG-1.2-03",
+   "strand": "B1",
+   "stage": "IGCSE",
+   "unit": "1 Characteristics and classification of living organisms",
+   "syllabus": "1.2.5/1.2.6/1.2.7",
+   "level": "supp",
+   "name": "分类反映进化关系；DNA 碱基序列分类",
+   "name_en": "Classification, evolution and DNA base sequences",
+   "desc": "分类系统旨在反映进化关系；DNA 碱基序列可用于分类；有较近共同祖先（亲缘关系更近）的生物 DNA 碱基序列更相似",
+   "prereqs": [
+    {
+     "id": "BIO-IG-1.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-4.1-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "evolutionary relationship",
+    "common ancestor",
+    "base sequence",
+    "DNA"
+   ],
+   "method": "做“碱基序列差异数”表格题：差异越少越近缘。常见错误：只看外形相似判断亲缘关系。",
+   "probe": "给四个物种同一基因片段的碱基差异数，问哪两个物种亲缘最近。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 1.2 Supplement 5–7",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-1.3-01",
+   "strand": "B1",
+   "stage": "IGCSE",
+   "unit": "1 Characteristics and classification of living organisms",
+   "syllabus": "1.3.1",
+   "level": "core",
+   "name": "动物界与植物界的特征",
+   "name_en": "Features of the animal and plant kingdoms",
+   "desc": "动物：多细胞，无细胞壁和叶绿体，从其他生物获取营养；植物：多细胞，有含纤维素的细胞壁和叶绿体，进行光合作用",
+   "prereqs": [
+    {
+     "id": "BIO-IG-1.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-LS-7Bs.02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "kingdom",
+    "animal",
+    "plant",
+    "multicellular",
+    "cellulose cell wall",
+    "chloroplast"
+   ],
+   "method": "用细胞结构 + 营养方式两条判断。常见错误：认为所有植物细胞都有叶绿体（根细胞没有）。",
+   "probe": "问：给出“多细胞、有细胞壁、无叶绿体”的生物，它是否属于植物界？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 1.3 Core 1"
+  },
+  {
+   "id": "BIO-IG-1.3-02",
+   "strand": "B1",
+   "stage": "IGCSE",
+   "unit": "1 Characteristics and classification of living organisms",
+   "syllabus": "1.3.2(a)/1.3.3",
+   "level": "core",
+   "name": "脊椎动物五纲",
+   "name_en": "Main groups of vertebrates",
+   "desc": "哺乳类（毛发、乳腺、外耳）、鸟类（羽毛、喙、硬壳卵）、爬行类（干燥鳞片、软壳卵）、两栖类（湿润无鳞皮肤、水中产卵）、鱼类（湿鳞、鳃、鳍）；能据特征分类",
+   "prereqs": [
+    {
+     "id": "BIO-IG-1.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "vertebrate",
+    "mammal",
+    "bird",
+    "reptile",
+    "amphibian",
+    "fish",
+    "scales",
+    "feathers",
+    "fur"
+   ],
+   "method": "做五纲对比表（皮肤覆盖物、呼吸、生殖）。常见错误：鲸鱼归鱼类；蝙蝠归鸟类。",
+   "probe": "给出“皮肤湿润无鳞、幼体用鳃呼吸”的动物，问属于哪一纲。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 1.3 Core 2(a), 3"
+  },
+  {
+   "id": "BIO-IG-1.3-03",
+   "strand": "B1",
+   "stage": "IGCSE",
+   "unit": "1 Characteristics and classification of living organisms",
+   "syllabus": "1.3.2(b)/1.3.3",
+   "level": "core",
+   "name": "节肢动物四类",
+   "name_en": "Main groups of arthropods",
+   "desc": "节肢动物有外骨骼、分节身体和有节附肢；多足类（多体节、每节 1–2 对足）、昆虫（3 对足、身体 3 部分、常有 2 对翅、1 对触角）、蛛形类（4 对足、身体 2 部分、无触角）、甲壳类（多于 4 对足、2 对触角）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-1.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "arthropod",
+    "exoskeleton",
+    "jointed legs",
+    "myriapod",
+    "insect",
+    "arachnid",
+    "crustacean",
+    "antennae"
+   ],
+   "method": "数足的对数是最快方法：3 对昆虫、4 对蛛形、>4 对甲壳、很多对多足。常见错误：把蜘蛛归为昆虫。",
+   "probe": "给一张有 8 条腿、身体两部分的图，问属于哪类并给出两条依据。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 1.3 Core 2(b), 3"
+  },
+  {
+   "id": "BIO-IG-1.3-04",
+   "strand": "B1",
+   "stage": "IGCSE",
+   "unit": "1 Characteristics and classification of living organisms",
+   "syllabus": "1.3.4/1.3.6",
+   "level": "supp",
+   "name": "五界分类",
+   "name_en": "The five kingdoms",
+   "desc": "动物界、植物界、真菌界（有几丁质细胞壁、无叶绿体、腐生营养、菌丝）、原核生物界（无细胞核、环状 DNA、质粒）、原生生物界（单细胞真核生物，有的有叶绿体）；能据特征把生物归入五界",
+   "prereqs": [
+    {
+     "id": "BIO-IG-1.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-2.1-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "five kingdoms",
+    "fungus",
+    "prokaryote",
+    "protoctist",
+    "hyphae",
+    "saprotrophic"
+   ],
+   "method": "对比表关键列：有无细胞核、有无细胞壁及成分、营养方式、单/多细胞。常见错误：把蘑菇归为植物。",
+   "probe": "问：酵母、细菌、草履虫、霉菌分别属于哪个界？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 1.3 Supplement 4, 6",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-1.3-05",
+   "strand": "B1",
+   "stage": "IGCSE",
+   "unit": "1 Characteristics and classification of living organisms",
+   "syllabus": "1.3.5/1.3.6",
+   "level": "supp",
+   "name": "蕨类与开花植物（单子叶、双子叶）",
+   "name_en": "Ferns and flowering plants",
+   "desc": "蕨类：有根茎叶、叶为羽状复叶（fronds）、用孢子繁殖、无花；开花植物用种子繁殖；单子叶（1 片子叶、平行叶脉、花部为 3 的倍数）与双子叶（2 片子叶、网状叶脉、花部为 4 或 5 的倍数）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-1.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "fern",
+    "frond",
+    "spore",
+    "flowering plant",
+    "monocotyledon",
+    "dicotyledon",
+    "parallel veins"
+   ],
+   "method": "叶脉 + 花瓣数是图片题最常用判断依据。常见错误：把蕨类孢子当种子。",
+   "probe": "给一片平行叶脉的叶和一朵 6 瓣花，问是单子叶还是双子叶。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 1.3 Supplement 5, 6",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-1.3-06",
+   "strand": "B1",
+   "stage": "IGCSE",
+   "unit": "1 Characteristics and classification of living organisms",
+   "syllabus": "1.3.7",
+   "level": "supp",
+   "name": "病毒的特征",
+   "name_en": "Features of viruses",
+   "desc": "病毒结构仅限：蛋白质外壳 + 遗传物质（DNA 或 RNA）；无细胞结构，只能在宿主细胞内复制",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bp.02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "virus",
+    "protein coat",
+    "genetic material",
+    "host cell"
+   ],
+   "method": "画一个病毒示意图只标两个结构。常见错误：给病毒加上细胞膜、细胞质。",
+   "probe": "问：抗生素为什么对病毒无效？（联系结构）",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 1.3 Supplement 7",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-2.1-01",
+   "strand": "B2",
+   "stage": "IGCSE",
+   "unit": "2 Organisation of the organism",
+   "syllabus": "2.1.1/2.1.3/2.1.4",
+   "level": "core",
+   "name": "动植物细胞结构与功能",
+   "name_en": "Plant and animal cell structure",
+   "desc": "比较动植物细胞：细胞壁（纤维素，支持）、细胞膜（控制进出）、细胞核、细胞质、叶绿体、核糖体（合成蛋白质）、线粒体（有氧呼吸）、液泡；能在图片中识别并说明功能",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bs.02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "cell wall",
+    "cell membrane",
+    "nucleus",
+    "cytoplasm",
+    "chloroplast",
+    "ribosome",
+    "mitochondria",
+    "vacuole"
+   ],
+   "method": "IGCSE 比初中多了 ribosome。常见错误：说细胞壁“控制物质进出”（那是细胞膜）；动物细胞也可能有小液泡。",
+   "probe": "给显微照片，让她标出 4 个结构并说出只有植物细胞才有的结构。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 2.1 Core 1, 3, 4"
+  },
+  {
+   "id": "BIO-IG-2.1-02",
+   "strand": "B2",
+   "stage": "IGCSE",
+   "unit": "2 Organisation of the organism",
+   "syllabus": "2.1.2/2.1.3/2.1.4",
+   "level": "core",
+   "name": "细菌细胞结构",
+   "name_en": "Bacterial cell structure",
+   "desc": "细菌细胞：细胞壁、细胞膜、细胞质、核糖体、环状 DNA、质粒；无细胞核、无线粒体",
+   "prereqs": [
+    {
+     "id": "BIO-IG-2.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "bacterium",
+    "circular DNA",
+    "plasmid",
+    "ribosome",
+    "cell wall"
+   ],
+   "method": "列三栏表（动物/植物/细菌）打勾。常见错误：给细菌画细胞核。",
+   "probe": "问：细菌的遗传物质在哪里？质粒在后来的哪个知识点里有用？（基因改造）",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 2.1 Core 2–4"
+  },
+  {
+   "id": "BIO-IG-2.1-03",
+   "strand": "B2",
+   "stage": "IGCSE",
+   "unit": "2 Organisation of the organism",
+   "syllabus": "2.1.6",
+   "level": "core",
+   "name": "特化细胞及其功能",
+   "name_en": "Specialised cells",
+   "desc": "纤毛细胞—在气管和支气管中移动黏液；根毛细胞—吸收；栅栏叶肉细胞—光合作用；神经元—传导电冲动；红细胞—运输氧；精子和卵细胞（配子）—生殖",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bs.03",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-2.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "ciliated cell",
+    "root hair cell",
+    "palisade mesophyll cell",
+    "neurone",
+    "red blood cell",
+    "gamete"
+   ],
+   "method": "对每种细胞写“结构特点→功能”。常见错误：纤毛细胞说成“过滤空气”（它是移动黏液）。",
+   "probe": "给 6 种细胞图连线功能，再问红细胞没有细胞核有什么好处。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 2.1 Core 6"
+  },
+  {
+   "id": "BIO-IG-2.1-04",
+   "strand": "B2",
+   "stage": "IGCSE",
+   "unit": "2 Organisation of the organism",
+   "syllabus": "2.1.5/2.1.7",
+   "level": "core",
+   "name": "细胞分裂与结构层次",
+   "name_en": "Cell division and levels of organisation",
+   "desc": "新细胞由已有细胞分裂产生；理解 cell、tissue、organ、organ system、organism 的含义并用大纲中的例子说明",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Bs.05",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "cell division",
+    "tissue",
+    "organ",
+    "organ system",
+    "organism"
+   ],
+   "method": "用消化系统/叶片各举一套五级例子。常见错误：把血液当器官、把叶当组织。",
+   "probe": "问：木质部是组织还是器官？心脏呢？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 2.1 Core 5, 7"
+  },
+  {
+   "id": "BIO-IG-2.2-01",
+   "strand": "B2",
+   "stage": "IGCSE",
+   "unit": "2 Organisation of the organism",
+   "syllabus": "2.2.1/2.2.2",
+   "level": "core",
+   "name": "放大倍数计算",
+   "name_en": "Magnification",
+   "desc": "magnification = image size ÷ actual size；以 mm 为单位计算放大倍数和实际大小；放大倍数无单位，写成 ×数字",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-UNIT",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-2.1-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "magnification",
+    "image size",
+    "actual size",
+    "millimetre"
+   ],
+   "method": "画 I-A-M 三角形记公式；先把两长度统一成 mm。常见错误：单位不统一；把放大倍数写成 mm。",
+   "probe": "图中细胞长 45 mm，放大 ×1500，求实际长度（再换成 μm 为补充）。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 2.2 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-2.2-02",
+   "strand": "B2",
+   "stage": "IGCSE",
+   "unit": "2 Organisation of the organism",
+   "syllabus": "2.2.3",
+   "level": "supp",
+   "name": "毫米与微米换算",
+   "name_en": "Converting mm and μm",
+   "desc": "1 mm = 1000 μm；在放大倍数计算中进行 mm 与 μm 的换算",
+   "prereqs": [
+    {
+     "id": "BIO-IG-2.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-SI",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-STDF",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "micrometre",
+    "millimetre",
+    "convert",
+    "μm"
+   ],
+   "method": "mm→μm ×1000，μm→mm ÷1000。常见错误：乘以 100 或方向弄反。",
+   "probe": "图像 30 mm，实际 15 μm，求放大倍数。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 2.2 Supplement 3",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-3.1-01",
+   "strand": "B2",
+   "stage": "IGCSE",
+   "unit": "3 Movement into and out of cells",
+   "syllabus": "3.1.1/3.1.2/3.1.3",
+   "level": "core",
+   "name": "扩散的定义",
+   "name_en": "Diffusion",
+   "desc": "扩散：粒子由于随机运动，从浓度较高区域向浓度较低区域的净移动（顺浓度梯度）；能量来自分子和离子随机运动的动能；一些物质通过细胞膜以扩散方式进出细胞",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-PART",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-PRESS",
+     "strength": "有帮助"
+    },
+    {
+     "id": "BIO-LS-8Bs.04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "diffusion",
+    "net movement",
+    "concentration gradient",
+    "random movement",
+    "kinetic energy"
+   ],
+   "method": "定义要写全：net movement、higher→lower concentration、random movement。常见错误：漏写 net；说扩散需要细胞提供能量。",
+   "probe": "问：扩散的能量来自哪里？为什么叫“净”移动？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 3.1 Core 1–3"
+  },
+  {
+   "id": "BIO-IG-3.1-02",
+   "strand": "B2",
+   "stage": "IGCSE",
+   "unit": "3 Movement into and out of cells",
+   "syllabus": "3.1.4/3.1.5",
+   "level": "core",
+   "name": "扩散的重要性与影响因素实验",
+   "name_en": "Importance of diffusion and factors affecting it",
+   "desc": "扩散在气体交换、营养吸收等过程中的重要性；探究表面积、温度、浓度梯度和距离对扩散速率的影响（如琼脂块+指示剂实验，比较表面积:体积比）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-3.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-PRAC-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "surface area",
+    "temperature",
+    "concentration gradient",
+    "distance",
+    "agar",
+    "surface area to volume ratio"
+   ],
+   "method": "琼脂块实验：块越小 SA:V 越大，颜色变化越快。常见错误：只改变了一个以上的变量；把大块耗时短说成扩散快。",
+   "probe": "给三个不同边长琼脂块的数据，让她算 SA:V 并解释哪个最先完全变色。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 3.1 Core 4–5"
+  },
+  {
+   "id": "BIO-IG-3.2-01",
+   "strand": "B2",
+   "stage": "IGCSE",
+   "unit": "3 Movement into and out of cells",
+   "syllabus": "3.2.1/3.2.2/3.2.3/3.2.6",
+   "level": "core",
+   "name": "水作为溶剂与渗透作用",
+   "name_en": "Water as a solvent; osmosis (core)",
+   "desc": "水作为溶剂在消化、排泄、运输中的作用；水通过部分透性膜扩散即渗透作用，水通过细胞膜以渗透方式进出细胞；植物靠细胞内水压向外压细胞壁获得支持",
+   "prereqs": [
+    {
+     "id": "BIO-IG-3.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "solvent",
+    "osmosis",
+    "partially permeable membrane",
+    "support",
+    "water"
+   ],
+   "method": "把渗透看作“水的扩散”。常见错误：说溶质通过渗透移动。",
+   "probe": "问：为什么不浇水的植物会萎蔫？用“细胞内的水压”解释。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 3.2 Core 1–3, 6"
+  },
+  {
+   "id": "BIO-IG-3.2-02",
+   "strand": "B2",
+   "stage": "IGCSE",
+   "unit": "3 Movement into and out of cells",
+   "syllabus": "3.2.4/3.2.5",
+   "level": "core",
+   "name": "渗透作用实验",
+   "name_en": "Investigating osmosis",
+   "desc": "用透析袋（Visking tubing）探究渗透；把马铃薯条等植物组织浸入不同浓度溶液，测质量或长度变化（百分比变化），描述变化",
+   "prereqs": [
+    {
+     "id": "BIO-IG-3.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-PRAC-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "dialysis tubing",
+    "Visking tubing",
+    "potato cylinder",
+    "percentage change in mass",
+    "concentration"
+   ],
+   "method": "算百分比变化 =（末−初）/初 ×100%；作图找质量不变时的浓度（与 x 轴交点）。常见错误：只看质量变化绝对值不算百分比；吸干表面水分的步骤忘记。",
+   "probe": "给马铃薯条在 0–1.0 mol/dm³ 蔗糖溶液中的质量数据，让她算百分比变化、作图并估计细胞液浓度。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 3.2 Core 4–5"
+  },
+  {
+   "id": "BIO-IG-3.2-03",
+   "strand": "B2",
+   "stage": "IGCSE",
+   "unit": "3 Movement into and out of cells",
+   "syllabus": "3.2.7/3.2.9",
+   "level": "supp",
+   "name": "用水势解释渗透",
+   "name_en": "Osmosis and water potential",
+   "desc": "渗透：水分子从水势较高处（稀溶液）通过部分透性膜向水势较低处（浓溶液）的净移动；水势和渗透在生物吸水和失水中的重要性",
+   "prereqs": [
+    {
+     "id": "BIO-IG-3.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "water potential",
+    "dilute solution",
+    "concentrated solution",
+    "net movement",
+    "partially permeable membrane"
+   ],
+   "method": "记“水往水势低处流”= 往溶液浓处流。常见错误：说“水从浓度高处到浓度低处”却没说清是水的浓度还是溶质浓度。",
+   "probe": "问：把红细胞放入纯水会怎样？用 water potential 解释。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 3.2 Supplement 7, 9",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-3.2-04",
+   "strand": "B2",
+   "stage": "IGCSE",
+   "unit": "3 Movement into and out of cells",
+   "syllabus": "3.2.8",
+   "level": "supp",
+   "name": "膨压与质壁分离",
+   "name_en": "Turgor and plasmolysis",
+   "desc": "用 turgid、turgor pressure、plasmolysis、flaccid 解释植物细胞在不同浓度溶液中的变化：稀溶液中吸水变膨胀（细胞壁防止破裂），浓溶液中失水变疲软，进一步质膜与细胞壁分离（质壁分离）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-3.2-03",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-2.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "turgid",
+    "turgor pressure",
+    "flaccid",
+    "plasmolysis",
+    "cell wall"
+   ],
+   "method": "画三张细胞图：turgid / flaccid / plasmolysed。常见错误：说动物细胞会 plasmolysis；说植物细胞在纯水中会破裂。",
+   "probe": "给洋葱表皮在浓盐水中的显微图，让她命名现象并解释。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 3.2 Supplement 8",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-3.3-01",
+   "strand": "B2",
+   "stage": "IGCSE",
+   "unit": "3 Movement into and out of cells",
+   "syllabus": "3.3.1",
+   "level": "core",
+   "name": "主动运输",
+   "name_en": "Active transport",
+   "desc": "主动运输：粒子从低浓度区域向高浓度区域（逆浓度梯度）通过细胞膜的移动，需要呼吸作用提供的能量",
+   "prereqs": [
+    {
+     "id": "BIO-IG-3.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "active transport",
+    "against a concentration gradient",
+    "energy",
+    "respiration"
+   ],
+   "method": "三种运输对比表：是否需能量、方向、是否需膜。常见错误：把主动运输的能量说成“来自动能”。",
+   "probe": "问：根毛细胞内的硝酸盐浓度比土壤高，它如何继续吸收硝酸盐？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 3.3 Core 1"
+  },
+  {
+   "id": "BIO-IG-3.3-02",
+   "strand": "B2",
+   "stage": "IGCSE",
+   "unit": "3 Movement into and out of cells",
+   "syllabus": "3.3.2/3.3.3",
+   "level": "supp",
+   "name": "主动运输的重要性与载体蛋白",
+   "name_en": "Importance of active transport; carrier proteins",
+   "desc": "主动运输对分子和离子跨膜运输的重要性（如根毛吸收离子）；载体蛋白在主动运输中运送分子或离子",
+   "prereqs": [
+    {
+     "id": "BIO-IG-3.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "protein carrier",
+    "ion uptake",
+    "root hair",
+    "mitochondria"
+   ],
+   "method": "联系：主动运输多的细胞线粒体多。常见错误：忘记写 protein carriers。",
+   "probe": "问：给根施加呼吸抑制剂后，离子吸收会怎样？为什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 3.3 Supplement 2–3",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-4.1-01",
+   "strand": "B3",
+   "stage": "IGCSE",
+   "unit": "4 Biological molecules",
+   "syllabus": "4.1.1/4.1.2",
+   "level": "core",
+   "name": "生物大分子的元素与组成",
+   "name_en": "Biological molecules: elements and building blocks",
+   "desc": "碳水化合物含 C、H、O；脂肪含 C、H、O；蛋白质含 C、H、O、N（有的含 S）；淀粉、糖原、纤维素由葡萄糖组成；蛋白质由氨基酸组成；脂肪和油由脂肪酸和甘油组成",
+   "prereqs": [
+    {
+     "id": "BIO-LS-8Bp.01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "carbohydrate",
+    "fat",
+    "protein",
+    "starch",
+    "glycogen",
+    "cellulose",
+    "glucose",
+    "amino acid",
+    "fatty acid",
+    "glycerol"
+   ],
+   "method": "做“大分子—单体—元素”三栏表。常见错误：说脂肪含 N；把糖原写成植物储能物质（植物是淀粉）。",
+   "probe": "问：哪类大分子一定含氮？纤维素由什么组成？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 4.1 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-4.1-02",
+   "strand": "B3",
+   "stage": "IGCSE",
+   "unit": "4 Biological molecules",
+   "syllabus": "4.1.3",
+   "level": "core",
+   "name": "食物检测",
+   "name_en": "Food tests",
+   "desc": "碘液检测淀粉（棕黄→蓝黑）；本尼迪特试剂检测还原糖（需水浴加热，蓝→绿/黄/橙/砖红）；双缩脲试剂检测蛋白质（蓝→紫）；乙醇乳化检测脂肪（白色乳浊）；DCPIP 检测维生素 C（蓝色褪色）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-4.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "iodine solution",
+    "Benedict's solution",
+    "biuret test",
+    "ethanol emulsion test",
+    "DCPIP",
+    "reducing sugar",
+    "vitamin C"
+   ],
+   "method": "做“试剂—步骤—阳性颜色”卡片；Benedict 必须加热。常见错误：Benedict 阳性写成“变红”而不写颜色梯度；DCPIP 写成变色而不是褪色。",
+   "probe": "给一份未知样品的四个检测结果，让她推断含哪些营养物质。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 4.1 Core 3"
+  },
+  {
+   "id": "BIO-IG-4.1-03",
+   "strand": "B3",
+   "stage": "IGCSE",
+   "unit": "4 Biological molecules",
+   "syllabus": "4.1.4",
+   "level": "supp",
+   "name": "DNA 的结构",
+   "name_en": "Structure of DNA",
+   "desc": "DNA 由两条链盘绕成双螺旋；每条链含有碱基；碱基对之间的键把两条链连在一起；碱基配对固定：A–T、C–G（不要求全名）",
+   "prereqs": [
+    {
+     "id": "BIO-LS-9Bs.03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "double helix",
+    "strand",
+    "base",
+    "base pairing",
+    "A-T",
+    "C-G"
+   ],
+   "method": "给一条链写出互补链练习。常见错误：A 配 C、G 配 T。",
+   "probe": "已知一条链 ATCGGA，写出另一条链。若 A 占 30%，C 占多少？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 4.1 Supplement 4",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-5.1-01",
+   "strand": "B3",
+   "stage": "IGCSE",
+   "unit": "5 Enzymes",
+   "syllabus": "5.1.1/5.1.2/5.1.3",
+   "level": "core",
+   "name": "催化剂与酶",
+   "name_en": "Catalysts and enzymes",
+   "desc": "催化剂：加快化学反应速率且自身不被反应改变的物质；酶是参与所有代谢反应的蛋白质，起生物催化剂作用；酶使反应速率足以维持生命",
+   "prereqs": [
+    {
+     "id": "BIO-IG-4.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "catalyst",
+    "enzyme",
+    "biological catalyst",
+    "metabolic reaction",
+    "protein"
+   ],
+   "method": "定义要包含 not changed。常见错误：说酶“被消耗”或“是活的”。",
+   "probe": "问：为什么没有酶生物就无法生存？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 5.1 Core 1–3"
+  },
+  {
+   "id": "BIO-IG-5.1-02",
+   "strand": "B3",
+   "stage": "IGCSE",
+   "unit": "5 Enzymes",
+   "syllabus": "5.1.4",
+   "level": "core",
+   "name": "酶作用与活性位点",
+   "name_en": "Enzyme action and the active site",
+   "desc": "酶的活性位点形状与底物互补，底物结合后形成产物（锁钥模型）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-5.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "active site",
+    "substrate",
+    "product",
+    "complementary",
+    "lock and key"
+   ],
+   "method": "画锁钥图：酶—底物—产物。常见错误：说活性位点与底物“相同形状”（应为互补）。",
+   "probe": "画图说明淀粉酶为什么不能分解蛋白质。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 5.1 Core 4"
+  },
+  {
+   "id": "BIO-IG-5.1-03",
+   "strand": "B3",
+   "stage": "IGCSE",
+   "unit": "5 Enzymes",
+   "syllabus": "5.1.6/5.1.7",
+   "level": "supp",
+   "name": "酶-底物复合物与专一性",
+   "name_en": "Enzyme–substrate complex and specificity",
+   "desc": "用活性位点、酶-底物复合物、底物、产物解释酶的作用；酶的专一性源于活性位点与底物形状互补、契合",
+   "prereqs": [
+    {
+     "id": "BIO-IG-5.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "enzyme-substrate complex",
+    "specificity",
+    "complementary shape",
+    "fit"
+   ],
+   "method": "答题模板：collide → bind to active site → enzyme-substrate complex → products released → enzyme unchanged。常见错误：漏写 complex。",
+   "probe": "问：解释为什么一种酶只能催化一种反应。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 5.1 Supplement 6–7",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-5.1-04",
+   "strand": "B3",
+   "stage": "IGCSE",
+   "unit": "5 Enzymes",
+   "syllabus": "5.1.5",
+   "level": "core",
+   "name": "温度和 pH 对酶活性的影响（实验）",
+   "name_en": "Effect of temperature and pH on enzymes",
+   "desc": "探究并描述温度和 pH 对酶活性的影响：存在最适温度/最适 pH；高温使酶变性（活性位点形状改变，不可逆）；常用淀粉酶+淀粉+碘液在点滴板上测终点时间",
+   "prereqs": [
+    {
+     "id": "BIO-IG-5.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-4.1-02",
+     "strength": "有帮助"
+    },
+    {
+     "id": "BIO-IG-PRAC-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "optimum temperature",
+    "optimum pH",
+    "denaturation",
+    "rate",
+    "end-point",
+    "spotting tile"
+   ],
+   "method": "看图读出 optimum；速率 = 1/时间。常见错误：说低温使酶变性（低温只是失活/变慢）；说高温“杀死”酶。",
+   "probe": "给淀粉酶在不同温度下碘液不再变蓝黑的时间数据，让她换算速率并找最适温度。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 5.1 Core 5"
+  },
+  {
+   "id": "BIO-IG-5.1-05",
+   "strand": "B3",
+   "stage": "IGCSE",
+   "unit": "5 Enzymes",
+   "syllabus": "5.1.8/5.1.9",
+   "level": "supp",
+   "name": "温度与 pH 影响的机理",
+   "name_en": "Explaining temperature and pH effects",
+   "desc": "温度升高 → 分子动能增加 → 有效碰撞频率增加 → 速率上升；超过最适温度活性位点形状改变、底物不再契合 → 变性；pH 偏离最适值改变活性位点形状和契合，导致变性",
+   "prereqs": [
+    {
+     "id": "BIO-IG-5.1-03",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-5.1-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "kinetic energy",
+    "effective collisions",
+    "shape and fit",
+    "denaturation"
+   ],
+   "method": "曲线分两段写：上升段用 kinetic energy/collisions，下降段用 shape/fit/denature。常见错误：混用两段解释。",
+   "probe": "给酶活性-温度曲线，让她分段解释。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 5.1 Supplement 8–9",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-6.1-01",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "6 Plant nutrition",
+   "syllabus": "6.1.1–6.1.4",
+   "level": "core",
+   "name": "光合作用的定义与方程",
+   "name_en": "Photosynthesis: definition and word equation",
+   "desc": "光合作用：植物利用光能、以原料合成碳水化合物；二氧化碳 + 水 → 葡萄糖 + 氧气（条件：光和叶绿素）；叶绿素是叶绿体中的绿色色素，把光能转化为化学物质中的能量",
+   "prereqs": [
+    {
+     "id": "BIO-LS-9Bp.06",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "photosynthesis",
+    "chlorophyll",
+    "chloroplast",
+    "light energy",
+    "chemical energy",
+    "glucose"
+   ],
+   "method": "能量转化表述：light energy → chemical energy。常见错误：说叶绿素“产生能量”。",
+   "probe": "问：叶绿素在光合作用中的作用是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 6.1 Core 1–4"
+  },
+  {
+   "id": "BIO-IG-6.1-02",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "6 Plant nutrition",
+   "syllabus": "6.1.5/6.1.6",
+   "level": "core",
+   "name": "光合产物的用途与矿质离子",
+   "name_en": "Uses of carbohydrates; nitrate and magnesium ions",
+   "desc": "光合产物用途：淀粉作能量储存、纤维素构建细胞壁、葡萄糖用于呼吸、蔗糖经韧皮部运输、花蜜吸引昆虫传粉；硝酸根离子用于合成氨基酸，镁离子用于合成叶绿素",
+   "prereqs": [
+    {
+     "id": "BIO-IG-6.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-LS-9Bp.05",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-4.1-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "starch",
+    "cellulose",
+    "sucrose",
+    "nectar",
+    "nitrate ions",
+    "magnesium ions",
+    "amino acids"
+   ],
+   "method": "五种用途配五个“去向”。常见错误：说运输的是葡萄糖（运输的是蔗糖）。",
+   "probe": "问：缺镁和缺硝酸盐的植物症状分别是什么，为什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 6.1 Core 5–6"
+  },
+  {
+   "id": "BIO-IG-6.1-03",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "6 Plant nutrition",
+   "syllabus": "6.1.7",
+   "level": "core",
+   "name": "光合作用需要叶绿素、光和 CO₂ 的实验",
+   "name_en": "Investigating the need for chlorophyll, light and CO₂",
+   "desc": "去淀粉（暗处放 48 h）→ 设置变量（斑叶、遮光、用碱石灰/氢氧化钠吸收 CO₂）→ 光照 → 叶片沸水中杀死、热乙醇脱色、碘液检测淀粉；需设置对照",
+   "prereqs": [
+    {
+     "id": "BIO-IG-6.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-4.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-PRAC-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "destarch",
+    "variegated leaf",
+    "control",
+    "soda lime",
+    "ethanol",
+    "iodine"
+   ],
+   "method": "按步骤写出每步原因（乙醇去叶绿素是为了看清颜色）。常见错误：忘记去淀粉；乙醇直接用明火加热（要水浴，易燃）。",
+   "probe": "给斑叶实验结果图，问为什么白色部分不变蓝黑。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 6.1 Core 7"
+  },
+  {
+   "id": "BIO-IG-6.1-04",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "6 Plant nutrition",
+   "syllabus": "6.1.8/6.1.9",
+   "level": "core",
+   "name": "影响光合速率的因素实验",
+   "name_en": "Factors affecting the rate of photosynthesis",
+   "desc": "探究光照强度、CO₂ 浓度和温度对光合速率的影响（如水草数气泡/测氧气体积，改变灯距）；用碳酸氢盐指示剂探究水生植物在光照和黑暗中的气体交换（CO₂ 多→黄，少→紫，大气水平→橙红）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-6.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-PRAC-02",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "light intensity",
+    "carbon dioxide concentration",
+    "temperature",
+    "rate",
+    "hydrogencarbonate indicator",
+    "pondweed"
+   ],
+   "method": "灯距实验要控制温度（用水槽隔热）。常见错误：把指示剂颜色记反；忽略植物在光下也呼吸。",
+   "probe": "给四支装水草的试管（光照/黑暗/遮光/无植物）的指示剂颜色，让她解释。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 6.1 Core 8–9"
+  },
+  {
+   "id": "BIO-IG-6.1-05",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "6 Plant nutrition",
+   "syllabus": "6.1.10",
+   "level": "supp",
+   "name": "光合作用平衡化学方程式",
+   "name_en": "Balanced equation for photosynthesis",
+   "desc": "6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂",
+   "prereqs": [
+    {
+     "id": "BIO-IG-6.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "balanced equation",
+    "C6H12O6",
+    "6CO2",
+    "6O2"
+   ],
+   "method": "与有氧呼吸方程对照记忆。常见错误：系数漏写或把 C₆H₁₂O₆ 写错。",
+   "probe": "默写方程并数两边原子是否守恒。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 6.1 Supplement 10",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-6.1-06",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "6 Plant nutrition",
+   "syllabus": "6.1.11",
+   "level": "supp",
+   "name": "光合作用的限制因素",
+   "name_en": "Limiting factors of photosynthesis",
+   "desc": "识别并解释不同环境条件下限制光合速率的因素（光照强度、CO₂ 浓度、温度）：曲线上升段由横轴变量限制，平台段由其他因素限制",
+   "prereqs": [
+    {
+     "id": "BIO-IG-6.1-04",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "limiting factor",
+    "plateau",
+    "light intensity",
+    "carbon dioxide",
+    "temperature"
+   ],
+   "method": "读图口诀：上升段看横轴，平台段看别的。常见错误：说平台段“光合作用停止”。",
+   "probe": "给两条不同 CO₂ 浓度下的光强-速率曲线，问 A、B 点的限制因素。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 6.1 Supplement 11",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-6.2-01",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "6 Plant nutrition",
+   "syllabus": "6.2.1–6.2.3",
+   "level": "core",
+   "name": "叶片结构与光合作用的适应",
+   "name_en": "Leaf structure and adaptations",
+   "desc": "叶大而薄（面积大、扩散距离短）；识别双子叶叶片结构：叶绿体、角质层、保卫细胞与气孔、上下表皮、栅栏叶肉、海绵叶肉、气室、维管束（木质部、韧皮部），并解释各结构如何适应光合作用",
+   "prereqs": [
+    {
+     "id": "BIO-IG-6.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-2.1-03",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-3.1-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "cuticle",
+    "epidermis",
+    "palisade mesophyll",
+    "spongy mesophyll",
+    "air spaces",
+    "stomata",
+    "guard cells",
+    "vascular bundle"
+   ],
+   "method": "画叶片横切面并逐层标注 + 一句适应。常见错误：说角质层用于吸光；把气孔画在上表皮为主。",
+   "probe": "给叶横切显微图，让她标 5 个结构并解释栅栏层为何在上面。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 6.2 Core 1–3"
+  },
+  {
+   "id": "BIO-IG-7.1-01",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "7 Human nutrition",
+   "syllabus": "7.1.1/7.1.2",
+   "level": "core",
+   "name": "平衡膳食与营养来源",
+   "name_en": "Balanced diet and dietary sources",
+   "desc": "平衡膳食的含义；碳水化合物、脂肪和油、蛋白质、维生素（C、D）、矿物质离子（钙、铁）、纤维（粗纤维）、水的主要来源及重要性",
+   "prereqs": [
+    {
+     "id": "BIO-LS-8Bp.01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-4.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "balanced diet",
+    "vitamin C",
+    "vitamin D",
+    "calcium",
+    "iron",
+    "fibre",
+    "roughage"
+   ],
+   "method": "四栏表：营养素—来源—作用—缺乏。常见错误：说纤维被消化吸收提供能量。",
+   "probe": "问：为什么膳食纤维不提供营养却很重要？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 7.1 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-7.1-02",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "7 Human nutrition",
+   "syllabus": "7.1.3",
+   "level": "core",
+   "name": "坏血病与佝偻病",
+   "name_en": "Scurvy and rickets",
+   "desc": "坏血病由缺乏维生素 C 引起；佝偻病由缺乏维生素 D（或钙）引起",
+   "prereqs": [
+    {
+     "id": "BIO-IG-7.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "scurvy",
+    "rickets",
+    "deficiency disease",
+    "vitamin C",
+    "vitamin D"
+   ],
+   "method": "C→Scurvy（牙龈出血），D→骨骼弯曲。常见错误：两者对调。",
+   "probe": "问：长期在海上没有新鲜水果的水手容易得什么病？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 7.1 Core 3"
+  },
+  {
+   "id": "BIO-IG-7.2-01",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "7 Human nutrition",
+   "syllabus": "7.2.1",
+   "level": "core",
+   "name": "消化系统的器官",
+   "name_en": "Organs of the digestive system",
+   "desc": "识别消化道：口腔、食管、胃、小肠（十二指肠、回肠）、大肠（结肠、直肠、肛门）；附属器官：唾液腺、胰腺、肝、胆囊",
+   "prereqs": [
+    {
+     "id": "BIO-IG-2.1-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "alimentary canal",
+    "oesophagus",
+    "duodenum",
+    "ileum",
+    "colon",
+    "rectum",
+    "pancreas",
+    "liver",
+    "gall bladder",
+    "salivary glands"
+   ],
+   "method": "按食物经过顺序默画。常见错误：认为食物经过肝脏或胰腺。",
+   "probe": "给消化系统图标出 8 个结构，并指出哪些食物不会经过。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 7.2 Core 1"
+  },
+  {
+   "id": "BIO-IG-7.2-02",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "7 Human nutrition",
+   "syllabus": "7.2.2",
+   "level": "core",
+   "name": "摄食、消化、吸收、同化、排遗",
+   "name_en": "Ingestion, digestion, absorption, assimilation, egestion",
+   "desc": "摄食（食物和饮料进入体内）、消化（食物分解）、吸收（营养物质由肠进入血液）、同化（细胞摄取和利用营养）、排遗（未消化食物以粪便排出）；对应各器官的功能",
+   "prereqs": [
+    {
+     "id": "BIO-IG-7.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "ingestion",
+    "digestion",
+    "absorption",
+    "assimilation",
+    "egestion",
+    "faeces"
+   ],
+   "method": "五个词按顺序排列对应器官。常见错误：egestion 与 excretion 混淆。",
+   "probe": "问：粪便排出属于 excretion 还是 egestion？为什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 7.2 Core 2"
+  },
+  {
+   "id": "BIO-IG-7.3-01",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "7 Human nutrition",
+   "syllabus": "7.3.1–7.3.6",
+   "level": "core",
+   "name": "物理消化与牙齿",
+   "name_en": "Physical digestion and teeth",
+   "desc": "物理消化：把食物分成小块而不改变分子化学结构，增大酶作用的表面积；识别切牙、犬牙、前臼齿、臼齿及功能；牙齿结构：釉质、牙本质、牙髓、神经、血管、牙骨质，牙嵌在颌骨和牙龈中；胃通过肌肉收缩搅拌食物",
+   "prereqs": [
+    {
+     "id": "BIO-IG-7.2-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "physical digestion",
+    "incisor",
+    "canine",
+    "premolar",
+    "molar",
+    "enamel",
+    "dentine",
+    "pulp",
+    "cement"
+   ],
+   "method": "画牙齿纵切图并标 6 层。常见错误：说物理消化“把淀粉变成糖”。",
+   "probe": "问：为什么物理消化能加快化学消化？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 7.3 Core 1–6"
+  },
+  {
+   "id": "BIO-IG-7.3-02",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "7 Human nutrition",
+   "syllabus": "7.3.7",
+   "level": "supp",
+   "name": "胆汁乳化脂肪",
+   "name_en": "Emulsification by bile",
+   "desc": "胆汁把脂肪和油乳化成小滴，增大表面积以利于脂肪酶的化学消化（乳化是物理消化，胆汁不是酶）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-7.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "bile",
+    "emulsification",
+    "fat droplets",
+    "surface area"
+   ],
+   "method": "强调 bile is not an enzyme。常见错误：说胆汁分解脂肪为脂肪酸。",
+   "probe": "问：胆囊切除的人为什么不宜吃太油的食物？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 7.3 Supplement 7",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-7.4-01",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "7 Human nutrition",
+   "syllabus": "7.4.1–7.4.5",
+   "level": "core",
+   "name": "化学消化与消化酶",
+   "name_en": "Chemical digestion and digestive enzymes",
+   "desc": "化学消化把大的不溶性分子分解为小的可溶性分子以便吸收；淀粉酶把淀粉分解为还原糖，蛋白酶把蛋白质分解为氨基酸，脂肪酶把脂肪分解为脂肪酸和甘油；各酶的分泌部位与作用部位；胃酸（盐酸）杀死食物中的微生物并提供酶最适的酸性 pH",
+   "prereqs": [
+    {
+     "id": "BIO-IG-5.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-4.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-7.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "chemical digestion",
+    "amylase",
+    "protease",
+    "lipase",
+    "hydrochloric acid",
+    "gastric juice"
+   ],
+   "method": "做“酶—分泌部位—作用部位—底物—产物”表。常见错误：说胃分泌淀粉酶；分泌部位和作用部位混为一谈（胰液在小肠起作用）。",
+   "probe": "问：胰腺分泌哪些酶？它们在哪里起作用？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 7.4 Core 1–5"
+  },
+  {
+   "id": "BIO-IG-7.4-02",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "7 Human nutrition",
+   "syllabus": "7.4.6/7.4.7/7.4.8",
+   "level": "supp",
+   "name": "淀粉与蛋白质的详细消化；胆汁中和胃酸",
+   "name_en": "Detailed digestion of starch and protein; bile neutralisation",
+   "desc": "淀粉酶把淀粉分解为麦芽糖，麦芽糖酶在小肠上皮细胞膜上把麦芽糖分解为葡萄糖；胃蛋白酶在胃的酸性条件下、胰蛋白酶在小肠的碱性条件下分解蛋白质；胆汁呈碱性，中和进入十二指肠的酸性食糜，为酶提供适宜 pH",
+   "prereqs": [
+    {
+     "id": "BIO-IG-7.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-5.1-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "maltose",
+    "maltase",
+    "pepsin",
+    "trypsin",
+    "epithelium",
+    "alkaline",
+    "neutralise"
+   ],
+   "method": "pepsin 胃/酸性，trypsin 小肠/碱性。常见错误：说麦芽糖酶在肠腔中分泌（实际在上皮细胞膜上起作用）。",
+   "probe": "问：胃蛋白酶进入小肠后为什么失去活性？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 7.4 Supplement 6–8",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-7.5-01",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "7 Human nutrition",
+   "syllabus": "7.5.1/7.5.2",
+   "level": "core",
+   "name": "吸收",
+   "name_en": "Absorption",
+   "desc": "营养物质主要在小肠吸收；大部分水在小肠吸收，部分在结肠吸收",
+   "prereqs": [
+    {
+     "id": "BIO-IG-7.2-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "absorption",
+    "small intestine",
+    "colon",
+    "water"
+   ],
+   "method": "常见错误：说水主要在大肠吸收。",
+   "probe": "问：腹泻为什么会导致脱水？（联系结肠吸水）",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 7.5 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-7.5-02",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "7 Human nutrition",
+   "syllabus": "7.5.3/7.5.4/7.5.5",
+   "level": "supp",
+   "name": "绒毛与微绒毛",
+   "name_en": "Villi and microvilli",
+   "desc": "绒毛和微绒毛增大小肠内表面积；绒毛结构：单层上皮细胞（有微绒毛）、毛细血管网、乳糜管；毛细血管吸收葡萄糖和氨基酸，乳糜管吸收脂肪酸和甘油",
+   "prereqs": [
+    {
+     "id": "BIO-IG-7.5-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-3.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "villus",
+    "microvilli",
+    "capillary",
+    "lacteal",
+    "epithelium",
+    "surface area"
+   ],
+   "method": "画绒毛结构图，联系扩散速率三因素（面积、距离、梯度）。常见错误：把乳糜管说成血管。",
+   "probe": "问：为什么绒毛壁只有一层细胞？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 7.5 Supplement 3–5",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-8.1-01",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "8 Transport in plants",
+   "syllabus": "8.1.1/8.1.2",
+   "level": "core",
+   "name": "木质部与韧皮部",
+   "name_en": "Xylem and phloem",
+   "desc": "木质部运输水和矿质离子并起支持作用；韧皮部运输蔗糖和氨基酸；识别非木本双子叶植物根、茎、叶横切面中木质部和韧皮部的位置",
+   "prereqs": [
+    {
+     "id": "BIO-LS-9Bs.01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-6.2-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "xylem",
+    "phloem",
+    "vascular bundle",
+    "sucrose",
+    "amino acids",
+    "mineral ions"
+   ],
+   "method": "记位置：茎中木质部在内、韧皮部在外；根中木质部呈星形在中央。常见错误：说木质部运输糖。",
+   "probe": "给根和茎横切图，让她标出木质部和韧皮部。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 8.1 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-8.1-02",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "8 Transport in plants",
+   "syllabus": "8.1.3",
+   "level": "supp",
+   "name": "木质部导管的结构与功能",
+   "name_en": "Structure of xylem vessels",
+   "desc": "导管壁厚并含木质素（支持、防止塌陷）、无细胞内容物、细胞首尾相连无横壁形成连续长管（便于水流通）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-8.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "xylem vessel",
+    "lignin",
+    "no cross walls",
+    "continuous tube",
+    "dead cells"
+   ],
+   "method": "三个特点各配一个“好处”。常见错误：说导管是活细胞。",
+   "probe": "问：导管没有横壁和细胞内容物对运输水有什么好处？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 8.1 Supplement 3",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-8.2-01",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "8 Transport in plants",
+   "syllabus": "8.2.1–8.2.4",
+   "level": "core",
+   "name": "根毛与水分运输途径",
+   "name_en": "Root hairs and the pathway of water",
+   "desc": "根毛细胞增大表面积以吸收水和矿质离子；水的途径：根毛细胞 → 根皮层细胞 → 木质部 → 叶肉细胞；用染料探究水在地上部分的运输途径",
+   "prereqs": [
+    {
+     "id": "BIO-IG-8.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-2.1-03",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-3.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "root hair cell",
+    "root cortex",
+    "xylem",
+    "mesophyll",
+    "stain",
+    "pathway"
+   ],
+   "method": "四步路径按顺序默写。常见错误：漏写 cortex；水进入根毛靠主动运输（应为渗透）。",
+   "probe": "芹菜插入染料后横切，问哪部分着色、说明了什么。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 8.2 Core 1–4"
+  },
+  {
+   "id": "BIO-IG-8.3-01",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "8 Transport in plants",
+   "syllabus": "8.3.1/8.3.2/8.3.3",
+   "level": "core",
+   "name": "蒸腾作用及影响因素实验",
+   "name_en": "Transpiration and investigating its rate",
+   "desc": "蒸腾：叶片散失水蒸气；水从叶肉细胞表面蒸发到气室，再以水蒸气形式经气孔扩散出叶；探究温度和风速对蒸腾速率的影响（如简易蒸腾计/称重法）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-8.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-6.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-PRAC-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "transpiration",
+    "evaporation",
+    "water vapour",
+    "stomata",
+    "potometer",
+    "wind speed"
+   ],
+   "method": "蒸腾计测的是吸水速率（近似蒸腾）。常见错误：说水从气孔“蒸发”（是在叶肉细胞表面蒸发，经气孔扩散）。",
+   "probe": "给蒸腾计气泡移动距离数据，让她算速率并比较有风/无风。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 8.3 Core 1–3"
+  },
+  {
+   "id": "BIO-IG-8.3-02",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "8 Transport in plants",
+   "syllabus": "8.3.4/8.3.5",
+   "level": "supp",
+   "name": "蒸腾拉力与叶内部结构",
+   "name_en": "Transpiration pull",
+   "desc": "失水与叶肉细胞间相互连通的气室提供的大内表面积、气孔大小和数量有关；水分子间存在吸引力，蒸腾拉力把木质部中连续的水柱向上拉",
+   "prereqs": [
+    {
+     "id": "BIO-IG-8.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-8.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "transpiration pull",
+    "water column",
+    "forces of attraction",
+    "cohesion",
+    "air spaces"
+   ],
+   "method": "链条式解释：蒸发→气孔扩散→叶肉吸水→木质部水柱被拉。常见错误：说根“压”水上去。",
+   "probe": "问：为什么剪断的花茎要在水下剪？（防止气泡打断水柱）",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 8.3 Supplement 4–5",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-8.3-03",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "8 Transport in plants",
+   "syllabus": "8.3.6/8.3.7",
+   "level": "supp",
+   "name": "蒸腾速率的影响因素解释与萎蔫",
+   "name_en": "Factors affecting transpiration; wilting",
+   "desc": "解释温度（蒸发和扩散加快）、风速（带走叶表水蒸气、维持浓度梯度）、湿度（湿度高梯度小、蒸腾减慢）对蒸腾速率的影响；失水多于吸水时细胞失去膨压，导致萎蔫",
+   "prereqs": [
+    {
+     "id": "BIO-IG-8.3-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-3.2-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "humidity",
+    "concentration gradient",
+    "wilting",
+    "turgor",
+    "temperature"
+   ],
+   "method": "每个因素都落到“水蒸气浓度梯度”或“分子动能”。常见错误：说湿度高“水蒸发不了”而不说梯度。",
+   "probe": "问：炎热有风的下午植物为什么容易萎蔫？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 8.3 Supplement 6–7",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-8.4-01",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "8 Transport in plants",
+   "syllabus": "8.4.1",
+   "level": "core",
+   "name": "转运（韧皮部运输）",
+   "name_en": "Translocation",
+   "desc": "转运：蔗糖和氨基酸在韧皮部中从源运往库的移动",
+   "prereqs": [
+    {
+     "id": "BIO-IG-8.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-6.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "translocation",
+    "phloem",
+    "source",
+    "sink",
+    "sucrose"
+   ],
+   "method": "区分 transpiration（水，木质部）和 translocation（糖，韧皮部）。常见错误：两词混用。",
+   "probe": "问：马铃薯块茎中的淀粉是怎么来的？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 8.4 Core 1"
+  },
+  {
+   "id": "BIO-IG-8.4-02",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "8 Transport in plants",
+   "syllabus": "8.4.2/8.4.3",
+   "level": "supp",
+   "name": "源与库",
+   "name_en": "Sources and sinks",
+   "desc": "源：释放蔗糖或氨基酸的部位；库：利用或储存蔗糖或氨基酸的部位；同一部位在不同时期可既是源又是库（如春季块茎/根作为源供芽生长，夏季成为储存的库）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-8.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "source",
+    "sink",
+    "storage organ",
+    "seasonal"
+   ],
+   "method": "举马铃薯块茎在春/秋的不同角色。常见错误：认为叶永远是源（嫩叶是库）。",
+   "probe": "问：为什么春天马铃薯块茎是源，秋天是库？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 8.4 Supplement 2–3",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-9.1-01",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "9 Transport in animals",
+   "syllabus": "9.1.1",
+   "level": "core",
+   "name": "循环系统",
+   "name_en": "Circulatory systems",
+   "desc": "循环系统是由血管、泵（心脏）和保证血液单向流动的瓣膜组成的系统",
+   "prereqs": [
+    {
+     "id": "BIO-LS-8Bs.02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "circulatory system",
+    "blood vessels",
+    "pump",
+    "valves",
+    "one-way flow"
+   ],
+   "method": "三要素：vessels + pump + valves。",
+   "probe": "问：瓣膜在循环系统中的作用是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 9.1 Core 1"
+  },
+  {
+   "id": "BIO-IG-9.1-02",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "9 Transport in animals",
+   "syllabus": "9.1.2/9.1.3/9.1.4",
+   "level": "supp",
+   "name": "单循环与双循环",
+   "name_en": "Single and double circulation",
+   "desc": "鱼的单循环：心脏→鳃→全身→心脏，每次循环经过心脏一次；哺乳动物的双循环：肺循环和体循环，每次循环经过心脏两次；双循环的优点：回心后再次加压，送往全身血压高、流速快，含氧血与缺氧血分开",
+   "prereqs": [
+    {
+     "id": "BIO-IG-9.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "single circulation",
+    "double circulation",
+    "pulmonary circulation",
+    "systemic circulation",
+    "pressure"
+   ],
+   "method": "画两个“8 字/圆圈”示意图对比。常见错误：说双循环“流经心脏两次”却说不出优点。",
+   "probe": "问：为什么哺乳动物需要双循环而鱼不需要那么高的血压？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 9.1 Supplement 2–4",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-9.2-01",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "9 Transport in animals",
+   "syllabus": "9.2.1/9.2.2",
+   "level": "core",
+   "name": "心脏结构",
+   "name_en": "Structure of the heart",
+   "desc": "识别心肌壁、隔膜、左右心室、左右心房、单向瓣膜、冠状动脉；动脉把血液运离心脏，静脉把血液运回心脏",
+   "prereqs": [
+    {
+     "id": "BIO-IG-9.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "atrium",
+    "ventricle",
+    "septum",
+    "valve",
+    "coronary artery",
+    "artery",
+    "vein"
+   ],
+   "method": "看图时左右是心脏本身的左右（与读者相反）。常见错误：左右颠倒；说动脉都运含氧血（肺动脉例外）。",
+   "probe": "给心脏图，让她标出 6 个结构并说出血流方向。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 9.2 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-9.2-02",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "9 Transport in animals",
+   "syllabus": "9.2.3/9.2.4",
+   "level": "core",
+   "name": "心脏活动监测与运动对心率的影响",
+   "name_en": "Monitoring the heart; effect of activity on heart rate",
+   "desc": "心脏活动可用心电图（ECG）、脉搏和听瓣膜关闭的声音监测；探究并描述运动对心率的影响",
+   "prereqs": [
+    {
+     "id": "BIO-IG-9.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-PRAC-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "ECG",
+    "pulse rate",
+    "heart rate",
+    "physical activity",
+    "recovery"
+   ],
+   "method": "测量：静息→运动→恢复，每次重复取平均。常见错误：只测一次；没控制运动强度。",
+   "probe": "给运动前后心率数据，让她作图描述并说出两个控制变量。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 9.2 Core 3–4"
+  },
+  {
+   "id": "BIO-IG-9.2-03",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "9 Transport in animals",
+   "syllabus": "9.2.5/9.2.6",
+   "level": "core",
+   "name": "冠心病",
+   "name_en": "Coronary heart disease",
+   "desc": "冠心病：冠状动脉阻塞；危险因素：饮食、缺乏运动、压力、吸烟、遗传倾向、年龄、性别；讨论饮食和运动在降低风险中的作用",
+   "prereqs": [
+    {
+     "id": "BIO-IG-9.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-LS-8Bp.03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "coronary heart disease",
+    "coronary artery",
+    "blockage",
+    "risk factor",
+    "saturated fat"
+   ],
+   "method": "因果链：脂肪沉积→动脉变窄→心肌缺氧→心梗。常见错误：说心脏腔内的血液不能给心肌供氧，却说不出冠状动脉的作用。",
+   "probe": "问：为什么冠状动脉阻塞会导致心肌死亡？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 9.2 Core 5–6"
+  },
+  {
+   "id": "BIO-IG-9.2-04",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "9 Transport in animals",
+   "syllabus": "9.2.7–9.2.10",
+   "level": "supp",
+   "name": "心脏瓣膜、壁厚与心动周期",
+   "name_en": "Valves, wall thickness and the cardiac cycle",
+   "desc": "识别房室瓣和半月瓣；左心室壁比右心室厚（要把血压到全身），心室壁比心房厚；隔膜分开含氧血与缺氧血；心动周期：心房收缩→房室瓣开、血入心室→心室收缩→房室瓣关、半月瓣开→血入动脉",
+   "prereqs": [
+    {
+     "id": "BIO-IG-9.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-9.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "atrioventricular valve",
+    "semilunar valve",
+    "septum",
+    "contraction",
+    "cardiac cycle"
+   ],
+   "method": "按“哪个腔收缩 → 哪个瓣开/关”列表。常见错误：说左心室厚是因为“血更多”（应为需要更高压力）。",
+   "probe": "问：心室收缩时哪组瓣膜关闭？为什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 9.2 Supplement 7–10",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-9.2-05",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "9 Transport in animals",
+   "syllabus": "9.2.11",
+   "level": "supp",
+   "name": "运动对心率影响的解释",
+   "name_en": "Explaining the effect of activity on heart rate",
+   "desc": "运动时肌肉需要更多能量 → 呼吸作用加快 → 需要更多氧气和葡萄糖、产生更多 CO₂ → 心率加快以增加供氧和带走 CO₂（及乳酸）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-9.2-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-12.2-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "aerobic respiration",
+    "oxygen demand",
+    "carbon dioxide removal",
+    "heart rate"
+   ],
+   "method": "按“能量需求→呼吸→供氧/排 CO₂”链式回答。常见错误：只说“因为累了”。",
+   "probe": "问：解释为什么跑步时心率升高。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 9.2 Supplement 11",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-9.3-01",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "9 Transport in animals",
+   "syllabus": "9.3.1/9.3.2/9.3.3",
+   "level": "core",
+   "name": "血管结构与主要血管",
+   "name_en": "Blood vessels",
+   "desc": "动脉壁厚、管腔窄；静脉壁薄、管腔大、有瓣膜；毛细血管壁仅一层细胞，进行物质交换；识别腔静脉、主动脉、肺动脉、肺静脉，肾动脉、肾静脉",
+   "prereqs": [
+    {
+     "id": "BIO-IG-9.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "artery",
+    "vein",
+    "capillary",
+    "lumen",
+    "valve",
+    "vena cava",
+    "aorta",
+    "pulmonary artery",
+    "pulmonary vein",
+    "renal artery"
+   ],
+   "method": "三栏对比表。常见错误：肺动脉和肺静脉含氧情况弄反。",
+   "probe": "给血管横切图，判断哪个是动脉并说出两条依据。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 9.3 Core 1–3"
+  },
+  {
+   "id": "BIO-IG-9.3-02",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "9 Transport in animals",
+   "syllabus": "9.3.4/9.3.5/9.3.6",
+   "level": "supp",
+   "name": "血管结构与功能的关系；肝的血管",
+   "name_en": "Relating vessel structure to function; hepatic vessels",
+   "desc": "动脉承受高压所以壁厚富弹性；静脉压力低，需瓣膜防倒流、管腔大减少阻力；毛细血管壁薄（扩散距离短）、数量多、管腔窄；肝的血管：肝动脉、肝静脉、肝门静脉",
+   "prereqs": [
+    {
+     "id": "BIO-IG-9.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "pressure",
+    "elastic",
+    "hepatic artery",
+    "hepatic vein",
+    "hepatic portal vein"
+   ],
+   "method": "肝门静脉从小肠到肝（不是心脏）。常见错误：把肝门静脉当成离开肝脏的血管。",
+   "probe": "问：为什么静脉有瓣膜而动脉没有（除心脏出口外）？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 9.3 Supplement 4–6",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-9.4-01",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "9 Transport in animals",
+   "syllabus": "9.4.1–9.4.4",
+   "level": "core",
+   "name": "血液成分与功能",
+   "name_en": "Components of blood",
+   "desc": "血液成分：红细胞、白细胞、血小板、血浆；在显微照片中识别红细胞和白细胞；红细胞含血红蛋白运氧；白细胞吞噬和产生抗体；血小板参与凝血；血浆运输血细胞、离子、营养、尿素、激素和 CO₂；凝血防止失血和病原体进入",
+   "prereqs": [
+    {
+     "id": "BIO-LS-8Bs.02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-2.1-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "red blood cell",
+    "haemoglobin",
+    "white blood cell",
+    "platelet",
+    "plasma",
+    "clotting"
+   ],
+   "method": "血浆运输清单六项可用口诀记。常见错误：说血小板是细胞并有细胞核。",
+   "probe": "给血涂片照片，标出红细胞和白细胞并说出区别。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 9.4 Core 1–4"
+  },
+  {
+   "id": "BIO-IG-9.4-02",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "9 Transport in animals",
+   "syllabus": "9.4.5/9.4.6/9.4.7",
+   "level": "supp",
+   "name": "淋巴细胞、吞噬细胞与凝血过程",
+   "name_en": "Lymphocytes, phagocytes and clotting",
+   "desc": "识别淋巴细胞（大圆核、细胞质少）和吞噬细胞（分叶核）；淋巴细胞产生抗体，吞噬细胞通过吞噬作用吞噬病原体；凝血：纤维蛋白原转变为纤维蛋白形成网",
+   "prereqs": [
+    {
+     "id": "BIO-IG-9.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "lymphocyte",
+    "phagocyte",
+    "phagocytosis",
+    "antibody",
+    "fibrinogen",
+    "fibrin"
+   ],
+   "method": "看核形状区分两类白细胞。常见错误：说吞噬细胞产生抗体。",
+   "probe": "问：伤口凝血时可溶性的什么变成不溶性的什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 9.4 Supplement 5–7",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-10.1-01",
+   "strand": "B7",
+   "stage": "IGCSE",
+   "unit": "10 Diseases and immunity",
+   "syllabus": "10.1.1/10.1.2/10.1.3",
+   "level": "core",
+   "name": "病原体与疾病传播",
+   "name_en": "Pathogens and transmission",
+   "desc": "病原体是致病生物；传染病的病原体可在宿主间传播；直接传播（接触，包括血液和其他体液）与间接传播（被污染的物体表面、食物、动物和空气）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-2.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-1.3-06",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "pathogen",
+    "transmissible disease",
+    "host",
+    "direct contact",
+    "indirect transmission"
+   ],
+   "method": "每种传播方式举一例。常见错误：把非传染病（如冠心病）当传染病。",
+   "probe": "问：流感和 HIV 分别通过什么方式传播？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 10.1 Core 1–3"
+  },
+  {
+   "id": "BIO-IG-10.1-02",
+   "strand": "B7",
+   "stage": "IGCSE",
+   "unit": "10 Diseases and immunity",
+   "syllabus": "10.1.4/10.1.5",
+   "level": "core",
+   "name": "身体防御与控制疾病传播",
+   "name_en": "Body defences and controlling disease spread",
+   "desc": "身体防御：皮肤、鼻毛、黏液、胃酸、白细胞；控制疾病传播的措施：清洁供水、卫生的食物制备、良好个人卫生、垃圾处理、污水处理（不要求处理步骤）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-10.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-9.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "body defences",
+    "mucus",
+    "stomach acid",
+    "hygiene",
+    "sewage treatment",
+    "clean water"
+   ],
+   "method": "分“物理屏障/化学屏障/细胞防御”三类。常见错误：说胃酸能杀死所有病原体。",
+   "probe": "问：为什么城市污水处理能减少霍乱这类疾病？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 10.1 Core 4–5"
+  },
+  {
+   "id": "BIO-IG-10.1-03",
+   "strand": "B7",
+   "stage": "IGCSE",
+   "unit": "10 Diseases and immunity",
+   "syllabus": "10.1.6–10.1.10",
+   "level": "supp",
+   "name": "主动免疫：抗原与抗体",
+   "name_en": "Active immunity: antigens and antibodies",
+   "desc": "主动免疫：体内产生抗体对病原体的防御；每种病原体有特定形状的抗原；抗体是与抗原结合的蛋白质，直接破坏病原体或标记它们供吞噬细胞消灭；特定抗体形状与特定抗原互补；感染或疫苗接种后获得主动免疫",
+   "prereqs": [
+    {
+     "id": "BIO-IG-10.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-9.4-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-5.1-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "active immunity",
+    "antigen",
+    "antibody",
+    "complementary shape",
+    "lymphocyte"
+   ],
+   "method": "类比酶与底物的互补形状。常见错误：说抗体“杀死”病毒时不说结合；混淆 antigen 和 antibody。",
+   "probe": "问：为什么麻疹抗体不能对抗流感病毒？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 10.1 Supplement 6–10",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-10.1-04",
+   "strand": "B7",
+   "stage": "IGCSE",
+   "unit": "10 Diseases and immunity",
+   "syllabus": "10.1.11/10.1.12",
+   "level": "supp",
+   "name": "疫苗接种",
+   "name_en": "Vaccination",
+   "desc": "疫苗：把减毒病原体或其抗原注入体内 → 抗原刺激淋巴细胞产生抗体 → 产生记忆细胞提供长期免疫；疫苗接种在控制疾病传播中的作用（群体免疫）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-10.1-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "vaccination",
+    "weakened pathogen",
+    "memory cells",
+    "immune response",
+    "herd immunity"
+   ],
+   "method": "画二次免疫抗体浓度曲线（第二次更快更多）。常见错误：说疫苗含抗体。",
+   "probe": "给两次接触抗原的抗体浓度曲线，让她解释第二次反应为什么更快更强。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 10.1 Supplement 11–12",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-10.1-05",
+   "strand": "B7",
+   "stage": "IGCSE",
+   "unit": "10 Diseases and immunity",
+   "syllabus": "10.1.13/10.1.14/10.1.15",
+   "level": "supp",
+   "name": "被动免疫",
+   "name_en": "Passive immunity",
+   "desc": "被动免疫：从其他个体获得抗体的短期防御，包括经胎盘和母乳获得；母乳喂养对婴儿发展被动免疫很重要；被动免疫不产生记忆细胞",
+   "prereqs": [
+    {
+     "id": "BIO-IG-10.1-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "passive immunity",
+    "placenta",
+    "breast milk",
+    "short-term",
+    "memory cells"
+   ],
+   "method": "主动 vs 被动对比表（抗体来源、持续时间、记忆细胞）。常见错误：说被动免疫能长期保护。",
+   "probe": "问：为什么母乳喂养的婴儿在头几个月较少感染？为什么这种保护是短期的？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 10.1 Supplement 13–15",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-10.1-06",
+   "strand": "B7",
+   "stage": "IGCSE",
+   "unit": "10 Diseases and immunity",
+   "syllabus": "10.1.16/10.1.17",
+   "level": "supp",
+   "name": "霍乱",
+   "name_en": "Cholera",
+   "desc": "霍乱是由细菌引起、经污染水传播的疾病；霍乱弧菌产生毒素使氯离子分泌进入小肠，水通过渗透进入肠腔，导致腹泻、脱水和血液中离子流失",
+   "prereqs": [
+    {
+     "id": "BIO-IG-10.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-3.2-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "cholera",
+    "toxin",
+    "chloride ions",
+    "osmosis",
+    "diarrhoea",
+    "dehydration"
+   ],
+   "method": "按“毒素→Cl⁻ 分泌→肠腔水势降低→水渗出→腹泻”顺序答。常见错误：说细菌“吃掉”肠道水分。",
+   "probe": "问：用水势解释霍乱为什么导致严重腹泻。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 10.1 Supplement 16–17（另见 unverified：Core/Supplement 归属由编号推断）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-11.1-01",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "11 Gas exchange in humans",
+   "syllabus": "11.1.1/11.1.2",
+   "level": "core",
+   "name": "气体交换面与呼吸系统结构",
+   "name_en": "Gas exchange surfaces and the breathing system",
+   "desc": "人体气体交换面特征：面积大、表面薄、血液供应丰富、通气良好；识别肺、膈、肋骨、肋间肌、喉、气管、支气管、细支气管、肺泡及相连毛细血管",
+   "prereqs": [
+    {
+     "id": "BIO-LS-8Bs.03",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-3.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "gas exchange surface",
+    "alveoli",
+    "bronchioles",
+    "larynx",
+    "trachea",
+    "diaphragm",
+    "intercostal muscles"
+   ],
+   "method": "四个特征对应肺泡的具体结构。常见错误：说肺泡壁“很厚以保护”。",
+   "probe": "问：肺泡的哪些特征使气体交换高效？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 11.1 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-11.1-02",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "11 Gas exchange in humans",
+   "syllabus": "11.1.3/11.1.4",
+   "level": "core",
+   "name": "吸入与呼出气体成分",
+   "name_en": "Inspired and expired air",
+   "desc": "用石灰水探究吸入与呼出气体差异（呼出气使石灰水更快变浑浊）；呼出气中氧气减少（约 21%→16%）、二氧化碳增多（约 0.04%→4%）、水蒸气增多",
+   "prereqs": [
+    {
+     "id": "BIO-IG-11.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-LS-8Bp.04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "limewater",
+    "inspired air",
+    "expired air",
+    "carbon dioxide",
+    "water vapour"
+   ],
+   "method": "记三组数字。常见错误：说呼出气中没有氧气。",
+   "probe": "给吸入/呼出气体成分表，问哪个是呼出气并说明依据。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 11.1 Core 3–4"
+  },
+  {
+   "id": "BIO-IG-11.1-03",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "11 Gas exchange in humans",
+   "syllabus": "11.1.5",
+   "level": "core",
+   "name": "运动对呼吸频率和深度的影响",
+   "name_en": "Effect of physical activity on breathing",
+   "desc": "探究并描述运动对呼吸频率和深度的影响（运动后频率和深度增加，随后逐渐恢复）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-11.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-PRAC-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "breathing rate",
+    "depth of breathing",
+    "physical activity",
+    "recovery"
+   ],
+   "method": "记录每分钟呼吸次数，重复三次取平均。常见错误：混淆呼吸频率与心率。",
+   "probe": "给运动前后呼吸频率表，让她作图并描述趋势。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 11.1 Core 5"
+  },
+  {
+   "id": "BIO-IG-11.1-04",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "11 Gas exchange in humans",
+   "syllabus": "11.1.6/11.1.7/11.1.8",
+   "level": "supp",
+   "name": "通气机制",
+   "name_en": "Mechanism of ventilation",
+   "desc": "识别内、外肋间肌；气管软骨环保持气管开放；吸气：外肋间肌收缩、肋骨上抬外移，膈肌收缩变平，胸腔体积增大、压强降低，空气进入；呼气：外肋间肌舒张（用力时内肋间肌收缩），膈肌舒张上拱，体积减小、压强增大",
+   "prereqs": [
+    {
+     "id": "BIO-IG-11.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-LS-8Bs.03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "internal intercostal muscles",
+    "external intercostal muscles",
+    "cartilage",
+    "thorax",
+    "volume",
+    "pressure"
+   ],
+   "method": "列吸气/呼气对比表四行（肋间肌、肋骨、膈、体积压强）。常见错误：说吸气时内肋间肌收缩。",
+   "probe": "问：吸气时外肋间肌和膈肌如何变化？胸腔压强怎么变？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 11.1 Supplement 6–8",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-11.1-05",
+   "strand": "B5",
+   "stage": "IGCSE",
+   "unit": "11 Gas exchange in humans",
+   "syllabus": "11.1.9/11.1.10",
+   "level": "supp",
+   "name": "呼吸成分差异与 CO₂ 调节呼吸的解释",
+   "name_en": "Explaining air composition and control of breathing",
+   "desc": "解释吸入与呼出气体差异（细胞呼吸消耗 O₂、产生 CO₂ 和水）；运动时血液 CO₂ 浓度升高，被脑感知，使呼吸频率加快、深度增加",
+   "prereqs": [
+    {
+     "id": "BIO-IG-11.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-11.1-03",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-12.2-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "carbon dioxide concentration",
+    "brain",
+    "detected",
+    "rate and depth of breathing"
+   ],
+   "method": "强调是 CO₂（不是缺氧）被脑感知。常见错误：说“肺感知到需要更多氧气”。",
+   "probe": "问：运动时呼吸加深加快的调节过程是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 11.1 Supplement 9–10",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-11.1-06",
+   "strand": "B7",
+   "stage": "IGCSE",
+   "unit": "11 Gas exchange in humans",
+   "syllabus": "11.1.11",
+   "level": "supp",
+   "name": "杯状细胞、黏液与纤毛细胞的保护作用",
+   "name_en": "Goblet cells, mucus and ciliated cells",
+   "desc": "杯状细胞分泌黏液粘住病原体和颗粒，纤毛细胞的纤毛摆动把黏液推向咽喉被吞下或咳出，保护呼吸系统",
+   "prereqs": [
+    {
+     "id": "BIO-IG-11.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-2.1-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "goblet cell",
+    "mucus",
+    "ciliated cell",
+    "cilia",
+    "pathogen",
+    "particles"
+   ],
+   "method": "联系吸烟：焦油损伤纤毛导致吸烟者咳嗽。常见错误：说纤毛“过滤”空气。",
+   "probe": "问：吸烟者为什么容易得呼吸道感染？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 11.1 Supplement 11",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-12.1-01",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "12 Respiration",
+   "syllabus": "12.1.1/12.1.2",
+   "level": "core",
+   "name": "能量的用途与温度对酵母呼吸的影响",
+   "name_en": "Uses of energy; effect of temperature on yeast respiration",
+   "desc": "生物体能量用途：肌肉收缩、蛋白质合成、细胞分裂、主动运输、生长、神经冲动传导、维持体温；探究并描述温度对酵母呼吸作用的影响（如测 CO₂ 气泡产生速率）",
+   "prereqs": [
+    {
+     "id": "BIO-LS-8Bp.04",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-5.1-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "energy",
+    "muscle contraction",
+    "protein synthesis",
+    "yeast",
+    "respiration rate"
+   ],
+   "method": "酵母实验与酶的温度曲线相联系。常见错误：说呼吸“产生能量”。",
+   "probe": "给酵母在不同温度下每分钟气泡数的数据，让她描述并解释趋势。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 12.1 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-12.2-01",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "12 Respiration",
+   "syllabus": "12.2.1/12.2.2/12.2.3",
+   "level": "core",
+   "name": "有氧呼吸",
+   "name_en": "Aerobic respiration",
+   "desc": "有氧呼吸：细胞中利用氧气分解营养分子释放能量的化学反应；葡萄糖 + 氧气 → 二氧化碳 + 水；（补充）C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O",
+   "prereqs": [
+    {
+     "id": "BIO-LS-8Bp.04",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-12.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "aerobic respiration",
+    "glucose",
+    "oxygen",
+    "carbon dioxide",
+    "water",
+    "balanced equation"
+   ],
+   "method": "与光合作用方程互为逆写。常见错误：方程里写“能量”作为产物（文字方程不写）。",
+   "probe": "默写文字方程和化学方程。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 12.2 Core 1–2, Supplement 3"
+  },
+  {
+   "id": "BIO-IG-12.3-01",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "12 Respiration",
+   "syllabus": "12.3.1–12.3.4",
+   "level": "core",
+   "name": "无氧呼吸",
+   "name_en": "Anaerobic respiration",
+   "desc": "无氧呼吸：不使用氧气分解营养分子释放能量；每个葡萄糖分子释放的能量比有氧呼吸少得多；酵母：葡萄糖 → 酒精 + 二氧化碳；剧烈运动时的肌肉：葡萄糖 → 乳酸",
+   "prereqs": [
+    {
+     "id": "BIO-IG-12.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "anaerobic respiration",
+    "yeast",
+    "alcohol",
+    "ethanol",
+    "lactic acid",
+    "less energy"
+   ],
+   "method": "对比表：有氧/酵母无氧/肌肉无氧的产物与能量。常见错误：说肌肉无氧呼吸产生 CO₂。",
+   "probe": "问：为什么面包发酵会膨胀？肌肉抽筋与什么物质积累有关？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 12.3 Core 1–4"
+  },
+  {
+   "id": "BIO-IG-12.3-02",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "12 Respiration",
+   "syllabus": "12.3.5/12.3.6/12.3.7",
+   "level": "supp",
+   "name": "酵母无氧呼吸方程与氧债",
+   "name_en": "Yeast equation and oxygen debt",
+   "desc": "C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂；剧烈运动时乳酸在肌肉和血液中积累形成氧债；运动后通过持续快心率把乳酸运到肝脏、持续深快呼吸供氧、在肝脏中有氧分解乳酸来偿还氧债",
+   "prereqs": [
+    {
+     "id": "BIO-IG-12.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-11.1-05",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "oxygen debt",
+    "lactic acid",
+    "liver",
+    "C2H5OH"
+   ],
+   "method": "三步偿还按“心—肺—肝”记。常见错误：说乳酸在肌肉中被“排出”。",
+   "probe": "问：短跑结束后为什么还要大口喘气几分钟？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 12.3 Supplement 5–7",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-13.1-01",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "13 Excretion in humans",
+   "syllabus": "13.1.1/13.1.2/13.1.3",
+   "level": "core",
+   "name": "人体排泄器官",
+   "name_en": "Excretion in humans",
+   "desc": "CO₂ 经肺排出；肾脏排出尿素、多余的水和离子；识别肾、输尿管、膀胱、尿道",
+   "prereqs": [
+    {
+     "id": "BIO-LS-9Bs.02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-1.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "excretion",
+    "kidney",
+    "ureter",
+    "bladder",
+    "urethra",
+    "urea"
+   ],
+   "method": "常见错误：混淆 ureter 与 urethra；把粪便当排泄物。",
+   "probe": "问：人体排泄的三类物质分别由什么器官排出？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 13.1 Core 1–3"
+  },
+  {
+   "id": "BIO-IG-13.1-02",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "13 Excretion in humans",
+   "syllabus": "13.1.4/13.1.5",
+   "level": "supp",
+   "name": "肾的结构与肾单位",
+   "name_en": "Kidney structure and the nephron",
+   "desc": "识别肾皮质和髓质；肾单位及相关血管：肾小球从血液中滤过水、葡萄糖、尿素和离子；肾单位重吸收全部葡萄糖、部分离子和大部分水回血液；形成含尿素、多余水和离子的尿液（不要求细节）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-13.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-3.3-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "cortex",
+    "medulla",
+    "nephron",
+    "glomerulus",
+    "filtration",
+    "reabsorption",
+    "urine"
+   ],
+   "method": "做“滤液 vs 尿液”成分表，葡萄糖滤过后全部重吸收。常见错误：说蛋白质被滤过。",
+   "probe": "给血浆、滤液、尿液成分表，问为什么葡萄糖在尿中为零而尿素浓度升高。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 13.1 Supplement 4–5",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-13.1-03",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "13 Excretion in humans",
+   "syllabus": "13.1.6–13.1.9",
+   "level": "supp",
+   "name": "肝脏、脱氨与尿素",
+   "name_en": "The liver, deamination and urea",
+   "desc": "肝脏把氨基酸转化为蛋白质（同化）；多余氨基酸在肝中脱氨（去除含氮部分）形成尿素；尿素有毒，所以必须排泄",
+   "prereqs": [
+    {
+     "id": "BIO-IG-13.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-7.2-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "deamination",
+    "urea",
+    "amino acids",
+    "assimilation",
+    "toxicity"
+   ],
+   "method": "路线：多余氨基酸→肝脱氨→尿素→血液→肾→尿。常见错误：说尿素在肾中产生。",
+   "probe": "问：高蛋白饮食后尿中尿素增加的原因。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 13.1 Supplement 6–9",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-14.1-01",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "14 Coordination and response",
+   "syllabus": "14.1.1–14.1.4",
+   "level": "core",
+   "name": "神经系统组成与神经元",
+   "name_en": "The nervous system and neurones",
+   "desc": "电冲动沿神经元传导；中枢神经系统（脑和脊髓）与周围神经系统（脑和脊髓以外的神经）；神经系统的作用是协调和调节身体功能；识别感觉、中间（relay）、运动神经元",
+   "prereqs": [
+    {
+     "id": "BIO-IG-2.1-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "CNS",
+    "PNS",
+    "neurone",
+    "sensory neurone",
+    "relay neurone",
+    "motor neurone",
+    "impulse"
+   ],
+   "method": "三种神经元按细胞体位置区分。常见错误：把神经元和神经混为一谈。",
+   "probe": "给三种神经元图，识别并说出各自位置。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 14.1 Core 1–4"
+  },
+  {
+   "id": "BIO-IG-14.1-02",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "14 Coordination and response",
+   "syllabus": "14.1.5/14.1.6",
+   "level": "core",
+   "name": "反射弧与反射",
+   "name_en": "Reflex arc and reflex action",
+   "desc": "反射弧：感受器 → 感觉神经元 → 中间神经元（在脊髓）→ 运动神经元 → 效应器（肌肉或腺体）；反射是自动、快速地整合刺激与效应器反应的方式",
+   "prereqs": [
+    {
+     "id": "BIO-IG-14.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "reflex arc",
+    "receptor",
+    "effector",
+    "reflex action",
+    "stimulus",
+    "response"
+   ],
+   "method": "用“碰到烫锅缩手”逐一对应。常见错误：说反射需要大脑思考。",
+   "probe": "给缩手反射图，让她按顺序标出五个部分。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 14.1 Core 5–6"
+  },
+  {
+   "id": "BIO-IG-14.1-03",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "14 Coordination and response",
+   "syllabus": "14.1.7–14.1.10",
+   "level": "core",
+   "name": "突触",
+   "name_en": "Synapses",
+   "desc": "突触是两个神经元之间的连接处；（补充）结构：含神经递质的囊泡、突触间隙、受体蛋白；过程：冲动到达→囊泡释放神经递质到突触间隙→神经递质扩散过间隙→与下一神经元受体蛋白结合→在下一神经元引发冲动；突触保证冲动单向传递",
+   "prereqs": [
+    {
+     "id": "BIO-IG-14.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-3.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "synapse",
+    "synaptic gap",
+    "vesicle",
+    "neurotransmitter",
+    "receptor protein",
+    "one direction"
+   ],
+   "method": "画突触图标四步。常见错误：说电冲动“跳过”间隙；不能解释为什么单向（只有前膜有囊泡、后膜有受体）。",
+   "probe": "问：为什么冲动只能单向通过突触？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 14.1 Core 7, Supplement 8–10"
+  },
+  {
+   "id": "BIO-IG-14.2-01",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "14 Coordination and response",
+   "syllabus": "14.2.1/14.2.2/14.2.3",
+   "level": "core",
+   "name": "感觉器官与眼的结构",
+   "name_en": "Sense organs and the eye",
+   "desc": "感觉器官是对特定刺激（光、声、触、温度、化学物质）起反应的感受器细胞群；眼的结构：角膜（折射光）、虹膜（控制进入瞳孔的光量）、晶状体（把光聚焦到视网膜）、视网膜（含感光细胞，部分对不同颜色敏感）、视神经（把冲动传到脑）、盲点",
+   "prereqs": [
+    {
+     "id": "BIO-IG-14.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-LIGHT",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-PRE-COLOUR",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "sense organ",
+    "receptor",
+    "cornea",
+    "iris",
+    "pupil",
+    "lens",
+    "retina",
+    "optic nerve",
+    "blind spot"
+   ],
+   "method": "画眼球剖面并逐个标功能。常见错误：说晶状体是主要折射结构（角膜折射最多）。",
+   "probe": "问：为什么盲点处看不到东西？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 14.2 Core 1–3"
+  },
+  {
+   "id": "BIO-IG-14.2-02",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "14 Coordination and response",
+   "syllabus": "14.2.4/14.2.5",
+   "level": "core",
+   "name": "瞳孔反射",
+   "name_en": "The pupil reflex",
+   "desc": "强光下瞳孔缩小、弱光下瞳孔放大；（补充）由虹膜环形肌和辐射肌的拮抗作用实现：强光时环形肌收缩、辐射肌舒张",
+   "prereqs": [
+    {
+     "id": "BIO-IG-14.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-14.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "pupil reflex",
+    "light intensity",
+    "pupil diameter",
+    "circular muscles",
+    "radial muscles",
+    "antagonistic"
+   ],
+   "method": "环形肌收缩=缩小（像收紧袋口）。常见错误：两种肌肉作用记反。",
+   "probe": "问：从暗室走到阳光下，瞳孔和虹膜肌肉如何变化？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 14.2 Core 4, Supplement 5"
+  },
+  {
+   "id": "BIO-IG-14.2-03",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "14 Coordination and response",
+   "syllabus": "14.2.6",
+   "level": "supp",
+   "name": "眼的调节（看远看近）",
+   "name_en": "Accommodation",
+   "desc": "看近处：睫状肌收缩、悬韧带松弛、晶状体变厚变凸、折射增强；看远处：睫状肌舒张、悬韧带拉紧、晶状体变薄、折射减弱",
+   "prereqs": [
+    {
+     "id": "BIO-IG-14.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-COLOUR",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "accommodation",
+    "ciliary muscles",
+    "suspensory ligaments",
+    "lens shape",
+    "refraction"
+   ],
+   "method": "口诀：近—肌缩、带松、晶厚。常见错误：说睫状肌收缩时悬韧带拉紧。",
+   "probe": "问：从看书转为看窗外远处时，睫状肌、悬韧带、晶状体如何变化？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 14.2 Supplement 6",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-14.2-04",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "14 Coordination and response",
+   "syllabus": "14.2.7/14.2.8/14.2.9",
+   "level": "supp",
+   "name": "视杆细胞、视锥细胞与中央凹",
+   "name_en": "Rods, cones and the fovea",
+   "desc": "视锥细胞集中在中央凹，视杆细胞分布在视网膜周边；视杆细胞敏感度高、用于夜视；三种视锥细胞吸收不同颜色的光，用于色觉；中央凹是视锥细胞最密集、视觉最清晰的部位",
+   "prereqs": [
+    {
+     "id": "BIO-IG-14.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "rods",
+    "cones",
+    "fovea",
+    "colour vision",
+    "night vision",
+    "retina"
+   ],
+   "method": "常见错误：说夜间看东西靠视锥细胞。",
+   "probe": "问：为什么夜里看东西时侧着眼看更清楚？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 14.2 Supplement 7–9",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-14.3-01",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "14 Coordination and response",
+   "syllabus": "14.3.1/14.3.2",
+   "level": "core",
+   "name": "激素与内分泌腺",
+   "name_en": "Hormones and endocrine glands",
+   "desc": "激素：由腺体产生、经血液运输、改变一个或多个特定靶器官活动的化学物质；肾上腺—肾上腺素，胰腺—胰岛素，睾丸—睾酮，卵巢—雌激素；（补充）胰腺还分泌胰高血糖素",
+   "prereqs": [
+    {
+     "id": "BIO-IG-9.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "hormone",
+    "endocrine gland",
+    "target organ",
+    "adrenaline",
+    "insulin",
+    "testosterone",
+    "oestrogen",
+    "glucagon"
+   ],
+   "method": "腺体—激素连线卡片。常见错误：说激素经神经传递。",
+   "probe": "给人体内分泌腺图，标出四个腺体及其激素。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 14.3 Core 1–2, Supplement 5"
+  },
+  {
+   "id": "BIO-IG-14.3-02",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "14 Coordination and response",
+   "syllabus": "14.3.3/14.3.4/14.3.6",
+   "level": "core",
+   "name": "肾上腺素与神经/激素调节比较",
+   "name_en": "Adrenaline; nervous vs hormonal control",
+   "desc": "肾上腺素在“战或逃”情境下分泌，使呼吸频率加快、心率加快、瞳孔放大；（补充）肾上腺素升高血糖浓度并加快心率以控制代谢活动；比较神经调节（快、短暂）与激素调节（慢、持久）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-14.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-14.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "adrenaline",
+    "fight or flight",
+    "heart rate",
+    "nervous control",
+    "hormonal control",
+    "speed",
+    "duration"
+   ],
+   "method": "对比表两行：速度、持续时间。常见错误：说激素反应比神经快。",
+   "probe": "问：考试前紧张时心跳加速是什么激素引起的？它为什么升高血糖？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 14.3 Core 3–4, Supplement 6"
+  },
+  {
+   "id": "BIO-IG-14.4-01",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "14 Coordination and response",
+   "syllabus": "14.4.1/14.4.2",
+   "level": "core",
+   "name": "稳态与胰岛素",
+   "name_en": "Homeostasis and insulin",
+   "desc": "稳态：维持恒定的内环境；胰岛素降低血糖浓度",
+   "prereqs": [
+    {
+     "id": "BIO-IG-14.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "homeostasis",
+    "internal environment",
+    "insulin",
+    "blood glucose"
+   ],
+   "method": "举体温、血糖、水分三例。常见错误：说胰岛素“分解葡萄糖”。",
+   "probe": "问：饭后血糖升高时胰腺分泌什么激素？结果如何？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 14.4 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-14.4-02",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "14 Coordination and response",
+   "syllabus": "14.4.3/14.4.4/14.4.5",
+   "level": "supp",
+   "name": "负反馈与血糖调节；1 型糖尿病",
+   "name_en": "Negative feedback, blood glucose control and Type 1 diabetes",
+   "desc": "负反馈：偏离设定点时触发使之回到设定点的反应；血糖高→胰岛素→肝把葡萄糖转化为糖原储存；血糖低→胰高血糖素→肝把糖原分解为葡萄糖；1 型糖尿病的治疗：注射胰岛素、监测血糖、控制饮食",
+   "prereqs": [
+    {
+     "id": "BIO-IG-14.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-4.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "negative feedback",
+    "set point",
+    "glucagon",
+    "glycogen",
+    "liver",
+    "Type 1 diabetes"
+   ],
+   "method": "glucagon（激素）与 glycogen（多糖）拼写别混。常见错误：说胰岛素把葡萄糖变成胰高血糖素。",
+   "probe": "给饭后血糖和胰岛素浓度曲线，让她解释负反馈过程。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 14.4 Supplement 3–5",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-14.4-03",
+   "strand": "B6",
+   "stage": "IGCSE",
+   "unit": "14 Coordination and response",
+   "syllabus": "14.4.6/14.4.7/14.4.8",
+   "level": "supp",
+   "name": "体温调节与皮肤结构",
+   "name_en": "Temperature control and skin",
+   "desc": "识别皮肤中的毛发、立毛肌、汗腺、感受器、感觉神经元、血管和脂肪组织；体温调节：脂肪隔热、出汗（蒸发散热）、颤抖（呼吸产热）、脑的作用（检测血液温度、协调反应）；血管舒张（皮肤毛细血管血流增加、散热）与血管收缩（小动脉收缩、减少散热）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-14.4-02",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-THERM",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "vasodilation",
+    "vasoconstriction",
+    "arterioles",
+    "sweating",
+    "shivering",
+    "hair erector muscles",
+    "insulation"
+   ],
+   "method": "注意是小动脉（arterioles）收缩/舒张，不是毛细血管“移动”。常见错误：说血管“移向皮肤表面”。",
+   "probe": "问：寒冷时身体如何减少热量散失？列出三种机制。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 14.4 Supplement 6–8",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-14.5-01",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "14 Coordination and response",
+   "syllabus": "14.5.1/14.5.2/14.5.3",
+   "level": "core",
+   "name": "向性：向重力性与向光性",
+   "name_en": "Gravitropism and phototropism",
+   "desc": "向重力性：植物部分朝向或背离重力方向生长；向光性：植物部分朝向或背离光源方向生长；探究并描述茎和根的向重力性和向光性（如幼苗单侧光、横放种子实验）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-1.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-PRAC-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "gravitropism",
+    "phototropism",
+    "shoot",
+    "root",
+    "positive",
+    "negative",
+    "clinostat"
+   ],
+   "method": "茎：正向光、负向重力；根：正向重力。常见错误：没有设置对照（均匀光照/旋转器）。",
+   "probe": "设计实验证明幼苗茎向光生长，说出对照组。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 14.5 Core 1–3"
+  },
+  {
+   "id": "BIO-IG-14.5-02",
+   "strand": "B4",
+   "stage": "IGCSE",
+   "unit": "14 Coordination and response",
+   "syllabus": "14.5.4/14.5.5",
+   "level": "supp",
+   "name": "生长素",
+   "name_en": "Auxin",
+   "desc": "向光性和向重力性是植物生长受化学调节的例子；生长素在茎尖产生，从茎尖向下扩散，在光和重力作用下分布不均，刺激细胞伸长（茎背光侧生长素多、伸长多，因此弯向光）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-14.5-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "auxin",
+    "shoot tip",
+    "cell elongation",
+    "unequal distribution"
+   ],
+   "method": "画单侧光下茎尖生长素分布图。常见错误：说生长素“被光破坏”或“使向光侧生长快”。",
+   "probe": "问：去掉茎尖的幼苗在单侧光下还会弯曲吗？为什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 14.5 Supplement 4–5",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-15.1-01",
+   "strand": "B7",
+   "stage": "IGCSE",
+   "unit": "15 Drugs",
+   "syllabus": "15.1.1–15.1.4",
+   "level": "core",
+   "name": "药物与抗生素",
+   "name_en": "Drugs and antibiotics",
+   "desc": "药物：进入体内改变或影响体内化学反应的任何物质；抗生素用于治疗细菌感染；部分细菌对抗生素有耐药性，降低抗生素效果；抗生素杀死细菌但对病毒无效",
+   "prereqs": [
+    {
+     "id": "BIO-IG-10.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-1.3-06",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "drug",
+    "antibiotic",
+    "bacterial infection",
+    "resistance",
+    "virus"
+   ],
+   "method": "常见错误：感冒（病毒）吃抗生素。",
+   "probe": "问：为什么医生不给流感病人开抗生素？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 15.1 Core 1–4"
+  },
+  {
+   "id": "BIO-IG-15.1-02",
+   "strand": "B7",
+   "stage": "IGCSE",
+   "unit": "15 Drugs",
+   "syllabus": "15.1.5",
+   "level": "supp",
+   "name": "合理使用抗生素与耐药菌（MRSA）",
+   "name_en": "Limiting antibiotic resistance",
+   "desc": "仅在必要时使用抗生素可以限制耐药菌（如 MRSA）的产生；须按疗程用完",
+   "prereqs": [
+    {
+     "id": "BIO-IG-15.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-18.3-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "MRSA",
+    "antibiotic resistance",
+    "course of antibiotics"
+   ],
+   "method": "与自然选择联系：抗生素是选择压力。常见错误：说细菌“习惯了”抗生素。",
+   "probe": "问：为什么不按疗程吃完抗生素会增加耐药菌？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 15.1 Supplement 5",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-16.1-01",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.1.1/16.1.2",
+   "level": "core",
+   "name": "无性生殖",
+   "name_en": "Asexual reproduction",
+   "desc": "无性生殖：由一个亲本产生遗传上完全相同后代的过程；能从图片和资料中识别无性生殖的例子（细菌分裂、马铃薯块茎、草莓匍匐茎、酵母出芽等）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-2.1-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "asexual reproduction",
+    "genetically identical",
+    "one parent",
+    "clone",
+    "tuber",
+    "runner",
+    "binary fission"
+   ],
+   "method": "关键词：one parent + genetically identical。常见错误：把扦插当作有性生殖。",
+   "probe": "给五个例子（含种子繁殖），让她挑出无性生殖。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.1 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-16.1-02",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.1.3",
+   "level": "supp",
+   "name": "无性生殖的利弊",
+   "name_en": "Advantages and disadvantages of asexual reproduction",
+   "desc": "对野生种群：快速繁殖、无需配偶，但缺乏变异，环境变化或疾病时可能全部灭亡；对作物生产：保持优良性状、成本低，但易受同一种病害整体侵袭",
+   "prereqs": [
+    {
+     "id": "BIO-IG-16.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-18.1-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "advantage",
+    "disadvantage",
+    "variation",
+    "crop production",
+    "population"
+   ],
+   "method": "分“野生/作物”两栏写利弊。常见错误：只写利不写弊。",
+   "probe": "问：香蕉都是无性繁殖的，为什么一场病害可能毁掉整个品种？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.1 Supplement 3",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-16.2-01",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.2.1/16.2.2",
+   "level": "core",
+   "name": "有性生殖与受精",
+   "name_en": "Sexual reproduction and fertilisation",
+   "desc": "有性生殖：两个配子的细胞核融合形成合子，产生遗传上彼此不同的后代；受精是配子细胞核的融合",
+   "prereqs": [
+    {
+     "id": "BIO-LS-9Bp.01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-16.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "sexual reproduction",
+    "gamete",
+    "zygote",
+    "fertilisation",
+    "nuclei fusion"
+   ],
+   "method": "强调是“细胞核”融合。常见错误：说受精是“精子进入卵细胞”而不写核融合。",
+   "probe": "问：有性生殖和无性生殖的后代在遗传上有什么不同？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.2 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-16.2-02",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.2.3/16.2.4",
+   "level": "supp",
+   "name": "单倍体与二倍体；有性生殖的利弊",
+   "name_en": "Haploid and diploid; pros and cons of sexual reproduction",
+   "desc": "配子核是单倍体，合子核是二倍体；有性生殖对野生种群（增加变异、适应环境变化，但需配偶、较慢）和作物生产（可培育新品种，但后代性状不稳定）的利弊",
+   "prereqs": [
+    {
+     "id": "BIO-IG-16.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-16.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "haploid",
+    "diploid",
+    "variation",
+    "advantage",
+    "disadvantage"
+   ],
+   "method": "与 16.1 利弊表并排对照。常见错误：说合子是单倍体。",
+   "probe": "问：为什么环境多变时有性生殖对物种更有利？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.2 Supplement 3–4",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-16.3-01",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.3.1/16.3.2",
+   "level": "core",
+   "name": "虫媒花的结构与功能",
+   "name_en": "Structure of an insect-pollinated flower",
+   "desc": "识别、绘制并说明虫媒花各部分功能：萼片（保护花蕾）、花瓣（吸引昆虫）、雄蕊（花丝、花药，产生花粉）、心皮（柱头接受花粉、花柱、子房含胚珠）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-16.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-PRAC-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "sepal",
+    "petal",
+    "stamen",
+    "filament",
+    "anther",
+    "carpel",
+    "stigma",
+    "style",
+    "ovary",
+    "ovule"
+   ],
+   "method": "解剖一朵花并按轮从外向内摆放。常见错误：把花药和柱头弄混；ovule 与 ovary 混淆。",
+   "probe": "给花的纵切图标 8 个结构并说出雌雄部分。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.3 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-16.3-02",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.3.3/16.3.4/16.3.7",
+   "level": "core",
+   "name": "风媒花与虫媒花的比较",
+   "name_en": "Wind- vs insect-pollinated flowers",
+   "desc": "风媒花：花药和柱头伸出花外、柱头羽毛状、花瓣小而不鲜艳、无蜜无香、花粉多而轻小光滑；虫媒花：花瓣大而鲜艳、有蜜腺和香味、花药柱头在花内、花粉少而大、表面有刺或黏",
+   "prereqs": [
+    {
+     "id": "BIO-IG-16.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "wind-pollinated",
+    "insect-pollinated",
+    "feathery stigma",
+    "pollen grain",
+    "nectary"
+   ],
+   "method": "做对比表五行。常见错误：说风媒花花粉“大而重”。",
+   "probe": "给一张禾本科花图，判断传粉方式并给出三条依据。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.3 Core 3–4, 7"
+  },
+  {
+   "id": "BIO-IG-16.3-03",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.3.5/16.3.6",
+   "level": "core",
+   "name": "传粉与受精（植物）",
+   "name_en": "Pollination and fertilisation in plants",
+   "desc": "传粉：花粉粒从花药转移到柱头；受精：花粉核与胚珠中的核融合",
+   "prereqs": [
+    {
+     "id": "BIO-IG-16.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "pollination",
+    "fertilisation",
+    "pollen nucleus",
+    "ovule"
+   ],
+   "method": "区分 pollination（转移）和 fertilisation（核融合）。常见错误：两词混用。",
+   "probe": "问：蜜蜂把花粉带到柱头上完成的是传粉还是受精？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.3 Core 5–6"
+  },
+  {
+   "id": "BIO-IG-16.3-04",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.3.8",
+   "level": "core",
+   "name": "种子萌发条件",
+   "name_en": "Conditions for germination",
+   "desc": "探究并描述影响种子萌发的环境条件：需要水、氧气和适宜温度（设置每次缺少一个条件的对照组）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-16.3-03",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-PRAC-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "germination",
+    "water",
+    "oxygen",
+    "suitable temperature",
+    "control"
+   ],
+   "method": "经典四管实验（干燥、无氧-焦性没食子酸、冷藏、对照）。常见错误：说种子萌发需要光。",
+   "probe": "设计实验证明种子萌发需要氧气，写出变量和对照。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.3 Core 8"
+  },
+  {
+   "id": "BIO-IG-16.3-05",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.3.9–16.3.12",
+   "level": "supp",
+   "name": "自花传粉、异花传粉与花粉管",
+   "name_en": "Self- and cross-pollination; pollen tube",
+   "desc": "自花传粉：花粉从花药传到同一朵花或同株另一朵花的柱头；异花传粉：传到同种另一植株花的柱头；两者对种群变异、适应环境变化能力、对传粉者依赖的影响；花粉管生长进入胚珠后完成受精",
+   "prereqs": [
+    {
+     "id": "BIO-IG-16.3-03",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-16.2-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "self-pollination",
+    "cross-pollination",
+    "pollen tube",
+    "micropyle",
+    "variation",
+    "pollinator"
+   ],
+   "method": "异花传粉 = 更多变异、但依赖传粉者。常见错误：同株不同花算成异花传粉。",
+   "probe": "问：如果某地传粉昆虫大量减少，依赖异花传粉的植物会怎样？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.3 Supplement 9–12",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-16.4-01",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.4.1/16.4.2",
+   "level": "core",
+   "name": "男女生殖系统",
+   "name_en": "Male and female reproductive systems",
+   "desc": "男性：睾丸（产生精子和睾酮）、阴囊、输精管、前列腺、尿道、阴茎；女性：卵巢（产生卵细胞和雌激素）、输卵管（受精场所）、子宫、子宫颈、阴道；能在图上识别并说明功能",
+   "prereqs": [
+    {
+     "id": "BIO-IG-16.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "testes",
+    "scrotum",
+    "sperm duct",
+    "prostate gland",
+    "urethra",
+    "penis",
+    "ovary",
+    "oviduct",
+    "uterus",
+    "cervix",
+    "vagina"
+   ],
+   "method": "按配子行走路线背结构。常见错误：受精发生在子宫（应在输卵管）。",
+   "probe": "给生殖系统图标出 5 个结构并指出受精部位。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.4 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-16.4-02",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.4.3–16.4.6",
+   "level": "core",
+   "name": "配子的适应特征与比较",
+   "name_en": "Adaptive features of gametes",
+   "desc": "受精是精子和卵细胞核的融合；精子：鞭毛（游动）、线粒体（供能）、顶体中的酶（消化卵的外层）；卵细胞：能量储存、受精后会改变的胶质层（阻止其他精子进入）；比较两种配子的大小、结构、运动性和数量",
+   "prereqs": [
+    {
+     "id": "BIO-IG-16.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-2.1-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "sperm",
+    "egg cell",
+    "flagellum",
+    "acrosome",
+    "jelly coat",
+    "motility"
+   ],
+   "method": "对比表四行。常见错误：说卵细胞会游动。",
+   "probe": "问：精子中为什么有大量线粒体？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.4 Core 3–6"
+  },
+  {
+   "id": "BIO-IG-16.4-03",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.4.7/16.4.8",
+   "level": "core",
+   "name": "早期发育与胎儿",
+   "name_en": "Early development and the fetus",
+   "desc": "合子发育成胚胎（细胞团）并植入子宫内膜；识别脐带、胎盘、羊膜囊、羊水并说明功能（羊水保护胎儿免受冲击）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-16.4-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-LS-9Bp.08",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "zygote",
+    "embryo",
+    "implantation",
+    "umbilical cord",
+    "placenta",
+    "amniotic sac",
+    "amniotic fluid"
+   ],
+   "method": "按时间顺序：受精→分裂→植入→胎盘形成。常见错误：说胎儿血液和母亲血液直接混合。",
+   "probe": "问：羊水的作用是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.4 Core 7–8"
+  },
+  {
+   "id": "BIO-IG-16.4-04",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.4.9/16.4.10",
+   "level": "supp",
+   "name": "胎盘与脐带的物质交换",
+   "name_en": "Placental exchange",
+   "desc": "胎盘和脐带在母体血液和胎儿血液之间交换溶解的营养、气体和排泄物（营养和 O₂ 进入胎儿，CO₂ 和尿素进入母体）；部分病原体和毒素可通过胎盘影响胎儿",
+   "prereqs": [
+    {
+     "id": "BIO-IG-16.4-03",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-3.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "placenta",
+    "exchange",
+    "nutrients",
+    "excretory products",
+    "pathogens",
+    "toxins"
+   ],
+   "method": "画双向箭头图。常见错误：说胎盘能阻挡所有有害物质。",
+   "probe": "问：为什么孕妇感染风疹可能伤害胎儿？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.4 Supplement 9–10",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-16.5-01",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.5.1/16.5.2",
+   "level": "core",
+   "name": "性激素与月经周期",
+   "name_en": "Sex hormones and the menstrual cycle",
+   "desc": "睾酮和雌激素在青春期调控第二性征的发育；月经周期中卵巢（卵泡发育、排卵约第 14 天）和子宫内膜（脱落、增厚）的变化",
+   "prereqs": [
+    {
+     "id": "BIO-IG-14.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-16.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "testosterone",
+    "oestrogen",
+    "puberty",
+    "secondary sexual characteristics",
+    "menstrual cycle",
+    "ovulation",
+    "uterus lining"
+   ],
+   "method": "画 28 天时间轴标内膜厚度和排卵。常见错误：排卵与月经时间混淆。",
+   "probe": "给月经周期图，问哪天最可能排卵、内膜何时最厚。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.5 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-16.5-02",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.5.3/16.5.4",
+   "level": "supp",
+   "name": "激素对月经周期和妊娠的调控",
+   "name_en": "Hormonal control of the menstrual cycle",
+   "desc": "FSH（垂体，促卵泡发育和雌激素分泌）、LH（垂体，触发排卵）、雌激素（卵巢，内膜增厚、抑制 FSH）、孕酮（黄体，维持内膜）；妊娠期孕酮和雌激素先由黄体后由胎盘产生",
+   "prereqs": [
+    {
+     "id": "BIO-IG-16.5-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-14.4-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "FSH",
+    "LH",
+    "progesterone",
+    "oestrogen",
+    "pituitary gland",
+    "corpus luteum",
+    "placenta"
+   ],
+   "method": "画四种激素浓度曲线对照排卵日。常见错误：说 FSH 由卵巢产生。",
+   "probe": "给激素曲线图，问哪种激素高峰引发排卵。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.5 Supplement 3–4",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-16.6-01",
+   "strand": "B7",
+   "stage": "IGCSE",
+   "unit": "16 Reproduction",
+   "syllabus": "16.6.1–16.6.5",
+   "level": "core",
+   "name": "性传播感染与 HIV",
+   "name_en": "Sexually transmitted infections and HIV",
+   "desc": "STI 是经性接触传播的感染；HIV 是引起 STI 的病原体，HIV 感染可导致艾滋病（AIDS）；HIV 传播方式（无保护性行为、共用针头、输血、母婴）；控制 STI 传播的方法（避孕套、检测、减少性伴侣、不共用针头）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-10.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "STI",
+    "HIV",
+    "AIDS",
+    "transmission",
+    "condom",
+    "contact tracing"
+   ],
+   "method": "传播方式与控制方法一一对应。常见错误：说 HIV 能通过握手、蚊子传播。",
+   "probe": "问：为什么吸毒者共用针头会增加 HIV 感染风险？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 16.6 Core 1–5"
+  },
+  {
+   "id": "BIO-IG-17.1-01",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "17 Inheritance",
+   "syllabus": "17.1.1/17.1.2/17.1.3",
+   "level": "core",
+   "name": "染色体、基因与等位基因",
+   "name_en": "Chromosomes, genes and alleles",
+   "desc": "染色体由 DNA 构成，DNA 以基因的形式携带遗传信息；基因是编码一种蛋白质的一段 DNA；等位基因是基因的不同形式",
+   "prereqs": [
+    {
+     "id": "BIO-LS-9Bs.03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "chromosome",
+    "DNA",
+    "gene",
+    "allele",
+    "genetic information"
+   ],
+   "method": "用“染色体是书、基因是章节、等位基因是不同版本”类比。常见错误：把 gene 和 allele 混用。",
+   "probe": "问：决定眼睛颜色的基因和蓝眼等位基因有什么区别？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 17.1 Core 1–3"
+  },
+  {
+   "id": "BIO-IG-17.1-02",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "17 Inheritance",
+   "syllabus": "17.1.4",
+   "level": "core",
+   "name": "人类性别的遗传",
+   "name_en": "Inheritance of sex",
+   "desc": "用 X 和 Y 染色体描述人类性别的遗传：XX 女、XY 男，遗传图解得 1:1",
+   "prereqs": [
+    {
+     "id": "BIO-IG-17.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-LS-9Bp.02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "X chromosome",
+    "Y chromosome",
+    "sex determination",
+    "genetic diagram"
+   ],
+   "method": "画标准遗传图解（亲本、配子、子代）。常见错误：配子写成 XY。",
+   "probe": "画遗传图解说明生男生女概率相等。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 17.1 Core 4"
+  },
+  {
+   "id": "BIO-IG-17.1-03",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "17 Inheritance",
+   "syllabus": "17.1.5–17.1.8",
+   "level": "supp",
+   "name": "蛋白质合成",
+   "name_en": "Protein synthesis",
+   "desc": "基因的碱基序列决定蛋白质的氨基酸序列；不同氨基酸序列使蛋白质形状不同；DNA 通过控制蛋白质（酶、膜载体、神经递质受体）的合成控制细胞功能；过程：基因留在核内→mRNA 是基因的复制本，在核内合成后进入细胞质→mRNA 通过核糖体→核糖体按 mRNA 碱基序列组装氨基酸成蛋白质",
+   "prereqs": [
+    {
+     "id": "BIO-IG-17.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-4.1-03",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-2.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "base sequence",
+    "amino acid sequence",
+    "mRNA",
+    "ribosome",
+    "protein shape"
+   ],
+   "method": "画流程图：DNA（核）→ mRNA → 核糖体（质）→ 蛋白质。常见错误：说 DNA 离开细胞核。",
+   "probe": "问：基因突变为什么可能导致酶失去功能？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 17.1 Supplement 5–8",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-17.1-04",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "17 Inheritance",
+   "syllabus": "17.1.9–17.1.12",
+   "level": "supp",
+   "name": "基因表达；单倍体与二倍体",
+   "name_en": "Gene expression; haploid and diploid",
+   "desc": "大多数体细胞含相同基因，但细胞只表达所需蛋白质对应的基因；单倍体核含一套染色体，二倍体核含两套；二倍体细胞中每种染色体成对，人类二倍体细胞有 23 对（46 条）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-17.1-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "gene expression",
+    "haploid",
+    "diploid",
+    "homologous pairs",
+    "23 pairs"
+   ],
+   "method": "人类：体细胞 46（2n），配子 23（n）。常见错误：说配子有 23 对。",
+   "probe": "问：人的精子有多少条染色体？为什么不是 46？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 17.1 Supplement 9–12",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-17.2-01",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "17 Inheritance",
+   "syllabus": "17.2.1–17.2.4",
+   "level": "core",
+   "name": "有丝分裂",
+   "name_en": "Mitosis",
+   "desc": "有丝分裂是产生遗传上相同细胞的核分裂（不要求分期）；作用：生长、修复受损组织、更替细胞、无性生殖；有丝分裂前染色体精确复制，分裂时复制的染色体分开，使每个子细胞染色体数保持不变",
+   "prereqs": [
+    {
+     "id": "BIO-IG-17.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-2.1-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "mitosis",
+    "genetically identical",
+    "growth",
+    "repair",
+    "replication",
+    "daughter cells"
+   ],
+   "method": "记“2n → 2n，两个一样的细胞”。常见错误：说有丝分裂产生配子。",
+   "probe": "问：皮肤伤口愈合时进行的是哪种细胞分裂？子细胞有多少条染色体？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 17.2 Core 1–4（另见 unverified：3–4 的 Core/Supplement 归属）"
+  },
+  {
+   "id": "BIO-IG-17.2-02",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "17 Inheritance",
+   "syllabus": "17.2.5",
+   "level": "supp",
+   "name": "干细胞",
+   "name_en": "Stem cells",
+   "desc": "干细胞是未特化的细胞，通过有丝分裂产生可以特化为执行特定功能的子细胞",
+   "prereqs": [
+    {
+     "id": "BIO-IG-17.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-2.1-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "stem cell",
+    "unspecialised",
+    "differentiate",
+    "mitosis"
+   ],
+   "method": "常见错误：说干细胞通过减数分裂产生特化细胞。",
+   "probe": "问：为什么干细胞可能用于治疗受损组织？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 17.2 Supplement 5",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-17.3-01",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "17 Inheritance",
+   "syllabus": "17.3.1/17.3.2",
+   "level": "core",
+   "name": "减数分裂",
+   "name_en": "Meiosis",
+   "desc": "减数分裂参与配子的产生；是染色体数从二倍体减半为单倍体的减数分裂，产生遗传上不同的细胞（不要求分期）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-17.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "meiosis",
+    "reduction division",
+    "haploid",
+    "gametes",
+    "genetically different"
+   ],
+   "method": "与有丝分裂做四行对比（场所、子细胞数、染色体数、是否相同）。常见错误：说减数分裂产生相同细胞。",
+   "probe": "问：如果配子由有丝分裂产生，受精后染色体数会怎样？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 17.3 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-17.4-01",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "17 Inheritance",
+   "syllabus": "17.4.1–17.4.9",
+   "level": "core",
+   "name": "遗传学基本术语",
+   "name_en": "Genetic terminology",
+   "desc": "遗传：遗传信息代代相传；基因型（等位基因组成）、表型（可观察特征）；纯合（两个相同等位基因，相同纯合子交配为纯种）、杂合（两个不同等位基因，不是纯种）；显性等位基因（只要存在就表达）、隐性等位基因（无显性等位基因时才表达）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-17.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "inheritance",
+    "genotype",
+    "phenotype",
+    "homozygous",
+    "heterozygous",
+    "pure-breeding",
+    "dominant",
+    "recessive"
+   ],
+   "method": "术语卡片 + 例子（Tt、TT、tt）。常见错误：说显性性状“更常见”。",
+   "probe": "问：Tt 是纯合还是杂合？表型是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 17.4 Core 1–9"
+  },
+  {
+   "id": "BIO-IG-17.4-02",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "17 Inheritance",
+   "syllabus": "17.4.11/17.4.12",
+   "level": "core",
+   "name": "单因子杂交与遗传图解",
+   "name_en": "Monohybrid crosses and Punnett squares",
+   "desc": "用遗传图解预测单因子杂交结果并计算表型比（限 1:1 和 3:1）；用 Punnett 方格表示产生多种基因型的杂交",
+   "prereqs": [
+    {
+     "id": "BIO-IG-17.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-17.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-RATIO",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "monohybrid cross",
+    "genetic diagram",
+    "Punnett square",
+    "phenotypic ratio",
+    "3:1",
+    "1:1"
+   ],
+   "method": "标准格式：亲本表型→亲本基因型→配子（画圈）→子代基因型→表型→比例。常见错误：配子写两个字母；比例写成百分比时算错。",
+   "probe": "Tt × Tt 和 Tt × tt 各画一个完整遗传图解并写比例。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 17.4 Core 11–12"
+  },
+  {
+   "id": "BIO-IG-17.4-03",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "17 Inheritance",
+   "syllabus": "17.4.10",
+   "level": "core",
+   "name": "系谱图分析",
+   "name_en": "Pedigree diagrams",
+   "desc": "解读系谱图中某一性状的遗传，推断个体基因型，判断性状显隐性（无病双亲生出患病子女 → 隐性）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-17.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "pedigree diagram",
+    "affected",
+    "carrier",
+    "generation"
+   ],
+   "method": "先找“两个正常生出患病”判断隐性。常见错误：用单个个体直接判断显隐性。",
+   "probe": "给一个三代系谱图，判断显隐性并写出两个个体的基因型。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 17.4 Core 10"
+  },
+  {
+   "id": "BIO-IG-17.4-04",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "17 Inheritance",
+   "syllabus": "17.4.13",
+   "level": "supp",
+   "name": "测交",
+   "name_en": "Test cross",
+   "desc": "用测交（与隐性纯合子杂交）鉴定显性表型个体的未知基因型：后代全显性 → 纯合；出现 1:1 → 杂合",
+   "prereqs": [
+    {
+     "id": "BIO-IG-17.4-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "test cross",
+    "homozygous recessive",
+    "unknown genotype"
+   ],
+   "method": "写出两种可能的遗传图解再比较。常见错误：用显性纯合子做测交。",
+   "probe": "问：如何判断一只黑色豚鼠是 BB 还是 Bb？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 17.4 Supplement 13",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-17.4-05",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "17 Inheritance",
+   "syllabus": "17.4.14/17.4.15/17.4.18",
+   "level": "supp",
+   "name": "共显性与 ABO 血型",
+   "name_en": "Codominance and ABO blood groups",
+   "desc": "共显性：杂合子中两个等位基因都影响表型；ABO 血型：等位基因 Iᴬ、Iᴮ（共显性）、Iᴼ（隐性），表型 A、B、AB、O；用遗传图解预测共显性杂交结果和表型比",
+   "prereqs": [
+    {
+     "id": "BIO-IG-17.4-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "codominance",
+    "ABO blood group",
+    "IA",
+    "IB",
+    "Io",
+    "multiple alleles"
+   ],
+   "method": "列出 6 种基因型对应 4 种表型。常见错误：把 AB 血型写成 Iᴬ Iᴬ。",
+   "probe": "A 型（IᴬIᴼ）与 B 型（IᴮIᴼ）父母，孩子可能是哪些血型，比例如何？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 17.4 Supplement 14–15, 18",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-17.4-06",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "17 Inheritance",
+   "syllabus": "17.4.16/17.4.17/17.4.18",
+   "level": "supp",
+   "name": "伴性遗传：红绿色盲",
+   "name_en": "Sex linkage: red-green colour blindness",
+   "desc": "伴性性状的基因位于性染色体上，使该性状在一种性别中更常见；红绿色盲是伴 X 隐性遗传例子（Xᴮ、Xᵇ 写法）；用遗传图解预测伴性遗传结果",
+   "prereqs": [
+    {
+     "id": "BIO-IG-17.4-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-17.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "sex-linked",
+    "X chromosome",
+    "colour blindness",
+    "carrier",
+    "XbY"
+   ],
+   "method": "等位基因一定写在 X 上，Y 上不写。常见错误：写成 Bb 而不带 X。",
+   "probe": "携带者母亲（XᴮXᵇ）与正常父亲生子，儿子色盲的概率是多少？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 17.4 Supplement 16–18",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-18.1-01",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "18 Variation and selection",
+   "syllabus": "18.1.1–18.1.5",
+   "level": "core",
+   "name": "连续变异与不连续变异",
+   "name_en": "Continuous and discontinuous variation",
+   "desc": "变异是同种个体间的差异；连续变异：两极之间连续范围的表型（身长、体重），由基因和环境共同引起；不连续变异：有限几种表型、无中间类型（ABO 血型、豌豆种子形状和颜色），通常仅由基因引起；探究并描述两类变异（如测量手长作直方图）",
+   "prereqs": [
+    {
+     "id": "BIO-LS-9Bp.03",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-PRAC-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "variation",
+    "continuous variation",
+    "discontinuous variation",
+    "histogram",
+    "bar chart"
+   ],
+   "method": "连续用直方图，不连续用条形图。常见错误：说身高只由基因决定。",
+   "probe": "给全班手掌宽度数据，让她选合适的图并说明是哪类变异。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 18.1 Core 1–5"
+  },
+  {
+   "id": "BIO-IG-18.1-02",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "18 Variation and selection",
+   "syllabus": "18.1.6/18.1.7/18.1.8",
+   "level": "core",
+   "name": "突变",
+   "name_en": "Mutation",
+   "desc": "突变是遗传物质的改变；突变是产生新等位基因的方式；电离辐射和某些化学物质会增加突变率",
+   "prereqs": [
+    {
+     "id": "BIO-IG-17.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "mutation",
+    "new alleles",
+    "ionising radiation",
+    "chemicals",
+    "mutagen"
+   ],
+   "method": "常见错误：说所有突变都有害。",
+   "probe": "问：为什么放射科工作人员要穿铅衣？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 18.1 Core 6–8"
+  },
+  {
+   "id": "BIO-IG-18.1-03",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "18 Variation and selection",
+   "syllabus": "18.1.9/18.1.10",
+   "level": "supp",
+   "name": "基因突变与遗传变异的来源",
+   "name_en": "Gene mutation and sources of genetic variation",
+   "desc": "基因突变是 DNA 碱基序列的随机改变；种群中遗传变异的来源：突变、减数分裂、随机交配、随机受精",
+   "prereqs": [
+    {
+     "id": "BIO-IG-18.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-17.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-4.1-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "gene mutation",
+    "base sequence",
+    "random mating",
+    "random fertilisation",
+    "meiosis"
+   ],
+   "method": "列四个来源。常见错误：漏掉随机受精。",
+   "probe": "问：除了突变，还有哪三个因素产生遗传变异？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 18.1 Supplement 9–10",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-18.2-01",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "18 Variation and selection",
+   "syllabus": "18.2.1/18.2.2",
+   "level": "core",
+   "name": "适应特征",
+   "name_en": "Adaptive features",
+   "desc": "适应特征是帮助生物在其环境中生存和繁殖的遗传性特征；能根据图片或资料描述某物种的适应特征（如骆驼、北极熊、仙人掌）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-18.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "adaptive feature",
+    "inherited",
+    "survive",
+    "reproduce",
+    "environment"
+   ],
+   "method": "答题：特征 + 如何帮助生存/繁殖。常见错误：把后天习得的行为当成适应特征。",
+   "probe": "给一张沙漠狐的图，描述两个适应特征及其作用。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 18.2 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-18.2-02",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "18 Variation and selection",
+   "syllabus": "18.2.3",
+   "level": "supp",
+   "name": "水生植物与旱生植物的适应",
+   "name_en": "Hydrophytes and xerophytes",
+   "desc": "旱生植物：厚角质层、气孔少且凹陷、叶卷曲或成刺、发达根系、储水组织；水生植物：气孔在叶上表面、角质层薄或无、组织中有大气腔助浮、木质部少",
+   "prereqs": [
+    {
+     "id": "BIO-IG-18.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-8.3-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "hydrophyte",
+    "xerophyte",
+    "sunken stomata",
+    "rolled leaves",
+    "air spaces",
+    "cuticle"
+   ],
+   "method": "每个特征都落到“减少蒸腾”或“获得气体/浮力”。常见错误：说睡莲气孔在下表面。",
+   "probe": "问：仙人掌叶变成刺有什么好处？睡莲气孔为什么长在上表面？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 18.2 Supplement 3",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-18.3-01",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "18 Variation and selection",
+   "syllabus": "18.3.1",
+   "level": "core",
+   "name": "自然选择",
+   "name_en": "Natural selection",
+   "desc": "自然选择：种群内存在遗传变异 → 产生大量后代 → 生存斗争（含资源竞争）→ 更适应环境的个体繁殖机会更大 → 把等位基因传给下一代",
+   "prereqs": [
+    {
+     "id": "BIO-LS-9Bp.04",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-18.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "natural selection",
+    "variation",
+    "competition",
+    "struggle for survival",
+    "better adapted",
+    "alleles"
+   ],
+   "method": "五步按顺序写，最后一定写 pass on alleles。常见错误：拉马克式“为了适应而改变”。",
+   "probe": "用自然选择解释长颈鹿颈长的进化。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 18.3 Core 1"
+  },
+  {
+   "id": "BIO-IG-18.3-02",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "18 Variation and selection",
+   "syllabus": "18.3.2/18.3.3",
+   "level": "core",
+   "name": "选择育种",
+   "name_en": "Selective breeding",
+   "desc": "选择育种：人类选择具有理想性状的个体 → 让它们杂交产生下一代 → 选择表现理想性状的后代 → 重复多代，以改良作物和家畜，并能应用于具体情境",
+   "prereqs": [
+    {
+     "id": "BIO-IG-18.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "selective breeding",
+    "artificial selection",
+    "desirable feature",
+    "many generations"
+   ],
+   "method": "常见错误：说选择育种一代就完成。",
+   "probe": "描述如何通过选择育种培育高产奶牛。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 18.3 Core 2–3"
+  },
+  {
+   "id": "BIO-IG-18.3-03",
+   "strand": "B8",
+   "stage": "IGCSE",
+   "unit": "18 Variation and selection",
+   "syllabus": "18.3.4/18.3.5/18.3.6",
+   "level": "supp",
+   "name": "适应过程、抗生素耐药与两种选择比较",
+   "name_en": "Adaptation, antibiotic resistance, natural vs artificial selection",
+   "desc": "适应：自然选择导致种群在多代中更适合其环境的过程；抗生素耐药菌株的产生是自然选择的例子（随机突变产生耐药等位基因 → 抗生素杀死非耐药菌 → 耐药菌繁殖）；自然选择与人工选择的区别（选择者、目标、速度）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-18.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-18.3-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-15.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "adaptation",
+    "antibiotic resistance",
+    "mutation",
+    "natural selection",
+    "artificial selection"
+   ],
+   "method": "耐药菌五步：突变→选择压力→存活→繁殖→比例上升。常见错误：说抗生素“导致”突变。",
+   "probe": "解释 MRSA 是如何出现的。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 18.3 Supplement 4–6",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-19.1-01",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "19 Organisms and their environment",
+   "syllabus": "19.1.1/19.1.2",
+   "level": "core",
+   "name": "能量流动",
+   "name_en": "Energy flow",
+   "desc": "太阳是生物系统主要的能量输入来源；能量流经生物：太阳光能 → 生物体内化学能 → 最终转移到环境中（以热能形式散失）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-6.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-ENERGY",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "energy flow",
+    "light energy",
+    "chemical energy",
+    "transfer",
+    "environment"
+   ],
+   "method": "能量单向流动、物质循环。常见错误：说能量在生态系统中循环。",
+   "probe": "问：为什么说能量在生态系统中是“流动”而不是“循环”？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 19.1 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-19.2-01",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "19 Organisms and their environment",
+   "syllabus": "19.2.1–19.2.9/19.2.13/19.2.14",
+   "level": "core",
+   "name": "食物链、食物网与营养级",
+   "name_en": "Food chains, food webs and trophic levels",
+   "desc": "食物链表示从生产者开始的能量传递；构建并解读食物链和食物网；生产者（通常通过光合作用利用阳光制造有机养料）、消费者（初级、次级、三级、四级）、植食动物、肉食动物、分解者（从死亡或废弃有机物获取能量）；营养级是生物在食物链、网或生态金字塔中的位置",
+   "prereqs": [
+    {
+     "id": "BIO-LS-7Be.01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-19.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "food chain",
+    "food web",
+    "producer",
+    "primary consumer",
+    "herbivore",
+    "carnivore",
+    "decomposer",
+    "trophic level"
+   ],
+   "method": "同一生物在不同链中可处于不同营养级。常见错误：箭头画反；把分解者放入食物链营养级中。",
+   "probe": "给一个食物网，问某种鸟占哪些营养级。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 19.2 Core 1–9, 13–14"
+  },
+  {
+   "id": "BIO-IG-19.2-02",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "19 Organisms and their environment",
+   "syllabus": "19.2.10",
+   "level": "core",
+   "name": "人类对食物网的影响",
+   "name_en": "Human impact on food webs",
+   "desc": "用食物链和食物网描述人类过度捕捞食用物种、引入外来物种对生态系统的影响",
+   "prereqs": [
+    {
+     "id": "BIO-IG-19.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-LS-8Be.03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "overharvesting",
+    "introduced species",
+    "food web",
+    "population"
+   ],
+   "method": "沿箭头上下各推一层：被吃者增、天敌减。常见错误：只分析一个物种。",
+   "probe": "问：大量捕捞鳕鱼对其猎物和天敌各有什么影响？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 19.2 Core 10"
+  },
+  {
+   "id": "BIO-IG-19.2-03",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "19 Organisms and their environment",
+   "syllabus": "19.2.11/19.2.12",
+   "level": "core",
+   "name": "数量金字塔与生物量金字塔",
+   "name_en": "Pyramids of numbers and biomass",
+   "desc": "绘制、描述并解释数量金字塔和生物量金字塔；生物量金字塔比数量金字塔更能代表食物链（不受个体大小影响，一般呈正金字塔）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-19.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "pyramid of numbers",
+    "pyramid of biomass",
+    "dry mass",
+    "inverted pyramid"
+   ],
+   "method": "按比例画横条。常见错误：一棵树+许多毛虫的数量金字塔不是正金字塔却画成正的。",
+   "probe": "给“橡树→毛虫→山雀”数据，分别画数量和生物量金字塔。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 19.2 Core 11–12"
+  },
+  {
+   "id": "BIO-IG-19.2-04",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "19 Organisms and their environment",
+   "syllabus": "19.2.15–19.2.19",
+   "level": "supp",
+   "name": "能量金字塔与能量传递效率",
+   "name_en": "Pyramids of energy and energy transfer efficiency",
+   "desc": "绘制并解释能量金字塔及其优点；营养级间能量传递效率低（呼吸散热、未被吃掉的部分、排泄物和粪便、不可消化部分），故食物链通常少于五个营养级；人吃作物比吃用作物喂养的牲畜更节能",
+   "prereqs": [
+    {
+     "id": "BIO-IG-19.2-03",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-RATIO",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "pyramid of energy",
+    "energy transfer efficiency",
+    "heat loss",
+    "respiration",
+    "trophic levels"
+   ],
+   "method": "效率 = 下一级能量 / 上一级能量 ×100%（约 10%）。常见错误：说能量“被消耗掉”而不说以热散失。",
+   "probe": "给每级能量数据，算传递效率，并解释为什么食物链很少超过 5 级。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 19.2 Supplement 15–19",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-19.3-01",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "19 Organisms and their environment",
+   "syllabus": "19.3.1",
+   "level": "core",
+   "name": "碳循环",
+   "name_en": "The carbon cycle",
+   "desc": "碳循环：光合作用（吸收 CO₂）、呼吸作用、取食、分解、化石燃料形成和燃烧",
+   "prereqs": [
+    {
+     "id": "BIO-IG-6.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-12.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-19.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "carbon cycle",
+    "photosynthesis",
+    "respiration",
+    "decomposition",
+    "fossil fuels",
+    "combustion"
+   ],
+   "method": "画循环图，每个箭头标一个过程。常见错误：忘了分解者的呼吸也释放 CO₂。",
+   "probe": "给碳循环空白图填过程名，问哪个过程从大气中移除 CO₂。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 19.3 Core 1"
+  },
+  {
+   "id": "BIO-IG-19.3-02",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "19 Organisms and their environment",
+   "syllabus": "19.3.2/19.3.3",
+   "level": "supp",
+   "name": "氮循环",
+   "name_en": "The nitrogen cycle",
+   "desc": "氮循环：动植物蛋白被分解为铵离子 → 硝化作用（铵→硝酸盐）→ 闪电和细菌固氮 → 植物吸收硝酸根离子 → 合成氨基酸和蛋白质 → 取食和消化蛋白质 → 脱氨 → 反硝化作用（硝酸盐→N₂）；微生物在分解、硝化、固氮、反硝化中的作用",
+   "prereqs": [
+    {
+     "id": "BIO-IG-19.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-6.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-13.1-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "nitrogen cycle",
+    "ammonium ions",
+    "nitrification",
+    "nitrogen fixation",
+    "denitrification",
+    "nitrifying bacteria"
+   ],
+   "method": "四类细菌分别配一个转化。常见错误：反硝化与硝化方向混淆；说植物直接吸收 N₂。",
+   "probe": "问：涝渍（缺氧）土壤为什么氮流失多？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 19.3 Supplement 2–3",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-19.4-01",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "19 Organisms and their environment",
+   "syllabus": "19.4.1–19.4.4",
+   "level": "core",
+   "name": "种群、群落与生态系统",
+   "name_en": "Populations, communities and ecosystems",
+   "desc": "种群：同一时间生活在同一区域的同种生物；群落：生态系统中所有不同物种的种群；生态系统：群落与其环境相互作用的单元；影响种群增长速率的因素：食物供应、竞争、捕食和疾病",
+   "prereqs": [
+    {
+     "id": "BIO-LS-8Be.01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-19.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "population",
+    "community",
+    "ecosystem",
+    "food supply",
+    "competition",
+    "predation",
+    "disease"
+   ],
+   "method": "三个定义的关键词：one species / all populations / community + environment。常见错误：把群落说成“一个物种的群体”。",
+   "probe": "问：池塘里所有的青蛙是种群还是群落？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 19.4 Core 1–4"
+  },
+  {
+   "id": "BIO-IG-19.4-02",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "19 Organisms and their environment",
+   "syllabus": "19.4.5/19.4.6",
+   "level": "core",
+   "name": "S 型种群增长曲线",
+   "name_en": "Sigmoid population growth curve",
+   "desc": "在资源有限的环境中，种群增长 S 型曲线的停滞期（lag）、指数期（log）、稳定期（stationary）和衰亡期（death）；解读种群增长图表",
+   "prereqs": [
+    {
+     "id": "BIO-IG-19.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "sigmoid curve",
+    "lag phase",
+    "exponential phase",
+    "stationary phase",
+    "death phase"
+   ],
+   "method": "在曲线上标四个阶段。常见错误：把稳定期说成“出生和死亡都停止”。",
+   "probe": "给酵母种群增长曲线，标出各阶段。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 19.4 Core 5–6"
+  },
+  {
+   "id": "BIO-IG-19.4-03",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "19 Organisms and their environment",
+   "syllabus": "19.4.7",
+   "level": "supp",
+   "name": "S 型曲线各阶段的解释",
+   "name_en": "Explaining phases of the sigmoid curve",
+   "desc": "解释各阶段原因：停滞期（适应环境、个体少）、指数期（资源充足、出生率远大于死亡率）、稳定期（限制因素如食物、空间使出生率 = 死亡率）、衰亡期（资源耗尽、废物积累，死亡率 > 出生率）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-19.4-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-6.1-06",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "limiting factor",
+    "birth rate",
+    "death rate",
+    "carrying capacity"
+   ],
+   "method": "每期都用“出生率 vs 死亡率”比较。常见错误：没有提到限制因素。",
+   "probe": "问：为什么酵母在培养瓶中最终会进入衰亡期？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 19.4 Supplement 7",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-20.1-01",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "20 Human influences on ecosystems",
+   "syllabus": "20.1.1",
+   "level": "core",
+   "name": "人类增加粮食生产的方法",
+   "name_en": "Increasing food production",
+   "desc": "农业机械（扩大耕地、提高效率）、化肥（提高产量）、杀虫剂（提高品质和产量）、除草剂（减少杂草竞争）、选择育种（提高作物和家畜产量）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-18.3-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-6.1-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "agricultural machinery",
+    "chemical fertiliser",
+    "insecticide",
+    "herbicide",
+    "selective breeding"
+   ],
+   "method": "五种方法各配“作用”。常见错误：混淆 insecticide 和 herbicide。",
+   "probe": "问：除草剂如何提高作物产量？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 20.1 Core 1"
+  },
+  {
+   "id": "BIO-IG-20.1-02",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "20 Human influences on ecosystems",
+   "syllabus": "20.1.2/20.1.3",
+   "level": "core",
+   "name": "单一种植与集约化畜牧",
+   "name_en": "Monocultures and intensive livestock production",
+   "desc": "大规模单一作物种植的利（高效、机械化、产量高）与弊（生物多样性降低、病虫害易扩散、土壤养分耗竭、依赖农药化肥）；集约化畜牧的利（产量高、成本低）与弊（动物福利、疾病传播、抗生素滥用、污染）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-20.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "monoculture",
+    "intensive livestock production",
+    "biodiversity",
+    "pests",
+    "animal welfare"
+   ],
+   "method": "利弊对照表。常见错误：只写缺点。",
+   "probe": "问：大面积种植单一品种棕榈油有哪些环境问题？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 20.1 Core 2–3"
+  },
+  {
+   "id": "BIO-IG-20.2-01",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "20 Human influences on ecosystems",
+   "syllabus": "20.2.1–20.2.4",
+   "level": "core",
+   "name": "生物多样性与栖息地破坏",
+   "name_en": "Biodiversity and habitat destruction",
+   "desc": "生物多样性：一个区域内不同物种的数目；栖息地破坏原因：住房、种植和畜牧扩张、开采自然资源、淡水和海洋污染；人类通过改变食物网可对栖息地产生负面影响；森林砍伐的不良影响：生物多样性降低、灭绝、水土流失、洪水、大气 CO₂ 增加",
+   "prereqs": [
+    {
+     "id": "BIO-IG-19.2-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-LS-9Be.01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "biodiversity",
+    "habitat destruction",
+    "deforestation",
+    "extinction",
+    "soil erosion",
+    "flooding"
+   ],
+   "method": "砍伐后果五点按“生物—土壤—水—大气”记。常见错误：只写“动物没有家”。",
+   "probe": "问：砍伐热带雨林为什么会加剧洪水和气候变化？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 20.2 Core 1–4"
+  },
+  {
+   "id": "BIO-IG-20.3-01",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "20 Human influences on ecosystems",
+   "syllabus": "20.3.1/20.3.2",
+   "level": "core",
+   "name": "水体污染与塑料污染",
+   "name_en": "Sewage, fertiliser and plastic pollution",
+   "desc": "未处理污水和过量化肥对水生生态系统的影响；不可生物降解塑料对水生和陆地生态系统的影响（缠绕、误食、微塑料、沿食物链积累）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-20.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-LS-8Be.02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "untreated sewage",
+    "fertiliser",
+    "aquatic ecosystem",
+    "non-biodegradable plastic",
+    "microplastics"
+   ],
+   "method": "常见错误：说塑料能被分解者分解。",
+   "probe": "问：海洋塑料对海龟可能造成哪些伤害？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 20.3 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-20.3-02",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "20 Human influences on ecosystems",
+   "syllabus": "20.3.3",
+   "level": "core",
+   "name": "温室气体与气候变化",
+   "name_en": "Methane, carbon dioxide and climate change",
+   "desc": "空气中甲烷（牲畜、稻田、垃圾填埋）和二氧化碳（燃烧化石燃料、砍伐森林）的来源；增强的温室效应和气候变化",
+   "prereqs": [
+    {
+     "id": "BIO-IG-19.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "methane",
+    "carbon dioxide",
+    "enhanced greenhouse effect",
+    "climate change",
+    "fossil fuels"
+   ],
+   "method": "区分自然温室效应与增强的温室效应。常见错误：把温室效应和臭氧层空洞混为一谈。",
+   "probe": "问：大规模养牛如何加剧全球变暖？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 20.3 Core 3"
+  },
+  {
+   "id": "BIO-IG-20.3-03",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "20 Human influences on ecosystems",
+   "syllabus": "20.3.4",
+   "level": "supp",
+   "name": "富营养化",
+   "name_en": "Eutrophication",
+   "desc": "富营养化过程：硝酸盐等离子增加 → 生产者（藻类）大量生长 → 生产者死亡后分解增加 → 分解者有氧呼吸增加 → 水中溶解氧减少 → 需氧生物死亡",
+   "prereqs": [
+    {
+     "id": "BIO-IG-20.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-19.3-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "eutrophication",
+    "nitrate",
+    "algal bloom",
+    "decomposers",
+    "dissolved oxygen"
+   ],
+   "method": "六步一个不能少，关键是“分解者呼吸耗氧”。常见错误：说藻类遮光导致鱼死亡而不说缺氧。",
+   "probe": "按顺序解释农田化肥流入湖泊后鱼类死亡的原因。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 20.3 Supplement 4",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-20.4-01",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "20 Human influences on ecosystems",
+   "syllabus": "20.4.1–20.4.4",
+   "level": "core",
+   "name": "可持续资源与濒危物种保护",
+   "name_en": "Sustainable resources and conservation of endangered species",
+   "desc": "可持续资源：产生速度与被移除速度相同、不会耗尽；森林和鱼类可持续管理；物种濒危或灭绝原因：气候变化、栖息地破坏、狩猎、过度捕捞、污染、引入物种；保护方法：监测和保护物种及栖息地、教育、圈养繁殖、种子库",
+   "prereqs": [
+    {
+     "id": "BIO-IG-20.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-RESOURCES",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "sustainable resource",
+    "endangered",
+    "extinct",
+    "captive breeding",
+    "seed bank",
+    "conservation"
+   ],
+   "method": "原因和措施各列清单配对。常见错误：把“可再生”和“可持续”完全等同。",
+   "probe": "问：种子库如何帮助保护植物物种？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 20.4 Core 1–4"
+  },
+  {
+   "id": "BIO-IG-20.4-02",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "20 Human influences on ecosystems",
+   "syllabus": "20.4.5/20.4.6",
+   "level": "supp",
+   "name": "森林与渔业资源的保护",
+   "name_en": "Conserving forests and fish stocks",
+   "desc": "森林保护：教育、保护区、配额、重新造林；渔业保护：教育、休渔期、保护区、控制网型和网眼大小、配额、监测",
+   "prereqs": [
+    {
+     "id": "BIO-IG-20.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "quota",
+    "replanting",
+    "closed season",
+    "protected area",
+    "mesh size",
+    "monitoring"
+   ],
+   "method": "每个措施说明“如何让产出 ≥ 移除”。常见错误：网眼越小越好（应大以放走幼鱼）。",
+   "probe": "问：为什么规定最小网眼尺寸能保护鱼类资源？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 20.4 Supplement 5–6",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-20.4-03",
+   "strand": "B9",
+   "stage": "IGCSE",
+   "unit": "20 Human influences on ecosystems",
+   "syllabus": "20.4.7/20.4.8/20.4.9",
+   "level": "supp",
+   "name": "保护计划的原因、AI/IVF 与遗传多样性",
+   "name_en": "Reasons for conservation; AI and IVF; loss of genetic variation",
+   "desc": "保护计划的原因：维持或增加生物多样性、减少灭绝、保护脆弱生态系统、维持生态系统功能（养分循环、提供食物、药物、燃料和基因资源）；圈养繁殖中使用人工授精（AI）和体外受精（IVF）；种群缩小会减少遗传变异，使物种难以适应环境变化、易受疾病影响",
+   "prereqs": [
+    {
+     "id": "BIO-IG-20.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-18.1-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "conservation programme",
+    "artificial insemination",
+    "IVF",
+    "genetic variation",
+    "inbreeding"
+   ],
+   "method": "常见错误：说小种群只要数量恢复就没有风险（遗传多样性已丢失）。",
+   "probe": "问：大熊猫圈养繁殖为什么要从不同个体交换精子？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 20.4 Supplement 7–9",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-21.1-01",
+   "strand": "B10",
+   "stage": "IGCSE",
+   "unit": "21 Biotechnology and genetic modification",
+   "syllabus": "21.1.1/21.1.2",
+   "level": "core",
+   "name": "细菌在生物技术中的用途",
+   "name_en": "Why bacteria are useful in biotechnology",
+   "desc": "细菌繁殖快、能合成复杂分子，因此在生物技术和基因改造中有用；（补充）操作和培养细菌伦理顾虑少，且有质粒",
+   "prereqs": [
+    {
+     "id": "BIO-IG-2.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "biotechnology",
+    "bacteria",
+    "rapid reproduction",
+    "complex molecules",
+    "plasmids",
+    "ethical concerns"
+   ],
+   "method": "列四个理由（核心 2 + 补充 2）。常见错误：只写“细菌小”。",
+   "probe": "问：为什么用细菌而不是羊来生产人胰岛素？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 21.1 Core 1, Supplement 2"
+  },
+  {
+   "id": "BIO-IG-21.2-01",
+   "strand": "B10",
+   "stage": "IGCSE",
+   "unit": "21 Biotechnology and genetic modification",
+   "syllabus": "21.2.1/21.2.2",
+   "level": "core",
+   "name": "酵母：生物燃料与面包制作",
+   "name_en": "Yeast in biofuels and bread-making",
+   "desc": "酵母无氧呼吸在生产生物燃料乙醇中的作用（发酵糖类产生乙醇）；面包制作中酵母无氧呼吸产生的 CO₂ 使面团膨胀，乙醇在烘烤中蒸发",
+   "prereqs": [
+    {
+     "id": "BIO-IG-12.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "yeast",
+    "anaerobic respiration",
+    "ethanol",
+    "biofuel",
+    "bread",
+    "carbon dioxide"
+   ],
+   "method": "两个应用分别利用哪种产物。常见错误：说面包膨胀是因为乙醇。",
+   "probe": "问：为什么面团要放在温暖处发酵？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 21.2 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-21.2-02",
+   "strand": "B10",
+   "stage": "IGCSE",
+   "unit": "21 Biotechnology and genetic modification",
+   "syllabus": "21.2.3/21.2.4",
+   "level": "core",
+   "name": "果胶酶与加酶洗衣粉",
+   "name_en": "Pectinase and biological washing powders",
+   "desc": "果胶酶分解细胞壁中的果胶，提高果汁产量并使果汁澄清；探究并描述含酶生物洗衣粉（蛋白酶、脂肪酶）的作用，最适温度较低",
+   "prereqs": [
+    {
+     "id": "BIO-IG-5.1-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "pectinase",
+    "fruit juice",
+    "biological washing powder",
+    "protease",
+    "lipase"
+   ],
+   "method": "洗衣粉实验：控制温度、时间、污渍面积。常见错误：说加酶洗衣粉在 90 °C 效果最好。",
+   "probe": "设计实验比较加酶和不加酶洗衣粉去除蛋渍的效果。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 21.2 Core 3–4"
+  },
+  {
+   "id": "BIO-IG-21.2-03",
+   "strand": "B10",
+   "stage": "IGCSE",
+   "unit": "21 Biotechnology and genetic modification",
+   "syllabus": "21.2.5",
+   "level": "supp",
+   "name": "乳糖酶与无乳糖牛奶",
+   "name_en": "Lactase and lactose-free milk",
+   "desc": "乳糖酶把乳糖分解为葡萄糖和半乳糖，用于生产无乳糖牛奶（供乳糖不耐受者饮用）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-21.2-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "lactase",
+    "lactose",
+    "glucose",
+    "galactose",
+    "lactose intolerance"
+   ],
+   "method": "常见错误：说乳糖酶分解蛋白质。",
+   "probe": "问：无乳糖牛奶为什么尝起来更甜？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 21.2 Supplement 5",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-21.2-04",
+   "strand": "B10",
+   "stage": "IGCSE",
+   "unit": "21 Biotechnology and genetic modification",
+   "syllabus": "21.2.6/21.2.7",
+   "level": "supp",
+   "name": "发酵罐",
+   "name_en": "Fermenters",
+   "desc": "发酵罐可用于细菌和真菌大规模生产有用产品（胰岛素、青霉素、真菌蛋白）；需要控制的条件：温度（冷却水套）、pH（探头加酸碱）、氧气（通气）、营养供应、废物排出，并保持无菌",
+   "prereqs": [
+    {
+     "id": "BIO-IG-21.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-5.1-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "fermenter",
+    "insulin",
+    "penicillin",
+    "mycoprotein",
+    "temperature",
+    "pH",
+    "aseptic"
+   ],
+   "method": "画发酵罐示意图并标各控制装置。常见错误：说需要加热（微生物呼吸产热，通常需要冷却）。",
+   "probe": "问：发酵罐为什么要有冷却水套？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 21.2 Supplement 6–7",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-21.3-01",
+   "strand": "B10",
+   "stage": "IGCSE",
+   "unit": "21 Biotechnology and genetic modification",
+   "syllabus": "21.3.1/21.3.2",
+   "level": "core",
+   "name": "基因改造的定义与实例",
+   "name_en": "Genetic modification: definition and examples",
+   "desc": "基因改造：通过去除、改变或插入单个基因改变生物的遗传物质；实例：把人类基因插入细菌生产人类蛋白质、使作物抗除草剂、抗虫害、提高营养品质（如黄金大米）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-17.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-21.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "genetic modification",
+    "insert gene",
+    "herbicide resistance",
+    "pest resistance",
+    "nutritional quality"
+   ],
+   "method": "四类实例各举一个。常见错误：把选择育种当成基因改造。",
+   "probe": "问：选择育种和基因改造有什么本质区别？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 21.3 Core 1–2"
+  },
+  {
+   "id": "BIO-IG-21.3-02",
+   "strand": "B10",
+   "stage": "IGCSE",
+   "unit": "21 Biotechnology and genetic modification",
+   "syllabus": "21.3.3",
+   "level": "supp",
+   "name": "基因改造的过程",
+   "name_en": "The process of genetic modification",
+   "desc": "以细菌生产人类蛋白为例：用限制酶切出人类基因（形成黏性末端）→ 用同一种限制酶切开细菌质粒（形成互补黏性末端）→ DNA 连接酶连接形成重组质粒 → 重组质粒导入细菌 → 细菌增殖 → 细菌表达人类基因合成蛋白质",
+   "prereqs": [
+    {
+     "id": "BIO-IG-21.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-2.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-17.1-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "restriction enzyme",
+    "sticky ends",
+    "plasmid",
+    "DNA ligase",
+    "recombinant plasmid",
+    "expression"
+   ],
+   "method": "六步流程图，强调“同一种”限制酶。常见错误：把连接酶和限制酶作用对调。",
+   "probe": "按顺序写出生产人胰岛素的基因工程步骤。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 21.3 Supplement 3",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-21.3-03",
+   "strand": "B10",
+   "stage": "IGCSE",
+   "unit": "21 Biotechnology and genetic modification",
+   "syllabus": "21.3.4",
+   "level": "supp",
+   "name": "转基因作物的利弊",
+   "name_en": "Advantages and disadvantages of GM crops",
+   "desc": "讨论转基因作物（大豆、玉米、水稻）的利（产量高、减少农药、营养提高）与弊（基因扩散到野生种、种子成本高、对昆虫和生物多样性的影响、长期健康影响未知）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-21.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "GM crops",
+    "soya",
+    "maize",
+    "rice",
+    "biodiversity",
+    "cross-pollination"
+   ],
+   "method": "利弊各写 3 条再下结论。常见错误：只给观点没有依据。",
+   "probe": "问：抗除草剂转基因作物可能对周围野生植物造成什么影响？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf 21.3 Supplement 4",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "BIO-IG-PRAC-01",
+   "strand": "PRAC",
+   "stage": "IGCSE",
+   "unit": "Practical assessment (Paper 5/6, AO3)",
+   "syllabus": "AO3",
+   "level": "core",
+   "name": "生物绘图与标注",
+   "name_en": "Biological drawings",
+   "desc": "对生物标本作清晰线条图：只用线条不涂阴影、比例正确、标注线用直尺且不交叉；计算图的放大倍数或标本实际大小并标注",
+   "prereqs": [
+    {
+     "id": "BIO-IG-2.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "line drawing",
+    "label",
+    "proportion",
+    "magnification",
+    "specimen"
+   ],
+   "method": "画图前先测量标本，保证比例。常见错误：涂阴影、线条重复、标注线有箭头。",
+   "probe": "给一片叶的照片，让她画图、标注并计算放大倍数。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf Practical assessment / Experimental skills and investigations 部分（AO3）及 Mathematical requirements：make clear line drawings of biological specimens"
+  },
+  {
+   "id": "BIO-IG-PRAC-02",
+   "strand": "PRAC",
+   "stage": "IGCSE",
+   "unit": "Practical assessment (Paper 5/6, AO3)",
+   "syllabus": "AO3",
+   "level": "core",
+   "name": "实验设计：变量与对照",
+   "name_en": "Planning investigations: variables and controls",
+   "desc": "识别自变量、因变量；说明需要保持不变的变量及原因；为自变量选取合适的数量和范围（至少 5 个值）；设置对照实验；作出有依据的预测；说明记录与处理结果的方法",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "independent variable",
+    "dependent variable",
+    "control variable",
+    "control experiment",
+    "prediction",
+    "range"
+   ],
+   "method": "用“改变什么—测量什么—控制什么—怎么测—重复几次”五问模板写计划。常见错误：把对照实验与控制变量混为一谈。",
+   "probe": "给“温度对酵母呼吸的影响”题目，让她写一个完整实验计划。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf Practical assessment / Experimental skills and investigations 部分（AO3）及 Mathematical requirements：Planning experiments and investigations"
+  },
+  {
+   "id": "BIO-IG-PRAC-03",
+   "strand": "PRAC",
+   "stage": "IGCSE",
+   "unit": "Practical assessment (Paper 5/6, AO3)",
+   "syllabus": "AO3",
+   "level": "core",
+   "name": "测量、读数与记录",
+   "name_en": "Making and recording measurements",
+   "desc": "以适当精度从模拟和数字仪器读数（量筒、温度计、停表、天平、刻度尺）；进行足够的重复测量；用表格系统记录数据，表头写物理量和单位、同一列小数位一致；记录食物检测等定性观察",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-DEC",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-UNIT",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "reading",
+    "precision",
+    "repeat",
+    "table",
+    "units",
+    "qualitative observation"
+   ],
+   "method": "表头格式：quantity / unit（单位不写进数据格）。常见错误：数据格里重复写单位；小数位不一致。",
+   "probe": "给一张有错误的结果表，让她找出三处错误。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf Practical assessment / Experimental skills and investigations 部分（AO3）及 Mathematical requirements：Making and recording observations, measurements and estimates"
+  },
+  {
+   "id": "BIO-IG-PRAC-04",
+   "strand": "PRAC",
+   "stage": "IGCSE",
+   "unit": "Practical assessment (Paper 5/6, AO3)",
+   "syllabus": "AO3",
+   "level": "core",
+   "name": "数据处理与作图",
+   "name_en": "Processing data and plotting graphs",
+   "desc": "计算平均值、范围、百分比和百分比变化、速率（1/时间）；选择合适图表（折线图、条形图、直方图）；坐标轴标量和单位、刻度均匀、图占纸一半以上；内插外推、求梯度和截距；按大纲数学要求使用标准形式与有效数字",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-AVG",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-STDF",
+     "strength": "有帮助"
+    },
+    {
+     "id": "MATH-PRE-RATIO",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "mean",
+    "range",
+    "percentage change",
+    "rate",
+    "line graph",
+    "bar chart",
+    "histogram",
+    "gradient",
+    "interpolate"
+   ],
+   "method": "画图检查表：标题、轴标签+单位、刻度、点用 ×、最佳拟合线或折线。常见错误：计算平均值时包含异常值。",
+   "probe": "给一组含异常值的重复数据，让她计算平均值并作图。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf Practical assessment / Experimental skills and investigations 部分（AO3）及 Mathematical requirements：Interpreting and evaluating experimental observations and data；Mathematical requirements"
+  },
+  {
+   "id": "BIO-IG-PRAC-05",
+   "strand": "PRAC",
+   "stage": "IGCSE",
+   "unit": "Practical assessment (Paper 5/6, AO3)",
+   "syllabus": "AO3",
+   "level": "core",
+   "name": "结论与评价改进",
+   "name_en": "Conclusions, evaluation and improvements",
+   "desc": "用数据支持结论并加解释；识别异常结果并采取措施；评价实验装置、方法与对照；指出误差来源（如终点判断、温度波动）并提出具体改进（如使用水浴、比色卡、增加重复）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-PRAC-02",
+     "strength": "必须"
+    },
+    {
+     "id": "BIO-IG-PRAC-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "conclusion",
+    "anomalous result",
+    "source of error",
+    "improvement",
+    "reliability",
+    "accuracy"
+   ],
+   "method": "改进要具体到“用什么仪器/怎么做”，不要只写“更仔细”。常见错误：把人为失误当作系统误差来源。",
+   "probe": "给一个变色终点判断的酶实验，让她指出两个误差来源并各提一个改进。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf Practical assessment / Experimental skills and investigations 部分（AO3）及 Mathematical requirements：Evaluating methods and suggesting possible improvements"
+  },
+  {
+   "id": "BIO-IG-PRAC-06",
+   "strand": "PRAC",
+   "stage": "IGCSE",
+   "unit": "Practical assessment (Paper 5/6, AO3)",
+   "syllabus": "AO3",
+   "level": "core",
+   "name": "取样方法",
+   "name_en": "Sampling methods",
+   "desc": "使用有代表性、避免偏差的取样方法：考虑样本量、简单随机取样（如随机坐标放置样方）",
+   "prereqs": [
+    {
+     "id": "BIO-IG-PRAC-02",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-AVG",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "sampling",
+    "sample size",
+    "random sampling",
+    "quadrat",
+    "bias"
+   ],
+   "method": "用随机数表生成坐标放样方。常见错误：把样方放在“看起来植物多”的地方。",
+   "probe": "问：估计操场上雏菊数量时，如何避免取样偏差？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf Practical assessment / Experimental skills and investigations 部分（AO3）及 Mathematical requirements：use methods of sampling that are representative and avoid bias"
+  },
+  {
+   "id": "BIO-IG-PRAC-07",
+   "strand": "PRAC",
+   "stage": "IGCSE",
+   "unit": "Practical assessment (Paper 5/6, AO3)",
+   "syllabus": "AO3",
+   "level": "core",
+   "name": "实验安全与 pH 测试",
+   "name_en": "Laboratory safety and testing pH",
+   "desc": "描述并解释危害和安全措施（乙醇易燃需水浴、本尼迪特加热戴护目镜、刀具使用）；描述如何测溶液 pH（通用指示剂、石蕊、pH 试纸）及碳酸氢盐指示剂的使用",
+   "prereqs": [
+    {
+     "id": "BIO-IG-PRAC-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "hazard",
+    "safety precaution",
+    "goggles",
+    "flammable",
+    "universal indicator",
+    "litmus",
+    "hydrogencarbonate indicator"
+   ],
+   "method": "危害-风险-措施三栏。常见错误：只写“小心”而不写具体措施。",
+   "probe": "问：用乙醇给叶片脱色时有什么危险？如何避免？",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf Practical assessment / Experimental skills and investigations 部分（AO3）及 Mathematical requirements：Safety in the laboratory；describe how the pH of a solution can be tested"
+  },
+  {
+   "id": "BIO-IG-PRAC-08",
+   "strand": "PRAC",
+   "stage": "IGCSE",
+   "unit": "Practical assessment (Paper 5/6, AO3)",
+   "syllabus": "AO3",
+   "level": "core",
+   "name": "表面积与体积比计算",
+   "name_en": "Surface area to volume ratio",
+   "desc": "计算长方体、圆柱等的表面积和体积，理解并使用表面积:体积比（如琼脂块扩散实验、生物体大小与交换面）；单位换算（cm³ 与 dm³、mg/g/kg、μm/mm/cm/m）",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-UNIT",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-RATIO",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "surface area",
+    "volume",
+    "surface area to volume ratio",
+    "cube",
+    "cylinder"
+   ],
+   "method": "边长加倍，表面积 ×4、体积 ×8，所以比值减半。常见错误：比值没有化成 x:1。",
+   "probe": "求 1 cm、2 cm、3 cm 立方体的 SA:V，并解释为什么大生物需要专门交换面。",
+   "source": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf Practical assessment / Experimental skills and investigations 部分（AO3）及 Mathematical requirements：Mathematical requirements — Geometry and measurements"
+  }
+ ]
+}

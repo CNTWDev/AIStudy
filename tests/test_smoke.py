@@ -655,6 +655,10 @@ def test_curricula_layers_tracks_and_bridges():
     ids_0511, ids_0500 = set(catalog.ids_for("eng-cambridge", "0511")), set(catalog.ids_for("eng-cambridge", "0500"))
     assert "ENG-REA-12" in ids_0511 - ids_0500 and "ENG-WRI-22" in ids_0500 - ids_0511
     assert len(catalog.ids_for("phy-cambridge", "core")) < len(catalog.ids_for("phy-cambridge", "extended"))
+    # 关联层：各领域的关联文件都加载了，物理英文术语能连到中文的同一内容
+    assert len(catalog.concepts) >= 200 and {"uses", "language", "context"} <= {ln["type"] for ln in catalog.links}
+    assert any(ln["type"] == "language" and ln["from"].startswith("PHY-IG") for ln in catalog.links)
+    assert catalog.packs["hist-shanghai"].subject == "history" and catalog.preset("sh-public-middle")["packs"]["chemistry"] == "chem-shanghai"
     with TestClient(app) as c:
         c.post("/login", data={"email": "p2@x.com", "password": "secret1"})
         kid = db.one("SELECT id FROM users WHERE email='a@x.com'")

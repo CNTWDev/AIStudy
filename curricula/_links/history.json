@@ -1,0 +1,726 @@
+{
+ "_doc": "历史：和语文、地理、英语、理科之间的融合。",
+ "concepts": [],
+ "links": [
+  {
+   "from": "HSH-ZG1-07",
+   "to": "CHN-GS-25",
+   "type": "context",
+   "note": "高中语文精读的《论语》《孟子》《老子》《庄子》选段，就是百家争鸣里这几家主张的原文"
+  },
+  {
+   "from": "CHN-GS-25",
+   "to": "HSH-ZG1-07",
+   "type": "uses",
+   "note": "读诸子选段前，先说清孔孟老庄各属哪一家、主张是什么，理解会快很多"
+  },
+  {
+   "from": "HSH-GY-02",
+   "to": "CHN-GS-25",
+   "type": "context",
+   "note": "春秋战国社会大变革是诸子著书立说的背景，语文课读原文正好印证"
+  },
+  {
+   "from": "CHN-GS-29",
+   "to": "HSH-GY-02",
+   "type": "uses",
+   "note": "读《论语》《孟子》《左传》选文，要知道春秋战国“礼崩乐坏”、诸侯争霸的时代背景"
+  },
+  {
+   "from": "CHN-GS-29",
+   "to": "HSH-ZG1-15",
+   "type": "uses",
+   "note": "《史记》选文出自司马迁，历史课讲过它是第一部纪传体通史，读选文时要用到"
+  },
+  {
+   "from": "HSH-ZG1-15",
+   "to": "CHN-GS-29",
+   "type": "context",
+   "note": "语文课读《史记》选篇，能看到“纪传体”是怎样以人物为中心写历史的"
+  },
+  {
+   "from": "HSH-ZG1-10",
+   "to": "CHN-GS-16",
+   "type": "context",
+   "note": "初中语文《陈涉世家》选自《史记》，讲的就是大泽乡起义"
+  },
+  {
+   "from": "CHN-GS-16",
+   "to": "HSH-ZG1-10",
+   "type": "uses",
+   "note": "读《陈涉世家》要先知道秦朝暴政和陈胜吴广起义的经过"
+  },
+  {
+   "from": "HSH-ZG1-08",
+   "to": "CHN-XZ-17",
+   "type": "uses",
+   "note": "甲骨文是汉字演变（甲骨文→金文→小篆→隶书→楷书）的第一站，语文课学过这条线"
+  },
+  {
+   "from": "HSH-ZG1-09",
+   "to": "CHN-XZ-17",
+   "type": "uses",
+   "note": "秦朝“书同文”统一用小篆，放回语文学过的汉字演变顺序里就记住了"
+  },
+  {
+   "from": "CHN-GS-31",
+   "to": "HSH-ZG1-08",
+   "type": "uses",
+   "note": "《诗经》《楚辞》的源头在先秦，历史课讲过《诗经》和屈原所处的时代"
+  },
+  {
+   "from": "CHN-GS-31",
+   "to": "HSH-ZG2-08",
+   "type": "uses",
+   "note": "唐诗为什么繁荣、李白杜甫白居易各在唐朝哪个阶段，历史课已经讲过"
+  },
+  {
+   "from": "CHN-GS-31",
+   "to": "HSH-ZG2-15",
+   "type": "uses",
+   "note": "宋词元曲的代表人物（苏轼、辛弃疾、李清照、关汉卿）在历史课宋元文化里出现过"
+  },
+  {
+   "from": "HSH-ZG2-05",
+   "to": "CHN-GS-24",
+   "type": "context",
+   "note": "杜甫《春望》“国破山河在”就写于安史之乱中，诗和历史可以互相印证"
+  },
+  {
+   "from": "CHN-GS-24",
+   "to": "HSH-ZG2-05",
+   "type": "uses",
+   "note": "评价杜甫诗里的忧国情怀，要先知道安史之乱让唐朝由盛转衰"
+  },
+  {
+   "from": "HSH-ZG2-11",
+   "to": "CHN-GS-24",
+   "type": "context",
+   "note": "陆游、辛弃疾的爱国诗词写的正是宋金对峙、收复中原的愿望"
+  },
+  {
+   "from": "HSH-ZG2-22",
+   "to": "CHN-ZS-04",
+   "type": "uses",
+   "note": "小学读过四大名著的故事，历史课只要再记住它们都成书于明清"
+  },
+  {
+   "from": "HSH-ZG1-16",
+   "to": "CHN-ZS-04",
+   "type": "context",
+   "note": "《三国演义》是小说，《三国志》是史书，赤壁之战等情节要分清史实和虚构"
+  },
+  {
+   "from": "HSH-ZG2-22",
+   "to": "CHN-ZS-11",
+   "type": "context",
+   "note": "《红楼梦》写的是清朝前中期一个大家族的兴衰，可以当作了解清代社会的窗口"
+  },
+  {
+   "from": "CHN-ZS-11",
+   "to": "HSH-GY-14",
+   "type": "uses",
+   "note": "读《红楼梦》的家族兴衰，最好先了解“康乾盛世”下已经潜藏的危机"
+  },
+  {
+   "from": "HSH-ZG3-11",
+   "to": "CHN-YD-20",
+   "type": "uses",
+   "note": "新文化运动里鲁迅发表《狂人日记》，小学语文“走近鲁迅”认识过这位作家"
+  },
+  {
+   "from": "CHN-WT-20",
+   "to": "HSH-ZG3-11",
+   "type": "uses",
+   "note": "鲁迅的杂文和纪念文章要放在新文化运动、反对旧道德的背景下读"
+  },
+  {
+   "from": "CHN-WT-20",
+   "to": "HSH-GY-20",
+   "type": "uses",
+   "note": "北洋军阀统治的黑暗现实，是理解鲁迅等作家批判锋芒的钥匙"
+  },
+  {
+   "from": "HSH-ZG3-16",
+   "to": "CHN-ZS-06",
+   "type": "context",
+   "note": "名著《红星照耀中国》是美国记者斯诺写的红军长征和陕北见闻，可配合长征一起读"
+  },
+  {
+   "from": "CHN-ZS-06",
+   "to": "HSH-ZG3-16",
+   "type": "context",
+   "note": "读《红星照耀中国》时，翻到历史课的长征路线图会更容易理解书里的地名和事件"
+  },
+  {
+   "from": "HSH-ZG3-22",
+   "to": "CHN-XZW-19",
+   "type": "context",
+   "note": "八年级语文新闻单元有毛泽东写的渡江战役消息，就是这段历史的第一手新闻"
+  },
+  {
+   "from": "CHN-SY-09",
+   "to": "HSH-GY-25",
+   "type": "uses",
+   "note": "研读革命领袖讲话和新闻通讯，要结合解放战争的进程理解它们的写作背景"
+  },
+  {
+   "from": "CHN-SY-09",
+   "to": "HSH-GY-26",
+   "type": "uses",
+   "note": "读新中国成立前后的讲话、通讯，要知道当时的历史任务（建国、巩固政权）"
+  },
+  {
+   "from": "HSH-ZG2-02",
+   "to": "CHN-GS-21",
+   "type": "context",
+   "note": "语文“古代文化常识”考的科举、官职名称，和历史课的科举制是一回事"
+  },
+  {
+   "from": "CHN-GS-21",
+   "to": "HSH-ZG2-02",
+   "type": "uses",
+   "note": "学古代文化常识里的“进士、殿试、状元”，先要知道科举制从隋朝创立的历史"
+  },
+  {
+   "from": "CHN-GS-21",
+   "to": "HSH-SKL-01",
+   "type": "uses",
+   "note": "文言文里的年号、干支纪年（如“庆历四年春”）要会换算，历史课学过纪年方法"
+  },
+  {
+   "from": "CHN-SY-01",
+   "to": "HSH-SKL-04",
+   "type": "uses",
+   "note": "新闻阅读里辨析事实与观点，和历史课区分史实与观点是同一种本领"
+  },
+  {
+   "from": "HSH-SKL-08",
+   "to": "CHN-WT-11",
+   "type": "uses",
+   "note": "写历史小论文要有论点、论据、论证，正是语文议论文三要素"
+  },
+  {
+   "from": "HSH-SKL-08",
+   "to": "CHN-SB-01",
+   "type": "uses",
+   "note": "语文学过梳理论证思路图，写历史小论文时先画一张就不会跑题"
+  },
+  {
+   "from": "HSH-SKL-07",
+   "to": "CHN-SY-07",
+   "type": "context",
+   "note": "辨别网络信息的立场和真伪，和历史课“看史料是谁写、为什么写”方法相同"
+  },
+  {
+   "from": "HSH-XB1-17",
+   "to": "CHN-ZS-10",
+   "type": "context",
+   "note": "费孝通《乡土中国》讲的差序格局、长老统治，帮你理解古代乡村靠宗族乡绅治理"
+  },
+  {
+   "from": "HSH-XB1-08",
+   "to": "CHN-ZS-10",
+   "type": "context",
+   "note": "《乡土中国》的“礼治秩序”“无讼”，能解释古代为何礼法结合、重教化轻诉讼"
+  },
+  {
+   "from": "HSH-XB3-01",
+   "to": "CHN-GS-25",
+   "type": "context",
+   "note": "中华优秀传统文化的“仁爱、民本、和合”等理念，原文就在语文课读的诸子散文里"
+  },
+  {
+   "from": "HSH-ZG4-19",
+   "to": "CHN-SY-06",
+   "type": "context",
+   "note": "做“三代人衣食住行”口述史，可以用语文家乡文化调查里学的访谈和调查报告方法"
+  },
+  {
+   "from": "HSH-ZG1-05",
+   "to": "CIG-REA-07",
+   "type": "context",
+   "note": "“卧薪尝胆”“尊王攘夷”这些成语典故都来自春秋时期的真实故事"
+  },
+  {
+   "from": "CIG-REA-07",
+   "to": "HSH-ZG1-10",
+   "type": "context",
+   "note": "“破釜沉舟”出自项羽巨鹿之战，知道历史故事更容易理解成语"
+  },
+  {
+   "from": "CIG-VOC-05",
+   "to": "HSH-ZG2-22",
+   "type": "context",
+   "note": "用中文介绍春节、中秋、端午时，可以加上历史课活动课讲的节日起源"
+  },
+  {
+   "from": "CIG-REA-08",
+   "to": "HSH-SKL-04",
+   "type": "context",
+   "note": "IGCSE 中文非虚构文本要分事实和观点，历史课的史实与观点辨析是很好的练习"
+  },
+  {
+   "from": "HSH-SKL-03",
+   "to": "GSH-TOOL-04",
+   "type": "uses",
+   "note": "读历史地图同样先看方向、比例尺和图例，地理课已经学过地图三要素"
+  },
+  {
+   "from": "HSH-ZG2-01",
+   "to": "GSH-CHN-08",
+   "type": "uses",
+   "note": "大运河连接海河、黄河、淮河、长江、钱塘江，先在地理课认清这几条河的位置"
+  },
+  {
+   "from": "HSH-ZG1-14",
+   "to": "GSH-CHN-29",
+   "type": "uses",
+   "note": "丝绸之路经过河西走廊和新疆的沙漠绿洲，地理课讲的西北干旱区就是这条路的环境"
+  },
+  {
+   "from": "HSH-ZG1-14",
+   "to": "GSH-X2-10",
+   "type": "context",
+   "note": "今天的“一带一路”就是借用古代丝绸之路的名字和走向"
+  },
+  {
+   "from": "GSH-X2-10",
+   "to": "HSH-ZG1-14",
+   "type": "uses",
+   "note": "学“一带一路”时，先回想汉代张骞开通的陆上丝绸之路和海上丝路"
+  },
+  {
+   "from": "HSH-XB3-09",
+   "to": "GSH-X2-10",
+   "type": "context",
+   "note": "古代商路上的文化交流，到今天在“一带一路”合作中继续延伸"
+  },
+  {
+   "from": "HSH-ZG1-02",
+   "to": "GSH-CHN-22",
+   "type": "uses",
+   "note": "南方河姆渡种水稻、北方半坡种粟，正好对应秦岭—淮河两侧的水田和旱地"
+  },
+  {
+   "from": "HSH-ZG1-18",
+   "to": "GSH-CHN-26",
+   "type": "uses",
+   "note": "江南能被开发，离不开南方亚热带季风气候雨热同期、河湖密布的自然条件"
+  },
+  {
+   "from": "HSH-ZG2-13",
+   "to": "GSH-CHN-27",
+   "type": "context",
+   "note": "宋元经济重心南移到江南，今天长江三角洲仍是全国最发达的地区之一"
+  },
+  {
+   "from": "HSH-ZG2-13",
+   "to": "GSH-CHN-31",
+   "type": "context",
+   "note": "黄道婆在松江（今上海）传播棉纺织技术，是上海的乡土历史"
+  },
+  {
+   "from": "GSH-CHN-14",
+   "to": "HSH-ZG1-08",
+   "type": "uses",
+   "note": "编古代铜矿利用简史，要用到商周青铜器（后母戊鼎、四羊方尊）的史实"
+  },
+  {
+   "from": "HSH-ZG1-08",
+   "to": "GSH-CHN-14",
+   "type": "context",
+   "note": "商周青铜器的铜从哪里来？地理课的古代铜矿专题给出答案"
+  },
+  {
+   "from": "GSH-CHN-25",
+   "to": "HSH-ZG2-11",
+   "type": "context",
+   "note": "黄河“夺淮入海”的大改道发生在南宋初年宋金战争时期"
+  },
+  {
+   "from": "HSH-SJ1-03",
+   "to": "GSH-REG-13",
+   "type": "context",
+   "note": "古埃及文明靠尼罗河定期泛滥，地理课讲的“生命之河”就是同一条河"
+  },
+  {
+   "from": "GSH-REG-13",
+   "to": "HSH-SJ1-03",
+   "type": "context",
+   "note": "埃及的金字塔旅游资源，来自历史课讲的古埃及法老陵墓"
+  },
+  {
+   "from": "HSH-SJ1-02",
+   "to": "GSH-REG-06",
+   "type": "context",
+   "note": "两河流域就在今天西亚的伊拉克一带，看西亚地图能找到幼发拉底河和底格里斯河"
+  },
+  {
+   "from": "HSH-SJ1-04",
+   "to": "GSH-REG-11",
+   "type": "context",
+   "note": "古印度文明发源于印度河、恒河流域，地理课的印度地图上能找到它们"
+  },
+  {
+   "from": "HSH-SJ1-11",
+   "to": "GSH-HUM-02",
+   "type": "uses",
+   "note": "伊斯兰教、佛教、基督教今天的分布，地理课讲过，历史课讲它们从哪里起源"
+  },
+  {
+   "from": "HSH-SJ1-11",
+   "to": "GSH-REG-06",
+   "type": "context",
+   "note": "伊斯兰教起源于阿拉伯半岛，今天西亚的阿拉伯文化就是从那里发展来的"
+  },
+  {
+   "from": "HSH-SJ1-14",
+   "to": "GSH-PHYS-01",
+   "type": "uses",
+   "note": "画新航路路线要先认清七大洲四大洋，以及好望角、大西洋、太平洋的位置"
+  },
+  {
+   "from": "HSH-GX-06",
+   "to": "GSH-X1-12",
+   "type": "context",
+   "note": "大航海时代的帆船要借助盛行风和洋流，地理课的洋流分布图能解释航线为什么这样走"
+  },
+  {
+   "from": "HSH-SJ1-12",
+   "to": "GSH-HUM-05",
+   "type": "context",
+   "note": "马丘比丘是印加文明的古城，地理课把它作为世界遗产保护的案例"
+  },
+  {
+   "from": "HSH-XB3-15",
+   "to": "GSH-HUM-05",
+   "type": "uses",
+   "note": "讨论文化遗产保护时，可用地理课马丘比丘“限流、分区管理”的例子"
+  },
+  {
+   "from": "HSH-SJ1-10",
+   "to": "GSH-REG-10",
+   "type": "context",
+   "note": "日本“东西方兼容”的文化，源头之一是大化改新时向唐朝学习"
+  },
+  {
+   "from": "HSH-SJ2-05",
+   "to": "GSH-REG-12",
+   "type": "context",
+   "note": "德国鲁尔区靠煤炭在第二次工业革命中成为重工业基地"
+  },
+  {
+   "from": "HSH-SJ1-17",
+   "to": "GSH-REG-14",
+   "type": "context",
+   "note": "美国是“移民国家”，历史课的北美殖民地和独立战争是它的起点"
+  },
+  {
+   "from": "HSH-SJ2-17",
+   "to": "GSH-REG-07",
+   "type": "context",
+   "note": "战后西欧走向联合，形成今天地理课讲的欧盟"
+  },
+  {
+   "from": "HSH-ZG2-19",
+   "to": "GSH-CHN-01",
+   "type": "uses",
+   "note": "清朝前期奠定的疆域，对照地理课的中国政区图和四至就清楚了"
+  },
+  {
+   "from": "HSH-GY-14",
+   "to": "GSH-CHN-01",
+   "type": "uses",
+   "note": "理解清朝如何奠定我国版图，要先熟悉今天中国的疆域与邻国"
+  },
+  {
+   "from": "HSH-ZG4-13",
+   "to": "GSH-CHN-28",
+   "type": "context",
+   "note": "港澳回归后成为特别行政区，地理课讲它们今天的金融航运和大湾区合作"
+  },
+  {
+   "from": "HSH-ZG4-14",
+   "to": "GSH-CHN-28",
+   "type": "context",
+   "note": "台湾自古是中国领土，地理课讲台湾岛的自然和经济"
+  },
+  {
+   "from": "HSH-ZG4-12",
+   "to": "GSH-CHN-04",
+   "type": "uses",
+   "note": "民族区域自治要放在“大杂居、小聚居”的民族分布格局上理解"
+  },
+  {
+   "from": "HSH-ZG2-12",
+   "to": "GSH-CHN-02",
+   "type": "context",
+   "note": "今天的“省”起源于元朝行省制度"
+  },
+  {
+   "from": "HSH-ZG4-09",
+   "to": "GSH-CHN-27",
+   "type": "context",
+   "note": "浦东开发开放让上海成为长三角城市群的龙头"
+  },
+  {
+   "from": "HSH-ZG4-09",
+   "to": "GSH-X2-03",
+   "type": "context",
+   "note": "改革开放和浦东开发，是上海今天能对外辐射全国的历史起点"
+  },
+  {
+   "from": "HSH-ZG3-01",
+   "to": "GSH-CHN-31",
+   "type": "context",
+   "note": "1843年上海开埠，从此由县城发展成近代大都市，这是上海城市发展的起点"
+  },
+  {
+   "from": "HSH-XB2-11",
+   "to": "GSH-HS2-06",
+   "type": "uses",
+   "note": "分析近代以来的城市化，要用到地理课城镇化阶段和城市问题的知识"
+  },
+  {
+   "from": "HSH-XB2-10",
+   "to": "GSH-HUM-03",
+   "type": "uses",
+   "note": "古代村落和城镇的选址，用地理课“聚落形成与地形、水源”的道理来解释"
+  },
+  {
+   "from": "HSH-XB2-10",
+   "to": "GSH-HS2-05",
+   "type": "context",
+   "note": "江南古镇和石库门是古代市镇、近代上海留下的城乡景观"
+  },
+  {
+   "from": "HSH-XB3-06",
+   "to": "GSH-HS2-02",
+   "type": "uses",
+   "note": "古代北方人口三次南迁，可以用地理课的人口迁移“推拉理论”分析原因"
+  },
+  {
+   "from": "HSH-XB3-08",
+   "to": "GSH-HS2-02",
+   "type": "uses",
+   "note": "现代国际移民的原因（经济、政治、环境），地理课已经系统讲过"
+  },
+  {
+   "from": "HSH-XB2-13",
+   "to": "GSH-CHN-17",
+   "type": "uses",
+   "note": "现代交通的变化（高铁网、上海港）在地理课交通运输业里学过"
+  },
+  {
+   "from": "HSH-XB1-12",
+   "to": "GSH-HS2-12",
+   "type": "context",
+   "note": "近代国际法确立的“国家主权”，到今天发展为《联合国海洋法公约》规定的海洋权益"
+  },
+  {
+   "from": "HSH-SKL-04",
+   "to": "ENG-REA-09",
+   "type": "context",
+   "note": "英语阅读里区分 fact 和 opinion，和历史课区分史实与观点是同一种思维"
+  },
+  {
+   "from": "ESH-REA-06",
+   "to": "HSH-SKL-04",
+   "type": "context",
+   "note": "上海英语阅读也要区分事实与观点，历史课的史实/观点辨析可以互相迁移"
+  },
+  {
+   "from": "HSH-SKL-02",
+   "to": "ENG-REA-14",
+   "type": "context",
+   "note": "英语里的 diary、letter、news report 也是历史学家常用的一手史料形式"
+  },
+  {
+   "from": "HSH-ZG4-19",
+   "to": "ENG-WRI-20",
+   "type": "context",
+   "note": "做口述史采访可以借鉴英语采访稿的问答格式"
+  },
+  {
+   "from": "ESH-REA-13",
+   "to": "HSH-SJ1-13",
+   "type": "context",
+   "note": "读莎士比亚等英文经典时，先了解文艺复兴和人文主义背景"
+  },
+  {
+   "from": "ESH-LIS-15",
+   "to": "HSH-XB3-05",
+   "type": "context",
+   "note": "跨文化讨论时，历史课讲的各地区文化传统（印度、日本、美洲）是很好的素材"
+  },
+  {
+   "from": "ESH-LIS-15",
+   "to": "HSH-XB3-01",
+   "type": "context",
+   "note": "用英语介绍中国文化时，可以用到历史课总结的中华优秀传统文化特点"
+  },
+  {
+   "from": "HSH-SJ1-19",
+   "to": "PSH-THERM-06",
+   "type": "context",
+   "note": "瓦特改良的蒸汽机和物理课的热机一样，都是把燃料的内能变成机械能"
+  },
+  {
+   "from": "PSH-THERM-06",
+   "to": "HSH-SJ1-19",
+   "type": "context",
+   "note": "热机的历史从蒸汽机开始，它引发了第一次工业革命"
+  },
+  {
+   "from": "HSH-SJ2-05",
+   "to": "PSH-MAG-04",
+   "type": "context",
+   "note": "第二次工业革命的“电气时代”靠的是发电机，原理就是物理课的电磁感应"
+  },
+  {
+   "from": "HSH-SJ2-05",
+   "to": "PSH-THERM-06",
+   "type": "context",
+   "note": "汽车和飞机用的内燃机，就是物理课学的四冲程汽油机"
+  },
+  {
+   "from": "HSH-GX-10",
+   "to": "PSH-MAG-04",
+   "type": "context",
+   "note": "比较两次工业革命时，发电机把机械能转化为电能是“电力”能普及的关键"
+  },
+  {
+   "from": "HSH-ZG2-15",
+   "to": "SCI-SH-G3-10",
+   "type": "uses",
+   "note": "指南针能指南北是因为地磁场，小学自然课学过磁极与指南针"
+  },
+  {
+   "from": "HSH-ZG2-14",
+   "to": "PSH-MAG-01",
+   "type": "context",
+   "note": "宋代把指南针用于航海，物理课的地磁场解释了它为什么能导航"
+  },
+  {
+   "from": "HSH-ZG1-08",
+   "to": "CSH-MAT-13",
+   "type": "context",
+   "note": "化学课讲的古代火法炼铜、湿法炼铜，就是青铜器的原料来源"
+  },
+  {
+   "from": "CSH-MAT-13",
+   "to": "HSH-ZG1-08",
+   "type": "context",
+   "note": "我国商周时期就能大规模冶铜铸造青铜器，是化学冶炼史的重要一页"
+  },
+  {
+   "from": "HSH-XB2-04",
+   "to": "CHEM-LS-7-07",
+   "type": "uses",
+   "note": "青铜是铜锡合金，比纯铜更硬，所以能取代石器做工具和武器"
+  },
+  {
+   "from": "HSH-XB2-04",
+   "to": "CSH-MAT-13",
+   "type": "context",
+   "note": "从青铜到铁器，背后是人类冶炼金属技术的进步"
+  },
+  {
+   "from": "HSH-ZG1-20",
+   "to": "MSH-GEO-22",
+   "type": "uses",
+   "note": "祖冲之把圆周率算到小数点后第七位，先要知道数学里π是什么"
+  },
+  {
+   "from": "HSH-SKL-01",
+   "to": "MSH-NUM-38",
+   "type": "uses",
+   "note": "时间轴就像数轴：公元前像负数、公元后像正数，只是没有公元0年"
+  },
+  {
+   "from": "HSH-SJ2-07",
+   "to": "PSH-MECH-09",
+   "type": "context",
+   "note": "牛顿创立经典力学，物理课的牛顿第一定律就是其中之一"
+  },
+  {
+   "from": "HSH-SJ2-07",
+   "to": "BSH-GEN-07",
+   "type": "uses",
+   "note": "达尔文《物种起源》提出自然选择，生物课学过它的四个要点"
+  },
+  {
+   "from": "HSH-SJ2-07",
+   "to": "PSH-MOD-07",
+   "type": "context",
+   "note": "爱因斯坦的相对论在高中物理会学到初步内容"
+  },
+  {
+   "from": "HSH-SJ1-01",
+   "to": "BSH-GEN-07",
+   "type": "context",
+   "note": "人类由古猿进化而来，生物课讲过人类起源于森林古猿"
+  },
+  {
+   "from": "HSH-ZG1-01",
+   "to": "BSH-GEN-07",
+   "type": "context",
+   "note": "元谋人、北京人是人类进化过程中的古人类，生物课讲进化的证据"
+  },
+  {
+   "from": "HSH-ZG4-18",
+   "to": "SCI-SH-G6-21",
+   "type": "uses",
+   "note": "“神舟五号”等航天成就，小学自然课“太空探索”已经介绍过"
+  },
+  {
+   "from": "HSH-ZG4-18",
+   "to": "PSH-MOD-06",
+   "type": "context",
+   "note": "原子弹利用核裂变释放能量，高中物理会学到原理"
+  },
+  {
+   "from": "HSH-ZG4-18",
+   "to": "BSH-GEN-06",
+   "type": "uses",
+   "note": "袁隆平的杂交水稻属于生物课讲的杂交育种"
+  },
+  {
+   "from": "HSH-XB2-03",
+   "to": "BSH-GEN-06",
+   "type": "uses",
+   "note": "杂交水稻、绿色革命提高粮食产量，靠的是利用变异培育新品种"
+  },
+  {
+   "from": "HSH-XB2-15",
+   "to": "BSH-HUM-13",
+   "type": "uses",
+   "note": "疫苗为什么能预防传染病，生物课讲过抗原、抗体和计划免疫"
+  },
+  {
+   "from": "HSH-XB2-15",
+   "to": "BIO-IG-15.1-01",
+   "type": "context",
+   "note": "弗莱明发现青霉素开启了抗生素时代，生物课讲抗生素只杀细菌不杀病毒"
+  },
+  {
+   "from": "HSH-XB2-14",
+   "to": "BSH-HUM-13",
+   "type": "uses",
+   "note": "分析黑死病为何大流行，要用传染源、传播途径、易感人群三个环节"
+  },
+  {
+   "from": "HSH-GX-08",
+   "to": "PSH-MECH-38",
+   "type": "context",
+   "note": "科学革命中牛顿发现万有引力定律，高中物理会定量学习"
+  },
+  {
+   "from": "HSH-XB2-06",
+   "to": "PSH-MOD-06",
+   "type": "context",
+   "note": "第三次科技革命的“原子能”就是物理课的核裂变与核电站"
+  }
+ ]
+}

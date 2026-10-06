@@ -1,0 +1,2303 @@
+{
+ "pack": {
+  "id": "chn-igcse",
+  "subject": "chinese",
+  "subject_name": "语文",
+  "edition": "剑桥 IGCSE 中文 0509 / 0523 / 0547",
+  "region": "国际学校",
+  "stages": [
+   "IGCSE"
+  ],
+  "version": 1,
+  "generated": "2026-10-06",
+  "verified": "2026-10-06",
+  "sources": [
+   "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf",
+   "https://www.cambridgeinternational.org/Images/697185-2026-2027-syllabus.pdf",
+   "https://cambridgeinternational.org/images/414856-2020-specimen-paper-1.pdf",
+   "https://www.cambridgeinternational.org/Images/670263-june-2022-mark-scheme-paper-21.pdf",
+   "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf",
+   "https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf",
+   "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf",
+   "https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf"
+  ],
+  "notes": "覆盖剑桥 IGCSE 三种中文考试（都约 130 学时，面向 14–16 岁，约国内 G9–G10）：0509 First Language Chinese（第一语言，2026–2027 版与 2028–2029 版结构相同，官方注明 no significant changes）：Paper 1 阅读、指导写作与文言文 2h15m 60 分 50%（现代文小说约 1000 字 23 分；两篇非虚构文本合计约 600 字、写 250–350 字的指导写作 25 分；明代文言短文约 200 字 12 分），Paper 2 写作 2h 50 分 50%（议论/讨论与描写/记叙各写一篇，各约 400–600 字、25 分）。0523 Chinese as a Second Language（第二语言，2026–2027 与 2028–2029 版结构相同）：Paper 1 阅读与写作 2h 60 分 60%（Ex1 信息转换 8、Ex2 简答 12、Ex3 多项匹配 10、Ex4 功能写作 100–120 字 8、Ex5 长篇写作 250–300 字 22），Paper 2 听力 35–45 分钟 30 分 20%，Component 3 口语 10–13 分钟 60 分 20%（演讲、话题会话、一般会话各 20 分）。0547 Mandarin Chinese（外语，约 CEFR A2）：听、读、说、写四卷各 25%；2025–2027 版写作 45 分（Q2 80–100 字 12 分，Q3 约 150 字 28 分），2028–2030 版（v2, 2025-10）写作改为 40 分（5+10+25，Q3 按任务完成 9、范围 9、准确 7 评分），口语准备时可写笔记，词汇表有增删。三种考试差别大，用 tracks 区分；只属于某种考试的知识点带 tracks 字段，通用点不带。0509 与 0523 试题繁简体并印、可用任一种作答；三种都不准用字典。剑桥 Primary / Lower Secondary 没有中文专门的课程框架（只有不分语种的 Modern Foreign Language（Lower Secondary 0771）），所以本包只做 IGCSE，不设 G6–G8 前置点。文言实词/虚词/句式等具体项目和书信格式、修辞名称等，大纲未逐条列出，是依据大纲题型（及 0509 官方样卷题型）整理的支撑知识，已在 source 中注明。",
+  "tracks": [
+   {
+    "id": "0509",
+    "name": "IGCSE 第一语言中文 0509"
+   },
+   {
+    "id": "0523",
+    "name": "IGCSE 中文作为第二语言 0523"
+   },
+   {
+    "id": "0547",
+    "name": "IGCSE 外语中文 0547"
+   }
+  ],
+  "default_track": "0509",
+  "system": "cambridge",
+  "school_types": [
+   "international",
+   "private"
+  ]
+ },
+ "strands": [
+  {
+   "id": "EXAM",
+   "name": "考试结构与规则"
+  },
+  {
+   "id": "LAN",
+   "name": "语言基础与语法"
+  },
+  {
+   "id": "VOC",
+   "name": "话题与词汇"
+  },
+  {
+   "id": "REA",
+   "name": "阅读理解"
+  },
+  {
+   "id": "CLA",
+   "name": "文言文阅读"
+  },
+  {
+   "id": "WRI",
+   "name": "写作"
+  },
+  {
+   "id": "LIS",
+   "name": "听力"
+  },
+  {
+   "id": "SPK",
+   "name": "口语"
+  }
+ ],
+ "kps": [
+  {
+   "id": "CIG-EX-01",
+   "strand": "EXAM",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1, Paper 2",
+   "name": "0509 试卷结构与评估目标",
+   "name_en": "0509 assessment overview",
+   "desc": "IGCSE First Language Chinese 0509，只在 6 月考，A*–G。Paper 1 阅读、指导写作与文言文（2 小时 15 分，60 分，占 50%）：Section 1 现代文阅读 23 分、Section 2 指导写作 25 分、Section 3 文言文 12 分；Paper 2 写作（2 小时，50 分，占 50%）：议论/讨论类与描写/记叙类各选 1 题，各 25 分。评估目标 AO1 阅读 R1–R5 占 40%，AO2 写作 W1–W5 占 60%。试卷全中文，繁简体并印，不准用字典。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "First Language Chinese",
+    "assessment objective",
+    "component",
+    "weighting"
+   ],
+   "method": "开学先把两张卷的分值、时间、题型画成一张表贴在书桌前；按分值分配时间（Paper 1 约 50 分钟阅读、50 分钟指导写作、25 分钟文言文，留 10 分钟检查）。常见错误：把 Paper 2 当成只写一篇作文，其实要写两篇。",
+   "probe": "问：0509 Paper 1 有几个部分、各多少分？Paper 2 要写几篇、每篇建议多少字？",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf（0509 2028–2029 大纲 Assessment overview / Paper 1 / Paper 2；2026–2027 版 https://www.cambridgeinternational.org/Images/697185-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-EX-02",
+   "strand": "EXAM",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1, Paper 2, Component 3",
+   "name": "0523 试卷结构与评估目标",
+   "name_en": "0523 assessment overview",
+   "desc": "IGCSE Chinese as a Second Language 0523，只在 6 月考。Paper 1 阅读与写作（2 小时，60 分，占 60%，Exercise 1–5）；Paper 2 听力（35–45 分钟，30 分，占 20%，Exercise 1–4，每段听两遍）；Component 3 口语（10–13 分钟，60 分，占 20%，校内录音、剑桥抽查）。阅读 30%、写作 30%、听力 20%、口语 20%。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "Second Language",
+    "Reading and Writing",
+    "Listening",
+    "Speaking",
+    "weighting"
+   ],
+   "method": "把 Paper 1 五道练习按“3 道阅读（30 分）+ 2 篇写作（30 分）”记，写作至少留 50 分钟。口语占 20% 而且可以提前准备 Part 1 演讲，是最容易提分的部分。",
+   "probe": "问：0523 的口语分几部分、每部分几分钟？Paper 1 两篇作文各要求多少字？",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Assessment overview；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-EX-03",
+   "strand": "EXAM",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1–4",
+   "name": "0547 试卷结构与 2028 年变化",
+   "name_en": "0547 assessment overview and 2028 changes",
+   "desc": "IGCSE Mandarin Chinese 0547（外语中文，约 CEFR A2），四卷各占 25%：Paper 1 听力（约 40 分钟含 6 分钟誊答案，30 道选择/匹配，30 分）；Paper 2 阅读（1 小时 15 分，40 分）；Paper 3 口语（约 10 分钟 + 10 分钟准备，40 分）；Paper 4 写作（1 小时 15 分）。2025–2027 版写作 45 分（5+12+28）；2028–2030 版改为 40 分（Q1 5 分、Q2 10 分、Q3 25 分），口语准备时可以写笔记，词汇表增删了一批词（如增 压力、外卖、人工智能、朋友圈，删 业余、啤酒、网吧）。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "Foreign Language",
+    "Mandarin Chinese",
+    "role play",
+    "CEFR A2"
+   ],
+   "method": "先确认自己是哪一年考：2027 年及以前按旧版（写作 45 分），2028 年起按新版（写作 40 分、Q3 分 Task Completion 9 / Range 9 / Accuracy 7）。词汇表以考试年份对应的官方版本为准。",
+   "probe": "问：2028 年考 0547，写作第 3 题多少分、按哪三项评分？口语准备时能不能写笔记？",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Changes to this syllabus / Assessment overview；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-EX-04",
+   "strand": "EXAM",
+   "stage": "IGCSE",
+   "name": "繁简体、字典与作答语言规则",
+   "name_en": "Script, dictionary and answer-language rules",
+   "desc": "0509 与 0523：试题用繁体和简体两种字体印刷，考生可以用任一种作答；三种考试都不准用字典，需要书写的回答必须用中文。0509 不允许语音输入、带联想/拼写检查的文字处理和读题人等辅助。",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "traditional characters",
+    "simplified characters",
+    "dictionary"
+   ],
+   "method": "整张卷子坚持用一种字体，避免繁简混写；平时练习就不查字典，遇到生词靠上下文猜。",
+   "probe": "问：0509 可以一半用繁体一半用简体吗？考试能带电子词典吗？",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf（0509 2028–2029 大纲 Assessment overview / Access arrangements；2026–2027 版 https://www.cambridgeinternational.org/Images/697185-2026-2027-syllabus.pdf 相同） ; https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Paper 1 notes；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0509",
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-EX-05",
+   "strand": "EXAM",
+   "stage": "IGCSE",
+   "name": "字数要求与限时写作",
+   "name_en": "Character counts and timed writing",
+   "desc": "官方建议字数（按汉字计）：0509 指导写作约 250–350 字、Paper 2 每篇约 400–600 字；0523 功能性写作 100–120 字、长篇写作 250–300 字；0547 Q2 约 80–100 字、Q3 约 150 字。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "characters",
+    "word count",
+    "time management"
+   ],
+   "method": "用方格稿纸练习，知道自己 10 行大约写多少字；写完估算字数，太短内容不足，太长会挤占检查时间且出错更多。",
+   "probe": "给学生一道限时题，看是否在建议字数范围内完成并留出检查时间。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf Paper 1 Section 2 / Paper 2 ; https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf Exercise 4–5 ; https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf Paper 4"
+  },
+  {
+   "id": "CIG-LAN-01",
+   "strand": "LAN",
+   "stage": "IGCSE",
+   "name": "汉字书写与错别字",
+   "name_en": "Accurate character writing",
+   "desc": "写字正确、不写错别字是写作评分的一项：0509 W5“write characters correctly”，0523 W4“control of punctuation and character formation”，0547 W4 要求合理准确。重点是形近字（己/已/巳）、同音字（的/地/得、在/再、做/作）、笔画增减。",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "character formation",
+    "homophone",
+    "radical"
+   ],
+   "method": "建立个人错字本，每次作文后把错字抄正 3 遍并写出区分口诀（如“左右的、动词前地、动词后得”）；考前通读一遍错字本。",
+   "probe": "给一段含 5 个错别字的短文，看能否全部找出并改正。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf AO2 W5 ; https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf AO2 W4 ; https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf AO4"
+  },
+  {
+   "id": "CIG-LAN-02",
+   "strand": "LAN",
+   "stage": "IGCSE",
+   "name": "标点符号的规范使用",
+   "name_en": "Chinese punctuation",
+   "desc": "掌握中文标点：句号、逗号、顿号（并列词语）、分号、冒号、引号、书名号《》、问号、感叹号、省略号、破折号；一逗到底、顿号逗号混用是常见失分点。0509 W5、0523 W4 明确考查标点。",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "punctuation",
+    "enumeration comma",
+    "quotation marks"
+   ],
+   "method": "对照写一张“英文标点 vs 中文标点”表：中文没有空格、省略号是六个点占两格、书名用《》不用斜体。",
+   "probe": "给一段没有标点的 80 字短文，让学生加标点。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf AO2 W5 ; https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf AO2 W4",
+   "tracks": [
+    "0509",
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-LAN-03",
+   "strand": "LAN",
+   "stage": "IGCSE",
+   "name": "关联词与复句",
+   "name_en": "Connectives and complex sentences",
+   "desc": "用关联词把句子连成有逻辑的段落：因果（因为…所以、由于）、转折（虽然…但是/可是、不过）、递进（不但…而且）、条件（只要…就、只有…才、如果/要是）、并列（一边…一边、又…又）、选择（或者、还是）、比例（越…越、越来越）、排除（除了…以外）。0523 W2/S2 要求用 linking devices；0547 词汇表列有这些连词。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "connective",
+    "linking device",
+    "complex sentence"
+   ],
+   "method": "每学一对关联词就造两个和自己生活有关的句子；作文里有意识地每段用 1–2 个，但不要每句都用。常见错误：“虽然…但是”后再加“可是”，“因为…所以”与“由于”混搭。",
+   "probe": "给 5 个句子填关联词（含 只有…才 与 只要…就 的辨析）。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf AO2 W2 / AO4 S2 ; https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf Vocabulary list – Conjunctions"
+  },
+  {
+   "id": "CIG-GR-01",
+   "strand": "LAN",
+   "stage": "IGCSE",
+   "syllabus": "Part 1",
+   "name": "数字、日期与时间表达",
+   "name_en": "Numbers, dates and times",
+   "desc": "基数到 10000、序数“第一”、二与两的区别（两个人、第二）、约数（几、多、左右）；年月日星期的顺序（2026 年 10 月 6 日 星期二）、24 小时制、…的时候、以前、以后。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "cardinal number",
+    "ordinal number",
+    "date",
+    "time expression"
+   ],
+   "method": "中文日期从大到小：年→月→日→星期→时间；量词前用“两”不用“二”。听力里数字和时间是高频考点，要多听报时、航班广播。",
+   "probe": "让学生说/写：“2028 年 6 月 15 日下午 3 点 45 分”；再判断“二个苹果”对不对。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Grammar and structures；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf） Part 1 Numbers, dates and times",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-GR-02",
+   "strand": "LAN",
+   "stage": "IGCSE",
+   "syllabus": "Part 1",
+   "name": "量词与名词短语",
+   "name_en": "Measure words and noun phrases",
+   "desc": "数词/这/那/几/哪 + 量词 + 名词；常用量词 个、本、张、件、条、只、辆、双、位、家、种，容器量词 杯、瓶、碗、盒，动量词 次、遍、一下；们 表复数；的 表领属和修饰（我的书、红色的衣服），亲属关系可省“的”（我妈妈）。",
+   "prereqs": [
+    {
+     "id": "CIG-GR-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "measure word",
+    "classifier",
+    "possession",
+    "modifier"
+   ],
+   "method": "把量词按形状记：张（平的：纸、床、桌子）、条（长的：鱼、裤子、路）、只（动物）、辆（车）。常见错误：什么都用“个”，或者“三个学生们”。",
+   "probe": "填量词：一__衬衫、两__自行车、三__狗、一__咖啡。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Grammar and structures；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf） Part 1 Nouns and noun phrases",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-GR-03",
+   "strand": "LAN",
+   "stage": "IGCSE",
+   "syllabus": "Part 1",
+   "name": "基本句型、否定与疑问",
+   "name_en": "Basic sentences, negation and questions",
+   "desc": "陈述句（是、有、形容词谓语：他很高、无动词句：今天星期一）；否定 不/没（有）的分工；疑问句：吗、正反问（去不去、是不是、有没有）、疑问词（谁、什么、哪儿、几、多少、为什么、怎么）、吧、还是（选择问）；句末 了 表变化；主题-评论句（这本书我看过）。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "question particle",
+    "A-not-A question",
+    "negation",
+    "topic-comment"
+   ],
+   "method": "不 否定习惯和将来（我不喝咖啡），没 否定已发生（我昨天没去）；形容词谓语句不加“是”（不说“他是很高”）。疑问词问句后不再加“吗”。",
+   "probe": "改错：“他是很忙。”“你去哪儿吗？”“我昨天不去学校。”",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Grammar and structures；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf） Part 1 Sentences",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-GR-04",
+   "strand": "LAN",
+   "stage": "IGCSE",
+   "syllabus": "Part 1",
+   "name": "动态助词与时间表达：了、过、在、要",
+   "name_en": "Aspect markers 了 / 过 / 在 and future",
+   "desc": "完成体 了（我买了两本书）、经历体 过（我去过北京）、进行 在/正在…呢、将来 会/要/要…了/快要…了；否定已完成用“没 + 动词”（去掉 了），经历否定“没 + 动词 + 过”。",
+   "prereqs": [
+    {
+     "id": "CIG-GR-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "aspect",
+    "perfective 了",
+    "experiential 过",
+    "progressive"
+   ],
+   "method": "画时间轴：过去经历（过）—已完成（了）—正在（在）—将要（要…了）。常见错误：“我没去了”、在所有过去句子里都加 了。",
+   "probe": "选择 了/过/在 填空：“我从来没去__中国。”“他__做作业呢。”",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Grammar and structures；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf） Part 1 Verbs",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-GR-05",
+   "strand": "LAN",
+   "stage": "IGCSE",
+   "syllabus": "Part 1",
+   "name": "介词与状语语序",
+   "name_en": "Prepositions and adverbial word order",
+   "desc": "介词 从、在、跟、到、给、用、离、往、对、关于、为；中文语序“主语 + 时间 + 地点/介词短语 + 动词 + 宾语”（我明天在学校跟朋友打球）；时量和程度补语放在动词后（学了两年、跑得很快）；副词 已经、还、再、又、才、就、都、也 的位置。",
+   "prereqs": [
+    {
+     "id": "CIG-GR-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "preposition",
+    "word order",
+    "adverbial",
+    "duration complement"
+   ],
+   "method": "记口诀“谁 + 什么时候 + 在哪儿 + 跟谁 + 做什么”。英语母语学生常把时间、地点放句末（“我学习在图书馆”），要专门改。再/又：再 表未发生的重复，又 表已发生的重复。",
+   "probe": "把词语排成句子：[昨天 / 我 / 在商店 / 给妈妈 / 买了 / 一束花]。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Grammar and structures；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf） Part 1 Prepositions / Adverbs",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-GR-06",
+   "strand": "LAN",
+   "stage": "IGCSE",
+   "syllabus": "Part 1",
+   "name": "补语：结果、趋向与程度",
+   "name_en": "Complements of result, direction and degree",
+   "desc": "结果补语（看完、听懂、找到、做错）、简单趋向补语（进来、出去、回来）、程度补语 得（他说得很流利、跑得不快）、介词补语 在/到（住在上海、走到学校）。",
+   "prereqs": [
+    {
+     "id": "CIG-GR-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "resultative complement",
+    "directional complement",
+    "complement of degree"
+   ],
+   "method": "程度补语结构“动词 + 得 + 形容词短语”，有宾语时重复动词（他说汉语说得很好）。结果补语的否定用“没”（没听懂）。",
+   "probe": "翻译：He speaks Chinese very fluently. / I didn't understand.",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Grammar and structures；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf） Part 1 Verbs",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-GR-07",
+   "strand": "LAN",
+   "stage": "IGCSE",
+   "syllabus": "Part 1",
+   "name": "比较句",
+   "name_en": "Comparisons",
+   "desc": "A 比 B + 形容词（+ 一点儿/得多/更）、A 跟 B 一样（+ 形容词）、A 像 B 一样、A 没有 B（那么）+ 形容词、最；比较句里不能用“很”。",
+   "prereqs": [
+    {
+     "id": "CIG-GR-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "comparison",
+    "比 sentence",
+    "superlative"
+   ],
+   "method": "常见错误“他比我很高”——比较句里改用 更 / 一点儿 / 得多。否定比较多用“没有”而非“不比”。",
+   "probe": "用三种方式比较上海和北京的天气（比 / 没有 / 跟…一样）。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Grammar and structures；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf） Part 1 Comparisons",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-GR-08",
+   "strand": "LAN",
+   "stage": "IGCSE",
+   "syllabus": "Part 1",
+   "name": "是…的 句与强调",
+   "name_en": "The 是…的 construction",
+   "desc": "用“是…的”强调已发生事件的时间、地点、方式（我是坐飞机来的、你是什么时候到的？）。",
+   "prereqs": [
+    {
+     "id": "CIG-GR-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "是…的 construction",
+    "emphasis"
+   ],
+   "method": "问过去事件的细节用 是…的，不用 了；否定说“不是…的”。",
+   "probe": "回答：“你是怎么来学校的？”“你是在哪儿出生的？”",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Grammar and structures；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf） Part 1 Sentences",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-GR-09",
+   "strand": "LAN",
+   "stage": "IGCSE",
+   "syllabus": "Part 2",
+   "name": "进阶结构：着、复合趋向补语与可能补语",
+   "name_en": "着, compound directional and potential complements",
+   "desc": "大纲 Part 2：持续体 着（门开着、他笑着说）、复合趋向补语（走进来、拿出去、站起来）、可能补语 得/不（听得懂、看不清楚、买不到）。",
+   "prereqs": [
+    {
+     "id": "CIG-GR-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "durative 着",
+    "compound directional complement",
+    "potential complement"
+   ],
+   "method": "可能补语表示“能不能”达到结果：听不懂 ≠ 没听懂（前者能力，后者事实）。有宾语时宾语常放在复合趋向补语中间（走进教室来）。",
+   "probe": "辨析：“我听不懂。”和“我没听懂。”有什么不同？",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Grammar and structures；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf） Part 2 Verbs",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-GR-10",
+   "strand": "LAN",
+   "stage": "IGCSE",
+   "syllabus": "Part 2",
+   "name": "把字句、被字句与让/使",
+   "name_en": "把, 被 and 让/使 constructions",
+   "desc": "大纲 Part 2：把字句（主语 + 把 + 宾语 + 动词 + 其他成分：我把作业做完了）、被字句（手机被弟弟弄坏了）、使役句 让/使（妈妈让我早点睡、这件事使我很感动）。",
+   "prereqs": [
+    {
+     "id": "CIG-GR-06",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-GR-09",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "把 construction",
+    "passive 被",
+    "causative"
+   ],
+   "method": "把字句动词后必须有“其他成分”（结果、趋向、了），不能说“我把饭吃”；宾语要是确定的。被字句多用于不如意的事。",
+   "probe": "把“弟弟打破了杯子”改成 把 字句和 被 字句。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Grammar and structures；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf） Part 2 Sentences",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-GR-11",
+   "strand": "LAN",
+   "stage": "IGCSE",
+   "name": "助动词与常用副词",
+   "name_en": "Modal verbs and common adverbs",
+   "desc": "助动词 会、能、可以、要、想、应该、必须、得(děi)、不用、愿意、敢；副词 已经、刚、才、就、还、再、又、都、也、只、常常、总是、马上、一定、也许、大概、当然。",
+   "prereqs": [
+    {
+     "id": "CIG-GR-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "modal verb",
+    "adverb",
+    "ability",
+    "permission"
+   ],
+   "method": "会/能/可以 分工：学会的技能用 会，条件允许用 能，许可用 可以。“必须”的否定是“不用/不必”，不是“不必须”。",
+   "probe": "选词：“我__游泳，但今天感冒了，不__游。”（会/能）",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Vocabulary list – Auxiliary verbs / Adverbs；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf） ; https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Grammar and structures；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf） Part 1 Verbs (auxiliary verbs)",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-VOC-01",
+   "strand": "VOC",
+   "stage": "IGCSE",
+   "syllabus": "Area A",
+   "name": "话题 A：日常活动",
+   "name_en": "Area A: Everyday activities",
+   "desc": "时间表达（钟点、星期、月份、季节）；饮食（三餐、水果蔬菜、肉和海鲜、零食、饮料、餐具）；身体与健康（身体部位、生病、看病）；出行与交通（问路、指路、交通工具）。这些话题是听、说、读、写四卷的语境来源；词汇表只是指导，考试可能出现表外词，需要根据上下文推测。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "daily routine",
+    "food and drink",
+    "health",
+    "transport"
+   ],
+   "method": "按话题做“词汇思维导图”，每个话题准备一段 5 句左右的自我介绍式短文，口语和写作可以反复用。生词以“字”带“词”记，提高猜词能力。",
+   "probe": "随机抽话题 A 的 10 个核心词（中→英、英→中）并让学生用其中 3 个说一段话。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Topic areas A–E；词汇表按话题编排，仅作指导；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-VOC-02",
+   "strand": "VOC",
+   "stage": "IGCSE",
+   "syllabus": "Area B",
+   "name": "话题 B：个人与社会生活",
+   "name_en": "Area B: Personal and social life",
+   "desc": "自己、家人和朋友（关系、外貌、性格、心情）；家（房间、家具、电器、家务、花园）；颜色；衣服和饰品；业余时间（爱好、运动、假期）。这些话题是听、说、读、写四卷的语境来源；词汇表只是指导，考试可能出现表外词，需要根据上下文推测。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "family",
+    "appearance",
+    "personality",
+    "home",
+    "hobbies"
+   ],
+   "method": "按话题做“词汇思维导图”，每个话题准备一段 5 句左右的自我介绍式短文，口语和写作可以反复用。生词以“字”带“词”记，提高猜词能力。",
+   "probe": "随机抽话题 B 的 10 个核心词（中→英、英→中）并让学生用其中 3 个说一段话。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Topic areas A–E；词汇表按话题编排，仅作指导；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-VOC-03",
+   "strand": "VOC",
+   "stage": "IGCSE",
+   "syllabus": "Area C",
+   "name": "话题 C：我们周围的世界",
+   "name_en": "Area C: The world around us",
+   "desc": "人与地方（大洲、国家、国籍、方位）；自然、环境、气候与天气；通讯与科技（数字世界、文件）；建筑环境（建筑、服务、城区、购物）；度量（大小、形状、钱）；材料。这些话题是听、说、读、写四卷的语境来源；词汇表只是指导，考试可能出现表外词，需要根据上下文推测。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "environment",
+    "weather",
+    "technology",
+    "shopping"
+   ],
+   "method": "按话题做“词汇思维导图”，每个话题准备一段 5 句左右的自我介绍式短文，口语和写作可以反复用。生词以“字”带“词”记，提高猜词能力。",
+   "probe": "随机抽话题 C 的 10 个核心词（中→英、英→中）并让学生用其中 3 个说一段话。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Topic areas A–E；词汇表按话题编排，仅作指导；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-VOC-04",
+   "strand": "VOC",
+   "stage": "IGCSE",
+   "syllabus": "Area D",
+   "name": "话题 D：工作的世界",
+   "name_en": "Area D: The world of work",
+   "desc": "教育（学校类型、培训、教室、学习用品、科目、学习）；工作（职业、事业、工作场所）。这些话题是听、说、读、写四卷的语境来源；词汇表只是指导，考试可能出现表外词，需要根据上下文推测。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "school subjects",
+    "career",
+    "workplace"
+   ],
+   "method": "按话题做“词汇思维导图”，每个话题准备一段 5 句左右的自我介绍式短文，口语和写作可以反复用。生词以“字”带“词”记，提高猜词能力。",
+   "probe": "随机抽话题 D 的 10 个核心词（中→英、英→中）并让学生用其中 3 个说一段话。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Topic areas A–E；词汇表按话题编排，仅作指导；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-VOC-05",
+   "strand": "VOC",
+   "stage": "IGCSE",
+   "syllabus": "Area E",
+   "name": "话题 E：国际世界",
+   "name_en": "Area E: The international world",
+   "desc": "国家、国籍与语言；文化、习俗、信仰与节日庆祝（春节、中秋、端午等）。这些话题是听、说、读、写四卷的语境来源；词汇表只是指导，考试可能出现表外词，需要根据上下文推测。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "culture",
+    "festival",
+    "customs",
+    "nationality"
+   ],
+   "method": "按话题做“词汇思维导图”，每个话题准备一段 5 句左右的自我介绍式短文，口语和写作可以反复用。生词以“字”带“词”记，提高猜词能力。",
+   "probe": "随机抽话题 E 的 10 个核心词（中→英、英→中）并让学生用其中 3 个说一段话。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Topic areas A–E；词汇表按话题编排，仅作指导；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-VOC-11",
+   "strand": "VOC",
+   "stage": "IGCSE",
+   "syllabus": "Area A",
+   "name": "0523 话题 A：青少年与教育",
+   "name_en": "0523 Area A: Young people and education",
+   "desc": "A1 教育与职业、A2 同伴关系、A3 社会、A4 家庭关系。这是口语 Part 3 一般会话的官方话题范围（至少一个来自 A–B、一个来自 C–D，且不能与演讲话题重复），阅读、听力和写作也常取材于这些话题。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "education",
+    "peer relationships",
+    "society",
+    "family"
+   ],
+   "method": "每个子话题准备：10–15 个高级词语、2 个观点和各自的理由与例子、1 个自己的经历。重点准备有争议的话题（代沟、社交网络、城乡生活），便于展开讨论。",
+   "probe": "就话题 A 中任一子话题问一个开放问题（如“你觉得社交网络对青少年利大还是弊大？”），看能否说出观点 + 理由 + 例子。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Component 3 Part 3 topics, Areas A–D；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-VOC-12",
+   "strand": "VOC",
+   "stage": "IGCSE",
+   "syllabus": "Area B",
+   "name": "0523 话题 B：健康与休闲",
+   "name_en": "0523 Area B: Health and leisure",
+   "desc": "B1 健康与健身、B2 休闲活动、B3 通讯与科技、B4 世界、B5 地理环境、B6 环境、B7 文化多样性。这是口语 Part 3 一般会话的官方话题范围（至少一个来自 A–B、一个来自 C–D，且不能与演讲话题重复），阅读、听力和写作也常取材于这些话题。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "health",
+    "leisure",
+    "communication technology",
+    "cultural diversity"
+   ],
+   "method": "每个子话题准备：10–15 个高级词语、2 个观点和各自的理由与例子、1 个自己的经历。重点准备有争议的话题（代沟、社交网络、城乡生活），便于展开讨论。",
+   "probe": "就话题 B 中任一子话题问一个开放问题（如“你觉得社交网络对青少年利大还是弊大？”），看能否说出观点 + 理由 + 例子。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Component 3 Part 3 topics, Areas A–D；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-VOC-13",
+   "strand": "VOC",
+   "stage": "IGCSE",
+   "syllabus": "Area C",
+   "name": "0523 话题 C：生活与家庭",
+   "name_en": "0523 Area C: Life and home",
+   "desc": "C1 国内外的家庭生活、C2 学校与教育、C3 未来职业规划、C4 友谊、C5 同伴压力与冲突、C6 代沟。这是口语 Part 3 一般会话的官方话题范围（至少一个来自 A–B、一个来自 C–D，且不能与演讲话题重复），阅读、听力和写作也常取材于这些话题。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "generation gap",
+    "peer pressure",
+    "career plans",
+    "friendship"
+   ],
+   "method": "每个子话题准备：10–15 个高级词语、2 个观点和各自的理由与例子、1 个自己的经历。重点准备有争议的话题（代沟、社交网络、城乡生活），便于展开讨论。",
+   "probe": "就话题 C 中任一子话题问一个开放问题（如“你觉得社交网络对青少年利大还是弊大？”），看能否说出观点 + 理由 + 例子。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Component 3 Part 3 topics, Areas A–D；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-VOC-14",
+   "strand": "VOC",
+   "stage": "IGCSE",
+   "syllabus": "Area D",
+   "name": "0523 话题 D：现代生活与文化",
+   "name_en": "0523 Area D: Modern life and culture",
+   "desc": "D1 青少年、D2 健康饮食、D3 体育运动、D4 电影与媒体、D5 爱好、D6 新通讯方式、D7 社交网络、D8 学习科技、D9 城乡生活、D10 旅游、D11 家乡、D12 污染、D13 回收、D14 全球变暖、D15 节日庆祝、D16 风俗传统、D17 饮食多样。这是口语 Part 3 一般会话的官方话题范围（至少一个来自 A–B、一个来自 C–D，且不能与演讲话题重复），阅读、听力和写作也常取材于这些话题。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "social networking",
+    "pollution",
+    "global warming",
+    "festivals",
+    "urban and rural life"
+   ],
+   "method": "每个子话题准备：10–15 个高级词语、2 个观点和各自的理由与例子、1 个自己的经历。重点准备有争议的话题（代沟、社交网络、城乡生活），便于展开讨论。",
+   "probe": "就话题 D 中任一子话题问一个开放问题（如“你觉得社交网络对青少年利大还是弊大？”），看能否说出观点 + 理由 + 例子。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Component 3 Part 3 topics, Areas A–D；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-REA-01",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "name": "提取与定位显性信息",
+   "name_en": "Locating explicit information",
+   "desc": "在文本中准确找到直接说明的事实、细节和态度（0509 R1；0523 R1“identify and select relevant information”；0547 R1/R4 在可预测文本中找相关信息）。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "explicit information",
+    "scan",
+    "key words"
+   ],
+   "method": "先读题划关键词（谁、什么时候、多少、为什么），再回原文定位；答案通常按文章顺序出现。常见错误：抄了整段，没有挑出题目要的那一点。",
+   "probe": "给一篇 300 字通知，问 4 个细节题（时间、地点、费用、报名方式）。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf AO1 R1 ; https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf AO1 R1 ; https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf AO2"
+  },
+  {
+   "id": "CIG-REA-02",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "name": "推断隐含信息、态度与写作目的",
+   "name_en": "Inferring implicit meaning and attitudes",
+   "desc": "理解文中没有直接说出的意思：人物的心情、作者/说话人的态度和目的、言外之意（0509 R2；0523 R2–R4“what is implied but not directly stated”；0547 R3 观点与态度）。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "implicit",
+    "infer",
+    "attitude",
+    "purpose"
+   ],
+   "method": "从动作、语气词、形容词和对比中找证据，答案写“结论 + 依据”。常见错误：凭自己的想法推断，没有回到原文找根据。",
+   "probe": "给一段对话，问“说话人对这个计划是什么态度？从哪句话看出来？”",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf AO1 R2 ; https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf AO1 R2–R4 ; https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf AO2 R3"
+  },
+  {
+   "id": "CIG-REA-03",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Section 1",
+   "name": "结合语境解释词语含义",
+   "name_en": "Explaining words in context",
+   "desc": "解释文中词语在特定语境中的意思，包括一词多义、比喻义和引申义（0509 样卷 1(a) 解释加线词的两个含义、1(d) 根据语境解释词义）。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "context",
+    "connotation",
+    "figurative meaning"
+   ],
+   "method": "先写词典义，再结合上下文写语境义；能替换成同义词放回原句读通才算对。常见错误：只写字面义。",
+   "probe": "从一篇小说中选 3 个词，让学生写出“本义”和“在文中的意思”。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf Paper 1 Section 1 ; 样卷 https://cambridgeinternational.org/images/414856-2020-specimen-paper-1.pdf Q1(a)(d)",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-REA-04",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Section 1",
+   "name": "修辞手法的识别与作用",
+   "name_en": "Figurative language and its effects",
+   "desc": "识别比喻、拟人、夸张、排比、对比、反问、设问、借代等修辞，并说明其表达效果（Section 1 有 9 分考比喻性语言、作者技巧和结构效果，R3）。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "simile",
+    "metaphor",
+    "personification",
+    "rhetorical device",
+    "effect"
+   ],
+   "method": "答题三步：指出手法 → 解释这句写了什么 → 说明效果（形象生动地写出…，表达了…的感情）。只写名称不写效果拿不到全分。",
+   "probe": "给 3 个句子，让学生写出修辞手法并分析作用。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf Paper 1 Section 1（9 marks: figurative language, author's technique, structure）; 样卷 https://cambridgeinternational.org/images/414856-2020-specimen-paper-1.pdf Q1(c)",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-REA-05",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Section 1",
+   "name": "描写方法与人物形象分析",
+   "name_en": "Description and characterisation",
+   "desc": "分析小说中的人物描写（外貌、语言、动作、心理、神态）和环境描写，概括人物形象，比较两处描写的异同（样卷 1(b)(g)）。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-REA-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "characterisation",
+    "description",
+    "imagery",
+    "setting"
+   ],
+   "method": "概括人物用“形容词 + 依据”（他是一个固执的人，从“…”可以看出）；环境描写要说明它对气氛、人物心情和情节的作用。",
+   "probe": "选一段小说，问“这一段的动作描写表现了人物什么性格？”",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf AO1 R3 ; 样卷 https://cambridgeinternational.org/images/414856-2020-specimen-paper-1.pdf Q1(b)(g)",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-REA-06",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Section 1",
+   "name": "结构与写作技巧分析",
+   "name_en": "Structure and writer's technique",
+   "desc": "理解作者如何用结构达到效果：线索、伏笔与照应、对比、首尾呼应、详略、插叙倒叙、标题的作用（R3“how writers use language and structure to achieve effects”）。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-05",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "structure",
+    "foreshadowing",
+    "contrast",
+    "narrative technique"
+   ],
+   "method": "读完先画情节曲线（开端-发展-高潮-结局），再找“前面提到、后面又出现”的细节。答题写清“这种结构使读者…”。",
+   "probe": "问：“文章开头写下雨，结尾又写雨停了，这样安排有什么作用？”",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf AO1 R3 ; Paper 1 Section 1",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-REA-07",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Section 1",
+   "name": "现代文中的引语、典故与成语",
+   "name_en": "Allusions, idioms and quotations in modern texts",
+   "desc": "理解现代文中引用的古诗文、典故、成语和俗语的含义及其在文中的作用（样卷 1(h) 解释文中引用的古语）。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "allusion",
+    "idiom",
+    "chengyu",
+    "quotation"
+   ],
+   "method": "积累常用成语和名句时写下出处、意思和一个例句；答题时先解释原意，再说明在文中表达了什么。",
+   "probe": "给出文中一句引用的古诗，问其意思和作者引用它的目的。",
+   "source": "样卷 https://cambridgeinternational.org/images/414856-2020-specimen-paper-1.pdf Q1(h) ; https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf 课程目标（aims）",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-REA-08",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Section 2",
+   "name": "分析和评价事实、观点与论证",
+   "name_en": "Analysing and evaluating facts, ideas and opinions",
+   "desc": "区分非虚构文本中的事实与观点，判断论据是否充分、立场是否片面，评价两篇主题相关文本的观点（R4）。这是指导写作的阅读基础。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "fact",
+    "opinion",
+    "evaluate",
+    "bias",
+    "argument"
+   ],
+   "method": "边读边用两种符号标注“事实（可验证）”和“观点（个人判断）”；评价时问“证据可靠吗？有没有反例？”",
+   "probe": "给一段报道，让学生找出 2 个事实和 2 个观点，并评价其中一个观点是否有说服力。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf AO1 R4 ; Paper 1 Section 2",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-REA-09",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Section 2",
+   "name": "为特定目的筛选并整合信息",
+   "name_en": "Selecting and synthesising information",
+   "desc": "根据写作任务，从两篇文本中挑出相关要点、合并同类、去掉重复（R5“select information for specific purposes”；W2“synthesise information”）。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "select",
+    "synthesise",
+    "relevant",
+    "key points"
+   ],
+   "method": "两篇文本各列要点表，用不同颜色标出“支持”和“反对”，再合并成提纲。常见错误：只用一篇文本，或照抄原句。",
+   "probe": "给两篇各 300 字的短文和一个写作任务，让学生 5 分钟内列出 6 个可用要点。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf AO1 R5 / AO2 W2 ; Paper 1 Section 2",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-REA-10",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Exercise 1",
+   "name": "0523 信息转换：填表与笔记",
+   "name_en": "0523 Information transfer",
+   "desc": "Paper 1 Exercise 1（8 分）：读一段材料，把信息填到表格或笔记模板中（R1–R3）。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "information transfer",
+    "form",
+    "notes"
+   ],
+   "method": "先看表格栏目，预测要找什么类型的信息（姓名、日期、原因）；填写要简短准确，不写完整句子；注意错别字也会影响得分。",
+   "probe": "给一篇活动报名说明，让学生填一张 8 栏的报名表。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Paper 1 Exercise 1；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-REA-11",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Exercise 2",
+   "name": "0523 实用文本简答题",
+   "name_en": "0523 Short-answer reading questions",
+   "desc": "Paper 1 Exercise 2（12 分）：读广告、宣传册、传单、指南、报告、说明书、说明或报刊文章，回答考查大意、细节和隐含意思的问题（R1–R4）。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-REA-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "gist",
+    "detail",
+    "leaflet",
+    "brochure"
+   ],
+   "method": "问“几点/几个理由”就给够几点；回答用文中的关键信息但要成句。熟悉各类实用文本的版面（标题、小标题、联系方式）。",
+   "probe": "给一份旅游宣传册，出 6 道简答题（含 1 道推断题）。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Paper 1 Exercise 2；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-REA-12",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Exercise 3",
+   "name": "0523 多项匹配",
+   "name_en": "0523 Multiple matching",
+   "desc": "Paper 1 Exercise 3（10 分）：把若干句子分别配到短段落（如几个人的介绍或经历）上，考查对细节、观点及其联系的理解（R1–R3）。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "multiple matching",
+    "paraphrase",
+    "distractor"
+   ],
+   "method": "句子往往是原文的同义改写，不要只找相同的字；每段可能有似是而非的干扰信息，要逐条核对否定词和程度词。",
+   "probe": "给 4 段人物经历和 10 个句子，计时 12 分钟完成匹配。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Paper 1 Exercise 3；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-REA-13",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 2",
+   "name": "0547 阅读：简单描述与图片匹配",
+   "name_en": "0547 Reading: simple descriptions",
+   "desc": "Paper 2 第 1–3 组（共 12 分）：读简单描述做四选一（5 分）、把句子和图片配对（4 分）、读邮件/短信/明信片/书信做四选一（3 分），考查 R1 抓主要信息。",
+   "prereqs": [
+    {
+     "id": "CIG-VOC-01",
+     "strength": "有帮助"
+    },
+    {
+     "id": "CIG-VOC-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "multiple choice",
+    "matching pictures",
+    "postcard"
+   ],
+   "method": "先看图片和选项，用中文说出每张图的关键词再读文本；注意否定词“不/没”和时间词。",
+   "probe": "给 5 句简单描述配图片，看正确率和用时。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Paper 2 Reading，第 1–3 组；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-REA-14",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 2",
+   "name": "0547 阅读：邮件、博客与广告",
+   "name_en": "0547 Reading: emails, blogs and notices",
+   "desc": "Paper 2 第 4–5 组：读邮件/短信/书信/博客用中文简答（9 分），把问题配到 4 则描述、广告或通知上（5 分），考查理解真实的事实性文本并选取相关信息（R2、R4）。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "short answer",
+    "blog",
+    "advertisement",
+    "notice"
+   ],
+   "method": "简答只需写出关键词或短语，但必须用中文、汉字写对；广告配对先看每个人的需求（预算、时间、地点）。",
+   "probe": "给一篇 200 字博客，出 5 道中文简答题。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Paper 2 Reading，第 4–5 组；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-REA-15",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 2",
+   "name": "0547 阅读：文章中的事件、观点与态度",
+   "name_en": "0547 Reading: longer articles",
+   "desc": "Paper 2 第 6–7 组：读较长的文章，做四选一（5 分）和中文简答（9 分），理解事件描述以及观点、想法和态度（R3、R4）。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-14",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-REA-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "article",
+    "opinion",
+    "attitude"
+   ],
+   "method": "先读题干再读文章，题目一般按段落顺序；遇到生词用部首和上下文猜，不要卡住。",
+   "probe": "给一篇 350 字文章，出 2 道态度题和 3 道细节题。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Paper 2 Reading，第 6–7 组；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-CLA-01",
+   "strand": "CLA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Section 3",
+   "name": "文言文考查方式与答题要求",
+   "name_en": "Classical Chinese section format",
+   "desc": "0509 Paper 1 Section 3（12 分）：一篇未见过的明代短篇小说或散文，约 200 字；题型为简答和选择题，只考阅读（R1、R2），不要求用文言写作，也不要求事先了解作品或历史背景。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "Classical Chinese",
+    "unseen text",
+    "Ming dynasty"
+   ],
+   "method": "平时多读明代笔记小品（如寓言、轶事），短而有情节；先通读抓故事，再逐句对照注释。用现代汉语作答。",
+   "probe": "给一篇 200 字左右明代短文，限时 25 分钟完成 6 道题，看能否说出故事大意。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf Paper 1 Section 3 Classical Chinese（明代短篇小说或散文，约 200 字，12 分，简答+选择，只考阅读） ; https://www.cambridgeinternational.org/Images/697185-2026-2027-syllabus.pdf",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-CLA-02",
+   "strand": "CLA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Section 3",
+   "name": "文言实词：一词多义与古今异义",
+   "name_en": "Content words: polysemy and ancient vs modern meaning",
+   "desc": "根据上下文判断文言实词的意思，区分一词多义（如“走”古义为跑）和古今异义（如“妻子”古指妻子和儿女），能指出某词的词性（样卷 3(a)(c)：解释词义、辨认动词和形容词等）。",
+   "prereqs": [
+    {
+     "id": "CIG-CLA-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "content word",
+    "polysemy",
+    "archaic meaning",
+    "part of speech"
+   ],
+   "method": "积累一本“文言实词卡”，每词记 2–3 个义项和例句；解释时把词义代回原句通读检验。常见错误：用现代意思直接套。",
+   "probe": "从文中挑 4 个实词，让学生写出在文中的意思。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf Paper 1 Section 3 Classical Chinese（明代短篇小说或散文，约 200 字，12 分，简答+选择，只考阅读） ; 样卷 https://cambridgeinternational.org/images/414856-2020-specimen-paper-1.pdf Q3(a)(c)",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-CLA-03",
+   "strand": "CLA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Section 3",
+   "name": "文言虚词的意义和用法",
+   "name_en": "Function words in Classical Chinese",
+   "desc": "掌握常见文言虚词 之、其、而、以、于、乃、则、者、也、焉 的主要用法；会比较同一个虚词在不同句子中的用法是否相同（样卷 3(g) 判断几个句子中同一字的用法）。",
+   "prereqs": [
+    {
+     "id": "CIG-CLA-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "function word",
+    "particle",
+    "usage"
+   ],
+   "method": "按“代词 / 助词 / 连词 / 介词”给每个虚词整理用法表，配一个熟悉的例句；比较题先判断词性再比较意思。",
+   "probe": "给 4 个含“之”的句子，问哪一个与原文中“之”的用法相同。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf Paper 1 Section 3 Classical Chinese（明代短篇小说或散文，约 200 字，12 分，简答+选择，只考阅读） ; 样卷 https://cambridgeinternational.org/images/414856-2020-specimen-paper-1.pdf Q3(g)",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-CLA-04",
+   "strand": "CLA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Section 3",
+   "name": "文言特殊句式、通假与词类活用",
+   "name_en": "Special sentence patterns and word-class shifts",
+   "desc": "识别判断句（…者，…也）、省略句、倒装句（宾语前置、状语后置）、被动句（为…所、见）以及常见通假字、名词作动词等词类活用，帮助准确理解句意。",
+   "prereqs": [
+    {
+     "id": "CIG-CLA-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-CLA-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "inversion",
+    "omission",
+    "passive",
+    "phonetic loan character"
+   ],
+   "method": "遇到读不通的句子，先补出省略的主语/宾语，再调整语序；翻译时保持原意不增减。",
+   "probe": "给 3 个特殊句式的句子，让学生说出句式类型并翻译。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf Paper 1 Section 3 Classical Chinese（明代短篇小说或散文，约 200 字，12 分，简答+选择，只考阅读）（大纲未列具体文言语法项目，此点为理解所需的支撑知识）",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-CLA-05",
+   "strand": "CLA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Section 3",
+   "name": "用现代汉语解释文言句子",
+   "name_en": "Rendering Classical Chinese in modern Chinese",
+   "desc": "把文言句子或情节用现代汉语准确说出来（样卷 3(d)(f)：解释加点短语、用现代汉语说明情节细节），做到字字落实、语句通顺。",
+   "prereqs": [
+    {
+     "id": "CIG-CLA-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-CLA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-CLA-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "translate",
+    "modern Chinese",
+    "paraphrase"
+   ],
+   "method": "用“留、换、补、删、调”五字法：人名地名保留、单音词换成双音词、补出省略、删去无义虚词、调整倒装语序。",
+   "probe": "给 2 个文言句，让学生翻译，按关键词是否落实给分。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf Paper 1 Section 3 Classical Chinese（明代短篇小说或散文，约 200 字，12 分，简答+选择，只考阅读） ; 样卷 https://cambridgeinternational.org/images/414856-2020-specimen-paper-1.pdf Q3(d)(f)",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-CLA-06",
+   "strand": "CLA",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Section 3",
+   "name": "文言文内容理解与寓意",
+   "name_en": "Understanding content and moral in Classical texts",
+   "desc": "把握文言短篇的情节、人物做法和作者想说明的道理，能依据原文判断说法正误并说明理由（样卷 3(e) 判断并给出依据）。",
+   "prereqs": [
+    {
+     "id": "CIG-CLA-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "plot",
+    "moral",
+    "evidence"
+   ],
+   "method": "读完用一句现代汉语概括“谁做了什么、结果怎样、说明什么”；判断题要引原文关键句作依据。",
+   "probe": "问：“故事中的主人公为什么这样做？这个故事告诉我们什么？”",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf Paper 1 Section 3 Classical Chinese（明代短篇小说或散文，约 200 字，12 分，简答+选择，只考阅读） ; 样卷 https://cambridgeinternational.org/images/414856-2020-specimen-paper-1.pdf Q3(e)",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-WRI-01",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "name": "审题、构思与列提纲",
+   "name_en": "Planning: task analysis and outlining",
+   "desc": "看清题目要求的文体、对象、目的和字数，写作前花 5–10 分钟列提纲（中心、段落安排、材料），这是 W1 清楚有效表达和 W2 组织观点的前提。",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "planning",
+    "outline",
+    "purpose",
+    "audience"
+   ],
+   "method": "用“文体-读者-目的-要点”四格审题；提纲至少写出每段的中心句。常见错误：没列提纲直接写，写到一半跑题。",
+   "probe": "给一道作文题，只让学生用 5 分钟写提纲，检查中心是否明确、段落是否合理。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf AO2 W1–W2 ; https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf AO2 W1–W2 ; https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf AO4"
+  },
+  {
+   "id": "CIG-WRI-02",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "name": "段落组织与衔接",
+   "name_en": "Paragraphing and cohesion",
+   "desc": "把内容分成连贯的段落，用过渡句和关联词连接（0523 W2“coherent paragraphs using appropriate linking devices”；0509 W2“sequence facts and develop ideas”）。",
+   "prereqs": [
+    {
+     "id": "CIG-WRI-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-LAN-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "paragraph",
+    "cohesion",
+    "transition",
+    "linking devices"
+   ],
+   "method": "每段一个中心句放段首；段与段之间用“首先/其次/此外/然而/总之”等过渡。检查方法：只读每段第一句，能否看懂全文思路。",
+   "probe": "给一篇不分段的 300 字短文，让学生分段并补上过渡词。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf AO2 W2 ; https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf AO2 W2",
+   "tracks": [
+    "0509",
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-WRI-03",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "name": "词汇的丰富与准确",
+   "name_en": "Range and precision of vocabulary",
+   "desc": "使用丰富、准确、恰当的词语，包括成语、四字词语和准确的动词形容词（0509 W3；0523 W3；0547 Q3 新版单列 Range 9 分）。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "vocabulary range",
+    "precision",
+    "idiom"
+   ],
+   "method": "每个话题积累“普通词 → 高级词”替换表（好 → 精彩/出色/令人难忘）；成语宁可少用，用错比不用更扣分。",
+   "probe": "给一段用词平淡的短文，让学生替换 5 个词使表达更准确生动。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf AO2 W3 ; https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf AO2 W3 ; https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf Paper 4 Q3（Range）"
+  },
+  {
+   "id": "CIG-WRI-04",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "name": "语体、语气与读者意识",
+   "name_en": "Register, tone and audience",
+   "desc": "根据读者和场合选择恰当的语体和语气：给朋友的邮件用口语化表达，给校长/报社的信和报告用正式书面语（0509 W4；0523 W5）。",
+   "prereqs": [
+    {
+     "id": "CIG-WRI-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "register",
+    "tone",
+    "formal",
+    "informal",
+    "audience"
+   ],
+   "method": "列出正式/非正式对照词（您 vs 你、敬请 vs 请、谢谢 vs 衷心感谢）；写前先问“读者是谁、我要他做什么”。",
+   "probe": "同一件事（申请参加活动）分别写给朋友和老师各 3 句话，比较语气差异。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf AO2 W4 ; https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf AO2 W5",
+   "tracks": [
+    "0509",
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-WRI-05",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "name": "书信与电子邮件格式",
+   "name_en": "Letter and email format",
+   "desc": "中文书信/邮件格式：称呼顶格加冒号、问候语、正文分段、结尾祝福语（祝你学习进步／此致 敬礼）、署名和日期；电子邮件有主题。0523 Exercise 4 常为邮件，0547 Q3 可选邮件/书信。",
+   "prereqs": [
+    {
+     "id": "CIG-WRI-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "letter format",
+    "email",
+    "salutation",
+    "closing"
+   ],
+   "method": "背一个万能框架：称呼—问候—写信目的—分点说明—期待回复—祝福—署名日期。常见错误：漏祝福语、“此致”和“敬礼”放错行。",
+   "probe": "让学生写一封邀请朋友参加生日会的短邮件，检查格式五要素。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf Paper 1 Exercise 4 ; https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf Paper 4 Q3",
+   "tracks": [
+    "0523",
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-WRI-06",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "syllabus": "Paper 2",
+   "name": "句式多样与语言准确",
+   "name_en": "Sentence variety and accuracy",
+   "desc": "长短句结合、使用复杂句（含关联词的复句）、适当运用修辞，同时保证语法和用字准确。0509 Paper 2 评分的“Style and Accuracy”（12 分）顶档要求句式多样、包括结构良好的复杂句、词汇广泛精准、语体一致、复杂句中也准确。",
+   "prereqs": [
+    {
+     "id": "CIG-WRI-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-LAN-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "sentence variety",
+    "complex sentence",
+    "accuracy",
+    "style"
+   ],
+   "method": "写完逐句检查：有没有成分残缺、搭配不当、语序错误；有意识地在开头和高潮段使用排比、比喻。",
+   "probe": "让学生把 5 个简单句改写成 2 个复句，并保持语法正确。",
+   "source": "https://www.cambridgeinternational.org/Images/670263-june-2022-mark-scheme-paper-21.pdf（0509/21 2022 年 6 月评分方案 Table A）; https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf AO2 W3–W5",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-WRI-07",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Section 2",
+   "name": "0509 指导写作",
+   "name_en": "0509 Directed writing",
+   "desc": "Paper 1 Section 2（25 分，内容 15 + 写作质量 10）：读两篇主题相关的非虚构文本（合计不超过约 600 字），用自己的话写约 250–350 字的论说/讨论性回应，要使用并评价两篇材料中的信息（W1–W5、R4、R5）。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-08",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-REA-09",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-WRI-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "directed writing",
+    "own words",
+    "evaluate",
+    "synthesise"
+   ],
+   "method": "先确定任务要求的形式（如给校刊的文章、演讲稿）和立场；材料要点要改写不能照抄，并加上自己的评价（同意/质疑及理由）。常见错误：只复述材料，没有评价；超字数太多。",
+   "probe": "用一套指导写作题，按“材料要点覆盖数 + 是否有评价 + 是否用自己的话”三项诊断。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf（0509 2028–2029 大纲 Paper 1 Section 2；2026–2027 版 https://www.cambridgeinternational.org/Images/697185-2026-2027-syllabus.pdf 相同） ; 样卷 https://cambridgeinternational.org/images/414856-2020-specimen-paper-1.pdf Section 2",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-WRI-08",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "syllabus": "Paper 2 Section 1",
+   "name": "0509 议论文",
+   "name_en": "0509 Argumentative writing",
+   "desc": "Paper 2 Section 1 可选的议论题：鲜明地表明一个立场，用事实、道理和例子说服读者，甚至说服持反对意见的人；约 400–600 字，25 分（内容与结构 13 + 风格与准确 12）。",
+   "prereqs": [
+    {
+     "id": "CIG-WRI-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-WRI-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-REA-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "argumentative",
+    "thesis",
+    "evidence",
+    "counter-argument",
+    "persuade"
+   ],
+   "method": "结构：引出论点—分论点 1/2/3（各配一个具体例子）—驳斥反方—总结并呼吁。评分顶档要求论证集中、有说服力、各部分逻辑连接，所以每段都要回扣中心论点。",
+   "probe": "给一个议论题，看学生能否在 10 分钟内写出论点、三个分论点和一个反驳。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf（0509 2028–2029 大纲 Paper 2 Section 1；2026–2027 版 https://www.cambridgeinternational.org/Images/697185-2026-2027-syllabus.pdf 相同） ; 评分 https://www.cambridgeinternational.org/Images/670263-june-2022-mark-scheme-paper-21.pdf Table B1",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-WRI-09",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "syllabus": "Paper 2 Section 1",
+   "name": "0509 讨论文（正反论述）",
+   "name_en": "0509 Discursive writing",
+   "desc": "Paper 2 Section 1 可选的讨论题：对一个问题做平衡、客观的考察，分别呈现正反两方面的观点，最后给出审慎的结论；约 400–600 字，25 分。",
+   "prereqs": [
+    {
+     "id": "CIG-WRI-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "discursive",
+    "balanced",
+    "objective",
+    "both sides"
+   ],
+   "method": "与议论文区别：要先公平陈述双方，不急于站队。结构：引入话题—支持方理由—反对方理由—权衡与结论。常见错误：写成一边倒的议论文。",
+   "probe": "问：“‘中学生是否应该带手机上学’写讨论文和议论文，开头有什么不同？”",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf（0509 2028–2029 大纲 Paper 2 Section 1；2026–2027 版 https://www.cambridgeinternational.org/Images/697185-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-WRI-10",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "syllabus": "Paper 2 Section 2",
+   "name": "0509 描写文",
+   "name_en": "0509 Descriptive writing",
+   "desc": "Paper 2 Section 2 可选的描写题：描写一个人、一个地方或一个场景，“用文字画出画面”，让读者能想象出来；约 400–600 字，25 分。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-05",
+     "strength": "有帮助"
+    },
+    {
+     "id": "CIG-WRI-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "descriptive",
+    "sensory details",
+    "imagery",
+    "atmosphere"
+   ],
+   "method": "调动五感（视、听、嗅、味、触），由远及近或由整体到细节；描写文不需要完整故事情节，重在氛围。常见错误：写成记叙文，大段叙事。",
+   "probe": "给题目“雨后的菜市场”，让学生写一段 150 字，检查用了几种感官描写。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf（0509 2028–2029 大纲 Paper 2 Section 2；2026–2027 版 https://www.cambridgeinternational.org/Images/697185-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-WRI-11",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "syllabus": "Paper 2 Section 2",
+   "name": "0509 记叙文",
+   "name_en": "0509 Narrative writing",
+   "desc": "Paper 2 Section 2 可选的记叙题：讲一个由一系列相互关联的事件组成的故事（真实或虚构），约 400–600 字，25 分；要有清楚的情节发展、人物和高潮。",
+   "prereqs": [
+    {
+     "id": "CIG-REA-06",
+     "strength": "有帮助"
+    },
+    {
+     "id": "CIG-WRI-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "narrative",
+    "plot",
+    "climax",
+    "point of view"
+   ],
+   "method": "用“开端—发展—高潮—结局”控制节奏，字数有限只写一个核心事件；用细节描写和心理描写推动情节，结尾点题。常见错误：流水账、结局仓促。",
+   "probe": "看学生的一篇记叙文能否画出情节曲线并指出高潮。",
+   "source": "https://www.cambridgeinternational.org/Images/744811-2028-2029-syllabus.pdf（0509 2028–2029 大纲 Paper 2 Section 2；2026–2027 版 https://www.cambridgeinternational.org/Images/697185-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0509"
+   ]
+  },
+  {
+   "id": "CIG-WRI-12",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Exercise 4",
+   "name": "0523 功能性写作（约 100–120 字）",
+   "name_en": "0523 Functional writing",
+   "desc": "Paper 1 Exercise 4（8 分）：按指定目的、格式和读者写一篇短的功能性文字，如电子邮件，100–120 字（W1–W5）；通常要覆盖题目给出的几个要点。",
+   "prereqs": [
+    {
+     "id": "CIG-WRI-05",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-WRI-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "functional writing",
+    "email",
+    "bullet points",
+    "purpose"
+   ],
+   "method": "把题目的每个要点各写 1–2 句，逐个打钩；字数短，开头结尾格式用最简洁的写法，省出字数写要点。",
+   "probe": "给一道邮件题（3 个要点），检查是否全部覆盖、格式和语气是否正确、字数是否在范围内。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Paper 1 Exercise 4；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-WRI-13",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1 Exercise 5",
+   "name": "0523 长篇写作（约 250–300 字）",
+   "name_en": "0523 Extended writing",
+   "desc": "Paper 1 Exercise 5（22 分）：按指定目的、格式和读者写一篇较长的连续文字，如电子邮件、文章、报告或评论，250–300 字（W1–W5）。",
+   "prereqs": [
+    {
+     "id": "CIG-WRI-12",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-WRI-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-WRI-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "article",
+    "report",
+    "review",
+    "extended writing"
+   ],
+   "method": "熟悉四种格式：文章（标题+观点段落）、报告（标题、目的、发现、建议）、评论（介绍对象+评价+推荐）、邮件。每段围绕题目一个要点并展开理由和例子。",
+   "probe": "给一道“为校刊写一篇关于学校活动的报告”题，检查格式、要点展开和语言多样性。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Paper 1 Exercise 5；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-WRI-14",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "syllabus": "Paper 4 Q1",
+   "name": "0547 写作 Q1：填表",
+   "name_en": "0547 Writing Q1: form filling",
+   "desc": "Paper 4 Question 1（5 分，每项 1 分）：用单个词或短语填写表格，考查 W1 传达简单事实信息。",
+   "prereqs": [
+    {
+     "id": "CIG-VOC-01",
+     "strength": "有帮助"
+    },
+    {
+     "id": "CIG-VOC-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "form filling",
+    "personal details",
+    "short phrase"
+   ],
+   "method": "常见栏目：姓名、年龄、国籍、爱好、喜欢的食物、交通方式。只写词语，但汉字必须写对。",
+   "probe": "给一张 5 栏的俱乐部报名表，看能否用正确汉字填写。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Paper 4 Question 1；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-WRI-15",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "syllabus": "Paper 4 Q2",
+   "name": "0547 写作 Q2：指导写作（约 80–100 字）",
+   "name_en": "0547 Writing Q2: directed writing",
+   "desc": "Paper 4 Question 2：就熟悉的日常话题写约 80–100 字（W2、W4），通常按图片或提示要点写；2028 年起 10 分（任务完成 5 + 语言范围与准确 5），2027 年前 12 分。",
+   "prereqs": [
+    {
+     "id": "CIG-WRI-14",
+     "strength": "有帮助"
+    },
+    {
+     "id": "CIG-GR-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "directed writing",
+    "task completion",
+    "prompts"
+   ],
+   "method": "每个提示点写 1–2 个完整句子，确保全部回答；用自己有把握的句型，少冒险。",
+   "probe": "给一道 4 个要点的短文题，检查覆盖率和句子准确率。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Paper 4 Question 2；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-WRI-16",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "syllabus": "Paper 4 Q3",
+   "name": "0547 写作 Q3：邮件/书信或文章/博客（约 150 字）",
+   "name_en": "0547 Writing Q3: email/letter or article/blog",
+   "desc": "Paper 4 Question 3：二选一（邮件/书信 或 文章/博客），约 150 字，描述事件、经历、观点和愿望（W3、W4）；2028 年起 25 分（任务完成 9、范围 9、准确 7），2027 年前 28 分。需要用过去、现在、将来不同时间框架。",
+   "prereqs": [
+    {
+     "id": "CIG-WRI-15",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-WRI-05",
+     "strength": "有帮助"
+    },
+    {
+     "id": "CIG-GR-04",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-LAN-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "email",
+    "blog",
+    "article",
+    "time frames",
+    "opinion"
+   ],
+   "method": "每个要点写“事实 + 观点 + 理由”，并有意识地混用 了/过（过去）、在（现在）、打算/会/要（将来）。用 因为…所以、虽然…但是 展示语言范围。",
+   "probe": "给一道博客题，看文中是否出现三种时间框架和至少两个带理由的观点。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Paper 4 Question 3；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-LIS-01",
+   "strand": "LIS",
+   "stage": "IGCSE",
+   "name": "听力通用策略：预读、抓关键词与数字",
+   "name_en": "Listening strategies",
+   "desc": "听前预读题目和选项、预测内容；听时抓关键词、数字、时间和否定词；两遍录音分工（第一遍抓大意，第二遍核对细节）。0523 和 0547 每段录音都播放两遍。",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "predict",
+    "key words",
+    "distractor"
+   ],
+   "method": "录音前用 30 秒圈出每题要找的信息类型；警惕“先说一个再改口”的干扰（原来是三点，后来改成四点）。",
+   "probe": "放一段 1 分钟的通知，看学生能否记下 4 个关键信息（时间、地点、数字、变化）。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf Paper 2 ; https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf Paper 1",
+   "tracks": [
+    "0523",
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-LIS-02",
+   "strand": "LIS",
+   "stage": "IGCSE",
+   "syllabus": "Paper 2 Ex1",
+   "name": "0523 听力：短文本简答",
+   "name_en": "0523 Listening: short-answer questions",
+   "desc": "Paper 2 Exercise 1（6 分）：听短的口语文本（交通广播、电话留言、简短对话），用简短答案回答 6 个问题（L1、L2）。",
+   "prereqs": [
+    {
+     "id": "CIG-LIS-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "announcement",
+    "phone message",
+    "short answer"
+   ],
+   "method": "答案通常是一个词或短语，写最关键的信息即可；不会写的字可以换同义词，但不能写拼音。",
+   "probe": "放 3 段机场/车站广播，各问 2 个问题。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Paper 2 Exercise 1；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-LIS-03",
+   "strand": "LIS",
+   "stage": "IGCSE",
+   "syllabus": "Paper 2 Ex2",
+   "name": "0523 听力：笔记/句子填空",
+   "name_en": "0523 Listening: gap-fill",
+   "desc": "Paper 2 Exercise 2（8 分）：听较长的对话、采访、独白或正式讲话，补全笔记或句子中的空格（L1、L2）。",
+   "prereqs": [
+    {
+     "id": "CIG-LIS-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "gap-fill",
+    "notes",
+    "interview",
+    "talk"
+   ],
+   "method": "先看空格前后的词，预测词性（名词/数字/动词）；填写要符合句子语法，汉字要写对。",
+   "probe": "放一段 3 分钟讲座，让学生补全 8 处笔记空格。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Paper 2 Exercise 2；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-LIS-04",
+   "strand": "LIS",
+   "stage": "IGCSE",
+   "syllabus": "Paper 2 Ex3",
+   "name": "0523 听力：信息纠错",
+   "name_en": "0523 Listening: information correction",
+   "desc": "Paper 2 Exercise 3（8 分）：听较长文本，找出并改正印刷笔记中的错误信息（L2–L4）。",
+   "prereqs": [
+    {
+     "id": "CIG-LIS-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "information correction",
+    "notes",
+    "detail"
+   ],
+   "method": "听前逐行读笔记，预想哪些信息最可能被改（数字、时间、人物、原因）；只改错误的那个词，不重写整句。",
+   "probe": "给一份含 4 处错误的笔记，放录音让学生找出并改正。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Paper 2 Exercise 3；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-LIS-05",
+   "strand": "LIS",
+   "stage": "IGCSE",
+   "syllabus": "Paper 2 Ex4",
+   "name": "0523 听力：两人讨论选择题",
+   "name_en": "0523 Listening: discussion multiple choice",
+   "desc": "Paper 2 Exercise 4（8 分）：听两位说话人的讨论，做多项选择题，理解观点、态度、观点间的联系和言外之意（L1–L4）。",
+   "prereqs": [
+    {
+     "id": "CIG-LIS-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-REA-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "discussion",
+    "attitude",
+    "multiple choice",
+    "implied meaning"
+   ],
+   "method": "区分两个人各自的观点；注意“不过、其实、我倒觉得”等转折标志；选项常是原话的同义改写。",
+   "probe": "放一段两人讨论，问“女士对这个建议的态度是？”等 4 题。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Paper 2 Exercise 4；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-LIS-06",
+   "strand": "LIS",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1",
+   "name": "0547 听力：通知与短对话选择",
+   "name_en": "0547 Listening: announcements and short dialogues",
+   "desc": "Paper 1 第 1–10 题（10 分）：听通知、电话留言、陈述和短独白/对话，做四选一（L1、L2），每段听两遍；最后有 6 分钟誊答案。",
+   "prereqs": [
+    {
+     "id": "CIG-LIS-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-VOC-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "multiple choice",
+    "announcement",
+    "transfer time"
+   ],
+   "method": "先看 4 个选项（常是图片或短语）的区别点，听时只关注那一点。",
+   "probe": "放 5 段短录音，做四选一，统计正确率。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Paper 1 Q1–10；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-LIS-07",
+   "strand": "LIS",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1",
+   "name": "0547 听力：匹配人物与观点",
+   "name_en": "0547 Listening: matching",
+   "desc": "Paper 1 第 11–20 题（10 分）：听 5 段短独白把人名配到图片上（11–15），听对话或采访把说话人与观点/态度配对（16–20）（L1–L4）。",
+   "prereqs": [
+    {
+     "id": "CIG-LIS-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "matching",
+    "opinion",
+    "monologue"
+   ],
+   "method": "选项比题目多时，用排除法；听到“但是/不过”后的内容往往才是真正观点。",
+   "probe": "放一段采访，让学生把 5 个观点配到两位说话人。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Paper 1 Q11–20；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-LIS-08",
+   "strand": "LIS",
+   "stage": "IGCSE",
+   "syllabus": "Paper 1",
+   "name": "0547 听力：较长独白与访谈",
+   "name_en": "0547 Listening: longer monologues and interviews",
+   "desc": "Paper 1 第 21–30 题（10 分）：听较长独白做四选一（21–25），听对话、讨论或采访做三选一（26–30），理解事件、观点与态度（L2–L4）。",
+   "prereqs": [
+    {
+     "id": "CIG-LIS-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "interview",
+    "discussion",
+    "multiple choice"
+   ],
+   "method": "长录音题目按顺序出现，听到一题答案后立刻看下一题；注意时态词判断事件是过去还是将来。",
+   "probe": "放一段 2 分钟采访，做 5 道三选一。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Paper 1 Q21–30；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-SPK-01",
+   "strand": "SPK",
+   "stage": "IGCSE",
+   "name": "发音与语调",
+   "name_en": "Pronunciation and intonation",
+   "desc": "普通话四声和轻声准确、语调自然，不影响理解；0523 S4“control of pronunciation and intonation patterns”，0547 S5“some control of pronunciation and intonation”。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "tone",
+    "pronunciation",
+    "intonation",
+    "neutral tone"
+   ],
+   "method": "录下自己的回答回听，标出声调错误多的词；重点练三声变调（你好 → ní hǎo）和“一、不”变调。",
+   "probe": "让学生朗读 10 个易错声调词和一段 50 字短文，记录声调错误数。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf AO4 S4 ; https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf AO3 S5",
+   "tracks": [
+    "0523",
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-SPK-02",
+   "strand": "SPK",
+   "stage": "IGCSE",
+   "name": "展开回答：观点 + 理由 + 例子",
+   "name_en": "Developing spoken answers",
+   "desc": "回答不只说“是/不是”，而要给出观点、理由、例子或个人经历，并能衔接（0523 S2“develop responses and link ideas”；0547 评分 13–15 档“frequently develops ideas; justifies answers”）。",
+   "prereqs": [
+    {
+     "id": "CIG-LAN-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "develop",
+    "justify",
+    "opinion",
+    "example"
+   ],
+   "method": "用公式“我认为… 因为… 比如… 所以…”；每个回答至少 3 句话。常见错误：只说一两个词，等考官追问。",
+   "probe": "问 3 个开放问题，统计每个回答的句数和是否有理由。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf AO4 S2 ; https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf Paper 3 Communication criteria",
+   "tracks": [
+    "0523",
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-SPK-03",
+   "strand": "SPK",
+   "stage": "IGCSE",
+   "syllabus": "Component 3 Part 1",
+   "name": "0523 口语 Part 1：演讲",
+   "name_en": "0523 Speaking Part 1: presentation",
+   "desc": "Component 3 Part 1（2–3 分钟，20 分：内容与表达 10、词汇与语音语调 5、句型结构 5）：就自选的、反映华语社区或文化某一方面的话题做演讲；不准用讲稿，可带一张明信片大小的提示卡（最多 5 个标题）和最多 4 件辅助材料（地图、图表、统计、图片）。",
+   "prereqs": [
+    {
+     "id": "CIG-SPK-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-VOC-14",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "presentation",
+    "cue card",
+    "Chinese culture"
+   ],
+   "method": "选一个自己真正了解的话题（如春节在上海、粤语与普通话、中国茶文化），准备事实 + 个人观点；提示卡只写 5 个关键词标题，练到不看稿也能流畅说 2.5 分钟。顶档要求内容全面、组织好、有观点、表达生动。",
+   "probe": "让学生做一次 2–3 分钟模拟演讲，按 10/5/5 三项评分。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Component 3 Part 1；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-SPK-04",
+   "strand": "SPK",
+   "stage": "IGCSE",
+   "syllabus": "Component 3 Part 2",
+   "name": "0523 口语 Part 2：话题会话",
+   "name_en": "0523 Speaking Part 2: topic conversation",
+   "desc": "Part 2（4–5 分钟，20 分：理解与应答 10、词汇语音语调 5、句型 5）：考官就演讲内容提问，进行自然、即兴的讨论。",
+   "prereqs": [
+    {
+     "id": "CIG-SPK-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "topic conversation",
+    "spontaneous",
+    "follow-up question"
+   ],
+   "method": "预想考官可能追问的 10 个问题（为什么选这个话题？你怎么看…？将来…？）并练习即兴回答；顶档要求能应对意外问题、能提出并捍卫观点。",
+   "probe": "演讲后连续追问 4 个问题，看能否即兴、完整、相关地回答。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Component 3 Part 2；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-SPK-05",
+   "strand": "SPK",
+   "stage": "IGCSE",
+   "syllabus": "Component 3 Part 3",
+   "name": "0523 口语 Part 3：一般会话",
+   "name_en": "0523 Speaking Part 3: general conversation",
+   "desc": "Part 3（4–5 分钟，20 分）：考官就 2–3 个一般话题提问（至少一个来自 Area A–B、一个来自 Area C–D），话题事先不知道，且不能与演讲话题重复。",
+   "prereqs": [
+    {
+     "id": "CIG-SPK-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-VOC-11",
+     "strength": "有帮助"
+    },
+    {
+     "id": "CIG-VOC-12",
+     "strength": "有帮助"
+    },
+    {
+     "id": "CIG-VOC-13",
+     "strength": "有帮助"
+    },
+    {
+     "id": "CIG-VOC-14",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "general conversation",
+    "unprepared topics"
+   ],
+   "method": "把 A–D 共 34 个子话题分组，各准备几个“万能”素材（一次旅行、一位朋友、一项爱好）在不同话题中复用；听不懂可以礼貌请考官重复。",
+   "probe": "随机抽两个不同 Area 的话题，各问 3 个问题，按理解与应答评分。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Component 3 Part 3；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同）",
+   "tracks": [
+    "0523"
+   ]
+  },
+  {
+   "id": "CIG-SPK-06",
+   "strand": "SPK",
+   "stage": "IGCSE",
+   "syllabus": "Paper 3",
+   "name": "0547 口语：角色扮演",
+   "name_en": "0547 Speaking: role play",
+   "desc": "Paper 3 角色扮演（约 2 分钟，10 分）：在 10 分钟准备时间读角色卡（2028 年起可写笔记），然后回答 5 个日常交际性问题（如买东西、订票、问路），每题 2 分：信息完整、语言恰当准确得 2 分，部分传达或有歧义得 1 分。",
+   "prereqs": [
+    {
+     "id": "CIG-GR-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-VOC-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "role play",
+    "transactional",
+    "candidate card"
+   ],
+   "method": "准备时把每个提示预先说成完整句子；注意时间框架（问“你上次…”要用过去）。答案简短准确即可，不必展开。",
+   "probe": "用一张购物情景卡做模拟，按 5×2 分评分。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Paper 3 Speaking – Role play；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-SPK-07",
+   "strand": "SPK",
+   "stage": "IGCSE",
+   "syllabus": "Paper 3",
+   "name": "0547 口语：两个话题会话",
+   "name_en": "0547 Speaking: topic conversations",
+   "desc": "Paper 3 话题会话：两个约 4 分钟的会话，话题由考官按随机分配表指定（熟悉的个人或日常话题），按 Communication（15 分）和 Quality of Language（15 分）评分；开头约 30 秒热身不计分。",
+   "prereqs": [
+    {
+     "id": "CIG-SPK-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-SPK-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CIG-VOC-02",
+     "strength": "有帮助"
+    },
+    {
+     "id": "CIG-VOC-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "topic conversation",
+    "randomisation",
+    "communication",
+    "quality of language"
+   ],
+   "method": "每个话题准备过去—现在—将来三类回答（我以前… 现在… 将来打算…），并练习用比较句、关联词提高语言档次。",
+   "probe": "就“学校生活”问 5 个问题（含一个过去、一个将来），按两项 15 分评分。",
+   "source": "https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Paper 3 Speaking – Topic conversations；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0547"
+   ]
+  },
+  {
+   "id": "CIG-SPK-08",
+   "strand": "SPK",
+   "stage": "IGCSE",
+   "name": "中华文化话题素材",
+   "name_en": "Chinese culture topics",
+   "desc": "积累中国传统节日（春节、元宵、清明、端午、中秋）、饮食、习俗、名胜等的基本事实和个人感受；0523 演讲须反映华语社区或文化某一方面，Part 3 有 D15 节日庆祝、D16 风俗传统、D17 饮食多样；0547 Area E 文化、习俗、信仰与节日。",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "festival",
+    "customs",
+    "Chinese-speaking community",
+    "culture"
+   ],
+   "method": "每个节日准备“时间—来历—习俗—食物—我的经历”五项；结合在上海的亲身体验更容易展开。",
+   "probe": "问：“说说你最喜欢的中国节日，你是怎么过的？”看能否说出 3 个习俗和一个个人经历。",
+   "source": "https://www.cambridgeinternational.org/Images/744807-2028-2029-syllabus.pdf（0523 2028–2029 大纲 Component 3 Part 1 / Area D15–D17；2026–2027 版 https://www.cambridgeinternational.org/Images/697191-2026-2027-syllabus.pdf 相同） ; https://www.cambridgeinternational.org/Images/743359-2028-2030-syllabus.pdf（0547 2028–2030 大纲 v2 Area E；2025–2027 版 https://www.cambridgeinternational.org/Images/664639-2025-2027-syllabus.pdf）",
+   "tracks": [
+    "0523",
+    "0547"
+   ]
+  }
+ ]
+}

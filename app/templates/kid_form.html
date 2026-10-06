@@ -9,7 +9,7 @@
   {% if not k %}<label>密码（至少 6 位，孩子用它登录）</label><input type="text" name="password" required minlength="6" autocomplete="off">{% endif %}
   {% if k %}<label style="display:flex;gap:8px;align-items:center;font-weight:normal"><input type="checkbox" name="disabled" value="1" style="width:auto" {{ 'checked' if k.status == 'disabled' }}> 暂停这个账号（孩子暂时不能登录，学习记录保留）</label>{% endif %}
   <div class="row">
-    <div class="grow"><label>年级</label><select name="grade">{% for g in GRADES %}<option value="{{ g }}" {{ 'selected' if k and k.grade == g }}>{{ stage_label(g) }}</option>{% endfor %}</select></div>
+    <div class="grow"><label>年级</label><select name="grade" id="grade">{% for g in GRADES %}<option value="{{ g }}" data-rank="{{ stage_rank(g) }}" {{ 'selected' if k and k.grade == g }}>{{ stage_label(g) }}</option>{% endfor %}</select></div>
     <div class="grow"><label>每天学习分钟</label><input type="number" name="daily_minutes" min="15" max="240" value="{{ k.daily_minutes if k else 60 }}"></div>
   </div>
   <label>学校（选填）</label><input type="text" name="school" value="{{ k.school if k else '' }}">
@@ -27,7 +27,7 @@
     <h3 style="margin:0 0 6px">{{ subj }}</h3>
     <label class="row" style="margin:0;font-weight:400"><input type="radio" name="subj_{{ packs[0].subject }}" value="" style="width:auto" {{ 'checked' if not cur }}> <span class="muted">暂不安排</span></label>
     {% for p in packs %}
-    <label class="row" style="margin:4px 0 0;font-weight:400"><input type="radio" name="subj_{{ p.subject }}" value="{{ p.id }}" style="width:auto" {{ 'checked' if cur and cur.id == p.id }}>
+    <label class="row" style="margin:4px 0 0;font-weight:400"><input type="radio" name="subj_{{ p.subject }}" value="{{ p.id }}" data-start="{{ stage_rank(p.stages[0]) }}" data-end="{{ stage_rank(p.stages[-1]) }}" style="width:auto" {{ 'checked' if cur and cur.id == p.id }}>
       <span class="grow"><b>{{ p.edition }}</b> <span class="muted small">{{ p.region }}{% if k and stage_rank(p.stages[0]) > stage_rank(k.grade) %} · {{ stage_label(p.stages[0]) }}开始，现在选就是提前预习{% endif %}</span>
       {% if p.tracks %}<select name="track_{{ p.id }}" class="trk" style="margin-top:4px" title="方向">{% for t in p.tracks %}<option value="{{ t.id }}" {{ 'selected' if p.track(tracks.get(p.id)) == t.id }}>{{ t.name }}</option>{% endfor %}</select>{% endif %}</span></label>
     {% endfor %}
@@ -36,14 +36,17 @@
   <div style="margin-top:16px"><button class="btn">保存</button> <a class="btn ghost" href="/parent">取消</a></div>
 </form>
 <script>
-// 选学校类型 → 预填每门课的教材和方向
+// 选学校类型 → 预填每门课的教材和方向（这个年级还没开、或已经学完的科目不预选，家长仍可手动选）
 $('#preset').onchange = () => {
   const o = $('#preset').selectedOptions[0]; if (!o || !o.dataset.packs) return;
   const packs = JSON.parse(o.dataset.packs);
+  const g = +($('#grade').selectedOptions[0]?.dataset.rank || 0);
   $$('input[type=radio][name^=subj_]').forEach(r => { if (r.value === '') r.checked = true; });
   for (const [subj, c] of Object.entries(packs)) {
     const pid = typeof c === 'string' ? c : c.pack;
-    const r = document.querySelector(`input[name="subj_${subj}"][value="${pid}"]`); if (r) r.checked = true;
+    const r = document.querySelector(`input[name="subj_${subj}"][value="${pid}"]`);
+    if (!r || (g && (g < +r.dataset.start || g > +r.dataset.end + 0.5))) continue;  // IGCSE(9.5) 读两年，十年级也算
+    r.checked = true;
     const t = document.querySelector(`select[name="track_${pid}"]`); if (t && c.track) t.value = c.track;
   }
 };

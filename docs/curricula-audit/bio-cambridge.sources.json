@@ -1,0 +1,753 @@
+{
+ "sources": [
+  {
+   "url": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf",
+   "what": "Cambridge IGCSE Biology 0610 2026–2028 syllabus（全部 21 个主题 Core/Supplement 学习目标、Assessment overview、Practical assessment、实验器材与试剂清单、数学要求）",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/748912-2026-2028-syllabus-update.pdf",
+   "what": "0610 2026–2028 syllabus update：version 2（2025-12）仅更新第 59 页链接；version 3（2026-08）仅更新第 9 页 Assessment Overview",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/663781-syllabus-changes-international-.pdf",
+   "what": "Cambridge Syllabus Changes (International) 2026-09 v1：0610 列于 2029 年 Republished syllabuses；March 系列仅限印度",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/764330-2029-syllabus.pdf",
+   "what": "同系列 IGCSE Chemistry 0620 2029 版（version 1, 2026-09）写明 no significant changes which affect teaching，用于旁证 0610 2029 republished 的性质",
+   "level": "佐证"
+  },
+  {
+   "url": "https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf",
+   "what": "Cambridge Lower Secondary Science 0893 Curriculum Framework（v1, 2020-09, 2021 首次教学）学校公开全文转载：Stage 7–9 Biology 全部 35 条学习目标（7Bs/7Bp/7Be/8Bs/8Bp/8Be/9Bs/9Bp/9Be）",
+   "level": "佐证"
+  },
+  {
+   "url": "https://help.cambridgeinternational.org/hc/en-gb/articles/360000055018-Which-age-group-of-learners-is-the-Cambridge-Lower-Secondary-Checkpoint-for",
+   "what": "Cambridge 帮助中心：Lower Secondary Checkpoint 面向约 11–14 岁学生（Stage 7–9），用于学段对应 G6–G8",
+   "level": "官方"
+  }
+ ],
+ "coverage": [
+  {
+   "section": "0610 1.1 Characteristics of living organisms",
+   "kp_ids": [
+    "BIO-IG-1.1-01"
+   ]
+  },
+  {
+   "section": "0610 1.2 Concept and uses of classification systems",
+   "kp_ids": [
+    "BIO-IG-1.2-01",
+    "BIO-IG-1.2-02",
+    "BIO-IG-1.2-03"
+   ]
+  },
+  {
+   "section": "0610 1.3 Features of organisms",
+   "kp_ids": [
+    "BIO-IG-1.3-01",
+    "BIO-IG-1.3-02",
+    "BIO-IG-1.3-03",
+    "BIO-IG-1.3-04",
+    "BIO-IG-1.3-05",
+    "BIO-IG-1.3-06"
+   ]
+  },
+  {
+   "section": "0610 2.1 Cell structure",
+   "kp_ids": [
+    "BIO-IG-2.1-01",
+    "BIO-IG-2.1-02",
+    "BIO-IG-2.1-03",
+    "BIO-IG-2.1-04"
+   ]
+  },
+  {
+   "section": "0610 2.2 Size of specimens",
+   "kp_ids": [
+    "BIO-IG-2.2-01",
+    "BIO-IG-2.2-02"
+   ]
+  },
+  {
+   "section": "0610 3.1 Diffusion",
+   "kp_ids": [
+    "BIO-IG-3.1-01",
+    "BIO-IG-3.1-02"
+   ]
+  },
+  {
+   "section": "0610 3.2 Osmosis",
+   "kp_ids": [
+    "BIO-IG-3.2-01",
+    "BIO-IG-3.2-02",
+    "BIO-IG-3.2-03",
+    "BIO-IG-3.2-04"
+   ]
+  },
+  {
+   "section": "0610 3.3 Active transport",
+   "kp_ids": [
+    "BIO-IG-3.3-01",
+    "BIO-IG-3.3-02"
+   ]
+  },
+  {
+   "section": "0610 4.1 Biological molecules",
+   "kp_ids": [
+    "BIO-IG-4.1-01",
+    "BIO-IG-4.1-02",
+    "BIO-IG-4.1-03"
+   ]
+  },
+  {
+   "section": "0610 5.1 Enzymes",
+   "kp_ids": [
+    "BIO-IG-5.1-01",
+    "BIO-IG-5.1-02",
+    "BIO-IG-5.1-03",
+    "BIO-IG-5.1-04",
+    "BIO-IG-5.1-05"
+   ]
+  },
+  {
+   "section": "0610 6.1 Photosynthesis",
+   "kp_ids": [
+    "BIO-IG-6.1-01",
+    "BIO-IG-6.1-02",
+    "BIO-IG-6.1-03",
+    "BIO-IG-6.1-04",
+    "BIO-IG-6.1-05",
+    "BIO-IG-6.1-06"
+   ]
+  },
+  {
+   "section": "0610 6.2 Leaf structure",
+   "kp_ids": [
+    "BIO-IG-6.2-01"
+   ]
+  },
+  {
+   "section": "0610 7.1 Diet",
+   "kp_ids": [
+    "BIO-IG-7.1-01",
+    "BIO-IG-7.1-02"
+   ]
+  },
+  {
+   "section": "0610 7.2 Digestive system",
+   "kp_ids": [
+    "BIO-IG-7.2-01",
+    "BIO-IG-7.2-02"
+   ]
+  },
+  {
+   "section": "0610 7.3 Physical digestion",
+   "kp_ids": [
+    "BIO-IG-7.3-01",
+    "BIO-IG-7.3-02"
+   ]
+  },
+  {
+   "section": "0610 7.4 Chemical digestion",
+   "kp_ids": [
+    "BIO-IG-7.4-01",
+    "BIO-IG-7.4-02"
+   ]
+  },
+  {
+   "section": "0610 7.5 Absorption",
+   "kp_ids": [
+    "BIO-IG-7.5-01",
+    "BIO-IG-7.5-02"
+   ]
+  },
+  {
+   "section": "0610 8.1 Xylem and phloem",
+   "kp_ids": [
+    "BIO-IG-8.1-01",
+    "BIO-IG-8.1-02"
+   ]
+  },
+  {
+   "section": "0610 8.2 Water uptake",
+   "kp_ids": [
+    "BIO-IG-8.2-01"
+   ]
+  },
+  {
+   "section": "0610 8.3 Transpiration",
+   "kp_ids": [
+    "BIO-IG-8.3-01",
+    "BIO-IG-8.3-02",
+    "BIO-IG-8.3-03"
+   ]
+  },
+  {
+   "section": "0610 8.4 Translocation",
+   "kp_ids": [
+    "BIO-IG-8.4-01",
+    "BIO-IG-8.4-02"
+   ]
+  },
+  {
+   "section": "0610 9.1 Circulatory systems",
+   "kp_ids": [
+    "BIO-IG-9.1-01",
+    "BIO-IG-9.1-02"
+   ]
+  },
+  {
+   "section": "0610 9.2 Heart",
+   "kp_ids": [
+    "BIO-IG-9.2-01",
+    "BIO-IG-9.2-02",
+    "BIO-IG-9.2-03",
+    "BIO-IG-9.2-04",
+    "BIO-IG-9.2-05"
+   ]
+  },
+  {
+   "section": "0610 9.3 Blood vessels",
+   "kp_ids": [
+    "BIO-IG-9.3-01",
+    "BIO-IG-9.3-02"
+   ]
+  },
+  {
+   "section": "0610 9.4 Blood",
+   "kp_ids": [
+    "BIO-IG-9.4-01",
+    "BIO-IG-9.4-02"
+   ]
+  },
+  {
+   "section": "0610 10.1 Diseases and immunity",
+   "kp_ids": [
+    "BIO-IG-10.1-01",
+    "BIO-IG-10.1-02",
+    "BIO-IG-10.1-03",
+    "BIO-IG-10.1-04",
+    "BIO-IG-10.1-05",
+    "BIO-IG-10.1-06"
+   ]
+  },
+  {
+   "section": "0610 11.1 Gas exchange in humans",
+   "kp_ids": [
+    "BIO-IG-11.1-01",
+    "BIO-IG-11.1-02",
+    "BIO-IG-11.1-03",
+    "BIO-IG-11.1-04",
+    "BIO-IG-11.1-05",
+    "BIO-IG-11.1-06"
+   ]
+  },
+  {
+   "section": "0610 12.1 Respiration",
+   "kp_ids": [
+    "BIO-IG-12.1-01"
+   ]
+  },
+  {
+   "section": "0610 12.2 Aerobic respiration",
+   "kp_ids": [
+    "BIO-IG-12.2-01"
+   ]
+  },
+  {
+   "section": "0610 12.3 Anaerobic respiration",
+   "kp_ids": [
+    "BIO-IG-12.3-01",
+    "BIO-IG-12.3-02"
+   ]
+  },
+  {
+   "section": "0610 13.1 Excretion in humans",
+   "kp_ids": [
+    "BIO-IG-13.1-01",
+    "BIO-IG-13.1-02",
+    "BIO-IG-13.1-03"
+   ]
+  },
+  {
+   "section": "0610 14.1 Coordination and response",
+   "kp_ids": [
+    "BIO-IG-14.1-01",
+    "BIO-IG-14.1-02",
+    "BIO-IG-14.1-03"
+   ]
+  },
+  {
+   "section": "0610 14.2 Sense organs",
+   "kp_ids": [
+    "BIO-IG-14.2-01",
+    "BIO-IG-14.2-02",
+    "BIO-IG-14.2-03",
+    "BIO-IG-14.2-04"
+   ]
+  },
+  {
+   "section": "0610 14.3 Hormones",
+   "kp_ids": [
+    "BIO-IG-14.3-01",
+    "BIO-IG-14.3-02"
+   ]
+  },
+  {
+   "section": "0610 14.4 Homeostasis",
+   "kp_ids": [
+    "BIO-IG-14.4-01",
+    "BIO-IG-14.4-02",
+    "BIO-IG-14.4-03"
+   ]
+  },
+  {
+   "section": "0610 14.5 Tropic responses",
+   "kp_ids": [
+    "BIO-IG-14.5-01",
+    "BIO-IG-14.5-02"
+   ]
+  },
+  {
+   "section": "0610 15.1 Drugs",
+   "kp_ids": [
+    "BIO-IG-15.1-01",
+    "BIO-IG-15.1-02"
+   ]
+  },
+  {
+   "section": "0610 16.1 Asexual reproduction",
+   "kp_ids": [
+    "BIO-IG-16.1-01",
+    "BIO-IG-16.1-02"
+   ]
+  },
+  {
+   "section": "0610 16.2 Sexual reproduction",
+   "kp_ids": [
+    "BIO-IG-16.2-01",
+    "BIO-IG-16.2-02"
+   ]
+  },
+  {
+   "section": "0610 16.3 Sexual reproduction in plants",
+   "kp_ids": [
+    "BIO-IG-16.3-01",
+    "BIO-IG-16.3-02",
+    "BIO-IG-16.3-03",
+    "BIO-IG-16.3-04",
+    "BIO-IG-16.3-05"
+   ]
+  },
+  {
+   "section": "0610 16.4 Sexual reproduction in humans",
+   "kp_ids": [
+    "BIO-IG-16.4-01",
+    "BIO-IG-16.4-02",
+    "BIO-IG-16.4-03",
+    "BIO-IG-16.4-04"
+   ]
+  },
+  {
+   "section": "0610 16.5 Sex hormones in humans",
+   "kp_ids": [
+    "BIO-IG-16.5-01",
+    "BIO-IG-16.5-02"
+   ]
+  },
+  {
+   "section": "0610 16.6 Sexually transmitted infections",
+   "kp_ids": [
+    "BIO-IG-16.6-01"
+   ]
+  },
+  {
+   "section": "0610 17.1 Chromosomes, genes and proteins",
+   "kp_ids": [
+    "BIO-IG-17.1-01",
+    "BIO-IG-17.1-02",
+    "BIO-IG-17.1-03",
+    "BIO-IG-17.1-04"
+   ]
+  },
+  {
+   "section": "0610 17.2 Mitosis",
+   "kp_ids": [
+    "BIO-IG-17.2-01",
+    "BIO-IG-17.2-02"
+   ]
+  },
+  {
+   "section": "0610 17.3 Meiosis",
+   "kp_ids": [
+    "BIO-IG-17.3-01"
+   ]
+  },
+  {
+   "section": "0610 17.4 Monohybrid inheritance",
+   "kp_ids": [
+    "BIO-IG-17.4-01",
+    "BIO-IG-17.4-02",
+    "BIO-IG-17.4-03",
+    "BIO-IG-17.4-04",
+    "BIO-IG-17.4-05",
+    "BIO-IG-17.4-06"
+   ]
+  },
+  {
+   "section": "0610 18.1 Variation",
+   "kp_ids": [
+    "BIO-IG-18.1-01",
+    "BIO-IG-18.1-02",
+    "BIO-IG-18.1-03"
+   ]
+  },
+  {
+   "section": "0610 18.2 Adaptive features",
+   "kp_ids": [
+    "BIO-IG-18.2-01",
+    "BIO-IG-18.2-02"
+   ]
+  },
+  {
+   "section": "0610 18.3 Selection",
+   "kp_ids": [
+    "BIO-IG-18.3-01",
+    "BIO-IG-18.3-02",
+    "BIO-IG-18.3-03"
+   ]
+  },
+  {
+   "section": "0610 19.1 Energy flow",
+   "kp_ids": [
+    "BIO-IG-19.1-01"
+   ]
+  },
+  {
+   "section": "0610 19.2 Food chains and food webs",
+   "kp_ids": [
+    "BIO-IG-19.2-01",
+    "BIO-IG-19.2-02",
+    "BIO-IG-19.2-03",
+    "BIO-IG-19.2-04"
+   ]
+  },
+  {
+   "section": "0610 19.3 Nutrient cycles",
+   "kp_ids": [
+    "BIO-IG-19.3-01",
+    "BIO-IG-19.3-02"
+   ]
+  },
+  {
+   "section": "0610 19.4 Populations",
+   "kp_ids": [
+    "BIO-IG-19.4-01",
+    "BIO-IG-19.4-02",
+    "BIO-IG-19.4-03"
+   ]
+  },
+  {
+   "section": "0610 20.1 Food supply",
+   "kp_ids": [
+    "BIO-IG-20.1-01",
+    "BIO-IG-20.1-02"
+   ]
+  },
+  {
+   "section": "0610 20.2 Habitat destruction",
+   "kp_ids": [
+    "BIO-IG-20.2-01"
+   ]
+  },
+  {
+   "section": "0610 20.3 Pollution",
+   "kp_ids": [
+    "BIO-IG-20.3-01",
+    "BIO-IG-20.3-02",
+    "BIO-IG-20.3-03"
+   ]
+  },
+  {
+   "section": "0610 20.4 Conservation",
+   "kp_ids": [
+    "BIO-IG-20.4-01",
+    "BIO-IG-20.4-02",
+    "BIO-IG-20.4-03"
+   ]
+  },
+  {
+   "section": "0610 21.1 Biotechnology and genetic modification",
+   "kp_ids": [
+    "BIO-IG-21.1-01"
+   ]
+  },
+  {
+   "section": "0610 21.2 Biotechnology",
+   "kp_ids": [
+    "BIO-IG-21.2-01",
+    "BIO-IG-21.2-02",
+    "BIO-IG-21.2-03",
+    "BIO-IG-21.2-04"
+   ]
+  },
+  {
+   "section": "0610 21.3 Genetic modification",
+   "kp_ids": [
+    "BIO-IG-21.3-01",
+    "BIO-IG-21.3-02",
+    "BIO-IG-21.3-03"
+   ]
+  },
+  {
+   "section": "0610 Practical assessment / Experimental skills (AO3) + Mathematical requirements",
+   "kp_ids": [
+    "BIO-IG-PRAC-01",
+    "BIO-IG-PRAC-02",
+    "BIO-IG-PRAC-03",
+    "BIO-IG-PRAC-04",
+    "BIO-IG-PRAC-05",
+    "BIO-IG-PRAC-06",
+    "BIO-IG-PRAC-07",
+    "BIO-IG-PRAC-08"
+   ]
+  },
+  {
+   "section": "0893 Biology 7Bs.01",
+   "kp_ids": [
+    "BIO-LS-7Bs.01"
+   ]
+  },
+  {
+   "section": "0893 Biology 7Bs.02",
+   "kp_ids": [
+    "BIO-LS-7Bs.02"
+   ]
+  },
+  {
+   "section": "0893 Biology 7Bs.03",
+   "kp_ids": [
+    "BIO-LS-7Bs.03"
+   ]
+  },
+  {
+   "section": "0893 Biology 7Bs.04",
+   "kp_ids": [
+    "BIO-LS-7Bs.02"
+   ]
+  },
+  {
+   "section": "0893 Biology 7Bs.05",
+   "kp_ids": [
+    "BIO-LS-7Bs.05"
+   ]
+  },
+  {
+   "section": "0893 Biology 7Bp.01",
+   "kp_ids": [
+    "BIO-LS-7Bp.01"
+   ]
+  },
+  {
+   "section": "0893 Biology 7Bp.02",
+   "kp_ids": [
+    "BIO-LS-7Bp.02"
+   ]
+  },
+  {
+   "section": "0893 Biology 7Bp.03",
+   "kp_ids": [
+    "BIO-LS-7Bp.03"
+   ]
+  },
+  {
+   "section": "0893 Biology 7Bp.04",
+   "kp_ids": [
+    "BIO-LS-7Bp.03"
+   ]
+  },
+  {
+   "section": "0893 Biology 7Be.01",
+   "kp_ids": [
+    "BIO-LS-7Be.01"
+   ]
+  },
+  {
+   "section": "0893 Biology 7Be.02",
+   "kp_ids": [
+    "BIO-LS-7Be.01"
+   ]
+  },
+  {
+   "section": "0893 Biology 8Bs.01",
+   "kp_ids": [
+    "BIO-LS-8Bs.01"
+   ]
+  },
+  {
+   "section": "0893 Biology 8Bs.02",
+   "kp_ids": [
+    "BIO-LS-8Bs.02"
+   ]
+  },
+  {
+   "section": "0893 Biology 8Bs.03",
+   "kp_ids": [
+    "BIO-LS-8Bs.03"
+   ]
+  },
+  {
+   "section": "0893 Biology 8Bs.04",
+   "kp_ids": [
+    "BIO-LS-8Bs.04"
+   ]
+  },
+  {
+   "section": "0893 Biology 8Bp.01",
+   "kp_ids": [
+    "BIO-LS-8Bp.01"
+   ]
+  },
+  {
+   "section": "0893 Biology 8Bp.02",
+   "kp_ids": [
+    "BIO-LS-8Bp.01"
+   ]
+  },
+  {
+   "section": "0893 Biology 8Bp.03",
+   "kp_ids": [
+    "BIO-LS-8Bp.03"
+   ]
+  },
+  {
+   "section": "0893 Biology 8Bp.04",
+   "kp_ids": [
+    "BIO-LS-8Bp.04"
+   ]
+  },
+  {
+   "section": "0893 Biology 8Bp.05",
+   "kp_ids": [
+    "BIO-LS-8Bp.04"
+   ]
+  },
+  {
+   "section": "0893 Biology 8Be.01",
+   "kp_ids": [
+    "BIO-LS-8Be.01"
+   ]
+  },
+  {
+   "section": "0893 Biology 8Be.02",
+   "kp_ids": [
+    "BIO-LS-8Be.02"
+   ]
+  },
+  {
+   "section": "0893 Biology 8Be.03",
+   "kp_ids": [
+    "BIO-LS-8Be.03"
+   ]
+  },
+  {
+   "section": "0893 Biology 9Bs.01",
+   "kp_ids": [
+    "BIO-LS-9Bs.01"
+   ]
+  },
+  {
+   "section": "0893 Biology 9Bs.02",
+   "kp_ids": [
+    "BIO-LS-9Bs.02"
+   ]
+  },
+  {
+   "section": "0893 Biology 9Bs.03",
+   "kp_ids": [
+    "BIO-LS-9Bs.03"
+   ]
+  },
+  {
+   "section": "0893 Biology 9Bp.01",
+   "kp_ids": [
+    "BIO-LS-9Bp.01"
+   ]
+  },
+  {
+   "section": "0893 Biology 9Bp.02",
+   "kp_ids": [
+    "BIO-LS-9Bp.02"
+   ]
+  },
+  {
+   "section": "0893 Biology 9Bp.03",
+   "kp_ids": [
+    "BIO-LS-9Bp.03"
+   ]
+  },
+  {
+   "section": "0893 Biology 9Bp.04",
+   "kp_ids": [
+    "BIO-LS-9Bp.04"
+   ]
+  },
+  {
+   "section": "0893 Biology 9Bp.05",
+   "kp_ids": [
+    "BIO-LS-9Bp.05"
+   ]
+  },
+  {
+   "section": "0893 Biology 9Bp.06",
+   "kp_ids": [
+    "BIO-LS-9Bp.06"
+   ]
+  },
+  {
+   "section": "0893 Biology 9Bp.07",
+   "kp_ids": [
+    "BIO-LS-9Bp.06"
+   ]
+  },
+  {
+   "section": "0893 Biology 9Bp.08",
+   "kp_ids": [
+    "BIO-LS-9Bp.08"
+   ]
+  },
+  {
+   "section": "0893 Biology 9Be.01",
+   "kp_ids": [
+    "BIO-LS-9Be.01"
+   ]
+  }
+ ],
+ "unverified": [
+  {
+   "what": "0610 2029 年版大纲 PDF 原文",
+   "why": "Cambridge Syllabus Changes 文件仅显示 0610 在 2029 年 republished；猜测的 Images/7643xx 地址未命中 Biology（764330 为 Chemistry 0620），未能取得 2029 版原件逐条核对。"
+  },
+  {
+   "what": "少数学习目标的 Core/Supplement 归属：10.1.16–17（霍乱）、17.2.3–4（有丝分裂前染色体复制、分裂时分开）",
+   "why": "通过 WebFetch 读取官方 PDF 时，两栏版式被线性化，多次读取给出的归属不一致。霍乱按“编号排在 Supplement 6–15 之后”判为 supp；17.2.3–4 多数读取为 Core，按 core 记录，建议对照 PDF 第 17.2 节原版式复核。"
+  },
+  {
+   "what": "0893 Lower Secondary Science 官方框架原件（Cambridge 教师支持站）",
+   "why": "原件需登录；使用学校公开转载的 v1（2020）全文作佐证。未查到 0893 新版框架信息。"
+  },
+  {
+   "what": "hot 标记",
+   "why": "Cambridge 不公布考点频率；本包 hot 仅按大纲 Practical assessment 列出的实验情境与 AO3 技能设定，不代表真题出现频率。"
+  },
+  {
+   "what": "desc 中的少量补充性细节（如吸入/呼出气体约 21%→16% O₂、0.04%→4% CO₂；能量传递效率约 10%；具体例子如甘蔗蟾蜍、黄金大米）",
+   "why": "大纲只要求描述差异或解释原因，未给具体数值和例子；这些是教学常用数值/例子，未逐一对照官方教材核实。"
+  }
+ ]
+}

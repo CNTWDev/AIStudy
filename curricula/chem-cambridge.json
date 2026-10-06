@@ -1,0 +1,5559 @@
+{
+ "pack": {
+  "id": "chem-cambridge",
+  "subject": "chemistry",
+  "subject_name": "化学",
+  "edition": "Cambridge LS Science 0893 → IGCSE Chem 0620",
+  "region": "国际学校",
+  "stages": [
+   "G6",
+   "G7",
+   "G8",
+   "IGCSE"
+  ],
+  "version": 1,
+  "generated": "2026-10-06",
+  "verified": "2026-10-06",
+  "tracks": [
+   {
+    "id": "extended",
+    "name": "IGCSE 0620 Core + Supplement（可冲 A*）"
+   },
+   {
+    "id": "core",
+    "name": "IGCSE 0620 只考 Core（最高 C）"
+   }
+  ],
+  "default_track": "extended",
+  "sources": [
+   "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf",
+   "https://www.cambridgeinternational.org/Images/663781-syllabus-changes-international-.pdf",
+   "Cambridge Lower Secondary Science Curriculum Framework 0893 (2020, first teaching 2021) — 官方全文在教师支持站；公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf",
+   "https://help.cambridgeinternational.org/hc/en-gb/articles/360000055018-Which-age-group-of-learners-is-the-Cambridge-Lower-Secondary-Checkpoint-for"
+  ],
+  "notes": "知识图谱：从 Cambridge Lower Secondary Science 0893 的 Chemistry 子领域（Stage 7、8、9，约 11–14 岁，本包按 Stage 7≈G6、Stage 8≈G7、Stage 9≈G8 标学段）到 Cambridge IGCSE Chemistry 0620（14–16 岁，约 G9–G10，stage 统一写 IGCSE）全部 12 个主题、49 个小节（1.1–12.5）及 Paper 5/6 实验技能。IGCSE 部分依据 0620 syllabus for examination in 2026, 2027 and 2028（PDF 封面识别为 Version 2；末页 changes 说明“no substantial changes … that would impact teaching”，仅更新 Assessment overview）；Cambridge《Syllabus Changes (International) September 2026》把 0620 列为 2027 年 3 月起的 version 2 修订，学习内容编号不变。考试结构：所有考生考三张卷——Paper 1/2 选择题（45 分钟，40 分，30%），Paper 3/4 理论（1 小时 15 分，80 分，50%），Paper 5 实验考试（1 小时 15 分）或 Paper 6 实验替代笔试（1 小时），40 分，20%；Core 考生考 1、3、5/6（最高 C），Extended 考生考 2、4、5/6（A*–G）。AO1 50%、AO2 30%、AO3 20%。level：core = 大纲 Core 栏；supp = 仅在 Supplement 栏（Extended 才考，带 tracks:[\"extended\"]）；core 点 desc 中标「（补充）」的句子属于 Supplement；pre = 初中（Lower Secondary）内容。Lower Secondary 的粒子模型（7Cm.06）沿用已有 SCI-PRE-PART，密度（9Cp.02/03）沿用 SCI-PRE-DENS，不另建同义点。id：CHEM-LS-<Stage>-nn 对应框架代码（syllabus 字段写代码），CHEM-IG-<小节>-nn 对应 0620 小节，CHEM-IG-PRAC-nn 对应 Paper 5/6 实验技能（AO3）。hot=true 仅用于大纲明确要在 Paper 5/6 实验考试中考查、或大纲附「Notes for use in qualitative analysis」的内容，以及需反复用到的计算/方程式基础（依据：syllabus 的 Practical assessment 和 qualitative analysis notes 部分），并非真题频次统计。prereqs 中 strength 取 必须 / 有帮助。",
+  "system": "cambridge",
+  "school_types": [
+   "international",
+   "private"
+  ]
+ },
+ "strands": [
+  {
+   "id": "S1",
+   "name": "物质的状态、原子结构与化学键"
+  },
+  {
+   "id": "S2",
+   "name": "化学式与化学计量"
+  },
+  {
+   "id": "S3",
+   "name": "电化学与化学能量"
+  },
+  {
+   "id": "S4",
+   "name": "化学反应：变化、速率、平衡与氧化还原"
+  },
+  {
+   "id": "S5",
+   "name": "酸、碱和盐"
+  },
+  {
+   "id": "S6",
+   "name": "元素周期表与金属"
+  },
+  {
+   "id": "S7",
+   "name": "环境化学"
+  },
+  {
+   "id": "S8",
+   "name": "有机化学"
+  },
+  {
+   "id": "S9",
+   "name": "实验技术、化学分析与实验技能"
+  }
+ ],
+ "kps": [
+  {
+   "id": "CHEM-LS-7-01",
+   "strand": "S1",
+   "stage": "G6",
+   "unit": "Stage 7 Chemistry: Materials and their structure",
+   "syllabus": "7Cm.01/7Cm.02/7Cm.05",
+   "level": "pre",
+   "name": "原子、元素与周期表初识",
+   "name_en": "Atoms, elements and the Periodic Table",
+   "desc": "一切物质都由原子构成；每一种原子就是一种元素（element）；周期表把已知元素按一定顺序排列（每格有元素符号）；真空（vacuum）是没有任何物质的空间。",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "atom",
+    "element",
+    "symbol",
+    "Periodic Table",
+    "matter",
+    "vacuum"
+   ],
+   "method": "先记 20 个常见元素的符号（H、He、C、N、O、Na、Mg、Al、Cl、Fe、Cu…），注意第二个字母小写（Co 是钴，CO 是一氧化碳）。用“乐高积木”类比：原子是积木块，元素是同一种积木。常见错误：以为空气是真空、或把“元素”和“原子”混为一谈。",
+   "probe": "给出 Na、CO、Co、O₂ 四个符号，问哪些是元素、哪个是两种原子组成的物质；再问“太空中星球之间几乎是什么？”",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：7Cm.01、7Cm.02、7Cm.05"
+  },
+  {
+   "id": "CHEM-LS-7-02",
+   "strand": "S6",
+   "stage": "G6",
+   "unit": "Stage 7 Chemistry: Materials and their structure; Stage 7 Chemistry: Properties of materials",
+   "syllabus": "7Cm.03/7Cp.05",
+   "level": "pre",
+   "name": "金属与非金属的物理性质",
+   "name_en": "Metals and non-metals: physical properties",
+   "desc": "元素分为金属和非金属两大类。金属通常：有光泽、导电导热好、有延展性（可锻、可拉丝）、熔点高、致密、敲击有声；非金属通常：无光泽、多为热和电的不良导体（石墨例外）、固态时脆、熔点较低，室温下可为固、液、气。",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "metal",
+    "non-metal",
+    "conductor",
+    "insulator",
+    "malleable",
+    "ductile",
+    "lustrous",
+    "brittle",
+    "sonorous"
+   ],
+   "method": "用对比表记性质，每条配一个生活例子（铜线导电、铝箔可锻、硫粉脆）。常见错误：把“导热好”当成金属唯一判据；忘记汞是液态金属、石墨是能导电的非金属。",
+   "probe": "给一种未知元素的性质（灰色有光泽、易碎、不导电），让她判断是金属还是非金属并说出依据。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：7Cm.03、7Cp.05"
+  },
+  {
+   "id": "CHEM-LS-7-03",
+   "strand": "S1",
+   "stage": "G6",
+   "unit": "Stage 7 Chemistry: Materials and their structure",
+   "syllabus": "7Cm.04/7Cm.07",
+   "level": "pre",
+   "name": "元素、化合物与混合物（粒子图表示）",
+   "name_en": "Elements, compounds and mixtures (particle diagrams)",
+   "desc": "元素只含一种原子；化合物由两种或以上元素按固定比例化学结合而成，性质与组成元素不同；混合物是两种或以上物质未化学结合地混在一起，可用物理方法分离（合金是混合物的一个例子）。能用粒子图（不同颜色小球）区分三者。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "element",
+    "compound",
+    "mixture",
+    "particle diagram",
+    "chemically joined",
+    "alloy"
+   ],
+   "method": "画三张小球图：同色单球/同色双球=元素，异色球连在一起=化合物，几种粒子混在一起不连=混合物。关键问“原子有没有化学结合？”。常见错误：把 O₂ 当成化合物（它是元素的分子）；把空气当成化合物。",
+   "probe": "给 4 幅粒子图（O₂、H₂O、O₂+N₂ 混合、Fe 原子）让她分类并说理由。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：7Cm.04、7Cm.07"
+  },
+  {
+   "id": "CHEM-LS-7-04",
+   "strand": "S4",
+   "stage": "G6",
+   "unit": "Stage 7 Chemistry: Properties of materials",
+   "syllabus": "7Cp.01",
+   "level": "pre",
+   "name": "物理性质与化学性质",
+   "name_en": "Physical and chemical properties",
+   "desc": "所有物质都有物理性质（不改变物质本身就能观察/测量：颜色、状态、熔沸点、密度、导电性、溶解性等）和化学性质（在化学反应中表现：可燃性、与酸反应、生锈、酸碱性等）。",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "physical property",
+    "chemical property",
+    "flammable",
+    "melting point",
+    "react"
+   ],
+   "method": "判断方法：测这个性质时物质有没有变成新物质？没变→物理性质。常见错误：把“溶解”当化学性质、把“可燃性”当物理性质。",
+   "probe": "列 6 条性质（熔点 98 °C、能在空气中燃烧、银白色、与水反应放出氢气、密度 0.97 g/cm³、能导电），让她分成物理/化学两类。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：7Cp.01"
+  },
+  {
+   "id": "CHEM-LS-7-05",
+   "strand": "S5",
+   "stage": "G6",
+   "unit": "Stage 7 Chemistry: Properties of materials",
+   "syllabus": "7Cp.02/7Cp.03",
+   "level": "pre",
+   "name": "酸碱性、pH 与指示剂",
+   "name_en": "Acidity, alkalinity, pH and indicators",
+   "desc": "酸碱性是化学性质，用 pH 衡量：pH < 7 酸性、= 7 中性、> 7 碱性（越小越酸，越大越碱）。石蕊：酸红、碱蓝；通用指示剂（Universal Indicator）用颜色对应 pH 值（红/橙—酸，绿—中性，蓝/紫—碱）。",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "acid",
+    "alkali",
+    "neutral",
+    "pH scale",
+    "indicator",
+    "litmus",
+    "Universal Indicator"
+   ],
+   "method": "记住“绿色 = 7 = 中性”作为锚点，向红色越酸、向紫色越碱。动手：用紫甘蓝汁/通用指示剂测醋、肥皂水、食盐水。常见错误：以为 pH 越大越酸；以为石蕊能读出具体 pH。",
+   "probe": "给三种溶液加通用指示剂后的颜色（红、绿、紫），问 pH 范围和酸碱性；再问“石蕊能区分 pH 3 和 pH 5 吗？”",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：7Cp.02、7Cp.03"
+  },
+  {
+   "id": "CHEM-LS-7-06",
+   "strand": "S9",
+   "stage": "G6",
+   "unit": "Stage 7 Chemistry: Properties of materials",
+   "syllabus": "7Cp.04",
+   "level": "pre",
+   "name": "氢气、二氧化碳、氧气的检验",
+   "name_en": "Tests for hydrogen, carbon dioxide and oxygen",
+   "desc": "氢气：点燃的木条靠近，发出“噗”的爆鸣声（squeaky pop）；氧气：带火星的木条复燃；二氧化碳：通入澄清石灰水，石灰水变浑浊（milky）。",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "lighted splint",
+    "glowing splint",
+    "limewater",
+    "squeaky pop",
+    "relights",
+    "milky"
+   ],
+   "method": "三句话三对应：H₂—lighted splint—pop；O₂—glowing splint—relights；CO₂—limewater—milky。常见错误：把“点燃的”和“带火星的”木条弄反；说 CO₂ 使木条熄灭就是检验（很多气体都能使火焰熄灭，不是确认方法）。",
+   "probe": "问：一试管气体能使带火星木条复燃，它是什么？如何证明另一试管是 CO₂？",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：7Cp.04"
+  },
+  {
+   "id": "CHEM-LS-7-07",
+   "strand": "S6",
+   "stage": "G6",
+   "unit": "Stage 7 Chemistry: Properties of materials",
+   "syllabus": "7Cp.06/7Cp.07",
+   "level": "pre",
+   "name": "合金及其硬度（粒子解释）",
+   "name_en": "Alloys and why they are harder",
+   "desc": "合金是金属与其他元素组成的混合物，性质（物理和化学）不同于组成它的纯物质；纯金属原子大小相同、排列整齐，层与层容易滑动所以较软；合金中加入大小不同的原子打乱了层，层不易滑动，所以更硬。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-7-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "alloy",
+    "pure metal",
+    "layers",
+    "slide",
+    "harder",
+    "steel",
+    "brass"
+   ],
+   "method": "画两张粒子图：整齐等大的圆 vs 中间夹几个大圆，用“layers slide easily / cannot slide”描述。常见错误：说合金是化合物；说合金更硬是因为“粒子结合更紧”。",
+   "probe": "给一张纯铁和一张钢的粒子图，问哪个更硬并解释。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：7Cp.06、7Cp.07"
+  },
+  {
+   "id": "CHEM-LS-7-08",
+   "strand": "S4",
+   "stage": "G6",
+   "unit": "Stage 7 Chemistry: Changes to materials",
+   "syllabus": "7Cc.01/7Cc.03",
+   "level": "pre",
+   "name": "判断化学反应并用粒子模型描述",
+   "name_en": "Recognising chemical reactions; particle model of reactions",
+   "desc": "化学反应的证据：反应物消失、生成性质不同的新物质（颜色变化、产生气体/气泡、生成沉淀、温度变化、发光等）。粒子模型：反应中原子重新组合成新的物质，原子本身不消失也不产生。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-7-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "chemical reaction",
+    "reactant",
+    "product",
+    "observation",
+    "rearrange",
+    "new substance"
+   ],
+   "method": "做“证据清单”：每次实验写下 before / after 的观察。用小球模型演示 2H₂ + O₂ → 2H₂O：数一数前后每种原子个数相同。常见错误：把溶解、熔化当作化学反应；以为反应时原子“变成”别的原子。",
+   "probe": "给出“冰融化”“镁带燃烧发出白光生成白色粉末”“糖溶于水”三种现象，问哪个是化学反应、证据是什么。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：7Cc.01、7Cc.03"
+  },
+  {
+   "id": "CHEM-LS-7-09",
+   "strand": "S5",
+   "stage": "G6",
+   "unit": "Stage 7 Chemistry: Changes to materials",
+   "syllabus": "7Cc.02",
+   "level": "pre",
+   "name": "沉淀的形成",
+   "name_en": "Formation of a precipitate",
+   "desc": "两种可溶的反应物溶液混合，发生化学反应生成至少一种不溶于水的产物，这种不溶固体在溶液中析出，称为沉淀（precipitate），溶液变浑浊。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "precipitate",
+    "soluble",
+    "insoluble",
+    "solution",
+    "cloudy"
+   ],
+   "method": "例子：硝酸银溶液 + 食盐水 → 白色沉淀（氯化银）。解释时一定要说出三点：反应物都可溶、发生了反应、产物之一不溶。常见错误：把“溶液变浑浊”说成物质“没溶解完”。",
+   "probe": "两种透明溶液混合后出现白色固体，请她解释为什么，以及这说明发生了什么变化。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：7Cc.02"
+  },
+  {
+   "id": "CHEM-LS-7-10",
+   "strand": "S5",
+   "stage": "G6",
+   "unit": "Stage 7 Chemistry: Changes to materials",
+   "syllabus": "7Cc.04",
+   "level": "pre",
+   "name": "中和反应与 pH 变化",
+   "name_en": "Neutralisation and change of pH",
+   "desc": "酸与碱反应互相抵消酸碱性称为中和（neutralisation）；向酸中逐渐加碱，pH 从小于 7 逐渐升高到 7（中性），继续加碱则大于 7；反之亦然。生活应用：抗酸药治胃酸、熟石灰改良酸性土壤。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "neutralisation",
+    "acid",
+    "alkali",
+    "pH",
+    "neutral",
+    "antacid"
+   ],
+   "method": "用通用指示剂做滴加实验，记录颜色从红→橙→绿→蓝的变化，画 pH–加入体积草图。常见错误：以为中和后溶液一定 pH = 7（加过量时不会）。",
+   "probe": "向稀盐酸中逐滴加入氢氧化钠溶液，问 pH 如何变化；为什么胃痛时吃抗酸药。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：7Cc.04"
+  },
+  {
+   "id": "CHEM-LS-8-01",
+   "strand": "S1",
+   "stage": "G7",
+   "unit": "Stage 8 Chemistry: Materials and their structure",
+   "syllabus": "8Cm.01/8Cm.02/8Cm.03",
+   "level": "pre",
+   "name": "卢瑟福原子模型与亚原子粒子",
+   "name_en": "Rutherford model of the atom and subatomic particles",
+   "desc": "卢瑟福模型：原子中心有一个很小、带正电、集中了几乎全部质量的原子核，电子在核外运动，原子大部分是空的。质子带正电、电子带负电、中子不带电；正负电荷之间的静电吸引把原子维系在一起。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "nucleus",
+    "proton",
+    "neutron",
+    "electron",
+    "charge",
+    "electrostatic attraction",
+    "Rutherford model"
+   ],
+   "method": "画“核 + 轨道”示意图并在每种粒子旁标电荷。可简单了解金箔实验：大多数 α 粒子直穿→原子大部分是空的；少数大角度反弹→核小而带正电。常见错误：说中子带负电；说原子核在原子中占很大体积。",
+   "probe": "问：原子核带什么电？为什么原子整体不带电？是什么力让电子留在原子里？",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8Cm.01、8Cm.02、8Cm.03"
+  },
+  {
+   "id": "CHEM-LS-8-02",
+   "strand": "S9",
+   "stage": "G7",
+   "unit": "Stage 8 Chemistry: Materials and their structure; Stage 8 Chemistry: Changes to materials",
+   "syllabus": "8Cm.04/8Cc.04",
+   "level": "pre",
+   "name": "纯度与不纯的产物",
+   "name_en": "Purity and impure products",
+   "desc": "纯度描述混合物中某种特定物质所占的多少；纯物质只含一种物质。化学反应不一定只生成一种纯产物，有时得到含多种产物（或残留反应物）的不纯混合物，需要进一步分离提纯。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "pure",
+    "impure",
+    "purity",
+    "mixture",
+    "product",
+    "purify"
+   ],
+   "method": "区分日常“纯”（如“纯天然”）和化学“纯”（只有一种物质）。常见错误：认为“纯净水”在化学上就是纯水；以为反应总得到单一产物。",
+   "probe": "问：标签写“99% 纯”的盐是什么意思？为什么反应后常常要过滤、结晶？",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8Cm.04、8Cc.04"
+  },
+  {
+   "id": "CHEM-LS-8-03",
+   "strand": "S2",
+   "stage": "G7",
+   "unit": "Stage 8 Chemistry: Properties of materials",
+   "syllabus": "8Cp.01",
+   "level": "pre",
+   "name": "溶液的浓度（粒子观点）",
+   "name_en": "Concentration of a solution (particle view)",
+   "desc": "溶液浓度表示一定体积溶剂（溶液）中溶质粒子的多少：同体积中溶质粒子越多，溶液越浓；加水稀释后粒子数不变但分布在更大体积中，浓度变小。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "concentration",
+    "solute",
+    "solvent",
+    "solution",
+    "dilute",
+    "concentrated"
+   ],
+   "method": "画两个同样大小的方框，一个里放 3 个溶质点，一个放 9 个，问哪个更浓。常见错误：认为溶液越多就越浓；把“浓”和“强”（酸的强弱）混淆。",
+   "probe": "给两杯糖水的粒子图（体积不同、粒子数不同），让她判断哪杯更浓。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8Cp.01"
+  },
+  {
+   "id": "CHEM-LS-8-04",
+   "strand": "S5",
+   "stage": "G7",
+   "unit": "Stage 8 Chemistry: Changes to materials",
+   "syllabus": "8Cc.05",
+   "level": "pre",
+   "name": "溶解度随温度的变化",
+   "name_en": "How solubility of salts varies with temperature",
+   "desc": "溶解度是在一定温度下一定量溶剂（如 100 g 水）中最多能溶解的溶质质量；大多数固体盐的溶解度随温度升高而增大，但不同盐增加的幅度不同（有的几乎不变）；能读溶解度曲线并比较不同盐。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-03",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-DEC",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "solubility",
+    "solubility curve",
+    "saturated",
+    "temperature",
+    "salt"
+   ],
+   "method": "练习读溶解度曲线：给定温度读溶解度、比较两条曲线、算降温时析出多少晶体（两温度下溶解度之差）。常见错误：把纵轴单位 g/100 g water 忽略；以为所有物质溶解度都随温度显著增大。",
+   "probe": "给出硝酸钾和氯化钠溶解度曲线，问 60 °C 时哪种溶解度大、把 60 °C 饱和硝酸钾溶液冷到 20 °C 会发生什么。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8Cc.05"
+  },
+  {
+   "id": "CHEM-LS-8-05",
+   "strand": "S9",
+   "stage": "G7",
+   "unit": "Stage 8 Chemistry: Properties of materials",
+   "syllabus": "8Cp.02",
+   "level": "pre",
+   "name": "纸层析（初中）",
+   "name_en": "Paper chromatography (lower secondary)",
+   "desc": "纸层析可分离并鉴定样品中的物质：在滤纸底部铅笔线上点样，放入溶剂（溶剂液面低于点样线），溶剂上升带动不同物质以不同速度移动而分开；与已知物质的斑点比较可鉴定成分。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "chromatography",
+    "chromatogram",
+    "solvent",
+    "baseline",
+    "spot",
+    "separate"
+   ],
+   "method": "做墨水/食用色素层析。记三条操作要点：基线用铅笔（墨水会被分离）、点样在溶剂液面之上、加盖防挥发。常见错误：起始线用钢笔画；溶剂没过样点导致样品溶到溶剂里。",
+   "probe": "看一张色谱图，问未知混合物含几种染料、含有哪种已知染料。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8Cp.02"
+  },
+  {
+   "id": "CHEM-LS-8-06",
+   "strand": "S2",
+   "stage": "G7",
+   "unit": "Stage 8 Chemistry: Changes to materials",
+   "syllabus": "8Cc.01",
+   "level": "pre",
+   "name": "文字方程式",
+   "name_en": "Word equations",
+   "desc": "用文字方程式表示反应：反应物 → 生成物，例如 镁 + 氧气 → 氧化镁；能从描述中找出反应物与生成物，并认识常见命名规律（-ide 两种元素，-ate 含氧酸根）。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "word equation",
+    "reactant",
+    "product",
+    "arrow",
+    "-ide",
+    "-ate"
+   ],
+   "method": "先圈出题中“…与…反应生成…”的物质，箭头左边放反应物，右边放生成物，用“+”连接。常见错误：用“=”代替箭头；把氧气写漏（燃烧总有氧气参加）。",
+   "probe": "写出“铁在氧气中燃烧生成氧化铁”和“锌与稀盐酸反应生成氯化锌和氢气”的文字方程式。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8Cc.01"
+  },
+  {
+   "id": "CHEM-LS-8-07",
+   "strand": "S3",
+   "stage": "G7",
+   "unit": "Stage 8 Chemistry: Changes to materials",
+   "syllabus": "8Cc.02",
+   "level": "pre",
+   "name": "放热与吸热（温度变化判断）",
+   "name_en": "Exothermic and endothermic processes (temperature change)",
+   "desc": "有些过程和反应是放热的（exothermic，向周围放出热，温度升高，如燃烧、中和），有些是吸热的（endothermic，从周围吸热，温度降低，如硝酸铵溶于水、柠檬酸与小苏打反应）；可用温度计测温度变化来判断。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-08",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-ENERGY",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "exothermic",
+    "endothermic",
+    "temperature change",
+    "thermometer",
+    "surroundings"
+   ],
+   "method": "“exo = 出去”，热量出去→周围变热；“endo = 进来”，热量被吸进→周围变冷。测量：记录初温和最高/最低温。常见错误：说吸热反应“产生冷”。",
+   "probe": "混合两种溶液后温度从 20 °C 降到 12 °C，问是放热还是吸热，并说明热量的流向。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8Cc.02"
+  },
+  {
+   "id": "CHEM-LS-8-08",
+   "strand": "S6",
+   "stage": "G7",
+   "unit": "Stage 8 Chemistry: Changes to materials",
+   "syllabus": "8Cc.03/8Cc.06",
+   "level": "pre",
+   "name": "金属活动性：与氧气、水、稀酸反应；惰性",
+   "name_en": "Reactivity of metals with oxygen, water and dilute acids; inert substances",
+   "desc": "金属（K、Na、Ca、Mg、Zn、Fe、Cu、Ag、Au）与氧气、水、稀酸反应的剧烈程度不同：钾、钠、钙与冷水反应（钾最剧烈），镁、锌、铁与稀酸反应产生氢气，铜、银、金与稀酸不反应；金属 + 酸 → 盐 + 氢气，金属 + 水 → 金属氢氧化物 + 氢气，金属 + 氧气 → 金属氧化物。一般不反应的物质称为惰性（inert），如金、稀有气体。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-06",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-7-06",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "reactivity",
+    "reactivity series",
+    "dilute acid",
+    "hydrogen",
+    "metal oxide",
+    "inert",
+    "unreactive"
+   ],
+   "method": "背顺序口诀：K Na Ca Mg (Al) Zn Fe (H) Cu Ag Au。对每种金属记一个典型现象（钠浮游熔球、镁与酸大量气泡、铜无现象）。常见错误：写成“金属 + 酸 → 盐 + 水”；以为铜能与稀盐酸反应。",
+   "probe": "给三种金属放入稀盐酸的气泡情况，让她排出活动性顺序；问为什么金首饰千年不变色。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8Cc.03、8Cc.06"
+  },
+  {
+   "id": "CHEM-LS-9-01",
+   "strand": "S6",
+   "stage": "G8",
+   "unit": "Stage 9 Chemistry: Materials and their structure",
+   "syllabus": "9Cm.01",
+   "level": "pre",
+   "name": "周期表结构与原子结构的关系",
+   "name_en": "Periodic Table structure and atomic structure",
+   "desc": "周期表按质子数排列，周期表的结构与原子结构相关（如同一周期电子层数相同、同一族最外层电子数相同），因此可以由元素在表中的位置预测其结构和性质（金属在左、非金属在右）。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-7-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "Periodic Table",
+    "group",
+    "period",
+    "proton number",
+    "electron shell",
+    "predict"
+   ],
+   "method": "先学会读一个元素格（符号、质子数、相对原子质量），再画前 20 号元素的电子层简图找规律。常见错误：把“周期”（横行）和“族”（纵列）弄反。",
+   "probe": "问：位于第 3 周期、第 II 族的元素是什么？它有几个电子层、最外层几个电子、是金属还是非金属？",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：9Cm.01"
+  },
+  {
+   "id": "CHEM-LS-9-02",
+   "strand": "S1",
+   "stage": "G8",
+   "unit": "Stage 9 Chemistry: Materials and their structure",
+   "syllabus": "9Cm.02/9Cm.03",
+   "level": "pre",
+   "name": "分子与共价键（初中）",
+   "name_en": "Molecules and covalent bonds (lower secondary)",
+   "desc": "两个或以上原子通过共价键化学结合形成分子；共价键是两个原子共用一对电子形成的键（本阶段只涉及单键），常见于非金属原子之间，如 H₂、Cl₂、H₂O、HCl。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-9-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "molecule",
+    "covalent bond",
+    "shared pair",
+    "electrons",
+    "non-metal"
+   ],
+   "method": "用两个圆相交、交叠处画一对电子表示共用电子对。常见错误：说共价键是“电子转移”；以为分子一定由不同元素组成（O₂、H₂ 也是分子）。",
+   "probe": "画出 H₂ 和 HCl 中的共用电子对，并说出一个共价键里有几个电子。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：9Cm.02、9Cm.03"
+  },
+  {
+   "id": "CHEM-LS-9-03",
+   "strand": "S1",
+   "stage": "G8",
+   "unit": "Stage 9 Chemistry: Materials and their structure",
+   "syllabus": "9Cm.04/9Cm.05",
+   "level": "pre",
+   "name": "离子与离子键（初中）",
+   "name_en": "Ions and ionic bonds (lower secondary)",
+   "desc": "离子是得到电子而带负电、或失去电子而带正电的原子；离子键是带正电的离子与带负电的离子之间的吸引。例如钠失去 1 个电子成为 Na⁺，氯得到 1 个电子成为 Cl⁻，二者相互吸引形成氯化钠。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-9-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "ion",
+    "positive ion",
+    "negative ion",
+    "gain electrons",
+    "lose electrons",
+    "ionic bond"
+   ],
+   "method": "记“失电子带正电”（电子带负电，失去负 → 变正）。常见错误：以为原子得到质子才带正电；把 Na⁺ 说成“多了一个正电荷粒子”。",
+   "probe": "问：镁原子失去 2 个电子后变成什么？带几个电荷？氯离子为什么带负电？",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：9Cm.04、9Cm.05"
+  },
+  {
+   "id": "CHEM-LS-9-04",
+   "strand": "S6",
+   "stage": "G8",
+   "unit": "Stage 9 Chemistry: Properties of materials",
+   "syllabus": "9Cp.01",
+   "level": "pre",
+   "name": "族内性质递变：以第 1 族为例",
+   "name_en": "Trends within a group: Group 1 as an example",
+   "desc": "周期表同一族元素的物理和化学性质有规律的变化。第 1 族（锂、钠、钾）：都是软金属、与水反应生成氢氧化物和氢气；从上到下熔点降低、与水反应越来越剧烈。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-9-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-8-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "group 1",
+    "alkali metal",
+    "trend",
+    "reactivity",
+    "melting point"
+   ],
+   "method": "列表：Li、Na、K 与水反应的现象（缓慢冒泡 / 熔成小球乱窜 / 燃起淡紫色火焰），从数据表找趋势并外推到铷。常见错误：把族内趋势说反；忘了“预测”题要先说趋势再给出估计值。",
+   "probe": "给出 Li、Na、K 的熔点，请她预测铷的熔点范围和它与水反应的剧烈程度。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：9Cp.01"
+  },
+  {
+   "id": "CHEM-LS-9-05",
+   "strand": "S1",
+   "stage": "G8",
+   "unit": "Stage 9 Chemistry: Properties of materials",
+   "syllabus": "9Cp.04",
+   "level": "pre",
+   "name": "简单结构与巨型结构",
+   "name_en": "Simple and giant structures",
+   "desc": "元素和化合物以简单结构（小分子，如水、二氧化碳，熔沸点低）或巨型结构（大量原子/离子连成网络，如金刚石、氯化钠、金属，熔沸点高）存在，结构影响其物理性质。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-9-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-9-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "simple molecular structure",
+    "giant structure",
+    "melting point",
+    "boiling point",
+    "lattice"
+   ],
+   "method": "先看熔点：很低（常温气体/液体）→ 简单分子；很高 → 巨型结构。常见错误：认为熔化分子物质要破坏共价键（其实只是克服分子之间的弱作用）。",
+   "probe": "给出三种物质的熔点（−183 °C、801 °C、3550 °C），让她判断各自是简单结构还是巨型结构。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：9Cp.04"
+  },
+  {
+   "id": "CHEM-LS-9-06",
+   "strand": "S2",
+   "stage": "G8",
+   "unit": "Stage 9 Chemistry: Changes to materials",
+   "syllabus": "9Cc.01",
+   "level": "pre",
+   "name": "符号方程式（初中，不要求配平）",
+   "name_en": "Symbol equations (lower secondary, no balancing)",
+   "desc": "用文字方程式和符号方程式（化学式）描述反应，例如 Mg + O₂ → MgO（本阶段不要求配平）；能读懂化学式中元素符号和下标表示的原子种类与数目。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-06",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-7-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "symbol equation",
+    "chemical formula",
+    "subscript",
+    "reactant",
+    "product"
+   ],
+   "method": "从文字方程式出发逐个替换成化学式。读化学式：H₂O = 2 个 H、1 个 O；CO₂ 中的“2”只修饰 O。常见错误：把下标写成大号数字（H2O 写成 H 2 O 混淆系数）。",
+   "probe": "把“碳 + 氧气 → 二氧化碳”写成符号方程式，并说出 CO₂ 中每种原子各有几个。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：9Cc.01"
+  },
+  {
+   "id": "CHEM-LS-9-07",
+   "strand": "S6",
+   "stage": "G8",
+   "unit": "Stage 9 Chemistry: Changes to materials",
+   "syllabus": "9Cc.02",
+   "level": "pre",
+   "name": "金属置换反应（初中）",
+   "name_en": "Displacement reactions (lower secondary)",
+   "desc": "较活泼的金属能把较不活泼的金属从其盐溶液中置换出来，如 铁 + 硫酸铜 → 硫酸亚铁 + 铜；能识别置换反应并预测产物（限 Ca、Mg、Zn、Fe、Cu、Au、Ag 及其盐）。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-08",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-8-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "displacement",
+    "more reactive",
+    "less reactive",
+    "salt solution",
+    "predict"
+   ],
+   "method": "判断步骤：①找出单质金属和盐中的金属；②比活动性；③单质更活泼才反应，互换位置写产物。常见错误：铜放进硫酸锌也写反应；忘了现象（红色铜析出、蓝色褪去）。",
+   "probe": "镁条放入硫酸铜溶液、铜片放入硝酸银溶液、铜片放入硫酸镁溶液，问哪些会反应、写出文字方程式。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：9Cc.02"
+  },
+  {
+   "id": "CHEM-LS-9-08",
+   "strand": "S5",
+   "stage": "G8",
+   "unit": "Stage 9 Chemistry: Changes to materials",
+   "syllabus": "9Cc.03",
+   "level": "pre",
+   "name": "制备盐并提纯：过滤、蒸发、结晶（初中）",
+   "name_en": "Preparing salts and purifying them (lower secondary)",
+   "desc": "金属 + 酸 → 盐 + 氢气；金属碳酸盐 + 酸 → 盐 + 水 + 二氧化碳。制备步骤：向酸中加入过量固体直到不再反应→过滤除去过量固体→加热蒸发部分水→冷却结晶→过滤并晾干晶体。盐的命名：盐酸→氯化物，硫酸→硫酸盐，硝酸→硝酸盐。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-08",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-7-10",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "salt",
+    "excess",
+    "filtration",
+    "evaporation",
+    "crystallisation",
+    "filtrate",
+    "residue"
+   ],
+   "method": "画流程图并标注每一步“为什么”：过量→确保酸用完；过滤→除去未反应固体；不要蒸干→得到较大晶体。常见错误：直接蒸干；把滤渣当作产物。",
+   "probe": "让她写出用碳酸铜和稀硫酸制硫酸铜晶体的步骤，并解释为什么要加过量碳酸铜。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：9Cc.03"
+  },
+  {
+   "id": "CHEM-LS-9-09",
+   "strand": "S4",
+   "stage": "G8",
+   "unit": "Stage 9 Chemistry: Changes to materials",
+   "syllabus": "9Cc.04",
+   "level": "pre",
+   "name": "反应速率的影响因素（粒子模型）",
+   "name_en": "Rate of reaction: concentration, surface area, temperature",
+   "desc": "提高反应物浓度、增大固体表面积（粉末代替块状）、升高温度都会加快反应速率；用粒子模型解释：单位时间内粒子碰撞的次数增多（升温还使粒子运动更快、碰撞更有力）。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-03",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-PART",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "rate of reaction",
+    "concentration",
+    "surface area",
+    "temperature",
+    "collision",
+    "particle"
+   ],
+   "method": "每个因素都用“更多的碰撞 per second”句式解释。实验：大理石块/粉末与稀盐酸，测产生气体的快慢。常见错误：说“粒子碰撞更多”而漏掉“单位时间内”；以为增大表面积会改变产物总量。",
+   "probe": "比较大理石块和大理石粉与同样盐酸的反应，问哪个快、为什么，最终产生的 CO₂ 是否一样多。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：9Cc.04"
+  },
+  {
+   "id": "CHEM-LS-9-10",
+   "strand": "S2",
+   "stage": "G8",
+   "unit": "Stage 9 Chemistry: Changes to materials",
+   "syllabus": "9Cc.05",
+   "level": "pre",
+   "name": "化学反应中质量与能量守恒",
+   "name_en": "Conservation of mass and energy in reactions",
+   "desc": "化学反应中原子只是重新组合，总质量保持不变（质量守恒）；能量也守恒，只是在化学储能和热等形式之间转移。若有气体逸出或从空气中吸收气体，敞口容器中称量的质量会变化。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-08",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-ENERGY",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "conservation of mass",
+    "conservation of energy",
+    "closed system",
+    "open system",
+    "gas escapes"
+   ],
+   "method": "解释“质量变了”的题目时先问：有没有气体进出？镁燃烧质量增加（结合了氧），碳酸钙与酸反应质量减少（CO₂ 逸出）。常见错误：说“反应中质量被消耗了”。",
+   "probe": "敞口烧杯中大理石与盐酸反应，天平读数下降，请她解释这是否违背质量守恒。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：9Cc.05"
+  },
+  {
+   "id": "CHEM-IG-1.1-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "1 States of matter / 1.1 Solids, liquids and gases",
+   "syllabus": "1.1",
+   "level": "core",
+   "name": "三态的性质与粒子结构",
+   "name_en": "Properties and particle structure of solids, liquids and gases",
+   "desc": "固体：形状和体积固定，粒子紧密规则排列、只在固定位置振动；液体：体积固定、形状随容器，粒子紧密不规则、可相互滑动；气体：无固定形状和体积、可压缩，粒子间距大、无规则快速运动。描述须用 separation / arrangement / motion 三方面。",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-PART",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "solid",
+    "liquid",
+    "gas",
+    "particle separation",
+    "arrangement",
+    "motion",
+    "vibrate",
+    "compress"
+   ],
+   "method": "用三列表格（separation / arrangement / motion）×三态填空，每格写英文短语。常见错误：说固体粒子不动；说液体粒子间“没有距离”；把“气体可压缩”的原因说成粒子变小。",
+   "probe": "让她用英文写出液体中粒子的 separation、arrangement、motion，并解释为什么气体容易被压缩。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 1.1 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-1.1-02",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "1 States of matter / 1.1 Solids, liquids and gases",
+   "syllabus": "1.1",
+   "level": "core",
+   "name": "状态变化与加热/冷却曲线",
+   "name_en": "Changes of state; heating and cooling curves",
+   "desc": "熔化、沸腾、蒸发、凝固、冷凝五种状态变化；沸腾在沸点整体发生，蒸发在任何温度只在液面发生。（补充）用动理论解释：加热使粒子动能增大，熔化/沸腾时吸收的能量用于克服粒子间作用力，所以加热曲线上出现温度不变的水平段；冷却曲线水平段对应凝固/冷凝放热。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-1.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-THERM",
+     "strength": "有帮助"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "melting",
+    "boiling",
+    "evaporation",
+    "freezing",
+    "condensation",
+    "heating curve",
+    "cooling curve",
+    "kinetic particle theory"
+   ],
+   "method": "画一张加热曲线，标出 solid / solid+liquid / liquid / liquid+gas / gas 五段，并在水平段写“energy used to overcome forces of attraction, temperature constant”。常见错误：认为水平段时没有吸热；把蒸发和沸腾等同。",
+   "probe": "给一条冷却曲线（某物质从 100 °C 冷到 20 °C，在 54 °C 有平台），问熔点是多少、平台段粒子发生了什么、为什么温度不变。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 1.1 Core 3, Supplement 5 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-1.1-03",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "1 States of matter / 1.1 Solids, liquids and gases",
+   "syllabus": "1.1",
+   "level": "core",
+   "name": "温度和压强对气体体积的影响",
+   "name_en": "Effect of temperature and pressure on the volume of a gas",
+   "desc": "压强不变时温度升高，气体体积增大；温度不变时压强增大，气体体积减小。（补充）用动理论解释：升温粒子运动更快、撞壁更频繁更有力，要保持压强不变体积须增大；加压把同样多的粒子压入更小空间。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-1.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-PRESS",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "volume",
+    "pressure",
+    "temperature",
+    "gas",
+    "collisions",
+    "kinetic energy"
+   ],
+   "method": "记两个方向：T↑→V↑，p↑→V↓，并配上“粒子撞容器壁”的图景。常见错误：说升温时“粒子变大”；把压强解释为“粒子相互挤压”。",
+   "probe": "注射器封住空气后放入热水，活塞怎样移动？用粒子运动解释。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 1.1 Core 4, Supplement 6 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-1.2-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "1 States of matter / 1.2 Diffusion",
+   "syllabus": "1.2",
+   "level": "core",
+   "name": "扩散",
+   "name_en": "Diffusion",
+   "desc": "扩散是粒子由于无规则运动，从高浓度区域向低浓度区域的净移动，最终均匀混合；气体中扩散快、液体中慢、固体中几乎不发生。用动理论解释：粒子不停地随机运动并相互碰撞。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-1.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-PRESS",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "diffusion",
+    "random motion",
+    "concentration",
+    "net movement",
+    "kinetic particle theory"
+   ],
+   "method": "典型实验：高锰酸钾晶体在水中扩散、溴蒸气扩散。解释时必须出现“particles move randomly”和“from high to low concentration”。常见错误：说扩散是因为“有风”或“对流”。",
+   "probe": "为什么在静止的水中滴入一滴墨水，过一段时间整杯水都变色？如果用热水会怎样？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 1.2 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-1.2-02",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "1 States of matter / 1.2 Diffusion",
+   "syllabus": "1.2",
+   "level": "supp",
+   "name": "相对分子质量对气体扩散速率的影响",
+   "name_en": "Effect of relative molecular mass on rate of diffusion",
+   "desc": "同温度下，相对分子质量越小的气体粒子运动越快、扩散越快。经典实验：玻璃管两端分别放浸有浓氨水和浓盐酸的棉花，白色氯化铵烟环出现在更靠近盐酸一端，因为 NH₃（Mr = 17）比 HCl（Mr = 36.5）扩散快。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-1.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-3.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "rate of diffusion",
+    "relative molecular mass",
+    "ammonia",
+    "hydrogen chloride",
+    "ammonium chloride"
+   ],
+   "method": "先算出两种气体的 Mr，再说“lower Mr → particles move faster → diffuses faster”。常见错误：以为白环出现在中间；把“分子大”说成“分子质量大”混用时不说明是 Mr。",
+   "probe": "NH₃ 与 HCl 扩散管实验中白色环在哪里形成？为什么？若改用 HBr 呢？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 1.2 Supplement 2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-2.1-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "2 Atoms, elements and compounds / 2.1 Elements, compounds and mixtures",
+   "syllabus": "2.1",
+   "level": "core",
+   "name": "元素、化合物与混合物（IGCSE）",
+   "name_en": "Elements, compounds and mixtures",
+   "desc": "描述元素、化合物和混合物的区别：元素由一种原子构成，不能用化学方法分解；化合物由两种或以上元素化学结合、比例固定、性质与组成元素不同、只能用化学方法分解；混合物不化学结合、组成可变、可用物理方法分离，各成分保持原有性质。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "element",
+    "compound",
+    "mixture",
+    "chemically combined",
+    "fixed ratio",
+    "physical separation"
+   ],
+   "method": "经典对比：铁粉+硫粉混合物（磁铁可吸出铁）vs 加热后生成的硫化亚铁（化合物，磁铁吸不出）。常见错误：把合金、空气、海水当化合物。",
+   "probe": "铁粉与硫粉混合后用磁铁处理，与加热后再用磁铁处理，现象有何不同？分别是什么类别？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 2.1 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-2.2-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "2 Atoms, elements and compounds / 2.2 Atomic structure and the Periodic Table",
+   "syllabus": "2.2",
+   "level": "core",
+   "name": "原子结构：质子、中子、电子",
+   "name_en": "Atomic structure: protons, neutrons and electrons",
+   "desc": "原子由中心原子核（含质子和中子）及在电子层中的电子组成。相对电荷：质子 +1、中子 0、电子 −1；相对质量：质子 1、中子 1、电子 1/1836（可忽略）。质子数（原子序数）= 核内质子数；质量数（核子数）= 质子数 + 中子数。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "nucleus",
+    "proton",
+    "neutron",
+    "electron",
+    "relative charge",
+    "relative mass",
+    "proton number",
+    "atomic number",
+    "mass number",
+    "nucleon number"
+   ],
+   "method": "做三行表格（particle / relative mass / relative charge）背熟。会由质子数和质量数算中子数：中子 = 质量数 − 质子数。常见错误：把质量数当成相对原子质量；电子相对质量写 0（应为约 1/1836，题目常要求写 negligible 或 1/1840）。",
+   "probe": "钾原子质子数 19、质量数 39，问电子数和中子数；电子的相对质量是多少？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 2.2 Core 1–4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-2.2-02",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "2 Atoms, elements and compounds / 2.2 Atomic structure and the Periodic Table",
+   "syllabus": "2.2",
+   "level": "core",
+   "name": "电子排布（1–20 号）与周期表",
+   "name_en": "Electronic configuration (proton number 1–20)",
+   "desc": "能写出质子数 1–20 的原子及其离子的电子排布（2,8,8,2 规则），如 Al 2,8,3、Na⁺ 2,8、Cl⁻ 2,8,8。稀有气体（VIII 族）最外层满；I–VII 族最外层电子数 = 族序数；电子层数 = 周期数。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-9-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "electronic configuration",
+    "electron shell",
+    "outer shell",
+    "group number",
+    "period number",
+    "noble gas"
+   ],
+   "method": "按“2, 8, 8, 2”往里填，写离子时先写原子再加/减电子。用排布反推周期（层数）和族（最外层电子数）。常见错误：第三层写成 18 个电子；写离子时忘了改变电子数。",
+   "probe": "写出 Mg、Mg²⁺、S、S²⁻ 的电子排布，并说出 S 在第几周期第几族。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 2.2 Core 5–6 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-2.3-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "2 Atoms, elements and compounds / 2.3 Isotopes",
+   "syllabus": "2.3",
+   "level": "core",
+   "name": "同位素与原子、离子符号",
+   "name_en": "Isotopes; symbols for atoms and ions",
+   "desc": "同位素是同一元素的不同原子：质子数相同、中子数不同。会读写核素符号：左上质量数、左下质子数，如 ¹²₆C；离子符号如 ³⁵₁₇Cl⁻，可由符号算出质子、中子、电子数。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "isotope",
+    "nuclide notation",
+    "mass number",
+    "proton number",
+    "ion"
+   ],
+   "method": "练习“由符号填表”：³⁵₁₇Cl⁻ → p = 17, n = 18, e = 18。常见错误：离子电子数忘了加减电荷；把同位素说成“不同元素”。",
+   "probe": "给出 ³⁷₁₇Cl 和 ²⁴₁₂Mg²⁺，分别写出质子、中子、电子数；问 ³⁵Cl 与 ³⁷Cl 是什么关系。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 2.3 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-2.3-02",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "2 Atoms, elements and compounds / 2.3 Isotopes",
+   "syllabus": "2.3",
+   "level": "supp",
+   "name": "同位素化学性质与相对原子质量计算",
+   "name_en": "Isotopes: chemical properties and calculating Ar",
+   "desc": "同一元素的同位素电子数相同、电子排布相同，所以化学性质相同。由各同位素的相对质量和丰度计算相对原子质量：Ar = Σ(同位素质量 × 丰度%) ÷ 100，如氯：(35 × 75 + 37 × 25) ÷ 100 = 35.5。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-AVG",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "isotope",
+    "abundance",
+    "relative atomic mass",
+    "weighted average",
+    "electronic configuration"
+   ],
+   "method": "理解“加权平均”：丰度大的同位素权重大，结果一定落在最小和最大质量之间、靠近丰度大的那个。常见错误：直接算 (35+37)/2 = 36；解释化学性质相同时说“质子数相同”而不说电子排布相同。",
+   "probe": "硼有 ¹⁰B（20%）和 ¹¹B（80%），求 Ar；为什么 ¹⁰B 和 ¹¹B 化学性质一样？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 2.3 Supplement 3–4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-2.4-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "2 Atoms, elements and compounds / 2.4 Ions and ionic bonds",
+   "syllabus": "2.4",
+   "level": "core",
+   "name": "离子形成与离子键（I 族–VII 族）",
+   "name_en": "Formation of ions and ionic bonds (Group I with Group VII)",
+   "desc": "金属原子失去电子形成阳离子（cation），非金属原子得到电子形成阴离子（anion），都达到稀有气体排布；离子键是带相反电荷离子之间强烈的静电吸引。会画 I 族与 VII 族化合物（如 NaCl）的点叉图（dot-and-cross diagram），只画最外层并标电荷。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.2-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-9-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "cation",
+    "anion",
+    "ionic bond",
+    "electrostatic attraction",
+    "dot-and-cross diagram",
+    "electron transfer"
+   ],
+   "method": "画点叉图三步：①画原子最外层（金属用 ×，非金属用 •）；②箭头表示电子转移；③画离子：方括号 + 电荷，金属离子外层画空或画满的内层。常见错误：画成共用电子；漏写方括号和电荷。",
+   "probe": "画出 KCl 形成过程的点叉图，并写出 K⁺ 和 Cl⁻ 的电子排布。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 2.4 Core 1–3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-2.4-02",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "2 Atoms, elements and compounds / 2.4 Ions and ionic bonds",
+   "syllabus": "2.4",
+   "level": "core",
+   "name": "离子化合物的性质",
+   "name_en": "Properties of ionic compounds",
+   "desc": "离子化合物熔沸点高；固态不导电，熔融或水溶液导电。（补充）用结构解释：巨型离子晶格中大量强静电吸引需要大量能量才能破坏，所以熔沸点高；熔融或溶解后离子能自由移动传导电流，固态离子被固定在晶格中不能移动。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "melting point",
+    "boiling point",
+    "electrical conductivity",
+    "aqueous",
+    "molten",
+    "mobile ions",
+    "lattice"
+   ],
+   "method": "固定答题句：conducts when molten or aqueous because ions are free to move (NOT electrons)。常见错误：说离子化合物导电是因为“电子移动”；说熔点高是因为“共价键强”。",
+   "probe": "为什么固态氯化钠不导电、熔融氯化钠能导电？为什么它的熔点高？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 2.4 Core 4, Supplement 7 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-2.4-03",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "2 Atoms, elements and compounds / 2.4 Ions and ionic bonds",
+   "syllabus": "2.4",
+   "level": "supp",
+   "name": "巨型离子晶格与一般金属–非金属离子键",
+   "name_en": "Giant ionic lattice; ionic bonding between metals and non-metals",
+   "desc": "离子化合物是由正负离子交替规则排列形成的巨型晶格（giant lattice）。能画一般金属与非金属形成离子键的点叉图，如 MgO、CaCl₂、Na₂O、MgCl₂，离子个数比由电荷平衡决定。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "giant ionic lattice",
+    "alternating ions",
+    "dot-and-cross diagram",
+    "magnesium oxide",
+    "calcium chloride"
+   ],
+   "method": "先由电荷定比例（Ca²⁺ 与 2 个 Cl⁻），再画点叉图，确保转移电子总数相等。常见错误：画 CaCl₂ 时只画一个 Cl⁻；画晶格时正负离子相邻排错。",
+   "probe": "画出 MgCl₂ 的点叉图，说明为什么需要两个氯原子。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 2.4 Supplement 5–6 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-2.5-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "2 Atoms, elements and compounds / 2.5 Simple molecules and covalent bonds",
+   "syllabus": "2.5",
+   "level": "core",
+   "name": "共价键与简单分子的点叉图",
+   "name_en": "Covalent bonds in simple molecules",
+   "desc": "共价键是两个原子共用一对电子形成的，使双方都达到稀有气体电子排布。会用点叉图表示 H₂、Cl₂、H₂O、CH₄、NH₃、HCl 及类似分子中的电子排布（只画最外层，孤对电子要画出）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.2-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-9-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "covalent bond",
+    "shared pair",
+    "dot-and-cross diagram",
+    "lone pair",
+    "noble gas configuration"
+   ],
+   "method": "画图前先数每个原子还差几个电子达到满层（H 差 1、O 差 2、N 差 3、C 差 4），即形成几个共价键。常见错误：漏画孤对电子（H₂O 中 O 有两对，NH₃ 中 N 有一对）；H 周围画出 8 个电子。",
+   "probe": "画出 NH₃ 的点叉图，说明 N 周围共有几个电子、有几对孤对电子。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 2.5 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-2.5-02",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "2 Atoms, elements and compounds / 2.5 Simple molecules and covalent bonds",
+   "syllabus": "2.5",
+   "level": "supp",
+   "name": "含双键/三键分子的点叉图",
+   "name_en": "Dot-and-cross diagrams for CH₃OH, C₂H₄, O₂, CO₂ and N₂",
+   "desc": "会画 CH₃OH、C₂H₄（C=C 双键）、O₂（O=O 双键）、CO₂（两个 C=O 双键）、N₂（N≡N 三键）及类似分子的点叉图；双键共用 2 对电子，三键共用 3 对。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.5-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "double bond",
+    "triple bond",
+    "shared pairs",
+    "carbon dioxide",
+    "nitrogen",
+    "ethene",
+    "methanol"
+   ],
+   "method": "检验：画完逐个原子数最外层电子是否为 8（H 为 2）。CO₂ 画成 O=C=O，C 在中间、每个 O 有 2 对孤对电子。常见错误：N₂ 画成单键；CO₂ 中 C 只有 4 个电子。",
+   "probe": "画出 CO₂ 和 N₂ 的点叉图，并说出各有几对共用电子。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 2.5 Supplement 4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-2.5-03",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "2 Atoms, elements and compounds / 2.5 Simple molecules and covalent bonds",
+   "syllabus": "2.5",
+   "level": "core",
+   "name": "简单分子物质的性质",
+   "name_en": "Properties of simple molecular compounds",
+   "desc": "简单分子物质熔沸点低、导电性差。（补充）用结构解释：分子之间只有弱的分子间作用力（intermolecular forces，不要求具体类型），熔化/沸腾只需克服这些弱作用而不是破坏共价键；分子不带电，也没有可移动的离子或电子，所以不导电。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.5-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-9-05",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "simple molecular",
+    "intermolecular forces",
+    "low melting point",
+    "poor conductivity",
+    "weak forces"
+   ],
+   "method": "区分“分子内的共价键很强”与“分子之间的作用力很弱”——熔沸点只与后者有关。常见错误：写“covalent bonds are weak so low melting point”（这是阅卷高频扣分点）。",
+   "probe": "为什么甲烷沸点很低？沸腾时破坏的是共价键吗？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 2.5 Core 3, Supplement 5 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-2.6-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "2 Atoms, elements and compounds / 2.6 Giant covalent structures",
+   "syllabus": "2.6",
+   "level": "core",
+   "name": "金刚石与石墨的结构和用途",
+   "name_en": "Giant covalent structures: diamond and graphite",
+   "desc": "金刚石：每个 C 与 4 个 C 形成共价键的三维巨型结构，极硬、熔点高、不导电，用于切割工具；石墨：每个 C 与 3 个 C 成键形成层状结构，层间作用力弱可滑动（作润滑剂），每个 C 有一个离域电子能导电（作电极）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.5-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-9-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "giant covalent structure",
+    "diamond",
+    "graphite",
+    "layers",
+    "delocalised electrons",
+    "lubricant",
+    "electrode"
+   ],
+   "method": "对比表：bonds per C（4 vs 3）、结构（tetrahedral 3D vs layers）、hardness、conductivity、use，每一条用途对应一条结构原因。常见错误：说石墨层间是“共价键断开”；说金刚石导电。",
+   "probe": "为什么石墨能导电而金刚石不能？为什么石墨能作润滑剂？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 2.6 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-2.6-02",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "2 Atoms, elements and compounds / 2.6 Giant covalent structures",
+   "syllabus": "2.6",
+   "level": "supp",
+   "name": "二氧化硅的巨型共价结构",
+   "name_en": "Giant covalent structure of silicon(IV) oxide",
+   "desc": "SiO₂ 为巨型共价结构：每个 Si 与 4 个 O 相连，每个 O 与 2 个 Si 相连；与金刚石相似，都很硬、熔沸点很高、不导电，因为需要破坏大量强共价键。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.6-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "silicon(IV) oxide",
+    "silica",
+    "giant covalent",
+    "tetrahedral",
+    "high melting point"
+   ],
+   "method": "把 SiO₂ 看成“金刚石中的 C 换成 Si，每两个 Si 之间插一个 O”。常见错误：把 SiO₂ 当成简单分子（像 CO₂ 那样）。",
+   "probe": "CO₂ 是气体而 SiO₂ 是坚硬固体，用结构解释差异。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 2.6 Supplement 3–4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-2.7-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "unit": "2 Atoms, elements and compounds / 2.7 Metallic bonding",
+   "syllabus": "2.7",
+   "level": "supp",
+   "name": "金属键与金属性质",
+   "name_en": "Metallic bonding and properties of metals",
+   "desc": "金属键是巨型金属晶格中正离子与“海洋”般离域电子之间的静电吸引。解释性质：离域电子可移动 → 导电性好；金属离子层可以相对滑动而金属键不被破坏 → 有延展性（可锻、可拉丝）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.4-01",
+     "strength": "有帮助"
+    },
+    {
+     "id": "CHEM-LS-7-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "metallic bond",
+    "delocalised electrons",
+    "sea of electrons",
+    "positive ions",
+    "lattice",
+    "malleable",
+    "ductile"
+   ],
+   "method": "画正离子阵列 + 周围的电子点。答题关键词：positive ions、delocalised electrons、electrostatic attraction、layers slide。常见错误：说金属中有“负离子”；导电说成“离子移动”。",
+   "probe": "用金属键解释铜为什么能导电、为什么能拉成导线。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 2.7 1–2（该小节 PDF 文本中 Core 栏为空、条目在 Supplement 栏，按补充内容处理） 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-3.1-01",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "unit": "3 Stoichiometry / 3.1 Formulae",
+   "syllabus": "3.1",
+   "level": "core",
+   "name": "化学式与分子式",
+   "name_en": "Formulae and molecular formulae",
+   "desc": "能写出大纲中出现的单质和化合物的化学式；分子式表示一个分子中各种原子的种类和数目；能从模型或示意图中各原子的相对数目推出简单化合物的化学式。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-9-06",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-2.2-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "formula",
+    "molecular formula",
+    "model",
+    "diagram",
+    "subscript"
+   ],
+   "method": "建一张常用化学式卡片（H₂O、CO₂、NH₃、CH₄、HCl、H₂SO₄、NaOH、CaCO₃…）每天过一遍；数模型时把每种颜色的球分别计数。常见错误：双原子单质写成 O、Cl（应为 O₂、Cl₂）。",
+   "probe": "给一个分子球棍模型（2 个黑球、6 个白球、1 个红球），让她写出分子式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 3.1 Core 1–3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-3.1-02",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "unit": "3 Stoichiometry / 3.1 Formulae",
+   "syllabus": "3.1",
+   "level": "core",
+   "name": "文字方程式与配平的符号方程式（含状态符号）",
+   "name_en": "Word and balanced symbol equations with state symbols",
+   "desc": "能写文字方程式和配平的符号方程式，并标状态符号 (s)、(l)、(g)、(aq)。配平只能改化学式前的系数，不能改下标。（补充）能根据题给信息推出带状态符号的符号方程式。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-3.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-9-06",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-9-10",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "symbol equation",
+    "balance",
+    "coefficient",
+    "state symbols",
+    "aqueous"
+   ],
+   "method": "配平顺序：先配复杂物质中的金属/非金属，最后配 H 和 O，检查每种原子两边相等。常见错误：改下标配平（H₂O → H₂O₂）；把水的状态写成 (aq)；溶液中的沉淀标 (aq)。",
+   "probe": "配平并标状态：Fe₂O₃ + CO → Fe + CO₂；铝与稀盐酸反应生成氯化铝溶液和氢气。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 3.1 Core 4, Supplement 8 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-3.1-03",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "unit": "3 Stoichiometry / 3.1 Formulae",
+   "syllabus": "3.1",
+   "level": "supp",
+   "name": "经验式定义与由离子电荷推化学式",
+   "name_en": "Empirical formula; deducing ionic formulae from ionic charges",
+   "desc": "经验式是化合物中各原子或离子最简整数比（如 C₂H₄ 的经验式为 CH₂）。能根据模型、示意图中离子的相对数目或离子电荷推出离子化合物的化学式，如 Al³⁺ 与 SO₄²⁻ → Al₂(SO₄)₃。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-3.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-2.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-RATIO",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "empirical formula",
+    "simplest ratio",
+    "ionic formula",
+    "charge",
+    "polyatomic ion"
+   ],
+   "method": "背常见离子电荷表（NH₄⁺、OH⁻、NO₃⁻、SO₄²⁻、CO₃²⁻），用“电荷交叉再约简”法，多原子离子个数大于 1 时加括号。常见错误：Ca(OH)₂ 写成 CaOH₂；Mg²⁺ 与 O²⁻ 写成 Mg₂O₂。",
+   "probe": "写出硝酸钙、硫酸铝、氢氧化铁(III) 的化学式，写出 C₆H₁₂O₆ 的经验式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 3.1 Supplement 5–6 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-3.1-04",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "unit": "3 Stoichiometry / 3.1 Formulae",
+   "syllabus": "3.1",
+   "level": "supp",
+   "name": "离子方程式",
+   "name_en": "Ionic equations",
+   "desc": "能写出带状态符号的离子方程式：只写实际参加反应的离子，删去旁观离子（spectator ions），如中和 H⁺(aq) + OH⁻(aq) → H₂O(l)、沉淀 Ag⁺(aq) + Cl⁻(aq) → AgCl(s)、置换 Zn(s) + Cu²⁺(aq) → Zn²⁺(aq) + Cu(s)。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-3.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-3.1-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "ionic equation",
+    "spectator ion",
+    "precipitate",
+    "state symbols",
+    "aqueous ions"
+   ],
+   "method": "三步：写完整方程式 → 把 (aq) 的离子化合物拆成离子 → 删去两边相同的离子；最后检查电荷守恒。常见错误：把沉淀或水也拆成离子；忘了电荷配平。",
+   "probe": "写出硫酸铜溶液与氢氧化钠溶液反应的离子方程式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 3.1 Supplement 7 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-3.2-01",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "unit": "3 Stoichiometry / 3.2 Relative masses of atoms and molecules",
+   "syllabus": "3.2",
+   "level": "core",
+   "name": "相对原子质量与相对分子（式）质量",
+   "name_en": "Relative atomic mass and relative molecular/formula mass",
+   "desc": "相对原子质量 Ar：元素各同位素的平均质量与 ¹²C 原子质量 1/12 的比值；相对分子质量 Mr：分子中各原子 Ar 之和（离子化合物称相对式量，也用 Mr），如 Mr(H₂SO₄) = 2×1 + 32 + 4×16 = 98。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-3.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-2.3-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "relative atomic mass",
+    "Ar",
+    "relative molecular mass",
+    "relative formula mass",
+    "Mr",
+    "carbon-12"
+   ],
+   "method": "算 Mr 时把化学式拆成“原子 × 个数”逐项列出，括号外下标乘到括号内每个原子。常见错误：Ca(OH)₂ 只加一个 OH；Mr 带单位 g。",
+   "probe": "计算 CaCO₃、Ca(OH)₂、CuSO₄·5H₂O 的 Mr。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 3.2 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-3.2-02",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "unit": "3 Stoichiometry / 3.2 Relative masses of atoms and molecules",
+   "syllabus": "3.2",
+   "level": "core",
+   "name": "按简单比例计算反应质量",
+   "name_en": "Reacting masses in simple proportions",
+   "desc": "利用方程式和 Mr 按比例计算反应物或生成物质量（不使用摩尔概念），如 已知 40 g CaCO₃ 分解得 22 g CO₂，则 10 g CaCO₃ 得 5.5 g CO₂；或由 Mr 比例 100 : 44 推算。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-3.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-RATIO",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "reacting mass",
+    "proportion",
+    "ratio",
+    "mass of product"
+   ],
+   "method": "列“已知质量 / 已知 Mr = 未知质量 / 未知 Mr（× 系数）”的比例式。常见错误：忽略方程式系数；把比例倒过来。",
+   "probe": "已知 2Mg + O₂ → 2MgO，12 g 镁完全燃烧生成多少克 MgO？（Ar：Mg 24，O 16）",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 3.2 Core 3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-3.3-01",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "unit": "3 Stoichiometry / 3.3 The mole and the Avogadro constant",
+   "syllabus": "3.3",
+   "level": "core",
+   "name": "浓度的单位：g/dm³ 与 mol/dm³",
+   "name_en": "Concentration units: g/dm³ and mol/dm³",
+   "desc": "溶液浓度可用 g/dm³（每立方分米溶液含溶质的克数）或 mol/dm³ 表示；1 dm³ = 1000 cm³。浓度 (g/dm³) = 溶质质量 (g) ÷ 溶液体积 (dm³)。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-03",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-UNIT",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "concentration",
+    "g/dm³",
+    "mol/dm³",
+    "dm³",
+    "cm³",
+    "solute"
+   ],
+   "method": "先把 cm³ 化成 dm³（÷1000）再除。常见错误：直接用 cm³ 计算；混淆 dm³ 与 m³。",
+   "probe": "把 5.0 g 氢氧化钠溶于水配成 250 cm³ 溶液，浓度是多少 g/dm³？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 3.3 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-3.3-02",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "unit": "3 Stoichiometry / 3.3 The mole and the Avogadro constant",
+   "syllabus": "3.3",
+   "level": "supp",
+   "name": "摩尔与阿伏伽德罗常数",
+   "name_en": "The mole and the Avogadro constant",
+   "desc": "摩尔（mol）是物质的量的单位，1 mol 物质含 6.02 × 10²³ 个粒子（原子、离子或分子），该数为阿伏伽德罗常数。用 n (mol) = m (g) ÷ M (g/mol) 计算物质的量、质量、摩尔质量或 Ar/Mr，以及粒子数 = n × 6.02 × 10²³。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-3.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-STDF",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "mole",
+    "amount of substance",
+    "Avogadro constant",
+    "molar mass",
+    "particles"
+   ],
+   "method": "画“n = m / M”三角形，配合科学记数法计算粒子数。注意区分“分子数”与“原子数”（1 mol CO₂ 含 3 mol 原子）。常见错误：用 Ar 代替 Mr；科学记数法乘除出错。",
+   "probe": "8.8 g CO₂ 是多少 mol？含多少个分子、多少个氧原子？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 3.3 Supplement 2–3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-3.3-03",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "unit": "3 Stoichiometry / 3.3 The mole and the Avogadro constant",
+   "syllabus": "3.3",
+   "level": "supp",
+   "name": "气体摩尔体积（24 dm³，r.t.p.）",
+   "name_en": "Molar gas volume at r.t.p.",
+   "desc": "室温室压（r.t.p.）下 1 mol 任何气体体积约为 24 dm³（24 000 cm³）：气体体积 (dm³) = n × 24。可用于由方程式计算反应中气体的体积。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-3.3-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "molar gas volume",
+    "r.t.p.",
+    "24 dm³",
+    "volume of gas"
+   ],
+   "method": "记住 24 dm³ = 24 000 cm³；气体之间的体积比 = 方程式系数比。常见错误：对固体或溶液也用 24 dm³；单位 cm³/dm³ 混用。",
+   "probe": "10 g 碳酸钙与足量盐酸反应，r.t.p. 下生成多少 cm³ CO₂？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 3.3 Supplement 4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-3.3-04",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "unit": "3 Stoichiometry / 3.3 The mole and the Avogadro constant",
+   "syllabus": "3.3",
+   "level": "supp",
+   "name": "化学计量计算与限量反应物",
+   "name_en": "Stoichiometric reacting masses and limiting reactants",
+   "desc": "用摩尔和方程式系数比进行反应质量、气体体积计算；判断限量反应物：分别算出各反应物的 mol，按系数比较，先耗尽者为限量反应物，产物量由它决定，另一反应物过量。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-3.3-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-3.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "stoichiometry",
+    "mole ratio",
+    "limiting reactant",
+    "excess",
+    "reacting mass"
+   ],
+   "method": "固定四步：质量→mol→按系数比换算→目标 mol→质量/体积。限量判断时把每种反应物 mol 除以其系数，比较大小。常见错误：直接用质量比代替 mol 比；忘了系数。",
+   "probe": "4.8 g 镁与含 0.30 mol HCl 的盐酸反应（Mg + 2HCl → MgCl₂ + H₂），哪个是限量反应物？生成多少 dm³ H₂？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 3.3 Supplement 5（质量、限量反应物、气体体积部分） 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-3.3-05",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "unit": "3 Stoichiometry / 3.3 The mole and the Avogadro constant",
+   "syllabus": "3.3",
+   "level": "supp",
+   "name": "溶液体积与浓度计算",
+   "name_en": "Calculations with volumes and concentrations of solutions",
+   "desc": "c (mol/dm³) = n (mol) ÷ V (dm³)；g/dm³ 与 mol/dm³ 互换：g/dm³ = mol/dm³ × M。体积单位 cm³ 与 dm³ 换算（÷1000）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-3.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-3.3-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "concentration",
+    "mol/dm³",
+    "g/dm³",
+    "volume",
+    "dilution"
+   ],
+   "method": "用 n = c × V 三角形，并在每一步写单位。常见错误：体积用 cm³ 直接代入；g/dm³ 与 mol/dm³ 转换时乘除颠倒。",
+   "probe": "25.0 cm³ 中含 0.0050 mol NaOH，浓度是多少 mol/dm³？换算成 g/dm³ 是多少？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 3.3 Supplement 5（溶液体积与浓度部分） 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-3.3-06",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "unit": "3 Stoichiometry / 3.3 The mole and the Avogadro constant",
+   "syllabus": "3.3",
+   "level": "supp",
+   "name": "滴定数据计算",
+   "name_en": "Titration calculations",
+   "desc": "利用滴定实验数据（取一致的滴定体积平均值）计算溶质的 mol、溶液浓度或所需体积：n(已知) = c × V → 按方程式系数比 → n(未知) → c = n ÷ V。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-3.3-05",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-12.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "titration",
+    "titre",
+    "concordant results",
+    "mean titre",
+    "concentration"
+   ],
+   "method": "先选 concordant titres（相差 ≤ 0.10 cm³）求平均，再按“c×V→比例→÷V”计算。常见错误：把粗滴（rough）也算入平均；忘记 H₂SO₄ 与 NaOH 是 1 : 2。",
+   "probe": "25.0 cm³ NaOH 溶液用 0.100 mol/dm³ H₂SO₄ 滴定，平均消耗 20.0 cm³，求 NaOH 浓度。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 3.3 Supplement 6 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-3.3-07",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "unit": "3 Stoichiometry / 3.3 The mole and the Avogadro constant",
+   "syllabus": "3.3",
+   "level": "supp",
+   "name": "经验式与分子式计算",
+   "name_en": "Calculating empirical and molecular formulae",
+   "desc": "由各元素质量或质量百分比求经验式：各除以 Ar → 除以最小值 → 化为整数比；由经验式和 Mr 求分子式：倍数 = Mr ÷ 经验式量。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-3.1-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-3.3-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "empirical formula",
+    "molecular formula",
+    "percentage by mass",
+    "mole ratio"
+   ],
+   "method": "用表格列：element / mass or % / ÷Ar / ÷smallest / ratio。比值出现 1.5、1.33 时乘 2、3 化整。常见错误：用原子序数代替 Ar；比值 1.5 直接四舍五入。",
+   "probe": "某烃含 C 85.7%、H 14.3%，Mr = 56，求经验式和分子式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 3.3 Supplement 7 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-3.3-08",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "unit": "3 Stoichiometry / 3.3 The mole and the Avogadro constant",
+   "syllabus": "3.3",
+   "level": "supp",
+   "name": "产率、质量分数与纯度计算",
+   "name_en": "Percentage yield, percentage composition and percentage purity",
+   "desc": "产率 % = 实际产量 ÷ 理论产量 × 100；质量分数 % = 元素在化合物中的总质量 ÷ Mr × 100；纯度 % = 纯物质质量 ÷ 样品总质量 × 100。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-3.3-04",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-8-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "percentage yield",
+    "theoretical yield",
+    "actual yield",
+    "percentage composition",
+    "percentage purity"
+   ],
+   "method": "先由计量计算求理论产量，再代公式；三个公式分清分子分母。常见错误：产率超过 100% 不察觉；质量分数忘乘原子个数。",
+   "probe": "理论可得 10.0 g 产物，实际得到 8.5 g，求产率；计算 NH₄NO₃ 中 N 的质量分数。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 3.3 Supplement 8 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-4.1-01",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "unit": "4 Electrochemistry / 4.1 Electrolysis",
+   "syllabus": "4.1",
+   "level": "core",
+   "name": "电解的定义与电解池组成",
+   "name_en": "Electrolysis: definition and electrolytic cells",
+   "desc": "电解：离子化合物在熔融或水溶液状态下通电而分解。电解池中：阳极（anode）是正极，阴极（cathode）是负极，电解质（electrolyte）是被电解的熔融或水溶液物质；惰性电极用铂或碳（石墨）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.4-02",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-CIRC",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "electrolysis",
+    "electrolyte",
+    "anode",
+    "cathode",
+    "inert electrode",
+    "molten",
+    "aqueous"
+   ],
+   "method": "记“PANIC”：Positive Anode, Negative Is Cathode。阳离子去阴极，阴离子去阳极。常见错误：把固态离子化合物也当电解质；阳极阴极与电池正负极对应混乱。",
+   "probe": "画一个电解熔融 NaCl 的装置图，标出 anode、cathode、electrolyte，并说明为什么必须熔融。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 4.1 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-4.1-02",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "unit": "4 Electrochemistry / 4.1 Electrolysis",
+   "syllabus": "4.1",
+   "level": "core",
+   "name": "熔融二元化合物的电解",
+   "name_en": "Electrolysis of molten binary compounds",
+   "desc": "金属或氢在阴极生成，非金属（氢除外）在阳极生成。熔融溴化铅(II)：阴极生成银灰色液态铅，阳极生成红棕色溴蒸气。能预测任一熔融二元化合物的电解产物（阴极金属、阳极非金属）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-4.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "molten",
+    "binary compound",
+    "lead(II) bromide",
+    "bromine",
+    "products at electrodes"
+   ],
+   "method": "做法：拆成阳离子和阴离子 → 阳离子到阴极成为金属，阴离子到阳极成为非金属单质（卤素为双原子 X₂）。常见错误：把产物电极弄反；写成 Br 而不是 Br₂。",
+   "probe": "预测熔融 KI 和熔融 Al₂O₃ 电解时两极产物，并描述熔融 PbBr₂ 电解时的现象。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 4.1 Core 3(a)、4、5 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-4.1-03",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "unit": "4 Electrochemistry / 4.1 Electrolysis",
+   "syllabus": "4.1",
+   "level": "core",
+   "name": "水溶液电解：浓氯化钠溶液与稀硫酸",
+   "name_en": "Electrolysis of concentrated aqueous sodium chloride and dilute sulfuric acid",
+   "desc": "惰性电极电解浓 NaCl 溶液：阴极产生氢气（无色气泡，点燃有爆鸣），阳极产生氯气（黄绿色、使湿润石蕊褪色），溶液逐渐变为 NaOH。电解稀硫酸：阴极产生氢气，阳极产生氧气，体积比约 2 : 1。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-4.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-7-06",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "brine",
+    "concentrated aqueous sodium chloride",
+    "dilute sulfuric acid",
+    "hydrogen",
+    "chlorine",
+    "oxygen"
+   ],
+   "method": "水溶液中多了 H⁺ 和 OH⁻：阴极上比氢活泼的金属不析出、改出 H₂。把每个电解的“两极产物 + 现象 + 检验方法”做成三列卡片。常见错误：说浓 NaCl 溶液电解阴极得到钠。",
+   "probe": "惰性电极电解浓氯化钠溶液，两极分别产生什么？如何检验？电解后溶液的 pH 怎样变化？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 4.1 Core 3(b)(c) 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-4.1-04",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "unit": "4 Electrochemistry / 4.1 Electrolysis",
+   "syllabus": "4.1",
+   "level": "supp",
+   "name": "卤化物稀/浓溶液电解产物预测",
+   "name_en": "Predicting products for dilute and concentrated aqueous halides",
+   "desc": "电解卤化物水溶液：阴极上若金属比氢活泼则生成氢气，否则生成金属；阳极上浓溶液生成卤素（如 Cl₂），稀溶液主要生成氧气（来自 OH⁻/水）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-4.1-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-9.4-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "halide",
+    "dilute",
+    "concentrated",
+    "discharge",
+    "reactivity series",
+    "oxygen"
+   ],
+   "method": "两条规则：cathode——比较金属与 H 的活动性；anode——halide 浓→halogen，稀→oxygen。常见错误：稀 NaCl 溶液阳极仍写 Cl₂；阴极写出钠、钾。",
+   "probe": "预测用惰性电极电解很稀的氯化钠溶液、浓溴化铜(II) 溶液时两极产物。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 4.1 Supplement 10 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-4.1-05",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "unit": "4 Electrochemistry / 4.1 Electrolysis",
+   "syllabus": "4.1",
+   "level": "supp",
+   "name": "电解硫酸铜溶液（惰性电极与铜电极）",
+   "name_en": "Electrolysis of aqueous copper(II) sulfate",
+   "desc": "碳/石墨惰性电极：阴极析出红棕色铜，阳极产生氧气气泡，溶液蓝色变浅（Cu²⁺ 减少）、酸性增强。铜电极：阳极铜溶解变小，阴极析出铜变大，溶液蓝色不变（铜电解精炼原理）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-4.1-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "copper(II) sulfate",
+    "inert electrodes",
+    "copper electrodes",
+    "copper deposited",
+    "electrolytic refining"
+   ],
+   "method": "两种电极对比表：anode 产物 / cathode 产物 / 颜色变化 / 电极质量变化。常见错误：铜电极时阳极也写出氧气；以为溶液颜色两种情况下都变浅。",
+   "probe": "用铜电极电解硫酸铜溶液 30 分钟后，两个电极的质量各怎样变化？溶液颜色呢？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 4.1 Supplement 9 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-4.1-06",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "unit": "4 Electrochemistry / 4.1 Electrolysis",
+   "syllabus": "4.1",
+   "level": "supp",
+   "name": "电解中的电荷转移与半反应方程式",
+   "name_en": "Charge transfer and ionic half-equations in electrolysis",
+   "desc": "外电路中电子从阳极流向电源、再流到阴极；电极上阳离子在阴极得电子（还原），阴离子在阳极失电子（氧化）；电解质中离子定向移动。会写半反应：Cu²⁺ + 2e⁻ → Cu，Pb²⁺ + 2e⁻ → Pb，2H⁺ + 2e⁻ → H₂，2Cl⁻ → Cl₂ + 2e⁻，4OH⁻ → O₂ + 2H₂O + 4e⁻。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-4.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-6.4-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "half-equation",
+    "oxidation",
+    "reduction",
+    "electrons",
+    "external circuit",
+    "ion movement"
+   ],
+   "method": "记 OIL RIG 与 “Reduction at Cathode (RED CAT), Oxidation at Anode (AN OX)”。写半反应后检查原子和电荷都守恒。常见错误：说电子在电解质溶液中移动；阳极半反应把电子写在左边且符号错。",
+   "probe": "写出电解熔融 NaCl 时两极的半反应，指出哪一极发生氧化，并说明电解质中导电的是什么粒子。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 4.1 Supplement 8、11 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-4.1-07",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "unit": "4 Electrochemistry / 4.1 Electrolysis",
+   "syllabus": "4.1",
+   "level": "core",
+   "name": "电镀",
+   "name_en": "Electroplating",
+   "desc": "金属物品电镀可改善外观并提高抗腐蚀性。电镀方法：待镀物品作阴极，镀层金属作阳极，电解质为含镀层金属离子的溶液（如镀铜用硫酸铜溶液）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-4.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "electroplating",
+    "cathode",
+    "anode",
+    "plating metal",
+    "corrosion resistance",
+    "appearance"
+   ],
+   "method": "口诀：object = cathode（负极吸引金属阳离子沉积在其表面）。常见错误：把待镀物品接到阳极；电解质不含镀层金属离子。",
+   "probe": "要给一把铁钥匙镀铜，画出装置并标明阳极、阴极和电解质。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 4.1 Core 6–7 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-4.2-01",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "unit": "4 Electrochemistry / 4.2 Hydrogen–oxygen fuel cells",
+   "syllabus": "4.2",
+   "level": "core",
+   "name": "氢氧燃料电池",
+   "name_en": "Hydrogen–oxygen fuel cells",
+   "desc": "氢氧燃料电池利用氢气和氧气产生电能，唯一的化学产物是水。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-4.1-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "fuel cell",
+    "hydrogen",
+    "oxygen",
+    "electricity",
+    "water"
+   ],
+   "method": "与燃烧对比：同样是 2H₂ + O₂ → 2H₂O，但能量以电能而不是热能形式释放。常见错误：说燃料电池产生 CO₂。",
+   "probe": "氢氧燃料电池的反应物和唯一的化学产物是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 4.2 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-4.2-02",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "unit": "4 Electrochemistry / 4.2 Hydrogen–oxygen fuel cells",
+   "syllabus": "4.2",
+   "level": "supp",
+   "name": "燃料电池与汽油机的优缺点比较",
+   "name_en": "Fuel cells vs petrol engines: advantages and disadvantages",
+   "desc": "优点：只生成水，不排放 CO₂、CO、氮氧化物等污染物；效率较高。缺点：氢气储存和运输困难（易燃、需高压）、加氢站少、氢气的生产常用化石燃料或耗电、燃料电池成本高。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-4.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-10.3-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "advantages",
+    "disadvantages",
+    "petrol engine",
+    "pollutants",
+    "storage of hydrogen"
+   ],
+   "method": "按“环境 / 储运安全 / 成本 / 制氢来源”四个维度各写一条。常见错误：只写“更环保”而不说具体不产生哪些污染物。",
+   "probe": "列出两条燃料电池汽车相对汽油车的优点和两条缺点。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 4.2 Supplement 2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-5.1-01",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "unit": "5 Chemical energetics / 5.1 Exothermic and endothermic reactions",
+   "syllabus": "5.1",
+   "level": "core",
+   "name": "放热反应与吸热反应（IGCSE）",
+   "name_en": "Exothermic and endothermic reactions",
+   "desc": "放热反应向周围转移热能，使周围温度升高；吸热反应从周围吸收热能，使周围温度降低。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "exothermic",
+    "endothermic",
+    "thermal energy",
+    "surroundings",
+    "temperature"
+   ],
+   "method": "答题时一定写“to/from the surroundings”和温度变化方向。常见错误：说吸热反应中反应混合物“吸收冷”。",
+   "probe": "氢氧化钠溶于水温度升高，是放热还是吸热？能量从哪里转移到哪里？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 5.1 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-5.1-02",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "unit": "5 Chemical energetics / 5.1 Exothermic and endothermic reactions",
+   "syllabus": "5.1",
+   "level": "core",
+   "name": "读懂反应路径图",
+   "name_en": "Interpreting reaction pathway diagrams",
+   "desc": "反应路径（能量）图：纵轴能量，横轴反应进程；生成物能量低于反应物 → 放热，高于反应物 → 吸热；曲线顶峰与反应物之差为活化能。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-5.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "reaction pathway diagram",
+    "energy level",
+    "reactants",
+    "products",
+    "progress of reaction"
+   ],
+   "method": "看“终点比起点高还是低”判断吸放热。常见错误：把曲线峰高误当成 ΔH；箭头方向画反。",
+   "probe": "给两张能量图，判断哪个是放热反应，并指出图中表示反应能量变化的线段。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 5.1 Core 3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-5.1-03",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "unit": "5 Chemical energetics / 5.1 Exothermic and endothermic reactions",
+   "syllabus": "5.1",
+   "level": "supp",
+   "name": "焓变 ΔH、活化能 Ea 与绘制反应路径图",
+   "name_en": "Enthalpy change, activation energy and drawing pathway diagrams",
+   "desc": "反应中热能的转移称为焓变 ΔH：放热反应 ΔH 为负，吸热反应 ΔH 为正。活化能 Ea 是碰撞粒子发生反应所需的最低能量。能根据数据绘制并标注反应路径图：反应物、生成物、ΔH（箭头从反应物指向生成物水平）、Ea（从反应物到峰顶）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-5.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "enthalpy change",
+    "ΔH",
+    "activation energy",
+    "Ea",
+    "negative",
+    "positive"
+   ],
+   "method": "画图检查清单：两条水平线标 reactants/products、ΔH 箭头起止、Ea 箭头从反应物到峰顶、正负号。常见错误：放热 ΔH 写正值；Ea 从生成物量起。",
+   "probe": "某反应 ΔH = −90 kJ/mol、Ea = +150 kJ/mol，请画出并标注其反应路径图。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 5.1 Supplement 4–6 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-5.1-04",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "unit": "5 Chemical energetics / 5.1 Exothermic and endothermic reactions",
+   "syllabus": "5.1",
+   "level": "supp",
+   "name": "键的断裂与形成解释焓变",
+   "name_en": "Bond breaking and bond making",
+   "desc": "断键吸热（吸热过程），成键放热（放热过程）。若成键放出的能量大于断键吸收的能量，反应放热（ΔH 为负）；反之吸热（ΔH 为正）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-5.1-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-2.5-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "bond breaking",
+    "bond making",
+    "endothermic",
+    "exothermic",
+    "bond energy"
+   ],
+   "method": "记“break = take（吸收），make = give out（放出）”。常见错误：说“断键放出能量”。",
+   "probe": "用断键和成键解释为什么甲烷燃烧是放热反应。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 5.1 Supplement 7 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-5.1-05",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "unit": "5 Chemical energetics / 5.1 Exothermic and endothermic reactions",
+   "syllabus": "5.1",
+   "level": "supp",
+   "name": "用键能计算焓变",
+   "name_en": "Calculating enthalpy change from bond energies",
+   "desc": "ΔH = 断开反应物中所有键吸收的总能量 − 形成生成物中所有键放出的总能量；需按方程式系数和每个分子中的键数逐一累加。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-5.1-04",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-11.1-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "bond energy",
+    "enthalpy change",
+    "kJ/mol",
+    "displayed formula"
+   ],
+   "method": "先画出所有分子的显示式数清每种键，列“bonds broken / bonds made”两栏表。常见错误：漏乘系数（2H₂O 有 4 个 O–H）；减反了导致符号错。",
+   "probe": "已知 H–H 436、Cl–Cl 242、H–Cl 431 kJ/mol，计算 H₂ + Cl₂ → 2HCl 的 ΔH。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 5.1 Supplement 8 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-6.1-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "unit": "6 Chemical reactions / 6.1 Physical and chemical changes",
+   "syllabus": "6.1",
+   "level": "core",
+   "name": "物理变化与化学变化",
+   "name_en": "Physical and chemical changes",
+   "desc": "物理变化不生成新物质、通常容易逆转（如状态变化、溶解）；化学变化生成新物质、通常难以逆转，常伴随能量变化、颜色变化、气体或沉淀生成。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "physical change",
+    "chemical change",
+    "new substance",
+    "reversible",
+    "observation"
+   ],
+   "method": "核心判据只有一个：是否生成新物质。常见错误：把“有颜色变化”一律当化学变化（如稀释有色溶液）。",
+   "probe": "判断：蜡烛熔化、蜡烛燃烧、硫酸铜晶体溶于水、铁生锈，各是物理还是化学变化？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 6.1 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-6.2-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "unit": "6 Chemical reactions / 6.2 Rate of reaction",
+   "syllabus": "6.2",
+   "level": "core",
+   "name": "影响反应速率的因素与催化剂",
+   "name_en": "Factors affecting rate of reaction; catalysts",
+   "desc": "增大溶液浓度、增大气体压强、增大固体表面积、升高温度、加入催化剂（包括酶）都会加快反应速率；去掉催化剂速率降低。催化剂加快反应速率，反应结束后本身没有变化。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-9-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "rate of reaction",
+    "concentration",
+    "pressure",
+    "surface area",
+    "temperature",
+    "catalyst",
+    "enzyme"
+   ],
+   "method": "五个因素做成一张表，每个配一个实验例子（大理石+盐酸、H₂O₂ + MnO₂）。常见错误：说催化剂“不参加反应”（它参加但最终复原）；以为催化剂会增加产量。",
+   "probe": "列出三种加快锌与稀硫酸反应速率的方法；MnO₂ 在过氧化氢分解中起什么作用？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 6.2 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-6.2-02",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "unit": "6 Chemical reactions / 6.2 Rate of reaction",
+   "syllabus": "6.2",
+   "level": "core",
+   "name": "测定反应速率的实验方法与数据解读",
+   "name_en": "Investigating and interpreting rates of reaction",
+   "desc": "实验方法：测量反应物或生成物质量随时间的变化（如锥形瓶放天平上测 CO₂ 逸出的失重），或测量生成气体的体积（气体注射器/倒置量筒）。会解读速率图：曲线越陡速率越大，曲线变平表示反应结束，终点高度由限量反应物的量决定。（补充）能评价这些方法，如气体溶于水影响排水法、轻气体质量变化太小不宜用称量法。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-6.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "gas syringe",
+    "mass loss",
+    "rate",
+    "gradient",
+    "volume of gas",
+    "graph",
+    "end of reaction"
+   ],
+   "method": "读图三问：哪条线开始最陡（最快）？何时变平（结束）？最终高度为何相同/不同？常见错误：把“最终产量更多”理解为“速率更快”；忘了初速率用初始斜率比较。",
+   "probe": "给两条 CO₂ 体积–时间曲线（块状与粉末大理石），问哪条是粉末、为什么最终体积相同；为什么用天平法时要在瓶口塞棉花？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 6.2 Core 3–4, Supplement 8 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-6.2-03",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "unit": "6 Chemical reactions / 6.2 Rate of reaction",
+   "syllabus": "6.2",
+   "level": "supp",
+   "name": "碰撞理论解释反应速率",
+   "name_en": "Collision theory",
+   "desc": "碰撞理论：反应需要粒子碰撞且能量 ≥ 活化能。用单位体积内粒子数、碰撞频率、粒子动能、活化能解释：浓度/压强增大 → 单位体积粒子多 → 碰撞频率增大；表面积增大 → 可碰撞的粒子多；升温 → 粒子动能增大，碰撞更频繁且更多碰撞能量超过 Ea；催化剂降低 Ea，更多碰撞成为有效碰撞。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-6.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-5.1-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "collision theory",
+    "frequency of collisions",
+    "particles per unit volume",
+    "kinetic energy",
+    "activation energy",
+    "successful collisions"
+   ],
+   "method": "每个答案三要素：变量变化 → 粒子层面的变化 → collision frequency / proportion of successful collisions 的变化。常见错误：说“更多碰撞”漏掉“per unit time”；说催化剂“给粒子能量”。",
+   "probe": "用碰撞理论解释温度升高为什么加快反应，以及催化剂如何起作用。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 6.2 Supplement 5–7 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-6.3-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "unit": "6 Chemical reactions / 6.3 Reversible reactions and equilibrium",
+   "syllabus": "6.3",
+   "level": "core",
+   "name": "可逆反应与水合物脱水/吸水",
+   "name_en": "Reversible reactions; hydrated and anhydrous salts",
+   "desc": "有些反应是可逆的，用 ⇌ 表示。加热水合物使其失水，向无水物加水使其水合：蓝色 CuSO₄·5H₂O ⇌ 白色 CuSO₄ + 5H₂O；粉红色 CoCl₂·6H₂O ⇌ 蓝色 CoCl₂ + 6H₂O。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-6.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "reversible reaction",
+    "⇌",
+    "hydrated",
+    "anhydrous",
+    "copper(II) sulfate",
+    "cobalt(II) chloride"
+   ],
+   "method": "记颜色对：铜盐“蓝↔白”，钴盐“粉↔蓝”。正向（加热）吸热，逆向（加水）放热。常见错误：两种物质颜色记反；说加水后无水硫酸铜“溶解变蓝”而不说生成水合物。",
+   "probe": "加热蓝色硫酸铜晶体会看到什么？冷却后加水又会怎样？写出可逆反应方程式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 6.3 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-6.3-02",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "unit": "6 Chemical reactions / 6.3 Reversible reactions and equilibrium",
+   "syllabus": "6.3",
+   "level": "supp",
+   "name": "动态平衡与平衡移动",
+   "name_en": "Dynamic equilibrium and position of equilibrium",
+   "desc": "密闭体系中可逆反应达到平衡：正反应速率等于逆反应速率，反应物和生成物浓度不再改变。平衡移动：升温向吸热方向移动；增大压强向气体分子数少的方向移动；增大某物质浓度向消耗该物质方向移动；催化剂不改变平衡位置，只加快达到平衡。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-6.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-5.1-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "equilibrium",
+    "dynamic",
+    "closed system",
+    "position of equilibrium",
+    "forward reaction",
+    "reverse reaction"
+   ],
+   "method": "用“体系总是反对你的改变”来预测，答题时说明移动方向和理由（数两边气体 mol 数、看 ΔH 符号）。常见错误：说平衡时“反应停止”或“浓度相等”；说催化剂使平衡右移。",
+   "probe": "对 N₂ + 3H₂ ⇌ 2NH₃（ΔH 为负），升温和加压分别使平衡如何移动？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 6.3 Supplement 3–4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-6.3-03",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "unit": "6 Chemical reactions / 6.3 Reversible reactions and equilibrium",
+   "syllabus": "6.3",
+   "level": "supp",
+   "name": "哈伯法合成氨",
+   "name_en": "The Haber process",
+   "desc": "N₂(g) + 3H₂(g) ⇌ 2NH₃(g)。原料：氮气来自空气，氢气来自甲烷（天然气）。典型条件：450 °C、20 000 kPa（200 atm）、铁催化剂。解释条件：温度是速率与产率的折中（正反应放热，低温产率高但太慢）；高压提高产率和速率，但更高压成本高、不安全；催化剂加快速率。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-6.3-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "Haber process",
+    "ammonia",
+    "iron catalyst",
+    "450 °C",
+    "200 atm",
+    "compromise",
+    "yield"
+   ],
+   "method": "背“450 / 200 / Fe”，并能分别从 rate、equilibrium position、safety、economics 四个角度说理由。常见错误：与接触法条件混淆；说高温是为了提高产率。",
+   "probe": "为什么哈伯法不用更低的温度？为什么不用更高的压强？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 6.3 Supplement 5–7、11 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-6.3-04",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "unit": "6 Chemical reactions / 6.3 Reversible reactions and equilibrium",
+   "syllabus": "6.3",
+   "level": "supp",
+   "name": "接触法制三氧化硫",
+   "name_en": "The Contact process",
+   "desc": "2SO₂(g) + O₂(g) ⇌ 2SO₃(g)。原料：SO₂ 由燃烧硫或焙烧金属硫化物矿得到，O₂ 来自空气。典型条件：450 °C、200 kPa（2 atm）、五氧化二钒 V₂O₅ 催化剂。低压即可获得高转化率，故不需高压（节省成本）；温度为速率与产率的折中。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-6.3-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "Contact process",
+    "sulfur dioxide",
+    "sulfur trioxide",
+    "vanadium(V) oxide",
+    "2 atm",
+    "compromise"
+   ],
+   "method": "与哈伯法并列对比表：方程式、原料来源、温度、压强、催化剂、理由。常见错误：压强写成 200 atm；催化剂写成铁。",
+   "probe": "接触法为什么只用 2 atm 而不用高压？写出该步反应方程式和催化剂。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 6.3 Supplement 8–11 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-6.4-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "unit": "6 Chemical reactions / 6.4 Redox",
+   "syllabus": "6.4",
+   "level": "core",
+   "name": "氧化还原（得氧失氧）与罗马数字命名",
+   "name_en": "Redox in terms of oxygen; Roman numerals",
+   "desc": "氧化是得到氧，还原是失去氧；氧化还原反应中氧化和还原同时发生。能在反应中指出被氧化和被还原的物质，如 CuO + H₂ → Cu + H₂O（CuO 被还原、H₂ 被氧化）。用罗马数字表示化合物中元素的氧化数，如 iron(III) oxide、copper(II) sulfate。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-3.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "oxidation",
+    "reduction",
+    "redox",
+    "gain of oxygen",
+    "loss of oxygen",
+    "Roman numeral",
+    "oxidation number"
+   ],
+   "method": "在方程式上画箭头：谁拿走了氧（被氧化），谁失去了氧（被还原）。常见错误：只说一个被氧化而忘了同时有物质被还原。",
+   "probe": "在 Fe₂O₃ + 3CO → 2Fe + 3CO₂ 中，哪种物质被氧化、哪种被还原？Fe₂O₃ 的名称中罗马数字是几？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 6.4 Core 1–5 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-6.4-02",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "unit": "6 Chemical reactions / 6.4 Redox",
+   "syllabus": "6.4",
+   "level": "supp",
+   "name": "电子得失与氧化数判断氧化还原",
+   "name_en": "Redox in terms of electrons and oxidation numbers",
+   "desc": "氧化 = 失去电子 = 氧化数升高；还原 = 得到电子 = 氧化数降低（OIL RIG）。氧化数规则：单质为 0；单原子离子等于其电荷；化合物中氧化数之和为 0；离子中之和等于离子电荷。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-6.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-2.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "oxidation number",
+    "loss of electrons",
+    "gain of electrons",
+    "OIL RIG",
+    "redox"
+   ],
+   "method": "标出每个元素反应前后的氧化数，升高者被氧化。常见错误：化合物中常见元素（O 为 −2、H 为 +1）规则记错；把离子方程式的旁观离子也算作被氧化/还原。",
+   "probe": "在 Zn + Cu²⁺ → Zn²⁺ + Cu 中，用电子转移和氧化数两种方法指出氧化与还原；求 SO₄²⁻ 中 S 的氧化数。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 6.4 Supplement 6–9 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-6.4-03",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "unit": "6 Chemical reactions / 6.4 Redox",
+   "syllabus": "6.4",
+   "level": "supp",
+   "name": "氧化剂、还原剂及其颜色检验",
+   "name_en": "Oxidising and reducing agents; colour-change tests",
+   "desc": "氧化剂氧化别的物质而自身被还原；还原剂还原别的物质而自身被氧化。用颜色变化识别氧化还原：酸性高锰酸钾（紫色）被还原剂还原后变为无色；碘化钾（无色）被氧化剂氧化生成碘，溶液变为黄棕色/棕色。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-6.4-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "oxidising agent",
+    "reducing agent",
+    "acidified potassium manganate(VII)",
+    "potassium iodide",
+    "colour change"
+   ],
+   "method": "记“被谁 vs 自己”：oxidising agent 本身被 reduced。KMnO₄ 是氧化剂（检验还原剂），KI 是还原剂（检验氧化剂）。常见错误：把氧化剂定义成“被氧化的物质”。",
+   "probe": "某气体使酸性 KMnO₄ 由紫色变无色，这说明该气体是氧化剂还是还原剂？在 Cl₂ + 2KI → 2KCl + I₂ 中谁是氧化剂？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 6.4 Supplement 10–13 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-7.1-01",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "unit": "7 Acids, bases and salts / 7.1 The characteristic properties of acids and bases",
+   "syllabus": "7.1",
+   "level": "core",
+   "name": "酸的特征反应",
+   "name_en": "Characteristic reactions of acids",
+   "desc": "酸 + 金属 → 盐 + 氢气；酸 + 碱 → 盐 + 水；酸 + 碳酸盐 → 盐 + 水 + 二氧化碳。能写出文字和配平的符号方程式。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-9-08",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-3.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "acid",
+    "metal",
+    "base",
+    "carbonate",
+    "salt",
+    "effervescence",
+    "hydrogen",
+    "carbon dioxide"
+   ],
+   "method": "三条“通式”背熟，用盐酸/硫酸/硝酸分别配三种金属练命名。常见错误：酸 + 碳酸盐漏写水；铜与稀酸也写反应。",
+   "probe": "写出碳酸镁与稀盐酸反应的文字和符号方程式，并说出可观察到的现象。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 7.1 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-7.1-02",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "unit": "7 Acids, bases and salts / 7.1 The characteristic properties of acids and bases",
+   "syllabus": "7.1",
+   "level": "core",
+   "name": "指示剂：石蕊、百里酚酞、甲基橙",
+   "name_en": "Indicators: litmus, thymolphthalein and methyl orange",
+   "desc": "酸中：石蕊红色、百里酚酞无色、甲基橙红色；碱中：石蕊蓝色、百里酚酞蓝色、甲基橙黄色。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "litmus",
+    "thymolphthalein",
+    "methyl orange",
+    "indicator",
+    "colour change"
+   ],
+   "method": "做 3×2 颜色表（indicator × acid/alkali）反复默写。常见错误：把百里酚酞记成酚酞（酚酞碱中粉红，不在此大纲）；甲基橙碱中写橙色。",
+   "probe": "某溶液中加百里酚酞变蓝，加甲基橙会是什么颜色？溶液是酸性还是碱性？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 7.1 Core 2、5 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-7.1-03",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "unit": "7 Acids, bases and salts / 7.1 The characteristic properties of acids and bases",
+   "syllabus": "7.1",
+   "level": "core",
+   "name": "碱与碱溶液的性质",
+   "name_en": "Bases and alkalis",
+   "desc": "碱是金属的氧化物或氢氧化物；可溶于水的碱称为碱溶液（alkali），如 NaOH、KOH、Ca(OH)₂（微溶）。碱 + 酸 → 盐 + 水；碱 + 铵盐（加热）→ 盐 + 水 + 氨气。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-7.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "base",
+    "alkali",
+    "metal oxide",
+    "metal hydroxide",
+    "ammonium salt",
+    "ammonia"
+   ],
+   "method": "画包含关系图：alkali ⊂ base。铵盐与碱加热放出 NH₃ 是检验 NH₄⁺ 的依据。常见错误：说所有碱都可溶；以为 CuO 是 alkali。",
+   "probe": "CuO 和 NaOH 哪个是 alkali？写出氯化铵与氢氧化钠溶液共热的文字方程式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 7.1 Core 3–4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-7.1-04",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "unit": "7 Acids, bases and salts / 7.1 The characteristic properties of acids and bases",
+   "syllabus": "7.1",
+   "level": "core",
+   "name": "H⁺、OH⁻、pH 与中和反应",
+   "name_en": "H⁺ and OH⁻ ions, pH and neutralisation",
+   "desc": "酸的水溶液含 H⁺，碱溶液含 OH⁻；用通用指示剂试纸的颜色和 pH 比较 H⁺ 浓度、中性及相对酸性、碱性（pH 越小 H⁺ 浓度越大）。中和：H⁺(aq) + OH⁻(aq) → H₂O(l)。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-10",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-7.1-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "hydrogen ion",
+    "hydroxide ion",
+    "pH",
+    "universal indicator paper",
+    "neutralisation",
+    "neutral"
+   ],
+   "method": "把 pH 尺与 H⁺/OH⁻ 浓度对应起来画一条轴。常见错误：说碱溶液“没有 H⁺”时把 pH 与 OH⁻ 方向弄反；中和离子方程式写成 HCl + NaOH。",
+   "probe": "pH 2 和 pH 5 的两种酸，哪种 H⁺ 浓度更大？写出中和反应的离子方程式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 7.1 Core 6–8 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-7.1-05",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "unit": "7 Acids, bases and salts / 7.1 The characteristic properties of acids and bases",
+   "syllabus": "7.1",
+   "level": "supp",
+   "name": "质子供体/受体与强酸弱酸",
+   "name_en": "Proton donors and acceptors; strong and weak acids",
+   "desc": "酸是质子（H⁺）供体，碱是质子受体。强酸在水溶液中完全电离，如 HCl(aq) → H⁺(aq) + Cl⁻(aq)；弱酸部分电离，如 CH₃COOH(aq) ⇌ H⁺(aq) + CH₃COO⁻(aq)。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-7.1-04",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-6.3-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "proton donor",
+    "proton acceptor",
+    "strong acid",
+    "weak acid",
+    "dissociation",
+    "fully",
+    "partially"
+   ],
+   "method": "区分“强/弱”（电离程度）与“浓/稀”（浓度）；弱酸方程式用 ⇌。常见错误：说弱酸就是稀酸；强酸电离式用 ⇌。",
+   "probe": "同浓度的盐酸和乙酸，哪个 pH 更小？为什么？写出两者的电离方程式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 7.1 Supplement 9–12 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-7.2-01",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "unit": "7 Acids, bases and salts / 7.2 Oxides",
+   "syllabus": "7.2",
+   "level": "core",
+   "name": "酸性氧化物与碱性氧化物",
+   "name_en": "Acidic and basic oxides",
+   "desc": "非金属氧化物通常为酸性氧化物（如 SO₂、CO₂，与碱反应），金属氧化物通常为碱性氧化物（如 CuO、CaO，与酸反应）；与元素的金属性/非金属性相关。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-7.1-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-7-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "acidic oxide",
+    "basic oxide",
+    "non-metal oxide",
+    "metal oxide"
+   ],
+   "method": "看氧化物前面的元素是金属还是非金属。常见错误：认为所有氧化物都是酸性的；把 CO 当作酸性氧化物（它是中性氧化物，不在要求中）。",
+   "probe": "给 MgO、SO₂、CO₂、CaO，分为酸性和碱性两类，并说一种检验方法。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 7.2 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-7.2-02",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "unit": "7 Acids, bases and salts / 7.2 Oxides",
+   "syllabus": "7.2",
+   "level": "supp",
+   "name": "两性氧化物",
+   "name_en": "Amphoteric oxides",
+   "desc": "两性氧化物既能与酸反应、又能与碱反应，都生成盐和水；Al₂O₃ 和 ZnO 是两性氧化物。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-7.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "amphoteric",
+    "aluminium oxide",
+    "zinc oxide",
+    "salt and water"
+   ],
+   "method": "记“Al、Zn 两头通吃”。与 12.5 中 Al³⁺、Zn²⁺ 氢氧化物沉淀溶于过量 NaOH 联系起来。常见错误：把 Al₂O₃ 当成碱性氧化物。",
+   "probe": "设计实验证明 ZnO 是两性氧化物。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 7.2 Supplement 2–3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-7.3-01",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "unit": "7 Acids, bases and salts / 7.3 Preparation of salts",
+   "syllabus": "7.3",
+   "level": "core",
+   "name": "可溶性盐的制备（过量固体法）",
+   "name_en": "Preparing soluble salts using excess metal, base or carbonate",
+   "desc": "酸与过量金属、过量不溶性碱或过量不溶性碳酸盐反应制可溶性盐：加入固体至不再溶解（或不再冒泡）→ 过滤除去过量固体 → 加热浓缩滤液至饱和 → 冷却结晶 → 过滤、用少量冷水洗、晾干。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-9-08",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-7.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "soluble salt",
+    "excess",
+    "filtration",
+    "crystallisation",
+    "saturated solution",
+    "crystals"
+   ],
+   "method": "每一步写目的（excess 保证酸反应完全、过滤除去固体、不蒸干以获得纯净晶体）。常见错误：用钠/钾与酸制盐（太剧烈不安全）；把溶液蒸干。",
+   "probe": "描述由氧化铜和稀硫酸制备纯净干燥的硫酸铜晶体的方法。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 7.3 Core 1(b)–(d) 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-7.3-02",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "unit": "7 Acids, bases and salts / 7.3 Preparation of salts",
+   "syllabus": "7.3",
+   "level": "core",
+   "name": "用滴定法制备可溶性盐",
+   "name_en": "Preparing soluble salts by titration",
+   "desc": "酸与碱溶液（如 NaOH、KOH、氨水）反应制钠盐、钾盐、铵盐：先用指示剂滴定确定恰好中和所需体积 → 不加指示剂按该体积重新混合 → 蒸发浓缩、结晶。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-7.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-12.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "titration",
+    "alkali",
+    "indicator",
+    "end-point",
+    "sodium salt",
+    "crystallisation"
+   ],
+   "method": "理解为什么不能用过量法：碱溶液和盐都可溶，过量的无法过滤除去。常见错误：带着指示剂直接蒸发结晶（产品被污染）。",
+   "probe": "为什么制硫酸钠要用滴定法而不用“过量固体法”？说出实验步骤。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 7.3 Core 1(a) 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-7.3-03",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "unit": "7 Acids, bases and salts / 7.3 Preparation of salts",
+   "syllabus": "7.3",
+   "level": "core",
+   "name": "盐的溶解性规则",
+   "name_en": "General solubility rules for salts",
+   "desc": "钠、钾、铵盐都可溶；硝酸盐都可溶；氯化物可溶，除了铅和银的氯化物；硫酸盐可溶，除了钡、钙、铅的硫酸盐；碳酸盐不溶，除了钠、钾、铵的碳酸盐；氢氧化物不溶，除了钠、钾、铵的氢氧化物，氢氧化钙微溶。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-7.3-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "soluble",
+    "insoluble",
+    "solubility rules",
+    "nitrate",
+    "chloride",
+    "sulfate",
+    "carbonate",
+    "hydroxide"
+   ],
+   "method": "做六行规则卡并记“例外清单”：AgCl、PbCl₂；BaSO₄、CaSO₄、PbSO₄。选择制备方法前先判断目标盐溶不溶。常见错误：认为所有硫酸盐都可溶。",
+   "probe": "判断 AgNO₃、BaSO₄、K₂CO₃、CaCO₃、PbCl₂ 是否可溶。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 7.3 Core 2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-7.3-04",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "unit": "7 Acids, bases and salts / 7.3 Preparation of salts",
+   "syllabus": "7.3",
+   "level": "core",
+   "name": "水合物、无水物与结晶水",
+   "name_en": "Hydrated and anhydrous substances; water of crystallisation",
+   "desc": "水合物是与水化学结合的物质；无水物是不含水的物质。（补充）结晶水是水合晶体中所含的水分子，如 CuSO₄·5H₂O、CoCl₂·6H₂O。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-6.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "hydrated",
+    "anhydrous",
+    "water of crystallisation",
+    "CuSO₄·5H₂O",
+    "CoCl₂·6H₂O"
+   ],
+   "method": "算水合物 Mr 时把“·5H₂O”的质量加进去（5 × 18）。常见错误：说“水合物 = 湿的盐”；Mr 计算漏掉结晶水。",
+   "probe": "什么是 water of crystallisation？计算 CuSO₄·5H₂O 中水的质量分数。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 7.3 Core 3, Supplement 5 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-7.3-05",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "unit": "7 Acids, bases and salts / 7.3 Preparation of salts",
+   "syllabus": "7.3",
+   "level": "supp",
+   "name": "沉淀法制备不溶性盐",
+   "name_en": "Preparing insoluble salts by precipitation",
+   "desc": "将分别含有所需阳离子和阴离子的两种可溶性盐溶液混合，生成不溶盐沉淀 → 过滤 → 用蒸馏水洗涤沉淀 → 干燥。例：BaCl₂(aq) + Na₂SO₄(aq) → BaSO₄(s) + 2NaCl(aq)。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-7.3-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-7-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "precipitation",
+    "insoluble salt",
+    "filter",
+    "wash",
+    "dry",
+    "spectator ions"
+   ],
+   "method": "选原料：两种都可溶，一种提供阳离子、一种提供阴离子（常选钠盐或硝酸盐）。常见错误：用不溶物做原料；忘了洗涤沉淀除去可溶杂质。",
+   "probe": "设计制备纯净干燥的碳酸铅(II) 的方法，写出所用的两种溶液。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 7.3 Supplement 4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-8.1-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "8 The Periodic Table / 8.1 Arrangement of elements",
+   "syllabus": "8.1",
+   "level": "core",
+   "name": "周期表的排列与金属性递变",
+   "name_en": "Arrangement of the Periodic Table; metallic to non-metallic character",
+   "desc": "周期表按质子数（原子序数）递增排列成周期（横行）和族（纵列）；同一周期从左到右，元素由金属性逐渐过渡到非金属性。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-9-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-2.2-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "Periodic Table",
+    "period",
+    "group",
+    "proton number",
+    "metallic character",
+    "non-metallic character"
+   ],
+   "method": "用第三周期 Na→Ar 举例：Na、Mg、Al 金属，Si 类金属，P、S、Cl 非金属，Ar 稀有气体。常见错误：认为周期表按相对原子质量排列。",
+   "probe": "第三周期从左到右元素性质如何变化？举出两个金属和两个非金属。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 8.1 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-8.1-02",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "8 The Periodic Table / 8.1 Arrangement of elements",
+   "syllabus": "8.1",
+   "level": "core",
+   "name": "族序数、离子电荷与性质预测",
+   "name_en": "Group number, ionic charge and predicting properties",
+   "desc": "族序数与离子电荷相关：I 族 +1、II 族 +2、III 族 +3、VI 族 −2、VII 族 −1。同族元素最外层电子数相同，因此化学性质相似；可由元素在周期表中的位置预测其性质。（补充）能根据给定信息找出族内趋势。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-8.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-2.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "group number",
+    "ionic charge",
+    "outer electrons",
+    "similar chemical properties",
+    "trend",
+    "predict"
+   ],
+   "method": "做“族 → 最外层电子 → 得失电子 → 离子电荷”四步链。数据题：先描述趋势（increase / decrease down the group）再外推。常见错误：VI 族离子电荷写 +6。",
+   "probe": "为什么锂和钠化学性质相似？给出 F、Cl、Br 的沸点，预测 I 的沸点范围。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 8.1 Core 3–5, Supplement 6 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-8.2-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "8 The Periodic Table / 8.2 Group I properties",
+   "syllabus": "8.2",
+   "level": "core",
+   "name": "第 I 族碱金属",
+   "name_en": "Group I alkali metals",
+   "desc": "锂、钠、钾是较软的金属；从上到下熔点降低、密度（总体）增大、反应性增强。与冷水反应生成金属氢氧化物和氢气（如 2Na + 2H₂O → 2NaOH + H₂），能根据信息预测铷、铯等性质。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-9-04",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-8.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "alkali metals",
+    "lithium",
+    "sodium",
+    "potassium",
+    "soft",
+    "density",
+    "reactivity",
+    "trend"
+   ],
+   "method": "表格记三项趋势：melting point ↓、density ↑、reactivity ↑。现象描述：浮于水面、熔成小球、四处游动、嘶嘶声、钾产生淡紫色火焰。常见错误：说密度严格单调（Na、K 有例外，大纲只要“总体增大”）；产物写成金属氧化物。",
+   "probe": "预测铯与水反应的剧烈程度和产物，写出方程式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 8.2 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-8.3-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "8 The Periodic Table / 8.3 Group VII properties",
+   "syllabus": "8.3",
+   "level": "core",
+   "name": "第 VII 族卤素的性质与外观",
+   "name_en": "Group VII halogens: properties and appearance",
+   "desc": "氯、溴、碘是双原子非金属分子；从上到下密度增大、反应性减弱。室温室压下：氯气为淡黄绿色气体，溴为红棕色液体，碘为灰黑色固体。能预测氟、砹等的性质。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-8.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "halogens",
+    "chlorine",
+    "bromine",
+    "iodine",
+    "diatomic",
+    "density",
+    "reactivity"
+   ],
+   "method": "颜色和状态三连：pale yellow-green gas / red-brown liquid / grey-black solid；趋势与第 I 族反应性方向相反。常见错误：说卤素反应性向下增强；碘写成紫色固体（大纲用 grey-black）。",
+   "probe": "砹在第 VII 族最下方，预测它在室温下的状态、颜色深浅和反应性。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 8.3 Core 1–2、4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-8.3-02",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "8 The Periodic Table / 8.3 Group VII properties",
+   "syllabus": "8.3",
+   "level": "core",
+   "name": "卤素置换反应",
+   "name_en": "Displacement reactions of halogens",
+   "desc": "较活泼的卤素能把较不活泼的卤素从其卤化物溶液中置换出来，如 Cl₂ + 2KBr → 2KCl + Br₂（溶液由无色变为橙/黄棕色）；碘不能置换氯和溴。解释：反应性 Cl > Br > I。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-8.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "displacement",
+    "halide",
+    "more reactive halogen",
+    "potassium bromide",
+    "potassium iodide"
+   ],
+   "method": "画 3×3 表（Cl₂、Br₂、I₂ × KCl、KBr、KI），打勾判断能否反应并写颜色。常见错误：写 Br₂ + KCl 能反应；把产物写成单原子 Br。",
+   "probe": "把溴水加入碘化钾溶液和氯化钾溶液中，哪个会反应？写出方程式和现象。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 8.3 Core 3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-8.4-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "8 The Periodic Table / 8.4 Transition elements",
+   "syllabus": "8.4",
+   "level": "core",
+   "name": "过渡元素",
+   "name_en": "Transition elements",
+   "desc": "过渡元素是金属：密度大、熔点高、形成有颜色的化合物，单质和化合物常作催化剂（如哈伯法中的铁）。（补充）过渡元素离子有可变氧化数，如铁(II) Fe²⁺ 和铁(III) Fe³⁺。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-8.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "transition elements",
+    "high density",
+    "high melting point",
+    "coloured compounds",
+    "catalyst",
+    "variable oxidation number"
+   ],
+   "method": "与第 I 族金属对比记忆（软、低熔点、白色化合物 vs 硬、高熔点、有色化合物）。常见错误：认为所有含金属的化合物都有颜色。",
+   "probe": "列出过渡元素的四个特征性质；为什么铁的化合物名称中有 (II)、(III)？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 8.4 Core 1, Supplement 2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-8.5-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "8 The Periodic Table / 8.5 Noble gases",
+   "syllabus": "8.5",
+   "level": "core",
+   "name": "稀有气体",
+   "name_en": "Noble gases",
+   "desc": "第 VIII 族稀有气体是不活泼的单原子气体，原因是最外层电子已满（稳定排布），不易得失或共用电子。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.2-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-8-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "noble gases",
+    "Group VIII",
+    "unreactive",
+    "monatomic",
+    "full outer shell"
+   ],
+   "method": "一句话答题：full outer shell → does not need to gain/lose/share electrons → unreactive。常见错误：说“稀有气体有 8 个电子”（氦只有 2 个）。",
+   "probe": "为什么氩不形成化合物、以单原子形式存在？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 8.5 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-9.1-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "9 Metals / 9.1 Properties of metals",
+   "syllabus": "9.1",
+   "level": "core",
+   "name": "金属与非金属物理性质比较",
+   "name_en": "Physical properties of metals and non-metals",
+   "desc": "比较金属与非金属：导热性、导电性、延展性（可锻性和延性）、熔沸点——金属一般导热导电好、有延展性、熔沸点高；非金属一般导热导电差、固态脆、熔沸点低。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "thermal conductivity",
+    "electrical conductivity",
+    "malleability",
+    "ductility",
+    "melting point",
+    "boiling point"
+   ],
+   "method": "用四行对比表；能说出例外（汞、石墨、金刚石）。常见错误：把 malleable（可锻）和 ductile（可拉丝）混淆。",
+   "probe": "给一种元素数据（熔点 1538 °C、导电、可锻），判断其类别并给出两条依据。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 9.1 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-9.1-02",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "9 Metals / 9.1 Properties of metals",
+   "syllabus": "9.1",
+   "level": "core",
+   "name": "金属的化学性质：与稀酸、水/水蒸气、氧气",
+   "name_en": "Chemical properties of metals",
+   "desc": "金属与稀酸反应生成盐和氢气；活泼金属与冷水反应生成氢氧化物和氢气，较活泼金属（如镁、锌、铁）与水蒸气反应生成金属氧化物和氢气；金属与氧气反应生成金属氧化物。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-08",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-3.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "dilute acid",
+    "cold water",
+    "steam",
+    "oxygen",
+    "metal oxide",
+    "metal hydroxide",
+    "hydrogen"
+   ],
+   "method": "区分产物：cold water → hydroxide；steam → oxide。常见错误：镁与水蒸气产物写成氢氧化镁。",
+   "probe": "写出镁与水蒸气、钙与冷水反应的方程式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 9.1 Core 2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-9.2-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "9 Metals / 9.2 Uses of metals",
+   "syllabus": "9.2",
+   "level": "core",
+   "name": "金属的用途与物理性质",
+   "name_en": "Uses of metals related to physical properties",
+   "desc": "铝：密度小 → 飞机制造；密度小 + 导电好 → 高架输电线；耐腐蚀 → 食品容器。铜：导电好 + 延性好 → 电线。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-9.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "aluminium",
+    "copper",
+    "low density",
+    "resistance to corrosion",
+    "electrical wiring",
+    "overhead cables"
+   ],
+   "method": "“用途 → 因为 → 性质”句型，每个用途配准确的性质（考试只给对应性质分）。常见错误：说铜用于电线是因为“便宜”。",
+   "probe": "为什么高架电缆用铝而不是铜？为什么家用电线用铜？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 9.2 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-9.3-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "9 Metals / 9.3 Alloys and their properties",
+   "syllabus": "9.3",
+   "level": "core",
+   "name": "合金的组成、性质与用途",
+   "name_en": "Alloys: composition, properties and uses",
+   "desc": "合金是金属与其他元素的混合物：黄铜 = 铜 + 锌；不锈钢 = 铁 + 铬、镍、碳等。合金可比纯金属更硬更强、更有用；不锈钢因硬度大和耐锈蚀用于餐具。能从结构图中识别合金（大小不同的原子混排）。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-07",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-9.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "alloy",
+    "brass",
+    "stainless steel",
+    "harder",
+    "stronger",
+    "cutlery",
+    "corrosion"
+   ],
+   "method": "背两个组成 + 一个用途。识图：同样大小原子整齐排列 = 纯金属；夹杂大小不同原子 = 合金。常见错误：说黄铜是铜和锡（那是青铜）。",
+   "probe": "黄铜和不锈钢各由什么组成？为什么餐具用不锈钢？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 9.3 Core 1–4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-9.3-02",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "9 Metals / 9.3 Alloys and their properties",
+   "syllabus": "9.3",
+   "level": "supp",
+   "name": "合金更硬的结构解释（IGCSE）",
+   "name_en": "Why alloys are harder: structure",
+   "desc": "合金中不同大小的原子破坏了金属晶格中规则的原子层，使原子层不再能相互滑动，所以合金比纯金属更硬、更强。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-9.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-2.7-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "layers",
+    "slide",
+    "different sized atoms",
+    "distort",
+    "lattice"
+   ],
+   "method": "答案要包含“different sized atoms”和“layers can no longer slide over each other”两个要点。常见错误：说合金原子之间“键更强”。",
+   "probe": "用结构解释钢为什么比纯铁硬。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 9.3 Supplement 5 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-9.4-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "9 Metals / 9.4 Reactivity series",
+   "syllabus": "9.4",
+   "level": "core",
+   "name": "金属活动性顺序及其反应",
+   "name_en": "The reactivity series",
+   "desc": "活动性顺序：钾、钠、钙、镁、铝、碳、锌、铁、氢、铜、银、金。钾、钠、钙与冷水反应；镁与水蒸气反应；镁、锌、铁与稀盐酸反应放出氢气，铜、银、金不反应；能用金属在顺序中的位置解释这些反应。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-08",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-9.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "reactivity series",
+    "potassium",
+    "magnesium",
+    "carbon",
+    "hydrogen",
+    "dilute hydrochloric acid",
+    "steam"
+   ],
+   "method": "背含碳和氢的完整顺序（碳在铝和锌之间、氢在铁和铜之间），它们分别是“能否用碳还原”和“能否与酸放氢”的分界线。常见错误：漏掉碳、氢；铝与锌位置颠倒。",
+   "probe": "按顺序写出 12 种物质；解释为什么铜不与稀盐酸反应而锌会。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 9.4 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-9.4-02",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "9 Metals / 9.4 Reactivity series",
+   "syllabus": "9.4",
+   "level": "core",
+   "name": "由实验结果推断活动性",
+   "name_en": "Deducing reactivity order from experimental results",
+   "desc": "根据实验数据（如与酸反应的气泡速率、温度升高、置换反应能否发生）推断一组金属的活动性顺序。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-9.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-9-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "deduce",
+    "order of reactivity",
+    "rate of bubbles",
+    "temperature rise",
+    "displacement"
+   ],
+   "method": "做“胜负表”：能把别人置换出来的赢一次，赢得多的更活泼；比较实验时检查变量是否控制（同浓度、同质量、同表面积）。常见错误：只看一组数据下结论。",
+   "probe": "给 X、Y、Z 三种金属与各自盐溶液的置换结果表，推断活动性顺序。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 9.4 Core 3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-9.4-03",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "9 Metals / 9.4 Reactivity series",
+   "syllabus": "9.4",
+   "level": "supp",
+   "name": "形成正离子的倾向、离子置换与铝的表观惰性",
+   "name_en": "Tendency to form positive ions; aluminium's oxide layer",
+   "desc": "金属越活泼越容易失去电子形成正离子；可由金属与镁、锌、铁、铜、银的离子溶液之间的置换反应比较活动性，如 Zn(s) + Cu²⁺(aq) → Zn²⁺(aq) + Cu(s)。铝表面有一层致密的氧化铝保护膜，阻止进一步反应，所以看起来不活泼。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-9.4-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-6.4-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-3.1-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "positive ions",
+    "lose electrons",
+    "displacement",
+    "aqueous ions",
+    "oxide layer",
+    "aluminium"
+   ],
+   "method": "写离子方程式表示置换并标出谁失电子（被氧化）。常见错误：用“铝不活泼”解释铝制品耐用（应是 oxide layer）。",
+   "probe": "为什么铝在活动性顺序中高于锌，但铝锅不易与水和空气反应？写出镁与硝酸银溶液反应的离子方程式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 9.4 Supplement 4–5 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-9.5-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "9 Metals / 9.5 Corrosion of metals",
+   "syllabus": "9.5",
+   "level": "core",
+   "name": "铁的生锈与隔绝防锈",
+   "name_en": "Rusting of iron and barrier methods",
+   "desc": "铁和钢生锈需同时有水和氧气，生成水合氧化铁(III)。常用隔绝法：涂漆、涂油、包塑料；原理是隔绝氧气或水。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-6.4-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "rusting",
+    "hydrated iron(III) oxide",
+    "water",
+    "oxygen",
+    "barrier method",
+    "painting",
+    "greasing"
+   ],
+   "method": "复习三支试管实验：只有水（煮沸并加油封）、只有空气（加干燥剂 CaCl₂）、水+空气——只有第三支生锈。常见错误：说生锈只需要水；说铁锈是 Fe₂O₃（应说 hydrated iron(III) oxide）。",
+   "probe": "设计实验证明铁生锈需要水和氧气；为什么自行车链条涂油而车架涂漆？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 9.5 Core 1–3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-9.5-02",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "9 Metals / 9.5 Corrosion of metals",
+   "syllabus": "9.5",
+   "level": "supp",
+   "name": "镀锌与牺牲保护",
+   "name_en": "Galvanising and sacrificial protection",
+   "desc": "镀锌（galvanising）既是隔绝法，也是牺牲保护：锌比铁活泼，更容易失去电子，即使镀层破损锌也会优先被氧化，从而保护铁。牺牲保护也用于船体上连接锌块或镁块。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-9.5-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-9.4-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "galvanising",
+    "sacrificial protection",
+    "zinc",
+    "more reactive",
+    "loses electrons",
+    "oxidised"
+   ],
+   "method": "关键句：zinc is more reactive than iron, so zinc loses electrons / is oxidised instead of iron。常见错误：把镀锡（不活泼金属）也当作牺牲保护。",
+   "probe": "镀锌铁桶表面划破后为什么仍不容易生锈？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 9.5 Supplement 4–5 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-9.6-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "9 Metals / 9.6 Extraction of metals",
+   "syllabus": "9.6",
+   "level": "core",
+   "name": "金属提取难易与活动性；铝的提取方法",
+   "name_en": "Ease of extraction and the reactivity series",
+   "desc": "金属越活泼，从矿石中提取越难：比碳不活泼的金属（如锌、铁、铜）可用碳还原其氧化物；比碳活泼的金属需要电解。铝的主要矿石是铝土矿（bauxite），铝通过电解提取。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-9.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-6.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "ore",
+    "extraction",
+    "reduction with carbon",
+    "electrolysis",
+    "bauxite",
+    "reactivity series"
+   ],
+   "method": "以碳为分界线把金属分两组。常见错误：说铝可用碳还原；把“矿石”和“金属”混淆。",
+   "probe": "为什么铁可用碳还原得到而铝必须用电解？铝的主要矿石叫什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 9.6 Core 1、3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-9.6-02",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "9 Metals / 9.6 Extraction of metals",
+   "syllabus": "9.6",
+   "level": "core",
+   "name": "高炉炼铁",
+   "name_en": "Extraction of iron in the blast furnace",
+   "desc": "原料：赤铁矿（Fe₂O₃）、焦炭、石灰石、热空气。过程：焦炭燃烧供热并生成 CO₂；CO₂ 被碳还原成 CO；CO 将氧化铁(III) 还原为铁；石灰石受热分解为氧化钙；氧化钙与二氧化硅杂质结合形成炉渣。（补充）方程式：C + O₂ → CO₂；C + CO₂ → 2CO；Fe₂O₃ + 3CO → 2Fe + 3CO₂；CaCO₃ → CaO + CO₂；CaO + SiO₂ → CaSiO₃。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-9.6-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-6.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "blast furnace",
+    "hematite",
+    "coke",
+    "limestone",
+    "carbon monoxide",
+    "slag",
+    "calcium silicate"
+   ],
+   "method": "画高炉图，在对应高度标出五步反应，并能说出每种原料的作用。常见错误：说是碳直接还原氧化铁（大纲要求 CO）；忘了石灰石用于除去 SiO₂。",
+   "probe": "说出焦炭、石灰石在高炉中的作用；（Extended）写出生成炉渣的方程式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 9.6 Core 2, Supplement 4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-9.6-03",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "unit": "9 Metals / 9.6 Extraction of metals",
+   "syllabus": "9.6",
+   "level": "supp",
+   "name": "电解氧化铝提取铝",
+   "name_en": "Extraction of aluminium by electrolysis",
+   "desc": "提纯的铝土矿（氧化铝）溶于熔融冰晶石中电解：冰晶石降低工作温度、提高导电性（节约能源）；阴极 Al³⁺ + 3e⁻ → Al，阳极 2O²⁻ → O₂ + 4e⁻；石墨阳极与生成的氧气反应生成 CO₂ 被消耗，需要定期更换。（不要求铝土矿提纯细节）",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-9.6-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-4.1-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "cryolite",
+    "aluminium oxide",
+    "carbon anode",
+    "half-equation",
+    "molten electrolyte"
+   ],
+   "method": "把装置图和三个“为什么”（为什么用冰晶石、为什么阳极要换、为什么耗电大）一起记。常见错误：说冰晶石是催化剂；阳极半反应电子数配错。",
+   "probe": "为什么电解铝时要使用冰晶石？为什么碳阳极需要定期更换？写出两极半反应。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 9.6 Supplement 5 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-10.1-01",
+   "strand": "S7",
+   "stage": "IGCSE",
+   "unit": "10 Chemistry of the environment / 10.1 Water",
+   "syllabus": "10.1",
+   "level": "core",
+   "name": "水的检验与纯度",
+   "name_en": "Tests for water and its purity",
+   "desc": "用无水氯化钴(II)（蓝 → 粉红）或无水硫酸铜(II)（白 → 蓝）检验水的存在；用熔点 0 °C、沸点 100 °C 检验水的纯度；实验中用蒸馏水而非自来水，因为它所含化学杂质更少。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-6.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "anhydrous cobalt(II) chloride",
+    "anhydrous copper(II) sulfate",
+    "pure water",
+    "boiling point",
+    "distilled water"
+   ],
+   "method": "注意：颜色检验只证明“有水”，证明“纯水”要测熔沸点。常见错误：说无水硫酸铜变蓝说明是纯水。",
+   "probe": "如何证明一种无色液体含水？如何证明它是纯水？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 10.1 Core 1–3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-10.1-02",
+   "strand": "S7",
+   "stage": "IGCSE",
+   "unit": "10 Chemistry of the environment / 10.1 Water",
+   "syllabus": "10.1",
+   "level": "core",
+   "name": "天然水中的物质：有益与有害",
+   "name_en": "Substances in natural water: beneficial and harmful",
+   "desc": "天然水可能含：溶解氧、金属化合物、塑料、污水、有害微生物、化肥中的硝酸盐、化肥和洗涤剂中的磷酸盐。有益：溶解氧供水生生物呼吸，部分金属化合物提供必需矿物质。有害：部分金属化合物有毒，塑料危害水生生物，污水含致病微生物，硝酸盐和磷酸盐导致水体缺氧、破坏水生生物。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-10.1-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "dissolved oxygen",
+    "sewage",
+    "microbes",
+    "nitrates",
+    "phosphates",
+    "deoxygenation",
+    "plastics"
+   ],
+   "method": "两栏列表 beneficial / harmful，每项写“物质 + 后果”。常见错误：说硝酸盐“直接毒死鱼”（大纲是 deoxygenation）。",
+   "probe": "化肥流入河流会造成什么后果？天然水中的溶解氧有什么作用？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 10.1 Core 4–6 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-10.1-03",
+   "strand": "S7",
+   "stage": "IGCSE",
+   "unit": "10 Chemistry of the environment / 10.1 Water",
+   "syllabus": "10.1",
+   "level": "core",
+   "name": "自来水的净化处理",
+   "name_en": "Treatment of the domestic water supply",
+   "desc": "自来水处理：沉淀和过滤除去固体；用活性炭除去异味和杂味；加氯消毒杀灭微生物。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-10.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "sedimentation",
+    "filtration",
+    "carbon",
+    "chlorination",
+    "microbes",
+    "water treatment"
+   ],
+   "method": "按顺序记“沉淀–过滤–炭–氯”，每步对应一个去除对象。常见错误：说过滤能除去细菌和溶解物；说加氯是为了去味。",
+   "probe": "说出自来水处理的三个步骤及每步的目的。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 10.1 Core 7 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-10.2-01",
+   "strand": "S7",
+   "stage": "IGCSE",
+   "unit": "10 Chemistry of the environment / 10.2 Fertilisers",
+   "syllabus": "10.2",
+   "level": "core",
+   "name": "化肥与 NPK",
+   "name_en": "Fertilisers",
+   "desc": "铵盐和硝酸盐用作化肥；NPK 化肥提供氮、磷、钾三种元素，促进植物生长。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-7.1-03",
+     "strength": "有帮助"
+    },
+    {
+     "id": "CHEM-IG-3.2-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "fertiliser",
+    "ammonium salt",
+    "nitrate",
+    "NPK",
+    "nitrogen",
+    "phosphorus",
+    "potassium"
+   ],
+   "method": "从化学式找出 N、P、K 元素，可用 Mr 比较不同化肥的含氮量（Extended 再用 3.3 计算质量分数）。常见错误：把“P”说成“钾”、“K”说成“磷”（K 是钾）。",
+   "probe": "NPK 分别代表哪些元素？举出两种含氮化肥。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 10.2 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-10.3-01",
+   "strand": "S7",
+   "stage": "IGCSE",
+   "unit": "10 Chemistry of the environment / 10.3 Air quality and climate",
+   "syllabus": "10.3",
+   "level": "core",
+   "name": "清洁干燥空气的组成",
+   "name_en": "Composition of clean, dry air",
+   "desc": "清洁干燥空气约含 78% 氮气、21% 氧气，其余为稀有气体和二氧化碳的混合物。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "air",
+    "nitrogen",
+    "oxygen",
+    "noble gases",
+    "carbon dioxide",
+    "composition"
+   ],
+   "method": "画饼图记 78/21/1。常见错误：把空气当化合物；说氧气占 78%。",
+   "probe": "空气中氮气、氧气各约占多少？剩余约 1% 主要是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 10.3 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-10.3-02",
+   "strand": "S7",
+   "stage": "IGCSE",
+   "unit": "10 Chemistry of the environment / 10.3 Air quality and climate",
+   "syllabus": "10.3",
+   "level": "core",
+   "name": "空气污染物的来源与危害",
+   "name_en": "Air pollutants: sources and effects",
+   "desc": "CO₂：含碳燃料完全燃烧 → 加剧全球变暖和气候变化；CO 与颗粒物：含碳燃料不完全燃烧 → CO 有毒，颗粒物增加呼吸疾病和癌症风险；甲烷：植物腐烂和动物消化 → 加剧全球变暖；氮氧化物：汽车发动机 → 酸雨、光化学烟雾、呼吸问题；SO₂：燃烧含硫化石燃料 → 酸雨。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-10.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-11.4-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "pollutant",
+    "carbon monoxide",
+    "particulates",
+    "methane",
+    "oxides of nitrogen",
+    "sulfur dioxide",
+    "acid rain",
+    "global warming"
+   ],
+   "method": "做六行表：pollutant / source / effect，逐行默写，注意 complete vs incomplete combustion。常见错误：说 CO₂ 造成酸雨；说 CO 导致全球变暖。",
+   "probe": "汽车尾气中有哪些污染物？分别造成什么危害？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 10.3 Core 2–3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-10.3-03",
+   "strand": "S7",
+   "stage": "IGCSE",
+   "unit": "10 Chemistry of the environment / 10.3 Air quality and climate",
+   "syllabus": "10.3",
+   "level": "core",
+   "name": "减缓气候变化与酸雨的策略",
+   "name_en": "Strategies to reduce climate change and acid rain",
+   "desc": "气候变化：植树、减少畜牧业、减少化石燃料使用、增加氢能和可再生能源（风能、太阳能）。酸雨：汽车装催化转化器、使用低硫燃料减少 SO₂ 排放、用氧化钙进行烟气脱硫。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-10.3-02",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-RESOURCES",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "climate change",
+    "renewable energy",
+    "catalytic converter",
+    "low-sulfur fuel",
+    "flue gas desulfurisation",
+    "calcium oxide"
+   ],
+   "method": "每条策略都说明“减少了哪种污染物 / 如何减少”。常见错误：说植树能减少酸雨；说催化转化器能除去 CO₂。",
+   "probe": "列出两种减少酸雨的方法并说明原理。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 10.3 Core 4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-10.3-04",
+   "strand": "S7",
+   "stage": "IGCSE",
+   "unit": "10 Chemistry of the environment / 10.3 Air quality and climate",
+   "syllabus": "10.3",
+   "level": "supp",
+   "name": "温室气体导致全球变暖的机理",
+   "name_en": "How greenhouse gases cause global warming",
+   "desc": "地球表面吸收太阳辐射后以红外（热能）形式向外辐射；CO₂、CH₄ 等温室气体吸收这部分热能并向各个方向（包括地面）重新发射，减少热能向太空散失，使地球平均温度升高。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-10.3-02",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-THERM",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "greenhouse gas",
+    "absorb",
+    "emit",
+    "thermal energy",
+    "infrared",
+    "global warming"
+   ],
+   "method": "按顺序写四步：absorbed by Earth → emitted as thermal (infrared) energy → absorbed and re-emitted by greenhouse gases → less energy lost to space。常见错误：把温室效应与臭氧层空洞混淆。",
+   "probe": "解释二氧化碳浓度升高如何导致全球变暖。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 10.3 Supplement 7 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-10.3-05",
+   "strand": "S7",
+   "stage": "IGCSE",
+   "unit": "10 Chemistry of the environment / 10.3 Air quality and climate",
+   "syllabus": "10.3",
+   "level": "supp",
+   "name": "汽车中氮氧化物的生成与催化转化器",
+   "name_en": "Oxides of nitrogen and catalytic converters",
+   "desc": "汽车发动机内高温使空气中的氮气和氧气反应生成氮氧化物；催化转化器将 CO 和 NO 等转化为无害气体，例如 2CO + 2NO → 2CO₂ + N₂。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-10.3-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-6.4-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "oxides of nitrogen",
+    "high temperature",
+    "catalytic converter",
+    "carbon monoxide",
+    "nitrogen monoxide"
+   ],
+   "method": "强调 N 来自空气而不是燃料。能把 2CO + 2NO → 2CO₂ + N₂ 写出并指出氧化与还原。常见错误：说氮氧化物来自汽油中的氮。",
+   "probe": "汽车尾气中的氮氧化物是怎样产生的？写出催化转化器中的一个反应。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 10.3 Supplement 8 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-10.3-06",
+   "strand": "S7",
+   "stage": "IGCSE",
+   "unit": "10 Chemistry of the environment / 10.3 Air quality and climate",
+   "syllabus": "10.3",
+   "level": "core",
+   "name": "光合作用",
+   "name_en": "Photosynthesis",
+   "desc": "光合作用：二氧化碳与水在叶绿素存在和光能作用下反应生成葡萄糖和氧气。文字方程式：二氧化碳 + 水 → 葡萄糖 + 氧气。（补充）符号方程式：6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-3.1-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "photosynthesis",
+    "chlorophyll",
+    "light energy",
+    "glucose",
+    "oxygen"
+   ],
+   "method": "与燃烧/呼吸方程式对照记忆（互为逆过程）。常见错误：把光和叶绿素写进反应物；配平系数写错。",
+   "probe": "写出光合作用的文字方程式（Extended 写配平的符号方程式），并说明叶绿素的作用。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 10.3 Core 5–6, Supplement 9 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.1-01",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.1 Formulae, functional groups and terminology",
+   "syllabus": "11.1",
+   "level": "core",
+   "name": "显示式",
+   "name_en": "Displayed formulae",
+   "desc": "显示式表示分子中所有原子和所有化学键（每条短线表示一个共价键），能画出并解读显示式。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-2.5-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "displayed formula",
+    "covalent bond",
+    "carbon",
+    "hydrogen"
+   ],
+   "method": "画后检查：每个 C 有 4 条键、每个 H 有 1 条、每个 O 有 2 条。常见错误：O–H 写成 H–O 后漏键；C 多出或少了键。",
+   "probe": "画出乙醇和乙酸的显示式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.1 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.1-02",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.1 Formulae, functional groups and terminology",
+   "syllabus": "11.1",
+   "level": "core",
+   "name": "同系物、官能团与通式",
+   "name_en": "Homologous series, functional groups and general formulae",
+   "desc": "官能团是决定同系物化学性质的原子或原子团；同系物是一族具有相同官能团、化学性质相似的化合物。通式：烷烃 CₙH₂ₙ₊₂，烯烃 CₙH₂ₙ，醇 CₙH₂ₙ₊₁OH，羧酸 CₙH₂ₙ₊₁COOH。（补充）同系物特征：相同官能团、相同通式、相邻成员相差一个 –CH₂–、物理性质呈递变规律、化学性质相似。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "homologous series",
+    "functional group",
+    "general formula",
+    "alkane",
+    "alkene",
+    "alcohol",
+    "carboxylic acid"
+   ],
+   "method": "用通式代入 n 生成分子式练习（如 n = 3 的醇 C₃H₇OH）。注意羧酸通式中 COOH 的 C 不计入 n。常见错误：烷烃写成 CₙH₂ₙ；同系物说成“性质完全相同”。",
+   "probe": "写出含 4 个碳原子的烷烃、烯烃、醇的分子式；说出同系物的三个特征。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.1 Core 2–4, Supplement 9 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.1-03",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.1 Formulae, functional groups and terminology",
+   "syllabus": "11.1",
+   "level": "core",
+   "name": "饱和与不饱和化合物",
+   "name_en": "Saturated and unsaturated compounds",
+   "desc": "饱和化合物分子中所有碳碳键都是单键；不饱和化合物分子中有一个或多个碳碳键不是单键（如 C=C）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "saturated",
+    "unsaturated",
+    "single bond",
+    "double bond",
+    "carbon–carbon"
+   ],
+   "method": "只看碳–碳键，不看 C=O（乙酸是饱和的）。常见错误：因含 C=O 就判为不饱和。",
+   "probe": "判断乙烷、乙烯、乙酸是饱和还是不饱和。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.1 Core 5–6 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.1-04",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.1 Formulae, functional groups and terminology",
+   "syllabus": "11.1",
+   "level": "supp",
+   "name": "结构式与结构异构体",
+   "name_en": "Structural formulae and structural isomers",
+   "desc": "结构式是无歧义地描述分子中原子排列方式的式子，如 CH₂=CH₂、CH₃CH₂OH、CH₃COOCH₃。结构异构体是分子式相同而结构式不同的化合物，如 C₄H₁₀：CH₃CH₂CH₂CH₃ 与 CH₃CH(CH₃)CH₃；C₄H₈：CH₃CH₂CH=CH₂ 与 CH₃CH=CHCH₃。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "structural formula",
+    "structural isomer",
+    "molecular formula",
+    "branched",
+    "unbranched"
+   ],
+   "method": "画异构体先变碳链（直链/支链），再变官能团位置；把画出的结构转一转检查是否重复。常见错误：把同一分子弯折后当作新的异构体。",
+   "probe": "画出 C₄H₁₀ 的两种结构异构体并写出结构式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.1 Supplement 7–8 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-11.2-01",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.2 Naming organic compounds",
+   "syllabus": "11.2",
+   "level": "core",
+   "name": "常见有机物命名与识别类别",
+   "name_en": "Naming organic compounds (core)",
+   "desc": "能命名并画出甲烷、乙烷、乙烯、乙醇、乙酸以及 11.4–11.7 反应产物的显示式；由名称后缀 -ane、-ene、-ol、-oic acid 或分子式/显示式判断化合物类别。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "methane",
+    "ethane",
+    "ethene",
+    "ethanol",
+    "ethanoic acid",
+    "-ane",
+    "-ene",
+    "-ol",
+    "-oic acid"
+   ],
+   "method": "词头记碳数（meth 1、eth 2、prop 3、but 4），后缀记类别。常见错误：乙醇与乙酸显示式混淆；ethene 写成双键缺 H。",
+   "probe": "给出“propene”“C₂H₅OH”两个信息，分别说出类别并画出显示式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.2 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.2-02",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.2 Naming organic compounds",
+   "syllabus": "11.2",
+   "level": "supp",
+   "name": "直链烷、烯、醇、羧酸的命名",
+   "name_en": "Naming unbranched alkanes, alkenes, alcohols and carboxylic acids",
+   "desc": "能命名并画出直链烷烃、烯烃（含 but-1-ene、but-2-ene）、醇（含 propan-1-ol、propan-2-ol、butan-1-ol、butan-2-ol）和最多含 4 个碳的羧酸的结构式和显示式。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-11.1-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "but-1-ene",
+    "but-2-ene",
+    "propan-1-ol",
+    "propan-2-ol",
+    "butanoic acid",
+    "position number"
+   ],
+   "method": "数字表示官能团所在碳的位置，从离官能团近的一端编号；羧酸的 COOH 碳计入碳数且总是 1 号。常见错误：but-3-ene（应为 but-1-ene）；丙酸碳数算错。",
+   "probe": "画出 butan-2-ol 和 propanoic acid 的显示式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.2 Supplement 3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-11.2-03",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.2 Naming organic compounds",
+   "syllabus": "11.2",
+   "level": "supp",
+   "name": "酯的命名",
+   "name_en": "Naming esters",
+   "desc": "能命名并画出由最多含 4 个碳的直链醇和直链羧酸生成的直链酯的显示式；命名为“醇部分 -yl + 酸部分 -oate”，如乙醇 + 乙酸 → ethyl ethanoate，甲醇 + 丙酸 → methyl propanoate。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.2-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "ester",
+    "ethyl ethanoate",
+    "-yl",
+    "-oate",
+    "alcohol",
+    "carboxylic acid"
+   ],
+   "method": "名字顺序是“醇在前、酸在后”，但结构式常写成酸部分在前（CH₃COOCH₂CH₃）。常见错误：把 methyl ethanoate 和 ethyl methanoate 混淆。",
+   "probe": "丙醇与乙酸反应生成的酯叫什么？画出它的显示式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.2 Supplement 4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-11.3-01",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.3 Fuels",
+   "syllabus": "11.3",
+   "level": "core",
+   "name": "化石燃料与烃",
+   "name_en": "Fossil fuels and hydrocarbons",
+   "desc": "化石燃料：煤、天然气、石油；天然气的主要成分是甲烷；烃是只含碳和氢两种元素的化合物；石油是烃的混合物。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.1-02",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-PRE-RESOURCES",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "fossil fuels",
+    "coal",
+    "natural gas",
+    "petroleum",
+    "methane",
+    "hydrocarbon"
+   ],
+   "method": "抓“only”：hydrocarbon = hydrogen and carbon ONLY。常见错误：说乙醇是烃；说石油是一种纯净物。",
+   "probe": "乙烷、乙醇、乙烯中哪些是烃？天然气的主要成分是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.3 Core 1–4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.3-02",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.3 Fuels",
+   "syllabus": "11.3",
+   "level": "core",
+   "name": "石油分馏与馏分用途",
+   "name_en": "Fractional distillation of petroleum and uses of fractions",
+   "desc": "石油经分馏分成有用的馏分；从分馏塔底部到顶部：碳链变短、挥发性变高、沸点降低、黏度降低。馏分用途：炼厂气—取暖做饭；汽油—汽车燃料；石脑油—化工原料；煤油—喷气燃料；柴油—柴油发动机；燃料油—轮船和家庭供暖；润滑油—润滑剂、蜡和抛光剂；沥青—铺路。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-12.4-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "fractional distillation",
+    "fractionating column",
+    "fraction",
+    "volatility",
+    "viscosity",
+    "chain length",
+    "bitumen"
+   ],
+   "method": "画分馏塔，从上到下标出 8 个馏分，左边画“短链/低沸点/易挥发/低黏度”箭头指向顶部。常见错误：说塔顶温度最高；把 naphtha 当作汽车燃料。",
+   "probe": "沥青和炼厂气分别在分馏塔哪里收集？比较它们的沸点和黏度。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.3 Core 5–7 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.4-01",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.4 Alkanes",
+   "syllabus": "11.4",
+   "level": "core",
+   "name": "烷烃的性质与燃烧",
+   "name_en": "Alkanes: bonding, properties and combustion",
+   "desc": "烷烃中只有单共价键，是饱和烃；一般不活泼，主要反应是燃烧和与氯气的取代反应。完全燃烧生成二氧化碳和水；氧气不足时不完全燃烧生成一氧化碳（和碳颗粒）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.1-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-3.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "alkane",
+    "saturated",
+    "single bond",
+    "combustion",
+    "complete combustion",
+    "incomplete combustion"
+   ],
+   "method": "练习配平燃烧方程式（先配 C，再配 H，最后配 O，必要时乘 2）。常见错误：说烷烃能使溴水褪色；不完全燃烧产物漏掉水。",
+   "probe": "写出丙烷完全燃烧的方程式；为什么燃气热水器通风不良很危险？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.4 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.4-02",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.4 Alkanes",
+   "syllabus": "11.4",
+   "level": "supp",
+   "name": "烷烃与氯气的取代反应",
+   "name_en": "Substitution reaction of alkanes with chlorine",
+   "desc": "取代反应是一个原子或原子团被另一个原子或原子团取代。烷烃与氯气在紫外光下发生光化学取代（紫外光提供活化能），如 CH₄ + Cl₂ → CH₃Cl + HCl；能画出一取代产物的结构式或显示式。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-5.1-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "substitution",
+    "photochemical",
+    "ultraviolet light",
+    "chloromethane",
+    "monosubstitution",
+    "hydrogen chloride"
+   ],
+   "method": "与加成反应对比：取代有两个产物（另一个是 HCl），加成只有一个。常见错误：漏写 HCl；说条件是加热。",
+   "probe": "写出乙烷与氯气发生一取代的方程式和条件，画出有机产物的显示式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.4 Supplement 3–4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-11.5-01",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.5 Alkenes",
+   "syllabus": "11.5",
+   "level": "core",
+   "name": "烯烃与裂化",
+   "name_en": "Alkenes and cracking",
+   "desc": "烯烃含碳碳双键，是不饱和烃。长链烷烃在高温和催化剂作用下裂化生成较短的烷烃、烯烃和氢气。裂化的原因：短链烃（如汽油）需求大于分馏产量，而长链馏分过剩；烯烃是制造聚合物等的原料。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-11.3-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "alkene",
+    "unsaturated",
+    "cracking",
+    "catalyst",
+    "high temperature",
+    "supply and demand"
+   ],
+   "method": "配平裂化方程式时检查 C、H 原子守恒，如 C₁₀H₂₂ → C₈H₁₈ + C₂H₄。常见错误：说裂化是为了“得到更多石油”；裂化产物只写烷烃。",
+   "probe": "写出癸烷裂化生成辛烷和乙烯的方程式，说出两个裂化的理由。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.5 Core 1–3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.5-02",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.5 Alkenes",
+   "syllabus": "11.5",
+   "level": "core",
+   "name": "溴水检验不饱和烃",
+   "name_en": "Bromine water test for unsaturation",
+   "desc": "用溴水区分饱和与不饱和烃：不饱和烃（烯烃）使橙色溴水褪为无色；饱和烃（烷烃）不使其褪色（保持橙色）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.5-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "aqueous bromine",
+    "bromine water",
+    "decolourise",
+    "orange",
+    "colourless",
+    "unsaturated"
+   ],
+   "method": "现象写完整：orange → colourless（不要写 clear，clear ≠ colourless）。常见错误：写“溴水变清”；说烷烃使溴水变色。",
+   "probe": "如何区分己烷和己烯？写出现象。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.5 Core 4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.5-03",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.5 Alkenes",
+   "syllabus": "11.5",
+   "level": "supp",
+   "name": "烯烃的加成反应",
+   "name_en": "Addition reactions of alkenes",
+   "desc": "加成反应只生成一种产物。烯烃与溴（或溴水）加成生成二溴代烷；与氢气在镍催化下加成生成烷烃；与水蒸气在酸催化下加成生成醇。能画出产物的结构式或显示式。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.5-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-11.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "addition reaction",
+    "bromine",
+    "hydrogenation",
+    "nickel catalyst",
+    "steam",
+    "acid catalyst"
+   ],
+   "method": "做三行表：reagent / condition / product。加成发生在双键处，双键打开、两边各接一个原子。常见错误：氢化条件写成铁催化；加成产物写出两种。",
+   "probe": "写出乙烯分别与溴、氢气、水蒸气反应的产物名称和条件。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.5 Supplement 5–6 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-11.6-01",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.6 Alcohols",
+   "syllabus": "11.6",
+   "level": "core",
+   "name": "乙醇的工业制取",
+   "name_en": "Manufacture of ethanol",
+   "desc": "两种方法：发酵——葡萄糖水溶液在 25–35 °C、酵母、无氧条件下发酵生成乙醇和二氧化碳；催化水化——乙烯与水蒸气在 300 °C、6000 kPa（60 atm）、酸催化下加成生成乙醇。（补充）比较优缺点：发酵用可再生原料、温度低，但反应慢、为分批生产、得到的是稀乙醇需提纯；水化法反应快、连续生产、产物纯度高，但原料来自不可再生的石油、能耗高。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.5-01",
+     "strength": "有帮助"
+    },
+    {
+     "id": "CHEM-IG-6.2-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "fermentation",
+    "yeast",
+    "anaerobic",
+    "hydration of ethene",
+    "acid catalyst",
+    "renewable",
+    "batch process"
+   ],
+   "method": "把两种方法的条件、原料、速率、纯度、可再生性做成对比表。常见错误：发酵温度写太高（酵母失活）；说发酵需要氧气。",
+   "probe": "比较两种制乙醇方法的条件；（Extended）各说一条优缺点。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.6 Core 1, Supplement 4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.6-02",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.6 Alcohols",
+   "syllabus": "11.6",
+   "level": "core",
+   "name": "乙醇的燃烧与用途",
+   "name_en": "Combustion and uses of ethanol",
+   "desc": "乙醇完全燃烧生成二氧化碳和水：C₂H₅OH + 3O₂ → 2CO₂ + 3H₂O。乙醇用作溶剂和燃料。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.6-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-11.4-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "combustion",
+    "ethanol",
+    "solvent",
+    "fuel"
+   ],
+   "method": "配平时注意乙醇自身含 1 个 O。常见错误：把燃烧系数 3O₂ 配错。",
+   "probe": "写出乙醇完全燃烧的配平方程式，并说出乙醇的两种用途。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.6 Core 2–3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.7-01",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.7 Carboxylic acids",
+   "syllabus": "11.7",
+   "level": "core",
+   "name": "乙酸的反应",
+   "name_en": "Reactions of ethanoic acid",
+   "desc": "乙酸具有酸的通性：与活泼金属反应生成乙酸盐和氢气，与碱反应生成乙酸盐和水，与碳酸盐反应生成乙酸盐、水和二氧化碳；会写盐的名称和化学式，如乙酸钠 CH₃COONa。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-7.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-11.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "ethanoic acid",
+    "ethanoate",
+    "sodium ethanoate",
+    "salt",
+    "carbonate"
+   ],
+   "method": "把 7.1 的三条酸通式中的“酸”换成乙酸，盐名改成 ethanoate。常见错误：乙酸镁写成 MgCH₃COO（应为 (CH₃COO)₂Mg）。",
+   "probe": "写出乙酸与碳酸钠反应的文字方程式和观察到的现象。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.7 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.7-02",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.7 Carboxylic acids",
+   "syllabus": "11.7",
+   "level": "supp",
+   "name": "乙醇氧化生成乙酸",
+   "name_en": "Formation of ethanoic acid by oxidation of ethanol",
+   "desc": "乙醇可被酸性高锰酸钾溶液氧化为乙酸（紫色褪去），也可在细菌作用下被空气氧化（制醋）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.6-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-6.4-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "oxidation",
+    "acidified potassium manganate(VII)",
+    "bacterial oxidation",
+    "vinegar"
+   ],
+   "method": "联系 6.4：KMnO₄ 是氧化剂，乙醇被氧化。常见错误：说葡萄酒变酸是发酵（实为细菌氧化）。",
+   "probe": "葡萄酒敞口放置变酸的原因是什么？实验室用什么试剂把乙醇转化为乙酸？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.7 Supplement 2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-11.7-03",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.7 Carboxylic acids",
+   "syllabus": "11.7",
+   "level": "supp",
+   "name": "酯化反应",
+   "name_en": "Esterification",
+   "desc": "羧酸与醇在酸催化下反应生成酯和水，如 CH₃COOH + C₂H₅OH ⇌ CH₃COOC₂H₅ + H₂O（乙酸乙酯）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.7-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-11.2-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "esterification",
+    "ester",
+    "acid catalyst",
+    "condensation",
+    "ethyl ethanoate"
+   ],
+   "method": "画显示式标出 –OH（来自酸）与 –H（来自醇）脱去成水。常见错误：漏写水；酯名中醇与酸部分颠倒。",
+   "probe": "写出甲醇与丁酸生成的酯的名称和结构式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.7 Supplement 3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-11.8-01",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.8 Polymers",
+   "syllabus": "11.8",
+   "level": "core",
+   "name": "聚合物与加聚：聚乙烯",
+   "name_en": "Polymers and addition polymerisation of ethene",
+   "desc": "聚合物是由许多小分子（单体）连接而成的大分子；乙烯通过加聚反应生成聚乙烯（poly(ethene)），双键打开相互连接；塑料由聚合物制成。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.5-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "polymer",
+    "monomer",
+    "addition polymerisation",
+    "poly(ethene)",
+    "plastic",
+    "repeat unit"
+   ],
+   "method": "画 n CH₂=CH₂ → –[CH₂–CH₂]ₙ–，注意重复单元两端伸出的键要穿过括号。常见错误：聚合物中仍画双键。",
+   "probe": "画出乙烯加聚生成聚乙烯的方程式。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.8 Core 1–3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.8-02",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.8 Polymers",
+   "syllabus": "11.8",
+   "level": "core",
+   "name": "塑料的性质与环境问题",
+   "name_en": "Plastics: disposal and environmental challenges",
+   "desc": "塑料的性质（如不可生物降解、耐用）给处理带来问题：填埋占用土地且长期不分解；在海洋中积累危害海洋生物；焚烧产生有毒气体。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.8-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "plastics",
+    "non-biodegradable",
+    "landfill",
+    "oceans",
+    "toxic gases",
+    "disposal"
+   ],
+   "method": "三个处理途径各对应一个问题，再连到“性质”。常见错误：只说“污染环境”太笼统。",
+   "probe": "为什么塑料垃圾难以处理？写出三种处理方式带来的问题。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.8 Core 4–5 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-11.8-03",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.8 Polymers",
+   "syllabus": "11.8",
+   "level": "supp",
+   "name": "加聚物的重复单元推断",
+   "name_en": "Repeat units of addition polymers",
+   "desc": "能识别加聚物的重复单元；由给定烯烃推出加聚物结构或重复单元，反之由重复单元推出单体，如 CH₂=CHCl → 聚氯乙烯 –[CH₂–CHCl]ₙ–。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.8-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "repeat unit",
+    "addition polymer",
+    "monomer",
+    "poly(chloroethene)",
+    "poly(propene)"
+   ],
+   "method": "方法：把 C=C 两个碳横着画，其余取代基上下画，打开双键加括号和 n。反推时在重复单元两个主链碳之间放回双键。常见错误：把取代基放进主链；聚丙烯重复单元画成三个碳的主链。",
+   "probe": "画出丙烯加聚的重复单元；由重复单元 –[CH₂–CH(CN)]– 推出单体。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.8 Supplement 6–7 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-11.8-04",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.8 Polymers",
+   "syllabus": "11.8",
+   "level": "supp",
+   "name": "缩聚：聚酰胺与聚酯（尼龙、PET）",
+   "name_en": "Condensation polymers: polyamides and polyesters",
+   "desc": "缩聚：两种含两个官能团的单体连接，每形成一个连接键脱去一个小分子（如水）；加聚只生成聚合物一种产物。聚酰胺：二元羧酸 + 二元胺，酰胺键 –CONH–（如尼龙）；聚酯：二元羧酸 + 二元醇，酯键 –COO–（如 PET）。能识别连接键、由单体推重复单元及反推。PET 可被分解回单体再重新聚合（可回收）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.8-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-11.7-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "condensation polymerisation",
+    "polyamide",
+    "polyester",
+    "nylon",
+    "PET",
+    "amide linkage",
+    "ester linkage",
+    "diol",
+    "diamine",
+    "dicarboxylic acid"
+   ],
+   "method": "用方块表示单体主体部分，只画官能团：□–COOH + H₂N–■ → □–CO–NH–■ + H₂O。常见错误：重复单元中画两个连接键；把缩聚与加聚产物数量说反。",
+   "probe": "画出由二元羧酸和二元醇生成的聚酯重复单元，比较加聚和缩聚的两点区别。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.8 Supplement 6、8–11 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-11.8-05",
+   "strand": "S8",
+   "stage": "IGCSE",
+   "unit": "11 Organic chemistry / 11.8 Polymers",
+   "syllabus": "11.8",
+   "level": "supp",
+   "name": "蛋白质：天然聚酰胺",
+   "name_en": "Proteins as natural polyamides",
+   "desc": "蛋白质是天然聚酰胺，由氨基酸单体（通式 H₂N–CHR–COOH）缩聚形成，单体之间以酰胺键 –CONH– 连接；能描述并画出蛋白质的结构片段。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-11.8-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "protein",
+    "amino acid",
+    "polyamide",
+    "amide linkage",
+    "natural polymer"
+   ],
+   "method": "把氨基酸画成 H₂N–□–COOH，连三个形成片段，标出酰胺键。常见错误：把蛋白质的连接键画成酯键。",
+   "probe": "画出由三个氨基酸形成的蛋白质片段并圈出酰胺键。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 11.8 Supplement 12–13 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-12.1-01",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "12 Experimental techniques and chemical analysis / 12.1 Experimental design",
+   "syllabus": "12.1",
+   "level": "core",
+   "name": "测量时间、温度、质量、体积的仪器",
+   "name_en": "Apparatus for measuring time, temperature, mass and volume",
+   "desc": "测时间用秒表；温度用温度计；质量用天平；体积用滴定管、移液管（volumetric pipette）、量筒、气体注射器。能根据精度要求选择合适仪器。",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-DEC",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-UNIT",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "stop-watch",
+    "thermometer",
+    "balance",
+    "burette",
+    "volumetric pipette",
+    "measuring cylinder",
+    "gas syringe"
+   ],
+   "method": "认清仪器图（滴定管有刻度和活塞、移液管只有一条刻度线）。比较精度：滴定管/移液管 > 量筒。常见错误：用量筒准确量 25.0 cm³ 待滴液；把移液管和滴定管名称混用。",
+   "probe": "要准确量取 25.0 cm³ 氢氧化钠溶液，用什么仪器？测量反应生成气体的体积用什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 12.1 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-12.1-02",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "12 Experimental techniques and chemical analysis / 12.1 Experimental design",
+   "syllabus": "12.1",
+   "level": "core",
+   "name": "评价实验方法与仪器的优缺点",
+   "name_en": "Advantages and disadvantages of experimental methods and apparatus",
+   "desc": "能就具体实验提出方法和仪器的优缺点，例如：气体注射器比排水集气更准确且可收集可溶气体；量筒快但精度低；称量法简便但质量变化小时误差大。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-12.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "advantage",
+    "disadvantage",
+    "accuracy",
+    "precision",
+    "suitable apparatus"
+   ],
+   "method": "答题模板：“A is better because … (more precise / measures directly / fewer losses)”，必须具体到本实验。常见错误：只写“更准确”而不说为什么。",
+   "probe": "用量筒和滴定管加入 25 cm³ 酸各有什么优缺点？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 12.1 Core 2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-12.1-03",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "12 Experimental techniques and chemical analysis / 12.1 Experimental design",
+   "syllabus": "12.1",
+   "level": "core",
+   "name": "溶液相关术语",
+   "name_en": "Solvent, solute, solution, saturated solution, residue and filtrate",
+   "desc": "溶剂：溶解溶质的物质；溶质：被溶解的物质；溶液：一种或多种溶质溶于溶剂形成的混合物；饱和溶液：一定温度下含溶质达到最大浓度的溶液；残渣：蒸发、蒸馏、过滤等过程后留下的物质；滤液：通过滤纸的液体或溶液。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-8-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "solvent",
+    "solute",
+    "solution",
+    "saturated solution",
+    "residue",
+    "filtrate"
+   ],
+   "method": "用一张过滤示意图同时标出 residue 和 filtrate；“saturated”一定要带上“at a specified temperature”。常见错误：residue 与 filtrate 弄反。",
+   "probe": "过滤泥沙水后，留在滤纸上的叫什么？流下来的叫什么？给出饱和溶液的定义。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 12.1 Core 3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-12.2-01",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "12 Experimental techniques and chemical analysis / 12.2 Acid–base titrations",
+   "syllabus": "12.2",
+   "level": "core",
+   "name": "酸碱滴定操作与终点判断",
+   "name_en": "Acid–base titration and end-point",
+   "desc": "酸碱滴定：用移液管准确量取一定体积溶液放入锥形瓶，加几滴合适的指示剂（如甲基橙或百里酚酞），从滴定管逐滴加入另一溶液并摇匀，指示剂颜色刚好发生变化时即为终点；记录初读数和末读数，重复至结果一致（concordant）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-12.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-7.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "titration",
+    "burette",
+    "volumetric pipette",
+    "indicator",
+    "end-point",
+    "conical flask",
+    "concordant"
+   ],
+   "method": "操作要点：滴定管读凹液面最低处、读到 0.05 cm³；接近终点时逐滴加；先做一次粗滴。常见错误：用通用指示剂（颜色渐变不适合）；读数只记一位小数。",
+   "probe": "描述用 0.100 mol/dm³ 盐酸滴定 25.0 cm³ 氢氧化钠溶液的步骤，用甲基橙时终点颜色怎样变？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 12.2 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-12.3-01",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "12 Experimental techniques and chemical analysis / 12.3 Chromatography",
+   "syllabus": "12.3",
+   "level": "core",
+   "name": "纸层析与色谱图解读",
+   "name_en": "Paper chromatography and interpreting chromatograms",
+   "desc": "用合适溶剂通过纸层析分离可溶的有色物质混合物；解读色谱图：与已知物质斑点比较鉴别未知物；纯物质只有一个斑点，不纯物质有多个斑点。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-8-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "paper chromatography",
+    "chromatogram",
+    "solvent front",
+    "baseline",
+    "pure",
+    "impure"
+   ],
+   "method": "看图三问：未知样有几个斑点（几种物质）？哪个斑点与已知样同高（含有该物质）？只有一个斑点说明什么？常见错误：认为斑点颜色相同就一定是同一物质（需看位置）。",
+   "probe": "给一张有 A、B、C 三个已知染料和 X 未知样的色谱图，判断 X 的组成和是否纯净。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 12.3 Core 1–2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-12.3-02",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "12 Experimental techniques and chemical analysis / 12.3 Chromatography",
+   "syllabus": "12.3",
+   "level": "supp",
+   "name": "显色剂与 Rf 值",
+   "name_en": "Locating agents and Rf values",
+   "desc": "无色物质（如氨基酸）层析后需喷显色剂（locating agent）使斑点显现。Rf = 物质移动距离 ÷ 溶剂移动距离（均从基线量起），Rf 在 0–1 之间，同一溶剂中可用于鉴定物质。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-12.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-RATIO",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "locating agent",
+    "Rf value",
+    "solvent front",
+    "colourless substances",
+    "distance travelled"
+   ],
+   "method": "量距离都从 baseline 开始，到斑点中心和到溶剂前沿；层析结束要立即用铅笔标出溶剂前沿。常见错误：从纸底边量起；算出 Rf > 1。",
+   "probe": "斑点距基线 3.6 cm，溶剂前沿距基线 9.0 cm，求 Rf；无色氨基酸怎么才能看到斑点？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 12.3 Supplement 3–4 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-12.4-01",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "12 Experimental techniques and chemical analysis / 12.4 Separation and purification",
+   "syllabus": "12.4",
+   "level": "core",
+   "name": "分离与提纯方法",
+   "name_en": "Methods of separation and purification",
+   "desc": "描述并解释：用合适溶剂溶解（分离可溶与不溶物）、过滤（分离不溶固体与液体）、结晶（从溶液得到固体溶质）、简单蒸馏（从溶液中得到溶剂）、分馏（分离沸点相近的互溶液体，如乙醇和水）。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-9-08",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-1.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "dissolving",
+    "filtration",
+    "crystallisation",
+    "simple distillation",
+    "fractional distillation",
+    "condenser",
+    "fractionating column"
+   ],
+   "method": "画蒸馏装置并记住细节：温度计球泡在支管口、冷凝管下进上出。常见错误：用蒸发从海水得到淡水（应蒸馏）；冷凝水方向反了。",
+   "probe": "如何从沙子和食盐混合物中得到干净的食盐晶体？如何从墨水中获得水？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 12.4 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-12.4-02",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "12 Experimental techniques and chemical analysis / 12.4 Separation and purification",
+   "syllabus": "12.4",
+   "level": "core",
+   "name": "根据物质信息选择分离方法",
+   "name_en": "Choosing suitable separation techniques",
+   "desc": "根据物质的溶解性、状态、沸点等信息选择合适的分离提纯方法或组合方法（如先溶解过滤再结晶）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-12.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "suggest",
+    "separation technique",
+    "solubility",
+    "boiling point",
+    "mixture"
+   ],
+   "method": "决策树：是否互溶？→ 有不溶固体用过滤；要溶质用结晶；要溶剂用蒸馏；两液沸点接近用分馏；有色成分用层析。常见错误：只写一种方法而题目需要多步。",
+   "probe": "给出物质 A（溶于水）和 B（不溶于水、溶于乙醇）的混合物，设计获得纯 A 的方法。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 12.4 Core 2 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-12.4-03",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "12 Experimental techniques and chemical analysis / 12.4 Separation and purification",
+   "syllabus": "12.4",
+   "level": "core",
+   "name": "用熔点和沸点判断物质纯度",
+   "name_en": "Identifying substances and assessing purity by melting and boiling points",
+   "desc": "纯物质有确定（尖锐）的熔点和沸点，可与资料值比较鉴别物质；杂质使熔点降低并使熔化在一个温度范围内发生，使沸点升高。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-1.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-LS-8-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "melting point",
+    "boiling point",
+    "pure",
+    "impurity",
+    "sharp",
+    "range"
+   ],
+   "method": "记“杂质：熔点降低且变成范围、沸点升高”。常见错误：说杂质使熔点升高。",
+   "probe": "某样品在 76–80 °C 熔化，资料中纯物质熔点 82 °C，说明什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 12.4 Core 3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-12.5-01",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "12 Experimental techniques and chemical analysis / 12.5 Identification of ions and gases",
+   "syllabus": "12.5",
+   "level": "core",
+   "name": "阴离子检验",
+   "name_en": "Tests for anions",
+   "desc": "碳酸根：加稀酸产生气泡，气体使澄清石灰水变浑浊；氯/溴/碘离子：用稀硝酸酸化后加硝酸银溶液，分别得白色、奶油色、黄色沉淀；硝酸根：加氢氧化钠溶液和铝箔并加热，产生使湿润红色石蕊试纸变蓝的氨气；硫酸根：用稀硝酸酸化后加硝酸钡溶液得白色沉淀；亚硫酸根：使酸性高锰酸钾溶液由紫色变无色。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-06",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-7.3-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "carbonate",
+    "halide",
+    "silver nitrate",
+    "nitrate",
+    "aluminium foil",
+    "sulfate",
+    "barium nitrate",
+    "sulfite"
+   ],
+   "method": "做五行“试剂—现象”卡片；理解先加稀硝酸是为了除去碳酸根等干扰（避免生成碳酸盐沉淀）。常见错误：硫酸根检验用盐酸后接硝酸银；卤离子沉淀颜色记混。",
+   "probe": "某溶液加稀硝酸酸化后加 AgNO₃ 得黄色沉淀，含什么离子？如何检验溶液中的硫酸根？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 12.5 Core 1 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-12.5-02",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "12 Experimental techniques and chemical analysis / 12.5 Identification of ions and gases",
+   "syllabus": "12.5",
+   "level": "core",
+   "name": "用 NaOH 溶液和氨水检验阳离子",
+   "name_en": "Tests for aqueous cations with NaOH and ammonia",
+   "desc": "Al³⁺：NaOH 白色沉淀溶于过量得无色溶液，氨水白色沉淀不溶于过量；NH₄⁺：NaOH 加热放出氨气（湿润红色石蕊变蓝）；Ca²⁺：NaOH 白色沉淀不溶于过量，氨水无沉淀或极少；Cr³⁺：NaOH 绿色沉淀溶于过量，氨水绿色沉淀不溶于过量；Cu²⁺：两者均为淡蓝色沉淀，NaOH 过量不溶，氨水过量溶解得深蓝色溶液；Fe²⁺：绿色沉淀，均不溶于过量；Fe³⁺：红褐色沉淀，均不溶于过量；Zn²⁺：白色沉淀，均溶于过量得无色溶液。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-7.3-03",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-7.1-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "aqueous sodium hydroxide",
+    "aqueous ammonia",
+    "precipitate",
+    "excess",
+    "soluble in excess",
+    "insoluble in excess"
+   ],
+   "method": "做 8×2 表格，每格写“颜色 + 过量后变化”。区分三种白色沉淀：Al³⁺（NaOH 溶、NH₃ 不溶）、Zn²⁺（都溶）、Ca²⁺（都不溶/氨水几乎无沉淀）。常见错误：Fe²⁺/Fe³⁺ 颜色记反；忘记 NH₄⁺ 要加热。",
+   "probe": "某溶液加 NaOH 得白色沉淀，过量后溶解；加氨水也得白色沉淀，过量后溶解，是哪种离子？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 12.5 Core 2（PDF 文本中 2、3 两条位于分页后的 Core 栏，按 Core 处理） 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-12.5-03",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "12 Experimental techniques and chemical analysis / 12.5 Identification of ions and gases",
+   "syllabus": "12.5",
+   "level": "core",
+   "name": "气体检验（IGCSE）",
+   "name_en": "Tests for gases",
+   "desc": "氨气：使湿润红色石蕊试纸变蓝；二氧化碳：使石灰水变浑浊；氯气：使湿润石蕊试纸褪色（漂白）；氢气：点燃的木条有爆鸣声；氧气：使带火星的木条复燃；二氧化硫：使酸性高锰酸钾溶液由紫色变无色。",
+   "prereqs": [
+    {
+     "id": "CHEM-LS-7-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "ammonia",
+    "damp red litmus",
+    "limewater",
+    "chlorine",
+    "bleaches",
+    "lighted splint",
+    "glowing splint",
+    "sulfur dioxide"
+   ],
+   "method": "在初中三种气体检验上增加 NH₃、Cl₂、SO₂；“damp”试纸是必需条件（气体要先溶于水）。常见错误：氯气检验写“变红”而漏写“bleached”；用干燥石蕊试纸。",
+   "probe": "如何检验氨气和氯气？SO₂ 用什么试剂检验，现象是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 12.5 Core 3 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）"
+  },
+  {
+   "id": "CHEM-IG-12.5-04",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "12 Experimental techniques and chemical analysis / 12.5 Identification of ions and gases",
+   "syllabus": "12.5",
+   "level": "supp",
+   "name": "焰色反应",
+   "name_en": "Flame tests for cations",
+   "desc": "用焰色反应鉴别阳离子：Li⁺ 红色，Na⁺ 黄色，K⁺ 淡紫色（lilac），Ca²⁺ 橙红色，Ba²⁺ 淡绿色，Cu²⁺ 蓝绿色。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-12.5-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "flame test",
+    "lithium",
+    "sodium",
+    "potassium",
+    "calcium",
+    "barium",
+    "copper(II)",
+    "lilac"
+   ],
+   "method": "操作：用浓盐酸清洗的镍铬丝/铂丝蘸取样品放在本生灯无光焰中观察。六种颜色做卡片记忆。常见错误：Li 与 Ca 的红色混淆（Li red，Ca orange-red）；钠的黄色掩盖钾的淡紫色。",
+   "probe": "某固体焰色为淡紫色，含什么离子？Li⁺ 与 Ca²⁺ 焰色分别是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 第 12.5 Supplement 4（PDF 文本中该条位于分页后，按此前读取到的版面判定为 Supplement） 条（Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028）",
+   "tracks": [
+    "extended"
+   ]
+  },
+  {
+   "id": "CHEM-IG-PRAC-01",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "Practical assessment: Paper 5 Practical Test / Paper 6 Alternative to Practical (AO3)",
+   "syllabus": "AO3",
+   "level": "core",
+   "name": "实验仪器的选择与安全使用、危害标识",
+   "name_en": "Selecting and safely using techniques, apparatus and materials; hazards",
+   "desc": "能从图或文字认出仪器，画出、补全或标注装置图；选择最合适的仪器和方法并说明理由；描述定性检验（离子、气体）的操作；识别实验危险并提出安全措施；能读懂试卷所用的 CLEAPSS 危害代码：C 腐蚀性、MH 中度危害、HH 健康危害、F 易燃、T 急性毒性、O 氧化性、N 危害水生环境。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-12.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "apparatus",
+    "hazard",
+    "safety precaution",
+    "corrosive",
+    "flammable",
+    "toxic",
+    "oxidising",
+    "goggles"
+   ],
+   "method": "每个实验都练“一个危险 + 一个对应措施”（如加热易燃的乙醇用水浴而非明火）。练习画截面装置图（不画立体图）。常见错误：安全措施写成笼统的“小心”；只写“戴护目镜”而不对应具体危险。",
+   "probe": "给一个用浓氨水和加热的实验，问有哪些危险、各采取什么措施；画出收集并测量气体体积的装置。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 「Practical assessment」部分 — 实验技能：Demonstrate knowledge of how to select and safely use techniques, apparatus and materials；Notes on hazard codes（Paper 5/6）；Paper 5/6 占总分 20%，Core 与 Extended 考生都考"
+  },
+  {
+   "id": "CHEM-IG-PRAC-02",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "Practical assessment: Paper 5 Practical Test / Paper 6 Alternative to Practical (AO3)",
+   "syllabus": "AO3",
+   "level": "core",
+   "name": "实验计划：变量控制与方法设计",
+   "name_en": "Planning experiments: variables and method",
+   "desc": "能区分自变量和因变量，说明需要控制哪些变量以及为什么；为自变量选择合适的取值范围和数量；选择仪器并说明理由；写出逐步实验步骤、需要记录的数据及如何从结果得出结论；识别风险并提出安全措施；做出有依据的预测。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-12.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-6.2-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "plan",
+    "independent variable",
+    "dependent variable",
+    "control variable",
+    "range",
+    "fair test",
+    "prediction"
+   ],
+   "method": "用固定模板写计划：variables → apparatus → method（编号步骤、写清测量什么、用什么测）→ repeat → how to analyse → safety。常见错误：步骤中缺少具体量（多少体积、什么浓度）；没有说明重复实验。",
+   "probe": "设计实验研究温度对硫代硫酸钠与盐酸反应速率的影响，写出变量和步骤。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 「Practical assessment」部分 — 实验技能：Plan experiments and investigations（Paper 5/6）；Paper 5/6 占总分 20%，Core 与 Extended 考生都考"
+  },
+  {
+   "id": "CHEM-IG-PRAC-03",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "Practical assessment: Paper 5 Practical Test / Paper 6 Alternative to Practical (AO3)",
+   "syllabus": "AO3",
+   "level": "core",
+   "name": "观察、读数与记录数据",
+   "name_en": "Making and recording observations and measurements",
+   "desc": "能从模拟或数字仪器（或其图示）读数，读到合适的精度（必要时读到最小刻度的一半，如滴定管读到 0.05 cm³、温度计读到 0.5 °C）；进行足够次数的测量并适当重复；记录化学检验中的定性观察（颜色、沉淀、气泡）；把数据整理成表格，表头注明物理量和单位，数据位数一致。",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-DEC",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-12.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "reading",
+    "precision",
+    "half a division",
+    "results table",
+    "units",
+    "observations",
+    "repeat"
+   ],
+   "method": "表头格式“volume / cm³”；所有读数位数一致（滴定管读数写 2 位小数）。描述现象要写“看到什么”而非“生成什么物质”。常见错误：表中每格都写单位；现象写成“生成了 CO₂”。",
+   "probe": "给一张滴定管初读数和末读数的图，让她读数、算出滴定体积并填入表格；描述往硫酸铜溶液中加 NaOH 的现象。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 「Practical assessment」部分 — 实验技能：Make and record observations, measurements and estimates（Paper 5/6）；Paper 5/6 占总分 20%，Core 与 Extended 考生都考"
+  },
+  {
+   "id": "CHEM-IG-PRAC-04",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "Practical assessment: Paper 5 Practical Test / Paper 6 Alternative to Practical (AO3)",
+   "syllabus": "AO3",
+   "level": "core",
+   "name": "数据处理与作图",
+   "name_en": "Processing data and drawing graphs",
+   "desc": "用计算器处理数据，按要求画图：选合适坐标比例（数据点占网格一半以上）、标注轴名与单位、准确描点、画最佳拟合直线或平滑曲线；从图中内插/外推读值，求斜率（梯度）或截距。",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-AVG",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "graph",
+    "line of best fit",
+    "scale",
+    "axes",
+    "gradient",
+    "intercept",
+    "interpolate",
+    "extrapolate"
+   ],
+   "method": "画图检查清单 S-A-L-T：Scale、Axes labelled with units、Line of best fit（不连点成折线）、Title/读值时画辅助线。常见错误：连点成折线；比例用奇数（如每格 3）。",
+   "probe": "给 6 组时间–体积数据，让她作图、画最佳拟合曲线，读出 45 s 时的体积并说明反应何时结束。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 「Practical assessment」部分 — 实验技能：Interpret and evaluate experimental observations and data（Paper 5/6）；Paper 5/6 占总分 20%，Core 与 Extended 考生都考"
+  },
+  {
+   "id": "CHEM-IG-PRAC-05",
+   "strand": "S9",
+   "stage": "IGCSE",
+   "unit": "Practical assessment: Paper 5 Practical Test / Paper 6 Alternative to Practical (AO3)",
+   "syllabus": "AO3",
+   "level": "core",
+   "name": "结论、异常值、误差来源与改进",
+   "name_en": "Conclusions, anomalous results, sources of error and improvements",
+   "desc": "能根据观察和数据得出有依据的结论并解释；评价数据的可靠性，识别异常结果并作适当处理（重做或剔除后求平均）；评价实验装置、方法和变量控制，指出误差来源（如热量散失、气体逸出、读数误差、终点判断）并提出具体改进（如用聚苯乙烯杯加盖、用气体注射器代替排水法、重复实验求平均）。",
+   "prereqs": [
+    {
+     "id": "CHEM-IG-PRAC-04",
+     "strength": "必须"
+    },
+    {
+     "id": "CHEM-IG-12.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-AVG",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "conclusion",
+    "anomalous result",
+    "reliability",
+    "source of error",
+    "improvement",
+    "repeat",
+    "evaluate"
+   ],
+   "method": "改进要与误差来源一一对应且具体（说清用什么替代什么）。常见错误：改进只写“更小心”“用更精确的仪器”而不具体；把异常值也计入平均。",
+   "probe": "测中和反应温度变化时结果偏低，指出两个可能的误差来源并分别提出改进。",
+   "source": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf 「Practical assessment」部分 — 实验技能：Evaluate methods and suggest possible improvements（Paper 5/6）；Paper 5/6 占总分 20%，Core 与 Extended 考生都考"
+  }
+ ]
+}
