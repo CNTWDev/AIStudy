@@ -110,16 +110,30 @@ def create_user(email: str, password: str, name: str, role: str = "parent", *, p
         (apply_note or "")[:300], now if status == "active" else None, now, now)
 
 
-def set_password(uid: int, password: str, *, keep_session: str | None = None) -> None:
-    """改密码，并让这个账号的其他登录会话全部失效。"""
+def set_password(uid: int, password: str, *, keep_session: str | None = None, must_change: bool = False) -> None:
+    """改密码，并让这个账号的其他登录会话全部失效。must_change：临时密码，下次登录要先改成自己的。"""
     validate_pw(password)
     with db.tx() as t:
-        t.run("UPDATE users SET pw_hash=?, pw_changed_at=?, failed_logins=0, locked_until=NULL WHERE id=?",
-              hash_pw(password), db.now(), uid)
+        t.run("UPDATE users SET pw_hash=?, pw_changed_at=?, failed_logins=0, locked_until=NULL, must_change_pw=? WHERE id=?",
+              hash_pw(password), db.now(), 1 if must_change else 0, uid)
         if keep_session:
             t.run("DELETE FROM sessions WHERE user_id=? AND token_hash<>?", uid, _sha(keep_session))
         else:
             t.run("DELETE FROM sessions WHERE user_id=?", uid)
+
+
+def temp_password() -> str:
+    """好读好输的临时密码：去掉了 0/O、1/l/I 这类容易看错的字符。"""
+    abc = "abcdefghjkmnpqrstuvwxyz23456789"
+    return "".join(secrets.choice(abc) for _ in range(4)) + "-" + "".join(secrets.choice(abc) for _ in range(4))
+
+
+def unlock(uid: int) -> None:
+    db.run("UPDATE users SET failed_logins=0, locked_until=NULL WHERE id=?", uid)
+
+
+def signout_all(uid: int) -> int:
+    return db.run("DELETE FROM sessions WHERE user_id=?", uid)
 
 
 def set_status(uid: int, status: str, by: int | None = None) -> None:

@@ -31,7 +31,8 @@ app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY, max_age=60 *
 app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), name="static")
 templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL,
-                             llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display)
+                             llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
+                             stage_rank=stage_rank)
 
 
 @app.exception_handler(LoginRequired)
@@ -57,6 +58,8 @@ async def _llm_error(request: Request, exc):
 
 def render(request: Request, name: str, status_code: int = 200, **ctx):
     user = auth.current_user(request)
+    if user and user["must_change_pw"] and name not in ("settings.html", "message.html"):
+        return RedirectResponse("/settings?force=1", 303)
     kid = None
     if user:
         kid = user if user["role"] == "kid" else (
@@ -193,10 +196,41 @@ def reset_submit(request: Request, token: str, password: str = Form(...), passwo
 
 
 @app.get("/settings", response_class=HTMLResponse)
-def settings_page(request: Request, msg: str = "", err: str = ""):
+def settings_page(request: Request, msg: str = "", err: str = "", force: str = ""):
     u = auth.require_user(request)
     return render(request, "settings.html", sessions=auth.sessions_of(u["id"]), this_sid=auth.current_session_hash(request),
                   msg=msg, err=err)
+
+
+def account_action(request: Request, actor, target, form) -> dict:
+    """家长管孩子账号、管理员管其他账号共用：重置密码 / 解除锁定 / 退出所有设备。返回给模板的 msg、shown_pw。"""
+    action = form.get("action") or ""
+    who = f"by {actor['email']}"
+    if action == "password":
+        pw = (form.get("password") or "").strip()
+        generated = not pw
+        pw = pw or auth.temp_password()
+        try:
+            auth.set_password(target["id"], pw, must_change=bool(form.get("force")))
+        except ValueError as e:
+            return {"msg": str(e)}
+        auth.log_event("password_reset_by_" + actor["role"], user_id=target["id"], email=target["email"], detail=who, request=request)
+        return {"msg": f"已重置 {target['name']} 的密码，其他设备上的登录已退出。" + ("" if generated else "新密码就是你刚才输入的。"),
+                "shown_pw": pw if generated else ""}
+    if action == "unlock":
+        auth.unlock(target["id"])
+        auth.log_event("unlock", user_id=target["id"], email=target["email"], detail=who, request=request)
+        return {"msg": "已解除锁定，可以重新登录了"}
+    if action == "signout":
+        n = auth.signout_all(target["id"])
+        auth.log_event("signout_all", user_id=target["id"], email=target["email"], detail=who, request=request)
+        return {"msg": f"已让 {target['name']} 在 {n} 台设备上退出登录"}
+    raise HTTPException(400, "不认识的操作")
+
+
+def account_ctx(acct, url: str, force: bool, reset_link: bool = False) -> dict:
+    return {"acct": auth.get_user(acct["id"]), "acct_url": url, "acct_sessions": len(auth.sessions_of(acct["id"])),
+            "acct_force": force, "acct_reset_link": reset_link, "now": db.now()}
 
 
 def _back(msg="", err=""):
@@ -413,8 +447,10 @@ def _version() -> str:
         return "未知"
 
 
-def _admin_back(tab="overview", msg="", link=""):
+def _admin_back(tab="overview", msg="", link="", uid=None):
     from urllib.parse import urlencode
+    if tab == "user" and uid:
+        return RedirectResponse(f"/admin/users/{uid}?" + urlencode({"msg": msg, "link": link}), 303)
     return RedirectResponse("/admin?" + urlencode({"tab": tab, "msg": msg, "link": link}), 303)
 
 
@@ -435,7 +471,7 @@ def admin_create_user(request: Request, email: str = Form(...), name: str = Form
 def admin_user_status(request: Request, uid: int, status: str = Form(...), back: str = Form("families")):
     a = auth.require_admin(request)
     if uid == a["id"]:
-        return _admin_back(back, msg="不能修改自己的状态")
+        return _admin_back(back, msg="不能修改自己的状态", uid=uid)
     u = auth.get_user(uid)
     if not u or status not in ("active", "disabled", "rejected"):
         raise HTTPException(404)
@@ -443,7 +479,7 @@ def admin_user_status(request: Request, uid: int, status: str = Form(...), back:
     event = {"active": "approve" if u["status"] == "pending" else "enable", "disabled": "disable", "rejected": "reject"}[status]
     auth.log_event("admin_" + event, user_id=uid, email=u["email"], detail=f"by {a['email']}", request=request)
     word = {"approve": "已审批通过", "enable": "已启用", "disable": "已停用", "reject": "已拒绝"}[event]
-    return _admin_back(back, msg=f"{u['email']} {word}")
+    return _admin_back(back, msg=f"{u['email']} {word}", uid=uid)
 
 
 @app.post("/admin/users/{uid}/admin")
@@ -467,7 +503,56 @@ def admin_reset_link(request: Request, uid: int, back: str = Form("families")):
     base = config.PUBLIC_URL or str(request.base_url).rstrip("/")
     auth.log_event("admin_reset_link", user_id=uid, email=u["email"], detail=f"by {a['email']}", request=request)
     return _admin_back(back, msg=f"已生成 {u['email']} 的重设密码链接（48 小时内有效，只能用一次），请发给对方：",
-                       link=f"{base}/reset/{token}")
+                       link=f"{base}/reset/{token}", uid=uid)
+
+
+def _admin_user_page(request: Request, a, u, msg="", link="", **extra):
+    parent = auth.get_user(u["parent_id"]) if u["parent_id"] else None
+    kids = db.q("SELECT * FROM users WHERE parent_id=? AND role='kid' ORDER BY id", u["id"])
+    inviter = auth.get_user(u["invited_by"]) if u["invited_by"] else None
+    events = db.q("SELECT * FROM auth_events WHERE user_id=? ORDER BY id DESC LIMIT 12", u["id"])
+    return render(request, "admin_user.html", u=u, me=a, parent=parent, kids=kids, inviter=inviter, events=events,
+                  msg=msg, link=link, **account_ctx(u, f"/admin/users/{u['id']}/account", force=u["role"] != "kid",
+                                                     reset_link=True), **extra)
+
+
+@app.get("/admin/users/{uid}", response_class=HTMLResponse)
+def admin_user(request: Request, uid: int, msg: str = "", link: str = ""):
+    a = auth.require_admin(request)
+    if uid == a["id"]:
+        return RedirectResponse("/settings", 303)
+    u = auth.get_user(uid)
+    if not u:
+        raise HTTPException(404)
+    return _admin_user_page(request, a, u, msg, link)
+
+
+@app.post("/admin/users/{uid}/profile")
+def admin_user_profile(request: Request, uid: int, name: str = Form(...), email: str = Form(...)):
+    a = auth.require_admin(request)
+    u = auth.get_user(uid)
+    if not u or uid == a["id"]:
+        raise HTTPException(404)
+    try:
+        email = auth.validate_email(email)
+    except ValueError as e:
+        return _admin_back("user", msg=str(e), uid=uid)
+    other = auth.by_email(email)
+    if other and other["id"] != uid:
+        return _admin_back("user", msg="这个邮箱已被别的账号使用", uid=uid)
+    db.run("UPDATE users SET name=?, email=? WHERE id=?", (name or "").strip()[:40] or u["name"], email, uid)
+    auth.log_event("admin_edit_profile", user_id=uid, email=email, detail=f"from {u['email']} by {a['email']}", request=request)
+    return _admin_back("user", msg="已保存", uid=uid)
+
+
+@app.post("/admin/users/{uid}/account")
+async def admin_user_account(request: Request, uid: int):
+    a = auth.require_admin(request)
+    u = auth.get_user(uid)
+    if not u or uid == a["id"]:
+        raise HTTPException(404)
+    res = account_action(request, a, u, await request.form())
+    return _admin_user_page(request, a, auth.get_user(uid), **res)
 
 
 @app.get("/admin/kids/{kid_id}", response_class=HTMLResponse)
@@ -531,11 +616,14 @@ def parent_home(request: Request):
     return render(request, "parent.html", kids=kids)
 
 
-def _kid_form_packs(form) -> list[tuple[str, str]]:
+def _kid_form_packs(form, grade: str, old: dict, grade_changed: bool) -> list[tuple[str, str]]:
+    """每门课选一个教材版本；学段按年级自动对应。年级没变、教材没换时保留原学段（「学校进度」里可能已经往后调过）。"""
     out = []
-    for pid in catalog.packs:
-        if form.get(f"pack_{pid}"):
-            out.append((pid, form.get(f"stage_{pid}") or catalog.packs[pid].stages[0]))
+    for subj in {p.subject for p in catalog.packs.values()}:
+        pid = form.get(f"subj_{subj}") or ""
+        if pid in catalog.packs and catalog.packs[pid].subject == subj:
+            keep = pid in old and not grade_changed
+            out.append((pid, old[pid] if keep else catalog.default_stage(pid, grade)))
     return out
 
 
@@ -549,8 +637,21 @@ def kid_new_page(request: Request):
 def kid_edit_page(request: Request, kid_id: int):
     p = auth.require_parent(request)
     k = auth.kid_of(p, kid_id)
-    enrolled = {e["pack_id"]: e["stage"] for e in enrollments(kid_id)}
-    return render(request, "kid_form.html", k=k, enrolled=enrolled, packs_by_subject=catalog.by_subject())
+    return _kid_form(request, k)
+
+
+def _kid_form(request: Request, k, **extra):
+    enrolled = {e["pack_id"]: e["stage"] for e in enrollments(k["id"])}
+    return render(request, "kid_form.html", k=k, enrolled=enrolled, packs_by_subject=catalog.by_subject(),
+                  **account_ctx(k, f"/parent/kids/{k['id']}/account", force=False), **extra)
+
+
+@app.post("/parent/kids/{kid_id}/account")
+async def kid_account(request: Request, kid_id: int):
+    p = auth.require_parent(request)
+    k = auth.kid_of(p, kid_id)
+    res = account_action(request, p, k, await request.form())
+    return _kid_form(request, auth.get_user(k["id"]), **res)
 
 
 @app.post("/parent/kids/save")
@@ -572,8 +673,10 @@ async def kid_save(request: Request):
     except ValueError as e:
         raise HTTPException(400, str(e))
     other = auth.by_email(email)
+    old_grade = None
     if kid_id:
         k = auth.kid_of(p, int(kid_id))
+        old_grade = k["grade"]
         if other and other["id"] != k["id"]:
             raise HTTPException(400, "这个邮箱已被别的账号使用")
         db.run("UPDATE users SET email=?, name=?, grade=?, school=?, daily_minutes=? WHERE id=?",
@@ -593,7 +696,8 @@ async def kid_save(request: Request):
                                       school=form.get("school") or "", daily_minutes=minutes)
         except ValueError as e:
             raise HTTPException(400, str(e))
-    chosen = _kid_form_packs(form)
+    old = {e["pack_id"]: e["stage"] for e in enrollments(kid_id)}
+    chosen = _kid_form_packs(form, grade, old, grade != old_grade)
     db.run("UPDATE enrollments SET active=0 WHERE user_id=?", kid_id)
     for pid, stage in chosen:
         db.run("INSERT INTO enrollments(user_id,pack_id,stage,active) VALUES(?,?,?,1) "
