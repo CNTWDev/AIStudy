@@ -17,6 +17,7 @@
 <button class="btn" id="selbtn" style="position:fixed;right:16px;bottom:90px;display:none;z-index:20">查「<span></span>」</button>
 <script>
 const RID = {{ r.id }}, LANG = {{ r.lang|tojson }};
+Run.start('read', {race: false});
 const t0 = Date.now(); setInterval(() => $('#timer').textContent = Math.round((Date.now() - t0) / 60000), 15000);
 const looked = new Set({{ looked|map(attribute='q')|list|tojson }}.map(s => s.toLowerCase()));
 // 把正文拆成可点的单词 / 句子
@@ -98,6 +99,7 @@ $('#finish').onclick = async () => {
     $$('.opt', q).forEach(o => { if (+o.dataset.o === +x.answer) o.classList.add('right'); else if (o.classList.contains('sel')) o.classList.add('wrong'); });
     $('.fbq', q).innerHTML = `<div class="small muted">${esc(x.explain)}</div>`; });
   $('#finish').textContent = '已打卡 ✓'; $('#finish').disabled = true;
+  Run.finish({n_items: r.results.length, n_right: r.results.filter(x => x.ok).length, best_combo: 0});
 };
 </script>
 {% endblock %}

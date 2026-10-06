@@ -200,6 +200,78 @@ function celebrate(res, el) {
   }
 }
 
+/* ---------- 跟自己比：专注计时、「上周的我」、个人最好（PB） ----------
+   专注只在页面开着、而且最近一分钟里有点击 / 打字 / 滚动时才走；切走、发呆不算。
+   一组做完记一笔：正确率不到 80% 的不算纪录，速度只比「每道答对的题平均用时」。 */
+const Run = {
+  on: false,
+  start(kind, opts) {
+    opts = opts || {};
+    Object.assign(Run, {on: true, kind, total: opts.total || 0, n: 0, right: 0, combo: 0, best: 0, active: 0,
+                        t0: Date.now(), last: Date.now(), tick: Date.now(), saved: false, pb: null, ghost: null});
+    let el = $('#runbar');
+    if (!el) {
+      el = document.createElement('div'); el.id = 'runbar'; el.className = 'runbar';
+      el.innerHTML = `<div class="row small"><span>⏱ 专注 <b class="rt">0:00</b></span><span class="muted rpb"></span><span class="grow"></span><span class="rg muted"></span></div>` +
+        (opts.race === false ? '' : `<div class="race"><i class="ghost" title="上周的我"></i><i class="me" title="我"></i></div>`);
+      if (opts.mount) opts.mount.insertAdjacentElement('beforebegin', el);
+      else ($('main h1') || document.body).insertAdjacentElement('afterend', el);
+    }
+    Run.el = el;
+    api('/api/records/' + kind).then(r => { Run.pb = r.pb; Run.ghost = r.ghost; Run.draw(); }).catch(() => {});
+    if (!Run.bound) {
+      Run.bound = true;
+      ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(e => addEventListener(e, () => { Run.last = Date.now(); }, {passive: true, capture: true}));
+      document.addEventListener('visibilitychange', () => { Run.tick = Date.now(); if (!document.hidden) Run.last = Date.now(); });
+      setInterval(Run.step, 1000);
+    }
+    Run.draw();
+  },
+  step() {
+    if (!Run.on) return;
+    const now = Date.now();
+    if (!document.hidden && now - Run.last < 60000) Run.active += Math.min(now - Run.tick, 5000);
+    Run.tick = now; Run.draw();
+  },
+  mmss(ms) { const s = Math.floor(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; },
+  hit(ok) {
+    if (!Run.on) return;
+    Run.n++; if (ok) { Run.right++; Run.combo++; Run.best = Math.max(Run.best, Run.combo); } else Run.combo = 0;
+    Run.draw();
+  },
+  draw() {
+    const el = Run.el; if (!el) return;
+    $('.rt', el).textContent = Run.mmss(Run.active);
+    if (Run.pb && Run.pb.focus >= 60000) $('.rpb', el).textContent = `· 最长 ${Run.mmss(Run.pb.focus)}` + (Run.active > Run.pb.focus ? ' 🔥 正在破纪录' : '');
+    const race = $('.race', el);
+    if (!race) return;
+    const tot = Math.max(Run.total, Run.n, 1);
+    $('.me', race).style.left = (100 * Math.min(Run.right, tot) / tot) + '%';
+    const g = $('.ghost', race);
+    if (Run.ghost) {
+      // 上周的我：按上周每道答对的题平均用时，这会儿应该已经答对几题
+      const gr = Run.active / Run.ghost;
+      g.style.display = ''; g.style.left = (100 * Math.min(gr, tot) / tot) + '%';
+      if (Run.right >= 2) {
+        const d = Math.round((Run.ghost * Run.right - Run.active) / 1000);
+        $('.rg', el).textContent = d >= 0 ? `比上周的我快 ${d} 秒 👟` : `上周的我领先 ${-d} 秒`;
+      } else $('.rg', el).textContent = '👻 上周的我在跑';
+    } else { g.style.display = 'none'; $('.rg', el).textContent = Run.pb && Run.pb.runs ? '' : '第一次：先立个纪录'; }
+  },
+  async finish(extra) {
+    if (!Run.on || Run.saved) return null;
+    Run.step(); Run.saved = true; Run.on = false;
+    const body = Object.assign({kind: Run.kind, n_items: Run.n, n_right: Run.right, ms_active: Run.active,
+                                ms_total: Date.now() - Run.t0, best_combo: Run.best}, extra || {});
+    try {
+      const r = await api('/api/run', body);
+      (r.pbs || []).forEach((p, i) => setTimeout(() => { toast('🏅 新 PB！' + p.label, 2600); cheer(Run.el); }, 400 + i * 1200));
+      if (Run.el) $('.rpb', Run.el).textContent = r.pbs && r.pbs.length ? '🏅 破了 ' + r.pbs.length + ' 项个人纪录' : (r.first ? '已立下第一个纪录' : '');
+      return r;
+    } catch (e) { return null; }
+  },
+};
+
 /* ---------- 划词：在网站任何页面选中文字 → 查词 / 翻译 / 加入复习 / 问一问 ----------
    系统按行为自动记录：同一个词或句子查第二次、做题时查的，自动放进复习（不用孩子手动加）。 */
 const QuickLook = {

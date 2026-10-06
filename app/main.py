@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import auth, config, db, engine, explore, insights, llm, papers, sitecfg, webpage
+from . import auth, config, db, engine, explore, insights, llm, papers, records, sitecfg, webpage
 from .auth import LoginRequired
 from .catalog import GRADES, catalog, stage_label, stage_rank
 from .content import content
@@ -295,7 +295,7 @@ def kid_brief(k) -> dict:
             "insights": insights.open_insights(k["id"], limit=6),
             "cov": explore.coverage(k["id"], m), "vocab": explore.word_stats(k["id"]),
             "weak": [catalog.kp(w["kp_id"]) for w in weak[:5]], "weak_n": len(weak),
-            "due": len(engine.due_cards(k["id"], 500)),
+            "due": len(engine.due_cards(k["id"], 500)), "weekly": records.weekly(k["id"]),
             "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='word'", k["id"])["n"]}
 
 
@@ -798,7 +798,7 @@ def today(request: Request):
     return render(request, "today.html", t=t, streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
                   stars=engine.total_stars(k["id"]), rec=engine.day_record(k["id"], t["day"]),
                   cov=explore.coverage(k["id"], m), lit=explore.lit_today(k["id"]), ahead=explore.ahead(k["id"], m),
-                  vocab=explore.word_stats(k["id"]),
+                  vocab=explore.word_stats(k["id"]), weekly=records.weekly(k["id"]), mine=records.summary(k["id"]),
                   found=insights.open_insights(k["id"], for_kid=me["role"] == "kid", limit=4 if me["role"] == "kid" else 10))
 
 
@@ -823,6 +823,24 @@ def plan_task_done(request: Request, body: dict = Body(...)):
         match["kp"] = body["kp"]
     engine.mark_task_by(k["id"], **match)
     return {"ok": True, "stars": engine.total_stars(k["id"])}
+
+
+# ================================================================== 跟自己比：PB、「上周的我」、专注计时
+
+@app.get("/api/records/{kind}")
+def records_get(request: Request, kind: str):
+    k = kid_or_redirect(request)
+    if kind not in records.KINDS:
+        raise HTTPException(404, "没有这种任务")
+    return {"kind": kind, "label": records.KINDS[kind], "pb": records.personal_best(k["id"], kind),
+            "ghost": records.ghost(k["id"], kind) if kind in records.SPEED_KINDS else None}
+
+
+@app.post("/api/run")
+def run_save(request: Request, body: dict = Body(...)):
+    k = kid_or_redirect(request)
+    return records.record(k["id"], str(body.get("kind", "")), body.get("n_items"), body.get("n_right"),
+                          body.get("ms_active"), body.get("ms_total"), body.get("best_combo"))
 
 
 @app.post("/api/checkin")
@@ -1615,7 +1633,7 @@ def _records_ctx(k):
 
 
 @app.get("/records", response_class=HTMLResponse)
-def records(request: Request):
+def records_page(request: Request):
     k = kid_or_redirect(request, manage=True)
     return render(request, "records.html", **_records_ctx(k), report_for=None)
 

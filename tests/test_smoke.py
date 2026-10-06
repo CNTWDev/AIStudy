@@ -590,3 +590,55 @@ def test_explore_warmup_and_selection(monkeypatch):
         c.post("/login", data={"email": "p2@x.com", "password": "secret1"})
         assert "以前学过的内容已摸清" in c.get("/parent").text
         c.get("/logout")
+
+
+def test_self_records():
+    """跟自己比：PB、「上周的我」、专注、每周进步卡。正确率不到 80% 不算纪录。"""
+    from datetime import timedelta
+
+    from app import db, records
+    with TestClient(app) as c:
+        kid = db.one("SELECT id FROM users WHERE email='b2@x.com'")["id"]
+        c.post("/login", data={"email": "b2@x.com", "password": "kidpass1"})
+        r = c.get("/api/records/words").json()
+        assert r["pb"]["runs"] == 0 and r["ghost"] is None
+        assert c.get("/api/records/nope").status_code == 404
+        # 上周的我：上周做了两组单词复习，每道答对的题 4 秒
+        today = db.today()
+        lastwk = today - timedelta(days=today.weekday() + 3)
+        for d in (lastwk, today - timedelta(days=1)):
+            db.insert("INSERT INTO runs(user_id,kind,day,n_items,n_right,ms_active,ms_total,best_combo,created_at) "
+                      "VALUES(?,?,?,?,?,?,?,?,?)", kid, "words", d.isoformat(), 10, 10, 40000, 50000, 4, db.now())
+        db.run("INSERT INTO days(user_id,day,plan,minutes) VALUES(?,?,?,?)", kid, lastwk.isoformat(), "[]", 20)
+        r = c.get("/api/records/words").json()
+        assert r["ghost"] == 4000 and r["pb"]["right"] == 10 and r["pb"]["speed"] == 4000
+        # 第一次做阅读：只立纪录，不算破纪录
+        assert c.post("/api/run", json={"kind": "read", "n_items": 3, "n_right": 3, "ms_active": 400000}).json()["first"]
+        # 乱答得快：正确率不到 80%，不算速度和答对纪录
+        r = c.post("/api/run", json={"kind": "words", "n_items": 20, "n_right": 12, "ms_active": 12000, "best_combo": 2}).json()
+        assert not r["pbs"]
+        # 认真又快：破答对、连对、速度三项
+        r = c.post("/api/run", json={"kind": "words", "n_items": 12, "n_right": 12, "ms_active": 36000, "ms_total": 1,
+                                     "best_combo": 12}).json()
+        assert {p["key"] for p in r["pbs"]} == {"right", "combo", "speed"}, r
+        assert r["pb"]["speed"] == 3000
+        # 专注 6 分钟以上：破最长专注（阅读那次是 6 分 40 秒）
+        r = c.post("/api/run", json={"kind": "practice", "n_items": 3, "n_right": 1, "ms_active": 500000}).json()
+        assert [p["key"] for p in r["pbs"]] == ["focus"]
+        # 乱填的数字会被收住
+        r = c.post("/api/run", json={"kind": "hack", "n_items": 5, "n_right": 99, "ms_active": -5}).json()
+        row = db.one("SELECT * FROM runs WHERE user_id=? ORDER BY id DESC", kid)
+        assert row["kind"] == "practice" and row["n_right"] == 5 and row["ms_active"] == 0
+        # 每周进步卡和「我的纪录」
+        wk = records.weekly(kid)
+        assert wk and any("学习了" in x for x in wk["lines"])
+        page = c.get("/today").text
+        assert "上周进步卡" in page and "我的纪录" in page and "每题最快 3.0 秒" in page
+        for path in ("/warmup", "/review?group=words"):
+            assert c.get(path).status_code == 200
+        # 家长只能看，不能替孩子记成绩；家长页能看到进步卡
+        c.get("/logout")
+        c.post("/login", data={"email": "p2@x.com", "password": "secret1"})
+        c.get(f"/parent/as/{kid}")
+        assert c.post("/api/run", json={"kind": "words", "n_items": 1, "n_right": 1}).status_code == 403
+        assert "上周进步" in c.get("/parent").text

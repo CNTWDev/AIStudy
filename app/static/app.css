@@ -118,3 +118,13 @@ details.card>summary{cursor:pointer;list-style:none}details.card>summary::-webki
 #selmenu.on{display:flex;animation:pop .18s ease-out}
 #selmenu button{background:transparent;color:#fff;border:0;padding:8px 10px;border-radius:8px;font-size:14px;cursor:pointer;white-space:nowrap}
 #selmenu button:hover{background:rgba(255,255,255,.15)}
+
+/* 跟自己比：专注计时 + 和「上周的我」赛跑 */
+.runbar{position:sticky;top:8px;z-index:5;background:var(--card,#fff);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin:8px 0}
+.runbar .rt{font-variant-numeric:tabular-nums}
+.race{position:relative;height:22px;margin-top:6px;background:linear-gradient(90deg,var(--line) 0,var(--line) 100%) center/100% 4px no-repeat}
+.race i{position:absolute;top:0;font-style:normal;transform:translateX(-50%);transition:left .6s ease;font-size:16px;line-height:22px}
+.race .me::before{content:"🏃"}
+.race .ghost{opacity:.45}.race .ghost::before{content:"👻"}
+.wkcard{border:2px solid #f1d38a;background:rgba(224,161,0,.07)}
+.wkcard li{margin:2px 0}

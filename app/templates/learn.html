@@ -52,6 +52,7 @@ async function loadItems() {
   try {
     const r = await api(`/api/practice/${KP}?n=3&purpose=${TASK === 'preview' ? 'preview' : 'practice'}`);
     items = r.items; idx = 0; right = 0;
+    if (items.length) Run.start('practice', {total: items.length, mount: $('#items')});
     if (!items.length) { $('#items').innerHTML = '<p>这个知识点暂时没有现成题' + (r.llm ? '，AI 出题失败了，稍后再试。' : '。服务器配置 AI 后会自动出题。') + '</p><p class="muted small">可以先按上面的方法自己练，再到「复习」里巩固。</p>'; return; }
     show();
   } catch (e) { $('#items').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
@@ -60,7 +61,7 @@ function show() {
   if (idx >= items.length) {
     $('#items').innerHTML = `<p><b>做完了：${right}/${items.length} 正确。</b> ${right === items.length ? '太棒了 🎉' : '每做一题都算数，继续加油！'}</p>` +
       (CTX && CTX.next ? `<div class="hint">🚀 ${esc(CTX.next)}</div>` : '') +
-      `<button class="btn ghost sm" onclick="loadItems()">再来 3 题</button>`; return;
+      `<button class="btn ghost sm" onclick="loadItems()">再来 3 题</button>`; Run.finish(); return;
   }
   const it = items[idx];
   const box = document.createElement('div');
@@ -74,7 +75,7 @@ function show() {
     submit: (answer, self, ms) => api('/api/answer', base(self ? {self, ms} : {answer, ms})),
     dontKnow: () => api('/api/answer', base({dont_know: true})),
     onDone: res => {
-      Combo.hit(!!res.correct, box); celebrate(res, box);
+      Run.hit(!!res.correct); Combo.hit(!!res.correct, box); celebrate(res, box);
       if (p) { if (res.correct) right++; }
       else if (res.correct) { right++; wrongStreak = 0; } else wrongStreak++;
       const nx = document.createElement('div'); nx.className = 'row'; nx.style.marginTop = '10px';
