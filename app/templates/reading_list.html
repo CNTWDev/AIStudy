@@ -18,6 +18,8 @@
     <div class="row"><div class="grow"><label>语言</label><select name="lang"><option value="en" {{ 'selected' if lang=='en' }}>英文</option><option value="zh" {{ 'selected' if lang=='zh' }}>中文</option></select></div>
     <div class="grow"><label>长度</label><select name="length"><option value="">标准</option><option value="很短，80-120 词（中文 300 字左右）">短一点</option><option value="长一些，300-400 词（中文 1000 字左右）">长一点</option></select></div></div>
     <label>想读什么？（选填）</label><input type="text" name="topic" placeholder="例如：恐龙、足球、太空、友谊、电和磁…">
+    {% if cross and (cross.en or cross.zh) %}<p class="small" style="margin:6px 0">🔗 读读别的课学过的：{% for l in ('en', 'zh') %}{% for c in cross[l] %}<button type="button" class="pill xt" data-lang="{{ l }}" data-topic="{{ c.topic }}">{{ '英文' if l == 'en' else '中文' }} · {{ c.subject }}「{{ c.kp.name }}」</button> {% endfor %}{% endfor %}</p>
+    <script>document.querySelectorAll('.xt').forEach(b => b.onclick = () => { const f = b.closest('form'); f.lang.value = b.dataset.lang; f.topic.value = b.dataset.topic; });</script>{% endif %}
     <p class="muted small">英文短文会自动用上你最近要复习的生词。</p>
     <button class="btn">生成短文</button>
   </form>

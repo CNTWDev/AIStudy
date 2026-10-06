@@ -128,3 +128,4 @@ details.card>summary{cursor:pointer;list-style:none}details.card>summary::-webki
 .race .ghost{opacity:.45}.race .ghost::before{content:"👻"}
 .wkcard{border:2px solid #f1d38a;background:rgba(224,161,0,.07)}
 .wkcard li{margin:2px 0}
+.bridge{padding:4px 0;border-bottom:1px dashed var(--line)}.bridge:last-child{border-bottom:0}

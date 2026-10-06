@@ -617,21 +617,23 @@ def parent_home(request: Request):
     return render(request, "parent.html", kids=kids)
 
 
-def _kid_form_packs(form, grade: str, old: dict, grade_changed: bool) -> list[tuple[str, str]]:
-    """每门课选一个教材版本；学段按年级自动对应。年级没变、教材没换时保留原学段（「学校进度」里可能已经往后调过）。"""
+def _kid_form_packs(form, grade: str, old: dict, grade_changed: bool) -> list[tuple[str, str, str]]:
+    """每门课选一个教材版本（有方向的再选方向）；学段按年级自动对应。
+    年级没变、教材没换时保留原学段（「学校进度」里可能已经往后调过）。"""
     out = []
     for subj in {p.subject for p in catalog.packs.values()}:
         pid = form.get(f"subj_{subj}") or ""
         if pid in catalog.packs and catalog.packs[pid].subject == subj:
             keep = pid in old and not grade_changed
-            out.append((pid, old[pid] if keep else catalog.default_stage(pid, grade)))
+            out.append((pid, old[pid] if keep else catalog.default_stage(pid, grade),
+                        catalog.packs[pid].track(form.get(f"track_{pid}"))))
     return out
 
 
 @app.get("/parent/kids/new", response_class=HTMLResponse)
 def kid_new_page(request: Request):
     auth.require_parent(request)
-    return render(request, "kid_form.html", k=None, enrolled={}, packs_by_subject=catalog.by_subject())
+    return render(request, "kid_form.html", k=None, enrolled={}, tracks={}, presets=catalog.presets, packs_by_subject=catalog.by_subject())
 
 
 @app.get("/parent/kids/{kid_id}/edit", response_class=HTMLResponse)
@@ -642,8 +644,10 @@ def kid_edit_page(request: Request, kid_id: int):
 
 
 def _kid_form(request: Request, k, **extra):
-    enrolled = {e["pack_id"]: e["stage"] for e in enrollments(k["id"])}
-    return render(request, "kid_form.html", k=k, enrolled=enrolled, packs_by_subject=catalog.by_subject(),
+    es = enrollments(k["id"])
+    enrolled = {e["pack_id"]: e["stage"] for e in es}
+    return render(request, "kid_form.html", k=k, enrolled=enrolled, tracks={e["pack_id"]: e["track"] for e in es},
+                  presets=catalog.presets, packs_by_subject=catalog.by_subject(k["school_type"] or ""),
                   **account_ctx(k, f"/parent/kids/{k['id']}/account", force=False), **extra)
 
 
@@ -700,10 +704,14 @@ async def kid_save(request: Request):
     old = {e["pack_id"]: e["stage"] for e in enrollments(kid_id)}
     chosen = _kid_form_packs(form, grade, old, grade != old_grade)
     db.run("UPDATE enrollments SET active=0 WHERE user_id=?", kid_id)
-    for pid, stage in chosen:
-        db.run("INSERT INTO enrollments(user_id,pack_id,stage,active) VALUES(?,?,?,1) "
-               "ON CONFLICT(user_id,pack_id) DO UPDATE SET stage=excluded.stage, active=1", kid_id, pid, stage)
+    for pid, stage, track in chosen:
+        db.run("INSERT INTO enrollments(user_id,pack_id,stage,active,track) VALUES(?,?,?,1,?) "
+               "ON CONFLICT(user_id,pack_id) DO UPDATE SET stage=excluded.stage, active=1, track=excluded.track",
+               kid_id, pid, stage, track)
         engine.seed_vocab(kid_id, pid, config.SEED_DIR)
+    preset = catalog.preset(form.get("preset") or "")
+    db.run("UPDATE users SET preset=?, school_type=? WHERE id=?", preset["id"] if preset else "",
+           preset["school_type"] if preset else "", kid_id)
     engine.today_plan(kid_id, rebuild=True)
     return RedirectResponse("/parent", 303)
 
@@ -912,7 +920,7 @@ def kmap(request: Request, pack_id: str):
     stage = engine.enrollment_stage(k["id"], pack_id) or catalog.default_stage(pack_id, k["grade"])
     groups = []
     for st in pack.stages:
-        kps = [kp for kp in catalog.pack_kps(pack_id) if kp["stage"] == st]
+        kps = [kp for kp in catalog.pack_kps(pack_id, track=engine.enroll_track(k["id"], pack_id)) if kp["stage"] == st]
         by_strand = {}
         for kp in kps:
             by_strand.setdefault(kp["strand"], []).append({**kp, "m": m.get(kp["id"])})
@@ -934,8 +942,8 @@ def progress_page(request: Request, pack: str = "", msg: str = ""):
         for kp in v["stage_kps"]:
             by_strand.setdefault(kp["strand"], []).append({**kp, "m": m.get(kp["id"])})
         v["strands"] = [(catalog.strand_name(e["pack_id"], s), lst) for s, lst in by_strand.items()]
-        v["next"] = engine.next_after(e["pack_id"], e["progress_kp"], m, engine.taught_set(k["id"])) if e["progress_kp"] else None
-        v["total"] = len(v["pack"].kp_ids)
+        v["next"] = engine.next_after(e["pack_id"], e["progress_kp"], m, engine.taught_set(k["id"]), e["track"]) if e["progress_kp"] else None
+        v["total"] = len(catalog.ids_for(e["pack_id"], e["track"]))
         rows.append(v)
     return render(request, "progress.html", rows=rows, open_pack=pack, msg=msg)
 
@@ -973,14 +981,16 @@ def learn(request: Request, kp_id: str, task: str = "practice"):
     pack = catalog.packs[kp["pack"]]
     vocab = db.q("SELECT front, back FROM cards WHERE user_id=? AND kp_id=? AND kind='term'", k["id"], kp_id)
     return render(request, "learn.html", kp=kp, pack=pack, pre=pre, post=post, me=m.get(kp_id), task=task,
-                  strand=catalog.strand_name(pack.id, kp["strand"]), vocab=vocab)
+                  strand=catalog.strand_name(pack.id, kp["strand"]), vocab=vocab, bridges=engine.bridges(k["id"], kp_id, m))
 
 
 @app.get("/api/teach/{kp_id}")
 def api_teach(request: Request, kp_id: str):
     k = kid_or_redirect(request)
     kp = catalog.kp(kp_id)
-    return llm.teach(kp, catalog.packs[kp["pack"]], k["grade"], user_id=k["id"])
+    known = [f"{b['subject']}「{b['kp']['name']}」（{b['label']}{'：' + b['note'] if b['note'] else ''}）"
+             for b in engine.bridges(k["id"], kp_id) if b["status"] in ("mastered", "learning")]
+    return llm.teach(kp, catalog.packs[kp["pack"]], k["grade"], user_id=k["id"], known=known)
 
 
 def _public_item(it: dict) -> dict:
@@ -1434,7 +1444,7 @@ def delete_card(request: Request, card_id: int):
 def reading_list(request: Request, lang: str = "en"):
     k = kid_or_redirect(request)
     rows = db.q("SELECT id, title, lang, source, minutes, finished_at, created_at FROM readings WHERE user_id=? ORDER BY id DESC LIMIT 50", k["id"])
-    return render(request, "reading_list.html", rows=rows, lang=lang)
+    return render(request, "reading_list.html", rows=rows, lang=lang, cross={l: engine.cross_topics(k["id"], l) for l in ("en", "zh")})
 
 
 @app.post("/reading/new")

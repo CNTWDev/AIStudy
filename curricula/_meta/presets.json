@@ -1,0 +1,89 @@
+{
+ "_doc": "学校模板：家长给孩子选「学校类型」时，按这里预填每门课的教材和方向；家长仍可逐科修改。packs 的键是学科 subject。引用的教材包必须存在（check 会校验）。",
+ "presets": [
+  {
+   "id": "sh-public-primary",
+   "name": "上海公办小学（1–5 年级）",
+   "school_type": "public",
+   "grades": [
+    "G1",
+    "G5"
+   ],
+   "packs": {
+    "chinese": "chn-tongbian",
+    "math": "math-shanghai",
+    "english": "eng-shanghai",
+    "science": "sci-shanghai"
+   }
+  },
+  {
+   "id": "sh-public-middle",
+   "name": "上海公办初中（6–9 年级）",
+   "school_type": "public",
+   "grades": [
+    "G6",
+    "G9"
+   ],
+   "packs": {
+    "chinese": "chn-tongbian",
+    "math": "math-shanghai",
+    "english": "eng-shanghai",
+    "physics": "phy-shanghai"
+   }
+  },
+  {
+   "id": "sh-public-high",
+   "name": "上海公办高中",
+   "school_type": "public",
+   "grades": [
+    "G10",
+    "G12"
+   ],
+   "packs": {
+    "chinese": "chn-tongbian",
+    "math": "math-shanghai",
+    "english": "eng-shanghai",
+    "physics": "phy-shanghai"
+   }
+  },
+  {
+   "id": "sh-bilingual",
+   "name": "上海民办双语学校（国家课程 + 剑桥英语）",
+   "school_type": "private",
+   "grades": [
+    "G1",
+    "G9"
+   ],
+   "packs": {
+    "chinese": "chn-tongbian",
+    "math": "math-shanghai",
+    "english": {
+     "pack": "eng-cambridge",
+     "track": "0511"
+    },
+    "physics": "phy-shanghai",
+    "science": "sci-shanghai"
+   }
+  },
+  {
+   "id": "intl-cambridge",
+   "name": "国际学校 · 剑桥 IGCSE 路线",
+   "school_type": "international",
+   "grades": [
+    "G3",
+    "G10"
+   ],
+   "packs": {
+    "chinese": "chn-tongbian",
+    "english": {
+     "pack": "eng-cambridge",
+     "track": "0511"
+    },
+    "physics": {
+     "pack": "phy-cambridge",
+     "track": "extended"
+    }
+   }
+  }
+ ]
+}

@@ -46,10 +46,13 @@ def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=
     return [i for i in items if isinstance(i, dict) and i.get("q") and i.get("type") in ("mcq", "num", "fill", "short")]
 
 
-def teach(kp: dict, pack, grade: str, user_id=None) -> dict:
+def teach(kp: dict, pack, grade: str, user_id=None, known: list[str] | None = None) -> dict:
+    """known：孩子在别的学科 / 教材里已经学过、和这个知识点相关的内容（跨学科融合：讲的时候拿来衔接）。"""
+    bridge = ("学生在其它学科已经学过这些相关内容：" + "；".join(known[:4]) +
+              "。讲解时如果自然，就从这些已知的内容引入或类比（比如「你在数学里学过……」「英语里叫……」），不要硬凑。\n") if known else ""
     user = (
         f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n"
-        f"已有学习方法：{kp.get('method','')}\n\n"
+        f"已有学习方法：{kp.get('method','')}\n{bridge}\n"
         "请把这个知识点拆成 3-4 个很小的步骤教给学生，每步一两句话，配一个生活化的小例子；"
         "最后给一个「一句话记住」。如有英文术语，给出英文和中文。\n"
         '输出：{"steps":[{"title":"..","text":".."}],"example":{"q":"..","a":".."},"remember":"..","terms":[{"en":"..","zh":".."}]}'

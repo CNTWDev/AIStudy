@@ -221,6 +221,8 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
         status = "mastered"
     else:
         status = update_mastery(user_id, kp_id, correct, weight=0.5 if dont_know else 1.0, source=mode)
+    if status == "mastered":
+        infer_equivalents(user_id, kp_id)
     if item and not correct and mode in ("practice", "diagnose", "probe", "paper", "exam"):
         # 错题自动进错题本（以卡片形式参与间隔复习）
         ans = item.get("answer")
@@ -241,6 +243,65 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
     return status
 
 
+# ------------------------------------------------------------------ 跨教材融合（见 catalog 的 concepts / links）
+
+def infer_equivalents(user_id: int, kp_id: str) -> int:
+    """学会了一个知识点：其它教材里同一概念的知识点，还没测过的推断为「学习中」（换教材、转学不用从零开始）。"""
+    n = 0
+    for k in catalog.equivalents(kp_id):
+        cur = db.one("SELECT status FROM mastery WHERE user_id=? AND kp_id=?", user_id, k["id"])
+        if not cur or cur["status"] == "unknown":
+            set_mastery(user_id, k["id"], 0.65, "learning", "concept")
+            n += 1
+    return n
+
+
+BRIDGE_LABEL = {"same": "同一个知识点", "uses": "要用到", "used_by": "会用在", "language": "另一种语言", "context": "相关背景"}
+
+
+def bridges(user_id: int, kp_id: str, mastery: dict | None = None, limit: int = 6) -> list[dict]:
+    """学这个知识点时可以连起来的别的学科 / 别的教材内容：同一概念、用到的、背景、另一种语言。
+    孩子已经会的排前面（讲解时拿来类比）；只在孩子自己教材里的才给链接。"""
+    mastery = get_mastery(user_id) if mastery is None else mastery
+    mine = {r["pack_id"] for r in db.q("SELECT pack_id FROM enrollments WHERE user_id=? AND active=1", user_id)}
+    out = [{"kp": k, "type": "same", "note": ""} for k in catalog.equivalents(kp_id)]
+    for r in catalog.related(kp_id):
+        t = "used_by" if r["type"] == "uses" and r["dir"] == "in" else r["type"]
+        out.append({"kp": r["kp"], "type": t, "note": r["note"]})
+    for b in out:
+        p = catalog.packs[b["kp"]["pack"]]
+        b.update(label=BRIDGE_LABEL[b["type"]], subject=p.subject_name, edition=p.edition, mine=p.id in mine,
+                 status=mastery.get(b["kp"]["id"], {}).get("status", "unknown"))
+    out.sort(key=lambda b: (b["status"] not in ("mastered", "learning"), not b["mine"]))
+    return out[:limit]
+
+
+def cross_topics(user_id: int, lang: str, limit: int = 3) -> list[dict]:
+    """语言阅读的跨学科话题：孩子最近在别的学科学过（学校教过或练过）的知识点。
+    英语阅读拿物理、科学、历史的内容来读（用英语学内容）；中文阅读拿历史、道法、科学的内容来读。"""
+    since = (db.today() - timedelta(days=21)).isoformat()
+    recent = [r["kp_id"] for r in db.q(
+        "SELECT kp_id, MAX(updated_at) AS t FROM mastery WHERE user_id=? AND updated_at>=? AND status IN ('learning','mastered') "
+        "GROUP BY kp_id ORDER BY t DESC LIMIT 60", user_id, since)]
+    recent += [r["kp_id"] for r in db.q("SELECT kp_id FROM kp_taught WHERE user_id=? ORDER BY marked_at DESC LIMIT 30", user_id)]
+    out, seen = [], set()
+    for k in recent:
+        kp = catalog.kp(k)
+        if not kp or k in seen:
+            continue
+        p = catalog.packs[kp["pack"]]
+        if p.subject in ("english", "chinese") or (lang == "zh" and p.subject == "math"):
+            continue
+        seen.add(k)
+        en = kp.get("name_en") or ""
+        out.append({"kp": kp, "subject": p.subject_name,
+                    "topic": (f"{p.subject_name}里学过的「{kp['name']}」{('(' + en + ')') if en else ''}：用英文讲讲它是什么、生活里在哪见到"
+                              if lang == "en" else f"和{p.subject_name}里学过的「{kp['name']}」有关的故事或科普")})
+        if len(out) >= limit:
+            break
+    return out
+
+
 # ------------------------------------------------------------------ 诊断（向后回溯）
 
 MAX_DIAG = 18
@@ -252,12 +313,23 @@ def enrollment_stage(user_id: int, pack_id: str) -> str | None:
     return r["stage"] if r else None
 
 
+def enroll_track(user_id: int, pack_id: str) -> str:
+    """孩子在这套教材里选的方向（没选就是默认方向；没有方向的教材返回空）。"""
+    r = db.one("SELECT track FROM enrollments WHERE user_id=? AND pack_id=?", user_id, pack_id)
+    return catalog.packs[pack_id].track(r["track"] if r else "") if pack_id in catalog.packs else ""
+
+
+def my_ids(user_id: int, pack_id: str) -> list[str]:
+    """这个孩子在这套教材里要学的知识点（按他选的方向）。"""
+    return catalog.ids_for(pack_id, enroll_track(user_id, pack_id))
+
+
 def start_diagnosis(user_id: int, pack_id: str, stage: str) -> int:
     """从当前学段（及上一学段）里选核心知识点做探测；做错就沿「必须」前置往回查，最多 3 级。"""
     pack = catalog.packs[pack_id]
     idx = pack.stages.index(stage) if stage in pack.stages else len(pack.stages) - 1
     window = pack.stages[max(0, idx - 1): idx + 1]
-    cands = [k for k in catalog.pack_kps(pack_id) if k["stage"] in window]
+    cands = [k for k in catalog.pack_kps(pack_id, track=enroll_track(user_id, pack_id)) if k["stage"] in window]
     has_items = {r["kp_id"] for r in db.q("SELECT DISTINCT kp_id FROM items")}
     # 高频 > 有现成题 > 当前学段；每个板块至少一个
     cands.sort(key=lambda k: (not k.get("hot"), k["id"] not in has_items, k["stage"] != stage))
@@ -364,7 +436,7 @@ def frontier(user_id: int, pack_id: str, stage: str, mastery: dict) -> list[dict
     idx = pack.stages.index(stage) if stage in pack.stages else 0
     window = set(pack.stages[idx: idx + 2])
     out = []
-    for k in catalog.pack_kps(pack_id):
+    for k in catalog.pack_kps(pack_id, track=enroll_track(user_id, pack_id)):
         if k["stage"] not in window or k["id"] in mastery and mastery[k["id"]]["status"] != "unknown":
             continue
         reqs = catalog.prereqs(k["id"], required_only=True)
@@ -408,23 +480,24 @@ def set_progress(user_id: int, pack_id: str, current_kp: str | None, taught: lis
 def progress_view(user_id: int, e) -> dict:
     """一个教材包的进度概况：学过的（以前学段 + 本学段勾选的）、正在学的、接下来的。"""
     pack = catalog.packs[e["pack_id"]]
+    ids = catalog.ids_for(pack.id, e["track"])
     taught = taught_set(user_id)
     cur = e["stage"]
-    learned = [k for k in pack.kp_ids if stage_rank(catalog.kps[k]["stage"]) < stage_rank(cur) or k in taught]
+    learned = [k for k in ids if stage_rank(catalog.kps[k]["stage"]) < stage_rank(cur) or k in taught]
     stale = not e["progress_at"] or e["progress_at"] < (db.today() - timedelta(days=PROGRESS_STALE_DAYS)).isoformat()
     return {"pack": pack, "stage": cur, "current": catalog.kp(e["progress_kp"]) if e["progress_kp"] else None,
-            "learned": learned, "taught_here": [k for k in pack.kp_ids if catalog.kps[k]["stage"] == cur and k in taught],
-            "stage_kps": [catalog.kps[k] for k in pack.kp_ids if catalog.kps[k]["stage"] == cur],
+            "learned": learned, "taught_here": [k for k in ids if catalog.kps[k]["stage"] == cur and k in taught],
+            "stage_kps": [catalog.kps[k] for k in ids if catalog.kps[k]["stage"] == cur], "track": pack.track_name(e["track"]),
             "updated": e["progress_at"], "stale": stale}
 
 
-def next_after(pack_id: str, kp_id: str, mastery: dict, taught: set) -> dict | None:
+def next_after(pack_id: str, kp_id: str, mastery: dict, taught: set, track: str | None = None) -> dict | None:
     """进度之后的下一个知识点：优先同一条线（strand）里、本学段或下一学段、前置都已学过的。"""
     pack = catalog.packs[pack_id]
     cur = catalog.kp(kp_id)
     if not cur:
         return None
-    ids = pack.kp_ids
+    ids = catalog.ids_for(pack.id, track)
     i = ids.index(kp_id) if kp_id in ids else -1
     rank = stage_rank(cur["stage"])
     for k in ids[i + 1:] + ids[:i]:
@@ -568,7 +641,7 @@ def build_plan(user_id: int) -> list[dict]:
             if mastery.get(cur["id"], {}).get("status") != "mastered":
                 sync_all.append({"type": "sync", "kp": cur["id"], "title": f"跟上学校：{cur['name']}",
                                  "why": "学校正在学这个，趁热练一练", "minutes": 12, "pack": pack_id})
-            nxt = next_after(pack_id, cur["id"], mastery, taught)
+            nxt = next_after(pack_id, cur["id"], mastery, taught, e["track"])
             if nxt:
                 pre_all.append({"type": "preview", "kp": nxt["id"], "title": f"预习：{nxt['name']}",
                                 "why": "学校马上要学，先看一眼", "minutes": 8, "pack": pack_id})
@@ -583,7 +656,7 @@ def build_plan(user_id: int) -> list[dict]:
         diag = db.one("SELECT id FROM diag_sessions WHERE user_id=? AND pack_id=? AND status='done'", user_id, pack_id)
         if not diag:
             diag_needed.append(pack_id)
-        kp_ids = set(catalog.packs[pack_id].kp_ids)
+        kp_ids = set(catalog.ids_for(pack_id, e["track"]))
         weak = [mastery[k] for k in kp_ids if k in mastery and
                 (mastery[k]["status"] == "weak" or mastery[k]["status"] == "learning" and mastery[k]["score"] < 0.6)]
         weak.sort(key=lambda m: m["score"])
@@ -767,7 +840,7 @@ def streak(user_id: int) -> int:
 
 def pack_summary(user_id: int, pack_id: str, mastery=None) -> dict:
     mastery = mastery if mastery is not None else get_mastery(user_id)
-    ids = catalog.packs[pack_id].kp_ids
+    ids = my_ids(user_id, pack_id)
     c = {"unknown": 0, "weak": 0, "learning": 0, "mastered": 0}
     for k in ids:
         c[mastery.get(k, {}).get("status", "unknown")] += 1

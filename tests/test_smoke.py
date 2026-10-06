@@ -642,3 +642,59 @@ def test_self_records():
         c.get(f"/parent/as/{kid}")
         assert c.post("/api/run", json={"kind": "words", "n_items": 1, "n_right": 1}).status_code == 403
         assert "上周进步" in c.get("/parent").text
+
+
+def test_curricula_layers_tracks_and_bridges():
+    """教材分层：学段配置、教材方向、学校模板、跨教材关联（同一概念互认、跨学科背景、阅读话题）。"""
+    from app import db, engine
+    from app.catalog import catalog, stage_rank
+    assert not catalog.errors, catalog.errors
+    assert stage_rank("MYP3") == 8 and stage_rank("DP1") == 11  # IB 学段在同一根学年轴上
+    eng = catalog.packs["eng-cambridge"]
+    assert eng.track("") == "0511" and eng.track("bogus") == "0511"
+    ids_0511, ids_0500 = set(catalog.ids_for("eng-cambridge", "0511")), set(catalog.ids_for("eng-cambridge", "0500"))
+    assert "ENG-REA-12" in ids_0511 - ids_0500 and "ENG-WRI-22" in ids_0500 - ids_0511
+    assert len(catalog.ids_for("phy-cambridge", "core")) < len(catalog.ids_for("phy-cambridge", "extended"))
+    with TestClient(app) as c:
+        c.post("/login", data={"email": "p2@x.com", "password": "secret1"})
+        kid = db.one("SELECT id FROM users WHERE email='a@x.com'")
+        page = c.get(f"/parent/kids/{kid['id']}/edit").text
+        assert "学校类型" in page and "国际学校 · 剑桥 IGCSE 路线" in page and 'name="track_eng-cambridge"' in page
+        # 选国际学校模板 + 英语 0500 方向
+        form = {"id": str(kid["id"]), "name": "姐姐", "email": "a@x.com", "grade": "G8", "daily_minutes": "90",
+                "preset": "intl-cambridge", "subj_english": "eng-cambridge", "track_eng-cambridge": "0500",
+                "subj_physics": "phy-cambridge", "track_phy-cambridge": "core", "subj_chinese": "chn-tongbian"}
+        c.post("/parent/kids/save", data=form)
+        u = db.one("SELECT preset, school_type FROM users WHERE id=?", kid["id"])
+        assert u["preset"] == "intl-cambridge" and u["school_type"] == "international"
+        assert engine.enroll_track(kid["id"], "eng-cambridge") == "0500"
+        assert engine.enroll_track(kid["id"], "phy-cambridge") == "core"
+        assert engine.pack_summary(kid["id"], "phy-cambridge")["total"] == len(catalog.ids_for("phy-cambridge", "core"))
+        # 0500 方向的地图里有定向写作、没有 ESL 的笔记补全
+        c.get(f"/parent/as/{kid['id']}")
+        m = c.get("/map/eng-cambridge").text
+        assert catalog.kp("ENG-WRI-22")["name"] in m and catalog.kp("ENG-REA-12")["name"] not in m
+        form["track_eng-cambridge"] = "0511"
+        c.post("/parent/kids/save", data=form)
+        c.get("/logout")
+        # 同一概念互认：学会沪科版「密度」→ 剑桥物理的密度推断为「学习中」
+        c.post("/login", data={"email": "a@x.com", "password": "secret1"})
+        assert not db.one("SELECT 1 AS x FROM mastery WHERE user_id=? AND kp_id='PHY-IG-1.4-01' AND status!='unknown'", kid["id"])
+        engine.record_attempt(kid["id"], None, "PSH-MECH-14", "probe", True)
+        mrow = db.one("SELECT status, source FROM mastery WHERE user_id=? AND kp_id='PHY-IG-1.4-01'", kid["id"])
+        assert mrow["status"] in ("learning", "mastered")
+        # 学习页显示跨学科联系，讲解提示里带上孩子已学的相关内容
+        page = c.get("/learn/PHY-IG-1.4-01").text
+        assert "和别的学科连起来" in page and catalog.kp("PSH-MECH-14")["name"] in page
+        seen = {}
+        from app import llm
+        orig = llm.teach
+        llm.teach = lambda kp, pack, grade, user_id=None, known=None: seen.setdefault("known", known) or {"steps": []}
+        try:
+            c.get("/api/teach/PHY-IG-1.4-01")
+        finally:
+            llm.teach = orig
+        assert any("密度" in x for x in seen["known"])
+        # 英语阅读可以选「别的课学过的」话题
+        assert any(t["kp"]["id"] in ("PSH-MECH-14", "PHY-IG-1.4-01") for t in engine.cross_topics(kid["id"], "en"))
+        assert "读读别的课学过的" in c.get("/reading").text

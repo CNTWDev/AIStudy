@@ -3,6 +3,7 @@
   python -m app.cli migrate                         执行数据库迁移（升级后必须执行，install.sh 会自动执行）
   python -m app.cli migrate-status                  查看迁移状态
   python -m app.cli check [--llm]                   检测数据库、迁移、教材、AI 配置；--llm 会真实调用一次 AI
+  python -m app.cli check-curricula                 只校验教材数据（学段、教材包、方向、跨教材关联、学校模板），不需要数据库
   python -m app.cli create-admin 邮箱 密码 [称呼]     创建管理员（或把已有家长账号设为管理员并重设密码）
   python -m app.cli reset-password 邮箱 新密码        重设任何账号的密码，并让它在所有设备上退出
   python -m app.cli unlock 邮箱                       解除密码输错导致的锁定
@@ -40,6 +41,7 @@ def check(with_llm: bool) -> int:
     good &= _ok(not pend, "数据库结构是最新的" if not pend else f"有 {len(pend)} 个迁移未执行：{', '.join(pend)}（运行 migrate）")
     catalog.load()
     good &= _ok(len(catalog.kps) > 0, f"教材包 {len(catalog.packs)} 个，知识点 {len(catalog.kps)} 个")
+    good &= _ok(not catalog.errors, "教材数据校验通过" if not catalog.errors else f"教材数据有 {len(catalog.errors)} 个问题（运行 check-curricula 查看）")
     if config.SECRET_KEY in ("", "dev-secret-change-me") or "请改" in config.SECRET_KEY:
         good &= _ok(False, "SECRET_KEY 还是默认值，请在 .env 里改成随机字符串")
     else:
@@ -92,6 +94,20 @@ def backup(target: Path) -> Path:
     return dst
 
 
+def check_curricula() -> int:
+    """教材数据校验：知识点 id 唯一、学段已定义、前置和关联都能找到、方向合法、学校模板引用的教材存在。"""
+    catalog.load()
+    print(f"学段 {len(catalog.stages)} 个，教材包 {len(catalog.packs)} 个，知识点 {len(catalog.kps)} 个，"
+          f"概念 {len(catalog.concepts)} 个，关联 {len(catalog.links)} 条，学校模板 {len(catalog.presets)} 个")
+    for p in catalog.packs.values():
+        tr = f"，方向：{' / '.join(t['id'] for t in p.tracks)}" if p.tracks else ""
+        print(f"  {p.id:16} {p.subject_name} · {p.edition}（{len(p.kp_ids)} 个点{tr}）")
+    for e in catalog.errors:
+        print("  [FAIL]", e)
+    print("校验通过" if not catalog.errors else f"有 {len(catalog.errors)} 个问题")
+    return 1 if catalog.errors else 0
+
+
 def main(argv) -> int:
     if not argv or argv[0] in ("-h", "--help", "help"):
         print(__doc__)
@@ -107,6 +123,8 @@ def main(argv) -> int:
         return 0
     if cmd == "check":
         return check("--llm" in args)
+    if cmd == "check-curricula":
+        return check_curricula()
     if cmd == "backup":
         print("已备份到", backup(Path(args[0]) if args else config.DATA_DIR / "backups"))
         return 0
