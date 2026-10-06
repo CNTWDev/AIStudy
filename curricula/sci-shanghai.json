@@ -1,0 +1,2758 @@
+{
+ "pack": {
+  "id": "sci-shanghai",
+  "subject": "science",
+  "subject_name": "科学",
+  "edition": "沪科技版科学（五·四学制，俞立中主编）",
+  "region": "上海公办",
+  "stages": [
+   "G1",
+   "G2",
+   "G3",
+   "G4",
+   "G5",
+   "G6"
+  ],
+  "version": 1,
+  "generated": "2026-10-06",
+  "verified": "2026-10-06",
+  "sources": [
+   "https://jw.beijing.gov.cn/xxgk/2024zcwj/2024qtwj/202408/W020240905543232813376.pdf",
+   "https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf",
+   "https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf",
+   "http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html",
+   "http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf",
+   "https://www.dzkbw.org/book/5798.html",
+   "https://www.dzkbw.org/book/5799.html",
+   "https://www.dzkbw.org/book/5800.html",
+   "https://www.dzkbw.org/book/5801.html",
+   "https://www.dzskb.com/hkjbxxkxys.html",
+   "https://www.renjiaoshe.com/jiaocai/2807.html"
+  ],
+  "notes": "教材：上海科学技术出版社（上海教委目录简称“沪科技”）《义务教育教科书（五·四学制）·科学》，俞立中主编，一年级上册至六年级下册，列入教育部《2024年义务教育国家课程教学用书目录》。上海科学课在1～6年级开设（小学G1–G5，初中预备年级G6）；七年级起改设生物学、地理，八年级起物理、化学。换版时间（据上海教委各学期教学用书目录中配套《科学活动手册》的启用情况）：一、六年级2024秋，二年级2025秋，三、四、五年级2026秋（三、四年级上册活动手册准用号 SD–XX–2026005/2026006，五年级上册标“待审”）；2026年春季三～五年级第二学期仍用《自然（试用本）》（沪远东或沪科教），2026年秋季目录中已不再列《自然》。本包中 G1上、G1下、G2上、G6上、G6下 按新版各册单元目录建点（unit 为官方单元名）；G2下、G3、G4、G5 新版目录未查到，按《义务教育科学课程标准（2022年版）》对应学段（1～2、3～4、5～6年级）内容要求补点，unit 留空、term 记“全”（G2下记“下”），source 注明是课标依据，待课本可查后改按单元重排。G5 点只收六年级课本未涉及的5～6年级课标内容，同学段的热、声光、电、能源、细胞、进化、人体、太阳系等放在 G6。与初中衔接：SCI-SH-G6-03/07 → SCI-PRE-ENERGY、SCI-PRE-THERM；G6-04 → SCI-PRE-SOUND；G6-05 → SCI-PRE-LIGHT、SCI-PRE-COLOUR；G6-06 → SCI-PRE-CIRC；G6-19/20/21 → SCI-PRE-SOLAR、SCI-PRE-GALAXY；G5-01/02/03 → SCI-PRE-FORCE、SCI-PRE-DENS；G6-02 → SCI-PRE-PART。同为 G6 的 SCI-PRE-ENERGY/SOUND/SOLAR 已作为“有帮助”前置引用。小学和预备年级科学没有市级统一考试，因此 hot 全部为 false。prereqs 中 strength 取 必须/有帮助。",
+  "system": "cn",
+  "school_types": [
+   "public",
+   "private"
+  ]
+ },
+ "strands": [
+  {
+   "id": "INQ",
+   "name": "科学探究与方法（观察、测量、分类、方位）"
+  },
+  {
+   "id": "MAT",
+   "name": "物质科学（物质、力、声光热电、能量）"
+  },
+  {
+   "id": "LIFE",
+   "name": "生命科学"
+  },
+  {
+   "id": "EARTH",
+   "name": "地球与宇宙科学"
+  },
+  {
+   "id": "TECH",
+   "name": "技术与工程（小小工程师）"
+  }
+ ],
+ "kps": [
+  {
+   "id": "SCI-SH-G1-01",
+   "strand": "INQ",
+   "stage": "G1",
+   "term": "上",
+   "unit": "走进科学课",
+   "name": "走进科学课",
+   "name_en": "Getting to know science lessons",
+   "desc": "认识科学课学什么：用眼睛看、用手摸等方式观察身边的事物，提出问题、动手试一试；知道实验室和课堂的基本安全规则（不随便尝、不乱碰器材）。",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "观察",
+    "提问",
+    "安全"
+   ],
+   "method": "多问“你是怎么知道的？”，让孩子说出“我看到…/我摸到…”。常见问题是只说结论不说观察到了什么。",
+   "probe": "给一片树叶，问“你能用哪些办法了解它？说出两个你观察到的特点。”",
+   "source": "目录：https://www.dzskb.com/hkjbxxkxys.html 、https://www.renjiaoshe.com/jiaocai/2807.html（一年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2024002 科学活动手册(一年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 「走进科学课」"
+  },
+  {
+   "id": "SCI-SH-G1-02",
+   "strand": "LIFE",
+   "stage": "G1",
+   "term": "上",
+   "unit": "第1单元 感知世界",
+   "name": "人有哪些感官",
+   "name_en": "Our senses",
+   "desc": "人有眼、耳、鼻、舌、皮肤等感觉器官，分别产生视觉、听觉、嗅觉、味觉、触觉。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "感官",
+    "视觉",
+    "听觉",
+    "嗅觉",
+    "味觉",
+    "触觉"
+   ],
+   "method": "用“蒙眼猜物”“闻一闻”等游戏把器官和感觉一一对上。常见错误是把“舌头”说成只能“说话”，或把皮肤漏掉。",
+   "probe": "连线题：眼—耳—鼻—舌—皮肤 对应 看、听、闻、尝、摸。",
+   "source": "目录：https://www.dzskb.com/hkjbxxkxys.html 、https://www.renjiaoshe.com/jiaocai/2807.html（一年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2024002 科学活动手册(一年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第1单元第1课"
+  },
+  {
+   "id": "SCI-SH-G1-03",
+   "strand": "LIFE",
+   "stage": "G1",
+   "term": "上",
+   "unit": "第1单元 感知世界",
+   "name": "感官怎样发挥作用",
+   "name_en": "How our senses work together",
+   "desc": "认识一件物体往往要几种感官一起用；感官能帮我们发现危险；要保护眼睛、耳朵等感官，不明物体不能随便尝。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "保护感官",
+    "安全"
+   ],
+   "method": "让孩子描述一个苹果时，提示“还能用别的感官吗？”。常见错误是认为“尝一尝”永远是安全的观察方法。",
+   "probe": "问“认识一个橘子，你会用到哪几种感官？哪种东西不能用嘴尝？”",
+   "source": "目录：https://www.dzskb.com/hkjbxxkxys.html 、https://www.renjiaoshe.com/jiaocai/2807.html（一年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2024002 科学活动手册(一年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第1单元第2课"
+  },
+  {
+   "id": "SCI-SH-G1-04",
+   "strand": "MAT",
+   "stage": "G1",
+   "term": "上",
+   "unit": "第2单元 认识物体",
+   "name": "物体有哪些特征",
+   "name_en": "Features of objects",
+   "desc": "观察并描述物体的外部特征：颜色、形状、大小、轻重、软硬、粗糙或光滑等（对应课标1.1的1～2年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "特征",
+    "形状",
+    "轻重",
+    "软硬",
+    "粗糙",
+    "光滑"
+   ],
+   "method": "用“我说你猜”游戏：只说特征让对方猜物体。常见错误是只说颜色，不会从多个方面描述。",
+   "probe": "给一块橡皮和一颗玻璃球，让孩子各说出三个特征并比较不同。",
+   "source": "目录：https://www.dzskb.com/hkjbxxkxys.html 、https://www.renjiaoshe.com/jiaocai/2807.html（一年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2024002 科学活动手册(一年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第2单元第1课"
+  },
+  {
+   "id": "SCI-SH-G1-05",
+   "strand": "INQ",
+   "stage": "G1",
+   "term": "上",
+   "unit": "第2单元 认识物体",
+   "name": "怎样比较长短和轻重",
+   "name_en": "Comparing length and weight",
+   "desc": "比较长短：一端对齐直接比，或用回形针、小方块等同一种物体当“单位”数一数；比较轻重：用手掂、用简易天平（低的一边更重）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "对齐",
+    "长短",
+    "轻重",
+    "天平"
+   ],
+   "method": "强调“起点对齐”和“用同一种单位”。常见错误是两端不对齐就比长短，或混用大小不同的回形针。",
+   "probe": "图中两支铅笔起点不齐，问哪支更长；简易天平左边低，问哪边物体重。",
+   "source": "目录：https://www.dzskb.com/hkjbxxkxys.html 、https://www.renjiaoshe.com/jiaocai/2807.html（一年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2024002 科学活动手册(一年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第2单元第2课"
+  },
+  {
+   "id": "SCI-SH-G1-06",
+   "strand": "INQ",
+   "stage": "G1",
+   "term": "上",
+   "unit": "第2单元 认识物体",
+   "name": "怎样给物体分类",
+   "name_en": "Sorting objects",
+   "desc": "按一个特征（颜色、形状、材料、用途等）把物体分成几类；同一组物体换一个标准会有不同分法。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "分类",
+    "标准"
+   ],
+   "method": "每次分类先说“我按什么分”。常见错误是一次分类中混用两个标准。",
+   "probe": "给8张物体卡片，让孩子分两次，每次说出分类标准。",
+   "source": "目录：https://www.dzskb.com/hkjbxxkxys.html 、https://www.renjiaoshe.com/jiaocai/2807.html（一年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2024002 科学活动手册(一年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第2单元第3课"
+  },
+  {
+   "id": "SCI-SH-G1-07",
+   "strand": "LIFE",
+   "stage": "G1",
+   "term": "上",
+   "unit": "第3单元 生机勃勃的大自然",
+   "name": "你认识哪些动植物",
+   "name_en": "Plants and animals around us",
+   "desc": "说出身边常见的植物和动物的名称，能区分哪些是植物、哪些是动物（对应课标5.2的1～2年级“认识周边常见的植物和动物”）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "植物",
+    "动物"
+   ],
+   "method": "带孩子去小区或公园“打卡”，拍照后说名字并分成植物、动物两堆。常见错误是把蘑菇当植物、把不会动的动物（如珊瑚）当植物——小学只需知道常见例子。",
+   "probe": "给10张图片，让孩子分成植物和动物两组。",
+   "source": "目录：https://www.dzskb.com/hkjbxxkxys.html 、https://www.renjiaoshe.com/jiaocai/2807.html（一年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2024002 科学活动手册(一年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第3单元第1课"
+  },
+  {
+   "id": "SCI-SH-G1-08",
+   "strand": "LIFE",
+   "stage": "G1",
+   "term": "上",
+   "unit": "第3单元 生机勃勃的大自然",
+   "name": "怎样观察动植物",
+   "name_en": "Observing plants and animals",
+   "desc": "用多种感官和放大镜按一定顺序（从整体到局部、从上到下）观察动植物，用画图或简单文字记录；观察时爱护动植物、注意安全。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-07",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G1-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "放大镜",
+    "观察记录"
+   ],
+   "method": "给孩子一张观察记录单（画—写—说）。常见错误是随意看几眼就画，没有顺序，漏掉部分。",
+   "probe": "让孩子观察一只蜗牛或一盆花，看他能否按顺序说出至少三个部分。",
+   "source": "目录：https://www.dzskb.com/hkjbxxkxys.html 、https://www.renjiaoshe.com/jiaocai/2807.html（一年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2024002 科学活动手册(一年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第3单元第2课"
+  },
+  {
+   "id": "SCI-SH-G1-09",
+   "strand": "LIFE",
+   "stage": "G1",
+   "term": "上",
+   "unit": "第3单元 生机勃勃的大自然",
+   "name": "动植物与我们的生活",
+   "name_en": "Plants, animals and our lives",
+   "desc": "举例说明动植物为人类提供食物、衣物材料、药材等，人也要保护动植物。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "食物",
+    "保护"
+   ],
+   "method": "从一日三餐和身上衣服往回追问“它来自哪种动植物？”。",
+   "probe": "问“米饭、鸡蛋、棉衣分别来自什么动植物？”",
+   "source": "目录：https://www.dzskb.com/hkjbxxkxys.html 、https://www.renjiaoshe.com/jiaocai/2807.html（一年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2024002 科学活动手册(一年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第3单元第3课"
+  },
+  {
+   "id": "SCI-SH-G1-10",
+   "strand": "EARTH",
+   "stage": "G1",
+   "term": "上",
+   "unit": "第4单元 天气知多少",
+   "name": "天气现象有哪些",
+   "name_en": "Weather phenomena",
+   "desc": "认识晴、多云、阴、雨、雪、风、雾等天气现象，会用简单天气符号记录天气。",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "天气",
+    "天气符号"
+   ],
+   "method": "每天和孩子一起记录天气日历，一周后数一数各种天气的天数。常见错误是把“多云”和“阴”混淆。",
+   "probe": "给一组天气符号，让孩子说出名称，并记录今天的天气。",
+   "source": "目录：https://www.dzskb.com/hkjbxxkxys.html 、https://www.renjiaoshe.com/jiaocai/2807.html（一年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2024002 科学活动手册(一年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第4单元第1课"
+  },
+  {
+   "id": "SCI-SH-G1-11",
+   "strand": "EARTH",
+   "stage": "G1",
+   "term": "上",
+   "unit": "第4单元 天气知多少",
+   "name": "天气变化带来的影响",
+   "name_en": "Effects of weather change",
+   "desc": "举例说明天气变化影响人们的穿衣、出行和动植物的活动，知道恶劣天气（大风、暴雨等）时的安全做法。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "天气预报",
+    "安全"
+   ],
+   "method": "看天气预报决定第二天穿什么、带不带伞。",
+   "probe": "问“明天有大雨，你出门要准备什么？雨天蚂蚁、蜗牛会怎样？”",
+   "source": "目录：https://www.dzskb.com/hkjbxxkxys.html 、https://www.renjiaoshe.com/jiaocai/2807.html（一年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2024002 科学活动手册(一年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第4单元第2课"
+  },
+  {
+   "id": "SCI-SH-G1-12",
+   "strand": "EARTH",
+   "stage": "G1",
+   "term": "上",
+   "unit": "第5单元 从秋天到冬天",
+   "name": "秋天里会发生什么",
+   "name_en": "Changes in autumn",
+   "desc": "观察秋天天气转凉，树叶变黄、落叶，果实成熟，部分动物储粮或迁徙等变化。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-07",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-SH-G1-10",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "秋天",
+    "落叶",
+    "迁徙"
+   ],
+   "method": "秋天带孩子捡落叶、做观察记录，对比夏天。",
+   "probe": "问“秋天你看到树和动物有哪些变化？说两个。”",
+   "source": "目录：https://www.dzskb.com/hkjbxxkxys.html 、https://www.renjiaoshe.com/jiaocai/2807.html（一年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2024002 科学活动手册(一年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第5单元第1课"
+  },
+  {
+   "id": "SCI-SH-G1-13",
+   "strand": "EARTH",
+   "stage": "G1",
+   "term": "上",
+   "unit": "第5单元 从秋天到冬天",
+   "name": "冬天里会发生什么",
+   "name_en": "Changes in winter",
+   "desc": "观察冬天气温低、可能结冰，植物落叶或常绿，部分动物冬眠，人们增加衣物保暖。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-12",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "冬天",
+    "冬眠",
+    "结冰"
+   ],
+   "method": "把秋天和冬天的观察记录放在一起比，说“哪里变了”。常见错误是认为所有树冬天都掉光叶子。",
+   "probe": "问“冬天哪些动物会冬眠？香樟树冬天掉叶子吗？”",
+   "source": "目录：https://www.dzskb.com/hkjbxxkxys.html 、https://www.renjiaoshe.com/jiaocai/2807.html（一年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2024002 科学活动手册(一年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第5单元第2课"
+  },
+  {
+   "id": "SCI-SH-G1-14",
+   "strand": "TECH",
+   "stage": "G1",
+   "term": "上",
+   "unit": "第6单元 小小工程师——植物标识牌",
+   "name": "小小工程师：植物标识牌",
+   "name_en": "Engineering task: plant label sign",
+   "desc": "按工程步骤完成一个植物标识牌：明确任务（要介绍哪种植物、放在户外）→画设计图选材料→制作→展示和改进。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "设计",
+    "制作",
+    "展示"
+   ],
+   "method": "让孩子先画图再动手，做完问“下雨会坏吗？怎么改？”。常见错误是跳过设计直接做。",
+   "probe": "问“做标识牌第一步要做什么？如果放在室外，你会选纸还是塑料片？为什么？”",
+   "source": "目录：https://www.dzskb.com/hkjbxxkxys.html 、https://www.renjiaoshe.com/jiaocai/2807.html（一年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2024002 科学活动手册(一年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第6单元第1～2课"
+  },
+  {
+   "id": "SCI-SH-G1-15",
+   "strand": "LIFE",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第1单元 动物运动会",
+   "name": "谁是游泳高手",
+   "name_en": "Animals that swim",
+   "desc": "观察鱼等水中动物，说出它们靠鳍、尾或脚蹼在水中游动，身体形状有利于游泳。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "游泳",
+    "鳍",
+    "尾"
+   ],
+   "method": "在水族箱或视频里观察鱼怎么摆尾。",
+   "probe": "问“鱼靠身体的哪些部分游泳？鸭子呢？”",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第1单元第1课"
+  },
+  {
+   "id": "SCI-SH-G1-16",
+   "strand": "LIFE",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第1单元 动物运动会",
+   "name": "谁是跑跳健将",
+   "name_en": "Animals that run and jump",
+   "desc": "观察动物用腿跑、跳、爬，比较不同动物腿的特点（长短、粗细、数量）与运动方式的关系。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-15",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "跑",
+    "跳",
+    "爬"
+   ],
+   "method": "让孩子模仿兔子跳、马跑，说出用到了身体哪部分。",
+   "probe": "问“袋鼠和蜗牛分别怎样运动？”",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第1单元第2课"
+  },
+  {
+   "id": "SCI-SH-G1-17",
+   "strand": "LIFE",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第1单元 动物运动会",
+   "name": "谁是飞行能手",
+   "name_en": "Animals that fly",
+   "desc": "观察鸟、昆虫等用翅膀飞行，知道不是所有有翅膀的动物都会飞（如鸵鸟、企鹅）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-16",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "飞行",
+    "翅膀"
+   ],
+   "method": "做“会飞的动物”分类卡片游戏。常见错误是以为会飞的都是鸟（蝴蝶、蝙蝠也会飞）。",
+   "probe": "问“蝴蝶、麻雀、企鹅中谁不会飞？蝴蝶是鸟吗？”",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第1单元第3课"
+  },
+  {
+   "id": "SCI-SH-G1-18",
+   "strand": "LIFE",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第2单元 常见植物博览会",
+   "name": "身边的常见植物有哪些",
+   "name_en": "Common plants around us",
+   "desc": "说出校园、家庭、公园里常见植物的名称，知道植物有树、草、花等不同类型。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "树",
+    "草",
+    "花"
+   ],
+   "method": "带孩子做“小区植物地图”。",
+   "probe": "给植物照片，让孩子说名字并分出树、草、花。",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第2单元第1课"
+  },
+  {
+   "id": "SCI-SH-G1-19",
+   "strand": "LIFE",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第2单元 常见植物博览会",
+   "name": "常见植物的特征",
+   "name_en": "Features of common plants",
+   "desc": "观察并描述植物的根、茎、叶、花、果实、种子等部分，比较不同植物叶子的形状、颜色等特征。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-18",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "根",
+    "茎",
+    "叶",
+    "花",
+    "果实",
+    "种子"
+   ],
+   "method": "拔一棵小草或买一棵带根的青菜，对照说出各部分名称。常见错误是把根和茎混淆（如土豆、藕）。",
+   "probe": "给一张植物图，让孩子标出根、茎、叶、花。",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第2单元第2课"
+  },
+  {
+   "id": "SCI-SH-G1-20",
+   "strand": "EARTH",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第3单元 季节的变化",
+   "name": "春天里会发生什么",
+   "name_en": "Changes in spring",
+   "desc": "观察春天气温回升，植物发芽开花，动物结束冬眠、活动增多等变化。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "春天",
+    "发芽",
+    "开花"
+   ],
+   "method": "和冬天的记录对比，说“谁醒了、谁发芽了”。",
+   "probe": "问“春天里植物和动物有哪些变化？”",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第3单元第1课"
+  },
+  {
+   "id": "SCI-SH-G1-21",
+   "strand": "EARTH",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第3单元 季节的变化",
+   "name": "夏天里会发生什么",
+   "name_en": "Changes in summer",
+   "desc": "观察夏天气温高、雷雨多，植物茂盛，昆虫活跃，人们防暑降温等现象。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-20",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "夏天",
+    "雷雨",
+    "防暑"
+   ],
+   "method": "讨论夏天的安全：防晒、防中暑、雷雨天不在大树下躲雨。",
+   "probe": "问“夏天天气有什么特点？雷雨时应该怎么做？”",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第3单元第2课"
+  },
+  {
+   "id": "SCI-SH-G1-22",
+   "strand": "EARTH",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第3单元 季节的变化",
+   "name": "季节变化有哪些规律",
+   "name_en": "Pattern of the seasons",
+   "desc": "知道一年有春、夏、秋、冬四季，按顺序循环出现；动植物和人的生活随季节变化。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-21",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G1-12",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "四季",
+    "循环",
+    "规律"
+   ],
+   "method": "做“四季转盘”，按顺序排列四季图片。常见错误是顺序排错或认为季节只出现一次。",
+   "probe": "打乱四季图片让孩子排顺序，并问“冬天之后是什么季节？”",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第3单元第3课"
+  },
+  {
+   "id": "SCI-SH-G1-23",
+   "strand": "MAT",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第4单元 看不见的空气",
+   "name": "空气在哪里",
+   "name_en": "Where is air?",
+   "desc": "通过实验（如把纸团塞进杯底倒扣入水中、挤压塑料袋）发现空气虽然看不见，但到处都有。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "空气",
+    "实验"
+   ],
+   "method": "在家做“杯中纸不湿”实验，让孩子解释为什么纸不湿。常见错误是认为“空杯子里什么都没有”。",
+   "probe": "问“一个看起来空的瓶子里有东西吗？你怎么证明？”",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第4单元第1课"
+  },
+  {
+   "id": "SCI-SH-G1-24",
+   "strand": "MAT",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第4单元 看不见的空气",
+   "name": "空气是什么样的",
+   "name_en": "What is air like?",
+   "desc": "知道空气是无色、无味、透明的气体，会流动（风是流动的空气）（课标1.2的1～2年级“认识空气是无色、无味的气体”）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-23",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "无色",
+    "无味",
+    "气体",
+    "风"
+   ],
+   "method": "用感官“检验”空气：看、闻、摸（扇风）。",
+   "probe": "问“空气是什么颜色？什么气味？风是怎么形成的感觉？”",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第4单元第2课"
+  },
+  {
+   "id": "SCI-SH-G1-25",
+   "strand": "MAT",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第4单元 看不见的空气",
+   "name": "为什么空气很重要",
+   "name_en": "Why air matters",
+   "desc": "举例说明人和动植物的生存离不开空气，空气还用于充气玩具、轮胎等；要保护空气清洁。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-24",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "呼吸",
+    "空气污染"
+   ],
+   "method": "让孩子屏住呼吸几秒钟，体会离不开空气。",
+   "probe": "问“哪些东西里充满了空气？为什么不能在空气不流通的地方玩塑料袋？”",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第4单元第3课"
+  },
+  {
+   "id": "SCI-SH-G1-26",
+   "strand": "MAT",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第5单元 身边的材料",
+   "name": "身边物品是用哪些材料做的",
+   "name_en": "Materials of everyday objects",
+   "desc": "识别生活中常见的材料：木材、塑料、金属、纸、布、玻璃、陶瓷等，说出物品是用什么材料做的（课标1.1“识别生活中常见的材料”）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-06",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "材料",
+    "木材",
+    "塑料",
+    "金属"
+   ],
+   "method": "在家做“材料寻宝”，按材料给物品分类。常见错误是一个物品用了多种材料只说一种。",
+   "probe": "问“铅笔是用哪些材料做的？”（木头、石墨芯、金属箍、橡皮）",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第5单元第1课"
+  },
+  {
+   "id": "SCI-SH-G1-27",
+   "strand": "MAT",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第5单元 身边的材料",
+   "name": "木材、塑料和金属的特点",
+   "name_en": "Properties of wood, plastic and metal",
+   "desc": "通过敲、摸、掂、放水里等简单方法比较木材、塑料、金属的特点（如金属较硬、有光泽、摸起来凉；木材能浮在水上），并知道金属是常见材料（课标1.3）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-26",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "光泽",
+    "硬度",
+    "沉浮"
+   ],
+   "method": "做对比实验时一次只比一个特点。常见错误是认为“重的一定会沉”。",
+   "probe": "给木块、塑料勺、铁勺，问“哪个有光泽？哪个放到水里会浮？”",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第5单元第2课"
+  },
+  {
+   "id": "SCI-SH-G1-28",
+   "strand": "MAT",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第5单元 身边的材料",
+   "name": "纸有什么特点",
+   "name_en": "Properties of paper",
+   "desc": "比较不同纸（报纸、卡纸、餐巾纸、牛皮纸等）的吸水性、厚薄、结实程度，知道不同用途选不同的纸，节约用纸。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-27",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "吸水性",
+    "纸"
+   ],
+   "method": "做“纸的吸水比赛”：同样大小的纸条一端浸水，看水爬多高。",
+   "probe": "问“擦水应该用餐巾纸还是蜡光纸？为什么？”",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第5单元第3课"
+  },
+  {
+   "id": "SCI-SH-G1-29",
+   "strand": "TECH",
+   "stage": "G1",
+   "term": "下",
+   "unit": "第6单元 小小工程师——创意花盆",
+   "name": "小小工程师：创意花盆",
+   "name_en": "Engineering task: creative flowerpot",
+   "desc": "根据植物的需要（排水、透气、能放土）确定花盆要求，设计并用材料制作创意花盆，按标准评价和展示、改进。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-14",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-SH-G1-27",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-SH-G1-19",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "设计",
+    "评价",
+    "改进"
+   ],
+   "method": "引导孩子先列“好花盆的标准”，做完逐条打钩评价。",
+   "probe": "问“花盆底部为什么要有小孔？用纸杯做花盆可能有什么问题？”",
+   "source": "目录：https://www.dzkbw.org/book/5798.html 、https://www.renjiaoshe.com/jiaocai/2808.html（一年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-XX-2024016 科学活动手册(一年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第6单元第1～3课"
+  },
+  {
+   "id": "SCI-SH-G2-01",
+   "strand": "MAT",
+   "stage": "G2",
+   "term": "上",
+   "unit": "第1单元 我们离不开水",
+   "name": "水在哪里",
+   "name_en": "Where is water?",
+   "desc": "找出自然界和生活中的水：河流、湖泊、海洋、雨、冰雪、水龙头，以及动植物体内的水。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-22",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "水",
+    "河流",
+    "海洋"
+   ],
+   "method": "和孩子列“家里哪里有水”清单，再扩展到自然界。",
+   "probe": "问“说出三个自然界有水的地方。西瓜里有水吗？”",
+   "source": "目录：https://www.dzkbw.org/book/5799.html（二年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2025004 科学活动手册(二年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第1单元第1课"
+  },
+  {
+   "id": "SCI-SH-G2-02",
+   "strand": "MAT",
+   "stage": "G2",
+   "term": "上",
+   "unit": "第1单元 我们离不开水",
+   "name": "水是怎样的",
+   "name_en": "What is water like?",
+   "desc": "观察并描述水的特征：无色、无味、透明，会流动，没有固定形状（随容器变化）（课标1.2的1～2年级“观察并描述水的特征”）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G1-24",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "透明",
+    "流动",
+    "形状"
+   ],
+   "method": "把水、牛奶、醋放在一起，用感官比较（不尝不明液体）。常见错误是说“水是白色的”。",
+   "probe": "问“水和牛奶有什么不同？把水从杯子倒进盘子，形状变了吗？”",
+   "source": "目录：https://www.dzkbw.org/book/5799.html（二年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2025004 科学活动手册(二年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第1单元第2课"
+  },
+  {
+   "id": "SCI-SH-G2-03",
+   "strand": "MAT",
+   "stage": "G2",
+   "term": "上",
+   "unit": "第1单元 我们离不开水",
+   "name": "为什么水很重要",
+   "name_en": "Why water matters",
+   "desc": "举例说明人、动植物离不开水，水用于饮用、洗涤、灌溉等；节约用水、保护水资源。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "节约用水",
+    "水资源"
+   ],
+   "method": "做家庭“一天用水记录”，讨论怎么节约。",
+   "probe": "问“植物几天不浇水会怎样？说两种节约用水的方法。”",
+   "source": "目录：https://www.dzkbw.org/book/5799.html（二年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2025004 科学活动手册(二年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第1单元第3课"
+  },
+  {
+   "id": "SCI-SH-G2-04",
+   "strand": "INQ",
+   "stage": "G2",
+   "term": "上",
+   "unit": "第2单元 位置与方向",
+   "name": "如何判断位置",
+   "name_en": "Describing position",
+   "desc": "选一个参照物，用前后、左右、上下、远近描述物体的位置；参照物不同，描述也不同。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-05",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "位置",
+    "参照物",
+    "前后左右"
+   ],
+   "method": "玩“藏宝游戏”，只能用“在…的左边/前面”给提示。常见错误是不说参照物，或面对面时左右颠倒。",
+   "probe": "画一张教室座位图，问“小明在小红的哪边？换成以小刚为准呢？”",
+   "source": "目录：https://www.dzkbw.org/book/5799.html（二年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2025004 科学活动手册(二年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第2单元第1课"
+  },
+  {
+   "id": "SCI-SH-G2-05",
+   "strand": "EARTH",
+   "stage": "G2",
+   "term": "上",
+   "unit": "第2单元 位置与方向",
+   "name": "如何判断方向",
+   "name_en": "Finding directions",
+   "desc": "认识东、南、西、北四个方向；会借助太阳（早晨在东方）或指南针等工具判断方向。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "东南西北",
+    "指南针",
+    "太阳"
+   ],
+   "method": "早上带孩子面向太阳站好，说“前东后西、左北右南”。常见错误是把地图上的“上”当成任何场合的北。",
+   "probe": "问“早上你面对太阳，你的左手边是哪个方向？”",
+   "source": "目录：https://www.dzkbw.org/book/5799.html（二年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2025004 科学活动手册(二年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第2单元第2课"
+  },
+  {
+   "id": "SCI-SH-G2-06",
+   "strand": "MAT",
+   "stage": "G2",
+   "term": "上",
+   "unit": "第3单元 推和拉",
+   "name": "推和拉都要用力吗",
+   "name_en": "Pushes and pulls are forces",
+   "desc": "知道推和拉都要用力，推力和拉力是常见的力；用力大小不同，效果不同（课标3.1的1～2年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-05",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "推力",
+    "拉力",
+    "力"
+   ],
+   "method": "让孩子推门、拉抽屉，说出是推还是拉、用力大还是小。",
+   "probe": "给几张图（推车、拔河、关门），让孩子判断是推力还是拉力。",
+   "source": "目录：https://www.dzkbw.org/book/5799.html（二年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2025004 科学活动手册(二年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第3单元第1课"
+  },
+  {
+   "id": "SCI-SH-G2-07",
+   "strand": "MAT",
+   "stage": "G2",
+   "term": "上",
+   "unit": "第3单元 推和拉",
+   "name": "施加推力还是拉力",
+   "name_en": "Choosing push or pull",
+   "desc": "根据要达到的效果选择推或拉；力可以让物体动起来、停下来、改变方向，也能使物体形状改变（如捏橡皮泥、拉弹簧）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "形状改变",
+    "运动"
+   ],
+   "method": "用橡皮泥、弹簧做“改变形状”实验。常见错误是认为只有物体动起来才说明用了力。",
+   "probe": "问“把橡皮泥压扁，用了什么力？足球被踢回去，力改变了什么？”",
+   "source": "目录：https://www.dzkbw.org/book/5799.html（二年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2025004 科学活动手册(二年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第3单元第2课"
+  },
+  {
+   "id": "SCI-SH-G2-08",
+   "strand": "TECH",
+   "stage": "G2",
+   "term": "上",
+   "unit": "第4单元 小小工程师――纸桥",
+   "name": "制作纸桥并发现问题",
+   "name_en": "Paper bridge: build and test",
+   "desc": "用纸搭一座能跨过两个支点的桥，测试它能承受多少重物（如硬币），记录并找出桥的问题（塌陷、弯曲）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-29",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-SH-G1-28",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "承重",
+    "测试"
+   ],
+   "method": "每次只放一枚硬币并记录，培养“测试—记录”的习惯。",
+   "probe": "问“怎样知道你的纸桥能承重多少？要记录什么？”",
+   "source": "目录：https://www.dzkbw.org/book/5799.html（二年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2025004 科学活动手册(二年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第4单元第1课"
+  },
+  {
+   "id": "SCI-SH-G2-09",
+   "strand": "TECH",
+   "stage": "G2",
+   "term": "上",
+   "unit": "第4单元 小小工程师――纸桥",
+   "name": "提高纸桥的承重本领",
+   "name_en": "Making a paper bridge stronger",
+   "desc": "通过改变纸的形状（折成瓦楞形、卷成筒、加横梁等）提高纸桥承重，比较改进前后的结果。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "结构",
+    "形状",
+    "改进"
+   ],
+   "method": "同样一张纸，平放和折成“M”形分别测，体会“形状改变承重”。常见错误是只想到多加几张纸。",
+   "probe": "问“不加纸，怎样让纸桥更结实？”",
+   "source": "目录：https://www.dzkbw.org/book/5799.html（二年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2025004 科学活动手册(二年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第4单元第2课"
+  },
+  {
+   "id": "SCI-SH-G2-10",
+   "strand": "MAT",
+   "stage": "G2",
+   "term": "上",
+   "unit": "第5单元 衣服材料",
+   "name": "你了解衣服吗",
+   "name_en": "Learning about clothes",
+   "desc": "了解衣服的作用（保暖、防晒、保护、美观）和不同季节、场合穿不同衣服。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-22",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "衣服",
+    "保暖"
+   ],
+   "method": "翻衣柜按季节分衣服，说出为什么。",
+   "probe": "问“为什么夏天穿浅色薄衣服，冬天穿厚衣服？”",
+   "source": "目录：https://www.dzkbw.org/book/5799.html（二年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2025004 科学活动手册(二年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第5单元第1课"
+  },
+  {
+   "id": "SCI-SH-G2-11",
+   "strand": "MAT",
+   "stage": "G2",
+   "term": "上",
+   "unit": "第5单元 衣服材料",
+   "name": "做衣服的材料有哪些",
+   "name_en": "Clothing materials",
+   "desc": "认识棉、麻、丝、毛和化学纤维（涤纶等）等衣服材料，比较它们的手感、吸水性、保暖性等，会看衣服洗标上的成分。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-10",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G1-26",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "棉",
+    "麻",
+    "丝",
+    "毛",
+    "化纤"
+   ],
+   "method": "一起读衣服洗标，按材料分类。常见错误是认为“看起来像棉的都是棉”。",
+   "probe": "给一张洗标“棉 60% 涤纶 40%”，问这件衣服用了哪些材料。",
+   "source": "目录：https://www.dzkbw.org/book/5799.html（二年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2025004 科学活动手册(二年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第5单元第2课"
+  },
+  {
+   "id": "SCI-SH-G2-12",
+   "strand": "TECH",
+   "stage": "G2",
+   "term": "上",
+   "unit": "第5单元 衣服材料",
+   "name": "衣服是怎样制成的",
+   "name_en": "How clothes are made",
+   "desc": "了解从原料（棉花、蚕茧、羊毛等）到纤维、纱线、布料，再经过裁剪、缝制做成衣服的大致过程。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-11",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "纤维",
+    "纱线",
+    "布料",
+    "缝制"
+   ],
+   "method": "拆一小段毛线或布边看纤维，再排“棉花→纱→布→衣服”流程卡。",
+   "probe": "打乱流程卡让孩子排序。",
+   "source": "目录：https://www.dzkbw.org/book/5799.html（二年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2025004 科学活动手册(二年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第5单元第3课"
+  },
+  {
+   "id": "SCI-SH-G2-13",
+   "strand": "LIFE",
+   "stage": "G2",
+   "term": "上",
+   "unit": "第6单元 动物的生存",
+   "name": "动物住在哪里",
+   "name_en": "Where animals live",
+   "desc": "知道不同动物生活在不同环境（水中、陆地、树上、地下等），动物的家能提供食物、水、躲避处，动物的生存需要一定的环境条件（课标7.1的1～2年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-17",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "栖息地",
+    "环境"
+   ],
+   "method": "给动物卡片配“家”（池塘、森林、地下洞穴）。",
+   "probe": "问“蚯蚓、青蛙、松鼠分别住在哪里？为什么鱼不能离开水？”",
+   "source": "目录：https://www.dzkbw.org/book/5799.html（二年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2025004 科学活动手册(二年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第6单元第1课"
+  },
+  {
+   "id": "SCI-SH-G2-14",
+   "strand": "LIFE",
+   "stage": "G2",
+   "term": "上",
+   "unit": "第6单元 动物的生存",
+   "name": "动物如何获取食物",
+   "name_en": "How animals get food",
+   "desc": "知道动物要吃其他生物获取养料：有的吃植物，有的吃动物，有的都吃；动物的嘴、牙、爪等与获取食物的方式有关。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "食物",
+    "植食",
+    "肉食",
+    "杂食"
+   ],
+   "method": "列“谁吃什么”表格，再看鸟嘴形状。常见错误是认为所有鸟都吃虫子。",
+   "probe": "问“老虎、牛、熊分别吃什么？啄木鸟的嘴有什么用？”",
+   "source": "目录：https://www.dzkbw.org/book/5799.html（二年级上册目录转写，佐证）；册别：上海市教委2026秋目录 SD–XX–2025004 科学活动手册(二年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第6单元第2课"
+  },
+  {
+   "id": "SCI-SH-G2-15",
+   "strand": "MAT",
+   "stage": "G2",
+   "term": "下",
+   "unit": "",
+   "name": "溶解：有的物质能溶在水里",
+   "name_en": "Some substances dissolve in water",
+   "desc": "知道有些物质（如盐、糖）能溶解在水中，有些物质（如沙子、面粉）很难溶解（课标2.2的1～2年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "溶解",
+    "不溶"
+   ],
+   "method": "做“盐、糖、沙子分别放进水里搅一搅”的对比实验，看哪个“消失”了。常见错误是把“看不见了”说成“没有了”。",
+   "probe": "问“盐放进水里看不见了，盐还在吗？怎么证明？”（尝一尝咸味——仅限食盐）",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 2.2 物质的溶解和溶液，1～2年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版二年级下册（2026春起用）目录未查到，unit 留空"
+  },
+  {
+   "id": "SCI-SH-G2-16",
+   "strand": "MAT",
+   "stage": "G2",
+   "term": "下",
+   "unit": "",
+   "name": "磁铁能吸引铁",
+   "name_en": "Magnets attract iron",
+   "desc": "认识常见的不同形状的磁铁（条形、蹄形、环形等），知道磁铁能吸引铁、镍等材料，不能吸引木头、塑料、铜、铝等（课标3.2的1～2年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-27",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "磁铁",
+    "吸引",
+    "铁"
+   ],
+   "method": "用磁铁在家“寻宝”，把被吸起来的和吸不起来的分两堆，再看是什么材料。常见错误是认为所有金属都能被磁铁吸引。",
+   "probe": "问“回形针、铝罐、铜钥匙、塑料尺，哪些能被磁铁吸起来？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 3.2 电磁相互作用，1～2年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版二年级下册（2026春起用）目录未查到，unit 留空"
+  },
+  {
+   "id": "SCI-SH-G2-17",
+   "strand": "EARTH",
+   "stage": "G2",
+   "term": "下",
+   "unit": "",
+   "name": "月亮的形状在变化",
+   "name_en": "The Moon changes shape",
+   "desc": "持续观察并描述每天看到的月亮形状是变化的（这一学段不要求“月相”术语）（课标9.4的1～2年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-22",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "月亮",
+    "观察记录"
+   ],
+   "method": "连续两周晚上画月亮记录单。常见错误是认为月亮自己会“变大变小”。",
+   "probe": "给几张不同日期的月亮画，问“月亮的样子每天都一样吗？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 9.4 月球是地球的卫星，1～2年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版二年级下册（2026春起用）目录未查到，unit 留空；该条经科普中国转述 https://cloud.kepuchina.cn/newSearch/imgText?id=7018996242266284032"
+  },
+  {
+   "id": "SCI-SH-G2-18",
+   "strand": "LIFE",
+   "stage": "G2",
+   "term": "下",
+   "unit": "",
+   "name": "植物和动物生存需要什么",
+   "name_en": "What plants and animals need to live",
+   "desc": "知道植物生长需要水、阳光、空气和适宜的温度等条件，动物需要食物、水、空气和栖息地（课标7.1的1～2年级“知道植物和动物的生存需要环境条件”）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-13",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G1-19",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "阳光",
+    "水",
+    "空气",
+    "生存条件"
+   ],
+   "method": "种一盆豆芽，一盆放暗处、一盆放窗台对比。常见错误是认为植物只要浇水就能长。",
+   "probe": "问“把一盆花放在黑柜子里一周会怎样？为什么？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 7.1 生物能适应其生存环境，1～2年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版二年级下册（2026春起用）目录未查到，unit 留空"
+  },
+  {
+   "id": "SCI-SH-G3-01",
+   "strand": "INQ",
+   "stage": "G3",
+   "term": "全",
+   "unit": "",
+   "name": "测量长度、质量和体积",
+   "name_en": "Measuring length, mass and volume",
+   "desc": "用尺子量长度（cm、m），用天平或电子秤称质量（g、kg），用量筒或量杯测液体体积（mL、L）；读数时视线与刻度相平（课标1.1的3～4年级“使用简单仪器测量长度、质量、体积、温度等”）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "长度",
+    "质量",
+    "体积",
+    "厘米",
+    "克",
+    "毫升"
+   ],
+   "method": "每次测量都写“数值+单位”。常见错误是忘写单位、尺子不从零刻度对齐、读量筒时俯视或仰视。",
+   "probe": "给一张尺子量铅笔的图（起点不在0），问铅笔多长；问量筒读数时眼睛应该在哪里。",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 1.1 物质具有一定的特性与功能，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版三年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G3-02",
+   "strand": "INQ",
+   "stage": "G3",
+   "term": "全",
+   "unit": "",
+   "name": "温度与温度计",
+   "name_en": "Temperature and thermometers",
+   "desc": "用温度计测量水温、气温，单位摄氏度（℃）；会正确读数（视线与液柱顶端相平），知道温度计玻璃泡不能碰容器壁和底。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "温度",
+    "摄氏度",
+    "温度计"
+   ],
+   "method": "测一杯热水每隔5分钟的温度并记录，体会温度在变化。常见错误是把温度计从水中拿出来再读数。",
+   "probe": "给一张温度计图，读出温度；问“测水温时能把温度计拿出来读吗？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 1.1 物质具有一定的特性与功能，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版三年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G3-03",
+   "strand": "MAT",
+   "stage": "G3",
+   "term": "全",
+   "unit": "",
+   "name": "材料的性质：透光性与导电性",
+   "name_en": "Material properties: transparency and conductivity",
+   "desc": "用实验比较不同材料的性质，如透光性（透明、半透明、不透明）和导电性（导体、绝缘体），并联系用途（课标1.1的3～4年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-27",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G3-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "透光性",
+    "导电性",
+    "导体",
+    "绝缘体"
+   ],
+   "method": "用手电筒照不同材料、用简单电路检测导电性，做成表格。常见错误是认为所有金属以外的东西都不导电（如盐水、石墨能导电）。",
+   "probe": "问“窗户玻璃、毛玻璃、木板分别属于哪种透光性？电线外皮为什么用塑料？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 1.1 物质具有一定的特性与功能，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版三年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G3-04",
+   "strand": "MAT",
+   "stage": "G3",
+   "term": "全",
+   "unit": "",
+   "name": "空气占有空间并有质量",
+   "name_en": "Air takes up space and has mass",
+   "desc": "通过实验说明空气占据空间（如倒扣杯子压入水中）、空气有质量（如两只气球的天平实验），空气可以被压缩（课标1.2的3～4年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-23",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G3-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "空间",
+    "质量",
+    "压缩"
+   ],
+   "method": "做“气球天平”：一边气球放气后天平倾斜。常见错误是认为空气没有重量。",
+   "probe": "问“一只充满气的气球和放了气的同一只气球，哪个重？怎么证明？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 1.2 空气与水是重要的物质，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版三年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G3-05",
+   "strand": "MAT",
+   "stage": "G3",
+   "term": "全",
+   "unit": "",
+   "name": "冰、水和水蒸气",
+   "name_en": "Ice, water and water vapour",
+   "desc": "说出冰、水、水蒸气在状态（固态、液态、气态）、形状和体积等方面的区别；描述水加热沸腾、冷却结冰的现象；知道固体有确定的形状和体积（课标1.2、2.1的3～4年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-02",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G3-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "固态",
+    "液态",
+    "气态",
+    "沸腾",
+    "结冰"
+   ],
+   "method": "用冰块→水→加热冒“白气”的连续实验，配合三态卡片。常见错误是把看到的“白气”当成水蒸气（白气是小水滴，水蒸气看不见）。",
+   "probe": "问“水壶口冒的白气是水蒸气吗？冰化成水，形状、体积会怎样？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 2.1 物质的三态变化；1.2 空气与水是重要的物质，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版三年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G3-06",
+   "strand": "MAT",
+   "stage": "G3",
+   "term": "全",
+   "unit": "",
+   "name": "蒸发与凝结",
+   "name_en": "Evaporation and condensation",
+   "desc": "描述物质加热或冷却时的状态变化：水受热蒸发成水蒸气，水蒸气遇冷凝结成小水滴；举出生活实例（晾衣服、镜子起雾）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G3-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "蒸发",
+    "凝结"
+   ],
+   "method": "比较两块湿布放阳光下和阴凉处谁先干。常见错误是认为只有沸腾时水才会变成水蒸气。",
+   "probe": "问“冬天窗户内侧为什么有小水珠？湿衣服怎样干得快？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 2.1 物质的三态变化，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版三年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G3-07",
+   "strand": "MAT",
+   "stage": "G3",
+   "term": "全",
+   "unit": "",
+   "name": "溶解的快慢",
+   "name_en": "Speed of dissolving",
+   "desc": "描述不同物质在一定量的水中溶解的情况（有的溶得多、有的溶得少）；知道搅拌、加热（提高水温）能加快溶解（课标2.2的3～4年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-15",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G3-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "溶解",
+    "搅拌",
+    "水温",
+    "对比实验"
+   ],
+   "method": "设计对比实验时只改变一个条件（搅拌或水温），其它保持相同。常见错误是同时改变两个条件。",
+   "probe": "问“想知道水温是否影响方糖溶解快慢，哪些条件要保持一样？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 2.2 物质的溶解和溶液，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版三年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G3-08",
+   "strand": "LIFE",
+   "stage": "G3",
+   "term": "全",
+   "unit": "",
+   "name": "植物和动物的主要特征",
+   "name_en": "Main features of plants and animals",
+   "desc": "能区分植物和动物的主要特征（如植物一般不能移动、能利用阳光；动物能运动、要摄取食物），按特征给常见动植物分类（课标5.2的3～4年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-19",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G2-14",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "分类",
+    "特征",
+    "脊椎动物"
+   ],
+   "method": "用二分检索表（“有没有脊柱/有没有羽毛”）给动物卡片分类。",
+   "probe": "给一组动物，让孩子按“有无脊柱”或“胎生/卵生”分两组并说明标准。",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 5.2 地球上存在动物、植物、微生物等不同类型的生物，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版三年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G3-09",
+   "strand": "LIFE",
+   "stage": "G3",
+   "term": "全",
+   "unit": "",
+   "name": "植物的一生",
+   "name_en": "Life cycle of a plant",
+   "desc": "通过种植观察植物从种子萌发、生长、开花、结果到产生新种子的生命周期；知道植物可以通过种子等方式繁殖。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-18",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G1-19",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "萌发",
+    "生命周期",
+    "繁殖"
+   ],
+   "method": "种凤仙花或豆子，坚持写观察日记、量高度。常见错误是把种子萌发需要阳光当成必须条件（萌发主要需要水、空气、适宜温度）。",
+   "probe": "给打乱的植物生长图片让孩子排序，并问“种子萌发需要哪些条件？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 8.1 植物通过多种方式进行繁殖，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该条目所在学段未能在原文中核对，按学习内容标题和学段进阶推定。注意：这是课标依据，不是教材目录——新版三年级（2026秋起用）目录未查到，unit/term 未定；该条所属学段未能核对"
+  },
+  {
+   "id": "SCI-SH-G3-10",
+   "strand": "MAT",
+   "stage": "G3",
+   "term": "全",
+   "unit": "",
+   "name": "磁极与指南针",
+   "name_en": "Magnetic poles and compasses",
+   "desc": "知道磁铁有两个磁极（N极、S极），同极相斥、异极相吸；知道地球有磁场，指南针能指示南北方向（课标3.2的3～4年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-16",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G2-05",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "磁极",
+    "N极",
+    "S极",
+    "指南针",
+    "地磁场"
+   ],
+   "method": "用两块条形磁铁做“推不推得动”的实验。常见错误是认为磁铁中间磁性最强。",
+   "probe": "问“两块磁铁N极靠近会怎样？指南针的N极指向哪里？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 3.2 电磁相互作用，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版三年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G3-11",
+   "strand": "MAT",
+   "stage": "G3",
+   "term": "全",
+   "unit": "",
+   "name": "声音的产生",
+   "name_en": "How sounds are made",
+   "desc": "举例说明声音是由物体振动产生的；知道噪声的危害和防治方法（课标3.3的3～4年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "振动",
+    "声音",
+    "噪声"
+   ],
+   "method": "摸喉咙说话、敲鼓面放小纸屑，看到振动。常见错误是认为声音是“从嘴里/鼓里冒出来的东西”。",
+   "probe": "问“敲鼓时鼓面上的米粒为什么会跳？按住鼓面声音会怎样？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 3.3 声音与光的传播，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版三年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G4-01",
+   "strand": "MAT",
+   "stage": "G4",
+   "term": "全",
+   "unit": "",
+   "name": "运动的快慢与方式",
+   "name_en": "Speed and types of motion",
+   "desc": "知道用速度大小描述物体运动的快慢（相同时间比路程，或相同路程比时间）；描述直线运动、曲线运动等不同运动方式（课标3.1的3～4年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-07",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G3-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "速度",
+    "直线运动",
+    "曲线运动"
+   ],
+   "method": "组织“小车赛跑”，用秒表和卷尺比较快慢。常见错误是只看路程不看时间就判断快慢。",
+   "probe": "问“小明10秒跑了60米，小红10秒跑了50米，谁快？荡秋千是直线运动吗？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 3.1 力是改变物体运动状态的原因，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版四年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G4-02",
+   "strand": "MAT",
+   "stage": "G4",
+   "term": "全",
+   "unit": "",
+   "name": "运动的物体具有能量",
+   "name_en": "Moving objects have energy",
+   "desc": "知道运动的物体具有能量，运动越快、物体越重，能做的“事”越多（如撞倒更多的积木）（课标4.1的3～4年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "能量",
+    "运动"
+   ],
+   "method": "让小球从不同高度滚下斜面撞纸盒，比较纸盒被推多远。",
+   "probe": "问“同一个小球，从高处还是低处滚下来把盒子推得更远？为什么？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 4.1 能的形式、转移与转化，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版四年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G4-03",
+   "strand": "MAT",
+   "stage": "G4",
+   "term": "全",
+   "unit": "",
+   "name": "光源与影子",
+   "name_en": "Light sources and shadows",
+   "desc": "识别光源（太阳、电灯）与反射光的物体（月亮、镜子）；描述影子的形成：不透明物体挡住光；影子的方向、长短随光源位置变化（课标3.3的3～4年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G3-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "光源",
+    "影子",
+    "不透明"
+   ],
+   "method": "用手电筒和小玩偶在墙上做影子，移动手电筒观察变化。常见错误是把月亮当光源。",
+   "probe": "问“月亮是光源吗？早晨和中午你的影子哪个长？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 3.3 声音与光的传播，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版四年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G4-04",
+   "strand": "MAT",
+   "stage": "G4",
+   "term": "全",
+   "unit": "",
+   "name": "简单电路",
+   "name_en": "Simple circuits",
+   "desc": "了解电路的基本组成（电池、导线、开关、小灯泡等用电器），连接能使小灯泡发光的闭合电路；知道安全用电常识（课标3.2的3～4年级“了解电路基本组成”）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G3-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "电路",
+    "电池",
+    "开关",
+    "闭合电路",
+    "短路"
+   ],
+   "method": "用电池盒、导线、小灯泡亲手连一遍，再画电路简图。常见错误是导线只接到电池一端、或造成短路。",
+   "probe": "给几张连接图，让孩子判断哪个灯泡会亮、为什么。",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 3.2 电磁相互作用，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版四年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G4-05",
+   "strand": "MAT",
+   "stage": "G4",
+   "term": "全",
+   "unit": "",
+   "name": "物体变化后物质不变",
+   "name_en": "Changes in shape or size without new substances",
+   "desc": "知道有些物体的形状或大小发生了变化，但构成物体的物质没有改变（如纸被剪碎、冰融化）（课标2.3的3～4年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G3-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "形状变化",
+    "物质不变"
+   ],
+   "method": "做“剪纸、揉纸、折纸”实验并问“它还是纸吗？”。",
+   "probe": "问“把一块巧克力切碎，它变成别的东西了吗？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 2.3 物质变化的特征，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版四年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G4-06",
+   "strand": "MAT",
+   "stage": "G4",
+   "term": "全",
+   "unit": "",
+   "name": "混合物的简单分离",
+   "name_en": "Separating mixtures",
+   "desc": "用筛、过滤、磁铁吸引、蒸发等简单物理方法分离混合在一起的物质（如沙和盐、铁屑和沙）（课标1.1的3～4年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G3-07",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G3-10",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "混合物",
+    "过滤",
+    "蒸发",
+    "分离"
+   ],
+   "method": "给孩子“盐沙混合物”，让他设计分步方案：溶解→过滤→蒸发。常见错误是想直接用过滤把盐和水分开。",
+   "probe": "问“怎样把混在一起的沙子和食盐分开？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 1.1 物质具有一定的特性与功能，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版四年级（2026秋起用）目录未查到，unit/term 未定；该学段内容另据矩道教育转述 https://www.judaoedu.com/news_show.aspx?id=15740"
+  },
+  {
+   "id": "SCI-SH-G4-07",
+   "strand": "LIFE",
+   "stage": "G4",
+   "term": "全",
+   "unit": "",
+   "name": "动物的生长发育",
+   "name_en": "Growth and development of animals",
+   "desc": "观察动物（如蚕、青蛙、鸡）从出生到成年的生长发育过程，知道不同动物的生殖方式（卵生、胎生）和发育过程不同。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G3-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "生长发育",
+    "卵生",
+    "胎生",
+    "变态发育"
+   ],
+   "method": "养蚕并做成长记录（卵→幼虫→蛹→成虫）。常见错误是认为所有动物小时候都和成年长得一样。",
+   "probe": "给蚕的四个阶段图片排序；问“青蛙小时候叫什么？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 8.2 不同种类动物具有不同的生殖方式和发育过程，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该条目所在学段未能在原文中核对，按学习内容标题和学段进阶推定。注意：这是课标依据，不是教材目录——新版四年级（2026秋起用）目录未查到，unit/term 未定；该条所属学段未能核对"
+  },
+  {
+   "id": "SCI-SH-G4-08",
+   "strand": "EARTH",
+   "stage": "G4",
+   "term": "全",
+   "unit": "",
+   "name": "月球是地球的卫星",
+   "name_en": "The Moon is Earth's satellite",
+   "desc": "知道月球是地球的天然卫星（区别于人造卫星），围绕地球运动；认识月球表面的环形山等特征（课标9.4的3～4年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-17",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "卫星",
+    "月球",
+    "环形山"
+   ],
+   "method": "用小球（月）绕大球（地）转的模型演示；看月球表面照片。",
+   "probe": "问“月球是行星还是卫星？人造卫星和月球有什么区别？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 9.4 月球是地球的卫星，3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版四年级（2026秋起用）目录未查到，unit/term 未定；该条经科普中国转述 https://cloud.kepuchina.cn/newSearch/imgText?id=7018996242266284032"
+  },
+  {
+   "id": "SCI-SH-G4-09",
+   "strand": "EARTH",
+   "stage": "G4",
+   "term": "全",
+   "unit": "",
+   "name": "地球表面的岩石与土壤",
+   "name_en": "Rocks and soil on Earth's surface",
+   "desc": "观察常见的岩石和土壤，描述其颜色、颗粒、软硬等特征；知道土壤对植物生长的作用，要保护土壤。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G3-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "岩石",
+    "土壤"
+   ],
+   "method": "收集几种石头和不同地方的土样做比较。",
+   "probe": "问“沙土和黏土哪个更保水？土壤对植物有什么用？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 核心概念10 地球系统（具体学习内容编号与学段未核对），3～4年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该条目所在学段未能在原文中核对，按学习内容标题和学段进阶推定。注意：这是课标依据，不是教材目录——新版四年级（2026秋起用）目录未查到，unit/term 未定；该条所属学习内容与学段未能核对"
+  },
+  {
+   "id": "SCI-SH-G5-01",
+   "strand": "MAT",
+   "stage": "G5",
+   "term": "全",
+   "unit": "",
+   "name": "沉与浮",
+   "name_en": "Sinking and floating",
+   "desc": "观察常见材料（木头、泡沫、铁块、橡皮泥等）在水中的沉浮现象，知道改变形状（如橡皮泥做成船形）可以改变沉浮，并联系材料用途（课标1.1的5～6年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-27",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G3-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "沉浮",
+    "浮力"
+   ],
+   "method": "先让孩子预测再动手验证，记录“预测—结果”。常见错误是认为“大的、重的一定沉，小的、轻的一定浮”。",
+   "probe": "问“一块橡皮泥放进水里会沉，怎样让它浮起来？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 1.1 物质具有一定的特性与功能，5～6年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版五年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G5-02",
+   "strand": "MAT",
+   "stage": "G5",
+   "term": "全",
+   "unit": "",
+   "name": "浮力、摩擦力与弹力",
+   "name_en": "Buoyancy, friction and elastic force",
+   "desc": "知道摩擦力、弹力、浮力等都是直接施加在物体上的力；能举例说明摩擦力的作用（增大或减小摩擦）、弹簧的弹力与形变有关（课标3.1的5～6年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-07",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G5-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "摩擦力",
+    "弹力",
+    "浮力",
+    "测力计"
+   ],
+   "method": "用测力计拉木块在毛巾和玻璃上滑动比较读数。常见错误是认为摩擦力总是有害的。",
+   "probe": "问“鞋底为什么有花纹？把皮球按进水里手为什么感到向上推？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 3.1 力是改变物体运动状态的原因，5～6年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版五年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G5-03",
+   "strand": "MAT",
+   "stage": "G5",
+   "term": "全",
+   "unit": "",
+   "name": "重力：地球的引力",
+   "name_en": "Gravity: Earth's pull",
+   "desc": "知道地球对物体有吸引力（重力），物体下落、水往低处流都与此有关；它与摩擦力、弹力不同，不需要直接接触（课标3.1的5～6年级“知道地球引力”）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G5-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "重力",
+    "引力"
+   ],
+   "method": "让孩子松手放不同物体，说“为什么都往下掉”。",
+   "probe": "问“在地球另一边的人为什么不会掉下去？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 3.1 力是改变物体运动状态的原因，5～6年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版五年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G5-04",
+   "strand": "MAT",
+   "stage": "G5",
+   "term": "全",
+   "unit": "",
+   "name": "空气是混合物",
+   "name_en": "Air is a mixture",
+   "desc": "知道空气是一种混合物，含有氮气、氧气、二氧化碳等多种气体；氧气能支持燃烧、供生物呼吸（课标1.2的5～6年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G3-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "混合物",
+    "氮气",
+    "氧气",
+    "二氧化碳"
+   ],
+   "method": "做“蜡烛在倒扣杯中熄灭”实验，讨论原因。常见错误是认为空气就是氧气。",
+   "probe": "问“空气中含量最多的气体是什么？蜡烛为什么在罩住的杯子里会熄灭？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 1.2 空气与水是重要的物质，5～6年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版五年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G5-05",
+   "strand": "EARTH",
+   "stage": "G5",
+   "term": "全",
+   "unit": "",
+   "name": "月相变化",
+   "name_en": "Phases of the Moon",
+   "desc": "认识新月、上弦月、满月、下弦月4种典型月相，说明月相大约一个月变化一次（课标9.4的5～6年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G4-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "月相",
+    "新月",
+    "上弦月",
+    "满月",
+    "下弦月"
+   ],
+   "method": "用手电筒（太阳）+小球（月）+自己的头（地球）做月相模拟。常见错误是认为月相是地球影子挡住月亮造成的（那是月食）。",
+   "probe": "给四张月相图让孩子命名并排序；问“月相是地球的影子造成的吗？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 9.4 月球是地球的卫星，5～6年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版五年级（2026秋起用）目录未查到，unit/term 未定；该条经科普中国转述 https://cloud.kepuchina.cn/newSearch/imgText?id=7018996242266284032"
+  },
+  {
+   "id": "SCI-SH-G5-06",
+   "strand": "LIFE",
+   "stage": "G5",
+   "term": "全",
+   "unit": "",
+   "name": "生物与环境相互依存",
+   "name_en": "Interdependence of living things and environment",
+   "desc": "简单描述生物与生物（如捕食、食物链）、生物与环境之间相互依存的关系（课标7.1的5～6年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-18",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G2-14",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "食物链",
+    "相互依存",
+    "生态"
+   ],
+   "method": "用“谁吃谁”卡片连成食物链，箭头指向吃的一方。常见错误是箭头方向画反。",
+   "probe": "问“草→兔→狐狸，如果狐狸大量减少，兔和草会怎样？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 7.1 生物能适应其生存环境，5～6年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该学段内容要求经转载版核对：https://zy.21cnjy.com/11948378。注意：这是课标依据，不是教材目录——新版五年级（2026秋起用）目录未查到，unit/term 未定"
+  },
+  {
+   "id": "SCI-SH-G5-07",
+   "strand": "LIFE",
+   "stage": "G5",
+   "term": "全",
+   "unit": "",
+   "name": "植物制造养分",
+   "name_en": "Plants make their own food",
+   "desc": "知道绿色植物能利用阳光、水和二氧化碳在叶中制造养分并释放氧气，维持自身生存，是其他生物食物的来源。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-18",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G5-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "光合作用",
+    "养分",
+    "氧气"
+   ],
+   "method": "做“遮光叶片”对比观察。常见错误是认为植物的养分全部从土壤里吸收。",
+   "probe": "问“植物长大需要的养分主要从哪里来？为什么说植物是食物链的起点？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 6.1 植物能制造和获取养分来维持自身的生存，5～6年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该条目所在学段未能在原文中核对，按学习内容标题和学段进阶推定。注意：这是课标依据，不是教材目录——新版五年级（2026秋起用）目录未查到，unit/term 未定；该条所属学段未能核对"
+  },
+  {
+   "id": "SCI-SH-G5-08",
+   "strand": "EARTH",
+   "stage": "G5",
+   "term": "全",
+   "unit": "",
+   "name": "地球自转与昼夜",
+   "name_en": "Earth's rotation and day and night",
+   "desc": "知道地球绕地轴自西向东自转，自转一周约一天，形成昼夜交替和太阳东升西落的现象。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "自转",
+    "昼夜交替",
+    "地轴"
+   ],
+   "method": "用地球仪和手电筒在暗室演示；常见错误是认为太阳绕地球转形成昼夜。",
+   "probe": "问“为什么太阳从东边升起？地球自转一周大约多长时间？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 9.2 地球绕地轴自转，5～6年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该条目所在学段未能在原文中核对，按学习内容标题和学段进阶推定。注意：这是课标依据，不是教材目录——新版五年级（2026秋起用）目录未查到，unit/term 未定；该条所属学段未能核对"
+  },
+  {
+   "id": "SCI-SH-G5-09",
+   "strand": "EARTH",
+   "stage": "G5",
+   "term": "全",
+   "unit": "",
+   "name": "地球公转与四季",
+   "name_en": "Earth's orbit and the seasons",
+   "desc": "知道地球绕太阳公转一周约一年；地轴倾斜与公转共同导致季节变化。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G5-08",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G1-22",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "公转",
+    "四季",
+    "地轴倾斜"
+   ],
+   "method": "用地球仪绕灯（太阳）走一圈，保持地轴方向不变。常见错误是认为夏天热是因为地球离太阳近。",
+   "probe": "问“地球公转一周多长时间？上海夏天热是因为离太阳更近吗？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 9.3 地球围绕太阳公转，5～6年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该条目所在学段未能在原文中核对，按学习内容标题和学段进阶推定。注意：这是课标依据，不是教材目录——新版五年级（2026秋起用）目录未查到，unit/term 未定；该条所属学段未能核对"
+  },
+  {
+   "id": "SCI-SH-G5-10",
+   "strand": "EARTH",
+   "stage": "G5",
+   "term": "全",
+   "unit": "",
+   "name": "人类活动与环境保护",
+   "name_en": "Human activity and the environment",
+   "desc": "举例说明人类活动（排污、砍伐、垃圾等）对环境的影响，以及垃圾分类、节能减排等保护环境的做法。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G5-06",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-SH-G2-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "环境保护",
+    "垃圾分类",
+    "污染"
+   ],
+   "method": "结合上海生活垃圾分类，让孩子当一周“家庭分类员”。",
+   "probe": "问“废电池属于哪类垃圾？乱扔塑料袋会对海洋动物造成什么影响？”",
+   "source": "依据：《义务教育科学课程标准（2022年版）》学习内容 核心概念11 人类活动与环境（具体学习内容编号与学段未核对），5～6年级内容要求（http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf，教育部发布页 http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html）；该条目所在学段未能在原文中核对，按学习内容标题和学段进阶推定。注意：这是课标依据，不是教材目录——新版五年级（2026秋起用）目录未查到，unit/term 未定；该条所属学习内容与学段未能核对"
+  },
+  {
+   "id": "SCI-SH-G6-01",
+   "strand": "MAT",
+   "stage": "G6",
+   "term": "上",
+   "unit": "第1单元 变化的物质世界",
+   "name": "物质的性质及检测",
+   "name_en": "Properties of matter and testing them",
+   "desc": "从颜色、状态、气味、硬度、溶解性、导电性、导热性、沉浮等方面描述物质的性质，用观察和简单实验检测、鉴别常见物质，并把性质与用途建立联系（课标1.1的5～6年级“将材料的性质与其主要用途建立联系”）。课内具体检测方法以课本为准。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G3-03",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G5-01",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-SH-G4-06",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "性质",
+    "检测",
+    "鉴别",
+    "导热性",
+    "溶解性"
+   ],
+   "method": "做“鉴别白色粉末”（盐、糖、面粉）任务：先列可检测的性质，再设计步骤（不尝不明物质）。常见错误是只凭外观下结论。",
+   "probe": "给三种看起来一样的白色粉末，问“你用哪些安全的实验区分它们？”",
+   "source": "目录：https://www.dzkbw.org/book/5800.html（六年级上册目录转写，佐证；另见 https://keben.app/book/0636/shst-science-grade-6-vol-1-2022）；册别：上海市教委2026秋目录 SD–CX–2024011 科学活动手册(六年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第1单元第1课"
+  },
+  {
+   "id": "SCI-SH-G6-02",
+   "strand": "MAT",
+   "stage": "G6",
+   "term": "上",
+   "unit": "第1单元 变化的物质世界",
+   "name": "物质的变化",
+   "name_en": "Changes of matter",
+   "desc": "区分两类变化：只改变形状、状态而没有新物质产生的变化（如冰融化、纸被剪碎），和产生新物质的变化（如纸燃烧、铁生锈）（课标2.3的5～6年级要求）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G4-05",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G6-01",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G5-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "物理变化",
+    "化学变化",
+    "新物质",
+    "燃烧",
+    "生锈"
+   ],
+   "method": "抓住判断标准“有没有新物质产生”，列生活中的例子归类。常见错误是把“有颜色变化、发光发热”直接当成有新物质。",
+   "probe": "问“蜡烛燃烧时，哪些是融化（无新物质）、哪些是燃烧（有新物质）？铁生锈属于哪一类？”",
+   "source": "目录：https://www.dzkbw.org/book/5800.html（六年级上册目录转写，佐证；另见 https://keben.app/book/0636/shst-science-grade-6-vol-1-2022）；册别：上海市教委2026秋目录 SD–CX–2024011 科学活动手册(六年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第1单元第2课"
+  },
+  {
+   "id": "SCI-SH-G6-03",
+   "strand": "MAT",
+   "stage": "G6",
+   "term": "上",
+   "unit": "第2单元 能与生活",
+   "name": "生活中的热传递",
+   "name_en": "Heat transfer in daily life",
+   "desc": "知道热总是从温度高的物体传到温度低的物体，热传递有传导、对流、辐射等方式；知道不同材料导热性不同，能用保温/散热解释生活现象。课内要求深度以课本为准。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G3-02",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G6-01",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-PRE-ENERGY",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "热传递",
+    "传导",
+    "对流",
+    "辐射",
+    "导热性"
+   ],
+   "method": "用金属勺和塑料勺插热水比较；用“热从高温流向低温”解释保温杯。常见错误是说“冷从冰传到手上”。",
+   "probe": "问“锅柄为什么用塑料或木头？冬天摸铁栏杆为什么比摸木头凉？”",
+   "source": "目录：https://www.dzkbw.org/book/5800.html（六年级上册目录转写，佐证；另见 https://keben.app/book/0636/shst-science-grade-6-vol-1-2022）；册别：上海市教委2026秋目录 SD–CX–2024011 科学活动手册(六年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第2单元第1课"
+  },
+  {
+   "id": "SCI-SH-G6-04",
+   "strand": "MAT",
+   "stage": "G6",
+   "term": "上",
+   "unit": "第2单元 能与生活",
+   "name": "生活中的声",
+   "name_en": "Sound in daily life",
+   "desc": "声音由物体振动产生，通过固体、液体、气体传播，真空不能传声；声音有高低（音调）和强弱（响度）；生活中控制噪声。（课本该课为“生活中的声与光”，此点覆盖声部分。）",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G3-11",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-SOUND",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "振动",
+    "传播",
+    "音调",
+    "响度",
+    "噪声"
+   ],
+   "method": "用橡皮筋“吉他”体会松紧与音调、用力大小与响度。常见错误是把“音调高”和“声音大”混为一谈。",
+   "probe": "问“把橡皮筋拉得更紧，弹出的声音哪里变了？月球上宇航员为什么不能直接对话？”",
+   "source": "目录：https://www.dzkbw.org/book/5800.html（六年级上册目录转写，佐证；另见 https://keben.app/book/0636/shst-science-grade-6-vol-1-2022）；册别：上海市教委2026秋目录 SD–CX–2024011 科学活动手册(六年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第2单元第2课"
+  },
+  {
+   "id": "SCI-SH-G6-05",
+   "strand": "MAT",
+   "stage": "G6",
+   "term": "上",
+   "unit": "第2单元 能与生活",
+   "name": "生活中的光",
+   "name_en": "Light in daily life",
+   "desc": "知道光在空气中沿直线传播，光遇到镜面等会发生反射，太阳光中包含不同颜色的光（课标3.3的5～6年级要求）；用这些解释影子、镜子、彩虹等现象。（课本该课为“生活中的声与光”，此点覆盖光部分。）",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G4-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "直线传播",
+    "反射",
+    "色散"
+   ],
+   "method": "用激光笔+烟雾/水雾看光路，用镜子玩“反射接力”。常见错误是认为我们看见物体是因为眼睛发出光。",
+   "probe": "问“为什么排队时看前面同学的后脑勺就知道排直了？雨后彩虹说明太阳光有什么特点？”",
+   "source": "目录：https://www.dzkbw.org/book/5800.html（六年级上册目录转写，佐证；另见 https://keben.app/book/0636/shst-science-grade-6-vol-1-2022）；册别：上海市教委2026秋目录 SD–CX–2024011 科学活动手册(六年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第2单元第2课"
+  },
+  {
+   "id": "SCI-SH-G6-06",
+   "strand": "MAT",
+   "stage": "G6",
+   "term": "上",
+   "unit": "第2单元 能与生活",
+   "name": "生活中的电",
+   "name_en": "Electricity in daily life",
+   "desc": "认识家庭电路和常见用电器，复习闭合电路、导体与绝缘体，知道串联、并联等简单连接（以课本为准），掌握安全用电与节约用电。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G4-04",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G3-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "电路",
+    "用电器",
+    "安全用电",
+    "串联",
+    "并联"
+   ],
+   "method": "让孩子看家里的插座、开关、电器铭牌，画出“电从哪里来到哪里去”。常见错误是用湿手碰开关、认为低压电池实验的经验可以套用在家用电上。",
+   "probe": "给两盏灯的两种连接图，问“拧下一盏，另一盏还亮吗？”；问“发现有人触电第一步怎么做？”",
+   "source": "目录：https://www.dzkbw.org/book/5800.html（六年级上册目录转写，佐证；另见 https://keben.app/book/0636/shst-science-grade-6-vol-1-2022）；册别：上海市教委2026秋目录 SD–CX–2024011 科学活动手册(六年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第2单元第3课"
+  },
+  {
+   "id": "SCI-SH-G6-07",
+   "strand": "MAT",
+   "stage": "G6",
+   "term": "上",
+   "unit": "第2单元 能与生活",
+   "name": "能源及其利用",
+   "name_en": "Energy resources and their use",
+   "desc": "知道自然界存在多种形式的能（光能、热能、电能、动能等），不同形式的能可以相互转化（课标4.1的5～6年级要求）；认识煤、石油、天然气和太阳能、风能、水能等能源，可再生与不可再生能源，节约能源。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G4-02",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G6-06",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-PRE-ENERGY",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "能的转化",
+    "能源",
+    "可再生能源",
+    "不可再生能源"
+   ],
+   "method": "做“能量转化接力”：太阳能电池板→电动机→转动，逐步说出能的形式。常见错误是说“能量用完就消失了”。",
+   "probe": "问“电灯工作时电能转化成了什么能？太阳能和煤哪个是可再生能源？”",
+   "source": "目录：https://www.dzkbw.org/book/5800.html（六年级上册目录转写，佐证；另见 https://keben.app/book/0636/shst-science-grade-6-vol-1-2022）；册别：上海市教委2026秋目录 SD–CX–2024011 科学活动手册(六年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第2单元第4课"
+  },
+  {
+   "id": "SCI-SH-G6-08",
+   "strand": "LIFE",
+   "stage": "G6",
+   "term": "上",
+   "unit": "第3单元 生命的延续",
+   "name": "细胞与生殖",
+   "name_en": "Cells and reproduction",
+   "desc": "认识细胞是生物体结构的基本单位（课标5.3的5～6年级），用显微镜或放大图观察细胞；初步认识生物体的结构层次（课标5.4）；了解生物通过生殖产生后代、延续生命。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G3-09",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G4-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "细胞",
+    "显微镜",
+    "生殖",
+    "结构层次"
+   ],
+   "method": "先在放大镜下看洋葱表皮，再看显微图片，画出细胞并标注。常见错误是把细胞想成只有动物才有。",
+   "probe": "问“洋葱表皮和人的口腔上皮都由什么构成？生物为什么要繁殖后代？”",
+   "source": "目录：https://www.dzkbw.org/book/5800.html（六年级上册目录转写，佐证；另见 https://keben.app/book/0636/shst-science-grade-6-vol-1-2022）；册别：上海市教委2026秋目录 SD–CX–2024011 科学活动手册(六年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第3单元第1课"
+  },
+  {
+   "id": "SCI-SH-G6-09",
+   "strand": "LIFE",
+   "stage": "G6",
+   "term": "上",
+   "unit": "第3单元 生命的延续",
+   "name": "多种多样的生物",
+   "name_en": "Diversity of living things",
+   "desc": "知道地球上存在动物、植物、微生物等多种多样的生物，会按特征分类；认识生物多样性及其保护的意义。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G3-08",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G6-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "生物多样性",
+    "分类",
+    "微生物"
+   ],
+   "method": "用检索表给10种生物分类，再查本地珍稀物种（如上海的扬子鳄、中华鲟）。常见错误是把蘑菇当植物。",
+   "probe": "问“蘑菇、细菌、苔藓各属于哪类生物？为什么要保护生物多样性？”",
+   "source": "目录：https://www.dzkbw.org/book/5800.html（六年级上册目录转写，佐证；另见 https://keben.app/book/0636/shst-science-grade-6-vol-1-2022）；册别：上海市教委2026秋目录 SD–CX–2024011 科学活动手册(六年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第3单元第2课"
+  },
+  {
+   "id": "SCI-SH-G6-10",
+   "strand": "LIFE",
+   "stage": "G6",
+   "term": "上",
+   "unit": "第3单元 生命的延续",
+   "name": "生物的进化",
+   "name_en": "Evolution of living things",
+   "desc": "初步了解化石是研究生物进化的证据；生物的遗传、变异和环境共同作用导致生物进化；生物适应环境（课标8.5、8.6，深度以课本为准）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G6-09",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G5-06",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "化石",
+    "遗传",
+    "变异",
+    "进化",
+    "适应"
+   ],
+   "method": "看恐龙化石与鸟类比较图，讨论“哪些特征相似”。常见错误是认为生物“为了适应环境主动改变自己”。",
+   "probe": "问“化石能告诉我们什么？长颈鹿的长脖子是因为天天伸脖子吃树叶变长的吗？”",
+   "source": "目录：https://www.dzkbw.org/book/5800.html（六年级上册目录转写，佐证；另见 https://keben.app/book/0636/shst-science-grade-6-vol-1-2022）；册别：上海市教委2026秋目录 SD–CX–2024011 科学活动手册(六年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第3单元第3课"
+  },
+  {
+   "id": "SCI-SH-G6-11",
+   "strand": "TECH",
+   "stage": "G6",
+   "term": "上",
+   "unit": "第4单元 小小工程师――节能小屋",
+   "name": "节能小屋：确定问题与设计优化",
+   "name_en": "Energy-saving house: define and design",
+   "desc": "明确节能小屋的工程问题（保温、采光、通风等要求和材料、成本限制），提出多个方案，根据热传递与材料性质比较、优化设计。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G6-03",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G6-07",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-SH-G2-09",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "工程问题",
+    "设计",
+    "优化",
+    "保温"
+   ],
+   "method": "让孩子写“需求—限制—方案A/B比较表”。常见错误是只关注外观、忽略可测量的标准。",
+   "probe": "问“想让小屋冬天更保暖，你会选什么材料做墙？如何检验你的设计？”",
+   "source": "目录：https://www.dzkbw.org/book/5800.html（六年级上册目录转写，佐证；另见 https://keben.app/book/0636/shst-science-grade-6-vol-1-2022）；册别：上海市教委2026秋目录 SD–CX–2024011 科学活动手册(六年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第4单元第1～2课"
+  },
+  {
+   "id": "SCI-SH-G6-12",
+   "strand": "TECH",
+   "stage": "G6",
+   "term": "上",
+   "unit": "第4单元 小小工程师――节能小屋",
+   "name": "节能小屋：制作模型与发布成果",
+   "name_en": "Energy-saving house: build and present",
+   "desc": "按设计制作节能小屋模型，用温度计等测试保温效果，记录数据、发现问题、改进，并展示交流设计成果。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G6-11",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G3-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "模型",
+    "测试",
+    "改进",
+    "展示"
+   ],
+   "method": "同时放一杯热水在“小屋”和对照盒里，每5分钟测一次温度画折线。",
+   "probe": "问“怎样用数据证明你的小屋保温效果好？需要什么对照？”",
+   "source": "目录：https://www.dzkbw.org/book/5800.html（六年级上册目录转写，佐证；另见 https://keben.app/book/0636/shst-science-grade-6-vol-1-2022）；册别：上海市教委2026秋目录 SD–CX–2024011 科学活动手册(六年级上册) https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf 第4单元第3～4课"
+  },
+  {
+   "id": "SCI-SH-G6-13",
+   "strand": "LIFE",
+   "stage": "G6",
+   "term": "下",
+   "unit": "第1单元 人体与健康",
+   "name": "食物与营养",
+   "name_en": "Food and nutrition",
+   "desc": "知道食物中含有糖类、蛋白质、脂肪、维生素、矿物质、水等营养成分，了解消化器官的作用和均衡膳食的意义。具体内容以课本为准。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G2-14",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-SH-G5-07",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "营养素",
+    "消化",
+    "均衡膳食"
+   ],
+   "method": "对照“中国居民平衡膳食宝塔”分析一天三餐。常见错误是认为脂肪完全有害、零食可以代替正餐。",
+   "probe": "给一份午餐，问“缺少了哪类营养？怎样搭配更均衡？”",
+   "source": "目录：https://www.dzkbw.org/book/5801.html（六年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-CX-2024031 科学活动手册(六年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第1单元第1课"
+  },
+  {
+   "id": "SCI-SH-G6-14",
+   "strand": "LIFE",
+   "stage": "G6",
+   "term": "下",
+   "unit": "第1单元 人体与健康",
+   "name": "脑与协调",
+   "name_en": "The brain and coordination",
+   "desc": "知道脑和神经让人体感知外界并作出反应，协调各器官的活动；感官把信息传给脑。具体内容以课本为准。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G1-03",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-SH-G6-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "脑",
+    "神经",
+    "反应",
+    "协调"
+   ],
+   "method": "做“接尺子”反应时间小游戏，讨论信息从眼睛到脑再到手。",
+   "probe": "问“看到球飞过来你伸手去接，身体里经历了什么过程？”",
+   "source": "目录：https://www.dzkbw.org/book/5801.html（六年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-CX-2024031 科学活动手册(六年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第1单元第2课"
+  },
+  {
+   "id": "SCI-SH-G6-15",
+   "strand": "LIFE",
+   "stage": "G6",
+   "term": "下",
+   "unit": "第1单元 人体与健康",
+   "name": "平衡与健康",
+   "name_en": "Balance and health",
+   "desc": "知道人体通过调节保持体温等稳定（课标6.3），了解作息、运动、饮食等生活习惯对健康的影响，形成健康生活方式。具体内容以课本为准。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G6-13",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G6-14",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "稳态",
+    "体温调节",
+    "健康生活"
+   ],
+   "method": "记录一周睡眠和运动时间，对照建议量。",
+   "probe": "问“运动后为什么会出汗？熬夜对身体有什么影响？”",
+   "source": "目录：https://www.dzkbw.org/book/5801.html（六年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-CX-2024031 科学活动手册(六年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第1单元第3课"
+  },
+  {
+   "id": "SCI-SH-G6-16",
+   "strand": "LIFE",
+   "stage": "G6",
+   "term": "下",
+   "unit": "第2单元 步入青春期",
+   "name": "从新生命走向成熟",
+   "name_en": "From new life to maturity",
+   "desc": "知道人的生命从受精卵开始（课标8.3），经过胎儿、婴儿、儿童、青春期、成年等阶段生长发育。具体内容以课本为准。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G6-08",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G4-07",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "受精卵",
+    "生长发育",
+    "生命周期"
+   ],
+   "method": "看自己从小到大的照片，按阶段排序并标注变化。",
+   "probe": "问“人的生命从哪里开始？胎儿在妈妈体内靠什么获得营养？”",
+   "source": "目录：https://www.dzkbw.org/book/5801.html（六年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-CX-2024031 科学活动手册(六年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第2单元第1课"
+  },
+  {
+   "id": "SCI-SH-G6-17",
+   "strand": "LIFE",
+   "stage": "G6",
+   "term": "下",
+   "unit": "第2单元 步入青春期",
+   "name": "青春期的变化",
+   "name_en": "Changes in puberty",
+   "desc": "了解青春期身体（身高体重快速增长、第二性征出现）和心理的变化，知道个体差异是正常的。具体内容以课本为准。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G6-16",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "青春期",
+    "第二性征",
+    "心理变化"
+   ],
+   "method": "家长用平和的态度陪孩子读课本，强调“早一点、晚一点都正常”。",
+   "probe": "问“青春期身体会有哪些变化？为什么同学之间变化早晚不同？”",
+   "source": "目录：https://www.dzkbw.org/book/5801.html（六年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-CX-2024031 科学活动手册(六年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第2单元第2课"
+  },
+  {
+   "id": "SCI-SH-G6-18",
+   "strand": "LIFE",
+   "stage": "G6",
+   "term": "下",
+   "unit": "第2单元 步入青春期",
+   "name": "青春期保健",
+   "name_en": "Health care in puberty",
+   "desc": "掌握青春期个人卫生、营养、运动和睡眠要求，正确处理情绪，学会自我保护。具体内容以课本为准。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G6-17",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G6-15",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "卫生",
+    "保健",
+    "自我保护"
+   ],
+   "method": "和孩子一起制定作息表和运动计划。",
+   "probe": "问“青春期为什么特别需要充足的睡眠和蛋白质？心情烦躁时可以怎么做？”",
+   "source": "目录：https://www.dzkbw.org/book/5801.html（六年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-CX-2024031 科学活动手册(六年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第2单元第3课"
+  },
+  {
+   "id": "SCI-SH-G6-19",
+   "strand": "EARTH",
+   "stage": "G6",
+   "term": "下",
+   "unit": "第3单元 宇宙探秘",
+   "name": "太阳系",
+   "name_en": "The Solar System",
+   "desc": "知道太阳系由太阳、八大行星及其卫星、小行星、彗星等组成，地球是太阳系中的一颗行星（课标9.1、9.5）；能按离太阳由近到远说出八大行星。具体内容以课本为准。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G5-09",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G5-05",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-PRE-SOLAR",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "太阳系",
+    "行星",
+    "卫星",
+    "彗星"
+   ],
+   "method": "用“水金地火木土天海”口诀，做按比例的行星距离纸带。常见错误是把月球、冥王星当成行星。",
+   "probe": "问“离太阳最近的行星是哪颗？月球是不是行星？”",
+   "source": "目录：https://www.dzkbw.org/book/5801.html（六年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-CX-2024031 科学活动手册(六年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第3单元第1课"
+  },
+  {
+   "id": "SCI-SH-G6-20",
+   "strand": "EARTH",
+   "stage": "G6",
+   "term": "下",
+   "unit": "第3单元 宇宙探秘",
+   "name": "恒星与星座",
+   "name_en": "Stars and constellations",
+   "desc": "知道太阳是一颗恒星，恒星能自己发光；星座是人为划分的星空区域；认识北斗七星、北极星等，会用星图辨认（课标9.5，深度以课本为准）。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G6-19",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G4-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "恒星",
+    "星座",
+    "北极星",
+    "北斗七星"
+   ],
+   "method": "晴朗夜晚用星图App找北斗七星，再沿“勺口”找北极星。常见错误是认为恒星离我们很近、星座里的星星彼此靠得很近。",
+   "probe": "问“太阳是恒星还是行星？怎样借北斗七星找到北极星？”",
+   "source": "目录：https://www.dzkbw.org/book/5801.html（六年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-CX-2024031 科学活动手册(六年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第3单元第2课"
+  },
+  {
+   "id": "SCI-SH-G6-21",
+   "strand": "EARTH",
+   "stage": "G6",
+   "term": "下",
+   "unit": "第3单元 宇宙探秘",
+   "name": "太空探索",
+   "name_en": "Space exploration",
+   "desc": "了解人类探索太空的历程和我国航天成就（如载人航天、探月、火星探测），知道太空探索拓展了人类对宇宙的认知（课标9.6）。具体内容以课本为准。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G6-19",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "航天",
+    "探月",
+    "火星探测"
+   ],
+   "method": "让孩子做一张“中国航天时间轴”。",
+   "probe": "问“我国的火星车叫什么名字？太空探索对人类有什么意义？”",
+   "source": "目录：https://www.dzkbw.org/book/5801.html（六年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-CX-2024031 科学活动手册(六年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第3单元第3课"
+  },
+  {
+   "id": "SCI-SH-G6-22",
+   "strand": "TECH",
+   "stage": "G6",
+   "term": "下",
+   "unit": "第4单元 小小工程师一火星车",
+   "name": "小小工程师：火星车",
+   "name_en": "Engineering task: Mars rover",
+   "desc": "根据火星环境（地形崎岖、温差大、远距离）确定火星车的工程问题，设计方案、选择材料与结构，制作并测试火星车模型（如越障、承重），改进后展示。",
+   "prereqs": [
+    {
+     "id": "SCI-SH-G6-21",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-SH-G6-12",
+     "strength": "有帮助"
+    },
+    {
+     "id": "SCI-SH-G6-07",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "工程问题",
+    "设计方案",
+    "测试",
+    "迭代"
+   ],
+   "method": "按“需求—设计—制作—测试—改进”五步写工程日志。常见错误是没有测试标准就宣布“完成”。",
+   "probe": "问“火星车要越过石块，你会在车轮设计上做什么改进？用什么方法测试？”",
+   "source": "目录：https://www.dzkbw.org/book/5801.html（六年级下册目录转写，佐证）；册别：上海市教委2026春目录 SD-CX-2024031 科学活动手册(六年级下册) https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf 第4单元第1～3课"
+  }
+ ]
+}

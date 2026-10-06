@@ -21,7 +21,23 @@
    "https://help.cambridgeinternational.org/hc/en-gb/articles/360000055018-Which-age-group-of-learners-is-the-Cambridge-Lower-Secondary-Checkpoint-for"
   ],
   "notes": "知识图谱：从数学与初中科学基础（Cambridge Lower Secondary Science 0893 Stage 7、8、9，约 11–14 岁，对应 G6、G7、G8）到 IGCSE Physics 0625（14–16 岁，约 G9–G10）全部六大板块。2026-2028 大纲（version 2, 2025-12）与 2029 大纲（version 1, 2026-09）主题编号相同，2029 版注明 \"no significant changes which affect teaching\"。1.1 与 MATH-PRE-UNIT/DEC/AVG/PYTH、ENG-PRE-CMD 沿用旧文件的 id、name、desc、level、prereqs、hot，保证旧诊断结果可对应；1.1-06~12 为学校补充（school）内容（游标卡尺、螺旋测微器、误差分析不在 0625 大纲 1.1 学习目标中）。较小的子主题合并为一个知识点，syllabus 字段用 / 列出覆盖的多个小节（如 1.7.2/1.7.4）；level=supp 表示该点主要属于 Supplement（Extended）内容，core 点 desc 中标「（补充）」的部分属于 Supplement。prereqs 中 strength 取 必须 / 有帮助。",
-  "verified": "2026-10-06"
+  "verified": "2026-10-06",
+  "system": "cambridge",
+  "school_types": [
+   "international",
+   "private"
+  ],
+  "default_track": "extended",
+  "tracks": [
+   {
+    "id": "extended",
+    "name": "IGCSE 0625 Core + Supplement（Extended，可冲 A*）"
+   },
+   {
+    "id": "core",
+    "name": "IGCSE 0625 只考 Core（最高 C）"
+   }
+  ]
  },
  "strands": [
   {
@@ -793,7 +809,10 @@
     "direction"
    ],
    "method": "背定义：scalar has magnitude only；vector has magnitude and direction。",
-   "probe": "问 speed 与 velocity 的区别，并说明哪个是矢量。"
+   "probe": "问 speed 与 velocity 的区别，并说明哪个是矢量。",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-1.1-14",
@@ -822,7 +841,10 @@
     "momentum"
    ],
    "method": "做两列词表反复默写；成对记忆：distance/displacement、speed/velocity、mass/weight（前标量后矢量）。",
-   "probe": "给 8 个物理量，让她分成标量和矢量两组。"
+   "probe": "给 8 个物理量，让她分成标量和矢量两组。",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-1.1-15",
@@ -852,7 +874,10 @@
     "direction"
    ],
    "method": "大小用勾股定理，方向用 tan θ = 对边/邻边，并说明角是相对哪个方向的；也可按比例作图。",
-   "probe": "两个互相垂直的力 3 N 和 4 N，求合力大小和方向。"
+   "probe": "两个互相垂直的力 3 N 和 4 N，求合力大小和方向。",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-1.2-01",
@@ -980,7 +1005,10 @@
     "drag"
    ],
    "method": "面积分块（矩形 + 三角形）算路程；跳伞题按“开始只有重力 → 速度增大阻力增大 → 合力减小加速度减小 → 阻力 = 重力，terminal velocity”四步写。常见错误：说到达终极速度时“没有力”。",
-   "probe": "给跳伞者的 v-t 图，让她解释各段形状并求某段路程。"
+   "probe": "给跳伞者的 v-t 图，让她解释各段形状并求某段路程。",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-1.3-01",
@@ -1155,7 +1183,10 @@
     "perpendicular"
    ],
    "method": "F 必须用 resultant force（先算合力再除以质量）。圆周运动：force perpendicular to velocity，速度一定时半径越小/质量越大需要的力越大。常见错误：直接用推力而不是合力代入。",
-   "probe": "已知推力和摩擦力及质量，求加速度。"
+   "probe": "已知推力和摩擦力及质量，求加速度。",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-1.5.2-01",
@@ -1248,7 +1279,10 @@
     "collision"
    ],
    "method": "背 p = mv、impulse = FΔt = Δ(mv)。安全题模板：气囊/缓冲区 increase the time of collision → 动量变化相同 → force is smaller。注意速度方向（反弹时 Δv 要相加）。",
-   "probe": "网球以 20 m/s 撞墙后以 15 m/s 弹回，求动量变化。"
+   "probe": "网球以 20 m/s 撞墙后以 15 m/s 弹回，求动量变化。",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-1.6-02",
@@ -1275,7 +1309,10 @@
     "after"
    ],
    "method": "列“碰前总动量 = 碰后总动量”，先规定正方向，反向速度取负。爆炸前总动量常为零。",
-   "probe": "两车相撞后粘在一起，求共同速度。"
+   "probe": "两车相撞后粘在一起，求共同速度。",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-1.7.1-01",
@@ -1339,7 +1376,10 @@
     "conservation"
    ],
    "method": "背 Ek = ½mv²、ΔEp = mgΔh；“从高处落下最大速度”题列 mgh = ½mv² 求 v（记得开方）。常见错误：v² 忘平方或忘开方，质量用 g。",
-   "probe": "球从 5 m 高处落下（忽略空气阻力），求落地速度。"
+   "probe": "球从 5 m 高处落下（忽略空气阻力），求落地速度。",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-1.7.2-01",
@@ -1500,7 +1540,10 @@
     "dam"
    ],
    "method": "背 Δp = ρgΔh，深度用 m、密度用 kg/m³。解释大坝底部更厚：pressure increases with depth。常见错误：用 g/cm³ 直接代入。",
-   "probe": "求水下 15 m 处由水产生的压强（ρ = 1000 kg/m³）。"
+   "probe": "求水下 15 m 处由水产生的压强（ρ = 1000 kg/m³）。",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-2.1.2-01",
@@ -1654,7 +1697,10 @@
     "insulation"
    ],
    "method": "背 ΔE = mcΔθ，c 的定义：energy needed to raise the temperature of 1 kg by 1 °C。实验：E = P × t（或 IVt），包上保温层减少热损失；结果偏大常因热量散失。",
-   "probe": "用 50 W 加热器加热 1 kg 铝块 5 min 升温 15 °C，求 c 并说出误差原因。"
+   "probe": "用 50 W 加热器加热 1 kg 铝块 5 min 升温 15 °C，求 c 并说出误差原因。",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-2.2.3-01",
@@ -1931,7 +1977,10 @@
     "Snell's law"
    ],
    "method": "记 slower → bends towards the normal；faster → away from the normal。背 n = sin i / sin r（i 在空气中）。计算器用 DEG 模式，sin⁻¹ 求角度。常见错误：i 和 r 放反，或用角度直接相除。",
-   "probe": "光以 40° 入射到 n = 1.5 的玻璃，求折射角。"
+   "probe": "光以 40° 入射到 n = 1.5 的玻璃，求折射角。",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-3.2.2-02",
@@ -2056,7 +2105,10 @@
     "optical fibre"
    ],
    "method": "数字信号优点背两条：noise can be removed / signal regenerated；faster data transfer, more information。Microwaves 穿透墙壁且用于卫星；手机/Wi-Fi 用 microwaves。",
-   "probe": "比较模拟与数字信号，并解释数字信号为何更不容易失真。"
+   "probe": "比较模拟与数字信号，并解释数字信号为何更不容易失真。",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-3.4-01",
@@ -2317,7 +2369,10 @@
     "LDR"
    ],
    "method": "记“电阻大的分到电压多”。传感题三步：条件变化 → 传感器电阻变化 → 它两端电压按比例变化。",
-   "probe": "热敏电阻与定值电阻串联，温度升高时热敏电阻两端电压如何变化？"
+   "probe": "热敏电阻与定值电阻串联，温度升高时热敏电阻两端电压如何变化？",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-4.4-01",
@@ -2562,7 +2617,10 @@
     "uranium"
    ],
    "method": "fission = splitting a large nucleus（中子撞击 U-235）；fusion = joining two small nuclei（hydrogen → helium，在恒星中）。两者都会损失质量放出能量。",
-   "probe": "比较裂变和聚变：哪种用于核电站、哪种发生在太阳中。"
+   "probe": "比较裂变和聚变：哪种用于核电站、哪种发生在太阳中。",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-5.2.1-01",
@@ -2654,7 +2712,10 @@
     "neutron → proton + electron"
    ],
    "method": "写方程时上下两行分别配平（A 守恒、Z 守恒）。α 用 ⁴₂He，β 用 ⁰₋₁e。",
-   "probe": "写出 ²³⁸₉₂U 发生 α 衰变的方程。"
+   "probe": "写出 ²³⁸₉₂U 发生 α 衰变的方程。",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-5.2.4-01",
@@ -3239,7 +3300,10 @@
    ],
    "method": "类比磁场：磁场方向看 N 极受力，电场方向看正电荷受力；正电荷向外发散、负电荷向内汇聚。",
    "probe": "画两块平行带电板之间的电场线并标出方向；电子放进去会往哪边动？",
-   "source": "https://www.cambridgeinternational.org/Images/697209-2026-2028-syllabus.pdf 第 4.2.1 Supplement 7–10 节（2029 版 https://www.cambridgeinternational.org/Images/764332-2029-syllabus.pdf 同编号同内容）"
+   "source": "https://www.cambridgeinternational.org/Images/697209-2026-2028-syllabus.pdf 第 4.2.1 Supplement 7–10 节（2029 版 https://www.cambridgeinternational.org/Images/764332-2029-syllabus.pdf 同编号同内容）",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-4.5.4-02",
@@ -3271,7 +3335,10 @@
    ],
    "method": "电子带负电：先把电流方向画成和电子运动相反，再用左手定则。",
    "probe": "一束电子向右射入垂直纸面向里的磁场，向哪边偏？",
-   "source": "https://www.cambridgeinternational.org/Images/697209-2026-2028-syllabus.pdf 第 4.5.4 Supplement 3 节（2029 版 https://www.cambridgeinternational.org/Images/764332-2029-syllabus.pdf 同编号同内容）"
+   "source": "https://www.cambridgeinternational.org/Images/697209-2026-2028-syllabus.pdf 第 4.5.4 Supplement 3 节（2029 版 https://www.cambridgeinternational.org/Images/764332-2029-syllabus.pdf 同编号同内容）",
+   "tracks": [
+    "extended"
+   ]
   },
   {
    "id": "PHY-IG-6.1.2-02",
@@ -3307,7 +3374,10 @@
    ],
    "method": "彗星近日点快、远日点慢：靠近太阳时重力势能转化为动能。",
    "probe": "给出彗星椭圆轨道图，问在哪一点速度最大并解释。",
-   "source": "https://www.cambridgeinternational.org/Images/697209-2026-2028-syllabus.pdf 第 6.1.2 Supplement 7、8、10 节（2029 版 https://www.cambridgeinternational.org/Images/764332-2029-syllabus.pdf 同编号同内容）"
+   "source": "https://www.cambridgeinternational.org/Images/697209-2026-2028-syllabus.pdf 第 6.1.2 Supplement 7、8、10 节（2029 版 https://www.cambridgeinternational.org/Images/764332-2029-syllabus.pdf 同编号同内容）",
+   "tracks": [
+    "extended"
+   ]
   }
  ]
 }

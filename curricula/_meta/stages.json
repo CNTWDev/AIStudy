@@ -1,0 +1,204 @@
+{
+ "_doc": "所有学制的学段放在同一根「学年」轴上：year = 相当于中国几年级（一年级 = 1）。不同学制的学段靠 year 比先后、做跨教材推断。孩子的「年级」用 grades 里的值（中国学年）；国际学校的孩子也按学年选（如 Year 9 / Grade 8 选「初二」）。加学制或学段：在 systems / stages 里加一行即可，教材包的 stage 字段引用这里的 id。",
+ "systems": [
+  {
+   "id": "cn",
+   "name": "中国（上海五·四学制）"
+  },
+  {
+   "id": "cambridge",
+   "name": "剑桥国际（Primary / Lower Secondary / IGCSE）"
+  },
+  {
+   "id": "alevel",
+   "name": "A-Level"
+  },
+  {
+   "id": "ib",
+   "name": "IB（PYP / MYP / DP）"
+  },
+  {
+   "id": "us",
+   "name": "美式（AP）"
+  }
+ ],
+ "grades": [
+  "G1",
+  "G2",
+  "G3",
+  "G4",
+  "G5",
+  "G6",
+  "G7",
+  "G8",
+  "G9",
+  "G10",
+  "G11",
+  "G12"
+ ],
+ "stages": [
+  {
+   "id": "G1",
+   "system": "cn",
+   "label": "一年级",
+   "year": 1,
+   "age": 6
+  },
+  {
+   "id": "G2",
+   "system": "cn",
+   "label": "二年级",
+   "year": 2,
+   "age": 7
+  },
+  {
+   "id": "G3",
+   "system": "cn",
+   "label": "三年级",
+   "year": 3,
+   "age": 8
+  },
+  {
+   "id": "G4",
+   "system": "cn",
+   "label": "四年级",
+   "year": 4,
+   "age": 9
+  },
+  {
+   "id": "G5",
+   "system": "cn",
+   "label": "五年级",
+   "year": 5,
+   "age": 10
+  },
+  {
+   "id": "G6",
+   "system": "cn",
+   "label": "六年级",
+   "year": 6,
+   "age": 11
+  },
+  {
+   "id": "G7",
+   "system": "cn",
+   "label": "初一",
+   "year": 7,
+   "age": 12
+  },
+  {
+   "id": "G8",
+   "system": "cn",
+   "label": "初二",
+   "year": 8,
+   "age": 13
+  },
+  {
+   "id": "G9",
+   "system": "cn",
+   "label": "初三",
+   "year": 9,
+   "age": 14
+  },
+  {
+   "id": "G10",
+   "system": "cn",
+   "label": "高一",
+   "year": 10,
+   "age": 15
+  },
+  {
+   "id": "G11",
+   "system": "cn",
+   "label": "高二",
+   "year": 11,
+   "age": 16
+  },
+  {
+   "id": "G12",
+   "system": "cn",
+   "label": "高三",
+   "year": 12,
+   "age": 17
+  },
+  {
+   "id": "IGCSE",
+   "system": "cambridge",
+   "label": "IGCSE",
+   "year": 9.5,
+   "age": 14,
+   "note": "两年课程，约对应初三–高一（14–16 岁）"
+  },
+  {
+   "id": "AS",
+   "system": "alevel",
+   "label": "AS Level",
+   "year": 11,
+   "age": 16
+  },
+  {
+   "id": "A-Level",
+   "system": "alevel",
+   "label": "A-Level",
+   "year": 11.5,
+   "age": 16,
+   "note": "两年课程（AS + A2），约对应高二–高三"
+  },
+  {
+   "id": "MYP1",
+   "system": "ib",
+   "label": "IB MYP 1",
+   "year": 6,
+   "age": 11
+  },
+  {
+   "id": "MYP2",
+   "system": "ib",
+   "label": "IB MYP 2",
+   "year": 7,
+   "age": 12
+  },
+  {
+   "id": "MYP3",
+   "system": "ib",
+   "label": "IB MYP 3",
+   "year": 8,
+   "age": 13
+  },
+  {
+   "id": "MYP4",
+   "system": "ib",
+   "label": "IB MYP 4",
+   "year": 9,
+   "age": 14
+  },
+  {
+   "id": "MYP5",
+   "system": "ib",
+   "label": "IB MYP 5",
+   "year": 10,
+   "age": 15
+  },
+  {
+   "id": "DP1",
+   "system": "ib",
+   "label": "IB DP 第一年",
+   "year": 11,
+   "age": 16
+  },
+  {
+   "id": "DP2",
+   "system": "ib",
+   "label": "IB DP 第二年",
+   "year": 12,
+   "age": 17
+  },
+  {
+   "id": "AP",
+   "system": "us",
+   "label": "AP",
+   "year": 11.5,
+   "age": 16
+  }
+ ]
+}

@@ -60,34 +60,88 @@ FastAPI 应用（app/main.py）
 - **安全日志**：登录成功/失败、锁定、改密码、停用、生成重设链接等都记在 `auth_events`，管理页可看最近 100 条。
 - 孩子只能看到自己的数据；家长能看自己孩子的总览和报告；管理员能看所有家庭和孩子的情况。
 
-## 4. 教材数据模型（可插拔）
+## 4. 教材数据模型：四层，各自独立、各自扩展
 
-每个文件 `curricula/<pack_id>.json` 是一个**教材包** = 一个学科的一个版本：
+不同年级、学科、学校类型的孩子用的教材都不一样，还会不断增加，所以教材数据分成四层。
+每一层只依赖它下面的层，每层都可以单独扩充。孩子自己的选择存在数据库里，不进教材文件。
+
+```
+孩子的选择（数据库）    年级 · 学校类型/模板 · 每科选哪套教材、哪个方向 · 学到哪 · 掌握情况
+        │
+学校模板 _meta/presets.json   上海公办小学/初中/高中、民办双语、国际学校剑桥路线……（预填，可逐科改）
+        │
+关联层   _links/*.json         concepts（同一概念跨教材互认）· links（uses / language / context）
+        │
+教材包   curricula/*.json      一套教材 = 板块 + 知识点（+ 方向 tracks）；包与包互不依赖
+        │
+学段     _meta/stages.json     所有学制放在同一根「学年」轴上（G1–G12、IGCSE、A-Level、IB MYP/DP、AP）
+```
+
+### 4.1 学段（`curricula/_meta/stages.json`）
+
+每个学段有 `id`、`system`（cn / cambridge / alevel / ib / us）、`label` 和 `year`。`year` 是「相当于中国几年级」，例如 IGCSE = 9.5，MYP3 = 8，DP1 = 11。
+
+- 不同学制的知识点靠 `year` 比先后，诊断回溯和跨教材推断都用它。
+- 加学制或年级只改这个文件。孩子的「年级」从 `grades` 里选。
+
+### 4.2 教材包（`curricula/<pack_id>.json`）
 
 ```json
 {
-  "pack": {"id": "eng-shanghai", "subject": "english", "subject_name": "英语",
-           "edition": "上海牛津版（小学·初中）+ 上海高中英语新教材", "region": "上海公办",
-           "stages": ["G1", "...", "G12"], "version": 1, "sources": ["..."], "notes": "..."},
-  "strands": [{"id": "GRA", "name": "语法"}],
-  "kps": [{
-    "id": "ESH-GRA-07", "strand": "GRA", "stage": "G3", "term": "上", "unit": "3A Module 2",
-    "name": "一般现在时（第三人称单数）", "name_en": "Present simple (3rd person)",
-    "desc": "掌握是什么样子", "prereqs": [{"id": "ESH-GRA-03", "strength": "必须"}],
-    "hot": true, "method": "低门槛学习方法 + 常见错误", "probe": "诊断题思路", "terms": ["..."]
-  }]
+  "pack": {"id": "eng-cambridge", "subject": "english", "subject_name": "英语", "edition": "剑桥英语（…）",
+           "region": "国际学校", "system": "cambridge", "school_types": ["international", "private"],
+           "tracks": [{"id": "0511", "name": "IGCSE ESL 0511（口语计入总分 25%）"}, {"id": "0510", "name": "…"}, {"id": "0500", "name": "…"}],
+           "default_track": "0511", "stages": ["G3", "…", "IGCSE"], "version": 2, "verified": "2026-10-06",
+           "sources": ["官方大纲 / 教学用书目录 URL"], "notes": "版本说明、学段对应、考试结构"},
+  "strands": [{"id": "REA", "name": "阅读"}],
+  "kps": [{"id": "ENG-REA-12", "strand": "REA", "stage": "IGCSE", "syllabus": "0510/0511 Paper 1 Ex3",
+           "tracks": ["0510", "0511"], "name": "笔记补全", "name_en": "Note completion", "desc": "…",
+           "prereqs": [{"id": "…", "strength": "必须"}], "hot": true, "method": "…", "probe": "…", "terms": ["…"],
+           "source": "这个点的依据"}]
 }
 ```
 
-要点：
+- **知识点 id 全局唯一，而且永不修改**，因为学生数据按 id 记录。内容变了就改字段；要删除先评估影响。
+- **方向（tracks）**：同一套教材里不同考试或难度的分支，例如剑桥英语 0511 / 0510 / 0500、IGCSE Core / Extended。
+  - 知识点带 `tracks` 字段，表示只属于这些方向；不带，表示所有方向都要学。
+  - 孩子在每套教材上选一个方向（存在 `enrollments.track`），没选就用 `default_track`。
+  - 诊断、计划、地图、进度、统计都只看所选方向的知识点：`catalog.ids_for(pack, track)`、`engine.my_ids(user, pack)`。
+- **prereqs**：「必须」用于诊断回溯和补漏，「有帮助」只做展示。前置的学段不能晚于本点，否则自动降为「有帮助」。
+- **school_types / system**：「编辑孩子」时把适合这类学校的教材排在前面。其它教材仍然可选，用于转学或提前学。
+- **加一套教材**：往 `curricula/` 放一个 JSON 文件，跑 `python -m app.cli check-curricula` 通过即可。CI 也会跑这一步。
+- 题库 `seed/items_*.json`、术语卡 `seed/vocab_*.json` 按知识点 id 挂靠。
 
-- **知识点 id 全局唯一**，前置关系可以跨包（例如上海物理引用数学基础知识点）。
-- **stage** 用统一学段：`G1`–`G12`，另有 `IGCSE`、`A-Level`，内部按顺序比较（IGCSE≈9.5）。孩子每个教材包有自己的「当前进度学段」，不一定等于年级（国际学校初二就在学 IGCSE 物理）。
-- **prereqs 强度**：「必须」用于诊断回溯和补漏；「有帮助」只做展示。
-- **加新教材**：往 `curricula/` 放一个新 JSON 文件，重启即可在「编辑孩子」里勾选。例如人教版数学、新概念英语、AP 物理都按这个格式写。
-- 题库 `seed/items_*.json`、术语卡 `seed/vocab_*.json` 按知识点 id 挂靠，人工核对过的题优先使用；没有题的知识点由 AI 现场出题并存入题库复用。
+### 4.3 关联层（`curricula/_links/*.json`）：学科独立，课上融合
 
-当前内置 6 个包，共 741 个知识点（统编语文 168、上海英语 134、沪教数学 150、上海物理 121、Cambridge 英语 75、Cambridge 物理 93）。这些知识图谱依据课程标准、考纲和教材目录整理，**没有复制教材原文**；各版教材可能修订，发现与孩子课本不一致时直接改 JSON 即可。
+教材包之间互不引用（基础前置点除外），跨学科的融合单独放在关联文件里。加关联不动教材，删掉一个关联文件也不影响教材。
+
+- **concepts**：同一个概念在不同教材里的知识点。例如「密度」在沪科版物理、剑桥物理、Lower Secondary Science 里各有一个点。
+  - 孩子学会其中一个，其它几个如果还没测过，就推断为「学习中」（`engine.infer_equivalents`）。
+  - 这样转学、换教材、公办转国际，都不用从零开始。
+- **links**：有方向的关联。
+  - `uses`：from 用到 to。例如物理「速度」用到数学「速度、路程、时间的数量关系」和一次函数。
+  - `language`：同一内容的另一种语言说法。例如物理术语和英语词汇。
+  - `context`：背景知识。例如英语阅读话题和语文、历史、道法里学过的内容。
+- 融合在上层应用里的落点：
+  1. **学习页「🔗 和别的学科连起来」**（`engine.bridges`）：列出同一概念、要用到、会用在、相关背景，孩子已经会的排前面。
+  2. **AI 讲解**：把孩子在别的学科已经学过的相关内容写进提示，让讲解从已知的东西引入，比如「你在数学里学过……」「英语里叫……」。
+  3. **语言阅读选题**（`engine.cross_topics`）：英语阅读用最近在物理、科学、历史里学过的内容（用英语学内容）；中文阅读用历史、道法、科学的内容。
+  4. **掌握度互认**：见上面的 concepts。
+
+### 4.4 学校模板（`curricula/_meta/presets.json`）
+
+模板是常见的「学校类型 → 各科教材 + 方向」组合，比如上海公办小学、上海公办初中、民办双语、国际学校剑桥路线。
+
+- 家长在「编辑孩子」里选了学校类型，各科教材和方向会自动选好，仍然可以逐科修改。
+- 选择记在 `users.preset` 和 `users.school_type` 里。
+- 新的学校类型加一条模板就行。模板引用的教材必须存在，由 `check-curricula` 校验。
+
+### 4.5 校对与来源
+
+2026-10 对照上海市教委教学用书目录、教育部目录、上海市教育考试院和剑桥官方大纲做过一次校对，报告和上海教材全景见 `docs/curricula-audit/`。
+
+- 新教材包也按同样的要求建：每个知识点写 `source`，查不到依据的记进 unverified，不凭记忆编。
+- 知识图谱依据课程标准、考纲和教材目录整理，**没有复制教材原文**。
 
 ## 5. 学习引擎
 

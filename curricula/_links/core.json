@@ -1,0 +1,121 @@
+{
+ "_doc": "跨教材关联（第一批，人工核对名称和说明后建立）。concepts：同一概念在不同教材里的知识点，学会一个，其它推断为「学习中」。links：uses = from 要用到 to；language = 同一内容的另一种语言；context = to 是 from 的相关背景。",
+ "concepts": [
+  {
+   "id": "math.pythagoras",
+   "name": "勾股定理",
+   "kps": [
+    "MSH-GEO-31",
+    "MATH-PRE-PYTH"
+   ]
+  },
+  {
+   "id": "math.mean",
+   "name": "平均数",
+   "kps": [
+    "MSH-STA-03",
+    "MATH-PRE-AVG"
+   ]
+  },
+  {
+   "id": "phy.density",
+   "name": "密度",
+   "kps": [
+    "PSH-MECH-14",
+    "PHY-IG-1.4-01",
+    "SCI-PRE-DENS"
+   ]
+  },
+  {
+   "id": "phy.pressure",
+   "name": "压强 p = F/S",
+   "kps": [
+    "PSH-MECH-15",
+    "PHY-IG-1.8-01"
+   ]
+  },
+  {
+   "id": "phy.liquid-pressure",
+   "name": "液体压强",
+   "kps": [
+    "PSH-MECH-16",
+    "PHY-IG-1.8-02"
+   ]
+  },
+  {
+   "id": "phy.speed",
+   "name": "速度与路程-时间图",
+   "kps": [
+    "PSH-MECH-03",
+    "SCI-PRE-SPEED",
+    "PHY-IG-1.2-01"
+   ]
+  },
+  {
+   "id": "phy.sound",
+   "name": "声音的产生与传播",
+   "kps": [
+    "PSH-SOUND-01",
+    "SCI-PRE-SOUND"
+   ]
+  },
+  {
+   "id": "phy.simple-circuit",
+   "name": "简单电路",
+   "kps": [
+    "PSH-ELEC-01",
+    "SCI-PRE-CIRC"
+   ]
+  },
+  {
+   "id": "phy.refraction",
+   "name": "光的折射",
+   "kps": [
+    "PSH-OPT-04",
+    "PHY-IG-3.2.2-01"
+   ]
+  },
+  {
+   "id": "phy.magnetic-field",
+   "name": "磁体与磁场",
+   "kps": [
+    "PSH-MAG-01",
+    "PHY-IG-4.1-01"
+   ]
+  },
+  {
+   "id": "phy.electromagnet",
+   "name": "电流的磁效应与电磁铁",
+   "kps": [
+    "PSH-MAG-02",
+    "PHY-IG-4.5.3-01"
+   ]
+  }
+ ],
+ "links": [
+  {
+   "from": "PSH-MECH-03",
+   "to": "MSH-APP-05",
+   "type": "uses",
+   "note": "速度 = 路程 ÷ 时间，就是小学学过的数量关系"
+  },
+  {
+   "from": "PSH-MECH-03",
+   "to": "MSH-FUN-03",
+   "type": "uses",
+   "note": "匀速运动的 s-t 图是一条过原点的直线（正比例 / 一次函数）"
+  },
+  {
+   "from": "SCI-PRE-SPEED",
+   "to": "MSH-APP-05",
+   "type": "uses",
+   "note": "speed = distance ÷ time，和数学里的速度问题一样"
+  },
+  {
+   "from": "PSH-MECH-14",
+   "to": "MSH-NUM-37",
+   "type": "uses",
+   "note": "同种物质质量和体积成正比，比值就是密度"
+  }
+ ]
+}

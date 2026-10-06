@@ -1,0 +1,479 @@
+{
+ "sources": [
+  {
+   "url": "https://jw.beijing.gov.cn/xxgk/2024zcwj/2024qtwj/202408/W020240905543232813376.pdf",
+   "what": "教育部办公厅《2024年义务教育国家课程教学用书目录》（北京市教委转载）：科学（五·四学制）俞立中主编，上海科学技术出版社，一年级上册至六年级下册，一至六年级使用",
+   "level": "官方"
+  },
+  {
+   "url": "https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf",
+   "what": "上海市教委2026年秋季上海市编写教学用书目录：科学活动手册 一上 SD–XX–2024002、二上 SD–XX–2025004、三上 SD–XX–2026005、四上 SD–XX–2026006、五上 待审、六上 SD–CX–2024011（沪科技）；未再列《自然（试用本）》",
+   "level": "官方"
+  },
+  {
+   "url": "https://edu.sh.gov.cn/xxgk2_zdgz_jcjy_04/20260810/339e915d906842caaf98736d562df96a.html",
+   "what": "上海市教委关于印发2026年秋季中小学教学用书目录的通知（沪教委基〔2026〕18号）",
+   "level": "官方"
+  },
+  {
+   "url": "https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf",
+   "what": "上海市教委2026年春季上海市编写教学用书目录：科学活动手册 一下 SD-XX-2024016、二下 SD-XX-2025013、六下 SD-CX-2024031；三～五年级第二学期仍用《自然（试用本）》（沪远东/沪科教）",
+   "level": "官方"
+  },
+  {
+   "url": "http://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html",
+   "what": "教育部《义务教育课程方案和课程标准（2022年版）》发布页（含科学课程标准附件）",
+   "level": "官方"
+  },
+  {
+   "url": "http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf",
+   "what": "《义务教育科学课程标准（2022年版）》PDF 原件（超过30MB，本次工具无法直接读取全文）",
+   "level": "官方"
+  },
+  {
+   "url": "https://zy.21cnjy.com/11948378",
+   "what": "科学课程标准（2022年版）word 转载版预览，用于核对 1.1、1.2、1.3、2.1–2.3、3.1–3.3、4.1、5.2–5.4、7.1 等条目的1～6年级内容要求（预览不全）",
+   "level": "佐证"
+  },
+  {
+   "url": "https://cloud.kepuchina.cn/newSearch/imgText?id=7018996242266284032",
+   "what": "科普中国：课标“月球是地球的卫星”1～2/3～4/5～6年级内容要求转述",
+   "level": "佐证"
+  },
+  {
+   "url": "https://www.judaoedu.com/news_show.aspx?id=15740",
+   "what": "课标1.1“物质具有一定的特性与功能”分学段要求转述",
+   "level": "佐证"
+  },
+  {
+   "url": "https://www.dzskb.com/hkjbxxkxys.html",
+   "what": "一年级上册（五四制）目录转写",
+   "level": "佐证"
+  },
+  {
+   "url": "https://www.renjiaoshe.com/jiaocai/2807.html",
+   "what": "一年级上册目录转写（与 dzskb 一致）",
+   "level": "佐证"
+  },
+  {
+   "url": "https://www.renjiaoshe.com/jiaocai/2808.html",
+   "what": "一年级下册目录转写",
+   "level": "佐证"
+  },
+  {
+   "url": "https://www.dzkbw.org/book/5798.html",
+   "what": "一年级下册（2026春版）目录转写（与 renjiaoshe 一致）",
+   "level": "佐证"
+  },
+  {
+   "url": "https://www.dzkbw.org/book/5799.html",
+   "what": "二年级上册目录转写（站点标“2026秋版”）",
+   "level": "佐证"
+  },
+  {
+   "url": "https://www.dzkbw.org/book/5800.html",
+   "what": "六年级上册（2024秋版）目录转写",
+   "level": "佐证"
+  },
+  {
+   "url": "https://keben.app/book/0636/shst-science-grade-6-vol-1-2022",
+   "what": "六年级上册书目信息（俞立中主编，五四制，上海科学技术出版社）",
+   "level": "佐证"
+  },
+  {
+   "url": "https://www.dzkbw.org/book/5801.html",
+   "what": "六年级下册（2026春版）目录转写",
+   "level": "佐证"
+  }
+ ],
+ "coverage": [
+  {
+   "section": "G1上 走进科学课",
+   "kp_ids": [
+    "SCI-SH-G1-01"
+   ]
+  },
+  {
+   "section": "G1上 第1单元 感知世界",
+   "kp_ids": [
+    "SCI-SH-G1-02",
+    "SCI-SH-G1-03"
+   ]
+  },
+  {
+   "section": "G1上 第2单元 认识物体",
+   "kp_ids": [
+    "SCI-SH-G1-04",
+    "SCI-SH-G1-05",
+    "SCI-SH-G1-06"
+   ]
+  },
+  {
+   "section": "G1上 第3单元 生机勃勃的大自然",
+   "kp_ids": [
+    "SCI-SH-G1-07",
+    "SCI-SH-G1-08",
+    "SCI-SH-G1-09"
+   ]
+  },
+  {
+   "section": "G1上 第4单元 天气知多少",
+   "kp_ids": [
+    "SCI-SH-G1-10",
+    "SCI-SH-G1-11"
+   ]
+  },
+  {
+   "section": "G1上 第5单元 从秋天到冬天",
+   "kp_ids": [
+    "SCI-SH-G1-12",
+    "SCI-SH-G1-13"
+   ]
+  },
+  {
+   "section": "G1上 第6单元 小小工程师——植物标识牌",
+   "kp_ids": [
+    "SCI-SH-G1-14"
+   ]
+  },
+  {
+   "section": "G1下 第1单元 动物运动会",
+   "kp_ids": [
+    "SCI-SH-G1-15",
+    "SCI-SH-G1-16",
+    "SCI-SH-G1-17"
+   ]
+  },
+  {
+   "section": "G1下 第2单元 常见植物博览会",
+   "kp_ids": [
+    "SCI-SH-G1-18",
+    "SCI-SH-G1-19"
+   ]
+  },
+  {
+   "section": "G1下 第3单元 季节的变化",
+   "kp_ids": [
+    "SCI-SH-G1-20",
+    "SCI-SH-G1-21",
+    "SCI-SH-G1-22"
+   ]
+  },
+  {
+   "section": "G1下 第4单元 看不见的空气",
+   "kp_ids": [
+    "SCI-SH-G1-23",
+    "SCI-SH-G1-24",
+    "SCI-SH-G1-25"
+   ]
+  },
+  {
+   "section": "G1下 第5单元 身边的材料",
+   "kp_ids": [
+    "SCI-SH-G1-26",
+    "SCI-SH-G1-27",
+    "SCI-SH-G1-28"
+   ]
+  },
+  {
+   "section": "G1下 第6单元 小小工程师——创意花盆",
+   "kp_ids": [
+    "SCI-SH-G1-29"
+   ]
+  },
+  {
+   "section": "G2上 第1单元 我们离不开水",
+   "kp_ids": [
+    "SCI-SH-G2-01",
+    "SCI-SH-G2-02",
+    "SCI-SH-G2-03"
+   ]
+  },
+  {
+   "section": "G2上 第2单元 位置与方向",
+   "kp_ids": [
+    "SCI-SH-G2-04",
+    "SCI-SH-G2-05"
+   ]
+  },
+  {
+   "section": "G2上 第3单元 推和拉",
+   "kp_ids": [
+    "SCI-SH-G2-06",
+    "SCI-SH-G2-07"
+   ]
+  },
+  {
+   "section": "G2上 第4单元 小小工程师――纸桥",
+   "kp_ids": [
+    "SCI-SH-G2-08",
+    "SCI-SH-G2-09"
+   ]
+  },
+  {
+   "section": "G2上 第5单元 衣服材料",
+   "kp_ids": [
+    "SCI-SH-G2-10",
+    "SCI-SH-G2-11",
+    "SCI-SH-G2-12"
+   ]
+  },
+  {
+   "section": "G2上 第6单元 动物的生存",
+   "kp_ids": [
+    "SCI-SH-G2-13",
+    "SCI-SH-G2-14"
+   ]
+  },
+  {
+   "section": "G2下 （课标补全）",
+   "kp_ids": [
+    "SCI-SH-G2-15",
+    "SCI-SH-G2-16",
+    "SCI-SH-G2-17",
+    "SCI-SH-G2-18"
+   ]
+  },
+  {
+   "section": "G3全 （课标补全）",
+   "kp_ids": [
+    "SCI-SH-G3-01",
+    "SCI-SH-G3-02",
+    "SCI-SH-G3-03",
+    "SCI-SH-G3-04",
+    "SCI-SH-G3-05",
+    "SCI-SH-G3-06",
+    "SCI-SH-G3-07",
+    "SCI-SH-G3-08",
+    "SCI-SH-G3-09",
+    "SCI-SH-G3-10",
+    "SCI-SH-G3-11"
+   ]
+  },
+  {
+   "section": "G4全 （课标补全）",
+   "kp_ids": [
+    "SCI-SH-G4-01",
+    "SCI-SH-G4-02",
+    "SCI-SH-G4-03",
+    "SCI-SH-G4-04",
+    "SCI-SH-G4-05",
+    "SCI-SH-G4-06",
+    "SCI-SH-G4-07",
+    "SCI-SH-G4-08",
+    "SCI-SH-G4-09"
+   ]
+  },
+  {
+   "section": "G5全 （课标补全）",
+   "kp_ids": [
+    "SCI-SH-G5-01",
+    "SCI-SH-G5-02",
+    "SCI-SH-G5-03",
+    "SCI-SH-G5-04",
+    "SCI-SH-G5-05",
+    "SCI-SH-G5-06",
+    "SCI-SH-G5-07",
+    "SCI-SH-G5-08",
+    "SCI-SH-G5-09",
+    "SCI-SH-G5-10"
+   ]
+  },
+  {
+   "section": "G6上 第1单元 变化的物质世界",
+   "kp_ids": [
+    "SCI-SH-G6-01",
+    "SCI-SH-G6-02"
+   ]
+  },
+  {
+   "section": "G6上 第2单元 能与生活",
+   "kp_ids": [
+    "SCI-SH-G6-03",
+    "SCI-SH-G6-04",
+    "SCI-SH-G6-05",
+    "SCI-SH-G6-06",
+    "SCI-SH-G6-07"
+   ]
+  },
+  {
+   "section": "G6上 第3单元 生命的延续",
+   "kp_ids": [
+    "SCI-SH-G6-08",
+    "SCI-SH-G6-09",
+    "SCI-SH-G6-10"
+   ]
+  },
+  {
+   "section": "G6上 第4单元 小小工程师――节能小屋",
+   "kp_ids": [
+    "SCI-SH-G6-11",
+    "SCI-SH-G6-12"
+   ]
+  },
+  {
+   "section": "G6下 第1单元 人体与健康",
+   "kp_ids": [
+    "SCI-SH-G6-13",
+    "SCI-SH-G6-14",
+    "SCI-SH-G6-15"
+   ]
+  },
+  {
+   "section": "G6下 第2单元 步入青春期",
+   "kp_ids": [
+    "SCI-SH-G6-16",
+    "SCI-SH-G6-17",
+    "SCI-SH-G6-18"
+   ]
+  },
+  {
+   "section": "G6下 第3单元 宇宙探秘",
+   "kp_ids": [
+    "SCI-SH-G6-19",
+    "SCI-SH-G6-20",
+    "SCI-SH-G6-21"
+   ]
+  },
+  {
+   "section": "G6下 第4单元 小小工程师一火星车",
+   "kp_ids": [
+    "SCI-SH-G6-22"
+   ]
+  },
+  {
+   "section": "课标 1.1 物质具有一定的特性与功能（1～6年级）",
+   "kp_ids": [
+    "SCI-SH-G1-04",
+    "SCI-SH-G1-26",
+    "SCI-SH-G3-01",
+    "SCI-SH-G3-02",
+    "SCI-SH-G3-03",
+    "SCI-SH-G4-06",
+    "SCI-SH-G5-01",
+    "SCI-SH-G6-01"
+   ]
+  },
+  {
+   "section": "课标 1.2 空气与水是重要的物质",
+   "kp_ids": [
+    "SCI-SH-G1-24",
+    "SCI-SH-G2-02",
+    "SCI-SH-G3-04",
+    "SCI-SH-G3-05",
+    "SCI-SH-G5-04"
+   ]
+  },
+  {
+   "section": "课标 2.1–2.3 物质的变化",
+   "kp_ids": [
+    "SCI-SH-G2-15",
+    "SCI-SH-G3-05",
+    "SCI-SH-G3-06",
+    "SCI-SH-G3-07",
+    "SCI-SH-G4-05",
+    "SCI-SH-G6-02"
+   ]
+  },
+  {
+   "section": "课标 3.1–3.3 运动与相互作用、声与光",
+   "kp_ids": [
+    "SCI-SH-G2-06",
+    "SCI-SH-G2-07",
+    "SCI-SH-G2-16",
+    "SCI-SH-G3-10",
+    "SCI-SH-G3-11",
+    "SCI-SH-G4-01",
+    "SCI-SH-G4-03",
+    "SCI-SH-G4-04",
+    "SCI-SH-G5-02",
+    "SCI-SH-G5-03",
+    "SCI-SH-G6-04",
+    "SCI-SH-G6-05",
+    "SCI-SH-G6-06"
+   ]
+  },
+  {
+   "section": "课标 4 能的转化与能量守恒",
+   "kp_ids": [
+    "SCI-SH-G4-02",
+    "SCI-SH-G6-03",
+    "SCI-SH-G6-07"
+   ]
+  },
+  {
+   "section": "课标 5–8 生命科学",
+   "kp_ids": [
+    "SCI-SH-G1-07",
+    "SCI-SH-G3-08",
+    "SCI-SH-G3-09",
+    "SCI-SH-G4-07",
+    "SCI-SH-G5-06",
+    "SCI-SH-G5-07",
+    "SCI-SH-G6-08",
+    "SCI-SH-G6-09",
+    "SCI-SH-G6-10",
+    "SCI-SH-G6-13",
+    "SCI-SH-G6-15",
+    "SCI-SH-G6-16"
+   ]
+  },
+  {
+   "section": "课标 9–11 地球与宇宙、人类活动与环境",
+   "kp_ids": [
+    "SCI-SH-G2-17",
+    "SCI-SH-G4-08",
+    "SCI-SH-G4-09",
+    "SCI-SH-G5-05",
+    "SCI-SH-G5-08",
+    "SCI-SH-G5-09",
+    "SCI-SH-G5-10",
+    "SCI-SH-G6-19",
+    "SCI-SH-G6-20",
+    "SCI-SH-G6-21"
+   ]
+  },
+  {
+   "section": "课标 12–13 技术与工程（各册“小小工程师”单元）",
+   "kp_ids": [
+    "SCI-SH-G1-14",
+    "SCI-SH-G1-29",
+    "SCI-SH-G2-08",
+    "SCI-SH-G2-09",
+    "SCI-SH-G6-11",
+    "SCI-SH-G6-12",
+    "SCI-SH-G6-22"
+   ]
+  }
+ ],
+ "unverified": [
+  {
+   "what": "二年级下册（新版，2025-2026学年第二学期起用）单元目录",
+   "why": "官方目录只列到活动手册书名；renjiaoshe、dzkbw、dzskb 等转写站均无该册目录。SCI-SH-G2-15～18 是按课标1～2年级内容要求补的点，不对应课本单元。"
+  },
+  {
+   "what": "三、四、五年级上册（2026秋新版）和下册（2027春起用）单元目录",
+   "why": "新书刚启用，网上查不到目录；五年级上册活动手册在2026秋目录中仍标“待审”。SCI-SH-G3-*、G4-*、G5-* 都按课标3～4、5～6年级内容要求补点，term 记“全”。G3和G4之间怎么分是按难度推定的，不是课本依据。"
+  },
+  {
+   "what": "课标原文逐条核对",
+   "why": "教育部 PDF 原件超过30MB，读取工具读不了，只能用 21cnjy 转载版预览和科普中国、矩道教育的转述核对一部分条目。SCI-SH-G3-09（植物的一生，8.1）、G4-07（动物生长发育，8.2）、G4-09（岩石与土壤，核心概念10）、G5-07（植物制造养分，6.1）、G5-08（自转与昼夜，9.2）、G5-09（公转与四季，9.3）、G5-10（人类活动与环境，核心概念11）只核对了学习内容标题，所属学段没有核对。"
+  },
+  {
+   "what": "已核对各册的课内具体内容",
+   "why": "G1、G2上、G6 只拿到单元名和课名，没有看到正文。desc 是按课名、课标对应学段要求和常识写的，六年级多处注明“以课本为准”（如热传递的三种方式、串联/并联、营养素种类、青春期内容深度）。"
+  },
+  {
+   "what": "二年级上册的版次",
+   "why": "dzkbw 标“2026秋版”，但上海2026秋目录显示二年级上册活动手册准用号是 SD–XX–2025004（2025年起用）。可能是重印版次，单元目录以该站转写为准。"
+  },
+  {
+   "what": "一年级上册“走进科学课”是否单独成单元",
+   "why": "dzskb 转写目录中它位于第1单元前，没有单元编号；本包把 unit 写成“走进科学课”。"
+  },
+  {
+   "what": "六年级第2单元第2课“生活中的声与光”",
+   "why": "课本中是一课，本包拆成 SCI-SH-G6-04（声）和 G6-05（光）两个点，二者 source 都指向同一课。"
+  }
+ ]
+}

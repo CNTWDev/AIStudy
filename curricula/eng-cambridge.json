@@ -31,7 +31,30 @@
    "https://www.cambridgeinternational.org/Images/607719-cambridge-lower-secondary-brochure.pdf"
   ],
   "notes": "版本：Cambridge 国际课程英语：Primary / Lower Secondary English as a Second Language (0057/0876) 与 English (0058/0861)（Stage 3-9）→ IGCSE English as a Second Language (0510/0511) 与 First Language English (0500)\n覆盖 Cambridge Stage 3-9 与 IGCSE 英语。学段对应：包内 G3-G9 按国际学校常见惯例记作 Cambridge Stage 3-9（Gn≈Stage n），这不是剑桥官方规定。剑桥官方年龄：Primary Stage 1-6 通常 5-11 岁，Lower Secondary Stage 7-9 通常 11-14 岁，IGCSE 面向 14-16 岁（两年课程，约 130 学时）；中国《义务教育法》第十一条规定满 6 周岁入学，所以按年龄算，中国 Gn 约等于 Cambridge Stage n+1（英国 Year n+1），按年龄 IGCSE 两年约对应中国 G9-G10。学校按哪种方式分班，以学校自己为准。stage 字段写的是该知识点通常最早系统学习的 Stage，语法点按 0057/0876 ESL 框架 Use of English 目标排。IGCSE ESL 0510（口语单独认证）和 0511（口语计入总分）从 2024 年起取消分层（Core/Extended），Paper 1 不再有 summary，原 note-making 改成 note completion（补全笔记），Listening 全部为选择题；2027-2029 版大纲官方说明 no significant changes。0500 First Language English 从 2027 年起改版：Paper 1 Reading 有三篇文本、四道题（含 120 词以内的概要和 200-250 词的作者语言效果分析），Paper 2 包括 Directed Writing（250-350 词）和 Composition（描写或记叙，350-450 词），也可以用 Coursework 代替 Paper 2。2027 年新出的 0465 IGCSE Core ESL 只在埃及开考，不适用于上海。",
-  "verified": "2026-10-06"
+  "verified": "2026-10-06",
+  "system": "cambridge",
+  "school_types": [
+   "international",
+   "private"
+  ],
+  "default_track": "0511",
+  "tracks": [
+   {
+    "id": "0511",
+    "name": "IGCSE ESL 0511（口语计入总分 25%）",
+    "desc": "读写 50% + 听力 25% + 口语 25%；上海国际学校最常见"
+   },
+   {
+    "id": "0510",
+    "name": "IGCSE ESL 0510（口语单独认证）",
+    "desc": "读写 70% + 听力 30%，口语另发证书"
+   },
+   {
+    "id": "0500",
+    "name": "IGCSE 第一语言英语 0500",
+    "desc": "母语难度：语言分析、概要、定向写作、记叙描写；一般需学校评估"
+   }
+  ]
  },
  "strands": [
   {
@@ -1057,7 +1080,11 @@
    "hot": true,
    "method": "先读笔记框架的标题和已给出的条目，判断每个空需要哪类信息（原因、例子、数字等）。再按框架顺序回原文找对应段落，答案写短语，不写整句；同一条信息不要重复用在两个空里。",
    "probe": "给一篇约 450 词文章和一个 2 个小标题、7 个空的笔记框架，检查信息定位是否准确、答案是否简洁不重复。",
-   "syllabus": "0510/0511 Paper 1 Exercise 3（R1, R2, R3）"
+   "syllabus": "0510/0511 Paper 1 Exercise 3（R1, R2, R3）",
+   "tracks": [
+    "0510",
+    "0511"
+   ]
   },
   {
    "id": "ENG-REA-13",
@@ -1083,7 +1110,10 @@
    "hot": true,
    "method": "三步法：先列要点（可借用笔记方法），再用同义词改写，最后用连接词串成一段。0500 概要不超过 120 词，不加个人观点和例子。写完数一数要点数量是否足够。",
    "probe": "给一篇文章，要求按特定方面写约 80 词概要，检查要点覆盖、改写程度和连贯性。",
-   "syllabus": "0500 Paper 1 Question 2（R1, R2, R3, R5; W 部分 5 分）"
+   "syllabus": "0500 Paper 1 Question 2（R1, R2, R3, R5; W 部分 5 分）",
+   "tracks": [
+    "0500"
+   ]
   },
   {
    "id": "ENG-WRI-01",
@@ -1533,7 +1563,11 @@
    "hot": true,
    "method": "用 AREA 法回答：Answer 回答—Reason 理由—Example 例子—Alternative/Add 补充。准备 10 个常考话题，每题录音练 2 分钟。",
    "probe": "模拟问答 3 个话题问题，评估回答长度、展开程度和词汇语法准确性。",
-   "syllabus": "0510/0511 Component 3 Speaking（S1-S4）"
+   "syllabus": "0510/0511 Component 3 Speaking（S1-S4）",
+   "tracks": [
+    "0510",
+    "0511"
+   ]
   },
   {
    "id": "ENG-GRA-28",
@@ -2204,7 +2238,11 @@
     "multiple choice"
    ],
    "syllabus": "0510/0511 Paper 1 Exercises 1, 4（R1-R4）",
-   "source": "https://www.cambridgeinternational.org/Images/721337-2027-2029-syllabus.pdf"
+   "source": "https://www.cambridgeinternational.org/Images/721337-2027-2029-syllabus.pdf",
+   "tracks": [
+    "0510",
+    "0511"
+   ]
   },
   {
    "id": "ENG-WRI-16",
@@ -2381,7 +2419,10 @@
     "audience"
    ],
    "syllabus": "0500 Paper 1 Question 4（R1-R3, R5; W1-W5）",
-   "source": "https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf"
+   "source": "https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf",
+   "tracks": [
+    "0500"
+   ]
   },
   {
    "id": "ENG-WRI-22",
@@ -2413,7 +2454,10 @@
     "discursive"
    ],
    "syllabus": "0500 Paper 2 Section A（R3, R4; W1-W5）",
-   "source": "https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf"
+   "source": "https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf",
+   "tracks": [
+    "0500"
+   ]
   },
   {
    "id": "ENG-WRI-23",
@@ -2445,7 +2489,10 @@
     "narrative writing"
    ],
    "syllabus": "0500 Paper 2 Section B; Component 3 Assignments 2, 3",
-   "source": "https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf"
+   "source": "https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf",
+   "tracks": [
+    "0500"
+   ]
   },
   {
    "id": "ENG-WRI-24",

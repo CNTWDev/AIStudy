@@ -29,7 +29,7 @@ def past_range(user_id: int, e, taught: set | None = None) -> list[str]:
     """「以前学过」的知识点：当前学段之前的，加上本学段学校已经教过的。"""
     taught = engine.taught_set(user_id) if taught is None else taught
     cur = stage_rank(e["stage"])
-    return [k for k in catalog.packs[e["pack_id"]].kp_ids
+    return [k for k in catalog.ids_for(e["pack_id"], e["track"])
             if stage_rank(catalog.kps[k]["stage"]) < cur or k in taught]
 
 
@@ -282,10 +282,10 @@ def ahead(user_id: int, mastery: dict | None = None) -> list[dict]:
     for e in _enrolls(user_id):
         nxt = None
         if e["progress_kp"] and catalog.kp(e["progress_kp"]):
-            nxt = engine.next_after(e["pack_id"], e["progress_kp"], mastery, taught)
+            nxt = engine.next_after(e["pack_id"], e["progress_kp"], mastery, taught, e["track"])
         if not nxt:
             cur = stage_rank(e["stage"])
-            nxt = next((catalog.kps[k] for k in catalog.packs[e["pack_id"]].kp_ids
+            nxt = next((catalog.kps[k] for k in catalog.ids_for(e["pack_id"], e["track"])
                         if stage_rank(catalog.kps[k]["stage"]) in (cur, cur + 1) and k not in taught
                         and mastery.get(k, {}).get("status") in (None, "unknown")), None)
         if not nxt:

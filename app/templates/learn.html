@@ -17,6 +17,10 @@
     {% if not readonly %}<div id="teach" style="margin-top:8px"><button class="btn ghost sm" id="teachbtn">🤖 让 AI 一步步讲给我听</button></div>{% endif %}</li>
   <li id="ctxli" style="display:none"><b>它从哪来、用在哪</b><div id="ctx" class="ctxbox"></div></li>
   <li><b>记住方法</b><div>{{ kp.method }}</div></li>
+  {% if bridges %}<li><b>🔗 和别的学科连起来</b>
+    {% for b in bridges %}<div class="bridge small">{% if b.mine %}<a href="/learn/{{ b.kp.id }}">{{ b.kp.name }}</a>{% else %}{{ b.kp.name }}{% endif %}
+      <span class="muted">{{ b.subject }} · {{ b.label }}{% if b.note %}：{{ b.note }}{% endif %}{% if b.type == 'same' %}（{{ b.edition }}）{% endif %}</span>
+      {% if b.status in ('mastered', 'learning') %}<span class="pill st-{{ b.status }}">{{ STATUS_LABEL[b.status] }}</span>{% endif %}</div>{% endfor %}</li>{% endif %}
   {% if readonly %}<li><b>做题和总结</b><div class="muted small">孩子用自己的账号登录后在这里练习。</div></li>{% else %}
   <li><b>动手做 3 题</b> <span class="muted small">从简单的开始；错了会自动进错题本</span>
     <div id="items" class="card" style="margin-top:8px"><button class="btn" id="start">开始做题</button></div></li>

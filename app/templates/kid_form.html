@@ -13,6 +13,12 @@
     <div class="grow"><label>每天学习分钟</label><input type="number" name="daily_minutes" min="15" max="240" value="{{ k.daily_minutes if k else 60 }}"></div>
   </div>
   <label>学校（选填）</label><input type="text" name="school" value="{{ k.school if k else '' }}">
+  <label>学校类型</label>
+  <select name="preset" id="preset">
+    <option value="">自己逐科选教材</option>
+    {% for pr in presets %}<option value="{{ pr.id }}" data-packs='{{ pr.packs|tojson }}' {{ 'selected' if k and k.preset == pr.id }}>{{ pr.name }}</option>{% endfor %}
+  </select>
+  <p class="muted small" style="margin:4px 0 0">选了学校类型会把下面每门课的教材和方向自动选好，你仍然可以逐科改（比如英语用剑桥教材）。</p>
   <h2>学科与教材</h2>
   <p class="muted small">每门课选孩子学校用的教材版本就行，学段按上面的年级自动对应。之后在「学校进度」里点到学校正在教的那一课，系统据此往前补漏、往后预习。</p>
   {% for subj, packs in packs_by_subject.items() %}
@@ -22,11 +28,25 @@
     <label class="row" style="margin:0;font-weight:400"><input type="radio" name="subj_{{ packs[0].subject }}" value="" style="width:auto" {{ 'checked' if not cur }}> <span class="muted">暂不安排</span></label>
     {% for p in packs %}
     <label class="row" style="margin:4px 0 0;font-weight:400"><input type="radio" name="subj_{{ p.subject }}" value="{{ p.id }}" style="width:auto" {{ 'checked' if cur and cur.id == p.id }}>
-      <span class="grow"><b>{{ p.edition }}</b> <span class="muted small">{{ p.region }}{% if stage_rank(p.stages[0]) > stage_rank(k.grade if k else 'G3') %} · {{ stage_label(p.stages[0]) }}开始，现在选就是提前预习{% endif %}</span></span></label>
+      <span class="grow"><b>{{ p.edition }}</b> <span class="muted small">{{ p.region }}{% if stage_rank(p.stages[0]) > stage_rank(k.grade if k else 'G3') %} · {{ stage_label(p.stages[0]) }}开始，现在选就是提前预习{% endif %}</span>
+      {% if p.tracks %}<select name="track_{{ p.id }}" class="trk" style="margin-top:4px" title="方向">{% for t in p.tracks %}<option value="{{ t.id }}" {{ 'selected' if p.track(tracks.get(p.id)) == t.id }}>{{ t.name }}</option>{% endfor %}</select>{% endif %}</span></label>
     {% endfor %}
   </div>
   {% endfor %}
   <div style="margin-top:16px"><button class="btn">保存</button> <a class="btn ghost" href="/parent">取消</a></div>
 </form>
+<script>
+// 选学校类型 → 预填每门课的教材和方向
+$('#preset').onchange = () => {
+  const o = $('#preset').selectedOptions[0]; if (!o || !o.dataset.packs) return;
+  const packs = JSON.parse(o.dataset.packs);
+  $$('input[type=radio][name^=subj_]').forEach(r => { if (r.value === '') r.checked = true; });
+  for (const [subj, c] of Object.entries(packs)) {
+    const pid = typeof c === 'string' ? c : c.pack;
+    const r = document.querySelector(`input[name="subj_${subj}"][value="${pid}"]`); if (r) r.checked = true;
+    const t = document.querySelector(`select[name="track_${pid}"]`); if (t && c.track) t.value = c.track;
+  }
+};
+</script>
 {% if k %}{% include "_account_security.html" %}{% endif %}
 {% endblock %}
