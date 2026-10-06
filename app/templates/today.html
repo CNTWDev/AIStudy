@@ -35,6 +35,30 @@
   {% else %}<p>今天没有安排。请家长在「家长页 → 阅读与单词」里安排每天的阅读和单词，或去「学科」选一个知识点。</p>{% endfor %}
 </div>
 
+{% if cov or lit or vocab.estimate %}
+<div class="card explore">
+  <h3 style="margin-top:0">🗺️ 我的学习地图 <span class="muted small">以前学过的内容，摸清了多少</span></h3>
+  {% for c in cov %}
+  <div class="row small"><span class="grow">{{ c.pack.subject_name }}</span><span class="muted">{{ c.known }}/{{ c.total }} · {{ c.pct }}%{% if c.weak %} · 要补 {{ c.weak }} 个{% endif %}</span></div>
+  <div class="bar"><span data-w="{{ c.pct }}" style="width:{{ c.pct if readonly else 0 }}%"></span></div>
+  {% endfor %}
+  {% if vocab.estimate %}<p class="small" style="margin:4px 0">🔤 估计认识约 <b>{{ vocab.estimate }}</b> 个核心英语词（已测 {{ vocab.tested }} 个，测得越多越准）</p>{% endif %}
+  {% if lit %}<p class="small" style="margin:6px 0 0">今天点亮 🌟 {% for k in lit %}<span class="lit">{{ k.name }}</span>{% endfor %}</p>
+  {% elif not readonly %}<p class="small muted" style="margin:6px 0 0">每天的「热身」和练习里会穿插几道以前的题，答对就点亮地图。</p>{% endif %}
+</div>
+{% endif %}
+
+{% if ahead %}
+<div class="card ahead">
+  <h3 style="margin-top:0">🧭 前方</h3>
+  {% for a in ahead %}
+  <a href="/learn/{{ a.kp.id }}?task=preview"><b>{{ a.pack.subject_name }} · 下一站：{{ a.kp.name }}</b>
+    <div class="small muted">{% if a.need %}准备度 {{ a.ready }}/{{ a.need }}{% if a.missing %}，先把「{{ a.missing|map(attribute='name')|join('」「') }}」练熟会更轻松{% else %}，基础都齐了，可以先预习{% endif %}{% else %}不需要前置，随时可以开始{% endif %}
+      {% if a.uses %} · 学会后能学：{{ a.uses|join('、') }}{% endif %}</div></a>
+  {% endfor %}
+</div>
+{% endif %}
+
 {% if found %}
 <div class="card">
   <h3 style="margin-top:0">🔍 {{ ASSISTANT }}发现{% if readonly %} <span class="muted small">（系统根据做题、复习、查词、提问、用时自动找出来的）</span>{% endif %}</h3>
@@ -74,6 +98,7 @@ if (just) {
   toast({{ 'true' if total and done == total else 'false' }} ? '🎉 全部完成！' : '+1 ⭐ 完成一项！');
   {% if total and done == total %}confetti();{% else %}cheer($('.step.next') || document.body);{% endif %}
 }
+setTimeout(() => $$('.explore .bar span').forEach(b => b.style.width = b.dataset.w + '%'), 150);
 $$('.step .chk').forEach(b => b.onclick = async () => {
   await api('/api/plan/task', {id: b.closest('.step').dataset.id, done: true});
   sessionStorage.setItem('justDone', b.closest('.step').dataset.type); location.reload();

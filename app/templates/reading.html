@@ -2,6 +2,7 @@
 {% block body %}
 <a href="/reading" class="small">← 阅读</a>
 <h1>{{ r.title }}</h1>
+{% if r.source and r.source.startswith('web:') %}<p class="small muted">来自 <a href="{{ r.source[4:] }}" target="_blank" rel="noopener noreferrer">{{ r.source[4:].split('/')[2] if r.source[4:].count('/') >= 2 else r.source[4:] }}</a>（只供自己学习阅读）</p>{% endif %}
 <p class="muted small">{{ '点一下不懂的单词就能查。' if r.lang == 'en' else '用手指长按/鼠标选中不懂的字词就能查；点一个句子可以问「这句什么意思」。' }} 已查 <span id="nlook">{{ looked|length }}</span> 个。</p>
 <div class="row" style="margin-bottom:8px"><input type="text" id="manual" class="grow" placeholder="也可以直接输入要查的词"><button class="btn sm" id="manualbtn">查</button></div>
 <div class="card reader" id="reader" lang="{{ 'en' if r.lang == 'en' else 'zh-CN' }}">{% for p in paras %}<p>{{ p }}</p>{% endfor %}</div>

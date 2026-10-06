@@ -27,6 +27,9 @@
     <div class="muted small">已掌握 {{ s.mastered }} · 学习中 {{ s.learning }} · 薄弱 {{ s.weak }} · 未测 {{ s.unknown }}（共 {{ s.total }}）</div>
   </div>
   {% endfor %}
+  {% if k.cov %}<p class="small" style="margin:6px 0">🗺️ 以前学过的内容已摸清：{% for c in k.cov %}{{ c.pack.subject_name }} {{ c.pct }}%（{{ c.known }}/{{ c.total }}）{{ '，' if not loop.last }}{% endfor %}
+    {% if k.vocab.estimate %} · 英语核心词约 {{ k.vocab.estimate }} 个{% endif %}
+    <br><span class="muted">系统每天在热身和练习里穿插几道以前的题，慢慢摸清，不用专门考试。</span></p>{% endif %}
   {% if k.insights %}<div style="margin-top:8px"><b class="small">🔍 系统发现</b>
     {% for f in k.insights %}<div class="finding sev{{ f.severity }}"><b class="small">{{ f.title }}</b>{% if not f.for_kid %} <span class="pill">只给家长看</span>{% endif %}<div class="small muted">{{ f.detail }}</div></div>{% endfor %}</div>{% endif %}
   {% if k.weak %}<p class="small">最需要补：{% for w in k.weak %}<span class="pill st-weak">{{ w.name }}</span> {% endfor %}</p>{% endif %}

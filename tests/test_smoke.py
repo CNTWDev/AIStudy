@@ -81,7 +81,9 @@ def test_full_flow():
         res = c.post("/api/answer", json={"item_id": it["id"], "kp_id": "MATH-PRE-UNIT", "answer": "0"}).json()
         assert "correct" in res
         items = c.get("/api/practice/ENG-VOC-01?n=3").json()["items"]  # 无种子题 → mock AI
-        assert len(items) == 3
+        assert len([i for i in items if not i.get("probe")]) == 3
+        # 练习里穿插一道「以前学过的」摸底题（第 2 题），记在它自己的知识点上
+        assert len(items) == 4 and items[1]["probe"]["kp"] != "ENG-VOC-01", items[1]
 
         # 复习卡片（错题 + 术语）
         due = c.get("/api/review/due").json()["cards"]
@@ -513,4 +515,77 @@ def test_account_management():
         assert "退出登录" in c.post(f"/admin/users/{parent}/account", data={"action": "signout"}).text
         assert not auth.sessions_of(parent)
         assert c.get(f"/admin/users/{db.one('SELECT id FROM users WHERE email=?', 'admin@x.com')['id']}").url.path == "/settings"
+        c.get("/logout")
+
+
+def test_explore_warmup_and_selection(monkeypatch):
+    from app import db, explore, webpage
+    with TestClient(app) as c:
+        kid = db.one("SELECT id FROM users WHERE email='a@x.com'")["id"]
+        c.post("/login", data={"email": "a@x.com", "password": "secret1"})
+        # 每天的清单最前面有「热身」：混着以前学过的知识点和旧单词
+        plan = c.post("/api/plan/rebuild").json()["plan"]
+        assert any(t["type"] == "warmup" for t in plan[:2]), plan
+        cov0 = {x["pack"].id: x["known"] for x in explore.coverage(kid)}
+        items = c.get("/api/warmup").json()["items"]
+        words = [i for i in items if i.get("word")]
+        kps = [i for i in items if i.get("probe")]
+        assert words and kps and "answer" not in kps[0]
+        # 旧单词：不认识 → 自动进单词复习；估算词汇量
+        w = words[0]
+        r = c.post("/api/warmup/word", json={"word": w["word"]["w"], "list": w["word"]["list"], "dont_know": True}).json()
+        assert not r["correct"] and r["added"]
+        assert db.one("SELECT id FROM cards WHERE user_id=? AND front=?", kid, w["word"]["w"])
+        for x in explore.pick_words(kid, 12):
+            c.post("/api/warmup/word", json={"word": x["word"]["w"], "list": x["word"]["list"], "choice": x["options"][0]})
+        assert explore.word_stats(kid)["estimate"]
+        # 旧知识点答错：沿必须前置往回追（排进队列）；答对：点亮 + 推断前置
+        p = kps[0]
+        r = c.post("/api/answer", json={"item_id": p["id"], "kp_id": p["probe"]["kp"], "mode": "probe", "dont_know": True,
+                                        "probe": {"depth": 0}}).json()
+        assert r["dont_know"]
+        from app.catalog import catalog
+        reqs = catalog.prereqs(p["probe"]["kp"], required_only=True)
+        if reqs:
+            assert db.one("SELECT id FROM probes WHERE user_id=? AND status='queued'", kid)
+        m = explore.engine.get_mastery(kid)
+        unk = lambda k: m.get(k, {}).get("status") in (None, "unknown")  # noqa: E731
+        rng = [k for e in db.q("SELECT * FROM enrollments WHERE user_id=? AND active=1", kid) for k in explore.past_range(kid, e)]
+        target = next(k for k in rng if unk(k) and any(unk(p["id"]) for p, _ in catalog.ancestors(k, depth=2)))
+        tpack = catalog.kps[target]["pack"]
+        it = explore.engine.items_for(kid, target, n=1, purpose="diagnose", grade="G8")[0]
+        good = it["answer"] if it["type"] == "mcq" else (it["answer"][0] if isinstance(it["answer"], list) else it["answer"])
+        r = c.post("/api/answer", json={"item_id": it["id"], "kp_id": target, "mode": "probe", "answer": good, "probe": {}}).json()
+        assert r["correct"] and r["lit"]["name"] and r["probe"]["inferred"] >= 1
+        cov1 = {x["pack"].id: x["known"] for x in explore.coverage(kid)}
+        assert cov1[tpack] > cov0.get(tpack, 0)
+        today = c.get("/today").text
+        assert "我的学习地图" in today and "今天点亮" in today and "前方" in today and "核心英语词" in today
+        assert "data-kid" in today and 'id="qlbtn"' in today
+        # 知识背景（mock AI）
+        assert c.get(f"/api/context/{target}").json()["story"]
+        # 划词：查第二次 / 做题时查 → 自动进复习；翻译；手动加入
+        from app import llm
+        monkeypatch.setattr(llm, "lookup", lambda q, ctx, lang, grade, user_id=None: {"word": q, "meaning": "意思：" + q})
+        assert not c.post("/api/lookup", json={"q": "glimmer", "lang": "en", "auto": True}).json()["auto_added"]
+        r = c.post("/api/lookup", json={"q": "glimmer", "lang": "en", "auto": True}).json()
+        assert r["auto_added"] and r["saved"]
+        r = c.post("/api/lookup", json={"q": "drizzle", "lang": "en", "auto": True, "item_id": it["id"]}).json()
+        assert r["auto_added"] == "做题时查的"
+        r = c.post("/api/translate", json={"text": "The ball rolls down the slope because of gravity."}).json()
+        assert r["meaning"] and r["auto_added"] == ""
+        r = c.post("/api/collect", json={"text": "net force", "context": "x"}).json()
+        assert r["id"] and db.one("SELECT kind FROM cards WHERE id=?", r["id"])["kind"] == "phrase"
+        # 贴链接读网页：内网地址拒绝；正常网页抽正文放进阅读器
+        r = c.post("/reading/url", data={"url": "http://127.0.0.1/admin"})
+        assert r.status_code == 400 and "内网" in r.text
+        html = "<html><head><title>Bees | News</title></head><body><nav>Home</nav><article><h1>Bees</h1>" + \
+               "".join(f"<p>Bees visit many flowers every day and help plants grow fruit number {i}.</p>" for i in range(5)) + "</article></body></html>"
+        monkeypatch.setattr(webpage, "fetch", lambda u: ("https://example.org/bees", html))
+        r = c.post("/reading/url", data={"url": "https://example.org/bees"})
+        assert r.url.path.startswith("/reading/") and "Bees visit" in r.text and "example.org" in r.text and "Home" not in r.text
+        c.get("/logout")
+        # 家长页能看到摸清了多少
+        c.post("/login", data={"email": "p2@x.com", "password": "secret1"})
+        assert "以前学过的内容已摸清" in c.get("/parent").text
         c.get("/logout")

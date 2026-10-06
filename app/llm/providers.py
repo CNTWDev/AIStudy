@@ -151,5 +151,7 @@ MOCK = {
     "passage": {"title": "A Small Seed", "body": "A small seed fell on the ground.\n\nIt rained, and the seed began to grow.",
                 "questions": [{"q": "What fell on the ground?", "options": ["A leaf", "A seed", "A stone", "A bird"],
                                "answer": 1, "explain": "第一句就说了 seed。"}]},
+    "context": {"story": "很久以前，人们为了公平地交换东西，需要一个大家都认可的办法。", "uses": ["买东西算账的时候", "做实验记录数据的时候"],
+                "fun": "古埃及人用身体的一部分当尺子。", "next": "学会它，就能去解决更复杂的问题。"},
     "ping": {"ok": True},
 }
