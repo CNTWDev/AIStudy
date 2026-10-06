@@ -51,7 +51,7 @@ type = "mock"
 # ---------------------------------------------------------------- 按任务单独设置（可选）
 # 不写就用 default 提供方和它的 model。可以给某个任务换提供方、换模型或调整思考强度。
 # 任务名：lookup 查词 / explain 讲句子 / sentence 造句点评 / teach 知识点讲解 /
-#         items 出题 / passage 写阅读短文
+#         items 出题 / passage 写阅读短文 / paper 试卷拍照解析（要看图片）
 # effort 可选 low / medium / high（只对 anthropic 有效，越高越准越慢越贵）
 #
 # [tasks.lookup]
@@ -62,3 +62,9 @@ type = "mock"
 #
 # [tasks.passage]
 # provider = "deepseek"
+#
+# 试卷拍照解析需要「能看图片」的模型：Claude 可以直接用；DeepSeek 目前不能看图，
+# 可以给这个任务单独指定通义千问的视觉模型（先在上面打开 [providers.qwen]）：
+# [tasks.paper]
+# provider = "qwen"
+# model = "qwen-vl-max"

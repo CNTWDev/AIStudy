@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/parent" class="small">← 家长页</a>
+<h1>{{ k.name }} 的阅读与单词</h1>
+{% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
+<p class="muted small">这里安排好之后，孩子每天的「今天」页会自动出现：单词复习 → 错题回顾 → 英语阅读 → 名著接着读 → 薄弱点练习，从上往下做就行。</p>
+
+{% macro current(kind, label) %}
+{% set t = active.get(kind) %}
+{% if t %}
+<div class="hint">正在{{ label }}：<b>{{ t.title }}</b> · 已完成 {{ t.position }}{% if t.total_units %}/{{ t.total_units }}{% endif %} {{ t.unit_name }}
+  {% if kind == 'words' %}· 每天 {{ t.daily_amount }} 个新词{% else %}· 每天 {{ t.daily_amount }} {{ t.unit_name }}、{{ t.daily_minutes }} 分钟 · 明天：{{ seg[kind].label }}{% endif %}
+  <form method="post" action="/parent/kids/{{ k.id }}/tracks" class="row" style="margin-top:6px">
+    <input type="hidden" name="kind" value="{{ kind }}">
+    <span class="small">把进度改成已完成</span><input type="number" name="position" value="{{ t.position }}" min="0" style="width:90px">
+    <button class="btn ghost sm" name="action" value="move">改进度</button>
+    <button class="btn ghost sm" name="action" value="stop">停止</button>
+  </form>
+</div>
+{% endif %}
+{% endmacro %}
+
+<div class="card">
+  <h3 style="margin-top:0">📕 中文名著接着读</h3>
+  {{ current('read_zh', '读') }}
+  <form method="post" action="/parent/kids/{{ k.id }}/tracks">
+    <input type="hidden" name="kind" value="read_zh">
+    <label>选一本书（按年级排列，带 ★ 的是统编教材「快乐读书吧 / 名著导读」要求的）</label>
+    <select name="ref" onchange="this.form.querySelector('.custom').style.display = this.value === 'custom' ? '' : 'none'">
+      {% for g, books in content.zh_by_grade() %}<optgroup label="{{ stage_label(g) }}">
+        {% for b in books %}<option value="{{ b.id }}" title="{{ b.term or '' }} {{ b.daily_amount if b.daily_amount is string else '' }}">{{ '★ ' if b.type == 'required' }}{{ b.title }}{% if b.author %}（{{ b.author }}）{% endif %}{% if b.total_units %} · {{ b.total_units }}{{ b.unit_name }}{% endif %}</option>{% endfor %}
+      </optgroup>{% endfor %}
+      <option value="custom">其他书（自己填）</option>
+    </select>
+    <div class="custom" style="display:none">
+      <div class="row"><div class="grow"><label>书名</label><input type="text" name="title"></div>
+        <div><label>共几章/回</label><input type="number" name="total_units" min="0" value="0"></div>
+        <div><label>单位</label><input type="text" name="unit_name" value="章" style="width:70px"></div></div>
+    </div>
+    <div class="row">
+      <div><label>每天读几{{ '章/回' }}</label><input type="number" name="daily_amount" value="1" min="1" max="10"></div>
+      <div><label>每天几分钟</label><input type="number" name="daily_minutes" value="15" min="5" max="90"></div>
+      <div><label>已经读完几章</label><input type="number" name="position" value="0" min="0"></div>
+    </div>
+    <div style="margin-top:10px"><button class="btn">{{ '换成这本' if active.read_zh else '开始读' }}</button></div>
+  </form>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">📘 英语阅读</h3>
+  {{ current('read_en', '读') }}
+  <p class="muted small">不安排具体书时，每天的英语阅读是 AI 按孩子水平写的短文。读纸质分级读物的话在这里选一本，孩子每天记录读到哪里。</p>
+  {% if content.for_kids %}<details class="small"><summary>起点建议</summary>{% for who, v in content.for_kids.items() %}
+    <p>{% if v is string %}{{ v }}{% else %}<b>{{ v.profile }}</b>：从 {{ v.start }} 开始{% if v.now_to %}，先到 {{ v.now_to }}{% endif %}。{{ v.plan }}{% if v.note %}<br><span class="muted">{{ v.note }}</span>{% endif %}{% endif %}</p>{% endfor %}</details>{% endif %}
+  <form method="post" action="/parent/kids/{{ k.id }}/tracks">
+    <input type="hidden" name="kind" value="read_en">
+    <select name="ref" onchange="this.form.querySelector('.custom').style.display = this.value === 'custom' ? '' : 'none'">
+      {% for lv in content.en_levels %}<optgroup label="{{ lv.id }}{% if lv.headwords %}（约 {{ lv.headwords }} 词）{% endif %}">
+        {% for b in lv.books %}<option value="{{ b.id }}">{{ b.title }}{% if b.series %} · {{ b.series }}{% endif %}{% if b.level %} {{ b.level }}{% endif %}</option>{% endfor %}
+      </optgroup>{% endfor %}
+      <option value="custom">其他书（自己填）</option>
+    </select>
+    <div class="custom" style="display:none">
+      <div class="row"><div class="grow"><label>书名</label><input type="text" name="title"></div>
+        <div><label>共几章（不知道填 0）</label><input type="number" name="total_units" min="0" value="0"></div>
+        <input type="hidden" name="unit_name" value="章"></div>
+    </div>
+    <div class="row">
+      <div><label>每天读几章</label><input type="number" name="daily_amount" value="1" min="1" max="10"></div>
+      <div><label>每天几分钟</label><input type="number" name="daily_minutes" value="15" min="5" max="90"></div>
+    </div>
+    <div style="margin-top:10px"><button class="btn">{{ '换成这本' if active.read_en else '开始读' }}</button></div>
+  </form>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">🔤 每天学新词</h3>
+  {{ current('words', '学') }}
+  <p class="muted small">每天自动从词表里取几个新词放进「单词复习」，之后按 1→2→4→7→15→30 天重复。孩子阅读时自己收藏的生词也会一起复习。</p>
+  <form method="post" action="/parent/kids/{{ k.id }}/tracks">
+    <input type="hidden" name="kind" value="words">
+    <select name="ref">{% for id, wl in content.word_lists.items() %}<option value="{{ id }}">{{ wl.title }}（{{ wl.words|length }} 词）</option>{% endfor %}</select>
+    <div class="row">
+      <div><label>每天几个新词</label><input type="number" name="daily_amount" value="8" min="1" max="30"></div>
+      <div><label>从第几个开始（已会的可跳过）</label><input type="number" name="position" value="0" min="0"></div>
+    </div>
+    <div style="margin-top:10px"><button class="btn">{{ '换成这个词表' if active.words else '开始' }}</button></div>
+  </form>
+</div>
+
+{% if content.plans %}
+<div class="card">
+  <h3 style="margin-top:0">参考：每日计划示例</h3>
+  {% for pl in content.plans %}
+  <details><summary><b>{{ pl.for or pl.id }}</b>{% if pl.weekday_minutes %} · 平时每天 {{ pl.weekday_minutes }} 分钟{% endif %}</summary>
+    <table>{% for x in pl.tasks %}<tr class="small"><td><b>{{ x.title }}</b></td><td>{{ x.minutes }} 分钟</td><td>{{ x.what }}{% if x.example %}<br><span class="muted">例：{{ x.example }}</span>{% endif %}</td></tr>{% endfor %}</table>
+    {% if pl.week_example %}<p class="small"><b>一周示例</b></p>{% for d in pl.week_example %}<p class="small">{{ d.day }}：{{ d['items']|join('；') }}</p>{% endfor %}{% endif %}
+    {% for n in pl.notes or [] %}<p class="small muted">· {{ n }}</p>{% endfor %}
+  </details>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if history %}<div class="card"><h3 style="margin-top:0">读过 / 学过的</h3>
+{% for t in history %}<p class="small">{{ {'read_zh':'📕','read_en':'📘','words':'🔤'}[t.kind] }} {{ t.title }} · 完成 {{ t.position }}{% if t.total_units %}/{{ t.total_units }}{% endif %} {{ t.unit_name }} · {{ t.created_at[:10] }} 开始</p>{% endfor %}</div>{% endif %}
+{% endblock %}

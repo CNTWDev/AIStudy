@@ -22,6 +22,7 @@ class ChatRequest:
     effort: str = "low"          # low / medium / high
     model: str | None = None     # 为空则用提供方配置里的 model
     json_mode: bool = True
+    images: list = field(default_factory=list)  # [(media_type, base64 字符串)]，用于看图（试卷拍照）
 
 
 @dataclass

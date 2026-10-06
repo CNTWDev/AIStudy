@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/papers" class="small">← 试卷</a>
+<h1>{{ p.title }}</h1>
+{% set marked = rows|selectattr('orig')|list %}
+{% set wrong = marked|rejectattr('orig', 'equalto', 'right')|list %}
+<div class="card">
+  <div class="muted small">{{ pack.subject_name if pack }} · {{ p.exam_date or p.created_at[:10] }} · 共 {{ rows|length }} 题
+    {% if marked %} · 原卷批改：对 {{ marked|length - wrong|length }}、错/扣分 {{ wrong|length }}（错题已放进错题本）{% endif %}</div>
+  {% if p.notes %}<p class="small">🤖 {{ p.notes }}</p>{% endif %}
+  {% if images %}<div class="small">原卷照片：{% for im in images %}<a href="/papers/{{ p.id }}/img/{{ im }}" target="_blank">第 {{ loop.index }} 张</a> {% endfor %}</div>{% endif %}
+  <p class="small" style="margin-bottom:0">把每道题在线再做一遍：会的很快过，不会的点「🤔 这道题还不会」。AI 给的答案偶尔会错，觉得不对就点「答案有问题」，这题不算分。</p>
+  {% if wrong %}<label class="small" style="font-weight:400;margin-top:8px"><input type="checkbox" id="onlywrong"> 只做原卷做错的 {{ wrong|length }} 题</label>{% endif %}
+  <div class="daybar" style="margin-top:10px"><span id="pbar"></span></div>
+</div>
+
+{% for r in rows %}
+<div class="card pq {{ 'origright' if r.orig == 'right' }}" id="pi-{{ r.id }}">
+  <div class="row small">
+    <b class="grow">第 {{ r.label }} 题{% if r.points %} <span class="muted">（{{ r.points|round(1)|string|replace('.0', '') }} 分）</span>{% endif %}</b>
+    {% if r.orig == 'wrong' %}<span class="pill st-weak">原卷 ✗</span>{% elif r.orig == 'partial' %}<span class="pill st-learning">原卷扣分</span>{% elif r.orig == 'right' %}<span class="pill st-mastered">原卷 ✓</span>{% endif %}
+    {% if r.page and images and r.page <= images|length %}<a href="/papers/{{ p.id }}/img/{{ images[r.page - 1] }}" target="_blank">📷 看原题</a>{% endif %}
+  </div>
+  <div class="muted small">知识点：{% if r.kp %}<a href="/learn/{{ r.kp.id }}">{{ r.kp.name }}</a>{% else %}未对应{% endif %}
+    <details style="display:inline"><summary style="display:inline;cursor:pointer">（改）</summary>
+      <select class="kpsel" data-pi="{{ r.id }}"><option value="">（不对应知识点）</option>
+        {% for c in cands %}<option value="{{ c.id }}" {{ 'selected' if r.kp_id == c.id }}>{{ stage_label(c.stage) }} · {{ c.name }}</option>{% endfor %}</select></details>
+    {% if r.orig_answer %} · 卷面上写的：{{ r.orig_answer }}{% endif %}</div>
+  {% if r.flagged %}<p class="muted small">已标记「答案有问题」，这题不计入诊断。</p>
+  {% elif r.answered_at %}<p class="small">{{ '🤔 还不会' if r.dont_know else ('✅ 重做对了' if r.correct else '❌ 重做还错') }} · 正确答案：{{ answer_display(r.item) }}</p>
+  {% else %}<div class="qbox" data-pi="{{ r.id }}"></div>{% endif %}
+</div>
+{% endfor %}
+
+<div class="card">
+  <p class="small" id="leftmsg"></p>
+  <button class="btn" id="finish">做完了，看诊断</button>
+  <form method="post" action="/papers/{{ p.id }}/delete" style="display:inline" onsubmit="return confirm('删除这份试卷和它的题目？（错题本里的错题会保留）')">
+    <button class="btn ghost sm">删除这份试卷</button></form>
+</div>
+
+<script>
+const PID = {{ p.id }}, QS = {{ qs|tojson }};
+function progress() {
+  const done = QS.filter(q => q.done || q.flagged).length;
+  $('#pbar').style.width = (100 * done / Math.max(QS.length, 1)) + '%';
+  $('#leftmsg').textContent = done < QS.length ? `已做 ${done}/${QS.length} 题。没做完也可以先看诊断，回头再接着做。` : `🎉 全部做完了！`;
+}
+QS.forEach(q => {
+  const box = document.querySelector(`.qbox[data-pi="${q.id}"]`);
+  if (!box) return;
+  const flag = () => {
+    const b = document.createElement('button'); b.className = 'btn ghost sm'; b.textContent = '答案有问题'; b.style.marginTop = '6px';
+    b.onclick = async () => { await api(`/api/papers/${PID}/answer`, {pi: q.id, flag: true}); q.flagged = true; b.replaceWith('已标记，这题不计分'); progress(); };
+    box.appendChild(b);
+  };
+  renderItem(box, q, {
+    submit: (answer, self) => api(`/api/papers/${PID}/answer`, self ? {pi: q.id, answer, self} : {pi: q.id, answer}),
+    dontKnow: () => api(`/api/papers/${PID}/answer`, {pi: q.id, dont_know: true}),
+    onDone: res => { q.done = true; progress(); if (!res.correct && !res.dont_know) flag(); },
+  });
+});
+document.querySelectorAll('.kpsel').forEach(s => s.onchange = async () => {
+  try { await api(`/api/papers/${PID}/kp`, {pi: +s.dataset.pi, kp_id: s.value}); toast('已改'); location.reload(); }
+  catch (e) { toast(e.message); }
+});
+const ow = $('#onlywrong');
+if (ow) ow.onchange = () => document.querySelectorAll('.pq.origright').forEach(el => el.style.display = ow.checked ? 'none' : '');
+$('#finish').onclick = async () => {
+  $('#finish').disabled = true;
+  await api(`/api/papers/${PID}/finish`, {});
+  sessionStorage.setItem('justDone', 'paper');
+  confetti();
+  setTimeout(() => location.href = `/papers/${PID}/report`, 900);
+};
+progress();
+</script>
+{% endblock %}

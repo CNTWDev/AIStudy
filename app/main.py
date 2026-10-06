@@ -1,6 +1,7 @@
 """AIStudy Web 应用入口。启动：uvicorn app.main:app"""
+import re
 from contextlib import asynccontextmanager
-from datetime import timedelta
+from datetime import date, timedelta
 
 from fastapi import Body, FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
@@ -8,15 +9,17 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import auth, config, db, engine, llm
+from . import auth, config, db, engine, llm, papers
 from .auth import LoginRequired
 from .catalog import GRADES, catalog, stage_label, stage_rank
+from .content import content
 
 
 @asynccontextmanager
 async def lifespan(app):
     db.init()
     catalog.load()
+    content.load()
     engine.load_seed_items(config.SEED_DIR)
     yield
     db.close()
@@ -28,7 +31,7 @@ app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY, max_age=60 *
 app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), name="static")
 templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL,
-                             llm_enabled=llm.enabled, GRADES=GRADES)
+                             llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display)
 
 
 @app.exception_handler(LoginRequired)
@@ -508,6 +511,65 @@ async def kid_save(request: Request):
     return RedirectResponse("/parent", 303)
 
 
+# ================================================================== 家长：阅读与单词安排
+
+@app.get("/parent/kids/{kid_id}/plan", response_class=HTMLResponse)
+def kid_plan_page(request: Request, kid_id: int, msg: str = ""):
+    p = auth.require_parent(request)
+    k = auth.kid_of(p, kid_id)
+    all_tracks = engine.tracks(kid_id, active_only=False)
+    active = {t["kind"]: t for t in all_tracks if t["active"]}
+    return render(request, "kid_plan.html", k=k, active=active, history=[t for t in all_tracks if not t["active"]],
+                  content=content, msg=msg, seg={kd: engine.track_today(t) for kd, t in active.items() if kd != "words"})
+
+
+@app.post("/parent/kids/{kid_id}/tracks")
+async def kid_tracks_save(request: Request, kid_id: int):
+    from urllib.parse import urlencode
+    p = auth.require_parent(request)
+    auth.kid_of(p, kid_id)
+    f = await request.form()
+    kind = f.get("kind")
+    if kind not in engine.TRACK_KINDS:
+        raise HTTPException(400)
+    if f.get("action") == "stop":
+        db.run("UPDATE tracks SET active=0 WHERE user_id=? AND kind=?", kid_id, kind)
+        msg = f"已停止「{engine.TRACK_KINDS[kind]}」"
+    elif f.get("action") == "move":
+        db.run("UPDATE tracks SET position=? WHERE user_id=? AND kind=? AND active=1",
+               max(0, int(f.get("position") or 0)), kid_id, kind)
+        msg = "已调整进度"
+    else:
+        ref = f.get("ref") or ""
+        minutes = max(5, min(90, int(f.get("daily_minutes") or 15)))
+        amount = max(0, min(50, int(f.get("daily_amount") or 1)))
+        position = max(0, int(f.get("position") or 0))
+        if kind == "words":
+            wl = content.word_lists.get(ref)
+            if not wl:
+                raise HTTPException(400, "请选择词表")
+            title, unit_name, units, total = wl["title"], "词", [], len(wl["words"])
+        elif ref and ref != "custom":
+            b = content.book(ref)
+            if not b:
+                raise HTTPException(400, "没有这本书")
+            title, unit_name, units, total = b["title"], b.get("unit_name") or "章", b.get("units", []), b.get("total_units", 0)
+        else:
+            title = (f.get("title") or "").strip().strip("《》")[:60]
+            if not title:
+                raise HTTPException(400, "请填写书名")
+            unit_name = (f.get("unit_name") or "章").strip()[:4] or "章"
+            units, total, ref = [], max(0, int(f.get("total_units") or 0)), ""
+        with db.tx() as t:
+            t.run("UPDATE tracks SET active=0 WHERE user_id=? AND kind=?", kid_id, kind)
+            t.run("INSERT INTO tracks(user_id,kind,ref,title,unit_name,units,total_units,position,daily_amount,daily_minutes,"
+                  "active,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,1,?)", kid_id, kind, ref, title, unit_name,
+                  db.jdump(units), total, position, amount if kind == "words" else max(1, amount), minutes, db.now())
+        msg = f"已安排「{engine.TRACK_KINDS[kind]}」：{title}"
+    engine.today_plan(kid_id, rebuild=True)
+    return RedirectResponse(f"/parent/kids/{kid_id}/plan?" + urlencode({"msg": msg}), 303)
+
+
 @app.get("/parent/kids/{kid_id}", response_class=HTMLResponse)
 def kid_report(request: Request, kid_id: int):
     p = auth.require_parent(request)
@@ -516,11 +578,11 @@ def kid_report(request: Request, kid_id: int):
 
 
 @app.get("/parent/as/{kid_id}")
-def parent_as(request: Request, kid_id: int):
+def parent_as(request: Request, kid_id: int, next: str = "/today"):
     p = auth.require_parent(request)
     auth.kid_of(p, kid_id)
     request.session["as_kid"] = kid_id
-    return RedirectResponse("/today", 303)
+    return RedirectResponse(next if next in ("/today", "/progress", "/subjects", "/records", "/papers") else "/today", 303)
 
 
 # ================================================================== 今天
@@ -532,7 +594,10 @@ def today(request: Request):
         return render(request, "message.html", title="还没有选择学科",
                       text="请家长在「家长页 → 编辑孩子」里勾选要学的教材。")
     t = engine.today_plan(k["id"])
-    return render(request, "today.html", t=t, streak=engine.streak(k["id"]), cal=engine.calendar(k["id"], 4))
+    st = engine.streak(k["id"])
+    cal = engine.calendar(k["id"], 4)
+    return render(request, "today.html", t=t, streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
+                  stars=engine.total_stars(k["id"]), rec=engine.day_record(k["id"], t["day"]))
 
 
 @app.post("/api/plan/rebuild")
@@ -548,14 +613,61 @@ def plan_task(request: Request, body: dict = Body(...)):
     return {"ok": True}
 
 
+@app.post("/api/plan/task-done")
+def plan_task_done(request: Request, body: dict = Body(...)):
+    k = kid_or_redirect(request)
+    match = {"type": body.get("type")}
+    if body.get("kp"):
+        match["kp"] = body["kp"]
+    engine.mark_task_by(k["id"], **match)
+    return {"ok": True, "stars": engine.total_stars(k["id"])}
+
+
 @app.post("/api/checkin")
 def checkin(request: Request, body: dict = Body(...)):
     k = kid_or_redirect(request)
     day = db.today().isoformat()
     engine.today_plan(k["id"])
-    db.run(f"UPDATE days SET checked_in=1, reflection=?, minutes={db.greatest('minutes', '?')} WHERE user_id=? AND day=?",
-           (body.get("reflection") or "")[:1000], int(body.get("minutes") or 0), k["id"], day)
-    return {"ok": True, "streak": engine.streak(k["id"])}
+    mood = (body.get("mood") or "")[:10]
+    db.run(f"UPDATE days SET checked_in=1, reflection=?, mood=?, minutes={db.greatest('minutes', '?')} WHERE user_id=? AND day=?",
+           (body.get("reflection") or "")[:1000], mood, int(body.get("minutes") or 0), k["id"], day)
+    s = engine.streak(k["id"])
+    return {"ok": True, "streak": s, "badges": engine.badges(s)}
+
+
+@app.get("/day/{day}", response_class=HTMLResponse)
+def day_page(request: Request, day: str):
+    k = kid_or_redirect(request)
+    try:
+        date.fromisoformat(day)
+    except ValueError:
+        raise HTTPException(404)
+    return render(request, "day.html", r=engine.day_record(k["id"], day), streak=engine.streak(k["id"]))
+
+
+# ================================================================== 阅读进度（名著接着读 / 英文分级读物）
+
+@app.get("/track/{tid}", response_class=HTMLResponse)
+def track_page(request: Request, tid: int):
+    k = kid_or_redirect(request)
+    t = db.one("SELECT * FROM tracks WHERE id=? AND user_id=?", tid, k["id"])
+    if not t:
+        raise HTTPException(404)
+    logs = db.q("SELECT * FROM reading_logs WHERE track_id=? ORDER BY id DESC LIMIT 10", tid)
+    book = content.book(t["ref"]) or {}
+    return render(request, "track.html", t=t, seg=engine.track_today(t), logs=logs, book=book,
+                  units=db.jload(t["units"], []))
+
+
+@app.post("/api/track/{tid}/log")
+def track_log(request: Request, tid: int, body: dict = Body(...)):
+    k = kid_or_redirect(request)
+    if not db.one("SELECT id FROM tracks WHERE id=? AND user_id=?", tid, k["id"]):
+        raise HTTPException(404)
+    engine.log_reading(k["id"], tid, to_pos=int(body.get("to") or 0), minutes=int(body.get("minutes") or 0),
+                       summary=(body.get("summary") or "").strip(), feeling=body.get("feeling") or "",
+                       pages=str(body.get("pages") or ""))
+    return {"ok": True, "stars": engine.total_stars(k["id"])}
 
 
 # ================================================================== 学科与知识图谱
@@ -587,6 +699,46 @@ def kmap(request: Request, pack_id: str):
         groups.append({"stage": st, "strands": [(catalog.strand_name(pack_id, s), v) for s, v in by_strand.items()],
                        "current": st == stage, "past": stage_rank(st) < stage_rank(stage)})
     return render(request, "map.html", pack=pack, groups=groups, stage=stage, sum=engine.pack_summary(k["id"], pack_id, m))
+
+
+# ================================================================== 课程进度（学校学到哪了）
+
+@app.get("/progress", response_class=HTMLResponse)
+def progress_page(request: Request, pack: str = "", msg: str = ""):
+    k = kid_or_redirect(request)
+    m = engine.get_mastery(k["id"])
+    rows = []
+    for e in enrollments(k["id"]):
+        v = engine.progress_view(k["id"], e)
+        by_strand = {}
+        for kp in v["stage_kps"]:
+            by_strand.setdefault(kp["strand"], []).append({**kp, "m": m.get(kp["id"])})
+        v["strands"] = [(catalog.strand_name(e["pack_id"], s), lst) for s, lst in by_strand.items()]
+        v["next"] = engine.next_after(e["pack_id"], e["progress_kp"], m, engine.taught_set(k["id"])) if e["progress_kp"] else None
+        v["total"] = len(v["pack"].kp_ids)
+        rows.append(v)
+    return render(request, "progress.html", rows=rows, open_pack=pack, msg=msg)
+
+
+@app.post("/progress/{pack_id}")
+async def progress_save(request: Request, pack_id: str):
+    from urllib.parse import urlencode
+    k = kid_or_redirect(request)
+    if pack_id not in {e["pack_id"] for e in enrollments(k["id"])}:
+        raise HTTPException(404)
+    f = await request.form()
+    stage = f.get("stage") or None
+    old = engine.enrollment_stage(k["id"], pack_id)
+    if stage and stage != old:
+        # 只换学段：先保存学段，再回到页面勾选新学段学过的内容
+        engine.set_progress(k["id"], pack_id, None, None, stage)
+        msg = f"已切换到 {stage_label(stage)}，请勾选这个学段学校已经学过的内容"
+    else:
+        engine.set_progress(k["id"], pack_id, f.get("current") or None, f.getlist("taught"), stage)
+        msg = "进度已更新，今天的任务已按新进度重新安排"
+    engine.mark_task_by(k["id"], type="progress")
+    engine.today_plan(k["id"], rebuild=True)
+    return RedirectResponse("/progress?" + urlencode({"pack": pack_id, "msg": msg}) + f"#p-{pack_id}", 303)
 
 
 @app.get("/learn/{kp_id}", response_class=HTMLResponse)
@@ -626,18 +778,7 @@ def api_practice(request: Request, kp_id: str, n: int = 3, purpose: str = "pract
     return {"items": [_public_item(i) for i in items], "llm": llm.enabled()}
 
 
-def _answer_display(it: dict) -> str:
-    a = it.get("answer")
-    if it["type"] == "mcq":
-        try:
-            return f"{'ABCD'[int(a)]}. {it['options'][int(a)]}"
-        except (TypeError, ValueError, IndexError, KeyError):
-            return str(a)
-    if it["type"] == "short":
-        return it.get("model", "")
-    if isinstance(a, list):
-        return " / ".join(map(str, a))
-    return f"{a} {it.get('unit', '')}".strip()
+_answer_display = engine.answer_display
 
 
 @app.post("/api/answer")
@@ -649,6 +790,10 @@ def api_answer(request: Request, body: dict = Body(...)):
     it = engine._item_row_to_dict(row)
     kp_id = body.get("kp_id") or it["kp_id"]
     mode = body.get("mode") or "practice"
+    if body.get("dont_know"):  # 「这道题还不会」：不算错，给讲解，进错题本，过几天再练
+        engine.record_attempt(k["id"], it, kp_id, mode, False, "", dont_know=True)
+        return {"correct": False, "dont_know": True, "answer": _answer_display(it), "explain": it.get("explain", ""),
+                "hint": it.get("hint", "")}
     if it["type"] == "short":
         if "self" not in body:  # 先给参考答案，孩子对照后自评
             return {"reveal": True, "answer": it.get("model", ""), "points": it.get("points", []), "explain": it.get("explain", "")}
@@ -669,6 +814,134 @@ def api_learn_done(request: Request, body: dict = Body(...)):
         engine.add_card(k["id"], "kp", kp["name"], body["summary"][:500], {"method": kp.get("method", "")}, kp_id)
     engine.mark_task_by(k["id"], kp=kp_id)
     return {"ok": True}
+
+
+# ================================================================== 试卷：拍照导入 → 在线订正 → 诊断
+
+def _paper_or_404(k, paper_id: int):
+    p = papers.get(k["id"], paper_id)
+    if not p:
+        raise HTTPException(404, "没有这份试卷")
+    return p
+
+
+@app.get("/papers", response_class=HTMLResponse)
+def papers_page(request: Request, pack: str = ""):
+    k = kid_or_redirect(request)
+    es = enrollments(k["id"])
+    lst = db.q("SELECT p.*, (SELECT COUNT(*) FROM paper_items i WHERE i.paper_id=p.id) AS n FROM papers p "
+               "WHERE p.user_id=? ORDER BY p.id DESC", k["id"])
+    return render(request, "papers.html", es=[(e, catalog.packs[e["pack_id"]]) for e in es], papers=lst, pack=pack,
+                  max_images=papers.MAX_IMAGES, llm_on=llm.enabled())
+
+
+@app.post("/api/papers")
+async def papers_create(request: Request):
+    k = kid_or_redirect(request)
+    u = auth.current_user(request)
+    f = await request.form()
+    pack_id = f.get("pack_id") or ""
+    if pack_id not in {e["pack_id"] for e in enrollments(k["id"])}:
+        raise HTTPException(400, "请选择学科")
+    images = []
+    for up in f.getlist("photos"):
+        if not hasattr(up, "read"):
+            continue
+        data = await up.read()
+        if not data:
+            continue
+        if up.content_type not in papers.IMAGE_TYPES:
+            raise HTTPException(400, "只支持 JPG / PNG / WEBP 图片")
+        if len(data) > papers.MAX_IMAGE_BYTES:
+            raise HTTPException(400, "图片太大（单张不超过 6 MB）")
+        images.append((up.content_type, data))
+    if len(images) > papers.MAX_IMAGES:
+        raise HTTPException(400, f"一次最多 {papers.MAX_IMAGES} 张照片")
+    text = (f.get("text") or "").strip()
+    if not images and len(text) < 10:
+        raise HTTPException(400, "请拍照上传，或者粘贴题目文字")
+    from starlette.concurrency import run_in_threadpool
+    pid = await run_in_threadpool(papers.create, k["id"], pack_id, title=(f.get("title") or "").strip(),
+                                  exam_date=f.get("exam_date") or "", images=images, text=text, created_by=u["id"])
+    engine.today_plan(k["id"], rebuild=True)
+    return {"ok": True, "id": pid}
+
+
+@app.get("/papers/{paper_id}", response_class=HTMLResponse)
+def paper_page(request: Request, paper_id: int):
+    k = kid_or_redirect(request)
+    p = _paper_or_404(k, paper_id)
+    rs = papers.rows(paper_id)
+    pack = catalog.packs.get(p["pack_id"])
+    stage = engine.enrollment_stage(k["id"], p["pack_id"]) or k["grade"]
+    return render(request, "paper.html", p=p, rows=rs, pack=pack, images=db.jload(p["images"], []),
+                  cands=papers.candidates(p["pack_id"], stage) if pack else [],
+                  qs=[{"id": r["id"], "type": r["item"]["type"], "q": r["item"]["q"], "zh": r["item"].get("zh", ""),
+                       "options": r["item"].get("options", []), "unit": r["item"].get("unit", ""),
+                       "done": bool(r["answered_at"]), "flagged": bool(r["flagged"])} for r in rs])
+
+
+@app.get("/papers/{paper_id}/img/{name}")
+def paper_image(request: Request, paper_id: int, name: str):
+    from fastapi.responses import FileResponse
+    k = kid_or_redirect(request)
+    p = _paper_or_404(k, paper_id)
+    if name not in db.jload(p["images"], []):
+        raise HTTPException(404)
+    return FileResponse(papers.PAPER_DIR / str(paper_id) / name)
+
+
+@app.post("/api/papers/{paper_id}/answer")
+def paper_answer(request: Request, paper_id: int, body: dict = Body(...)):
+    k = kid_or_redirect(request)
+    p = _paper_or_404(k, paper_id)
+    return papers.answer(k["id"], p, int(body.get("pi") or 0), body)
+
+
+@app.post("/api/papers/{paper_id}/kp")
+def paper_set_kp(request: Request, paper_id: int, body: dict = Body(...)):
+    """家长 / 孩子觉得 AI 对应的知识点不对，手动改。"""
+    k = kid_or_redirect(request)
+    p = _paper_or_404(k, paper_id)
+    kp_id = body.get("kp_id") or None
+    if kp_id and kp_id not in catalog.packs[p["pack_id"]].kp_ids:
+        raise HTTPException(400, "知识点不在这门课里")
+    pi = db.one("SELECT item_id FROM paper_items WHERE id=? AND paper_id=?", int(body.get("pi") or 0), paper_id)
+    if not pi:
+        raise HTTPException(404)
+    with db.tx() as t:
+        t.run("UPDATE paper_items SET kp_id=? WHERE id=?", kp_id, int(body["pi"]))
+        t.run("UPDATE items SET kp_id=?, kp_ids=? WHERE id=?", kp_id or "", db.jdump([kp_id] if kp_id else []), pi["item_id"])
+    return {"ok": True}
+
+
+@app.post("/api/papers/{paper_id}/finish")
+def paper_finish(request: Request, paper_id: int):
+    k = kid_or_redirect(request)
+    p = _paper_or_404(k, paper_id)
+    papers.finish(k["id"], p)
+    engine.today_plan(k["id"], rebuild=True)
+    return {"ok": True, "stars": engine.total_stars(k["id"])}
+
+
+@app.get("/papers/{paper_id}/report", response_class=HTMLResponse)
+def paper_report(request: Request, paper_id: int):
+    k = kid_or_redirect(request)
+    p = _paper_or_404(k, paper_id)
+    return render(request, "paper_report.html", p=p, r=papers.report(k["id"], p), pack=catalog.packs.get(p["pack_id"]))
+
+
+@app.post("/papers/{paper_id}/delete")
+def paper_delete(request: Request, paper_id: int):
+    import shutil
+    k = kid_or_redirect(request)
+    _paper_or_404(k, paper_id)
+    with db.tx() as t:
+        t.run("DELETE FROM paper_items WHERE paper_id=?", paper_id)
+        t.run("DELETE FROM papers WHERE id=?", paper_id)
+    shutil.rmtree(papers.PAPER_DIR / str(paper_id), ignore_errors=True)
+    engine.today_plan(k["id"], rebuild=True)
+    return RedirectResponse("/papers", 303)
 
 
 # ================================================================== 诊断
@@ -744,16 +1017,17 @@ def diag_report(request: Request, sid: int):
 # ================================================================== 复习
 
 @app.get("/review", response_class=HTMLResponse)
-def review_page(request: Request):
+def review_page(request: Request, group: str = ""):
     kid_or_redirect(request)
-    return render(request, "review.html")
+    return render(request, "review.html", group=group if group in engine.CARD_GROUPS else "")
 
 
 @app.get("/api/review/due")
-def review_due(request: Request):
+def review_due(request: Request, group: str = ""):
     k = kid_or_redirect(request)
     cards = []
-    for c in engine.due_cards(k["id"], 60):
+    limit = 8 if group == "mistakes" else 60
+    for c in engine.due_cards(k["id"], limit, group or None):
         d = dict(c)
         d["extra"] = db.jload(c["extra"], {})
         d["kp_name"] = (catalog.kp(c["kp_id"]) or {}).get("name", "") if c["kp_id"] else ""
@@ -765,8 +1039,9 @@ def review_due(request: Request):
 def review_card(request: Request, card_id: int, body: dict = Body(...)):
     k = kid_or_redirect(request)
     r = engine.review_card(k["id"], card_id, body.get("grade", "good"))
-    if not engine.due_cards(k["id"], 1):
-        engine.mark_task_by(k["id"], type="review")
+    for group, task in (("words", "words"), ("mistakes", "mistakes"), ("other", "review")):
+        if not engine.due_cards(k["id"], 1, group):
+            engine.mark_task_by(k["id"], type=task)
     return r or {}
 
 
@@ -891,7 +1166,7 @@ def reading_finish(request: Request, rid: int, body: dict = Body(...)):
     minutes = max(1, min(120, int(body.get("minutes") or 1)))
     db.run("UPDATE readings SET finished_at=?, minutes=minutes+? WHERE id=?", db.now(), minutes, rid)
     engine._touch_day(k["id"], minutes)
-    engine.mark_task_by(k["id"], type="reading", lang=r["lang"])
+    engine.mark_task_by(k["id"], type="read_" + r["lang"], lang=r["lang"])
     return {"results": results}
 
 
@@ -909,6 +1184,9 @@ def _records_ctx(k):
     tot = db.one("SELECT COUNT(*) AS n, SUM(correct) AS ok FROM attempts WHERE user_id=?", k["id"])
     return {"k": k, "packs": packs, "attempts": att, "weak": [(catalog.kp(w["kp_id"]), w) for w in weak[:12]],
             "cal": engine.calendar(k["id"], 12), "streak": engine.streak(k["id"]), "days": days, "lookups": lookups,
+            "reads": db.q("SELECT * FROM reading_logs WHERE user_id=? ORDER BY id DESC LIMIT 30", k["id"]),
+            "papers": [{**dict(p), "rep": db.jload(p["report"], {})} for p in
+                       db.q("SELECT * FROM papers WHERE user_id=? ORDER BY id DESC LIMIT 20", k["id"])],
             "tot": tot, "mistakes": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='mistake'", k["id"])["n"],
             "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='word'", k["id"])["n"]}
 
@@ -917,6 +1195,98 @@ def _records_ctx(k):
 def records(request: Request):
     k = kid_or_redirect(request)
     return render(request, "records.html", **_records_ctx(k), report_for=None)
+
+
+# ================================================================== 浏览器划词插件（外部页面查词 → 单词本）
+
+def _lang_of(text: str) -> str:
+    return "zh" if re.search(r"[一-鿿]", text or "") else "en"
+
+
+@app.get("/ext/me")
+def ext_me(request: Request):
+    u = auth.user_by_token(request)
+    return {"name": u["name"], "due_words": len(engine.due_cards(u["id"], 300, "words")),
+            "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind IN ('word','phrase')", u["id"])["n"]}
+
+
+@app.post("/ext/lookup")
+def ext_lookup(request: Request, body: dict = Body(...)):
+    u = auth.user_by_token(request)
+    text = (body.get("text") or "").strip()[:80]
+    if not text:
+        raise HTTPException(400, "没有选中文字")
+    context = (body.get("context") or "")[:400]
+    lang = _lang_of(text)
+    res = llm.lookup(text, context, lang, u["grade"], user_id=u["id"])
+    db.run("INSERT INTO lookups(user_id,reading_id,query,context,result,created_at) VALUES(?,?,?,?,?,?)",
+           u["id"], None, text, context, db.jdump(res), db.now())
+    saved = db.one("SELECT id FROM cards WHERE user_id=? AND kind IN ('word','phrase') AND LOWER(front) IN (?,?)", u["id"],
+                   text.lower()[:300], (res.get("word") or text).lower()[:300])
+    return {"lang": lang, "result": res, "saved": bool(saved)}
+
+
+@app.post("/ext/save")
+def ext_save(request: Request, body: dict = Body(...)):
+    u = auth.user_by_token(request)
+    word = (body.get("word") or "").strip()
+    meaning = (body.get("meaning") or "").strip()
+    if not word or not meaning:
+        raise HTTPException(400, "缺少单词或意思")
+    kind = "phrase" if " " in word.strip() else "word"
+    extra = {k: (body.get(k) or "")[:400] for k in ("phonetic", "pinyin", "example", "example_zh", "context", "url", "pos")}
+    extra["source"] = "插件"
+    cid = engine.add_card(u["id"], kind, word, meaning, extra, starred=1)
+    return {"ok": True, "id": cid, "due_words": len(engine.due_cards(u["id"], 300, "words"))}
+
+
+@app.get("/tools", response_class=HTMLResponse)
+def tools_page(request: Request, kid: int = 0):
+    return _tools_render(request, kid)
+
+
+def _tools_render(request: Request, kid: int, token: str = ""):
+    u = auth.require_user(request)
+    target = u
+    kids = db.q("SELECT id, name FROM users WHERE parent_id=? ORDER BY id", u["id"]) if u["role"] == "parent" else []
+    if u["role"] == "parent":
+        kid = kid or request.session.get("as_kid") or (kids[0]["id"] if kids else 0)
+        target = auth.kid_of(u, kid) if kid else None
+    return render(request, "tools.html", target=target, kids=kids, token=token,
+                  tokens=auth.api_tokens_of(target["id"]) if target else [],
+                  server=config.PUBLIC_URL or str(request.base_url).rstrip("/"))
+
+
+@app.post("/tools/token")
+def tools_token(request: Request, kid: int = Form(0), action: str = Form("new"), token_hash: str = Form("")):
+    u = auth.require_user(request)
+    target = auth.kid_of(u, kid) if u["role"] == "parent" and kid else u
+    if action == "revoke":
+        auth.revoke_api_token(target["id"], token_hash)
+        return RedirectResponse(f"/tools?kid={kid}", 303)
+    token = auth.create_api_token(target["id"])
+    auth.log_event("api_token_create", user_id=target["id"], email=target["email"], detail=f"by {u['email']}", request=request)
+    return _tools_render(request, kid, token)  # 连接码只在这一次页面里显示，不放进网址
+
+
+@app.get("/tools/extension.zip")
+def tools_extension_zip(request: Request):
+    import io
+    import zipfile
+    from fastapi.responses import Response
+    auth.require_user(request)
+    src = config.BASE_DIR / "extension"
+    server = config.PUBLIC_URL or str(request.base_url).rstrip("/")
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+        for p in sorted(src.rglob("*")):
+            if p.is_file():
+                data = p.read_bytes()
+                if p.name == "config.js":
+                    data = f'const AISTUDY_DEFAULT_SERVER = "{server}";\n'.encode()
+                z.writestr("aistudy-extension/" + str(p.relative_to(src)), data)
+    return Response(buf.getvalue(), media_type="application/zip",
+                    headers={"Content-Disposition": 'attachment; filename="aistudy-extension.zip"'})
 
 
 @app.get("/healthz")

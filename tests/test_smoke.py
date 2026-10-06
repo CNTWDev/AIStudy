@@ -46,7 +46,7 @@ def test_full_flow():
 
         # 姐姐登录
         r = c.post("/login", data={"email": "a@x.com", "password": "secret1"})
-        assert "今日计划" in r.text
+        assert "今天的任务" in r.text
         assert "摸底诊断" in r.text
         for path in ["/subjects", "/map/phy-cambridge", "/learn/PHY-IG-1.1-05", "/review", "/words", "/reading", "/records",
                      "/diagnose/phy-cambridge", "/words?kind=term", "/settings"]:
@@ -217,3 +217,159 @@ def test_approval_and_admin(monkeypatch):
         c.get("/logout")
         assert "家长页" in c.post("/login", data={"email": "s@x.com", "password": "secret1"}).text
         assert c.get("/admin").status_code == 403
+
+
+def test_daily_tasks_progress_and_tools():
+    import io
+    import zipfile
+
+    from app import db
+    with TestClient(app) as c:
+        kid_b = db.one("SELECT id FROM users WHERE email='b@x.com'")["id"]
+        # 家长给弟弟安排：西游记每天 1 回、英文分级读物、每天 5 个新词
+        c.post("/login", data={"email": "p@x.com", "password": "secret1"})
+        assert "西游记" in c.get(f"/parent/kids/{kid_b}/plan").text
+        c.post(f"/parent/kids/{kid_b}/tracks", data={"kind": "read_zh", "ref": "zh-xiyouji", "daily_amount": "1", "daily_minutes": "20"})
+        c.post(f"/parent/kids/{kid_b}/tracks", data={"kind": "read_en", "ref": "en-i-will-surprise-my-friend", "daily_amount": "1", "daily_minutes": "15"})
+        r = c.post(f"/parent/kids/{kid_b}/tracks", data={"kind": "words", "ref": "en-core-g3", "daily_amount": "5"})
+        assert "已安排" in r.text
+        c.get("/logout")
+
+        c.post("/login", data={"email": "b@x.com", "password": "secret1"})
+        plan = c.post("/api/plan/rebuild").json()["plan"]
+        types = [t["type"] for t in plan]
+        assert types[0] == "progress"  # 还没设置学校进度 → 第一项提醒
+        assert {"words", "read_zh", "read_en"} <= set(types), types
+        assert "第 1 回" in c.get("/today").text or "第1回" in c.get("/today").text
+        assert len(c.get("/api/review/due?group=words").json()["cards"]) >= 5
+
+        # 更新学校进度：数学正在学两位数乘两位数，前面的乘法学过了
+        assert "学校学到哪了" in c.get("/progress").text
+        r = c.post("/progress/math-shanghai", data={"stage": "G3", "current": "MSH-NUM-20",
+                                                   "taught": ["MSH-NUM-16", "MSH-NUM-17"]})
+        assert "进度已更新" in r.text
+        e = db.one("SELECT * FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)
+        assert e["progress_kp"] == "MSH-NUM-20"
+        taught = {x["kp_id"] for x in db.q("SELECT kp_id FROM kp_taught WHERE user_id=?", kid_b)}
+        assert taught == {"MSH-NUM-16", "MSH-NUM-17", "MSH-NUM-20"}
+        plan = c.post("/api/plan/rebuild").json()["plan"]
+        prog = [t for t in plan if t["type"] == "progress"]
+        assert prog and prog[0]["done"]  # 做完的进度任务保留并打勾
+        assert any(t["type"] == "sync" and "两位数乘两位数" in t["title"] for t in plan), plan
+        # 再次只改学段：清空正在学，保留勾选
+        c.post("/progress/math-shanghai", data={"stage": "G4"})
+        assert db.one("SELECT stage FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["stage"] == "G4"
+        c.post("/progress/math-shanghai", data={"stage": "G3", "current": "MSH-NUM-20", "taught": ["MSH-NUM-16"]})
+
+        # 名著接着读：读完第 1 回 → 任务完成、进度 +1
+        tid = db.one("SELECT id FROM tracks WHERE user_id=? AND kind='read_zh' AND active=1", kid_b)["id"]
+        assert c.get(f"/track/{tid}").status_code == 200
+        assert c.post(f"/api/track/{tid}/log", json={"to": 1, "minutes": 18, "summary": "石猴出世", "feeling": "😄"}).json()["ok"]
+        assert db.one("SELECT position FROM tracks WHERE id=?", tid)["position"] == 1
+        plan = c.post("/api/plan/rebuild").json()["plan"]
+        assert [t for t in plan if t["type"] == "read_zh"][0]["done"]
+        assert "石猴出世" in c.get(f"/day/{db.today().isoformat()}").text
+
+        # 「这道题还不会」：不算错，进错题本
+        items = c.get("/api/practice/MATH-PRE-UNIT?n=1").json()["items"]
+        res = c.post("/api/answer", json={"item_id": items[0]["id"], "kp_id": "MATH-PRE-UNIT", "dont_know": True}).json()
+        assert res["dont_know"] and "answer" in res
+        assert db.one("SELECT COUNT(*) AS n FROM attempts WHERE user_id=? AND dont_know=1", kid_b)["n"] == 1
+        assert db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='mistake'", kid_b)["n"] >= 1
+        assert c.get("/review?group=mistakes").status_code == 200
+        assert c.post("/api/checkin", json={"reflection": "读了西游记", "minutes": 30, "mood": "😄"}).json()["badges"]
+
+        # 划词查词插件：生成连接码 → 用 Bearer 调接口 → 加入单词本 → 作废后不能用
+        r = c.post("/tools/token", data={"kid": "0"})
+        token = r.text.split('id="tok"')[1].split(">")[1].split("<")[0].strip()
+        assert token.startswith("ais_") and "token=" not in str(r.url)
+        c.get("/logout")
+        with TestClient(app) as ext:
+            h = {"Authorization": f"Bearer {token}"}
+            assert ext.get("/ext/me").status_code == 401
+            assert ext.get("/ext/me", headers=h).json()["name"] == "弟弟"
+            look = ext.post("/ext/lookup", json={"text": "seed", "context": "A small seed fell."}, headers=h).json()
+            assert look["lang"] == "en" and look["result"]["meaning"] and not look["saved"]
+            assert ext.post("/ext/save", json={"word": "seed", "meaning": "种子"}, headers=h).json()["ok"]
+            assert ext.post("/ext/lookup", json={"text": "seed"}, headers=h).json()["saved"]
+            assert ext.post("/ext/lookup", json={"text": "苹果"}, headers=h).json()["lang"] == "zh"
+            card = db.one("SELECT * FROM cards WHERE user_id=? AND front='seed'", kid_b)
+            assert "插件" in card["extra"]
+
+            # 家长页面：给孩子管理连接码、下载插件
+            c.post("/login", data={"email": "p@x.com", "password": "secret1"})
+            page = c.get(f"/tools?kid={kid_b}").text
+            assert "弟弟" in page and "作废" in page
+            th = db.one("SELECT token_hash FROM api_tokens WHERE user_id=?", kid_b)["token_hash"]
+            c.post("/tools/token", data={"kid": str(kid_b), "action": "revoke", "token_hash": th})
+            assert ext.get("/ext/me", headers=h).status_code == 401
+            z = zipfile.ZipFile(io.BytesIO(c.get("/tools/extension.zip").content))
+            assert "aistudy-extension/manifest.json" in z.namelist()
+            assert "http" in z.read("aistudy-extension/config.js").decode()
+            assert c.get(f"/parent/as/{kid_b}?next=/progress").url.path == "/progress"
+
+
+def test_paper_import_and_diagnosis():
+    from app import db, papers
+    with TestClient(app) as c:
+        kid_b = db.one("SELECT id FROM users WHERE email='b@x.com'")["id"]
+        c.post("/login", data={"email": "b@x.com", "password": "secret1"})
+        assert "导入一份试卷" in c.get("/papers").text
+        # 没有照片也没有文字 → 提示
+        assert c.post("/api/papers", data={"pack_id": "math-shanghai"}).status_code == 400
+        assert c.post("/api/papers", data={"pack_id": "nope", "text": "x" * 20}).status_code == 400
+        assert c.post("/api/papers", data={"pack_id": "math-shanghai"},
+                      files=[("photos", ("a.txt", b"hello", "text/plain"))]).status_code == 400
+        jpg = b"\xff\xd8\xff\xe0" + b"0" * 100
+        r = c.post("/api/papers", data={"pack_id": "math-shanghai", "title": "第三单元测验", "exam_date": "2026-10-01"},
+                   files=[("photos", ("p1.jpg", jpg, "image/jpeg")), ("photos", ("p2.jpg", jpg, "image/jpeg"))])
+        assert r.status_code == 200, r.text
+        pid = r.json()["id"]
+        p = db.one("SELECT * FROM papers WHERE id=?", pid)
+        assert p["title"] == "第三单元测验" and db.jload(p["images"]) == ["1.jpg", "2.jpg"]
+        rows = papers.rows(pid)
+        assert len(rows) == 3
+        assert rows[0]["kp_id"] and rows[2]["kp_id"] is None  # 不在候选列表里的知识点 → 未对应
+        assert rows[0]["orig"] == "wrong" and rows[1]["orig"] == "right"
+        # 原卷错题进错题本；今天多一项「试卷订正」
+        assert db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='mistake' AND front LIKE '示例：1 m%'", kid_b)["n"] == 1
+        plan = c.post("/api/plan/rebuild").json()["plan"]
+        assert any(t["type"] == "paper" for t in plan), plan
+        page = c.get(f"/papers/{pid}").text
+        assert "第三单元测验" in page and "原卷 ✗" in page
+        assert c.get(f"/papers/{pid}/img/1.jpg").content == jpg
+        assert c.get(f"/papers/{pid}/img/9.jpg").status_code == 404
+
+        # 在线重做：第 1 题选对、第 2 题还不会、第 3 题（简答）先看参考答案再自评
+        a = c.post(f"/api/papers/{pid}/answer", json={"pi": rows[0]["id"], "answer": "1"}).json()
+        assert a["correct"] and a["left"] == 2
+        a = c.post(f"/api/papers/{pid}/answer", json={"pi": rows[1]["id"], "dont_know": True}).json()
+        assert a["dont_know"] and a["answer"] == "5"
+        assert c.post(f"/api/papers/{pid}/answer", json={"pi": rows[2]["id"], "answer": "我觉得"}).json()["reveal"]
+        assert c.post(f"/api/papers/{pid}/answer", json={"pi": rows[2]["id"], "answer": "我觉得", "self": "no"}).json()["left"] == 0
+        # 改知识点
+        kp = papers.candidates("math-shanghai", "G3")[5]["id"]
+        assert c.post(f"/api/papers/{pid}/kp", json={"pi": rows[2]["id"], "kp_id": kp}).json()["ok"]
+        assert c.post(f"/api/papers/{pid}/kp", json={"pi": rows[2]["id"], "kp_id": "PHY-IG-1.1-02"}).status_code == 400
+
+        assert c.post(f"/api/papers/{pid}/finish").json()["ok"]
+        rep = c.get(f"/papers/{pid}/report").text
+        assert "要补的知识点" in rep and "可能是粗心" in rep
+        assert db.one("SELECT status FROM papers WHERE id=?", pid)["status"] == "done"
+        plan = c.post("/api/plan/rebuild").json()["plan"]
+        assert [t for t in plan if t["type"] == "paper"][0]["done"]
+        assert "第三单元测验" in c.get("/records").text
+
+        # 别人看不到；删除
+        c.get("/logout")
+        c.post("/login", data={"email": "a@x.com", "password": "secret1"})
+        assert c.get(f"/papers/{pid}").status_code == 404
+        assert c.get(f"/papers/{pid}/img/1.jpg").status_code == 404
+        c.get("/logout")
+        c.post("/login", data={"email": "b@x.com", "password": "secret1"})
+        c.post(f"/papers/{pid}/delete")
+        assert not db.one("SELECT id FROM papers WHERE id=?", pid)
+        assert not (papers.PAPER_DIR / str(pid)).exists()
+        # 粘贴文字也可以
+        r = c.post("/api/papers", data={"pack_id": "math-shanghai", "text": "1. 1 m = ? cm\n2. 2 + 3 = ?"})
+        assert r.status_code == 200 and db.one("SELECT source FROM papers WHERE id=?", r.json()["id"])["source"] == "text"

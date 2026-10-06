@@ -1,37 +1,79 @@
 {% extends "base.html" %}
 {% block body %}
 {% set done = t.plan|selectattr('done')|list|length %}
+{% set total = t.plan|length %}
+{% set ns = namespace(next=None) %}
+{% for x in t.plan %}{% if not x.done and ns.next is none %}{% set ns.next = x.id %}{% endif %}{% endfor %}
 <h1>今天 · {{ t.day[5:] }}</h1>
-<p class="muted">已完成 <b>{{ done }}/{{ t.plan|length }}</b> · 今天学了约 {{ t.minutes }} 分钟 · 连续打卡 <b>{{ streak }}</b> 天 🔥</p>
+
 <div class="card">
-  <div class="row"><h3 class="grow" style="margin:0">今日计划</h3><button class="btn ghost sm" id="rebuild">重新安排</button></div>
-  <p class="muted small">按顺序做就行。每一项都拆成小步骤，卡住了就点「退一步」。</p>
-  {% for x in t.plan %}
-  <div class="task {{ 'done' if x.done }}" data-id="{{ x.id }}">
-    <button class="chk" title="标记完成">{{ '✓' if x.done }}</button>
+  <div class="streakbox">
+    <div class="big"><span class="flame">🔥</span></div>
     <div class="grow">
-      <a class="t" href="{{ x.url }}"><span class="kind k-{{ x.type }}">{{ {'review':'复习','weak':'补弱','backfill':'回溯','preview':'预习','reading':'阅读','diagnose':'诊断'}[x.type] }}</span>{{ x.title }}</a>
-      <div class="muted small">{{ x.why }} · 约 {{ x.minutes }} 分钟{% if x.pack %} · {{ catalog.packs[x.pack].subject_name }}{% endif %}</div>
+      <div style="font-size:20px">已经坚持 <b>{{ streak }}</b> 天</div>
+      <div class="muted small">{% if badges.next %}再坚持 {{ badges.to_next }} 天得到 {{ badges.next[1] }}「{{ badges.next[2] }}」{% else %}你太厉害了！{% endif %} · 累计 ⭐ {{ stars }}</div>
+      {% if badges.got %}<div class="badges">{% for b in badges.got %}<span title="{{ b[2] }}">{{ b[1] }}</span>{% endfor %}</div>{% endif %}
     </div>
-    <a class="btn sm" href="{{ x.url }}">开始</a>
   </div>
-  {% else %}<p>今天没有安排。可以去「学科」选一个知识点练练，或读一篇文章。</p>{% endfor %}
+  <p class="small muted" style="margin:8px 0 0">坚持比做对更重要：每完成一项就得一颗 ⭐，不管对错。</p>
 </div>
+
 <div class="card">
-  <h3 style="margin-top:0">今日打卡</h3>
-  {% if t.checked_in %}<p>✅ 今天已打卡。{% if t.reflection %}<br><span class="muted">「{{ t.reflection }}」</span>{% endif %}</p>{% endif %}
+  <div class="row"><h3 class="grow" style="margin:0">今天的任务 <span class="muted small">{{ done }}/{{ total }}</span></h3><button class="btn ghost sm" id="rebuild">重新安排</button></div>
+  <div class="daybar"><span style="width:{{ (100 * done / total) if total else 0 }}%"></span></div>
+  {% if total and done == total %}<p class="pop" style="font-size:18px">🎉 今天的任务全部完成！写一句「一日记录」再去休息吧。</p>
+  {% else %}<p class="muted small">从上往下，一项一项做。不会的题点「这道题还不会」就行。 · <a href="/progress">学校学到哪了</a></p>{% endif %}
+  {% for x in t.plan %}
+  <div class="step {{ 'done' if x.done }} {{ 'next' if x.id == ns.next }}" data-id="{{ x.id }}" data-type="{{ x.type }}">
+    <div class="num">{{ '✓' if x.done else loop.index }}</div>
+    <div class="grow">
+      <a class="t" href="{{ x.url }}">{{ x.title }}</a>
+      <div class="muted small">{{ x.why }} · 约 {{ x.minutes }} 分钟</div>
+    </div>
+    {% if x.id == ns.next %}<a class="btn" href="{{ x.url }}">开始</a>{% elif not x.done %}<button class="btn ghost sm chk" title="已经在别处做完了">做完了</button>{% endif %}
+  </div>
+  {% else %}<p>今天没有安排。请家长在「家长页 → 阅读与单词」里安排每天的阅读和单词，或去「学科」选一个知识点。</p>{% endfor %}
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">一日记录</h3>
+  <p class="small">今天：完成 {{ done }} 项 · 学了约 {{ t.minutes }} 分钟 · 做题 {{ rec.attempts|length }} 道（对 {{ rec.right }}{% if rec.dont_know %} · 还不会 {{ rec.dont_know }}{% endif %}）
+    · 复习卡片 {{ rec.reviews }} 张 · 新收藏 {{ rec.new_cards|length }} 个{% if rec.reads %} · 读书 {{ rec.reads|length }} 次{% endif %}
+    · <a href="/day/{{ t.day }}">看详细</a></p>
+  {% if t.checked_in %}<p>✅ 今天已经记录。{% if t.reflection %}<br><span class="muted">「{{ t.reflection }}」</span>{% endif %}</p>{% endif %}
+  <label>今天的心情</label>
+  <div class="moods">{% for m in ['😄','🙂','😐','😣','😴'] %}<button data-m="{{ m }}" class="{{ 'sel' if rec.mood == m }}">{{ m }}</button>{% endfor %}</div>
   <label>今天学到了什么 / 哪里还不懂？（一句话就行）</label>
   <textarea id="refl" style="min-height:70px">{{ t.reflection }}</textarea>
-  <div class="row" style="margin-top:8px"><span class="muted small">学习了</span><input type="number" id="mins" value="{{ t.minutes }}" style="width:90px"><span class="muted small">分钟</span><button class="btn" id="checkin">打卡</button></div>
+  <div class="row" style="margin-top:8px"><span class="muted small">学习了</span><input type="number" id="mins" value="{{ t.minutes }}" style="width:90px"><span class="muted small">分钟</span><button class="btn" id="checkin">{{ '更新记录' if t.checked_in else '写好了，打卡' }}</button></div>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">这一周</h3>
+  {% set mx = [week|map(attribute='minutes')|max, 1]|max %}
+  <div class="mini-bars">{% for d in week %}<div style="height:{{ 100 * d.minutes / mx }}%" title="{{ d.day }}：{{ d.minutes }} 分钟"></div>{% endfor %}</div>
+  <div class="row small muted" style="justify-content:space-between">{% for d in week %}<a href="/day/{{ d.day }}">{{ d.wd }}</a>{% endfor %}</div>
 </div>
 <h3>最近四周</h3>
-<div class="cal">{% for d in cal %}<div class="{{ 'l3' if d.minutes >= 60 else 'l2' if d.minutes >= 30 else 'l1' if d.minutes > 0 or d.checked }} {{ 'today' if d.day == t.day }}" title="{{ d.day }}：{{ d.minutes }} 分钟">.</div>{% endfor %}</div>
+<div class="cal">{% for d in cal %}<a href="/day/{{ d.day }}" class="{{ 'l3' if d.minutes >= 60 else 'l2' if d.minutes >= 30 else 'l1' if d.minutes > 0 or d.checked }} {{ 'today' if d.day == t.day }}" title="{{ d.day }}：{{ d.minutes }} 分钟">.</a>{% endfor %}</div>
 <script>
-$$('.task .chk').forEach(b => b.onclick = async () => {
-  const row = b.closest('.task'); const done = !row.classList.contains('done');
-  await api('/api/plan/task', {id: row.dataset.id, done}); row.classList.toggle('done', done); b.textContent = done ? '✓' : '';
+const just = sessionStorage.getItem('justDone');
+if (just) {
+  sessionStorage.removeItem('justDone');
+  const el = $(`.step.done[data-type="${just}"]`); if (el) el.classList.add('justdone');
+  toast({{ 'true' if total and done == total else 'false' }} ? '🎉 全部完成！' : '+1 ⭐ 完成一项！');
+  {% if total and done == total %}confetti();{% else %}cheer($('.step.next') || document.body);{% endif %}
+}
+$$('.step .chk').forEach(b => b.onclick = async () => {
+  await api('/api/plan/task', {id: b.closest('.step').dataset.id, done: true});
+  sessionStorage.setItem('justDone', b.closest('.step').dataset.type); location.reload();
 });
 $('#rebuild').onclick = async () => { await api('/api/plan/rebuild', {}); location.reload(); };
-$('#checkin').onclick = async () => { const r = await api('/api/checkin', {reflection: $('#refl').value, minutes: +$('#mins').value}); alert('打卡成功！连续 ' + r.streak + ' 天'); location.reload(); };
+let mood = {{ rec.mood|tojson }};
+$$('.moods button').forEach(b => b.onclick = () => { $$('.moods button').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); mood = b.dataset.m; });
+$('#checkin').onclick = async () => {
+  const r = await api('/api/checkin', {reflection: $('#refl').value, minutes: +$('#mins').value, mood});
+  confetti(); toast('打卡成功！已经坚持 ' + r.streak + ' 天 🔥', 2200); setTimeout(() => location.reload(), 2300);
+};
 </script>
 {% endblock %}

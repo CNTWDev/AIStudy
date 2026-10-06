@@ -1,15 +1,18 @@
 {% extends "base.html" %}
 {% block body %}
 <h1>学科</h1>
+<p class="small"><a class="btn ghost sm" href="/progress">📍 更新学校进度</a> <a class="btn ghost sm" href="/papers">📷 导入试卷</a>
+  <span class="muted">告诉系统学校学到哪了、考了什么，每天的任务会跟着走</span></p>
 {% for r in rows %}
 {% set s = r.sum %}
 <div class="card">
-  <div class="row"><div class="grow"><h2 style="margin:0">{{ r.pack.subject_name }}</h2><div class="muted small">{{ r.pack.edition }} · 当前 {{ stage_label(r.e.stage) }}</div></div></div>
+  <div class="row"><div class="grow"><h2 style="margin:0">{{ r.pack.subject_name }}</h2><div class="muted small">{{ r.pack.edition }} · 当前 {{ stage_label(r.e.stage) }}{% if r.e.progress_kp and catalog.kp(r.e.progress_kp) %} · 学校正在学：{{ catalog.kp(r.e.progress_kp).name }}{% endif %}</div></div></div>
   <div class="bar" style="margin:10px 0"><span style="width:{{ 100*s.mastered/s.total }}%;background:var(--ok)"></span><span style="width:{{ 100*s.learning/s.total }}%;background:var(--learn)"></span><span style="width:{{ 100*s.weak/s.total }}%;background:var(--warn)"></span></div>
   <div class="muted small">已掌握 {{ s.mastered }} · 学习中 {{ s.learning }} · 薄弱 {{ s.weak }} · 未测 {{ s.unknown }}</div>
   <div class="row" style="margin-top:10px">
     <a class="btn" href="/map/{{ r.pack.id }}">知识地图</a>
     <a class="btn ghost" href="/diagnose/{{ r.pack.id }}">{{ '再诊断一次' if r.diag else '摸底诊断' }}</a>
+    <a class="btn ghost" href="/papers?pack={{ r.pack.id }}">导入试卷</a>
   </div>
 </div>
 {% endfor %}

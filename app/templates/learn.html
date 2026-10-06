@@ -55,7 +55,7 @@ async function loadItems() {
 }
 function show() {
   if (idx >= items.length) {
-    $('#items').innerHTML = `<p><b>做完了：${right}/${items.length} 正确。</b> ${right === items.length ? '太棒了 🎉' : right ? '继续加油！' : '没关系，先看看前置知识，再回来。'}</p>` +
+    $('#items').innerHTML = `<p><b>做完了：${right}/${items.length} 正确。</b> ${right === items.length ? '太棒了 🎉' : '每做一题都算数，继续加油！'}</p>` +
       `<button class="btn ghost sm" onclick="loadItems()">再来 3 题</button>`; return;
   }
   const it = items[idx];
@@ -64,6 +64,7 @@ function show() {
   $('#items').appendChild(box);
   renderItem(box, it, {
     submit: (answer, self) => api('/api/answer', self ? {item_id: it.id, kp_id: KP, self} : {item_id: it.id, kp_id: KP, answer}),
+    dontKnow: () => api('/api/answer', {item_id: it.id, kp_id: KP, dont_know: true}),
     onDone: res => {
       if (res.correct) { right++; wrongStreak = 0; } else wrongStreak++;
       const nx = document.createElement('div'); nx.className = 'row'; nx.style.marginTop = '10px';
@@ -74,6 +75,6 @@ function show() {
   });
 }
 $('#start').onclick = loadItems;
-$('#finish').onclick = async () => { await api('/api/learn/done', {kp_id: KP, summary: $('#summary').value}); location.href = '/today'; };
+$('#finish').onclick = async () => { await api('/api/learn/done', {kp_id: KP, summary: $('#summary').value}); sessionStorage.setItem('justDone', 'learn'); location.href = '/today'; };
 </script>
 {% endblock %}

@@ -14,14 +14,14 @@
 {% endif %}
 <header class="top">
   <a class="logo" href="/">📚 AIStudy</a>
-  {% if user %}<span class="who">{{ (kid or user).name }}{% if kid %} · {{ stage_label(kid.grade) }}{% endif %} {% if user.is_admin %} · <a href="/admin">管理</a>{% endif %} · <a href="/settings">账号</a></span>{% endif %}
+  {% if user %}<span class="who">{{ (kid or user).name }}{% if kid %} · {{ stage_label(kid.grade) }}{% endif %} {% if user.is_admin %} · <a href="/admin">管理</a>{% endif %} · <a href="/tools">查词工具</a> · <a href="/settings">账号</a></span>{% endif %}
 </header>
 <main class="wrap">{% block body %}{% endblock %}</main>
 {% if kid %}
 {% set p = request.url.path %}
 <nav class="tabs">
   <a href="/today" class="{{ 'on' if p.startswith('/today') }}"><span class="i">☀️</span>今天</a>
-  <a href="/subjects" class="{{ 'on' if p.startswith('/subjects') or p.startswith('/map') or p.startswith('/learn') or p.startswith('/diagnose') }}"><span class="i">🗺️</span>学科</a>
+  <a href="/subjects" class="{{ 'on' if p.startswith('/subjects') or p.startswith('/papers') or p.startswith('/progress') or p.startswith('/map') or p.startswith('/learn') or p.startswith('/diagnose') }}"><span class="i">🗺️</span>学科</a>
   <a href="/reading" class="{{ 'on' if p.startswith('/reading') }}"><span class="i">📖</span>阅读</a>
   <a href="/review" class="{{ 'on' if p.startswith('/review') or p.startswith('/words') }}"><span class="i">🔁</span>复习</a>
   <a href="/records" class="{{ 'on' if p.startswith('/records') }}"><span class="i">📅</span>记录</a>

@@ -9,6 +9,8 @@
     <div class="grow"><h2 style="margin:0">{{ k.u.name }} <span class="pill">{{ stage_label(k.u.grade) }}</span>{% if k.u.status == 'disabled' %} <span class="pill st-weak">已暂停</span>{% endif %}</h2>
       <div class="muted small">{{ k.u.email }}{% if k.u.school %} · {{ k.u.school }}{% endif %} · 每天 {{ k.u.daily_minutes }} 分钟</div></div>
     <a class="btn sm" href="/parent/as/{{ k.u.id }}">以孩子视角打开</a>
+    <a class="btn ghost sm" href="/parent/kids/{{ k.u.id }}/plan">阅读与单词</a>
+    <a class="btn ghost sm" href="/parent/as/{{ k.u.id }}?next=/progress">学校进度</a>
     <a class="btn ghost sm" href="/parent/kids/{{ k.u.id }}">学习报告</a>
     <a class="btn ghost sm" href="/parent/kids/{{ k.u.id }}/edit">编辑</a>
   </div>

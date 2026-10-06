@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/today" class="small">← 今天</a>
+<h1>一日记录 · {{ r.day }} {{ r.mood }}</h1>
+<div class="stats">
+  <div class="stat"><b>{{ r.done }}/{{ r.plan|length }}</b><span>完成任务 ⭐</span></div>
+  <div class="stat"><b>{{ r.minutes }}</b><span>学习分钟</span></div>
+  <div class="stat"><b>{{ r.attempts|length }}</b><span>做题（对 {{ r.right }}）</span></div>
+  <div class="stat"><b>{{ r.reviews }}</b><span>复习卡片</span></div>
+  <div class="stat"><b>{{ r.new_cards|length }}</b><span>新收藏</span></div>
+</div>
+{% if r.reflection %}<div class="card"><b>那天写下的：</b>{{ r.reflection }}</div>{% endif %}
+<div class="card">
+  <h3 style="margin-top:0">任务</h3>
+  {% for x in r.plan %}<p class="small">{{ '✅' if x.done else '⬜' }} {{ x.title }}</p>{% else %}<p class="muted small">那天没有安排任务。</p>{% endfor %}
+</div>
+{% if r.reads or r.readings %}<div class="card">
+  <h3 style="margin-top:0">阅读</h3>
+  {% for x in r.reads %}<p class="small">📖 《{{ x.title }}》{% if x.to_pos %} 读到第 {{ x.to_pos }}{% endif %}{% if x.pages %} {{ x.pages }}{% endif %} · {{ x.minutes }} 分钟 {{ x.feeling }}{% if x.summary %}<br><span class="muted">「{{ x.summary }}」</span>{% endif %}</p>{% endfor %}
+  {% for x in r.readings %}<p class="small">📄 {{ x.title }}（{{ '英文' if x.lang == 'en' else '中文' }}短文）</p>{% endfor %}
+</div>{% endif %}
+{% if r.attempts %}<div class="card">
+  <h3 style="margin-top:0">做题</h3>
+  <p class="small muted">对 {{ r.right }} · 错 {{ r.wrong }} · 还不会 {{ r.dont_know }}（做了就有收获）</p>
+  {% for a in r.attempts %}<p class="small">{{ '✅' if a.correct else ('🤔' if a.dont_know else '❌') }} {{ a.kp.name if a.kp else a.kp_id }}</p>{% endfor %}
+</div>{% endif %}
+{% if r.new_cards or r.lookups %}<div class="card">
+  <h3 style="margin-top:0">新收藏 / 查过的词</h3>
+  <p>{% for c in r.new_cards %}<span class="pill">{{ c.front[:30] }}</span> {% endfor %}</p>
+  {% if r.lookups %}<p class="small muted">查过：{% for l in r.lookups %}{{ l.query }}{{ '、' if not loop.last }}{% endfor %}</p>{% endif %}
+</div>{% endif %}
+{% endblock %}

@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "AIStudy 划词查词",
+  "version": "1.0.0",
+  "description": "在任意网页选中不认识的英文单词或中文词语，一键用 AI 查意思、听发音，并加入 AIStudy 单词本定期复习。",
+  "permissions": ["storage", "contextMenus"],
+  "host_permissions": ["<all_urls>"],
+  "background": {"service_worker": "background.js"},
+  "content_scripts": [{"matches": ["<all_urls>"], "js": ["content.js"], "run_at": "document_idle", "all_frames": false}],
+  "options_page": "options.html",
+  "action": {"default_popup": "popup.html", "default_title": "AIStudy"}
+}

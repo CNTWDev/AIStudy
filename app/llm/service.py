@@ -102,7 +102,7 @@ def _count_usage(user_id: int | None):
            "ON CONFLICT(user_id, day) DO UPDATE SET calls=llm_usage.calls+1", user_id, day)
 
 
-def ask_json(task: str, system: str, user: str, *, user_id=None, effort="low", max_tokens=4000, cache=True):
+def ask_json(task: str, system: str, user: str, *, user_id=None, effort="low", max_tokens=4000, cache=True, images=None):
     s = settings()
     if s.error:
         raise LLMError("AI 配置有误：" + s.error)
@@ -113,8 +113,9 @@ def ask_json(task: str, system: str, user: str, *, user_id=None, effort="low", m
         raise LLMError("AI 还没配置好：" + why)
     req = ChatRequest(task=task, system=system + "\n只输出一个 JSON 对象，不要输出其他文字。", user=user,
                       max_tokens=(route and route.max_tokens) or max_tokens,
-                      effort=(route and route.effort) or effort, model=route.model if route else None)
-    cache = cache and s.cache
+                      effort=(route and route.effort) or effort, model=route.model if route else None,
+                      images=list(images or []))
+    cache = cache and s.cache and not images
     key = hashlib.sha256(f"{task}\n{p.cfg.name}\n{req.model or p.cfg.model}\n{system}\n{user}".encode()).hexdigest()
     if cache:
         row = db.one("SELECT value FROM llm_cache WHERE key=?", key)

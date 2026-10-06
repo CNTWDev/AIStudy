@@ -293,3 +293,34 @@ def kid_of(parent, kid_id: int):
     if not k:
         raise HTTPException(404, "没有这个孩子账号")
     return k
+
+
+# ------------------------------------------------------------------ 外部工具令牌（浏览器划词插件）
+
+def create_api_token(uid: int, name: str = "浏览器插件") -> str:
+    token = "ais_" + secrets.token_urlsafe(24)
+    db.run("INSERT INTO api_tokens(token_hash,user_id,name,created_at) VALUES(?,?,?,?)", _sha(token), uid, name[:40], db.now())
+    return token
+
+
+def api_tokens_of(uid: int) -> list:
+    return db.q("SELECT * FROM api_tokens WHERE user_id=? ORDER BY created_at DESC", uid)
+
+
+def revoke_api_token(uid: int, token_hash: str) -> None:
+    db.run("DELETE FROM api_tokens WHERE user_id=? AND token_hash=?", uid, token_hash)
+
+
+def user_by_token(request: Request):
+    """从 Authorization: Bearer ais_xxx 取用户；无效时抛 401。"""
+    h = request.headers.get("authorization", "")
+    token = h[7:].strip() if h.lower().startswith("bearer ") else ""
+    if not token:
+        raise HTTPException(401, "缺少连接码")
+    row = db.one("SELECT * FROM api_tokens WHERE token_hash=?", _sha(token))
+    u = get_user(row["user_id"]) if row else None
+    if not u or u["status"] != "active":
+        raise HTTPException(401, "连接码无效或已被收回，请在 AIStudy「我的账号」里重新生成")
+    if not row["last_used"] or row["last_used"][:13] != db.now()[:13]:
+        db.run("UPDATE api_tokens SET last_used=? WHERE token_hash=?", db.now(), row["token_hash"])
+    return u

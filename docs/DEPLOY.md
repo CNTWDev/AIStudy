@@ -66,6 +66,8 @@ sudo /opt/aistudy/install.sh install            # 可加 --domain / --mirror cn
 2. 在「家长页」→「添加孩子」：给每个孩子一个登录邮箱（不需要是真实能收信的邮箱，只当登录名用）和密码，选年级和要学的教材。
 3. 孩子在自己的设备上用自己的邮箱登录。手机浏览器里可以「添加到主屏幕」，像 App 一样打开。
 
+4. 家长页「阅读与单词」给每个孩子选书和词表，「学校进度」选好每门课学到哪了；电脑上在顶部「查词工具」安装划词查词插件。
+
 其他家庭想用：管理员在「管理」页生成**邀请码**发给对方，对方在登录页「新家庭注册」时填写。
 没有邀请码的人也能提交申请，管理员在「管理 → 概览」里审批。`.env` 的 `REGISTRATION` 可改为 `invite`（必须邀请码）、`closed`（只能管理员创建）或 `open`（任何人可注册）。
 
@@ -97,6 +99,9 @@ sudo /opt/aistudy/install.sh check --llm     # --llm 会真实调用一次 AI，
 
 还可以按任务单独指定模型（例如查词用便宜的、出题用强的），见 `config/llm.toml` 底部的 `[tasks.xxx]` 注释。
 `default = "none"` 则关闭所有 AI 功能，其余功能照常。
+
+**试卷拍照解析**要用能看图片的模型：Claude 可以直接用；用 DeepSeek 时给 `[tasks.paper]` 单独指定通义千问的视觉模型（`qwen-vl-max`，见 `config/llm.toml` 底部注释），或者导入时粘贴文字。
+试卷照片存在 `/opt/aistudy/data/papers/`；`install.sh backup` 只备份数据库，照片如需保留请一并拷贝。
 
 ## 5. 升级
 
