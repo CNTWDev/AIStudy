@@ -42,7 +42,7 @@
       <a class="t" href="{{ x.url }}">{{ x.title }}</a>
       <div class="why">{{ x.why }} <span class="mins">· 约 {{ x.minutes }} 分钟</span></div>
     </div>
-    {% if readonly %}{% elif x.id == ns.next %}<a class="btn" href="{{ x.url }}">开始</a>{% elif not x.done %}<button class="linkbtn chk" title="已经在别处做完了，直接打勾">✓ 已做完</button>{% endif %}
+    {% if not readonly and not x.done %}<span class="stepacts">{% if x.type in manual_done %}<button class="btn soft sm chk" title="在纸质书上读完了，直接打勾">📖 在书上读完了</button>{% endif %}{% if x.id == ns.next %}<a class="btn" href="{{ x.url }}">开始</a>{% endif %}</span>{% endif %}
   </div>
   {% else %}<div class="empty"><div class="e">🌤️</div><b>今天还没有安排</b>请家长在「家长页 → 阅读与单词」里安排每天的阅读和单词，或者去「学科」选一个知识点。</div>{% endfor %}
   </div>

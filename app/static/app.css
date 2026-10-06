@@ -196,8 +196,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:8px 6px;b
 .step.next{background:linear-gradient(135deg,var(--brand-2),color-mix(in srgb,var(--brand-2) 40%,var(--card)));border:1.5px solid var(--brand-3);padding:16px 14px;margin:6px -6px}
 .step.next .num{background:var(--brand);border-color:var(--brand);color:var(--on-brand);box-shadow:0 0 0 5px color-mix(in srgb,var(--brand) 18%,transparent)}
 .step.next .t{font-size:17.5px}
-.step .chk{opacity:.0;transition:opacity .15s}.step:hover .chk,.step .chk:focus-visible{opacity:1}
-@media (hover:none){.step .chk{opacity:1}}
+.stepacts{display:flex;gap:8px;align-items:center;flex:none;flex-wrap:wrap;justify-content:flex-end}
 .step.justdone .num{animation:pop .6s ease-out}
 .streakbox{display:flex;gap:14px;align-items:center}.streakbox .big{font-size:40px;line-height:1}
 /* 今天页顶部：问候 + 进度环 + 继续按钮 */

@@ -265,6 +265,12 @@ def test_daily_tasks_progress_and_tools():
         assert {"words", "read_zh", "read_en"} <= set(types), types
         assert "第 1 回" in c.get("/today").text or "第1回" in c.get("/today").text
         assert len(c.get("/api/review/due?group=words").json()["cards"]) >= 5
+        # 手动打勾只给阅读（可能读的是纸质书）；单词等任务要真做完才算
+        words_t = next(t for t in plan if t["type"] == "words")
+        assert c.post("/api/plan/task", json={"id": words_t["id"], "done": True}).status_code == 400
+        read_t = next(t for t in plan if t["type"] == "read_en")
+        assert c.post("/api/plan/task", json={"id": read_t["id"], "done": True}).json()["ok"]
+        assert "在书上读完了" in c.get("/today").text
 
         # 更新学校进度：数学正在学两位数乘两位数，前面的乘法学过了
         assert "学校学到哪了" in c.get("/progress").text
