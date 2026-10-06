@@ -176,7 +176,7 @@ python -m pytest -q
 ```
 app/            应用代码（app/llm/ 是 AI 抽象层）
 migrations/     数据库迁移（按编号执行）
-curricula/      教材知识图谱（每套教材一个 JSON）
+curricula/      教材知识图谱（每套教材一个 JSON；2026-10 对照官方目录校对过，见 docs/curricula-audit/）
 content/        书单（中文名著 / 英文分级读物）、分年级词表、每日计划示例
 extension/      浏览器划词查词插件（Chrome / Edge，MV3）
 seed/           人工核对过的题库、术语卡

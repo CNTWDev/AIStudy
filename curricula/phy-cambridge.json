@@ -12,14 +12,16 @@
    "G9",
    "IGCSE"
   ],
-  "version": 1,
+  "version": 2,
   "generated": "2026-10-06",
   "sources": [
    "https://www.cambridgeinternational.org/Images/764332-2029-syllabus.pdf",
    "https://www.cambridgeinternational.org/Images/697209-2026-2028-syllabus.pdf",
-   "/mnt/project-files/aistudy/data/phy_igcse_1.1_knowledge_points.json"
+   "Cambridge Lower Secondary Science Curriculum Framework 0893 (2020, first teaching 2021) — 官方全文在教师支持站；公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf",
+   "https://help.cambridgeinternational.org/hc/en-gb/articles/360000055018-Which-age-group-of-learners-is-the-Cambridge-Lower-Secondary-Checkpoint-for"
   ],
-  "notes": "知识图谱：从数学与初中科学基础（Cambridge Lower Secondary Stage 7-9 对应 G6-G9）到 IGCSE Physics 0625 全部六大板块。2026-2028 与 2029 大纲主题编号相同（2029 版注明无影响教学的重大变化）。1.1 与 MATH-PRE-UNIT/DEC/AVG/PYTH、ENG-PRE-CMD 沿用旧文件的 id、name、desc、level、prereqs、hot，保证旧诊断结果可对应；1.1-06~12 为学校补充（school）内容。较小的子主题合并为一个知识点，syllabus 字段用 / 列出覆盖的多个小节（如 1.7.2/1.7.4）；supp 表示该点主要属于 Supplement（Extended）内容，core 点中也可能附带少量 supplement 细节。prereqs 中 strength 取 必须 / 有帮助。"
+  "notes": "知识图谱：从数学与初中科学基础（Cambridge Lower Secondary Science 0893 Stage 7、8、9，约 11–14 岁，对应 G6、G7、G8）到 IGCSE Physics 0625（14–16 岁，约 G9–G10）全部六大板块。2026-2028 大纲（version 2, 2025-12）与 2029 大纲（version 1, 2026-09）主题编号相同，2029 版注明 \"no significant changes which affect teaching\"。1.1 与 MATH-PRE-UNIT/DEC/AVG/PYTH、ENG-PRE-CMD 沿用旧文件的 id、name、desc、level、prereqs、hot，保证旧诊断结果可对应；1.1-06~12 为学校补充（school）内容（游标卡尺、螺旋测微器、误差分析不在 0625 大纲 1.1 学习目标中）。较小的子主题合并为一个知识点，syllabus 字段用 / 列出覆盖的多个小节（如 1.7.2/1.7.4）；level=supp 表示该点主要属于 Supplement（Extended）内容，core 点 desc 中标「（补充）」的部分属于 Supplement。prereqs 中 strength 取 必须 / 有帮助。",
+  "verified": "2026-10-06"
  },
  "strands": [
   {
@@ -343,12 +345,12 @@
   {
    "id": "SCI-PRE-ENERGY",
    "strand": "BASE",
-   "stage": "G7",
+   "stage": "G6",
    "syllabus": "",
    "level": "pre",
    "name": "能量储存与转移",
    "name_en": "Energy stores and transfers",
-   "desc": "动能、重力势能、化学能、弹性势能、热能等储存方式，能量守恒",
+   "desc": "能量在事件或过程中的变化（储存与转移）；能量会耗散而变得不那么有用（Stage 7）；能量守恒，不能被创造或消灭（Stage 9）",
    "prereqs": [],
    "hot": false,
    "terms": [
@@ -372,7 +374,7 @@
    "level": "pre",
    "name": "简单电路",
    "name_en": "Simple circuits",
-   "desc": "电路符号、串并联、电流表和电压表的基本接法",
+   "desc": "电是电子在电路中流动的简单模型，导体允许电子流动、绝缘体阻碍电子流动；用电流表测串联电路电流，增加电池/灯对电流的影响；用规范符号画含电池、开关、灯、蜂鸣器、电流表的电路（Stage 7）；并联电路电流分流，测串并联电路的电流和电压（Stage 9）",
    "prereqs": [],
    "hot": false,
    "terms": [
@@ -396,7 +398,7 @@
    "level": "pre",
    "name": "力的基础",
    "name_en": "Forces basics",
-   "desc": "力的种类、单位牛顿、力的示意图、平衡力",
+   "desc": "力的种类、单位牛顿、力的示意图；引力是任意两物体间的吸引力，质量越大引力越大，真空中没有空气阻力（Stage 7）；平衡力与非平衡力对运动的影响（Stage 8）",
    "prereqs": [],
    "hot": false,
    "terms": [
@@ -415,12 +417,12 @@
   {
    "id": "SCI-PRE-LIGHT",
    "strand": "BASE",
-   "stage": "G8",
+   "stage": "G7",
    "syllabus": "",
    "level": "pre",
    "name": "光的直线传播与反射",
    "name_en": "Light travels in straight lines; reflection",
-   "desc": "光沿直线传播，平面镜反射，入射角等于反射角",
+   "desc": "光沿直线传播；平面镜反射，入射角等于反射角（Stage 8）",
    "prereqs": [],
    "hot": false,
    "terms": [
@@ -923,9 +925,9 @@
    "stage": "IGCSE",
    "syllabus": "1.2",
    "level": "core",
-   "name": "速度-时间图与加速度",
-   "name_en": "Speed–time graphs and acceleration",
-   "desc": "v-t 图斜率 = 加速度；水平线 = 匀速；a = Δv/Δt",
+   "name": "速度-时间图、图下面积与加速度",
+   "name_en": "Speed–time graphs, area under the graph and acceleration",
+   "desc": "v-t 图：水平线 = 匀速，斜线 = 加速/减速（定性判断）；图下面积 = 路程（限匀速或匀加速，核心要求 1.2.7）；a = Δv/Δt 的定义、用 v-t 图斜率求加速度、区分恒定与变化的加速度（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-1.2-02",
@@ -954,9 +956,9 @@
    "stage": "IGCSE",
    "syllabus": "1.2",
    "level": "supp",
-   "name": "v-t 图面积、减速、自由落体与终极速度",
-   "name_en": "Area under v–t graph, deceleration, free fall and terminal velocity",
-   "desc": "v-t 图下面积 = 路程；负加速度 = 减速；g ≈ 9.8 m/s²；阻力增大到等于重力时达到终极速度",
+   "name": "减速、自由落体与终极速度",
+   "name_en": "Deceleration, free fall and terminal velocity",
+   "desc": "减速 = 负加速度，并用于计算；地面附近自由落体加速度 g 近似恒定 ≈ 9.8 m/s²（此条为核心要求 1.2.8）；在均匀重力场中有/无空气或液体阻力时物体的下落运动，阻力增大到等于重力时达到终极速度",
    "prereqs": [
     {
      "id": "PHY-IG-1.2-03",
@@ -988,7 +990,7 @@
    "level": "core",
    "name": "质量、重量与重力场强度",
    "name_en": "Mass, weight and gravitational field strength",
-   "desc": "质量是物体所含物质的量（kg）；重量是重力（N）；W = mg，g = 9.8 N/kg",
+   "desc": "质量是静止物体所含物质多少的量度（kg）；重量是作用在有质量物体上的重力（N）；重力场强度 g = W/m（力/单位质量），地面附近 g ≈ 9.8 N/kg，与自由落体加速度等价；用天平比较重量（质量）；重量是重力场对质量的作用（补充）",
    "prereqs": [
     {
      "id": "MATH-PRE-REARR",
@@ -1024,7 +1026,7 @@
    "level": "core",
    "name": "密度的计算与测量",
    "name_en": "Density: calculation, measurement and floating",
-   "desc": "ρ = m/V；用天平和量筒/排水法测密度；密度小于液体的物体漂浮",
+   "desc": "ρ = m/V；测液体、规则固体、不规则下沉固体（排水法）的密度；根据密度判断物体是否漂浮；根据密度判断互不相溶的两种液体哪层在上（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-1.1-03",
@@ -1057,10 +1059,10 @@
    "strand": "S1",
    "stage": "IGCSE",
    "syllabus": "1.5.1",
-   "level": "supp",
+   "level": "core",
    "name": "形变、弹簧与胡克定律",
    "name_en": "Load–extension graphs and Hooke's law",
-   "desc": "力可以改变物体形状；伸长量 = 现长 − 原长；比例极限内 F = kx",
+   "desc": "力可以改变物体的大小和形状；画、描、读弹性固体的载荷-伸长图并描述实验步骤；伸长量 = 现长 − 原长；弹簧常数 k = F/x 与比例极限（补充，不要求弹性极限）",
    "prereqs": [
     {
      "id": "SCI-PRE-FORCE",
@@ -1283,7 +1285,7 @@
    "level": "core",
    "name": "能量储存、转移与守恒",
    "name_en": "Energy stores, transfers and conservation",
-   "desc": "能量有多种储存形式，通过力、电流、加热、波来转移，总量守恒",
+   "desc": "能量可储存为动能、重力势能、化学能、弹性（应变）势能、核能、静电能和内能（热能）；通过力（机械功）、电流（电功）、加热、电磁波/声波等波在储存方式间转移；能量守恒并会读简单能流图；多阶段问题与 Sankey 图（补充）",
    "prereqs": [
     {
      "id": "SCI-PRE-ENERGY",
@@ -1384,7 +1386,7 @@
    "level": "core",
    "name": "能源",
    "name_en": "Energy resources",
-   "desc": "化石燃料、核能、风能、水能、潮汐、地热、太阳能、生物燃料的原理与优缺点；太阳是大多数能源的来源",
+   "desc": "化石燃料、生物燃料、水能（波浪、潮汐、水电站）、地热、核燃料、太阳能电池（光）、太阳能热水板（红外）和风能如何获得有用能量或发电（涉及锅炉、涡轮机、发电机）；按可再生性、可获得性、可靠性、规模、环境影响比较优缺点；除地热、核能、潮汐外能源最终来自太阳辐射，太阳靠核聚变释放能量，核聚变发电仍在研究（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-1.7.1-01",
@@ -1413,7 +1415,7 @@
    "level": "core",
    "name": "效率",
    "name_en": "Efficiency",
-   "desc": "效率 = 有用输出 ÷ 总输入 × 100%（能量或功率）",
+   "desc": "定性理解能量转移的效率（核心）；效率 = 有用能量输出 ÷ 总能量输入 (×100%) 或 有用功率输出 ÷ 总功率输入 (×100%) 的定义与计算（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-1.7.1-01",
@@ -1662,7 +1664,7 @@
    "level": "core",
    "name": "熔化、沸腾与蒸发",
    "name_en": "Melting, boiling and evaporation",
-   "desc": "熔化/沸腾时吸热但温度不变；蒸发发生在表面，使液体冷却；影响蒸发的因素",
+   "desc": "熔化/沸腾时吸热但温度不变；标准大气压下水的熔点 0 °C、沸点 100 °C；凝结与凝固的粒子解释；蒸发是高能粒子从液面逸出，使液体冷却；沸腾与蒸发的区别、温度/表面积/空气流动对蒸发的影响、与蒸发液体接触的物体变冷（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-2.1.2-01",
@@ -1690,7 +1692,7 @@
    "level": "core",
    "name": "热传导",
    "name_en": "Conduction",
-   "desc": "固体中通过粒子振动（和金属中自由电子）传热；金属是良导体，气体液体是不良导体",
+   "desc": "实验区分热的良导体与不良导体（核心）；所有固体中通过原子/分子晶格振动传热、金属中还通过自由（离域）电子运动传热，气体和多数液体导热差的粒子解释，许多固体导热比绝热体好（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-2.1.2-01",
@@ -1816,7 +1818,7 @@
    "level": "core",
    "name": "横波与纵波",
    "name_en": "Transverse and longitudinal waves",
-   "desc": "横波振动方向垂直于传播方向（电磁波、水波）；纵波平行（声波），有疏部和密部",
+   "desc": "横波振动方向垂直于传播方向（电磁波、水波、地震 S 波）；纵波振动方向平行于传播方向（声波、地震 P 波）；声波的疏部与密部见 3.4（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-3.1-01",
@@ -1939,7 +1941,7 @@
    "level": "core",
    "name": "临界角、全反射与光纤",
    "name_en": "Critical angle, total internal reflection and optical fibres",
-   "desc": "光从密介质射向疏介质，入射角大于临界角时发生全反射；n = 1/sin c；光纤通信、内窥镜",
+   "desc": "光从光密介质射向光疏介质，入射角大于临界角时发生全反射，会举内反射和全反射的例子（核心）；n = 1/sin c 与光纤在通信中的应用（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-3.2.2-01",
@@ -1994,7 +1996,7 @@
    "level": "core",
    "name": "色散与电磁波谱",
    "name_en": "Dispersion and the electromagnetic spectrum",
-   "desc": "白光经棱镜色散为七色；电磁波谱顺序、在真空中速度相同（3.0×10⁸ m/s）、各波段用途与危害",
+   "desc": "白光经玻璃三棱镜色散为按频率/波长排列的七种色光，单色光的含义（补充）；电磁波谱各波段按频率和波长排序，在真空中速度相同（3.0×10⁸ m/s，数值为补充）；各波段用途（无线电、微波、红外、可见光、紫外、X 射线、γ 射线）与危害；低轨与地球同步卫星用微波通信",
    "prereqs": [
     {
      "id": "PHY-IG-3.1-02",
@@ -2064,7 +2066,7 @@
    "level": "core",
    "name": "声音",
    "name_en": "Sound",
-   "desc": "声由振动产生，是纵波，需要介质；人耳范围 20 Hz–20 kHz；振幅定响度、频率定音调；回声；在空气中约 330–350 m/s；超声波（>20 kHz）用于探伤、医学成像、声呐（补充）",
+   "desc": "声由振动产生，是纵波，需要介质；人耳范围 20 Hz–20 000 Hz；空气中声速约 330–350 m/s，会用距离和时间测声速；振幅定响度、频率定音调；回声是声波的反射；超声波频率 > 20 kHz（核心）；疏部与密部、声速 固体 > 液体 > 气体、超声波用于无损探伤、医学软组织成像、声呐测距（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-3.1-02",
@@ -2097,7 +2099,7 @@
    "level": "core",
    "name": "磁现象与磁场",
    "name_en": "Magnets and magnetic fields",
-   "desc": "同极相斥异极相吸；感应磁化；软铁（临时磁体）与钢（永磁体）；磁感线从 N 到 S，越密越强",
+   "desc": "同极相斥异极相吸；感应磁化；软铁（临时磁体）与钢（永磁体），磁性与非磁性材料；磁场是磁极受力的区域，某点磁场方向是 N 极在该点的受力方向；条形磁铁磁感线从 N 到 S，用指南针/铁屑描绘；永磁体与电磁铁的用途；磁力源于磁场相互作用、磁感线越密磁场越强（补充）",
    "prereqs": [
     {
      "id": "SCI-PRE-FORCE",
@@ -2126,7 +2128,7 @@
    "level": "core",
    "name": "电荷、电流与电压",
    "name_en": "Charge, current, e.m.f. and potential difference",
-   "desc": "摩擦起电是电子转移；电流是电荷流动 I = Q/t；电动势与电势差是单位电荷做的功（V = W/Q）",
+   "desc": "正负电荷，同种相斥异种相吸；摩擦起电只转移电子；用电子模型区分导体与绝缘体；电流与电荷流动有关，金属导电靠自由电子，直流与交流的区别，电流表/电压表的使用；电动势 = 电源把单位电荷绕整个回路移动所做的电功，电势差 = 单位电荷通过元件所做的功，单位都是 V（核心）；电荷单位 C、I = Q/t、常规电流从正到负而电子从负到正、E = W/Q、V = W/Q（补充）",
    "prereqs": [
     {
      "id": "SCI-PRE-CIRC",
@@ -2159,7 +2161,7 @@
    "level": "core",
    "name": "电阻与 I-V 特性",
    "name_en": "Resistance and I–V characteristics",
-   "desc": "R = V/I；电阻与长度成正比、与横截面积成反比；定值电阻、灯丝、二极管的 I-V 图",
+   "desc": "R = V/I，用电压表和电流表测电阻；定性：金属丝电阻随长度增大、随横截面积增大而减小（核心）；电阻与长度成正比、与横截面积成反比的计算，定值电阻、灯丝、二极管的 I-V 图（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-4.2.2-01",
@@ -2230,7 +2232,7 @@
    "level": "core",
    "name": "电路符号与元件",
    "name_en": "Circuit symbols and components",
-   "desc": "电池、开关、电阻、变阻器、热敏电阻、光敏电阻、灯、保险丝、继电器、二极管/LED 等的符号和作用",
+   "desc": "电池、电源、发电机、分压器、开关、定值/可变电阻、加热器、热敏电阻（仅 NTC）、光敏电阻、灯、电动机、电铃、电表、线圈、变压器、保险丝、继电器的电路符号和作用（核心）；二极管和 LED（补充）",
    "prereqs": [
     {
      "id": "SCI-PRE-CIRC",
@@ -2258,7 +2260,7 @@
    "level": "core",
    "name": "串联与并联电路",
    "name_en": "Series and parallel circuits",
-   "desc": "串联电流处处相等、电压相加、电阻相加；并联各支路电压相等、电流相加、总电阻小于最小支路电阻",
+   "desc": "串联电流处处相等、电动势相加、电阻相加；并联干路电流大于各支路电流，两电阻并联总电阻小于任一电阻；照明电路灯并联的好处（核心）；节点电流和守恒、串联各分压之和等于总电压、并联各支路电压相等的计算，两电阻并联总电阻的计算（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-4.2.4-01",
@@ -2290,7 +2292,7 @@
    "level": "supp",
    "name": "分压器",
    "name_en": "Potential dividers",
-   "desc": "两个串联电阻按电阻比分电压 V₁/V₂ = R₁/R₂；与热敏/光敏电阻组成传感电路",
+   "desc": "电流一定时导体电阻越大其两端电压越大（核心）；可变分压器的作用，两电阻分压 R₁/R₂ = V₁/V₂，与热敏/光敏电阻组成传感电路（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-4.3.2-01",
@@ -2358,7 +2360,7 @@
    "level": "core",
    "name": "电磁感应与交流发电机",
    "name_en": "Electromagnetic induction and the a.c. generator",
-   "desc": "导体切割磁感线或磁场变化产生感应电动势；增大速度、磁场强度、匝数可增大；楞次定律（补充）；交流发电机的滑环与电刷",
+   "desc": "导体切割磁感线或磁场变化可产生感应电动势，演示实验及影响大小的因素（核心）；感应电动势方向阻碍引起它的变化，力、磁场、感应电流的相对方向（补充）；简单交流发电机（转动线圈或转动磁铁）及滑环、电刷（核心）；电动势-时间图并与线圈位置对应（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-4.1-01",
@@ -2421,7 +2423,7 @@
    "level": "core",
    "name": "电动机效应与直流电动机",
    "name_en": "The motor effect and the d.c. motor",
-   "desc": "磁场中通电导线受力；左手定则判断方向；直流电动机中换向器每半圈改变电流方向",
+   "desc": "实验显示磁场中通电导体受力，电流或磁场反向时力反向（核心）；力、磁场、电流的相对方向（左手定则）（补充）；通电线圈在磁场中受转动效应，匝数、电流、磁场越大越强（核心）；直流电动机中换向器和电刷的作用（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-4.5.3-01",
@@ -2448,7 +2450,7 @@
    "level": "core",
    "name": "变压器与远距离输电",
    "name_en": "The transformer and power transmission",
-   "desc": "Vp/Vs = Np/Ns；升压/降压变压器；高压输电减小电流和热损失 P = I²R（补充）",
+   "desc": "软铁芯变压器的结构，初级/次级、升压/降压；Vp/Vs = Np/Ns；变压器用于高压输电及高压输电的优点（核心）；变压器工作原理，100% 效率时 IpVp = IsVs，用 P = I²R 解释电压越高输电线损耗越小（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-4.5.1-01",
@@ -2485,7 +2487,7 @@
    "level": "core",
    "name": "原子结构与 α 粒子散射",
    "name_en": "The atom and alpha-particle scattering",
-   "desc": "原子由带正电的原子核和绕核运动的电子组成；离子；α 散射实验说明原子大部分是空的、核小而重且带正电",
+   "desc": "原子由带正电的原子核和绕核运动的带负电电子组成；失去电子成正离子，得到电子成负离子（核心）；α 粒子穿过薄金属片的散射支持核式模型：原子大部分是空的，核很小、集中了大部分质量且带正电（补充）",
    "prereqs": [
     {
      "id": "SCI-PRE-PART",
@@ -2570,7 +2572,7 @@
    "level": "core",
    "name": "本底辐射与探测",
    "name_en": "Background radiation and detection",
-   "desc": "本底辐射来源（氡气、岩石、建筑、食物、宇宙射线）；盖革计数器测计数率；修正计数率 = 读数 − 本底",
+   "desc": "本底辐射及其主要来源（空气中的氡气、岩石和建筑、食物和饮料、宇宙射线）；电离辐射用探测器加计数器测量，计数率单位 counts/s 或 counts/min（核心）；用本底测量求修正计数率 = 读数 − 本底（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-5.1.2-01",
@@ -2631,7 +2633,7 @@
    "level": "supp",
    "name": "放射性衰变与衰变方程",
    "name_en": "Radioactive decay and decay equations",
-   "desc": "衰变是自发、随机的；α 衰变 A−4、Z−2；β 衰变中子变质子，Z+1；γ 不改变 A、Z",
+   "desc": "放射性衰变是不稳定原子核的变化，放出 α、β 粒子和/或 γ 射线，α 或 β 衰变后变成另一种元素（核心）；中子过多或核太重导致放射性，衰变使核更稳定；α 衰变 A−4、Z−2；β 衰变中子 → 质子 + 电子，Z+1；γ 不改变 A、Z；用核素符号写衰变方程（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-5.2.2-01",
@@ -2693,7 +2695,7 @@
    "level": "core",
    "name": "地球自转、公转与月相",
    "name_en": "The Earth, seasons and the Moon",
-   "desc": "地球自转约 24 h 造成昼夜；公转约 365 天加地轴倾斜造成季节；月球绕地球约 1 个月，月相变化",
+   "desc": "地球绕倾斜的地轴约 24 h 自转一周，解释太阳的视日运动和昼夜交替；约 365 天绕太阳公转一周，解释季节的周期性；月球约一个月绕地球一周，解释月相周期（核心）；平均轨道速度 v = 2πr/T（补充）",
    "prereqs": [
     {
      "id": "SCI-PRE-LIGHT",
@@ -2720,7 +2722,7 @@
    "level": "core",
    "name": "太阳系与引力",
    "name_en": "The Solar System and gravity",
-   "desc": "八大行星顺序；内行星岩质小、外行星气态大（吸积模型）；太阳引力使行星绕行，离太阳越远引力和轨道速度越小；v = 2πr/T、光传播时间（补充）",
+   "desc": "太阳系包括太阳、八大行星（按顺序）、小行星/矮行星、卫星、彗星等；内四颗行星岩质小、外四颗气态大（吸积模型）；行星表面引力场强度取决于行星质量，离行星越远越弱；太阳拥有太阳系绝大部分质量，其引力使行星绕其运行；计算光在太阳系中传播较远距离所需的时间（核心）；离太阳越远太阳引力场越弱、行星轨道速度越小（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-6.1.1-01",
@@ -2757,7 +2759,7 @@
    "level": "core",
    "name": "太阳与恒星的一生",
    "name_en": "The Sun as a star and the life cycle of stars",
-   "desc": "太阳是中等大小恒星，主要由氢和氦组成，靠核聚变发光；光年；恒星演化（补充）",
+   "desc": "太阳是中等大小恒星，主要由氢和氦组成，主要以红外、可见光、紫外辐射能量；恒星由核聚变（稳定恒星中氢聚变为氦）提供能量（补充）；星系含数十亿颗恒星，太阳在银河系中，其他恒星远得多，天文距离用光年（光在真空中一年传播的距离，1 ly = 9.5×10¹⁵ m 为补充）；恒星演化：星云 → 原恒星 → 稳定恒星 → 红巨星/红超巨星 → 行星状星云+白矮星 或 超新星 → 中子星/黑洞（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-6.1.2-01",
@@ -2790,7 +2792,7 @@
    "level": "core",
    "name": "宇宙、红移与大爆炸",
    "name_en": "The Universe, redshift and the Big Bang",
-   "desc": "银河系是数十亿星系之一；遥远星系光谱红移说明宇宙在膨胀；宇宙微波背景辐射；H₀ = v/d，宇宙年龄约 1/H₀（补充）",
+   "desc": "银河系是构成宇宙的数十亿星系之一，直径约 100 000 光年；红移是远离的恒星和星系发出的电磁辐射观测波长变长；遥远星系光的红移说明宇宙在膨胀，支持大爆炸理论（核心）；宇宙微波背景辐射（CMBR）；由红移求退行速度、用超新星亮度求距离；H₀ = v/d，目前估计 H₀ ≈ 2.2×10⁻¹⁸ s⁻¹，宇宙年龄 ≈ d/v = 1/H₀（补充）",
    "prereqs": [
     {
      "id": "PHY-IG-6.2.1-01",
@@ -2816,6 +2818,496 @@
    ],
    "method": "背 redshift = observed wavelength is longer than emitted wavelength because the source moves away。两大证据：redshift（越远越红移越大）和 CMBR。补充：H₀ = v/d，1/H₀ 估算宇宙年龄。",
    "probe": "解释星系红移如何支持大爆炸理论；给 H₀ 估算宇宙年龄。"
+  },
+  {
+   "id": "SCI-PRE-SOUND",
+   "strand": "BASE",
+   "stage": "G6",
+   "syllabus": "",
+   "level": "pre",
+   "name": "声音的产生与传播、回声",
+   "name_en": "Sound: vibration, no sound in a vacuum, echoes",
+   "desc": "声由振动产生，声波中粒子来回振动传递；声音不能在真空中传播；回声是声波的反射",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-PART",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "vibration",
+    "particles",
+    "vacuum",
+    "medium",
+    "echo",
+    "reflection"
+   ],
+   "method": "用“粒子推粒子”画声波；真空罩闹钟实验记结论。常见错误：说声音在真空中传得更快。",
+   "probe": "问：为什么宇航员在太空中不能直接对话？回声是怎样产生的？",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：7Ps.01、7Ps.02"
+  },
+  {
+   "id": "SCI-PRE-WAVEFORM",
+   "strand": "BASE",
+   "stage": "G8",
+   "syllabus": "",
+   "level": "pre",
+   "name": "波形图：响度、音调与叠加",
+   "name_en": "Waveforms: loudness, pitch and superposition",
+   "desc": "会画和读波形图：振幅越大响度越大，频率越高音调越高；两列声波可以相互加强或相互抵消",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-SOUND",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "waveform",
+    "amplitude",
+    "frequency",
+    "loudness",
+    "pitch",
+    "reinforce",
+    "cancel"
+   ],
+   "method": "对比两张示波器波形：先看高度（响度）再看疏密（音调）。",
+   "probe": "给两张波形图，问哪个更响、哪个音调更高；两列波反相叠加会怎样？",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：9Ps.01、9Ps.02"
+  },
+  {
+   "id": "SCI-PRE-SPEED",
+   "strand": "BASE",
+   "stage": "G7",
+   "syllabus": "",
+   "level": "pre",
+   "name": "速度计算与路程-时间图（初中）",
+   "name_en": "Speed and simple distance–time graphs",
+   "desc": "速度 = 路程 ÷ 时间；画和解读简单的路程-时间图",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "有帮助"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "speed",
+    "distance",
+    "time",
+    "distance-time graph",
+    "m/s"
+   ],
+   "method": "三角形记 s = v t；图线越陡速度越大，水平线表示静止。",
+   "probe": "小明 5 s 走 20 m，求速度；在 d-t 图上指出静止段。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8Pf.01、8Pf.02"
+  },
+  {
+   "id": "SCI-PRE-MOMENT",
+   "strand": "BASE",
+   "stage": "G7",
+   "syllabus": "",
+   "level": "pre",
+   "name": "力矩（初中）",
+   "name_en": "Turning forces (moments)",
+   "desc": "识别并计算转动效应：力矩 = 力 × 距离",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-FORCE",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "moment",
+    "turning force",
+    "pivot",
+    "distance",
+    "balance"
+   ],
+   "method": "跷跷板实验：轻的人坐远一点也能平衡。",
+   "probe": "2 N 的力作用在离支点 0.5 m 处，力矩是多少？",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8Pf.04"
+  },
+  {
+   "id": "SCI-PRE-PRESS",
+   "strand": "BASE",
+   "stage": "G7",
+   "syllabus": "",
+   "level": "pre",
+   "name": "压强与扩散（初中）",
+   "name_en": "Pressure and diffusion",
+   "desc": "压强由物质施加在一定面积上的力产生：压强 = 力 ÷ 面积；用粒子理论定性解释气体和液体压强；扩散是粒子运动使物质相互混合",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-FORCE",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-PART",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "pressure",
+    "force",
+    "area",
+    "particle",
+    "gas pressure",
+    "diffusion"
+   ],
+   "method": "钉板/雪鞋例子理解“面积大压强小”；气体压强 = 粒子撞墙。",
+   "probe": "为什么雪地鞋不容易陷下去？香水味为什么能传满房间？",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8Pf.05、8Pf.06、8Pf.07"
+  },
+  {
+   "id": "SCI-PRE-COLOUR",
+   "strand": "BASE",
+   "stage": "G7",
+   "syllabus": "",
+   "level": "pre",
+   "name": "折射、色散与色光",
+   "name_en": "Refraction, dispersion and colour",
+   "desc": "光在空气与玻璃/水的界面因速度改变而折射；白光由多种色光组成，可用三棱镜色散；色光的相加、相减（滤光）、吸收和反射",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-LIGHT",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "refraction",
+    "speed of light",
+    "prism",
+    "dispersion",
+    "spectrum",
+    "filter",
+    "absorb",
+    "reflect"
+   ],
+   "method": "画光从空气进玻璃：变慢、靠近法线。红色物体只反射红光。",
+   "probe": "红光照在绿色叶子上，叶子看起来是什么颜色？为什么？",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8Ps.02、8Ps.03、8Ps.04"
+  },
+  {
+   "id": "SCI-PRE-MAG",
+   "strand": "BASE",
+   "stage": "G7",
+   "syllabus": "",
+   "level": "pre",
+   "name": "磁场与电磁铁（初中）",
+   "name_en": "Magnetic fields and electromagnets",
+   "desc": "磁体周围存在磁场，对其他磁场施力；地球有磁场是因为地核像一个磁体；如何制作电磁铁、电磁铁的应用；探究影响电磁铁磁性强弱的因素（匝数、电流、铁芯）",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-CIRC",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "magnetic field",
+    "magnet",
+    "electromagnet",
+    "coil",
+    "current",
+    "iron core",
+    "Earth's magnetic field"
+   ],
+   "method": "控制变量：一次只改匝数或电流，数吸起的回形针。",
+   "probe": "怎样让电磁铁吸起更多回形针？说出两种方法。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8Pe.01、8Pe.02、8Pe.03、8ESp.01"
+  },
+  {
+   "id": "SCI-PRE-RESOURCES",
+   "strand": "BASE",
+   "stage": "G7",
+   "syllabus": "",
+   "level": "pre",
+   "name": "可再生与不可再生资源（初中）",
+   "name_en": "Renewable and non-renewable resources",
+   "desc": "识别可再生资源（风能、潮汐能、太阳能、生物塑料）与不可再生资源（化石燃料）及人类如何利用",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-ENERGY",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "renewable",
+    "non-renewable",
+    "fossil fuels",
+    "wind",
+    "tidal",
+    "solar"
+   ],
+   "method": "按“会不会用完”分类。",
+   "probe": "把煤、风能、太阳能、石油分成两类并说明理由。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8ESp.02"
+  },
+  {
+   "id": "SCI-PRE-DENS",
+   "strand": "BASE",
+   "stage": "G8",
+   "syllabus": "",
+   "level": "pre",
+   "name": "密度与浮沉（初中）",
+   "name_en": "Density, floating and sinking",
+   "desc": "用密度解释物体在水中为什么浮或沉：密度比水小的上浮，比水大的下沉",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-PART",
+     "strength": "有帮助"
+    },
+    {
+     "id": "MATH-PRE-UNIT",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "density",
+    "float",
+    "sink",
+    "water",
+    "mass",
+    "volume"
+   ],
+   "method": "和水比较密度：小浮大沉。",
+   "probe": "一块木头和一块同样大小的铁放进水里，为什么一浮一沉？",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：9Pf.01"
+  },
+  {
+   "id": "SCI-PRE-THERM",
+   "strand": "BASE",
+   "stage": "G8",
+   "syllabus": "",
+   "level": "pre",
+   "name": "热与温度、热传递（初中）",
+   "name_en": "Heat, temperature and thermal transfer",
+   "desc": "区分热量与温度；热能总是从较热的物体/区域转移到较冷的（热耗散）；传导、对流、辐射三种热传递；蒸发致冷",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-PART",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-ENERGY",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "heat",
+    "temperature",
+    "conduction",
+    "convection",
+    "radiation",
+    "evaporation",
+    "cooling",
+    "dissipation"
+   ],
+   "method": "温度是“多热”，热量是“传了多少能量”；三种方式各配一个生活例子。",
+   "probe": "一杯热水和一桶温水，哪个温度高？哪个含的内能可能更多？",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：9Pf.02、9Pf.04、9Pf.05、9Pf.06"
+  },
+  {
+   "id": "SCI-PRE-RES",
+   "strand": "BASE",
+   "stage": "G8",
+   "syllabus": "",
+   "level": "pre",
+   "name": "电阻 R = V/I（初中）",
+   "name_en": "Resistance (resistance = voltage / current)",
+   "desc": "计算电阻：电阻 = 电压 ÷ 电流，描述电阻如何影响电流；用规范符号画含定值/可变电阻、电流表、电压表、灯、蜂鸣器的电路",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-CIRC",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "resistance",
+    "voltage",
+    "current",
+    "ohm",
+    "variable resistor",
+    "voltmeter"
+   ],
+   "method": "电阻越大，同样电压下电流越小。",
+   "probe": "6 V 电压使 0.5 A 电流通过灯，灯的电阻是多少？",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：9Pe.03、9Pe.04"
+  },
+  {
+   "id": "SCI-PRE-SOLAR",
+   "strand": "BASE",
+   "stage": "G6",
+   "syllabus": "",
+   "level": "pre",
+   "name": "太阳系的形成、引力、潮汐与日月食",
+   "name_en": "Solar System formation, gravity, tides and eclipses",
+   "desc": "行星由尘埃和气体在引力作用下聚集形成；引力使太阳系各天体绕太阳运行；潮汐是地球、月球、太阳间引力作用的结果；日食和月食的成因",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-FORCE",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "planet",
+    "dust",
+    "gas",
+    "gravity",
+    "orbit",
+    "tide",
+    "solar eclipse",
+    "lunar eclipse"
+   ],
+   "method": "画日-地-月三球直线排列图：月在中间是日食，地在中间是月食。",
+   "probe": "画图说明为什么月食只发生在满月时。",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：7ESs.01–7ESs.04"
+  },
+  {
+   "id": "SCI-PRE-GALAXY",
+   "strand": "BASE",
+   "stage": "G8",
+   "syllabus": "",
+   "level": "pre",
+   "name": "星系、小行星与星云（初中）",
+   "name_en": "Galaxies, asteroids and nebulae",
+   "desc": "星系由星际尘埃和气体、恒星及行星系统组成；小行星是比行星小的岩石，由行星系统形成时剩下的岩石构成；小行星撞地球的后果（气候变化、大灭绝）；月球形成的碰撞说证据；星云是尘埃和气体云，是恒星的诞生地",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-SOLAR",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "galaxy",
+    "asteroid",
+    "nebula",
+    "stellar nursery",
+    "collision theory",
+    "mass extinction"
+   ],
+   "method": "按尺度从小到大排：小行星 < 行星 < 恒星系 < 星系。",
+   "probe": "星云和星系有什么区别？",
+   "source": "Cambridge Lower Secondary Science Curriculum Framework 0893 (Version 1, published Sept 2020, first teaching Sept 2021)；官方全文在 Cambridge 教师支持站（需登录），本次读取的是学校公开镜像 https://sktjosef.com/s/Science-Curriculum-Framework-0893_tcm143-595685.pdf（佐证级）：8ESs.01、8ESs.02、9ESs.01–9ESs.03"
+  },
+  {
+   "id": "PHY-IG-4.2.1-02",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "syllabus": "4.2.1",
+   "level": "supp",
+   "name": "电场",
+   "name_en": "Electric fields",
+   "desc": "电荷单位是库仑；电场是电荷受力的区域，某点电场方向是正电荷在该点的受力方向；画点电荷、带电导体球周围和两块带异种电荷平行板之间的电场线（不考边缘效应）",
+   "prereqs": [
+    {
+     "id": "PHY-IG-4.2.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-4.1-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "electric field",
+    "coulomb",
+    "point charge",
+    "field lines",
+    "parallel plates",
+    "positive charge"
+   ],
+   "method": "类比磁场：磁场方向看 N 极受力，电场方向看正电荷受力；正电荷向外发散、负电荷向内汇聚。",
+   "probe": "画两块平行带电板之间的电场线并标出方向；电子放进去会往哪边动？",
+   "source": "https://www.cambridgeinternational.org/Images/697209-2026-2028-syllabus.pdf 第 4.2.1 Supplement 7–10 节（2029 版 https://www.cambridgeinternational.org/Images/764332-2029-syllabus.pdf 同编号同内容）"
+  },
+  {
+   "id": "PHY-IG-4.5.4-02",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "syllabus": "4.5.4",
+   "level": "supp",
+   "name": "磁场中带电粒子束受力",
+   "name_en": "Force on beams of charged particles in a magnetic field",
+   "desc": "确定带电粒子束在磁场中的受力方向：用左手定则时电流方向取正电荷运动方向，电子束要取运动的反方向",
+   "prereqs": [
+    {
+     "id": "PHY-IG-4.5.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-4.2.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "charged particles",
+    "beam",
+    "electron beam",
+    "magnetic field",
+    "Fleming's left-hand rule",
+    "deflection"
+   ],
+   "method": "电子带负电：先把电流方向画成和电子运动相反，再用左手定则。",
+   "probe": "一束电子向右射入垂直纸面向里的磁场，向哪边偏？",
+   "source": "https://www.cambridgeinternational.org/Images/697209-2026-2028-syllabus.pdf 第 4.5.4 Supplement 3 节（2029 版 https://www.cambridgeinternational.org/Images/764332-2029-syllabus.pdf 同编号同内容）"
+  },
+  {
+   "id": "PHY-IG-6.1.2-02",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "syllabus": "6.1.2",
+   "level": "supp",
+   "name": "椭圆轨道与行星数据分析",
+   "name_en": "Elliptical orbits and planetary data",
+   "desc": "行星、小行星和彗星的轨道是椭圆，太阳不在中心（圆轨道除外）；分析行星轨道距离、周期、密度、表面温度、表面重力场强度等数据；椭圆轨道上离太阳越近运行越快，用能量守恒解释",
+   "prereqs": [
+    {
+     "id": "PHY-IG-6.1.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.7.1-02",
+     "strength": "有帮助"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "elliptical orbit",
+    "comet",
+    "orbital period",
+    "orbital distance",
+    "conservation of energy",
+    "planetary data"
+   ],
+   "method": "彗星近日点快、远日点慢：靠近太阳时重力势能转化为动能。",
+   "probe": "给出彗星椭圆轨道图，问在哪一点速度最大并解释。",
+   "source": "https://www.cambridgeinternational.org/Images/697209-2026-2028-syllabus.pdf 第 6.1.2 Supplement 7、8、10 节（2029 版 https://www.cambridgeinternational.org/Images/764332-2029-syllabus.pdf 同编号同内容）"
   }
  ]
 }
