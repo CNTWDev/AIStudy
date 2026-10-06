@@ -1,0 +1,2046 @@
+{
+ "sources": [
+  {
+   "url": "https://www.cambridgeinternational.org/Images/662466-2025-2027-syllabus.pdf",
+   "what": "Cambridge IGCSE Mathematics 0580 syllabus 2025-2027（逐节读取 C1.1–C9.5、E1.1–E9.7 学习目标与注释、Assessment overview、List of formulas）",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/745681-2028-2030-syllabus.pdf",
+   "what": "Cambridge IGCSE Mathematics 0580 syllabus 2028-2030 version 2（2026-08）：节号列表、Assessment overview、Changes to this syllabus（no significant changes）",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/763300-2028-2030-syllabus-update.pdf",
+   "what": "0580 2028-2030 syllabus update：仅 Assessment overview 更新",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/709706-2025-2027-syllabus-update.pdf",
+   "what": "0580 2025-2027 syllabus update：v2 澄清 prism 定义（C5.4/E5.4）、E2.11 倒数与指数图像要求、C8.2.2/E8.2.2 加入 random",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/jp/Images/757622-cambridge-igcse-subject-mathematics-0580.pdf",
+   "what": "0580 学科简介（基于 2028-2030 版）：9 大主题、Core/Extended 关系、130 学时",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/745683-2028-2030-syllabus.pdf",
+   "what": "Cambridge IGCSE Additional Mathematics 0606 syllabus 2028-2030 version 1：14 个主题全部学习目标、Assessment overview",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/662470-2025-2027-syllabus.pdf",
+   "what": "0606 syllabus 2025-2027：14 个主题标题与试卷结构（核对一致）",
+   "level": "官方"
+  },
+  {
+   "url": "https://sktjosef.com/s/0862-Lower-Secondary-Mathematics-Curriculum-Framework-2020_tcm143-592602.pdf",
+   "what": "Cambridge Lower Secondary Mathematics Curriculum Framework 0862（Version 2, 2021-01）Stage 7/8/9 全部学习目标；官方原件在教师支持站需登录，此为学校公开转载",
+   "level": "佐证"
+  },
+  {
+   "url": "https://help.cambridgeinternational.org/hc/en-gb/articles/360000055018-Which-age-group-of-learners-is-the-Cambridge-Lower-Secondary-Checkpoint-for",
+   "what": "Cambridge 帮助中心：Lower Secondary 对应年龄（沿用 phy-cambridge 的 Stage 7≈G6、8≈G7、9≈G8 对应）",
+   "level": "官方"
+  }
+ ],
+ "coverage": [
+  {
+   "section": "0580 C1.1",
+   "kp_ids": [
+    "MATH-IG-1.1-01"
+   ]
+  },
+  {
+   "section": "0580 C1.2",
+   "kp_ids": [
+    "MATH-IG-1.2-01"
+   ]
+  },
+  {
+   "section": "0580 C1.3",
+   "kp_ids": [
+    "MATH-IG-1.3-01"
+   ]
+  },
+  {
+   "section": "0580 C1.4",
+   "kp_ids": [
+    "MATH-IG-1.4-01"
+   ]
+  },
+  {
+   "section": "0580 C1.5",
+   "kp_ids": [
+    "MATH-IG-1.5-01"
+   ]
+  },
+  {
+   "section": "0580 C1.6",
+   "kp_ids": [
+    "MATH-IG-1.6-01"
+   ]
+  },
+  {
+   "section": "0580 C1.7",
+   "kp_ids": [
+    "MATH-IG-1.7-01"
+   ]
+  },
+  {
+   "section": "0580 C1.8",
+   "kp_ids": [
+    "MATH-IG-1.8-01",
+    "MATH-PRE-STDF"
+   ]
+  },
+  {
+   "section": "0580 C1.9",
+   "kp_ids": [
+    "MATH-IG-1.9-01"
+   ]
+  },
+  {
+   "section": "0580 C1.10",
+   "kp_ids": [
+    "MATH-IG-1.10-01"
+   ]
+  },
+  {
+   "section": "0580 C1.11",
+   "kp_ids": [
+    "MATH-IG-1.11-01"
+   ]
+  },
+  {
+   "section": "0580 C1.12",
+   "kp_ids": [
+    "MATH-IG-1.12-01"
+   ]
+  },
+  {
+   "section": "0580 C1.13",
+   "kp_ids": [
+    "MATH-IG-1.13-01",
+    "MATH-IG-1.13-02"
+   ]
+  },
+  {
+   "section": "0580 C1.14",
+   "kp_ids": [
+    "MATH-IG-1.14-01"
+   ]
+  },
+  {
+   "section": "0580 C1.15",
+   "kp_ids": [
+    "MATH-IG-1.15-01"
+   ]
+  },
+  {
+   "section": "0580 C1.16",
+   "kp_ids": [
+    "MATH-IG-1.16-01"
+   ]
+  },
+  {
+   "section": "0580 C2.1",
+   "kp_ids": [
+    "MATH-IG-2.1-01"
+   ]
+  },
+  {
+   "section": "0580 C2.2",
+   "kp_ids": [
+    "MATH-IG-2.2-01"
+   ]
+  },
+  {
+   "section": "0580 C2.4",
+   "kp_ids": [
+    "MATH-IG-2.4-01"
+   ]
+  },
+  {
+   "section": "0580 C2.5",
+   "kp_ids": [
+    "MATH-IG-2.5-01",
+    "MATH-IG-2.5-02",
+    "MATH-IG-2.5-03"
+   ]
+  },
+  {
+   "section": "0580 C2.6",
+   "kp_ids": [
+    "MATH-IG-2.6-01"
+   ]
+  },
+  {
+   "section": "0580 C2.7",
+   "kp_ids": [
+    "MATH-IG-2.7-01"
+   ]
+  },
+  {
+   "section": "0580 C2.9",
+   "kp_ids": [
+    "MATH-IG-2.9-01"
+   ]
+  },
+  {
+   "section": "0580 C2.10",
+   "kp_ids": [
+    "MATH-IG-2.10-01"
+   ]
+  },
+  {
+   "section": "0580 C2.11",
+   "kp_ids": [
+    "MATH-IG-2.11-01"
+   ]
+  },
+  {
+   "section": "0580 C3.1",
+   "kp_ids": [
+    "MATH-IG-3.1-01"
+   ]
+  },
+  {
+   "section": "0580 C3.2",
+   "kp_ids": [
+    "MATH-IG-3.2-01"
+   ]
+  },
+  {
+   "section": "0580 C3.3",
+   "kp_ids": [
+    "MATH-IG-3.3-01"
+   ]
+  },
+  {
+   "section": "0580 C3.5",
+   "kp_ids": [
+    "MATH-IG-3.5-01"
+   ]
+  },
+  {
+   "section": "0580 C3.6",
+   "kp_ids": [
+    "MATH-IG-3.6-01"
+   ]
+  },
+  {
+   "section": "0580 C4.1",
+   "kp_ids": [
+    "MATH-IG-4.1-01"
+   ]
+  },
+  {
+   "section": "0580 C4.2",
+   "kp_ids": [
+    "MATH-IG-4.2-01"
+   ]
+  },
+  {
+   "section": "0580 C4.3",
+   "kp_ids": [
+    "MATH-IG-4.3-01"
+   ]
+  },
+  {
+   "section": "0580 C4.4",
+   "kp_ids": [
+    "MATH-IG-4.4-01"
+   ]
+  },
+  {
+   "section": "0580 C4.5",
+   "kp_ids": [
+    "MATH-IG-4.5-01"
+   ]
+  },
+  {
+   "section": "0580 C4.6",
+   "kp_ids": [
+    "MATH-IG-4.6-01",
+    "MATH-IG-4.6-02"
+   ]
+  },
+  {
+   "section": "0580 C4.7",
+   "kp_ids": [
+    "MATH-IG-4.7-01"
+   ]
+  },
+  {
+   "section": "0580 C5.1",
+   "kp_ids": [
+    "MATH-IG-5.1-01",
+    "MATH-PRE-UNIT"
+   ]
+  },
+  {
+   "section": "0580 C5.2",
+   "kp_ids": [
+    "MATH-IG-5.2-01"
+   ]
+  },
+  {
+   "section": "0580 C5.3",
+   "kp_ids": [
+    "MATH-IG-5.3-01"
+   ]
+  },
+  {
+   "section": "0580 C5.4",
+   "kp_ids": [
+    "MATH-IG-5.4-01"
+   ]
+  },
+  {
+   "section": "0580 C5.5",
+   "kp_ids": [
+    "MATH-IG-5.5-01"
+   ]
+  },
+  {
+   "section": "0580 C6.1",
+   "kp_ids": [
+    "MATH-IG-6.1-01",
+    "MATH-PRE-PYTH"
+   ]
+  },
+  {
+   "section": "0580 C6.2",
+   "kp_ids": [
+    "MATH-IG-6.2-01",
+    "MATH-PRE-TRIG"
+   ]
+  },
+  {
+   "section": "0580 C7.1",
+   "kp_ids": [
+    "MATH-IG-7.1-01"
+   ]
+  },
+  {
+   "section": "0580 C8.1",
+   "kp_ids": [
+    "MATH-IG-8.1-01"
+   ]
+  },
+  {
+   "section": "0580 C8.2",
+   "kp_ids": [
+    "MATH-IG-8.2-01"
+   ]
+  },
+  {
+   "section": "0580 C8.3",
+   "kp_ids": [
+    "MATH-IG-8.3-01"
+   ]
+  },
+  {
+   "section": "0580 C9.1",
+   "kp_ids": [
+    "MATH-IG-9.1-01"
+   ]
+  },
+  {
+   "section": "0580 C9.2",
+   "kp_ids": [
+    "MATH-IG-9.2-01"
+   ]
+  },
+  {
+   "section": "0580 C9.3",
+   "kp_ids": [
+    "MATH-IG-9.3-01",
+    "MATH-PRE-AVG"
+   ]
+  },
+  {
+   "section": "0580 C9.4",
+   "kp_ids": [
+    "MATH-IG-9.4-01"
+   ]
+  },
+  {
+   "section": "0580 C9.5",
+   "kp_ids": [
+    "MATH-IG-9.5-01"
+   ]
+  },
+  {
+   "section": "0580 E1.1",
+   "kp_ids": [
+    "MATH-IG-1.1-01"
+   ]
+  },
+  {
+   "section": "0580 E1.2",
+   "kp_ids": [
+    "MATH-IG-1.2-01",
+    "MATH-IG-1.2-02"
+   ]
+  },
+  {
+   "section": "0580 E1.3",
+   "kp_ids": [
+    "MATH-IG-1.3-01"
+   ]
+  },
+  {
+   "section": "0580 E1.4",
+   "kp_ids": [
+    "MATH-IG-1.4-01",
+    "MATH-IG-1.4-02"
+   ]
+  },
+  {
+   "section": "0580 E1.5",
+   "kp_ids": [
+    "MATH-IG-1.5-01"
+   ]
+  },
+  {
+   "section": "0580 E1.6",
+   "kp_ids": [
+    "MATH-IG-1.6-01"
+   ]
+  },
+  {
+   "section": "0580 E1.7",
+   "kp_ids": [
+    "MATH-IG-1.7-01",
+    "MATH-IG-1.7-02"
+   ]
+  },
+  {
+   "section": "0580 E1.8",
+   "kp_ids": [
+    "MATH-IG-1.8-01"
+   ]
+  },
+  {
+   "section": "0580 E1.9",
+   "kp_ids": [
+    "MATH-IG-1.9-01"
+   ]
+  },
+  {
+   "section": "0580 E1.10",
+   "kp_ids": [
+    "MATH-IG-1.10-01",
+    "MATH-IG-1.10-02"
+   ]
+  },
+  {
+   "section": "0580 E1.11",
+   "kp_ids": [
+    "MATH-IG-1.11-01"
+   ]
+  },
+  {
+   "section": "0580 E1.12",
+   "kp_ids": [
+    "MATH-IG-1.12-01"
+   ]
+  },
+  {
+   "section": "0580 E1.13",
+   "kp_ids": [
+    "MATH-IG-1.13-01",
+    "MATH-IG-1.13-02",
+    "MATH-IG-1.13-03"
+   ]
+  },
+  {
+   "section": "0580 E1.14",
+   "kp_ids": [
+    "MATH-IG-1.14-01"
+   ]
+  },
+  {
+   "section": "0580 E1.15",
+   "kp_ids": [
+    "MATH-IG-1.15-01"
+   ]
+  },
+  {
+   "section": "0580 E1.16",
+   "kp_ids": [
+    "MATH-IG-1.16-01"
+   ]
+  },
+  {
+   "section": "0580 E1.17",
+   "kp_ids": [
+    "MATH-IG-1.17-01"
+   ]
+  },
+  {
+   "section": "0580 E1.18",
+   "kp_ids": [
+    "MATH-IG-1.18-01"
+   ]
+  },
+  {
+   "section": "0580 E2.1",
+   "kp_ids": [
+    "MATH-IG-2.1-01"
+   ]
+  },
+  {
+   "section": "0580 E2.2",
+   "kp_ids": [
+    "MATH-IG-2.2-01",
+    "MATH-IG-2.2-02",
+    "MATH-IG-2.2-03"
+   ]
+  },
+  {
+   "section": "0580 E2.3",
+   "kp_ids": [
+    "MATH-IG-2.3-01"
+   ]
+  },
+  {
+   "section": "0580 E2.4",
+   "kp_ids": [
+    "MATH-IG-2.4-01",
+    "MATH-IG-2.4-02"
+   ]
+  },
+  {
+   "section": "0580 E2.5",
+   "kp_ids": [
+    "MATH-IG-2.5-01",
+    "MATH-IG-2.5-02",
+    "MATH-IG-2.5-03",
+    "MATH-IG-2.5-04",
+    "MATH-IG-2.5-05",
+    "MATH-IG-2.5-06",
+    "MATH-IG-2.5-07"
+   ]
+  },
+  {
+   "section": "0580 E2.6",
+   "kp_ids": [
+    "MATH-IG-2.6-01",
+    "MATH-IG-2.6-02",
+    "MATH-IG-2.6-03"
+   ]
+  },
+  {
+   "section": "0580 E2.7",
+   "kp_ids": [
+    "MATH-IG-2.7-01",
+    "MATH-IG-2.7-02"
+   ]
+  },
+  {
+   "section": "0580 E2.8",
+   "kp_ids": [
+    "MATH-IG-2.8-01"
+   ]
+  },
+  {
+   "section": "0580 E2.9",
+   "kp_ids": [
+    "MATH-IG-2.9-01",
+    "MATH-IG-2.9-02"
+   ]
+  },
+  {
+   "section": "0580 E2.10",
+   "kp_ids": [
+    "MATH-IG-2.10-01",
+    "MATH-IG-2.10-02"
+   ]
+  },
+  {
+   "section": "0580 E2.11",
+   "kp_ids": [
+    "MATH-IG-2.11-01",
+    "MATH-IG-2.11-02"
+   ]
+  },
+  {
+   "section": "0580 E2.12",
+   "kp_ids": [
+    "MATH-IG-2.12-01",
+    "MATH-IG-2.12-02"
+   ]
+  },
+  {
+   "section": "0580 E2.13",
+   "kp_ids": [
+    "MATH-IG-2.13-01",
+    "MATH-IG-2.13-02"
+   ]
+  },
+  {
+   "section": "0580 E3.1",
+   "kp_ids": [
+    "MATH-IG-3.1-01"
+   ]
+  },
+  {
+   "section": "0580 E3.2",
+   "kp_ids": [
+    "MATH-IG-3.2-01"
+   ]
+  },
+  {
+   "section": "0580 E3.3",
+   "kp_ids": [
+    "MATH-IG-3.3-01"
+   ]
+  },
+  {
+   "section": "0580 E3.4",
+   "kp_ids": [
+    "MATH-IG-3.4-01"
+   ]
+  },
+  {
+   "section": "0580 E3.5",
+   "kp_ids": [
+    "MATH-IG-3.5-01"
+   ]
+  },
+  {
+   "section": "0580 E3.6",
+   "kp_ids": [
+    "MATH-IG-3.6-01"
+   ]
+  },
+  {
+   "section": "0580 E3.7",
+   "kp_ids": [
+    "MATH-IG-3.7-01"
+   ]
+  },
+  {
+   "section": "0580 E4.1",
+   "kp_ids": [
+    "MATH-IG-4.1-01"
+   ]
+  },
+  {
+   "section": "0580 E4.2",
+   "kp_ids": [
+    "MATH-IG-4.2-01"
+   ]
+  },
+  {
+   "section": "0580 E4.3",
+   "kp_ids": [
+    "MATH-IG-4.3-01"
+   ]
+  },
+  {
+   "section": "0580 E4.4",
+   "kp_ids": [
+    "MATH-IG-4.4-01",
+    "MATH-IG-4.4-02"
+   ]
+  },
+  {
+   "section": "0580 E4.5",
+   "kp_ids": [
+    "MATH-IG-4.5-01",
+    "MATH-IG-4.5-02"
+   ]
+  },
+  {
+   "section": "0580 E4.6",
+   "kp_ids": [
+    "MATH-IG-4.6-01",
+    "MATH-IG-4.6-02"
+   ]
+  },
+  {
+   "section": "0580 E4.7",
+   "kp_ids": [
+    "MATH-IG-4.7-01",
+    "MATH-IG-4.7-02"
+   ]
+  },
+  {
+   "section": "0580 E4.8",
+   "kp_ids": [
+    "MATH-IG-4.8-01"
+   ]
+  },
+  {
+   "section": "0580 E5.1",
+   "kp_ids": [
+    "MATH-IG-5.1-01",
+    "MATH-PRE-UNIT"
+   ]
+  },
+  {
+   "section": "0580 E5.2",
+   "kp_ids": [
+    "MATH-IG-5.2-01"
+   ]
+  },
+  {
+   "section": "0580 E5.3",
+   "kp_ids": [
+    "MATH-IG-5.3-01"
+   ]
+  },
+  {
+   "section": "0580 E5.4",
+   "kp_ids": [
+    "MATH-IG-5.4-01"
+   ]
+  },
+  {
+   "section": "0580 E5.5",
+   "kp_ids": [
+    "MATH-IG-5.5-01"
+   ]
+  },
+  {
+   "section": "0580 E6.1",
+   "kp_ids": [
+    "MATH-IG-6.1-01",
+    "MATH-PRE-PYTH"
+   ]
+  },
+  {
+   "section": "0580 E6.2",
+   "kp_ids": [
+    "MATH-IG-6.2-01",
+    "MATH-IG-6.2-02",
+    "MATH-PRE-TRIG"
+   ]
+  },
+  {
+   "section": "0580 E6.3",
+   "kp_ids": [
+    "MATH-IG-6.3-01"
+   ]
+  },
+  {
+   "section": "0580 E6.4",
+   "kp_ids": [
+    "MATH-IG-6.4-01"
+   ]
+  },
+  {
+   "section": "0580 E6.5",
+   "kp_ids": [
+    "MATH-IG-6.5-01",
+    "MATH-IG-6.5-02"
+   ]
+  },
+  {
+   "section": "0580 E6.6",
+   "kp_ids": [
+    "MATH-IG-6.6-01"
+   ]
+  },
+  {
+   "section": "0580 E7.1",
+   "kp_ids": [
+    "MATH-IG-7.1-01",
+    "MATH-IG-7.1-02"
+   ]
+  },
+  {
+   "section": "0580 E7.2",
+   "kp_ids": [
+    "MATH-IG-7.2-01"
+   ]
+  },
+  {
+   "section": "0580 E7.3",
+   "kp_ids": [
+    "MATH-IG-7.3-01"
+   ]
+  },
+  {
+   "section": "0580 E7.4",
+   "kp_ids": [
+    "MATH-IG-7.4-01"
+   ]
+  },
+  {
+   "section": "0580 E8.1",
+   "kp_ids": [
+    "MATH-IG-8.1-01"
+   ]
+  },
+  {
+   "section": "0580 E8.2",
+   "kp_ids": [
+    "MATH-IG-8.2-01"
+   ]
+  },
+  {
+   "section": "0580 E8.3",
+   "kp_ids": [
+    "MATH-IG-8.3-01",
+    "MATH-IG-8.3-02"
+   ]
+  },
+  {
+   "section": "0580 E8.4",
+   "kp_ids": [
+    "MATH-IG-8.4-01"
+   ]
+  },
+  {
+   "section": "0580 E9.1",
+   "kp_ids": [
+    "MATH-IG-9.1-01"
+   ]
+  },
+  {
+   "section": "0580 E9.2",
+   "kp_ids": [
+    "MATH-IG-9.2-01"
+   ]
+  },
+  {
+   "section": "0580 E9.3",
+   "kp_ids": [
+    "MATH-IG-9.3-01",
+    "MATH-IG-9.3-02"
+   ]
+  },
+  {
+   "section": "0580 E9.4",
+   "kp_ids": [
+    "MATH-IG-9.4-01"
+   ]
+  },
+  {
+   "section": "0580 E9.5",
+   "kp_ids": [
+    "MATH-IG-9.5-01"
+   ]
+  },
+  {
+   "section": "0580 E9.6",
+   "kp_ids": [
+    "MATH-IG-9.6-01"
+   ]
+  },
+  {
+   "section": "0580 E9.7",
+   "kp_ids": [
+    "MATH-IG-9.7-01"
+   ]
+  },
+  {
+   "section": "0606 主题 1 Functions",
+   "kp_ids": [
+    "MATH-AM-1-01",
+    "MATH-AM-1-02"
+   ]
+  },
+  {
+   "section": "0606 主题 2 Quadratic functions",
+   "kp_ids": [
+    "MATH-AM-2-01",
+    "MATH-AM-2-02"
+   ]
+  },
+  {
+   "section": "0606 主题 3 Factors of polynomials",
+   "kp_ids": [
+    "MATH-AM-3-01"
+   ]
+  },
+  {
+   "section": "0606 主题 4 Equations, inequalities and graphs",
+   "kp_ids": [
+    "MATH-AM-4-01",
+    "MATH-AM-4-02"
+   ]
+  },
+  {
+   "section": "0606 主题 5 Simultaneous equations",
+   "kp_ids": [
+    "MATH-IG-2.5-02",
+    "MATH-IG-2.5-07"
+   ]
+  },
+  {
+   "section": "0606 主题 6 Logarithmic and exponential functions",
+   "kp_ids": [
+    "MATH-AM-6-01",
+    "MATH-AM-6-02"
+   ]
+  },
+  {
+   "section": "0606 主题 7 Straight-line graphs",
+   "kp_ids": [
+    "MATH-AM-7-01"
+   ]
+  },
+  {
+   "section": "0606 主题 8 Coordinate geometry of the circle",
+   "kp_ids": [
+    "MATH-AM-8-01"
+   ]
+  },
+  {
+   "section": "0606 主题 9 Circular measure",
+   "kp_ids": [
+    "MATH-AM-9-01"
+   ]
+  },
+  {
+   "section": "0606 主题 10 Trigonometry",
+   "kp_ids": [
+    "MATH-AM-10-01",
+    "MATH-AM-10-02"
+   ]
+  },
+  {
+   "section": "0606 主题 11 Permutations and combinations",
+   "kp_ids": [
+    "MATH-AM-11-01"
+   ]
+  },
+  {
+   "section": "0606 主题 12 Series",
+   "kp_ids": [
+    "MATH-AM-12-01",
+    "MATH-AM-12-02"
+   ]
+  },
+  {
+   "section": "0606 主题 13 Vectors in two dimensions",
+   "kp_ids": [
+    "MATH-AM-13-01"
+   ]
+  },
+  {
+   "section": "0606 主题 14 Calculus",
+   "kp_ids": [
+    "MATH-AM-14-01",
+    "MATH-AM-14-02",
+    "MATH-AM-14-03",
+    "MATH-AM-14-04"
+   ]
+  },
+  {
+   "section": "0862 7Ae.01",
+   "kp_ids": [
+    "MATH-LS-7A-01"
+   ]
+  },
+  {
+   "section": "0862 7Ae.02",
+   "kp_ids": [
+    "MATH-LS-7A-02"
+   ]
+  },
+  {
+   "section": "0862 7Ae.03",
+   "kp_ids": [
+    "MATH-LS-7A-02"
+   ]
+  },
+  {
+   "section": "0862 7Ae.04",
+   "kp_ids": [
+    "MATH-LS-7A-01"
+   ]
+  },
+  {
+   "section": "0862 7Ae.05",
+   "kp_ids": [
+    "MATH-LS-7A-03"
+   ]
+  },
+  {
+   "section": "0862 7Ae.06",
+   "kp_ids": [
+    "MATH-LS-7A-04"
+   ]
+  },
+  {
+   "section": "0862 7Ae.07",
+   "kp_ids": [
+    "MATH-LS-7A-01"
+   ]
+  },
+  {
+   "section": "0862 7As.01",
+   "kp_ids": [
+    "MATH-LS-7A-05"
+   ]
+  },
+  {
+   "section": "0862 7As.02",
+   "kp_ids": [
+    "MATH-LS-7A-05"
+   ]
+  },
+  {
+   "section": "0862 7As.03",
+   "kp_ids": [
+    "MATH-LS-7A-06"
+   ]
+  },
+  {
+   "section": "0862 7As.04",
+   "kp_ids": [
+    "MATH-LS-7A-07"
+   ]
+  },
+  {
+   "section": "0862 7As.05",
+   "kp_ids": [
+    "MATH-LS-7A-07"
+   ]
+  },
+  {
+   "section": "0862 7As.06",
+   "kp_ids": [
+    "MATH-LS-7A-07"
+   ]
+  },
+  {
+   "section": "0862 7As.07",
+   "kp_ids": [
+    "MATH-LS-7A-08"
+   ]
+  },
+  {
+   "section": "0862 7Gg.01",
+   "kp_ids": [
+    "MATH-LS-7G-01"
+   ]
+  },
+  {
+   "section": "0862 7Gg.02",
+   "kp_ids": [
+    "MATH-LS-7G-02"
+   ]
+  },
+  {
+   "section": "0862 7Gg.03",
+   "kp_ids": [
+    "MATH-LS-7G-03"
+   ]
+  },
+  {
+   "section": "0862 7Gg.04",
+   "kp_ids": [
+    "MATH-LS-7G-04"
+   ]
+  },
+  {
+   "section": "0862 7Gg.05",
+   "kp_ids": [
+    "MATH-LS-7G-05"
+   ]
+  },
+  {
+   "section": "0862 7Gg.06",
+   "kp_ids": [
+    "MATH-LS-7G-06"
+   ]
+  },
+  {
+   "section": "0862 7Gg.07",
+   "kp_ids": [
+    "MATH-LS-7G-07"
+   ]
+  },
+  {
+   "section": "0862 7Gg.08",
+   "kp_ids": [
+    "MATH-LS-7G-06"
+   ]
+  },
+  {
+   "section": "0862 7Gg.09",
+   "kp_ids": [
+    "MATH-LS-7G-07"
+   ]
+  },
+  {
+   "section": "0862 7Gg.10",
+   "kp_ids": [
+    "MATH-LS-7G-01"
+   ]
+  },
+  {
+   "section": "0862 7Gg.11",
+   "kp_ids": [
+    "MATH-LS-7G-08"
+   ]
+  },
+  {
+   "section": "0862 7Gg.12",
+   "kp_ids": [
+    "MATH-LS-7G-08"
+   ]
+  },
+  {
+   "section": "0862 7Gg.13",
+   "kp_ids": [
+    "MATH-LS-7G-08"
+   ]
+  },
+  {
+   "section": "0862 7Gg.14",
+   "kp_ids": [
+    "MATH-LS-7G-09"
+   ]
+  },
+  {
+   "section": "0862 7Gp.01",
+   "kp_ids": [
+    "MATH-LS-7G-10"
+   ]
+  },
+  {
+   "section": "0862 7Gp.02",
+   "kp_ids": [
+    "MATH-LS-7G-11"
+   ]
+  },
+  {
+   "section": "0862 7Gp.03",
+   "kp_ids": [
+    "MATH-LS-7G-12"
+   ]
+  },
+  {
+   "section": "0862 7Gp.04",
+   "kp_ids": [
+    "MATH-LS-7G-12"
+   ]
+  },
+  {
+   "section": "0862 7Gp.05",
+   "kp_ids": [
+    "MATH-LS-7G-12"
+   ]
+  },
+  {
+   "section": "0862 7Gp.06",
+   "kp_ids": [
+    "MATH-LS-7G-13"
+   ]
+  },
+  {
+   "section": "0862 7Nf.01",
+   "kp_ids": [
+    "MATH-LS-7N-06"
+   ]
+  },
+  {
+   "section": "0862 7Nf.02",
+   "kp_ids": [
+    "MATH-LS-7N-07"
+   ]
+  },
+  {
+   "section": "0862 7Nf.03",
+   "kp_ids": [
+    "MATH-LS-7N-07"
+   ]
+  },
+  {
+   "section": "0862 7Nf.04",
+   "kp_ids": [
+    "MATH-LS-7N-07"
+   ]
+  },
+  {
+   "section": "0862 7Nf.05",
+   "kp_ids": [
+    "MATH-LS-7N-09"
+   ]
+  },
+  {
+   "section": "0862 7Nf.06",
+   "kp_ids": [
+    "MATH-LS-7N-06"
+   ]
+  },
+  {
+   "section": "0862 7Nf.07",
+   "kp_ids": [
+    "MATH-LS-7N-08"
+   ]
+  },
+  {
+   "section": "0862 7Nf.08",
+   "kp_ids": [
+    "MATH-LS-7N-08"
+   ]
+  },
+  {
+   "section": "0862 7Nf.09",
+   "kp_ids": [
+    "MATH-LS-7N-10"
+   ]
+  },
+  {
+   "section": "0862 7Nf.10",
+   "kp_ids": [
+    "MATH-LS-7N-10"
+   ]
+  },
+  {
+   "section": "0862 7Nf.11",
+   "kp_ids": [
+    "MATH-LS-7N-10"
+   ]
+  },
+  {
+   "section": "0862 7Ni.01",
+   "kp_ids": [
+    "MATH-LS-7N-01"
+   ]
+  },
+  {
+   "section": "0862 7Ni.02",
+   "kp_ids": [
+    "MATH-LS-7N-02"
+   ]
+  },
+  {
+   "section": "0862 7Ni.03",
+   "kp_ids": [
+    "MATH-LS-7N-02"
+   ]
+  },
+  {
+   "section": "0862 7Ni.04",
+   "kp_ids": [
+    "MATH-LS-7N-03"
+   ]
+  },
+  {
+   "section": "0862 7Ni.05",
+   "kp_ids": [
+    "MATH-LS-7N-03"
+   ]
+  },
+  {
+   "section": "0862 7Ni.06",
+   "kp_ids": [
+    "MATH-LS-7N-04"
+   ]
+  },
+  {
+   "section": "0862 7Np.01",
+   "kp_ids": [
+    "MATH-LS-7N-05"
+   ]
+  },
+  {
+   "section": "0862 7Np.02",
+   "kp_ids": [
+    "MATH-LS-7N-05"
+   ]
+  },
+  {
+   "section": "0862 7Sp.01",
+   "kp_ids": [
+    "MATH-LS-7S-05"
+   ]
+  },
+  {
+   "section": "0862 7Sp.02",
+   "kp_ids": [
+    "MATH-LS-7S-05"
+   ]
+  },
+  {
+   "section": "0862 7Sp.03",
+   "kp_ids": [
+    "MATH-LS-7S-06"
+   ]
+  },
+  {
+   "section": "0862 7Sp.04",
+   "kp_ids": [
+    "MATH-LS-7S-06"
+   ]
+  },
+  {
+   "section": "0862 7Sp.05",
+   "kp_ids": [
+    "MATH-LS-7S-07"
+   ]
+  },
+  {
+   "section": "0862 7Ss.01",
+   "kp_ids": [
+    "MATH-LS-7S-01"
+   ]
+  },
+  {
+   "section": "0862 7Ss.02",
+   "kp_ids": [
+    "MATH-LS-7S-01"
+   ]
+  },
+  {
+   "section": "0862 7Ss.03",
+   "kp_ids": [
+    "MATH-LS-7S-02"
+   ]
+  },
+  {
+   "section": "0862 7Ss.04",
+   "kp_ids": [
+    "MATH-LS-7S-03"
+   ]
+  },
+  {
+   "section": "0862 7Ss.05",
+   "kp_ids": [
+    "MATH-LS-7S-04"
+   ]
+  },
+  {
+   "section": "0862 8Ae.01",
+   "kp_ids": [
+    "MATH-LS-8A-01"
+   ]
+  },
+  {
+   "section": "0862 8Ae.02",
+   "kp_ids": [
+    "MATH-LS-8A-01"
+   ]
+  },
+  {
+   "section": "0862 8Ae.03",
+   "kp_ids": [
+    "MATH-LS-8A-02"
+   ]
+  },
+  {
+   "section": "0862 8Ae.04",
+   "kp_ids": [
+    "MATH-LS-8A-01"
+   ]
+  },
+  {
+   "section": "0862 8Ae.05",
+   "kp_ids": [
+    "MATH-LS-8A-03"
+   ]
+  },
+  {
+   "section": "0862 8Ae.06",
+   "kp_ids": [
+    "MATH-LS-8A-04"
+   ]
+  },
+  {
+   "section": "0862 8Ae.07",
+   "kp_ids": [
+    "MATH-LS-8A-05"
+   ]
+  },
+  {
+   "section": "0862 8As.01",
+   "kp_ids": [
+    "MATH-LS-8A-06"
+   ]
+  },
+  {
+   "section": "0862 8As.02",
+   "kp_ids": [
+    "MATH-LS-8A-06"
+   ]
+  },
+  {
+   "section": "0862 8As.03",
+   "kp_ids": [
+    "MATH-LS-7A-06"
+   ]
+  },
+  {
+   "section": "0862 8As.04",
+   "kp_ids": [
+    "MATH-LS-8A-07"
+   ]
+  },
+  {
+   "section": "0862 8As.05",
+   "kp_ids": [
+    "MATH-LS-8A-07"
+   ]
+  },
+  {
+   "section": "0862 8As.06",
+   "kp_ids": [
+    "MATH-LS-8A-07"
+   ]
+  },
+  {
+   "section": "0862 8As.07",
+   "kp_ids": [
+    "MATH-LS-8A-08"
+   ]
+  },
+  {
+   "section": "0862 8Gg.01",
+   "kp_ids": [
+    "MATH-LS-8G-01"
+   ]
+  },
+  {
+   "section": "0862 8Gg.02",
+   "kp_ids": [
+    "MATH-LS-8G-02"
+   ]
+  },
+  {
+   "section": "0862 8Gg.03",
+   "kp_ids": [
+    "MATH-LS-8G-03"
+   ]
+  },
+  {
+   "section": "0862 8Gg.04",
+   "kp_ids": [
+    "MATH-LS-8G-04"
+   ]
+  },
+  {
+   "section": "0862 8Gg.05",
+   "kp_ids": [
+    "MATH-LS-8G-05"
+   ]
+  },
+  {
+   "section": "0862 8Gg.06",
+   "kp_ids": [
+    "MATH-LS-8G-06"
+   ]
+  },
+  {
+   "section": "0862 8Gg.07",
+   "kp_ids": [
+    "MATH-LS-8G-06"
+   ]
+  },
+  {
+   "section": "0862 8Gg.08",
+   "kp_ids": [
+    "MATH-LS-8G-06"
+   ]
+  },
+  {
+   "section": "0862 8Gg.09",
+   "kp_ids": [
+    "MATH-LS-7G-01"
+   ]
+  },
+  {
+   "section": "0862 8Gg.10",
+   "kp_ids": [
+    "MATH-LS-8G-07"
+   ]
+  },
+  {
+   "section": "0862 8Gg.11",
+   "kp_ids": [
+    "MATH-LS-8G-07"
+   ]
+  },
+  {
+   "section": "0862 8Gg.12",
+   "kp_ids": [
+    "MATH-LS-8G-08"
+   ]
+  },
+  {
+   "section": "0862 8Gp.01",
+   "kp_ids": [
+    "MATH-LS-8G-09"
+   ]
+  },
+  {
+   "section": "0862 8Gp.02",
+   "kp_ids": [
+    "MATH-LS-8G-10"
+   ]
+  },
+  {
+   "section": "0862 8Gp.03",
+   "kp_ids": [
+    "MATH-LS-8G-11"
+   ]
+  },
+  {
+   "section": "0862 8Gp.04",
+   "kp_ids": [
+    "MATH-LS-8G-11"
+   ]
+  },
+  {
+   "section": "0862 8Gp.05",
+   "kp_ids": [
+    "MATH-LS-8G-11"
+   ]
+  },
+  {
+   "section": "0862 8Gp.06",
+   "kp_ids": [
+    "MATH-LS-8G-12"
+   ]
+  },
+  {
+   "section": "0862 8Nf.01",
+   "kp_ids": [
+    "MATH-LS-8N-07"
+   ]
+  },
+  {
+   "section": "0862 8Nf.02",
+   "kp_ids": [
+    "MATH-LS-8N-08"
+   ]
+  },
+  {
+   "section": "0862 8Nf.03",
+   "kp_ids": [
+    "MATH-LS-8N-08"
+   ]
+  },
+  {
+   "section": "0862 8Nf.04",
+   "kp_ids": [
+    "MATH-LS-8N-08"
+   ]
+  },
+  {
+   "section": "0862 8Nf.05",
+   "kp_ids": [
+    "MATH-LS-8N-09"
+   ]
+  },
+  {
+   "section": "0862 8Nf.06",
+   "kp_ids": [
+    "MATH-LS-8N-10"
+   ]
+  },
+  {
+   "section": "0862 8Nf.07",
+   "kp_ids": [
+    "MATH-LS-8N-06"
+   ]
+  },
+  {
+   "section": "0862 8Nf.08",
+   "kp_ids": [
+    "MATH-LS-8N-06"
+   ]
+  },
+  {
+   "section": "0862 8Nf.09",
+   "kp_ids": [
+    "MATH-PRE-RATIO"
+   ]
+  },
+  {
+   "section": "0862 8Nf.10",
+   "kp_ids": [
+    "MATH-LS-8N-11"
+   ]
+  },
+  {
+   "section": "0862 8Nf.11",
+   "kp_ids": [
+    "MATH-LS-8N-11"
+   ]
+  },
+  {
+   "section": "0862 8Ni.01",
+   "kp_ids": [
+    "MATH-LS-8N-01"
+   ]
+  },
+  {
+   "section": "0862 8Ni.02",
+   "kp_ids": [
+    "MATH-LS-8N-01"
+   ]
+  },
+  {
+   "section": "0862 8Ni.03",
+   "kp_ids": [
+    "MATH-LS-8N-02"
+   ]
+  },
+  {
+   "section": "0862 8Ni.04",
+   "kp_ids": [
+    "MATH-LS-8N-03"
+   ]
+  },
+  {
+   "section": "0862 8Ni.05",
+   "kp_ids": [
+    "MATH-LS-8N-04"
+   ]
+  },
+  {
+   "section": "0862 8Ni.06",
+   "kp_ids": [
+    "MATH-LS-8N-05"
+   ]
+  },
+  {
+   "section": "0862 8Ni.07",
+   "kp_ids": [
+    "MATH-LS-8N-05"
+   ]
+  },
+  {
+   "section": "0862 8Np.01",
+   "kp_ids": [
+    "MATH-LS-8N-06"
+   ]
+  },
+  {
+   "section": "0862 8Np.02",
+   "kp_ids": [
+    "MATH-PRE-STDF"
+   ]
+  },
+  {
+   "section": "0862 8Sp.01",
+   "kp_ids": [
+    "MATH-LS-8S-03"
+   ]
+  },
+  {
+   "section": "0862 8Sp.02",
+   "kp_ids": [
+    "MATH-LS-8S-04"
+   ]
+  },
+  {
+   "section": "0862 8Sp.03",
+   "kp_ids": [
+    "MATH-LS-8S-04"
+   ]
+  },
+  {
+   "section": "0862 8Sp.04",
+   "kp_ids": [
+    "MATH-LS-7S-07"
+   ]
+  },
+  {
+   "section": "0862 8Ss.01",
+   "kp_ids": [
+    "MATH-LS-8S-01"
+   ]
+  },
+  {
+   "section": "0862 8Ss.02",
+   "kp_ids": [
+    "MATH-LS-8S-01"
+   ]
+  },
+  {
+   "section": "0862 8Ss.03",
+   "kp_ids": [
+    "MATH-LS-7S-02"
+   ]
+  },
+  {
+   "section": "0862 8Ss.04",
+   "kp_ids": [
+    "MATH-LS-8S-02"
+   ]
+  },
+  {
+   "section": "0862 8Ss.05",
+   "kp_ids": [
+    "MATH-LS-7S-04"
+   ]
+  },
+  {
+   "section": "0862 9Ae.01",
+   "kp_ids": [
+    "MATH-LS-9A-01"
+   ]
+  },
+  {
+   "section": "0862 9Ae.02",
+   "kp_ids": [
+    "MATH-LS-9A-01",
+    "MATH-LS-9A-02"
+   ]
+  },
+  {
+   "section": "0862 9Ae.03",
+   "kp_ids": [
+    "MATH-LS-9A-03"
+   ]
+  },
+  {
+   "section": "0862 9Ae.04",
+   "kp_ids": [
+    "MATH-LS-9A-03",
+    "MATH-PRE-REARR"
+   ]
+  },
+  {
+   "section": "0862 9Ae.05",
+   "kp_ids": [
+    "MATH-LS-9A-04"
+   ]
+  },
+  {
+   "section": "0862 9Ae.06",
+   "kp_ids": [
+    "MATH-LS-9A-05"
+   ]
+  },
+  {
+   "section": "0862 9Ae.07",
+   "kp_ids": [
+    "MATH-LS-9A-06"
+   ]
+  },
+  {
+   "section": "0862 9As.01",
+   "kp_ids": [
+    "MATH-LS-9A-07"
+   ]
+  },
+  {
+   "section": "0862 9As.02",
+   "kp_ids": [
+    "MATH-LS-9A-07"
+   ]
+  },
+  {
+   "section": "0862 9As.03",
+   "kp_ids": [
+    "MATH-LS-7A-06"
+   ]
+  },
+  {
+   "section": "0862 9As.04",
+   "kp_ids": [
+    "MATH-LS-9A-08"
+   ]
+  },
+  {
+   "section": "0862 9As.05",
+   "kp_ids": [
+    "MATH-LS-9A-08"
+   ]
+  },
+  {
+   "section": "0862 9As.06",
+   "kp_ids": [
+    "MATH-LS-9A-09"
+   ]
+  },
+  {
+   "section": "0862 9As.07",
+   "kp_ids": [
+    "MATH-LS-9A-10"
+   ]
+  },
+  {
+   "section": "0862 9Gg.01",
+   "kp_ids": [
+    "MATH-LS-9G-01"
+   ]
+  },
+  {
+   "section": "0862 9Gg.02",
+   "kp_ids": [
+    "MATH-PRE-SI"
+   ]
+  },
+  {
+   "section": "0862 9Gg.03",
+   "kp_ids": [
+    "MATH-LS-9G-01"
+   ]
+  },
+  {
+   "section": "0862 9Gg.04",
+   "kp_ids": [
+    "MATH-LS-9G-02"
+   ]
+  },
+  {
+   "section": "0862 9Gg.05",
+   "kp_ids": [
+    "MATH-LS-9G-02"
+   ]
+  },
+  {
+   "section": "0862 9Gg.06",
+   "kp_ids": [
+    "MATH-LS-9G-03"
+   ]
+  },
+  {
+   "section": "0862 9Gg.07",
+   "kp_ids": [
+    "MATH-LS-9G-04"
+   ]
+  },
+  {
+   "section": "0862 9Gg.08",
+   "kp_ids": [
+    "MATH-LS-9G-04"
+   ]
+  },
+  {
+   "section": "0862 9Gg.09",
+   "kp_ids": [
+    "MATH-LS-9G-04"
+   ]
+  },
+  {
+   "section": "0862 9Gg.10",
+   "kp_ids": [
+    "MATH-PRE-PYTH"
+   ]
+  },
+  {
+   "section": "0862 9Gg.11",
+   "kp_ids": [
+    "MATH-LS-9G-05"
+   ]
+  },
+  {
+   "section": "0862 9Gp.01",
+   "kp_ids": [
+    "MATH-LS-8G-09"
+   ]
+  },
+  {
+   "section": "0862 9Gp.02",
+   "kp_ids": [
+    "MATH-LS-8G-10"
+   ]
+  },
+  {
+   "section": "0862 9Gp.03",
+   "kp_ids": [
+    "MATH-LS-9G-06"
+   ]
+  },
+  {
+   "section": "0862 9Gp.04",
+   "kp_ids": [
+    "MATH-LS-9G-06"
+   ]
+  },
+  {
+   "section": "0862 9Gp.05",
+   "kp_ids": [
+    "MATH-LS-9G-06"
+   ]
+  },
+  {
+   "section": "0862 9Gp.06",
+   "kp_ids": [
+    "MATH-LS-8G-12"
+   ]
+  },
+  {
+   "section": "0862 9Gp.07",
+   "kp_ids": [
+    "MATH-LS-8G-12"
+   ]
+  },
+  {
+   "section": "0862 9Nf.01",
+   "kp_ids": [
+    "MATH-LS-8N-07"
+   ]
+  },
+  {
+   "section": "0862 9Nf.02",
+   "kp_ids": [
+    "MATH-LS-8N-08"
+   ]
+  },
+  {
+   "section": "0862 9Nf.03",
+   "kp_ids": [
+    "MATH-LS-8N-08"
+   ]
+  },
+  {
+   "section": "0862 9Nf.04",
+   "kp_ids": [
+    "MATH-LS-8N-08"
+   ]
+  },
+  {
+   "section": "0862 9Nf.05",
+   "kp_ids": [
+    "MATH-LS-9N-05"
+   ]
+  },
+  {
+   "section": "0862 9Nf.06",
+   "kp_ids": [
+    "MATH-LS-8N-06"
+   ]
+  },
+  {
+   "section": "0862 9Nf.07",
+   "kp_ids": [
+    "MATH-PRE-RATIO"
+   ]
+  },
+  {
+   "section": "0862 9Nf.08",
+   "kp_ids": [
+    "MATH-LS-8N-11",
+    "MATH-PRE-RATIO"
+   ]
+  },
+  {
+   "section": "0862 9Ni.01",
+   "kp_ids": [
+    "MATH-LS-9N-01"
+   ]
+  },
+  {
+   "section": "0862 9Ni.02",
+   "kp_ids": [
+    "MATH-LS-9N-02"
+   ]
+  },
+  {
+   "section": "0862 9Ni.03",
+   "kp_ids": [
+    "MATH-PRE-STDF"
+   ]
+  },
+  {
+   "section": "0862 9Ni.04",
+   "kp_ids": [
+    "MATH-LS-9N-03"
+   ]
+  },
+  {
+   "section": "0862 9Np.01",
+   "kp_ids": [
+    "MATH-PRE-STDF"
+   ]
+  },
+  {
+   "section": "0862 9Np.02",
+   "kp_ids": [
+    "MATH-LS-9N-04"
+   ]
+  },
+  {
+   "section": "0862 9Sp.01",
+   "kp_ids": [
+    "MATH-LS-8S-03"
+   ]
+  },
+  {
+   "section": "0862 9Sp.02",
+   "kp_ids": [
+    "MATH-LS-8S-04"
+   ]
+  },
+  {
+   "section": "0862 9Sp.03",
+   "kp_ids": [
+    "MATH-LS-8S-04"
+   ]
+  },
+  {
+   "section": "0862 9Sp.04",
+   "kp_ids": [
+    "MATH-LS-8S-05"
+   ]
+  },
+  {
+   "section": "0862 9Ss.01",
+   "kp_ids": [
+    "MATH-LS-8S-01"
+   ]
+  },
+  {
+   "section": "0862 9Ss.02",
+   "kp_ids": [
+    "MATH-LS-8S-01"
+   ]
+  },
+  {
+   "section": "0862 9Ss.03",
+   "kp_ids": [
+    "MATH-LS-7S-02"
+   ]
+  },
+  {
+   "section": "0862 9Ss.04",
+   "kp_ids": [
+    "MATH-LS-8S-02"
+   ]
+  },
+  {
+   "section": "0862 9Ss.05",
+   "kp_ids": [
+    "MATH-LS-7S-04"
+   ]
+  }
+ ],
+ "unverified": [
+  {
+   "what": "0862 框架官方原件",
+   "why": "cambridgeinternational.org 上的 Lower Secondary 框架全文需教师登录，学习目标取自学校公开镜像（sktjosef.com），仅为佐证级；未与官方原件逐字比对。"
+  },
+  {
+   "what": "Lower Secondary Checkpoint 数学试卷结构",
+   "why": "未找到可公开读取的官方 Checkpoint 数学考试说明，故 LS 点 hot 一律为 false，notes 未写 Checkpoint 卷面结构。"
+  },
+  {
+   "what": "0580 学习目标逐字原文",
+   "why": "WebFetch 返回的是 PDF 文本的摘要转述，个别注释（如 E4.2 注明“不要求作垂直平分线和角平分线”、C9.3 数据不分组）按返回内容采用，未能以本机 pdftotext 逐字核对（本机 curl 被代理 403 拦截）。"
+  },
+  {
+   "what": "0580 2028-2030 版各节学习目标正文",
+   "why": "只读取了 2028-2030 版的节号范围、Assessment overview 与 Changes 页；逐条目标按 2025-2027 版写，依据是官方声明 no significant changes which affect teaching。"
+  },
+  {
+   "what": "0606 是否要求复合函数求导（chain rule）",
+   "why": "读取到的 14.4 只写 products and quotients，因此 MATH-AM-14-01 未写入链式法则；14.12 对 (ax+b) 型函数积分暗示需要，但未核实。"
+  },
+  {
+   "what": "0580 Extended 可得等级",
+   "why": "2025-2027 与 2028-2030 大纲 Assessment overview 均写 A*–E；学科简介 757622 写 Extended 面向 A*–C 目标考生。tracks 名称按协调方给定的文字保留。"
+  },
+  {
+   "what": "学期（term）",
+   "why": "国际学校各校进度不同，LS 点 term 统一写“全”，IGCSE/0606 点不写 term。"
+  }
+ ]
+}

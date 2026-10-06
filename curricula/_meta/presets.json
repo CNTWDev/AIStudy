@@ -90,6 +90,10 @@
     "biology": {
      "pack": "bio-cambridge",
      "track": "extended"
+    },
+    "math": {
+     "pack": "math-cambridge",
+     "track": "extended"
     }
    }
   }
