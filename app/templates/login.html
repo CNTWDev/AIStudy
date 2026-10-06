@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block body %}
-<div style="max-width:420px;margin:24px auto">
+<div style="max-width:440px;margin:24px auto">
   {% if mode == 'first' %}
   <h1>第一次使用：创建管理员账号</h1>
-  <p class="muted">这是系统里的第一个账号，会成为家长兼管理员。之后在家长页为每个孩子创建各自的登录邮箱。</p>
+  <p class="muted">这是系统里的第一个账号，不需要邀请码，会成为家长兼管理员。之后在家长页为每个孩子创建各自的登录邮箱，在「管理」页邀请其他家庭。</p>
   {% else %}
   <h1>登录</h1>
   {% endif %}
@@ -16,15 +16,20 @@
     <p class="muted small">孩子的账号由家长创建，忘记密码请找家长在「编辑孩子」里重设；家长忘记密码请找管理员。</p>
   </form>
   {% endif %}
-  {% if mode in ('first', 'open', 'invite') %}
+  {% if mode in ('first', 'open', 'invite', 'approval') %}
   <details class="card" {{ 'open' if mode == 'first' or show_register }}>
     {% if mode != 'first' %}<summary><b>新家庭注册家长账号</b></summary>{% endif %}
     <form method="post" action="/register">
-      <label>你的称呼</label><input type="text" name="name" placeholder="例如：爸爸" required>
+      <label>你的称呼</label><input type="text" name="name" placeholder="例如：小明妈妈" required>
       <label>邮箱</label><input type="email" name="email" required value="{{ email or '' }}">
       <label>密码（至少 6 位）</label><input type="password" name="password" required minlength="6" autocomplete="new-password">
-      {% if mode == 'invite' %}<label>邀请码（向管理员索取）</label><input type="text" name="invite" required placeholder="例如 3F2A-91BC-07DE">{% endif %}
-      <div style="margin-top:16px"><button class="btn" style="width:100%">创建账号</button></div>
+      {% if mode == 'invite' %}
+      <label>邀请码（向管理员或已经在用的家长索取）</label><input type="text" name="invite" required value="{{ invite or '' }}" placeholder="例如 3F2A-91BC-07DE">
+      {% elif mode == 'approval' %}
+      <label>邀请码（有就填，直接开通；没有可以留空，提交后等管理员审批）</label><input type="text" name="invite" value="{{ invite or '' }}" placeholder="例如 3F2A-91BC-07DE">
+      <label>没有邀请码时：简单介绍一下（例如：谁介绍的、孩子几年级）</label><input type="text" name="note" maxlength="200">
+      {% endif %}
+      <div style="margin-top:16px"><button class="btn" style="width:100%">{{ '提交申请' if mode == 'approval' and not invite else '创建账号' }}</button></div>
     </form>
   </details>
   {% endif %}

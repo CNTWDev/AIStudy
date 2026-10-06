@@ -88,10 +88,10 @@ def home(request: Request):
 
 
 @app.get("/login", response_class=HTMLResponse)
-def login_page(request: Request):
+def login_page(request: Request, invite: str = ""):
     if auth.current_user(request):
         return RedirectResponse("/", 303)
-    return render(request, "login.html", mode=_reg_mode())
+    return render(request, "login.html", mode=_reg_mode(), invite=invite, show_register=bool(invite))
 
 
 @app.post("/login")
@@ -105,22 +105,35 @@ def login(request: Request, email: str = Form(...), password: str = Form(...)):
 
 @app.post("/register")
 def register(request: Request, email: str = Form(...), password: str = Form(...), name: str = Form(...),
-             invite: str = Form("")):
+             invite: str = Form(""), note: str = Form("")):
     mode = _reg_mode()
     if mode == "closed":
         raise HTTPException(403, "注册已关闭，请联系管理员创建账号")
+    invite = (invite or "").strip().upper()
     try:
         email = auth.validate_email(email)
         auth.validate_pw(password)
         if auth.by_email(email):
             raise ValueError("这个邮箱已注册，可以直接登录")
-        with db.tx() as t:
-            if mode == "invite" and not auth.use_invite(t, invite):
+        inv = None
+        if invite:
+            with db.tx() as t:
+                inv = auth.use_invite(t, invite)
+            if not inv:
                 raise ValueError("邀请码不对、已用完或已过期")
-        uid = auth.create_user(email, password, name, "parent", is_admin=(mode == "first"))
+        elif mode == "invite":
+            raise ValueError("需要邀请码才能注册（向管理员或已经在用的家长索取）")
+        status = "pending" if (mode == "approval" and not inv) else "active"
+        uid = auth.create_user(email, password, name, "parent", is_admin=(mode == "first"), status=status,
+                               invited_by=inv["created_by"] if inv else None, invite_code=inv["code"] if inv else None,
+                               apply_note=note)
     except ValueError as e:
-        return render(request, "login.html", error=str(e), mode=mode, email=email, show_register=True)
-    auth.log_event("register", user_id=uid, email=email, detail=f"mode={mode} invite={invite.strip().upper()}", request=request)
+        return render(request, "login.html", error=str(e), mode=mode, email=email, invite=invite, show_register=True)
+    auth.log_event("register" if status == "active" else "apply", user_id=uid, email=email,
+                   detail=f"mode={mode} invite={invite}", request=request)
+    if status == "pending":
+        return render(request, "message.html", title="申请已提交",
+                      text="管理员审批通过后，就可以用这个邮箱和密码登录了。", link="/login")
     auth.login(request, auth.get_user(uid))
     return RedirectResponse("/parent", 303)
 
@@ -205,46 +218,137 @@ def revoke_session(request: Request, token_hash: str = Form(""), all_others: str
     return _back(msg="已退出所选设备")
 
 
-# ================================================================== 管理员
+# ================================================================== 管理后台
+
+def kid_brief(k) -> dict:
+    """一个孩子的概况：家长页和管理后台共用。"""
+    m = engine.get_mastery(k["id"])
+    packs = [{"pack": catalog.packs[e["pack_id"]], "stage": e["stage"], "sum": engine.pack_summary(k["id"], e["pack_id"], m)}
+             for e in enrollments(k["id"])]
+    cal = engine.calendar(k["id"], weeks=1)
+    today = engine.today_plan(k["id"]) if packs else {"plan": [], "minutes": 0}
+    weak = sorted([v for v in m.values() if v["status"] == "weak" and catalog.kp(v["kp_id"])], key=lambda v: v["score"])
+    return {"u": k, "packs": packs, "streak": engine.streak(k["id"]), "week": cal,
+            "week_min": sum(d["minutes"] for d in cal), "week_days": sum(1 for d in cal if d["minutes"] or d["checked"]),
+            "today": today, "today_done": sum(1 for t in today["plan"] if t.get("done")),
+            "weak": [catalog.kp(w["kp_id"]) for w in weak[:5]], "weak_n": len(weak),
+            "due": len(engine.due_cards(k["id"], 500)),
+            "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='word'", k["id"])["n"]}
+
+
+ADMIN_TABS = [("overview", "概览"), ("families", "家庭与孩子"), ("invites", "邀请码"), ("tree", "邀请关系"),
+              ("log", "安全日志"), ("system", "系统")]
+
 
 @app.get("/admin", response_class=HTMLResponse)
-def admin_home(request: Request, msg: str = "", link: str = ""):
-    auth.require_admin(request)
-    users = db.q("SELECT u.*, p.name AS parent_name FROM users u LEFT JOIN users p ON p.id=u.parent_id "
-                 "ORDER BY COALESCE(u.parent_id, u.id), u.parent_id IS NOT NULL, u.id")
-    invites = db.q("SELECT * FROM invites ORDER BY created_at DESC LIMIT 50")
-    events = db.q("SELECT * FROM auth_events ORDER BY id DESC LIMIT 100")
-    return render(request, "admin.html", users=users, invites=invites, events=events, msg=msg, link=link,
-                  reg_mode=config.REGISTRATION, now=db.now(), llm_status=llm.check())
+def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str = "", q: str = ""):
+    a = auth.require_admin(request)
+    ctx = {"tab": tab, "tabs": ADMIN_TABS, "msg": msg, "link": link, "now": db.now(), "q": q}
+    users = db.q("SELECT u.*, i.name AS inviter_name, i.email AS inviter_email, p.name AS parent_name "
+                 "FROM users u LEFT JOIN users i ON i.id=u.invited_by LEFT JOIN users p ON p.id=u.parent_id ORDER BY u.id")
+    by_id = {u["id"]: u for u in users}
+    ctx["pending"] = [u for u in users if u["status"] == "pending"]
+    week_ago = (db.today() - timedelta(days=7)).isoformat()
+    ctx["stats"] = {
+        "families": sum(1 for u in users if u["role"] == "parent" and u["status"] == "active"),
+        "kids": sum(1 for u in users if u["role"] == "kid"),
+        "pending": len(ctx["pending"]),
+        "active_kids": db.one("SELECT COUNT(DISTINCT user_id) AS n FROM days WHERE day>=? AND (minutes>0 OR checked_in=1)",
+                              week_ago)["n"],
+        "invites_open": db.one("SELECT COUNT(*) AS n FROM invites WHERE used<max_uses AND (expires_at IS NULL OR expires_at>?)",
+                               db.now())["n"],
+    }
+    if tab == "overview":
+        ctx["recent"] = sorted([u for u in users if u["role"] == "parent"], key=lambda u: u["created_at"], reverse=True)[:8]
+    elif tab == "families":
+        fams = []
+        for p in users:
+            if p["role"] != "parent":
+                continue
+            if q and q.lower() not in (p["email"] + p["name"]).lower():
+                continue
+            kids = [kid_brief(k) for k in users if k["parent_id"] == p["id"]]
+            fams.append({"p": p, "kids": kids,
+                         "invited": [u for u in users if u["invited_by"] == p["id"]]})
+        ctx["families"] = fams
+    elif tab == "invites":
+        invites = db.q("SELECT v.*, u.name AS creator_name, u.email AS creator_email FROM invites v "
+                       "LEFT JOIN users u ON u.id=v.created_by ORDER BY v.created_at DESC LIMIT 200")
+        used_by = {}
+        for u in users:
+            if u["invite_code"]:
+                used_by.setdefault(u["invite_code"], []).append(u)
+        ctx["invites"], ctx["used_by"] = invites, used_by
+    elif tab == "tree":
+        parents = [u for u in users if u["role"] == "parent"]
+        children = {}
+        for u in parents:
+            children.setdefault(u["invited_by"] if u["invited_by"] in by_id else None, []).append(u)
+        kids_of = {}
+        for u in users:
+            if u["role"] == "kid":
+                kids_of.setdefault(u["parent_id"], []).append(u)
+
+        def walk(pid, depth):
+            out = []
+            for u in children.get(pid, []):
+                out.append({"u": u, "depth": depth, "kids": kids_of.get(u["id"], []),
+                            "n_invited": len(children.get(u["id"], []))})
+                if depth < 20:
+                    out += walk(u["id"], depth + 1)
+            return out
+        ctx["tree"] = walk(None, 0)
+    elif tab == "log":
+        ctx["events"] = db.q("SELECT * FROM auth_events ORDER BY id DESC LIMIT 300")
+    elif tab == "system":
+        from . import migrate
+        ctx.update(reg_mode=config.REGISTRATION, llm_status=llm.check(), migrations=migrate.status(),
+                   version=_version(), db_dialect=db.DIALECT)
+    ctx["me"] = a
+    return render(request, "admin.html", **ctx)
 
 
-def _admin_back(msg="", link=""):
+def _version() -> str:
+    head = config.BASE_DIR / ".git" / "HEAD"
+    try:
+        ref = head.read_text().strip()
+        if ref.startswith("ref:"):
+            p = config.BASE_DIR / ".git" / ref.split(" ", 1)[1]
+            return p.read_text().strip()[:7] if p.exists() else ref
+        return ref[:7]
+    except OSError:
+        return "未知"
+
+
+def _admin_back(tab="overview", msg="", link=""):
     from urllib.parse import urlencode
-    return RedirectResponse("/admin?" + urlencode({"msg": msg, "link": link}), 303)
+    return RedirectResponse("/admin?" + urlencode({"tab": tab, "msg": msg, "link": link}), 303)
 
 
 @app.post("/admin/users/create")
 def admin_create_user(request: Request, email: str = Form(...), name: str = Form(""), password: str = Form(...)):
     a = auth.require_admin(request)
     try:
-        uid = auth.create_user(email, password, name, "parent")
+        uid = auth.create_user(email, password, name, "parent", invited_by=a["id"])
     except ValueError as e:
-        return _admin_back(msg=str(e))
+        return _admin_back("families", msg=str(e))
     auth.log_event("admin_create_user", user_id=uid, email=email, detail=f"by {a['email']}", request=request)
-    return _admin_back(msg="已创建家长账号 " + email.strip().lower())
+    return _admin_back("families", msg="已创建家长账号 " + email.strip().lower())
 
 
 @app.post("/admin/users/{uid}/status")
-def admin_user_status(request: Request, uid: int, status: str = Form(...)):
+def admin_user_status(request: Request, uid: int, status: str = Form(...), back: str = Form("families")):
     a = auth.require_admin(request)
     if uid == a["id"]:
-        return _admin_back(msg="不能停用自己")
+        return _admin_back(back, msg="不能修改自己的状态")
     u = auth.get_user(uid)
-    if not u:
+    if not u or status not in ("active", "disabled", "rejected"):
         raise HTTPException(404)
-    auth.set_status(uid, "disabled" if status == "disabled" else "active")
-    auth.log_event("admin_" + status, user_id=uid, email=u["email"], detail=f"by {a['email']}", request=request)
-    return _admin_back(msg=f"{u['email']} 已{'停用' if status == 'disabled' else '启用'}")
+    auth.set_status(uid, status, by=a["id"])
+    event = {"active": "approve" if u["status"] == "pending" else "enable", "disabled": "disable", "rejected": "reject"}[status]
+    auth.log_event("admin_" + event, user_id=uid, email=u["email"], detail=f"by {a['email']}", request=request)
+    word = {"approve": "已审批通过", "enable": "已启用", "disable": "已停用", "reject": "已拒绝"}[event]
+    return _admin_back(back, msg=f"{u['email']} {word}")
 
 
 @app.post("/admin/users/{uid}/admin")
@@ -252,14 +356,14 @@ def admin_toggle_admin(request: Request, uid: int, on: str = Form("")):
     a = auth.require_admin(request)
     u = auth.get_user(uid)
     if not u or u["role"] != "parent" or uid == a["id"]:
-        return _admin_back(msg="只能把其他家长账号设为管理员")
+        return _admin_back("families", msg="只能把其他家长账号设为管理员")
     db.run("UPDATE users SET is_admin=? WHERE id=?", 1 if on else 0, uid)
     auth.log_event("admin_grant" if on else "admin_revoke", user_id=uid, email=u["email"], detail=f"by {a['email']}", request=request)
-    return _admin_back(msg="已更新管理员权限")
+    return _admin_back("families", msg="已更新管理员权限")
 
 
 @app.post("/admin/users/{uid}/reset")
-def admin_reset_link(request: Request, uid: int):
+def admin_reset_link(request: Request, uid: int, back: str = Form("families")):
     a = auth.require_admin(request)
     u = auth.get_user(uid)
     if not u:
@@ -267,22 +371,59 @@ def admin_reset_link(request: Request, uid: int):
     token = auth.create_reset(uid, a["id"])
     base = config.PUBLIC_URL or str(request.base_url).rstrip("/")
     auth.log_event("admin_reset_link", user_id=uid, email=u["email"], detail=f"by {a['email']}", request=request)
-    return _admin_back(msg=f"已生成 {u['email']} 的重设密码链接（48 小时内有效，只能用一次），请发给对方：",
+    return _admin_back(back, msg=f"已生成 {u['email']} 的重设密码链接（48 小时内有效，只能用一次），请发给对方：",
                        link=f"{base}/reset/{token}")
+
+
+@app.get("/admin/kids/{kid_id}", response_class=HTMLResponse)
+def admin_kid_report(request: Request, kid_id: int):
+    auth.require_admin(request)
+    k = db.one("SELECT * FROM users WHERE id=? AND role='kid'", kid_id)
+    if not k:
+        raise HTTPException(404)
+    return render(request, "records.html", **_records_ctx(k), report_for=k)
 
 
 @app.post("/admin/invites/create")
 def admin_invite(request: Request, note: str = Form(""), max_uses: int = Form(1), days: int = Form(14)):
     a = auth.require_admin(request)
     code = auth.create_invite(a["id"], note, max_uses, days)
-    return _admin_back(msg=f"新邀请码：{code}（可用 {max_uses} 次，{days} 天内有效）")
+    return _admin_back("invites", msg=f"新邀请码：{code}（可用 {max_uses} 次，{days} 天内有效）",
+                       link=f"{config.PUBLIC_URL or str(request.base_url).rstrip('/')}/login?invite={code}")
 
 
 @app.post("/admin/invites/{code}/delete")
 def admin_invite_delete(request: Request, code: str):
     auth.require_admin(request)
     db.run("DELETE FROM invites WHERE code=?", code)
-    return _admin_back(msg="已删除邀请码")
+    return _admin_back("invites", msg="已作废邀请码 " + code)
+
+
+# ================================================================== 家长邀请亲友
+
+@app.get("/invite", response_class=HTMLResponse)
+def my_invites(request: Request, msg: str = "", link: str = ""):
+    p = auth.require_parent(request)
+    invites = db.q("SELECT * FROM invites WHERE created_by=? ORDER BY created_at DESC", p["id"])
+    joined = db.q("SELECT id, name, email, status, invite_code, created_at FROM users WHERE invited_by=? ORDER BY id", p["id"])
+    return render(request, "invite.html", invites=invites, joined=joined, msg=msg, link=link, now=db.now(),
+                  limit=None if p["is_admin"] else config.PARENT_INVITE_LIMIT, open_n=auth.open_invites(p["id"]),
+                  reg_mode=config.REGISTRATION)
+
+
+@app.post("/invite")
+def my_invite_create(request: Request, note: str = Form("")):
+    from urllib.parse import urlencode
+    p = auth.require_parent(request)
+    if config.REGISTRATION == "closed":
+        return RedirectResponse("/invite?" + urlencode({"msg": "系统目前不开放注册，请联系管理员"}), 303)
+    if not p["is_admin"] and auth.open_invites(p["id"]) >= config.PARENT_INVITE_LIMIT:
+        return RedirectResponse("/invite?" + urlencode({"msg": f"你手里还有 {config.PARENT_INVITE_LIMIT} 个没用完的邀请码，先把它们发出去吧"}), 303)
+    code = auth.create_invite(p["id"], note, 1, 14)
+    auth.log_event("invite_create", user_id=p["id"], email=p["email"], detail=code, request=request)
+    base = config.PUBLIC_URL or str(request.base_url).rstrip("/")
+    return RedirectResponse("/invite?" + urlencode({"msg": f"邀请码：{code}（一次有效，14 天内使用）。把下面的链接发给对方：",
+                                                    "link": f"{base}/login?invite={code}"}), 303)
 
 
 # ================================================================== 家长
@@ -291,18 +432,7 @@ def admin_invite_delete(request: Request, code: str):
 def parent_home(request: Request):
     p = auth.require_parent(request)
     request.session.pop("as_kid", None)
-    kids = []
-    for k in db.q("SELECT * FROM users WHERE parent_id=? ORDER BY id", p["id"]):
-        m = engine.get_mastery(k["id"])
-        packs = [{"pack": catalog.packs[e["pack_id"]], "stage": e["stage"], "sum": engine.pack_summary(k["id"], e["pack_id"], m)}
-                 for e in enrollments(k["id"])]
-        cal = engine.calendar(k["id"], weeks=1)
-        today = engine.today_plan(k["id"]) if packs else {"plan": [], "minutes": 0}
-        weak = sorted([v for v in m.values() if v["status"] == "weak" and catalog.kp(v["kp_id"])], key=lambda v: v["score"])[:5]
-        kids.append({"u": k, "packs": packs, "streak": engine.streak(k["id"]), "week": cal,
-                     "week_min": sum(d["minutes"] for d in cal), "today": today,
-                     "weak": [catalog.kp(w["kp_id"]) for w in weak],
-                     "due": len(engine.due_cards(k["id"], 500))})
+    kids = [kid_brief(k) for k in db.q("SELECT * FROM users WHERE parent_id=? ORDER BY id", p["id"])]
     return render(request, "parent.html", kids=kids)
 
 

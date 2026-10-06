@@ -176,3 +176,44 @@ def test_accounts():
         assert "家长页" in c.post("/login", data={"email": "q@x.com", "password": "newpass1"}).text
         assert db.one("SELECT COUNT(*) AS n FROM auth_events WHERE event='login_fail'")["n"] >= 5
         assert link
+
+
+def test_approval_and_admin(monkeypatch):
+    from app import auth, config, db
+    monkeypatch.setattr(config, "REGISTRATION", "approval")
+    with TestClient(app) as c:
+        # 没有邀请码：提交申请 → 待审批，不能登录
+        r = c.post("/register", data={"email": "s@x.com", "password": "secret1", "name": "申请人", "note": "朋友介绍，孩子四年级"})
+        assert "申请已提交" in r.text
+        assert "等待管理员审批" in c.post("/login", data={"email": "s@x.com", "password": "secret1"}).text
+
+        # 家长生成邀请链接 → 别人用它注册直接开通，记录邀请关系
+        c.post("/login", data={"email": "q@x.com", "password": "newpass1"})
+        r = c.post("/invite", data={"note": "同事"})
+        code = r.text.split("邀请码：")[1][:14]
+        assert "/login?invite=" + code in r.text
+        c.get("/logout")
+        assert code in c.get(f"/login?invite={code}").text
+        r = c.post("/register", data={"email": "t@x.com", "password": "secret1", "name": "同事", "invite": code})
+        assert "家长页" in r.text
+        t = auth.by_email("t@x.com")
+        assert t["invited_by"] == auth.by_email("q@x.com")["id"] and t["invite_code"] == code
+        c.get("/logout")
+
+        # 管理员：概览里能看到待审批，通过后可以登录
+        c.post("/login", data={"email": "p@x.com", "password": "secret1"})
+        r = c.get("/admin")
+        assert "朋友介绍，孩子四年级" in r.text
+        s_id = auth.by_email("s@x.com")["id"]
+        c.post(f"/admin/users/{s_id}/status", data={"status": "active", "back": "overview"})
+        for tab in ["overview", "families", "invites", "tree", "log", "system"]:
+            assert c.get(f"/admin?tab={tab}").status_code == 200, tab
+        fam = c.get("/admin?tab=families").text
+        assert "姐姐" in fam and "连续" in fam
+        assert "同事" in c.get("/admin?tab=tree").text
+        assert "→ 同事" in c.get("/admin?tab=invites").text
+        kid = db.one("SELECT id FROM users WHERE role='kid' ORDER BY id")["id"]
+        assert c.get(f"/admin/kids/{kid}").status_code == 200
+        c.get("/logout")
+        assert "家长页" in c.post("/login", data={"email": "s@x.com", "password": "secret1"}).text
+        assert c.get("/admin").status_code == 403

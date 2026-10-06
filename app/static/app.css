@@ -52,3 +52,8 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:6px 4px;b
 .err{background:var(--warn-2);color:var(--warn);padding:10px 12px;border-radius:10px}
 .loading{color:var(--muted);font-size:14px}.loading::after{content:"…";animation:dots 1s infinite}@keyframes dots{50%{opacity:.2}}
 .banner{background:var(--learn-2);padding:8px 16px;text-align:center;font-size:14px}
+/* 管理后台 */
+.subnav{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}.subnav a{padding:6px 12px;border-radius:99px;background:var(--brand-2);color:var(--brand);text-decoration:none;font-size:14px}.subnav a.on{background:var(--brand);color:#fff}
+.badge{display:inline-block;min-width:18px;padding:0 5px;border-radius:9px;background:var(--warn);color:#fff;font-size:12px;text-align:center}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:14px}.stat{background:var(--card,#fff);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}.stat b{display:block;font-size:26px}.stat span{font-size:13px;color:var(--muted,#888)}
+.card table{display:block;overflow-x:auto}

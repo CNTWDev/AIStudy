@@ -67,7 +67,7 @@ sudo /opt/aistudy/install.sh install            # 可加 --domain / --mirror cn
 3. 孩子在自己的设备上用自己的邮箱登录。手机浏览器里可以「添加到主屏幕」，像 App 一样打开。
 
 其他家庭想用：管理员在「管理」页生成**邀请码**发给对方，对方在登录页「新家庭注册」时填写。
-也可以在 `.env` 里把 `REGISTRATION` 改成 `closed`（只能管理员创建）或 `open`（任何人可注册）。
+没有邀请码的人也能提交申请，管理员在「管理 → 概览」里审批。`.env` 的 `REGISTRATION` 可改为 `invite`（必须邀请码）、`closed`（只能管理员创建）或 `open`（任何人可注册）。
 
 ## 4. 配置 AI（Claude 等）
 

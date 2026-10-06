@@ -5,6 +5,8 @@
   退出、改密码、停用账号、管理员强制下线都会删除对应会话，立即失效。
 - 锁定：同一账号连续输错 LOGIN_MAX_FAILS 次，锁定 LOGIN_LOCK_MINUTES 分钟。
 - 角色：parent（家长）/ kid（孩子，属于某个家长）；is_admin=1 的家长是管理员（第一个注册的账号）。
+- 状态：active 正常 / pending 等待审批 / rejected 未通过 / disabled 已停用。
+- 邀请：管理员和家长都能生成邀请码；用邀请码注册的账号记录 invited_by（谁邀请的）和 invite_code。
 """
 import hashlib
 import hmac
@@ -92,15 +94,19 @@ def by_email(email: str):
 
 
 def create_user(email: str, password: str, name: str, role: str = "parent", *, parent_id=None, is_admin=False,
-                grade="G3", school="", daily_minutes=60) -> int:
+                grade="G3", school="", daily_minutes=60, status="active", invited_by=None, invite_code=None,
+                apply_note="") -> int:
     email = validate_email(email)
     validate_pw(password)
     if by_email(email):
         raise ValueError("这个邮箱已注册")
+    now = db.now()
     return db.insert(
-        "INSERT INTO users(email,pw_hash,name,role,parent_id,is_admin,grade,school,daily_minutes,pw_changed_at,created_at) "
-        "VALUES(?,?,?,?,?,?,?,?,?,?,?)", email, hash_pw(password), (name or "").strip()[:40] or ("家长" if role == "parent" else "孩子"),
-        role, parent_id, 1 if is_admin else 0, grade, school, daily_minutes, db.now(), db.now())
+        "INSERT INTO users(email,pw_hash,name,role,parent_id,is_admin,grade,school,daily_minutes,status,invited_by,"
+        "invite_code,apply_note,approved_at,pw_changed_at,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        email, hash_pw(password), (name or "").strip()[:40] or ("家长" if role == "parent" else "孩子"),
+        role, parent_id, 1 if is_admin else 0, grade, school, daily_minutes, status, invited_by, invite_code,
+        (apply_note or "")[:300], now if status == "active" else None, now, now)
 
 
 def set_password(uid: int, password: str, *, keep_session: str | None = None) -> None:
@@ -115,11 +121,14 @@ def set_password(uid: int, password: str, *, keep_session: str | None = None) ->
             t.run("DELETE FROM sessions WHERE user_id=?", uid)
 
 
-def set_status(uid: int, status: str) -> None:
-    assert status in ("active", "disabled")
+def set_status(uid: int, status: str, by: int | None = None) -> None:
+    assert status in ("active", "disabled", "pending", "rejected")
     with db.tx() as t:
-        t.run("UPDATE users SET status=? WHERE id=?", status, uid)
-        if status == "disabled":
+        if status == "active":
+            t.run("UPDATE users SET status=?, approved_at=COALESCE(approved_at, ?), approved_by=COALESCE(approved_by, ?) "
+                  "WHERE id=?", status, db.now(), by, uid)
+        else:
+            t.run("UPDATE users SET status=? WHERE id=?", status, uid)
             t.run("DELETE FROM sessions WHERE user_id=?", uid)
 
 
@@ -141,8 +150,9 @@ def authenticate(email: str, password: str, request: Request | None = None):
         log_event("login_fail", user_id=u["id"], email=email, detail="locked" if locked else f"fail {fails}", request=request)
         return None, "邮箱或密码不对"
     if u["status"] != "active":
-        log_event("login_disabled", user_id=u["id"], email=email, request=request)
-        return None, "这个账号已被停用，请联系家长或管理员"
+        log_event("login_" + u["status"], user_id=u["id"], email=email, request=request)
+        return None, {"pending": "账号已提交申请，正在等待管理员审批，通过后就能登录",
+                      "rejected": "账号申请没有通过，请联系管理员"}.get(u["status"], "这个账号已被停用，请联系家长或管理员")
     return u, ""
 
 
@@ -187,7 +197,9 @@ def current_user(request: Request):
             if u and u["status"] == "active":
                 user = u
                 if s["last_seen"] < _iso(now - timedelta(minutes=5)):
-                    db.run("UPDATE sessions SET last_seen=? WHERE token_hash=?", _iso(now), s["token_hash"])
+                    with db.tx() as t:
+                        t.run("UPDATE sessions SET last_seen=? WHERE token_hash=?", _iso(now), s["token_hash"])
+                        t.run("UPDATE users SET last_active_at=? WHERE id=?", _iso(now), u["id"])
         if user is None:
             request.session.clear()
     request.state.user = user
@@ -204,18 +216,28 @@ def revoke_session(uid: int, token_hash: str) -> None:
 
 # ------------------------------------------------------------------ 邀请码 / 重设密码
 
-def create_invite(created_by: int, note="", max_uses=1, days=14) -> str:
+def create_invite(created_by: int | None, note="", max_uses=1, days=14) -> str:
     code = "-".join(secrets.token_hex(2).upper() for _ in range(3))
     db.run("INSERT INTO invites(code,created_by,note,max_uses,used,expires_at,created_at) VALUES(?,?,?,?,0,?,?)",
-           code, created_by, note[:100], max(1, int(max_uses)), _iso(_now() + timedelta(days=days)), db.now())
+           code, created_by, note[:100], max(1, min(int(max_uses), 1000)), _iso(_now() + timedelta(days=max(1, int(days)))),
+           db.now())
     return code
 
 
-def use_invite(t: "db.Tx", code: str) -> bool:
+def open_invites(uid: int) -> int:
+    """这个人手里还能用的邀请码数量。"""
+    return db.one("SELECT COUNT(*) AS n FROM invites WHERE created_by=? AND used<max_uses AND (expires_at IS NULL OR expires_at>?)",
+                  uid, db.now())["n"]
+
+
+def use_invite(t: "db.Tx", code: str):
+    """邀请码有效则占用一次，返回邀请码记录；无效返回 None。"""
     code = (code or "").strip().upper()
+    if not code:
+        return None
     n = t.run("UPDATE invites SET used=used+1 WHERE code=? AND used<max_uses AND (expires_at IS NULL OR expires_at>?)",
               code, db.now())
-    return n == 1
+    return t.one("SELECT * FROM invites WHERE code=?", code) if n == 1 else None
 
 
 def create_reset(uid: int, created_by: int | None, hours=48) -> str:
