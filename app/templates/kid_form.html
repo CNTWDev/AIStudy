@@ -28,7 +28,7 @@
     <label class="row" style="margin:0;font-weight:400"><input type="radio" name="subj_{{ packs[0].subject }}" value="" style="width:auto" {{ 'checked' if not cur }}> <span class="muted">暂不安排</span></label>
     {% for p in packs %}
     <label class="row" style="margin:4px 0 0;font-weight:400"><input type="radio" name="subj_{{ p.subject }}" value="{{ p.id }}" style="width:auto" {{ 'checked' if cur and cur.id == p.id }}>
-      <span class="grow"><b>{{ p.edition }}</b> <span class="muted small">{{ p.region }}{% if stage_rank(p.stages[0]) > stage_rank(k.grade if k else 'G3') %} · {{ stage_label(p.stages[0]) }}开始，现在选就是提前预习{% endif %}</span>
+      <span class="grow"><b>{{ p.edition }}</b> <span class="muted small">{{ p.region }}{% if k and stage_rank(p.stages[0]) > stage_rank(k.grade) %} · {{ stage_label(p.stages[0]) }}开始，现在选就是提前预习{% endif %}</span>
       {% if p.tracks %}<select name="track_{{ p.id }}" class="trk" style="margin-top:4px" title="方向">{% for t in p.tracks %}<option value="{{ t.id }}" {{ 'selected' if p.track(tracks.get(p.id)) == t.id }}>{{ t.name }}</option>{% endfor %}</select>{% endif %}</span></label>
     {% endfor %}
   </div>
