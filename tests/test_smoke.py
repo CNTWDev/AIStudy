@@ -525,7 +525,8 @@ def test_explore_warmup_and_selection(monkeypatch):
         c.post("/login", data={"email": "a@x.com", "password": "secret1"})
         # 每天的清单最前面有「热身」：混着以前学过的知识点和旧单词
         plan = c.post("/api/plan/rebuild").json()["plan"]
-        assert any(t["type"] == "warmup" for t in plan[:2]), plan
+        todo = [t for t in plan if not t["done"]]  # 今天已经做完的旧任务会留在清单最前面
+        assert any(t["type"] == "warmup" for t in todo[:2]), plan
         cov0 = {x["pack"].id: x["known"] for x in explore.coverage(kid)}
         items = c.get("/api/warmup").json()["items"]
         words = [i for i in items if i.get("word")]
