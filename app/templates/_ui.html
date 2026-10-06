@@ -48,7 +48,7 @@
 
 {# 学科的图标和颜色 #}
 {% set SUBJ = {'chinese': ('📖', 'coral'), 'english': ('🔤', 'sky'), 'math': ('📐', 'violet'), 'physics': ('⚡', 'brand'),
-  'chemistry': ('⚗️', 'learn'), 'biology': ('🌱', 'ok'), 'history': ('🏛️', 'warn'), 'geography': ('🌏', 'sky'), 'science': ('🔬', 'brand')} %}
+  'chemistry': ('⚗️', 'learn'), 'biology': ('🌱', 'ok'), 'history': ('🏛️', 'warn'), 'geography': ('🌏', 'sky'), 'science': ('🔬', 'brand'), 'economics': ('💹', 'warn')} %}
 {% macro subj_ico(subject, size=40) %}{% set c = SUBJ.get(subject, ('📘', 'brand')) %}<span class="sico" style="width:{{ size }}px;height:{{ size }}px;font-size:{{ (size * 0.5)|int }}px;background:var(--{{ c[1] }}-2);color:var(--{{ c[1] }})">{{ c[0] }}</span>{% endmacro %}
 
 {# 掌握情况：一条分段进度条 + 图例 #}

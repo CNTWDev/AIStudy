@@ -1,0 +1,15 @@
+{
+ "_doc": "经济：和数学、地理之间的融合。数学前置已写在 econ-cambridge 的 prereqs 里，这里只放相关背景。",
+ "concepts": [],
+ "links": [
+  {"from": "ECO-IG-5.3-01", "to": "GSH-HUM-01", "type": "context", "note": "地理课讲过世界人口增长和分布，经济课再从出生率、死亡率、迁移看人口为什么变化"},
+  {"from": "ECO-IG-5.3-02", "to": "GSH-HS2-03", "type": "context", "note": "人口合理容量和资源承载力，就是人口规模变化对经济影响的地理角度"},
+  {"from": "ECO-IG-5.4-01", "to": "GSH-HUM-04", "type": "context", "note": "地理里的发达国家和发展中国家，经济课用人均 GDP、HDI 来衡量差距并解释原因"},
+  {"from": "ECO-IG-6.1-01", "to": "GSH-HUM-04", "type": "context", "note": "各国按自身条件分工合作，就是经济课里国家专业化和自由贸易的现实例子"},
+  {"from": "ECO-IG-3.5-02", "to": "GSH-HS2-08", "type": "context", "note": "地理里的工业区位和工业类型（劳动力导向、技术导向）对应劳动密集型和资本密集型生产"},
+  {"from": "ECO-IG-2.9-02", "to": "GSH-HS2-14", "type": "context", "note": "污染这类外部成本是市场失灵；地理课从人地关系和可持续发展看同一个问题"},
+  {"from": "ECO-IG-6.3-01", "to": "MATH-IG-1.16-01", "type": "uses", "note": "汇率换算在数学课就练过，经济课要解释汇率为什么变、变了有什么影响"},
+  {"from": "ECO-IG-4.7-01", "to": "MATH-LS-9N-05", "type": "uses", "note": "连续几年的通胀率叠加就是复合百分比"},
+  {"from": "ECO-IG-4.5-01", "to": "MATH-IG-1.17-01", "type": "uses", "note": "每年按固定增长率增长的 GDP 就是指数增长"}
+ ]
+}

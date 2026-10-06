@@ -1,0 +1,3250 @@
+{
+ "pack": {
+  "id": "econ-cambridge",
+  "subject": "economics",
+  "subject_name": "经济",
+  "edition": "Cambridge IGCSE Economics 0455 (2027–2029)",
+  "region": "国际学校",
+  "stages": [
+   "IGCSE"
+  ],
+  "version": 1,
+  "generated": "2026-10-06",
+  "verified": "2026-10-06",
+  "sources": [
+   "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf",
+   "https://www.cambridgeinternational.org/Images/736034-2027-2029-syllabus-update.pdf",
+   "https://www.cambridgeinternational.org/Images/697154-2026-syllabus.pdf",
+   "https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf",
+   "https://www.cambridgeinternational.org/Images/663781-syllabus-changes-international-.pdf",
+   "https://cambridgeinternational.org/Images/718206-2027-2029-syllabus.pdf",
+   "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-lower-secondary/curriculum/",
+   "https://www.ibo.org/programmes/middle-years-programme/curriculum/individuals-and-societies/",
+   "https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 第三方镜像，佐证）"
+  ],
+  "notes": "知识图谱：Cambridge IGCSE Economics 0455，按 2027–2029 版大纲（718148，version 1, 2024-09；更新文件 736034 于 2025-06 仅更新 Specimen Paper 2 第 1(a)、3(b)、5(a) 题评分方案与样卷）全部 6 个 Section、所有学习目标组（1.1.1–6.4.4）建点，另加 4 个考试技能点（strand EX，对应 AO1–AO3）。2026 年考试仍用旧版（697154，2026 syllabus v2，Paper 1：30 题 45 分钟 30 分；Paper 2：2 小时 15 分 90 分）；2027 起新版：所有考生考两卷，无 Core/Extended 分层，等级 A*–G——Paper 1 选择题 40 题 1 小时 40 分（30%），Paper 2 结构题 2 小时 80 分（70%）：Section A 1 道必答案例题（20 分，a–f），Section B 4 选 3（各 20 分，a–d）；可用计算器。AO1 知识理解约 43%、AO2 分析约 47%、AO3 评价约 10%（仅 Paper 2）。新版主要变化：删去工会、企业成长方式、税收原则等旧内容，新增稀缺性、五种弹性类型、垄断作为市场失灵、竞争性市场、兼并定义、ATC 规模经济图、投资对生产率影响、衰退、季节性失业、医疗、全球化变化，并在全书加入环境可持续。Cambridge O Level Economics 2281（2027–2029 版 718206）考试结构与 0455 相同（Paper 1 40 题 1 小时 30%，Paper 2 2 小时 80 分 70%），官方称与其他经济学大纲共享内容、IGCSE 教材适用，但不能与 0455 同季报考；另有 IGCSE (9–1) Economics 0987（仅部分地区）。Cambridge IGCSE Business Studies 0450 是另一门学科，本包不含。入学前：Cambridge Lower Secondary 没有独立的经济课；新设的 Lower Secondary Humanities 0839 的 People 线涉及心理、社会、经济等社会科学，但学习目标全文仅在教师支持站，未能核实，故本包不设 G7–G8 预备点，数学前置指向 math-cambridge。IB MYP Individuals & Societies 可开设独立经济学课程或含经济的综合人文课。level 全部为 core（大纲无分层）；syllabus 字段为学习目标编号；hot=true 仅当该点出现在 2027 Specimen Paper 2 评分方案的题目中或被 2024 年 6 月考官报告列为考生薄弱点（来源写在 source 中）；官方不公布考点频率。prereqs 中 strength 取 必须 / 有帮助。",
+  "system": "cambridge",
+  "school_types": [
+   "international",
+   "private"
+  ]
+ },
+ "strands": [
+  {
+   "id": "E1",
+   "name": "基本经济问题"
+  },
+  {
+   "id": "E2",
+   "name": "资源配置：市场、供求与政府干预"
+  },
+  {
+   "id": "E3",
+   "name": "微观经济决策者：货币银行、家庭、工人、企业"
+  },
+  {
+   "id": "E4",
+   "name": "政府与宏观经济"
+  },
+  {
+   "id": "E5",
+   "name": "经济发展"
+  },
+  {
+   "id": "E6",
+   "name": "国际贸易与全球化"
+  },
+  {
+   "id": "EX",
+   "name": "考试技能（AO1 知识 / AO2 分析 / AO3 评价）"
+  }
+ ],
+ "kps": [
+  {
+   "id": "ECO-IG-1.1-01",
+   "strand": "E1",
+   "stage": "IGCSE",
+   "unit": "1 The basic economic problem",
+   "syllabus": "1.1.1",
+   "level": "core",
+   "name": "基本经济问题与稀缺性",
+   "name_en": "The basic economic problem and scarcity",
+   "desc": "基本经济问题：有限的资源（finite resources）无法满足无限的欲望（infinite wants），由此产生稀缺性（scarcity）；能分别举出消费者、工人、企业、政府面对的稀缺性例子",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "basic economic problem",
+    "scarcity",
+    "finite resources",
+    "unlimited/infinite wants",
+    "needs",
+    "wants",
+    "consumers",
+    "producers",
+    "governments"
+   ],
+   "method": "先背准定义原句，再给四类决策者各造一个例子（零花钱、时间、工厂预算、政府预算）。常见错误：把 scarcity 写成 shortage（短缺是价格低于均衡时的市场现象，稀缺是永恒的基本问题）。",
+   "probe": "问：“即使富裕国家也存在 basic economic problem”——为什么？看她是否答出“欲望无限而资源有限”，而非“有穷人”。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 1.1.1"
+  },
+  {
+   "id": "ECO-IG-1.1-02",
+   "strand": "E1",
+   "stage": "IGCSE",
+   "unit": "1 The basic economic problem",
+   "syllabus": "1.1.2",
+   "level": "core",
+   "name": "三个基本经济问题",
+   "name_en": "What, how and for whom to produce",
+   "desc": "资源配置决策的三个基本问题：生产什么（what）、如何生产（how，如劳动密集或资本密集）、为谁生产（for whom）；任何经济体系都必须回答",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "resource allocation",
+    "what to produce",
+    "how to produce",
+    "for whom to produce",
+    "economic system"
+   ],
+   "method": "用一家奶茶店和一个国家各回答一遍三问。常见错误：把 for whom 理解成“卖给谁做广告”，它指产出在人群间如何分配（谁买得起）。",
+   "probe": "问：政府决定用机器人而非工人修路，回答的是哪个基本问题？（how）",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 1.1.2"
+  },
+  {
+   "id": "ECO-IG-1.1-03",
+   "strand": "E1",
+   "stage": "IGCSE",
+   "unit": "1 The basic economic problem",
+   "syllabus": "1.1.3",
+   "level": "core",
+   "name": "经济物品与自由物品",
+   "name_en": "Economic goods and free goods",
+   "desc": "经济物品需要稀缺资源生产、有机会成本、通常有价格；自由物品（如空气、海水）不稀缺、生产不耗资源、机会成本为零；同一物品在不同情境可能转化（如瓶装水）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "economic good",
+    "free good",
+    "opportunity cost",
+    "scarce"
+   ],
+   "method": "判断标准只看“是否用了稀缺资源/有无机会成本”，不看“是否收费”。常见错误：把免费公立学校、公园当 free good——它们是政府付费的 economic good（或 public/merit good）。",
+   "probe": "问：公立学校学生不交学费，教育是 free good 吗？为什么？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 1.1.3"
+  },
+  {
+   "id": "ECO-IG-1.2-01",
+   "strand": "E1",
+   "stage": "IGCSE",
+   "unit": "1 The basic economic problem",
+   "syllabus": "1.2.1",
+   "level": "core",
+   "name": "生产要素及其报酬",
+   "name_en": "Factors of production and their rewards",
+   "desc": "四种生产要素：土地 land（一切自然资源）、劳动 labour（人的体力脑力）、资本 capital（人造的生产用品，如机器厂房）、企业家才能 enterprise（组织其他要素并承担风险）；对应报酬：rent、wages、interest、profit",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "factors of production",
+    "land",
+    "labour",
+    "capital",
+    "enterprise",
+    "entrepreneur",
+    "rent",
+    "wages",
+    "interest",
+    "profit",
+    "capital goods"
+   ],
+   "method": "画 4×2 表一一对应。常见错误：把“钱”当 capital（经济学的 capital 是 capital goods）；把报酬与要素混写——2024 考官报告指出考生被问 reward 时答了 factor。",
+   "probe": "问：一位厨师的工资、一台烤箱、一块店面、老板承担的风险，各属于哪种要素或报酬？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 1.2.1；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 21：factor of production 与 reward 混淆"
+  },
+  {
+   "id": "ECO-IG-1.2-02",
+   "strand": "E1",
+   "stage": "IGCSE",
+   "unit": "1 The basic economic problem",
+   "syllabus": "1.2.2",
+   "level": "core",
+   "name": "生产要素数量与质量的变化",
+   "name_en": "Changes in the quantity and quality of factors of production",
+   "desc": "各要素数量变化的原因（如移民与人口增长改变劳动数量、发现新资源、投资增加资本存量、资源枯竭）与质量变化的原因（教育培训提高劳动质量、技术进步提高资本质量、土地改良或污染）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "quantity",
+    "quality",
+    "investment",
+    "education",
+    "training",
+    "technology",
+    "depletion",
+    "net migration"
+   ],
+   "method": "每种要素各写一条“数量↑原因”“质量↑原因”。常见错误：把“更多工人”说成劳动质量提升。",
+   "probe": "问：一国推行职业培训，与接纳大量移民，分别影响劳动的数量还是质量？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 1.2.2；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）1(b)/1(c) 资本品与生产率"
+  },
+  {
+   "id": "ECO-IG-1.3-01",
+   "strand": "E1",
+   "stage": "IGCSE",
+   "unit": "1 The basic economic problem",
+   "syllabus": "1.3.1",
+   "level": "core",
+   "name": "机会成本",
+   "name_en": "Opportunity cost",
+   "desc": "机会成本：做出选择时放弃的“次优选择”（next best alternative forgone）的价值；能在消费者、工人、企业、政府等不同情境中举例",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "opportunity cost",
+    "next best alternative",
+    "forgone",
+    "choice",
+    "trade-off"
+   ],
+   "method": "定义必须出现 “next best alternative forgone” 四个词。常见错误：把所有放弃的选项加总，或答成“花掉的钱”。2024 考官报告：考生没看出政府支出选择中的机会成本。",
+   "probe": "问：小明周六可以打工赚 200 元、补课或去打球，他选了补课，机会成本是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 1.3.1；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 22/13：opportunity cost 识别；https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）5(b) 上大学的机会成本"
+  },
+  {
+   "id": "ECO-IG-1.3-02",
+   "strand": "E1",
+   "stage": "IGCSE",
+   "unit": "1 The basic economic problem",
+   "syllabus": "1.3.2",
+   "level": "core",
+   "name": "机会成本对决策的影响",
+   "name_en": "Opportunity cost and decision-making",
+   "desc": "消费者、工人、企业、政府分配资源时如何权衡机会成本：如政府增加医疗支出可能减少教育支出；学生上大学放弃工资收入",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "decision-making",
+    "allocate",
+    "trade-off",
+    "government spending",
+    "consumers",
+    "workers",
+    "firms"
+   ],
+   "method": "答题用“如果选 A，就放弃了 B 带来的……”句式。常见错误：只写定义不落到情境。",
+   "probe": "问：政府决定修高铁，对纳税人和其他公共服务意味着什么机会成本？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 1.3.2；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）5(b)"
+  },
+  {
+   "id": "ECO-IG-1.4-01",
+   "strand": "E1",
+   "stage": "IGCSE",
+   "unit": "1 The basic economic problem",
+   "syllabus": "1.4.1",
+   "level": "core",
+   "name": "生产可能性曲线的定义与画法",
+   "name_en": "Production possibility curve (PPC)",
+   "desc": "PPC：在资源和技术给定、全部有效利用时，一个经济体能生产的两种产品的最大组合；能画出向外凸的曲线（机会成本递增）或直线（机会成本不变），轴标两种产品名",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-LS-7A-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "production possibility curve",
+    "PPC",
+    "maximum output",
+    "combination",
+    "capital goods",
+    "consumer goods"
+   ],
+   "method": "画图三要素：两轴标产品名（不是 price/quantity）、曲线触及两轴、标题。2024 考官报告：考生把 PPC 轴写成 price/quantity，或曲线没碰到轴就拐回。",
+   "probe": "让她画一条资本品—消费品 PPC，检查轴标签和曲线端点。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 1.4.1；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 22/23：PPC 轴标签、曲线未触轴"
+  },
+  {
+   "id": "ECO-IG-1.4-02",
+   "strand": "E1",
+   "stage": "IGCSE",
+   "unit": "1 The basic economic problem",
+   "syllabus": "1.4.2",
+   "level": "core",
+   "name": "PPC 内、上、外的点",
+   "name_en": "Points under, on and beyond a PPC",
+   "desc": "曲线内的点表示资源未充分利用（如失业）、生产无效率；曲线上的点表示充分有效利用；曲线外的点在现有资源下无法达到",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "productive efficiency",
+    "unemployment",
+    "unemployed resources",
+    "unattainable",
+    "inefficient"
+   ],
+   "method": "把三类点和“失业/充分就业/不可达”挂钩。常见错误：说曲线外的点“效率更高”。",
+   "probe": "问：经济衰退时，一国的生产点在 PPC 的什么位置？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 1.4.2；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 12 Q3 PPC"
+  },
+  {
+   "id": "ECO-IG-1.4-03",
+   "strand": "E1",
+   "stage": "IGCSE",
+   "unit": "1 The basic economic problem",
+   "syllabus": "1.4.3",
+   "level": "core",
+   "name": "沿 PPC 移动与机会成本",
+   "name_en": "Movements along a PPC",
+   "desc": "沿曲线移动表示把资源从一种产品转到另一种，多生产一种就要少生产另一种，减少量即机会成本；能从图上读出并计算机会成本",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-1.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "movement along",
+    "reallocation",
+    "opportunity cost"
+   ],
+   "method": "在图上标出 A→B，用两个产量差写出“多生产 X 单位 A 的机会成本是 Y 单位 B”。常见错误：读反方向。",
+   "probe": "给一张 PPC：从 (20,50) 移到 (30,40)，多生产 10 单位食物的机会成本是多少？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 1.4.3"
+  },
+  {
+   "id": "ECO-IG-1.4-04",
+   "strand": "E1",
+   "stage": "IGCSE",
+   "unit": "1 The basic economic problem",
+   "syllabus": "1.4.4",
+   "level": "core",
+   "name": "PPC 的移动：原因与后果",
+   "name_en": "Shifts of a PPC and economic growth",
+   "desc": "要素数量增加或质量提高（投资、技术进步、教育、移民、发现资源）使 PPC 向外移，代表潜在经济增长；灾害、战争、资源枯竭、人口流出使其内移；只影响一种产品的技术进步使曲线单边转动；今天多生产资本品可使未来 PPC 外移",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-1.2-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "shift",
+    "outward shift",
+    "inward shift",
+    "economic growth",
+    "potential output",
+    "technology",
+    "investment"
+   ],
+   "method": "区分“点向曲线移动（实际增长、利用闲置资源）”与“曲线外移（产能增长）”。2024 考官报告：考生忽略题干中的“未来”维度——多生产资本品意味着未来 PPC 外移。",
+   "probe": "问：一国今年把更多资源用于生产机器而非消费品，今年和十年后的 PPC 各有什么变化？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 1.4.4；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 12 Q3：PPC 的未来维度"
+  },
+  {
+   "id": "ECO-IG-2.1-01",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.1.1",
+   "level": "core",
+   "name": "市场的含义与买卖双方",
+   "name_en": "How markets work",
+   "desc": "市场：买方和卖方交换商品服务的任何安排（不一定是实体场所），举例（商品市场、劳动市场、外汇市场、网购平台）；买方决定需求、卖方决定供给",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "market",
+    "buyers",
+    "sellers",
+    "consumers",
+    "producers",
+    "product market",
+    "labour market"
+   ],
+   "method": "定义强调 “buyers and sellers come together to exchange”。常见错误：只说“买东西的地方”。",
+   "probe": "问：淘宝、人才招聘会、外汇交易各是哪种市场？谁是买方谁是卖方？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.1.1"
+  },
+  {
+   "id": "ECO-IG-2.2-01",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.2.1",
+   "level": "core",
+   "name": "需求、个人需求与市场需求",
+   "name_en": "Individual and market demand",
+   "desc": "需求：在一定价格下愿意且有能力（willing and able）购买的数量；市场需求是所有个人需求在每一价格下的横向加总；需求曲线向下倾斜，纵轴 Price、横轴 Quantity demanded",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-LS-8A-07",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "demand",
+    "willing and able",
+    "individual demand",
+    "market demand",
+    "demand schedule",
+    "demand curve",
+    "quantity demanded",
+    "law of demand"
+   ],
+   "method": "用需求表画曲线、两人需求表相加得市场需求。常见错误：定义漏掉 “able”（有购买力），把“想要”等同需求。",
+   "probe": "给两个消费者的需求表，求价格 5 时的市场需求量，并画出市场需求曲线。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.2.1"
+  },
+  {
+   "id": "ECO-IG-2.2-02",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.2.2",
+   "level": "core",
+   "name": "沿需求曲线移动：扩张与收缩",
+   "name_en": "Movements along a demand curve",
+   "desc": "只有商品自身价格变化引起需求量变化，表现为沿曲线移动：降价→需求扩张（extension），涨价→需求收缩（contraction）；能画图标出点的移动",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "extension in demand",
+    "contraction in demand",
+    "movement along",
+    "quantity demanded",
+    "own price"
+   ],
+   "method": "口诀：“自身价格 = 沿线走；其他因素 = 整条线移”。2024 考官报告：考生把 extension in demand 和需求曲线移动混为一谈，是 MCQ 错得最多的题之一。",
+   "probe": "问：电影票降价后看电影的人变多，这是需求增加还是需求扩张？画图说明。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.2.2；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 12 Q5：extension vs shift"
+  },
+  {
+   "id": "ECO-IG-2.2-03",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.2.3",
+   "level": "core",
+   "name": "需求曲线的移动及原因",
+   "name_en": "Shifts of a demand curve",
+   "desc": "非价格因素使整条需求曲线移动：收入、替代品与互补品价格、偏好与时尚、广告、人口规模与结构、税收与补贴（对消费者）、利率等；增加右移、减少左移；画图须标 D1、D2 与新的数量",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.2-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "increase in demand",
+    "decrease in demand",
+    "shift",
+    "income",
+    "substitute",
+    "complement",
+    "tastes and fashion",
+    "advertising",
+    "population"
+   ],
+   "method": "把每个因素造一个例子并判方向（替代品涨价→本品需求右移）。2024 考官报告：新曲线不标注、移错曲线；MCQ 中把“需求增加”和“供给减少”同时选。",
+   "probe": "问：咖啡涨价，对茶叶和咖啡伴侣的需求曲线各有什么影响？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.2.3；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 21 图形标注、Paper 13 Q5；https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）1(d) 画供求图"
+  },
+  {
+   "id": "ECO-IG-2.3-01",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.3.1",
+   "level": "core",
+   "name": "供给、个人供给与市场供给",
+   "name_en": "Individual and market supply",
+   "desc": "供给：在一定价格下生产者愿意且能够出售的数量；市场供给是所有企业供给的加总；供给曲线向上倾斜（价格越高利润动机越强）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "supply",
+    "willing and able",
+    "individual supply",
+    "market supply",
+    "supply schedule",
+    "supply curve",
+    "quantity supplied"
+   ],
+   "method": "与需求对照学，解释“为什么向上倾斜”要提利润（profit motive）。常见错误：画图时轴标错或把 S 画成向下。",
+   "probe": "问：为什么价格上升时企业愿意多供给？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.3.1"
+  },
+  {
+   "id": "ECO-IG-2.3-02",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.3.2",
+   "level": "core",
+   "name": "沿供给曲线移动",
+   "name_en": "Movements along a supply curve",
+   "desc": "只由商品自身价格引起：涨价→供给扩张（extension），降价→供给收缩（contraction）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.2-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "extension in supply",
+    "contraction in supply",
+    "movement along",
+    "quantity supplied"
+   ],
+   "method": "同需求的口诀。常见错误：价格上涨说成“供给增加”。",
+   "probe": "问：房价上涨后开发商建更多房子，是供给增加还是供给扩张？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.3.2"
+  },
+  {
+   "id": "ECO-IG-2.3-03",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.3.3",
+   "level": "core",
+   "name": "供给曲线的移动及原因",
+   "name_en": "Shifts of a supply curve",
+   "desc": "非价格因素：生产成本（工资、原材料）、技术、间接税与补贴、天气与自然灾害、企业数量、其他产品的价格；增加右移、减少左移",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.3-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.2-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "increase in supply",
+    "decrease in supply",
+    "costs of production",
+    "technology",
+    "indirect tax",
+    "subsidy",
+    "weather"
+   ],
+   "method": "记“成本↑供给左移”。2024 考官报告：考生误以为关税使需求曲线移动——关税提高进口品成本，使供给左移。",
+   "probe": "问：对进口汽车征关税，国内进口车市场哪条曲线移动？向哪边？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.3.3；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 12 Q27：tariff 移动 supply"
+  },
+  {
+   "id": "ECO-IG-2.4-01",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.4.1",
+   "level": "core",
+   "name": "价格机制",
+   "name_en": "The price mechanism",
+   "desc": "价格机制通过价格的信号（signalling）、激励（incentive）和配给（rationing）作用，回答生产什么、如何生产、为谁生产三个基本问题",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "price mechanism",
+    "signal",
+    "incentive",
+    "rationing",
+    "resource allocation",
+    "invisible hand"
+   ],
+   "method": "用“某商品需求上升→价格涨→利润上升→资源流入”这条链练习。常见错误：只说“价格由供求决定”，没有说出价格如何引导资源配置。",
+   "probe": "问：人们越来越爱吃植物肉，价格机制如何让更多资源流入这个行业？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.4.1"
+  },
+  {
+   "id": "ECO-IG-2.4-02",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.4.2",
+   "level": "core",
+   "name": "市场均衡",
+   "name_en": "Market equilibrium",
+   "desc": "均衡：需求量等于供给量时的价格和数量，市场出清、无内在变化压力；能从供求表找均衡、在图上标出 Pe、Qe",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "equilibrium",
+    "equilibrium price",
+    "equilibrium quantity",
+    "market clearing",
+    "demand and supply schedules"
+   ],
+   "method": "先在表中找 Qd=Qs 的行，再画图核对。常见错误：把均衡说成“价格最低”或“人人都买得到”。",
+   "probe": "给供求表，问均衡价格和数量各是多少。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.4.2"
+  },
+  {
+   "id": "ECO-IG-2.4-03",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.4.3",
+   "level": "core",
+   "name": "市场失衡：短缺与过剩",
+   "name_en": "Market disequilibrium: shortages and surpluses",
+   "desc": "价格高于均衡→供给大于需求→过剩（surplus），价格下降；价格低于均衡→需求大于供给→短缺（shortage），价格上升；能在表和图上量出过剩或短缺的数量",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.4-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "disequilibrium",
+    "shortage",
+    "excess demand",
+    "surplus",
+    "excess supply"
+   ],
+   "method": "在图上画一条高于和低于均衡的水平线，标出 Qd、Qs 之差。常见错误：短缺量写成 Qd 或 Qs 本身而非差值。",
+   "probe": "问：价格定在 8 元时需求 100、供给 160，市场处于什么状态？差额多少？价格会怎样变？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.4.3；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）3(c) 最高最低价造成的失衡"
+  },
+  {
+   "id": "ECO-IG-2.5-01",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.5.1",
+   "level": "core",
+   "name": "价格变化的原因",
+   "name_en": "Causes of price changes",
+   "desc": "需求或供给的变化如何改变均衡价格：需求增加→价格和数量都上升；供给增加→价格下降、数量上升；两者同时变化时的组合判断",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.4-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.2-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.3-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "change in equilibrium",
+    "increase in demand",
+    "decrease in supply",
+    "new equilibrium"
+   ],
+   "method": "每题四步：哪条线、向哪移、画新均衡、写价格数量变化。常见错误：一个事件同时移动两条线。",
+   "probe": "问：一场霜冻毁了橙子收成，同时健康饮食潮流兴起，橙汁价格一定上涨吗？数量呢？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.5.1；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）1(d)"
+  },
+  {
+   "id": "ECO-IG-2.5-02",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.5.2",
+   "level": "core",
+   "name": "价格变化的后果与供求图分析",
+   "name_en": "Consequences of price changes",
+   "desc": "价格变化对销量的影响；会用供求图说明市场条件变化（如素食潮流对番茄市场、天气对农产品）的影响，并写出对生产者、消费者的含义",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.5-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "sales",
+    "market conditions",
+    "diagram",
+    "label",
+    "P1 Q1 P2 Q2"
+   ],
+   "method": "画图必标：轴（Price / Quantity）、原线与新线（D1→D2）、两个均衡点、箭头。2027 样卷 1(d) 画图 4 分，仅图形给分（no marks for written analysis）。",
+   "probe": "让她画：更多人吃素对番茄市场的影响，检查所有标签。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.5.2；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）1(d)：Draw a demand and supply diagram（4 分）"
+  },
+  {
+   "id": "ECO-IG-2.6-01",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.6.1",
+   "level": "core",
+   "name": "需求价格弹性的定义",
+   "name_en": "Definition of price elasticity of demand (PED)",
+   "desc": "PED：需求量对价格变化的反应程度（responsiveness of quantity demanded to a change in price）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.2-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "price elasticity of demand",
+    "PED",
+    "responsiveness",
+    "quantity demanded"
+   ],
+   "method": "定义要有 “responsiveness … quantity demanded … change in price”。常见错误：说成“价格对需求的反应”（方向反了）。",
+   "probe": "问：用一句英文定义 PED。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.6.1"
+  },
+  {
+   "id": "ECO-IG-2.6-02",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.6.2",
+   "level": "core",
+   "name": "PED 的计算与五种类型",
+   "name_en": "Calculating and interpreting PED",
+   "desc": "PED = 需求量变化百分比 ÷ 价格变化百分比（取绝对值判断）；完全无弹性（0）、缺乏弹性（0–1）、单位弹性（1）、富有弹性（>1）、完全弹性（∞）；能画出对应的需求曲线形状（垂直、陡、等轴双曲、平缓、水平）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.6-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-LS-8N-09",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-IG-1.13-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "percentage change",
+    "perfectly inelastic",
+    "inelastic",
+    "unitary elastic",
+    "elastic",
+    "perfectly elastic",
+    "formula"
+   ],
+   "method": "公式“Q 在上、P 在下”，先各自算百分比变化再相除。2024 考官报告：考生把公式倒过来算出 3.33 而非 0.3。",
+   "probe": "价格从 10 涨到 12，需求量从 100 降到 90，求 PED 并说明类型。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.6.2；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 21：elasticity 公式倒置"
+  },
+  {
+   "id": "ECO-IG-2.6-03",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.6.3",
+   "level": "core",
+   "name": "PED 的决定因素",
+   "name_en": "Determinants of PED",
+   "desc": "影响弹性的因素：替代品数量与接近程度、支出占收入比重、必需品/奢侈品、成瘾性与习惯、时间长短、市场定义的宽窄",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.6-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "substitutes",
+    "proportion of income",
+    "necessity",
+    "luxury",
+    "habit-forming",
+    "addictive",
+    "time period",
+    "definition of the market"
+   ],
+   "method": "每个因素写成“因为……所以需求更（缺乏）弹性”。常见错误：只说“因为是必需品”而不解释消费者为何不减少购买。",
+   "probe": "问：为什么某品牌的大米比“大米”整体更富有弹性？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.6.3；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）3(b) 大米需求弹性上升的原因"
+  },
+  {
+   "id": "ECO-IG-2.6-04",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.6.4",
+   "level": "core",
+   "name": "PED 与消费支出、企业收入",
+   "name_en": "PED, consumer expenditure and revenue",
+   "desc": "需求缺乏弹性时涨价使总收入（=消费者总支出）上升，富有弹性时涨价使总收入下降，单位弹性不变；能用图（矩形面积 P×Q）和计算说明",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.6-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "total revenue",
+    "total expenditure",
+    "price × quantity",
+    "inelastic",
+    "elastic"
+   ],
+   "method": "记“缺乏弹性：价格与收入同向；富有弹性：反向”，再用数字验证。2024 考官报告：考生把“价格变化”与“弹性”对收入的作用混淆。",
+   "probe": "问：PED=-0.4 的商品降价 10%，企业收入会怎样变？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.6.4；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 11 Q7"
+  },
+  {
+   "id": "ECO-IG-2.6-05",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.6.5",
+   "level": "core",
+   "name": "PED 对决策的意义",
+   "name_en": "Significance of PED for decision-making",
+   "desc": "PED 对企业定价、政府征间接税（对缺乏弹性商品征税收入多但减少消费作用小）、消费者和工人的意义",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.6-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "pricing decisions",
+    "tax revenue",
+    "indirect tax",
+    "burden",
+    "demerit goods"
+   ],
+   "method": "用香烟税做完整例子：税收大、消费降得少。常见错误：认为对缺乏弹性商品征税能大幅减少消费。",
+   "probe": "问：政府想用征税大幅减少汽油消费，汽油需求缺乏弹性意味着什么？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.6.5"
+  },
+  {
+   "id": "ECO-IG-2.7-01",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.7.1",
+   "level": "core",
+   "name": "供给价格弹性的定义与计算",
+   "name_en": "Price elasticity of supply (PES): definition and calculation",
+   "desc": "PES：供给量对价格变化的反应程度；PES = 供给量变化百分比 ÷ 价格变化百分比；五种类型与对应供给曲线形状",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.3-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.6-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "price elasticity of supply",
+    "PES",
+    "quantity supplied",
+    "perfectly inelastic supply",
+    "elastic supply"
+   ],
+   "method": "与 PED 并列对照：PES 通常为正。常见错误：用需求量代替供给量。",
+   "probe": "价格上涨 20%，供给量增加 5%，求 PES 并判断类型。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.7.1"
+  },
+  {
+   "id": "ECO-IG-2.7-02",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.7.2/2.7.3",
+   "level": "core",
+   "name": "PES 的决定因素",
+   "name_en": "Determinants of PES",
+   "desc": "影响供给弹性的因素：闲置产能、库存能否储存、生产所需时间（短期/长期）、要素的流动性与可得性",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.7-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "spare capacity",
+    "stocks",
+    "inventories",
+    "time period",
+    "factor mobility",
+    "perishable"
+   ],
+   "method": "农产品（生长周期长、易腐）与工业品对比。常见错误：把 PED 的因素（替代品）套到 PES。",
+   "probe": "问：为什么草莓的短期供给缺乏弹性，而 T 恤的供给较富有弹性？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.7.2/2.7.3"
+  },
+  {
+   "id": "ECO-IG-2.8-01",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.8.1/2.8.2",
+   "level": "core",
+   "name": "市场经济体系及其利弊",
+   "name_en": "The market economic system",
+   "desc": "市场经济：资源由私营部门通过价格机制配置；优点：效率、选择多、激励创新、对消费者偏好反应快；缺点：市场失灵、收入不平等、公共物品不提供、外部成本、垄断",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "market economic system",
+    "private sector",
+    "consumer sovereignty",
+    "efficiency",
+    "choice",
+    "inequality",
+    "market failure"
+   ],
+   "method": "列“利/弊”两栏，每条都写原因。常见错误：只记中文概念，答不出英文名词。",
+   "probe": "问：纯市场经济为何可能不提供路灯和国防？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.8.1/2.8.2"
+  },
+  {
+   "id": "ECO-IG-2.9-01",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.9.1/2.9.2",
+   "level": "core",
+   "name": "市场失灵及相关术语",
+   "name_en": "Market failure and associated terms",
+   "desc": "市场失灵：价格机制未能实现资源有效配置；术语：public goods（非竞争性、非排他性）、merit goods、demerit goods、private/external/social benefits、private/external/social costs（social = private + external）、monopoly",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.8-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "market failure",
+    "public good",
+    "non-rival",
+    "non-excludable",
+    "free rider",
+    "merit good",
+    "demerit good",
+    "private cost",
+    "external cost",
+    "social cost",
+    "private benefit",
+    "external benefit",
+    "social benefit",
+    "monopoly"
+   ],
+   "method": "背公式 social cost = private cost + external cost。2027 样卷 3(a) 直接考 external cost 与 social cost 的区别；2024 考官报告：考生找了原文没提到的 external cost。",
+   "probe": "问：工厂排污，工厂付的电费和下游渔民的损失，哪个是 private cost，哪个是 external cost？social cost 是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.9.1/2.9.2；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）3(a) external vs social cost；https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 23"
+  },
+  {
+   "id": "ECO-IG-2.9-02",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.9.3/2.9.4",
+   "level": "core",
+   "name": "市场失灵的原因与后果",
+   "name_en": "Causes and consequences of market failure",
+   "desc": "原因：公共物品的搭便车、对 merit goods 信息不足、对 demerit goods 低估危害、外部性被忽略、垄断滥用；后果：demerit goods 与有外部成本的商品过度消费，merit goods 与有外部收益的商品消费不足，公共物品不被提供，垄断限制供给抬高价格（不要求画图）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.9-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "over-consumption",
+    "under-consumption",
+    "misallocation of resources",
+    "free rider problem",
+    "information failure",
+    "abuse of monopoly power"
+   ],
+   "method": "每类失灵写成“原因→过多/过少→资源错配”链。常见错误：只说“不好”，不说是过度还是不足。",
+   "probe": "问：为什么市场会让疫苗接种“太少”？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.9.3/2.9.4"
+  },
+  {
+   "id": "ECO-IG-2.10-01",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.10.1/2.10.2",
+   "level": "core",
+   "name": "混合经济体系",
+   "name_en": "The mixed economic system",
+   "desc": "混合经济：私营与公共部门共同配置资源，政府干预纠正市场失灵；优点与缺点（政府失灵、税负、效率低）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.8-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.9-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "mixed economic system",
+    "public sector",
+    "private sector",
+    "government intervention",
+    "government failure"
+   ],
+   "method": "用中国或英国举例说明哪些领域由政府提供。常见错误：认为混合经济必然比市场经济好。",
+   "probe": "问：混合经济的一个缺点是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.10.1/2.10.2"
+  },
+  {
+   "id": "ECO-IG-2.10-02",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.10.3",
+   "level": "core",
+   "name": "最高限价与最低限价",
+   "name_en": "Maximum and minimum prices",
+   "desc": "最高限价设在均衡价之下才有效→短缺、黑市、排队；最低限价设在均衡价之上才有效→过剩（如农产品、最低工资）；会画图并评价利弊",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.4-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.9-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "maximum price",
+    "price ceiling",
+    "minimum price",
+    "price floor",
+    "shortage",
+    "surplus",
+    "black market",
+    "rationing"
+   ],
+   "method": "记位置：max 在下、min 在上（反直觉）。2027 样卷 3(c) 6 分分析题。常见错误：把最高限价画在均衡价之上。",
+   "probe": "让她画房租最高限价图，标出短缺量。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.10.3；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）3(c)"
+  },
+  {
+   "id": "ECO-IG-2.10-03",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.10.3",
+   "level": "core",
+   "name": "间接税（纠正外部成本）",
+   "name_en": "Indirect taxation to correct market failure",
+   "desc": "对 demerit goods 或产生外部成本的商品征间接税（如碳税）：供给曲线左移（向上移动税额），价格上升、数量下降；利弊：增加收入、减少消费，但缺乏弹性时效果小、累退、可能走私",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.3-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.9-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.6-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "indirect tax",
+    "carbon tax",
+    "specific tax",
+    "ad valorem tax",
+    "demerit good",
+    "external cost",
+    "tax incidence"
+   ],
+   "method": "画图：S 左移为 S+tax，标新价格。2027 样卷 1(f) 6 分讨论“是否征碳税”，需两面论证+结论。",
+   "probe": "问：对含糖饮料征税一定能大幅减少消费吗？结合 PED 讨论。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.10.3；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）1(f) carbon tax"
+  },
+  {
+   "id": "ECO-IG-2.10-04",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.10.3",
+   "level": "core",
+   "name": "补贴",
+   "name_en": "Subsidies",
+   "desc": "补贴：政府付给生产者的款项，使供给曲线右移、价格下降、数量增加，用于鼓励 merit goods 或有外部收益的商品；利弊：机会成本、可能低效、依赖",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.3-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.9-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "subsidy",
+    "merit good",
+    "external benefit",
+    "opportunity cost",
+    "increase in supply"
+   ],
+   "method": "画图 S 右移。2027 样卷 3(d) 8 分讨论“是否补贴牙膏”。常见错误：说补贴使需求曲线右移。",
+   "probe": "问：政府补贴公共交通，对公交票价和乘客数量有什么影响？有什么缺点？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.10.3；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）3(d)"
+  },
+  {
+   "id": "ECO-IG-2.10-05",
+   "strand": "E2",
+   "stage": "IGCSE",
+   "unit": "2 The allocation of resources",
+   "syllabus": "2.10.3",
+   "level": "core",
+   "name": "其他干预手段：管制、私有化、国有化、直接提供、配额",
+   "name_en": "Regulation, privatisation, nationalisation, direct provision and quotas",
+   "desc": "管制（法律禁止或限制，如禁烟、排放标准）、私有化（公有转私营）、国有化（私营转公有）、政府直接提供（公共物品、教育医疗）、配额（如自然资源开采限额）的定义与利弊（不要求画图）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.10-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.9-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "regulation",
+    "privatisation",
+    "nationalisation",
+    "direct provision",
+    "quota",
+    "legislation"
+   ],
+   "method": "每种手段配一个适用的市场失灵。常见错误：混淆 privatisation 与 nationalisation 的方向。",
+   "probe": "问：政府对渔业设捕捞配额，是在纠正什么问题？可能有什么缺点？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 2.10.3"
+  },
+  {
+   "id": "ECO-IG-3.1-01",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.1.1",
+   "level": "core",
+   "name": "货币的形式、职能与特征",
+   "name_en": "Money: forms, functions and characteristics",
+   "desc": "形式：硬币、纸币、银行存款、电子货币；职能：交换媒介、价值尺度（计价单位）、价值储藏、延期支付标准；特征：可接受性、耐久性、可携带、可分割、同质、稀缺/供应有限",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "money",
+    "medium of exchange",
+    "unit of account",
+    "measure of value",
+    "store of value",
+    "standard of deferred payment",
+    "acceptability",
+    "durability",
+    "portability",
+    "divisibility",
+    "homogeneity",
+    "scarcity",
+    "barter"
+   ],
+   "method": "函数（functions）和特征（characteristics）分开记。2024 考官报告：考生分不清货币的职能，对 store of value 解释薄弱。",
+   "probe": "问：“钱可以存起来以后用”体现了哪种职能？“纸币便于携带”是职能还是特征？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.1.1；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 12 Q15、Paper 21"
+  },
+  {
+   "id": "ECO-IG-3.1-02",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.1.2",
+   "level": "core",
+   "name": "中央银行与商业银行",
+   "name_en": "Central banks and commercial banks",
+   "desc": "中央银行：发行货币、政府的银行、银行的银行、最后贷款人、实施货币政策（利率）、管理外汇储备；商业银行：吸收存款、发放贷款、提供支付服务、追求利润",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "central bank",
+    "commercial bank",
+    "lender of last resort",
+    "bankers' bank",
+    "deposits",
+    "loans",
+    "interest rate"
+   ],
+   "method": "对比表：谁的银行、目标（稳定 vs 利润）。常见错误：以为央行给普通人开户贷款。",
+   "probe": "问：中国人民银行与工商银行各自的一项主要职能是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.1.2"
+  },
+  {
+   "id": "ECO-IG-3.2-01",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.2.1",
+   "level": "core",
+   "name": "影响家庭支出、储蓄与借贷的因素",
+   "name_en": "Influences on household spending, saving and borrowing",
+   "desc": "收入（收入越高支出越多但支出占比下降、储蓄占比上升）、利率（利率升→储蓄更有吸引力、借贷更贵）、信心、年龄（生命周期）、文化",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "disposable income",
+    "consumption",
+    "saving",
+    "borrowing",
+    "rate of interest",
+    "confidence",
+    "age",
+    "culture"
+   ],
+   "method": "把五因素各写成方向明确的因果链。2027 样卷 4(b)“说明储蓄减少的两个原因”。",
+   "probe": "问：利率下调，对家庭储蓄与借贷各有什么影响？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.2.1；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）4(b)"
+  },
+  {
+   "id": "ECO-IG-3.3-01",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.3.1",
+   "level": "core",
+   "name": "影响职业选择的因素",
+   "name_en": "Factors affecting choice of occupation",
+   "desc": "工资因素（工资、加班费、奖金、佣金）与非工资因素（培训机会、晋升、工作条件、工作时长、假期、职业稳定性、地点、附加福利 fringe benefits、工作满意度）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "wage factors",
+    "non-wage factors",
+    "job satisfaction",
+    "fringe benefits",
+    "promotion prospects",
+    "working conditions",
+    "job security"
+   ],
+   "method": "列两栏各至少 5 条英文词。2027 样卷 4(c)“分析为何愿当教师的人减少”。",
+   "probe": "问：一个人放弃高薪金融工作去当教师，可能是哪些非工资因素？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.3.1；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）4(c)"
+  },
+  {
+   "id": "ECO-IG-3.3-02",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.3.2",
+   "level": "core",
+   "name": "工资的决定与最低工资",
+   "name_en": "Wage determination and national minimum wage",
+   "desc": "劳动力需求（派生需求，取决于产品需求和生产率）与劳动力供给决定均衡工资；工会议价能力；政府政策如全国最低工资（NMW）：高于均衡时劳动供给大于需求→可能失业；会画劳动市场图（轴：Wage rate / Quantity of labour）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.4-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.10-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "wage rate",
+    "demand for labour",
+    "supply of labour",
+    "derived demand",
+    "trade union",
+    "collective bargaining",
+    "national minimum wage",
+    "NMW",
+    "unemployment"
+   ],
+   "method": "劳动市场图纵轴是工资不是价格。2024 考官报告：考生找错最低工资实施后的劳动供求点。",
+   "probe": "让她画最低工资高于均衡工资的劳动市场图，标出被雇用人数与失业量。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.3.2；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 11 Q11 最低工资"
+  },
+  {
+   "id": "ECO-IG-3.3-03",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.3.3",
+   "level": "core",
+   "name": "工资差异的原因",
+   "name_en": "Reasons for differences in wages",
+   "desc": "劳动供求、议价能力、歧视（如性别）、政府政策；技能高低、所处部门（第一/二/三产业）、私营与公共部门如何影响工资",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.3-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "wage differentials",
+    "skilled",
+    "unskilled",
+    "discrimination",
+    "primary sector",
+    "secondary sector",
+    "tertiary sector",
+    "public sector",
+    "private sector",
+    "bargaining power"
+   ],
+   "method": "用医生 vs 清洁工、足球明星 vs 护士做供求分析。常见错误：只说“医生更重要”，不用供求语言。",
+   "probe": "问：为什么足球明星比护士工资高？用劳动供求解释。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.3.3"
+  },
+  {
+   "id": "ECO-IG-3.3-04",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.3.4",
+   "level": "core",
+   "name": "劳动力的流动性",
+   "name_en": "Mobility of labour",
+   "desc": "职业流动性（换行业的能力，受技能、培训、资格限制）与地理流动性（换地区的能力，受房价、家庭、信息限制）变化的原因与后果",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.3-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "occupational mobility",
+    "geographical mobility",
+    "immobility",
+    "retraining",
+    "structural unemployment"
+   ],
+   "method": "区分两种流动性，并联系结构性失业。2024 考官报告：考生不理解“影响流动性的因素”。",
+   "probe": "问：煤矿工人难以转去做程序员，这是哪种不流动？政府可以怎么帮？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.3.4；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 21 mobility"
+  },
+  {
+   "id": "ECO-IG-3.3-05",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.3.5",
+   "level": "core",
+   "name": "劳动分工",
+   "name_en": "Division of labour",
+   "desc": "劳动分工：生产过程分成多个任务、工人各自专门负责一项（worker specialisation）；优点：效率与产量提高、节省时间与培训；缺点：单调、技能面窄、依赖、某环节停滞影响全线",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "division of labour",
+    "specialisation",
+    "productivity",
+    "repetitive",
+    "boredom",
+    "interdependence"
+   ],
+   "method": "定义题 2 分，必须答出“任务细分+工人专做一项”。2027 样卷 4(a) 直接考定义。",
+   "probe": "问：用英文定义 division of labour 并说一个缺点。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.3.5；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）4(a)"
+  },
+  {
+   "id": "ECO-IG-3.4-01",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.4.1",
+   "level": "core",
+   "name": "企业类型与大小企业利弊",
+   "name_en": "Types of firms; small and large firms",
+   "desc": "按产业分第一（采掘农业）、第二（制造建筑）、第三（服务）产业企业；按所有权分私营与公共部门企业；小企业的优劣（灵活、个性化服务、融资难）与大企业的优劣（规模经济、市场力量、规模不经济）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "primary sector",
+    "secondary sector",
+    "tertiary sector",
+    "private sector",
+    "public sector",
+    "small firms",
+    "large firms"
+   ],
+   "method": "给 10 家公司归类。常见错误：把“国企”说成 private sector。",
+   "probe": "问：为什么在经济发达后小企业依然能生存？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.4.1"
+  },
+  {
+   "id": "ECO-IG-3.4-02",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.4.2",
+   "level": "core",
+   "name": "企业兼并：横向、纵向与混合",
+   "name_en": "Mergers: horizontal, vertical and conglomerate",
+   "desc": "横向兼并（同行业同阶段）、纵向兼并（同行业不同阶段，前向/后向）、混合兼并（不同行业）的定义、例子与利弊（对企业、消费者、员工）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "merger",
+    "horizontal merger",
+    "vertical merger",
+    "forward vertical",
+    "backward vertical",
+    "conglomerate merger",
+    "takeover"
+   ],
+   "method": "画产业链判断方向。常见错误：把面包店并购面粉厂说成横向。",
+   "probe": "问：汽车厂收购轮胎厂属于哪种兼并？对消费者可能有什么好处和坏处？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.4.2"
+  },
+  {
+   "id": "ECO-IG-3.6-01",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.6.1/3.6.2",
+   "level": "core",
+   "name": "成本的定义与计算",
+   "name_en": "Costs of production: definitions and calculation",
+   "desc": "总成本 TC = 固定成本 FC + 可变成本 VC；平均总成本 ATC = TC/Q；AFC = FC/Q（随产量下降）；AVC = VC/Q；能从表格计算并画出成本随产量变化的图",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-LS-7N-02",
+     "strength": "有帮助"
+    },
+    {
+     "id": "MATH-LS-7S-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "total cost",
+    "fixed cost",
+    "variable cost",
+    "average total cost",
+    "average fixed cost",
+    "average variable cost",
+    "output"
+   ],
+   "method": "做一张产量 0–10 的成本表。2024 考官报告：考生在机械化情境中混淆总成本与平均成本的变化。",
+   "probe": "给 FC=100、每单位 VC=5，求产量 20 时的 TC、ATC、AFC。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.6.1/3.6.2；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 13 Q11 total vs average cost"
+  },
+  {
+   "id": "ECO-IG-3.4-03",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.4.3",
+   "level": "core",
+   "name": "规模经济与规模不经济",
+   "name_en": "Economies and diseconomies of scale",
+   "desc": "内部规模经济（采购、技术、融资、管理、营销、风险分担）与内部规模不经济（沟通协调困难、员工积极性低）；外部规模经济（行业集聚、专业供应商、熟练劳动力）与外部规模不经济（拥堵、要素价格上升）；会画 U 形长期 ATC 图标出两段",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-3.6-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "economies of scale",
+    "diseconomies of scale",
+    "internal",
+    "external",
+    "bulk buying",
+    "financial",
+    "technical",
+    "managerial",
+    "average total cost",
+    "ATC"
+   ],
+   "method": "图上 ATC 下降段=规模经济、上升段=规模不经济。常见错误：说规模经济是“总成本降低”（应为平均成本）。",
+   "probe": "问：深圳电子产业集聚给每家企业带来的好处属于内部还是外部规模经济？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.4.3"
+  },
+  {
+   "id": "ECO-IG-3.5-01",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.5.1",
+   "level": "core",
+   "name": "对生产要素的需求",
+   "name_en": "Demand for factors of production",
+   "desc": "影响企业对要素需求的因素：产品需求（派生需求）、要素的相对价格、可得性、生产率",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-3.3-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "derived demand",
+    "demand for factors",
+    "relative price",
+    "availability",
+    "productivity"
+   ],
+   "method": "联系劳动需求曲线右移的原因。常见错误：忘了“派生需求”这个术语。",
+   "probe": "问：电动车需求大涨，对电池工程师的需求有什么影响？为什么？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.5.1"
+  },
+  {
+   "id": "ECO-IG-3.5-02",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.5.2",
+   "level": "core",
+   "name": "劳动密集型与资本密集型生产",
+   "name_en": "Labour-intensive and capital-intensive production",
+   "desc": "选择不同生产方式的原因（要素相对价格、产品性质、市场规模、技术）及各自利弊",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.5-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-1.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "labour-intensive",
+    "capital-intensive",
+    "automation",
+    "mechanisation",
+    "flexibility"
+   ],
+   "method": "与基本问题 how to produce 挂钩。常见错误：认为资本密集一定更好。",
+   "probe": "问：为什么高端定制服装多用劳动密集生产？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.5.2"
+  },
+  {
+   "id": "ECO-IG-3.5-03",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.5.3",
+   "level": "core",
+   "name": "产量与生产率",
+   "name_en": "Production and productivity",
+   "desc": "产量（production）是产出总量；生产率（productivity）是每单位投入的产出（如人均产出）；影响因素：教育培训、技术、资本投资、管理、激励；投资增加如何提高生产率",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.5-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-1.2-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "production",
+    "productivity",
+    "labour productivity",
+    "output per worker",
+    "investment",
+    "training",
+    "technology"
+   ],
+   "method": "生产率是“比率”，要用除法。2024 考官报告：考生把“减少工人”误当成生产率下降；2027 样卷 1(c) 考第三产业生产率上升原因。",
+   "probe": "问：工厂裁员 10% 但产量不变，劳动生产率怎么变？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.5.3；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 11 Q12；https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）1(c)"
+  },
+  {
+   "id": "ECO-IG-3.6-02",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.6.3/3.6.4",
+   "level": "core",
+   "name": "收入的定义与计算",
+   "name_en": "Revenue: definition and calculation",
+   "desc": "总收入 TR = 价格 × 销量；平均收入 AR = TR/Q（= 价格）；销量对收入的影响；利润 = TR − TC（区分收入与利润）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.6-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.6-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "total revenue",
+    "average revenue",
+    "sales",
+    "profit",
+    "loss"
+   ],
+   "method": "每次答题问自己：题目问的是 revenue 还是 profit？2024 考官报告：考生把“收入增加”等同“利润增加”。",
+   "probe": "问：某企业销量增加使收入上升 20%，利润一定上升吗？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.6.3/3.6.4；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 23 profit vs revenue"
+  },
+  {
+   "id": "ECO-IG-3.6-03",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.6.5",
+   "level": "core",
+   "name": "企业目标",
+   "name_en": "Objectives of firms",
+   "desc": "生存、社会福利（社会企业、公共部门）、利润最大化、增长；不同类型和阶段的企业目标不同",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.6-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "survival",
+    "social welfare",
+    "profit maximisation",
+    "growth",
+    "market share"
+   ],
+   "method": "联系 private/public sector 判断。常见错误：认为所有企业只追求利润。",
+   "probe": "问：一家新创企业在经济衰退期最可能的目标是什么？为什么？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.6.5"
+  },
+  {
+   "id": "ECO-IG-3.7-01",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.7.1",
+   "level": "core",
+   "name": "竞争性市场",
+   "name_en": "Competitive markets",
+   "desc": "特征：企业多、进出容易、产品相近、信息较充分；企业数量多对价格（低）、质量、选择（多）、利润（正常）的影响及利弊（不要求图形与完全竞争理论）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-3.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "competitive market",
+    "many firms",
+    "barriers to entry",
+    "choice",
+    "quality",
+    "normal profit",
+    "innovation"
+   ],
+   "method": "按“价格/质量/选择/利润”四维对比垄断。2027 样卷 4(d) 8 分讨论电动车市场竞争加剧是否惠及消费者。",
+   "probe": "问：电动车品牌越来越多，消费者一定获益吗？给出两面理由。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.7.1；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）4(d)"
+  },
+  {
+   "id": "ECO-IG-3.7-02",
+   "strand": "E3",
+   "stage": "IGCSE",
+   "unit": "3 Microeconomic decision-makers",
+   "syllabus": "3.7.2",
+   "level": "core",
+   "name": "垄断市场",
+   "name_en": "Monopoly markets",
+   "desc": "特征：单一卖家、进入壁垒高、无近似替代品、价格制定者；对价格、质量、选择、利润的影响及利弊（规模经济、研发资金 vs 高价、低效、选择少）（不要求图形）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.7-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "monopoly",
+    "barriers to entry",
+    "price maker",
+    "abnormal profit",
+    "natural monopoly",
+    "economies of scale"
+   ],
+   "method": "与竞争市场四维对照写。常见错误：只写垄断的坏处，Paper 2 讨论题需要两面。",
+   "probe": "问：自来水公司通常是垄断，这种安排有什么好处？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 3.7.2"
+  },
+  {
+   "id": "ECO-IG-4.1-01",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.1.1",
+   "level": "core",
+   "name": "政府宏观经济目标及其冲突",
+   "name_en": "Macroeconomic aims and conflicts",
+   "desc": "六大目标：经济增长、充分就业/低失业、物价稳定/低通胀、国际收支稳定、收入再分配、环境可持续；选择目标的理由与衡量标准；冲突：充分就业 vs 物价稳定、增长 vs 环境、充分就业 vs 国际收支",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.10-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "macroeconomic aims",
+    "economic growth",
+    "full employment",
+    "low inflation",
+    "price stability",
+    "balance of payments stability",
+    "redistribution of income",
+    "environmental sustainability",
+    "conflict"
+   ],
+   "method": "六个目标各写一个衡量指标；三对冲突各写一条因果链。常见错误：冲突只说“两者矛盾”而无机制。",
+   "probe": "问：为什么降低失业可能导致通胀上升？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.1.1"
+  },
+  {
+   "id": "ECO-IG-4.2-01",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.2.1",
+   "level": "core",
+   "name": "政府预算：赤字与盈余",
+   "name_en": "The government budget: deficit and surplus",
+   "desc": "政府预算是对一年收入（主要是税收）和支出的计划；赤字=支出>收入；盈余=收入>支出；能计算赤字或盈余的大小",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-LS-7N-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "government budget",
+    "budget deficit",
+    "budget surplus",
+    "balanced budget",
+    "tax revenue",
+    "government spending"
+   ],
+   "method": "用“支出 − 收入”算，正为赤字。常见错误：把预算赤字与经常账户赤字混淆。",
+   "probe": "政府收入 800 亿、支出 950 亿，是赤字还是盈余？多少？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.2.1"
+  },
+  {
+   "id": "ECO-IG-4.2-02",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.2.2",
+   "level": "core",
+   "name": "政府支出的原因与效果",
+   "name_en": "Reasons for government spending",
+   "desc": "主要支出领域（教育、医疗、国防、基础设施、社会保障/福利）及支出理由（提供公共物品与 merit goods、再分配、刺激总需求）和效果",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.9-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "government spending",
+    "infrastructure",
+    "healthcare",
+    "education",
+    "defence",
+    "welfare benefits",
+    "transfer payments"
+   ],
+   "method": "每个领域都同时写短期效果（总需求）与长期效果（供给侧）。常见错误：只写“对人民好”。",
+   "probe": "问：政府加大基础设施投资，短期和长期分别如何影响经济？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.2.2"
+  },
+  {
+   "id": "ECO-IG-4.2-03",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.2.3",
+   "level": "core",
+   "name": "税收：目的与分类",
+   "name_en": "Taxation: reasons and classification",
+   "desc": "征税目的：筹集收入、抑制 demerit goods、减少进口、再分配、影响总需求、促进环境可持续；分类：累进税（收入越高税率越高）、累退税、比例税；直接税（对收入与财富，如所得税）与间接税（对支出，如 VAT）；对各主体与经济的影响",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.10-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "progressive tax",
+    "regressive tax",
+    "proportional tax",
+    "direct tax",
+    "indirect tax",
+    "income tax",
+    "VAT",
+    "corporation tax",
+    "tax burden"
+   ],
+   "method": "两套分类不要混：直接/间接看“对什么征”，累进/累退看“税负占收入比例”。2024 考官报告：考生只给了一种分类方式而非两种。",
+   "probe": "问：增值税对穷人和富人的影响为什么被称为 regressive？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.2.3；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 23 classification"
+  },
+  {
+   "id": "ECO-IG-4.2-04",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.2.4/4.2.5/4.2.6",
+   "level": "core",
+   "name": "财政政策",
+   "name_en": "Fiscal policy",
+   "desc": "财政政策：调整税收和政府支出以影响总需求和宏观目标；扩张性（减税、增支）与紧缩性（加税、减支）；如何用于促进增长、就业、控通胀、改善国际收支、再分配及局限（时滞、预算赤字、挤出）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.2-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.2-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "fiscal policy",
+    "expansionary",
+    "contractionary",
+    "total demand",
+    "aggregate demand",
+    "taxation",
+    "government spending"
+   ],
+   "method": "记住“财政 = 税+支出；货币 = 利率+货币供给+汇率”。2024 考官报告：考生把财政政策和货币政策（利率）混淆。",
+   "probe": "问：降低个人所得税属于什么政策？如何影响失业？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.2.4/4.2.5/4.2.6；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 21 fiscal vs monetary"
+  },
+  {
+   "id": "ECO-IG-4.3-01",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.3.1/4.3.2/4.3.3",
+   "level": "core",
+   "name": "货币政策",
+   "name_en": "Monetary policy",
+   "desc": "货币供给定义；货币政策：通过利率、货币供给、汇率影响总需求；降息→借贷成本下降、储蓄回报下降→消费投资增加→增长与就业↑但通胀可能↑；加息反之；对各宏观目标的作用与局限",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-3.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "money supply",
+    "monetary policy",
+    "interest rate",
+    "central bank",
+    "expansionary",
+    "contractionary",
+    "exchange rate",
+    "borrowing",
+    "investment"
+   ],
+   "method": "画“利率↓→借贷↑储蓄↓→消费投资↑→总需求↑”链。2024 考官报告：考生把降息联系到物价稳定而非增长，并把利率与汇率的关系弄反。",
+   "probe": "问：央行加息，对通胀和失业分别有什么影响？对本币汇率呢？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.3.1/4.3.2/4.3.3；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 11 Q19、Paper 13 Q19"
+  },
+  {
+   "id": "ECO-IG-4.4-01",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.4.1/4.4.2/4.4.3",
+   "level": "core",
+   "name": "供给侧政策",
+   "name_en": "Supply-side policy",
+   "desc": "供给侧政策：提高经济生产能力（产能、生产率）的政策；措施：教育培训、基础设施投资、劳动市场改革、降低直接税、放松管制、改善工作与投资激励、私有化；对宏观目标的作用（长期、可降通胀同时增长）与局限（时间长、成本高）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.2-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-3.5-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-1.4-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "supply-side policy",
+    "productive capacity",
+    "education and training",
+    "infrastructure",
+    "labour market reforms",
+    "deregulation",
+    "privatisation",
+    "incentives",
+    "productivity"
+   ],
+   "method": "与 PPC 外移联系。2027 样卷 2(c) 分析两项降失业政策。常见错误：把所有政府支出都算供给侧。",
+   "probe": "问：政府资助职业培训为什么既能降失业又不太会引发通胀？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.4.1/4.4.2/4.4.3；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）2(c)"
+  },
+  {
+   "id": "ECO-IG-4.5-01",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.5.1/4.5.2",
+   "level": "core",
+   "name": "经济增长的定义与衡量",
+   "name_en": "Economic growth: definition and measurement",
+   "desc": "经济增长：一国产出（实际 GDP）的增加；GDP：一年内国内生产的商品与服务总值；实际 GDP 剔除通胀影响；会算增长率",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-LS-8N-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "economic growth",
+    "gross domestic product",
+    "GDP",
+    "real GDP",
+    "nominal GDP",
+    "output"
+   ],
+   "method": "强调 real 与 nominal 的区别。常见错误：名义 GDP 上升就说经济增长了。",
+   "probe": "问：名义 GDP 增长 5%、通胀 6%，实际经济增长了吗？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.5.1/4.5.2"
+  },
+  {
+   "id": "ECO-IG-4.5-02",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.5.3",
+   "level": "core",
+   "name": "经济增长的原因与利弊",
+   "name_en": "Causes and consequences of economic growth",
+   "desc": "原因：总需求增加、资源数量增加、资源质量提高；利：生活水平、就业、税收；弊：通胀、环境破坏、资源耗竭、不平等",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.5-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-1.4-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "total demand",
+    "quantity of resources",
+    "quality of resources",
+    "living standards",
+    "pollution",
+    "inequality",
+    "sustainability"
+   ],
+   "method": "用 PPC 说明供给侧原因。常见错误：只写好处。",
+   "probe": "问：经济快速增长可能带来哪两个问题？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.5.3"
+  },
+  {
+   "id": "ECO-IG-4.5-03",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.5.4",
+   "level": "core",
+   "name": "经济衰退的原因与后果",
+   "name_en": "Causes and consequences of recession",
+   "desc": "衰退：实际 GDP 连续两个季度负增长；原因：总需求下降、资源数量或质量下降；对消费者、工人、企业、政府的后果（失业、收入下降、破产、税收减少、福利支出增加）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.5-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "recession",
+    "negative economic growth",
+    "two consecutive quarters",
+    "cyclical unemployment",
+    "business confidence"
+   ],
+   "method": "每类主体各写一条后果。常见错误：定义漏掉“连续两个季度”。",
+   "probe": "问：衰退时政府预算为何往往恶化？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.5.4"
+  },
+  {
+   "id": "ECO-IG-4.5-04",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.5.5",
+   "level": "core",
+   "name": "促进经济增长的政策",
+   "name_en": "Policies to promote economic growth",
+   "desc": "财政、货币、供给侧政策促进增长的方式及其有效性（时滞、通胀、预算赤字、环境）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.5-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.2-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "expansionary fiscal policy",
+    "expansionary monetary policy",
+    "supply-side policy",
+    "effectiveness",
+    "time lag"
+   ],
+   "method": "三类政策列表对比：作用渠道、见效速度、副作用。常见错误：讨论题不评价有效性。",
+   "probe": "问：降息促进增长在什么情况下可能无效？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.5.5"
+  },
+  {
+   "id": "ECO-IG-4.6-01",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.6.1/4.6.2",
+   "level": "core",
+   "name": "就业、失业的定义与衡量",
+   "name_en": "Employment and unemployment: definitions and measurement",
+   "desc": "失业：有能力且愿意工作、积极寻找但无工作的人；充分就业；劳动力调查（labour force survey）衡量失业；失业率 = 失业人数 ÷ 劳动力 × 100%",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-LS-7N-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "employment",
+    "unemployment",
+    "full employment",
+    "labour force",
+    "labour force survey",
+    "unemployment rate",
+    "claimant count"
+   ],
+   "method": "分母是劳动力不是总人口。2024 考官报告：考生把“如何衡量（调查方法）”答成“计算公式”。",
+   "probe": "问：劳动力 5000 万、失业 250 万，失业率多少？失业数据是怎么收集的？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.6.1/4.6.2；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 21 measurement vs calculation"
+  },
+  {
+   "id": "ECO-IG-4.6-02",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.6.3",
+   "level": "core",
+   "name": "失业的类型",
+   "name_en": "Types of unemployment",
+   "desc": "摩擦性（换工作间隙）、结构性（产业衰落、技能不匹配）、周期性（总需求不足、衰退）、季节性（随季节变化的工作）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.6-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-3.3-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "frictional unemployment",
+    "structural unemployment",
+    "cyclical unemployment",
+    "seasonal unemployment",
+    "demand-deficient"
+   ],
+   "method": "每种配一个案例并配对应政策。常见错误：把衰退期裁员说成结构性失业。",
+   "probe": "问：自动化让收银员失业属于哪种失业？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.6.3"
+  },
+  {
+   "id": "ECO-IG-4.6-03",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.6.4/4.6.5",
+   "level": "core",
+   "name": "失业的后果与降低失业的政策",
+   "name_en": "Consequences of unemployment and policies to reduce it",
+   "desc": "对个人（收入、技能退化）、企业（劳动力易招但需求下降）、政府（福利支出增、税收减）、经济（产出低于 PPC）的后果；降失业政策：扩张性财政与货币政策（周期性）、供给侧政策如培训（结构性）、信息服务（摩擦性）及有效性",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.6-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.2-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "consequences",
+    "welfare benefits",
+    "tax revenue",
+    "opportunity cost",
+    "retraining",
+    "job centres"
+   ],
+   "method": "“失业类型→对症政策”配对表。2027 样卷 2(b) 解释失业下降对企业的两项后果、2(c) 分析两项降失业政策。",
+   "probe": "问：针对结构性失业，降息为何效果有限？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.6.4/4.6.5；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）2(b)/2(c)"
+  },
+  {
+   "id": "ECO-IG-4.7-01",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.7.1/4.7.2",
+   "level": "core",
+   "name": "通胀与通缩的定义与 CPI 衡量",
+   "name_en": "Inflation, deflation and the CPI",
+   "desc": "通胀：一般物价水平的持续上升；通缩：一般物价水平的持续下降；CPI：选基年、选一篮子商品、调查价格、加权（按支出比重）、计算指数；会用指数算通胀率",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-LS-8N-09",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-LS-7S-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "inflation",
+    "deflation",
+    "general price level",
+    "Consumer Prices Index",
+    "CPI",
+    "base year",
+    "basket of goods",
+    "weights",
+    "disinflation"
+   ],
+   "method": "注意“通胀率下降≠物价下降”（disinflation）。常见错误：单一商品涨价就叫通胀。",
+   "probe": "问：CPI 从 120 升到 126，通胀率是多少？通胀率从 5% 降到 2%，物价下降了吗？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.7.1/4.7.2"
+  },
+  {
+   "id": "ECO-IG-4.7-02",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.7.3/4.7.4",
+   "level": "core",
+   "name": "通胀的原因与后果",
+   "name_en": "Causes and consequences of inflation",
+   "desc": "需求拉动型（总需求超过产能）与成本推动型（工资、原材料、进口价格上涨）；对储蓄者、贷款人（受损）与借款人（受益）的影响，对消费者、工人、企业、国际竞争力的影响",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.7-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "demand-pull inflation",
+    "cost-push inflation",
+    "savers",
+    "lenders",
+    "borrowers",
+    "real value",
+    "menu costs",
+    "international competitiveness",
+    "fixed incomes"
+   ],
+   "method": "用“实际值”解释借贷双方得失。常见错误：说通胀对所有人都不好。",
+   "probe": "问：通胀 8%、存款利率 3%，储户的实际收益如何？借款人呢？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.7.3/4.7.4"
+  },
+  {
+   "id": "ECO-IG-4.7-03",
+   "strand": "E4",
+   "stage": "IGCSE",
+   "unit": "4 Government and the macroeconomy",
+   "syllabus": "4.7.5",
+   "level": "core",
+   "name": "控制通胀的政策",
+   "name_en": "Policies to control inflation",
+   "desc": "紧缩性货币政策（加息）、紧缩性财政政策、供给侧政策对控制通胀的作用及有效性（成本推动型时需求管理的代价、对增长就业的冲击）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.7-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.2-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "contractionary monetary policy",
+    "contractionary fiscal policy",
+    "supply-side policy",
+    "trade-off"
+   ],
+   "method": "先判断通胀类型再选政策。2027 样卷 5(d) 讨论外国跨国公司能否降低通胀。",
+   "probe": "问：石油涨价导致的通胀，加息是好办法吗？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 4.7.5；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）5(d)"
+  },
+  {
+   "id": "ECO-IG-5.1-01",
+   "strand": "E5",
+   "stage": "IGCSE",
+   "unit": "5 Economic development",
+   "syllabus": "5.1.1",
+   "level": "core",
+   "name": "生活水平指标：人均实际 GDP 与 HDI",
+   "name_en": "Indicators of living standards: real GDP per head and HDI",
+   "desc": "人均实际 GDP = 实际 GDP ÷ 人口；HDI 由三部分组成：健康（出生时预期寿命）、教育（平均受教育年限与预期受教育年限）、收入（人均 GNI，按购买力平价）；两者作为指标的优缺点（不反映分配、非市场活动、环境、闲暇）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-4.5-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "living standards",
+    "real GDP per head",
+    "GDP per capita",
+    "Human Development Index",
+    "HDI",
+    "life expectancy",
+    "mean years of schooling",
+    "expected years of schooling",
+    "GNI per capita"
+   ],
+   "method": "记 HDI 三维度。常见错误：说 HDI 包含“幸福感”或“污染”。2027 样卷 2(d) 讨论经常账户盈余能否提高生活水平。",
+   "probe": "问：两国人均 GDP 相同，HDI 差很多，可能原因是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 5.1.1；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）2(d)"
+  },
+  {
+   "id": "ECO-IG-5.1-02",
+   "strand": "E5",
+   "stage": "IGCSE",
+   "unit": "5 Economic development",
+   "syllabus": "5.1.2",
+   "level": "core",
+   "name": "生活水平与收入分配的差异",
+   "name_en": "Comparing living standards and income distribution",
+   "desc": "国内与国家间生活水平和收入分配差异的原因（收入、就业、教育医疗、资源、政策、税制）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-5.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "income distribution",
+    "inequality",
+    "within countries",
+    "between countries"
+   ],
+   "method": "用数据表练习比较两国。常见错误：只看平均数不看分配。",
+   "probe": "问：一国人均收入很高，为什么仍可能很多人生活水平低？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 5.1.2"
+  },
+  {
+   "id": "ECO-IG-5.2-01",
+   "strand": "E5",
+   "stage": "IGCSE",
+   "unit": "5 Economic development",
+   "syllabus": "5.2.1/5.2.2",
+   "level": "core",
+   "name": "贫困：绝对与相对贫困及其原因",
+   "name_en": "Absolute and relative poverty and their causes",
+   "desc": "绝对贫困：收入不足以满足基本生存需要（食物、住所、衣物）；相对贫困：收入显著低于社会平均水平（如低于中位数的一定比例）；原因：失业、低工资、疾病、年龄、环境因素",
+   "prereqs": [
+    {
+     "id": "ECO-IG-5.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "absolute poverty",
+    "relative poverty",
+    "basic needs",
+    "median income",
+    "low wages",
+    "illness"
+   ],
+   "method": "两定义对照记。2027 样卷 5(c) 分析投资减少如何增加贫困。常见错误：认为富裕国家没有贫困。",
+   "probe": "问：投资减少为什么会让更多人陷入贫困？写出因果链。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 5.2.1/5.2.2；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）5(c)"
+  },
+  {
+   "id": "ECO-IG-5.2-02",
+   "strand": "E5",
+   "stage": "IGCSE",
+   "unit": "5 Economic development",
+   "syllabus": "5.2.3",
+   "level": "core",
+   "name": "缓解贫困与再分配的政策",
+   "name_en": "Policies to alleviate poverty and redistribute income",
+   "desc": "促进经济增长、改善教育、改善医疗、更慷慨的国家福利、累进税、全国最低工资等政策及其利弊",
+   "prereqs": [
+    {
+     "id": "ECO-IG-5.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.2-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-3.3-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "redistribution",
+    "state benefits",
+    "progressive taxation",
+    "national minimum wage",
+    "education",
+    "healthcare"
+   ],
+   "method": "每项政策写“如何帮助穷人+一个缺点”。常见错误：忽视最低工资可能引起的失业。",
+   "probe": "问：提高最低工资一定能减少贫困吗？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 5.2.3"
+  },
+  {
+   "id": "ECO-IG-5.3-01",
+   "strand": "E5",
+   "stage": "IGCSE",
+   "unit": "5 Economic development",
+   "syllabus": "5.3.1",
+   "level": "core",
+   "name": "影响人口增长的因素",
+   "name_en": "Factors affecting population growth",
+   "desc": "出生率、死亡率（每千人）、净移民（移入 − 移出）；各国差异及原因（医疗、教育、女性地位、收入、宗教文化、政策、战争）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-5.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "birth rate",
+    "death rate",
+    "net migration",
+    "immigration",
+    "emigration",
+    "natural increase",
+    "life expectancy"
+   ],
+   "method": "公式：人口变化 = 出生 − 死亡 + 净移民。2027 样卷 1(e) 分析预期寿命与净移民率的关系。",
+   "probe": "问：一个国家出生率下降、死亡率下降、净移民为负，人口一定减少吗？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 5.3.1；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）1(e)"
+  },
+  {
+   "id": "ECO-IG-5.3-02",
+   "strand": "E5",
+   "stage": "IGCSE",
+   "unit": "5 Economic development",
+   "syllabus": "5.3.2",
+   "level": "core",
+   "name": "人口规模与结构变化的影响",
+   "name_en": "Effects of changes in population size and structure",
+   "desc": "最优人口概念；人口增减及年龄（老龄化、依赖比）与性别结构变化对劳动力、政府支出、需求结构、增长的影响",
+   "prereqs": [
+    {
+     "id": "ECO-IG-5.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "optimum population",
+    "ageing population",
+    "dependency ratio",
+    "dependent population",
+    "working population",
+    "gender distribution"
+   ],
+   "method": "画人口金字塔识别老龄化。常见错误：认为人口越多越好或越少越好。",
+   "probe": "问：人口老龄化对政府预算有什么影响？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 5.3.2"
+  },
+  {
+   "id": "ECO-IG-5.4-01",
+   "strand": "E5",
+   "stage": "IGCSE",
+   "unit": "5 Economic development",
+   "syllabus": "5.4.1",
+   "level": "core",
+   "name": "国家间经济发展差异的原因与后果",
+   "name_en": "Causes and consequences of international differences in development",
+   "desc": "收入、生产率、人口增长、三次产业比重、储蓄与投资、教育、医疗、自然资源方面的差异如何造成并体现发展差距",
+   "prereqs": [
+    {
+     "id": "ECO-IG-5.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-5.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-3.5-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "economic development",
+    "developed country",
+    "developing country",
+    "primary sector",
+    "savings",
+    "investment",
+    "productivity"
+   ],
+   "method": "做一张“发达 vs 发展中”对照表。常见错误：只用 GDP 判断发展。",
+   "probe": "问：为什么第一产业比重高的国家收入往往较低？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 5.4.1"
+  },
+  {
+   "id": "ECO-IG-6.1-01",
+   "strand": "E6",
+   "stage": "IGCSE",
+   "unit": "6 International trade and globalisation",
+   "syllabus": "6.1.1",
+   "level": "core",
+   "name": "国家专业化",
+   "name_en": "Specialisation by country",
+   "desc": "国家专业化生产其资源配置最佳或成本最低的产品并进行贸易；优点（效率、产量、规模经济）与缺点（依赖、需求下降时风险、结构性失业）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-3.3-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-1.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "specialisation",
+    "low-cost production",
+    "resource allocation",
+    "dependence",
+    "international trade"
+   ],
+   "method": "与劳动分工类比。2024 考官报告：考生误把“自然资源相似”当作国家专业化的依据。",
+   "probe": "问：为什么沙特专业化生产石油？风险是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 6.1.1；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 13 Q27"
+  },
+  {
+   "id": "ECO-IG-6.1-02",
+   "strand": "E6",
+   "stage": "IGCSE",
+   "unit": "6 International trade and globalisation",
+   "syllabus": "6.1.2",
+   "level": "core",
+   "name": "自由贸易",
+   "name_en": "Free trade",
+   "desc": "自由贸易：国家间无贸易壁垒的贸易；利弊（选择多、价格低、竞争、规模经济 vs 国内产业受冲击、失业、依赖）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-6.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "free trade",
+    "trade barriers",
+    "international trade",
+    "competition",
+    "choice"
+   ],
+   "method": "答题按消费者/生产者/工人/政府分层。常见错误：只写对消费者的好处。2027 样卷 2(a) 要求定义 international trade。",
+   "probe": "问：用英文定义 free trade，并说对国内生产者的一个坏处。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 6.1.2"
+  },
+  {
+   "id": "ECO-IG-6.2-01",
+   "strand": "E6",
+   "stage": "IGCSE",
+   "unit": "6 International trade and globalisation",
+   "syllabus": "6.2.1/6.2.2",
+   "level": "core",
+   "name": "全球化及其变化的原因与影响",
+   "name_en": "Globalisation: causes and consequences",
+   "desc": "全球化：各国经济日益融合与相互依存；变化原因：贸易限制变化、运输成本、通信成本、跨国公司的流动；对国际贸易、竞争、环境、移民、收入分配、经济发展的影响",
+   "prereqs": [
+    {
+     "id": "ECO-IG-6.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "globalisation",
+    "interdependence",
+    "transport costs",
+    "communication costs",
+    "multinational companies",
+    "MNCs"
+   ],
+   "method": "原因四条、影响六方面各写一句。常见错误：把全球化等同于“出国旅游方便”。",
+   "probe": "问：运输成本下降如何推动全球化？对环境有何影响？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 6.2.1/6.2.2"
+  },
+  {
+   "id": "ECO-IG-6.2-02",
+   "strand": "E6",
+   "stage": "IGCSE",
+   "unit": "6 International trade and globalisation",
+   "syllabus": "6.2.3",
+   "level": "core",
+   "name": "跨国公司的作用",
+   "name_en": "Role of multinational companies (MNCs)",
+   "desc": "跨国公司对东道国（就业、技术、税收、出口 vs 利润汇出、压低本地企业、环境、可能撤离）和母国（利润回流 vs 就业外流）的利弊",
+   "prereqs": [
+    {
+     "id": "ECO-IG-6.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "multinational company",
+    "MNC",
+    "host country",
+    "home country",
+    "foreign direct investment",
+    "FDI",
+    "repatriation of profits"
+   ],
+   "method": "“东道国/母国 × 利/弊”四格表。2027 样卷 5(d) 讨论外国跨国公司能否降低通胀。",
+   "probe": "问：特斯拉在上海建厂，对中国（东道国）有哪些好处和坏处？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 6.2.3；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）5(d)"
+  },
+  {
+   "id": "ECO-IG-6.2-03",
+   "strand": "E6",
+   "stage": "IGCSE",
+   "unit": "6 International trade and globalisation",
+   "syllabus": "6.2.4",
+   "level": "core",
+   "name": "贸易限制手段",
+   "name_en": "Methods of protection",
+   "desc": "关税（对进口征税，提高进口价格）、进口配额（数量限制）、补贴（给国内生产者降成本）、禁运（完全禁止）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-6.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.10-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.3-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "tariff",
+    "import quota",
+    "subsidy",
+    "embargo",
+    "protectionism"
+   ],
+   "method": "每种手段说清作用机制。2024 考官报告：考生答“如何保护”而非题目问的“为什么保护”；MCQ 误以为关税移动需求曲线。",
+   "probe": "问：关税和进口配额都能减少进口，两者的区别是什么？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 6.2.4；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 12 Q27、Paper 23"
+  },
+  {
+   "id": "ECO-IG-6.2-04",
+   "strand": "E6",
+   "stage": "IGCSE",
+   "unit": "6 International trade and globalisation",
+   "syllabus": "6.2.5",
+   "level": "core",
+   "name": "实施贸易保护的理由",
+   "name_en": "Reasons for trade restrictions",
+   "desc": "保护幼稚（朝阳）产业、保护衰退（夕阳）产业、保护战略产业、防止倾销、减少经常账户赤字、增加税收、限制 demerit goods 进口、促进环境可持续",
+   "prereqs": [
+    {
+     "id": "ECO-IG-6.2-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "infant industry",
+    "sunrise industry",
+    "declining industry",
+    "sunset industry",
+    "strategic industry",
+    "dumping",
+    "current account deficit",
+    "tax revenue"
+   ],
+   "method": "八条理由背英文关键词。2024 考官报告：被问 why 却答了 how。",
+   "probe": "问：什么是 dumping？为什么它可以成为限制进口的理由？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 6.2.5；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 23 reasons for protection"
+  },
+  {
+   "id": "ECO-IG-6.2-05",
+   "strand": "E6",
+   "stage": "IGCSE",
+   "unit": "6 International trade and globalisation",
+   "syllabus": "6.2.6",
+   "level": "core",
+   "name": "贸易限制的后果",
+   "name_en": "Consequences of trade restrictions",
+   "desc": "对本国（保护就业、产业，但物价上升、选择减少、效率下降）与贸易伙伴（出口下降、报复、贸易战）的影响；限制自由贸易的利弊",
+   "prereqs": [
+    {
+     "id": "ECO-IG-6.2-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "retaliation",
+    "trade war",
+    "higher prices",
+    "inefficiency",
+    "reduced choice"
+   ],
+   "method": "讨论题须两面+结论。常见错误：忽略报复风险。",
+   "probe": "问：对进口钢铁加征关税，本国汽车厂会受到什么影响？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 6.2.6"
+  },
+  {
+   "id": "ECO-IG-6.3-01",
+   "strand": "E6",
+   "stage": "IGCSE",
+   "unit": "6 International trade and globalisation",
+   "syllabus": "6.3.1/6.3.2",
+   "level": "core",
+   "name": "汇率与外汇买卖的原因",
+   "name_en": "Foreign exchange rates and why currencies are traded",
+   "desc": "汇率：一种货币以另一种货币表示的价格；买卖外币的原因：商品服务贸易、投机、政府干预、跨国支付利润利息股息、工人汇款、跨国资本投资",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-IG-1.16-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "foreign exchange rate",
+    "currency",
+    "speculation",
+    "remittances",
+    "dividends",
+    "investment"
+   ],
+   "method": "每个原因判断“增加对哪种货币的需求”。常见错误：外国人买中国货，以为是增加美元需求（实为增加人民币需求）。",
+   "probe": "问：美国游客来上海旅游，影响哪种货币的需求？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 6.3.1/6.3.2"
+  },
+  {
+   "id": "ECO-IG-6.3-02",
+   "strand": "E6",
+   "stage": "IGCSE",
+   "unit": "6 International trade and globalisation",
+   "syllabus": "6.3.3",
+   "level": "core",
+   "name": "浮动汇率的决定与波动",
+   "name_en": "Determination of a floating exchange rate",
+   "desc": "浮动汇率由外汇市场货币供求决定；升值（appreciation）与贬值（depreciation）；会画货币供求图（纵轴：一种货币的外币价格）；波动原因：进出口需求变化、利率变化（加息吸引热钱→需求上升→升值）、投机",
+   "prereqs": [
+    {
+     "id": "ECO-IG-6.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-2.4-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "floating exchange rate",
+    "appreciation",
+    "depreciation",
+    "demand for a currency",
+    "supply of a currency",
+    "equilibrium exchange rate",
+    "hot money",
+    "speculation"
+   ],
+   "method": "图的纵轴写“price of £ in $”。2024 考官报告：考生弄错美国利率变化对外汇需求的影响；2027 样卷 5(a) 要求说出汇率下降的两个原因。",
+   "probe": "问：英国加息，英镑汇率会怎样变？画图说明。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 6.3.3；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 11 Q29；https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）5(a)"
+  },
+  {
+   "id": "ECO-IG-6.3-03",
+   "strand": "E6",
+   "stage": "IGCSE",
+   "unit": "6 International trade and globalisation",
+   "syllabus": "6.3.4",
+   "level": "core",
+   "name": "汇率变化的后果",
+   "name_en": "Consequences of exchange rate changes",
+   "desc": "本币升值→出口以外币计更贵、进口以本币计更便宜→出口减少进口增加（口诀 SPICED：Strong Pound Imports Cheap Exports Dear）；贬值反之；对通胀、就业、经常账户的影响",
+   "prereqs": [
+    {
+     "id": "ECO-IG-6.3-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "appreciation",
+    "depreciation",
+    "export prices",
+    "import prices",
+    "SPICED",
+    "WPIDEC",
+    "competitiveness"
+   ],
+   "method": "用具体数字换算（1 美元 = 7 元 → 6.5 元）。2024 考官报告：考生不理解升值使出口变贵、把贬值对进出口的作用弄反。",
+   "probe": "问：人民币贬值对中国出口商和进口奶粉的价格有什么影响？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 6.3.4；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 12 Q29、Paper 22"
+  },
+  {
+   "id": "ECO-IG-6.4-01",
+   "strand": "E6",
+   "stage": "IGCSE",
+   "unit": "6 International trade and globalisation",
+   "syllabus": "6.4.1",
+   "level": "core",
+   "name": "国际收支经常账户的结构与计算",
+   "name_en": "Structure of the current account",
+   "desc": "经常账户四部分：货物贸易、服务贸易、初次收入（跨国工资利润利息股息）、二次收入（转移，如汇款、援助）；能计算各部分和总差额（赤字/盈余）",
+   "prereqs": [
+    {
+     "id": "ECO-IG-6.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-LS-7N-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "balance of payments",
+    "current account",
+    "trade in goods",
+    "trade in services",
+    "primary income",
+    "secondary income",
+    "deficit",
+    "surplus",
+    "visible trade",
+    "invisible trade"
+   ],
+   "method": "把例子归类：外国公司汇回利润=初次收入；侨汇=二次收入。常见错误：把货物贸易差额当作整个经常账户差额。",
+   "probe": "给四部分数据（含正负），求经常账户差额。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 6.4.1"
+  },
+  {
+   "id": "ECO-IG-6.4-02",
+   "strand": "E6",
+   "stage": "IGCSE",
+   "unit": "6 International trade and globalisation",
+   "syllabus": "6.4.2/6.4.3",
+   "level": "core",
+   "name": "经常账户赤字与盈余的原因与后果",
+   "name_en": "Causes and consequences of current account deficits and surpluses",
+   "desc": "原因：汇率、通胀、国内收入、生产率与竞争力；对 GDP、就业、通胀、汇率的影响",
+   "prereqs": [
+    {
+     "id": "ECO-IG-6.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-6.3-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "current account deficit",
+    "current account surplus",
+    "competitiveness",
+    "GDP",
+    "employment",
+    "inflation",
+    "exchange rate"
+   ],
+   "method": "用“出口↑→总需求↑→GDP、就业↑，但可能通胀↑、本币升值”链。2027 样卷 2(d) 讨论经常账户盈余是否提高生活水平。",
+   "probe": "问：长期经常账户赤字可能有哪些问题？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 6.4.2/6.4.3；考查重点佐证：https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）2(d)"
+  },
+  {
+   "id": "ECO-IG-6.4-03",
+   "strand": "E6",
+   "stage": "IGCSE",
+   "unit": "6 International trade and globalisation",
+   "syllabus": "6.4.4",
+   "level": "core",
+   "name": "实现国际收支稳定的政策",
+   "name_en": "Policies to achieve balance of payments stability",
+   "desc": "财政、货币（利率、汇率）、供给侧政策与保护主义对国际收支的作用及有效性",
+   "prereqs": [
+    {
+     "id": "ECO-IG-6.4-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.2-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-4.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-6.2-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "expenditure-reducing",
+    "expenditure-switching",
+    "devaluation",
+    "protectionism",
+    "supply-side policy"
+   ],
+   "method": "分“减少进口支出”与“转移支出”两类思考。常见错误：只写关税，不讨论报复与通胀。",
+   "probe": "问：用货币贬值改善经常账户赤字有什么风险？",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Subject content 6.4.4"
+  },
+  {
+   "id": "ECO-IG-X-01",
+   "strand": "EX",
+   "stage": "IGCSE",
+   "unit": "Assessment objectives AO1–AO3 / Scheme of assessment",
+   "syllabus": "AO1",
+   "level": "core",
+   "name": "定义题与术语精确性",
+   "name_en": "Definitions and economic terminology (AO1)",
+   "desc": "Paper 2 的 (a) 小题（2 分）多为 define/identify：给出精确、带关键术语的定义；AO1 占总分约 43%，Paper 1 有 40 道选择题（1 小时，30%）覆盖全部内容",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "define",
+    "identify",
+    "state",
+    "terminology",
+    "multiple choice",
+    "command words"
+   ],
+   "method": "为每个小节建英文定义卡，每周默写。2024 考官报告：模糊定义如“microeconomics is small”拿不到分；考官要求使用 syllabus terminology。",
+   "probe": "随机抽 5 个术语（opportunity cost, PED, merit good, recession, appreciation），让她用英文默写定义。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Assessment objectives / Scheme of assessment；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 21/22 Key messages"
+  },
+  {
+   "id": "ECO-IG-X-02",
+   "strand": "EX",
+   "stage": "IGCSE",
+   "unit": "Assessment objectives AO1–AO3 / Scheme of assessment",
+   "syllabus": "AO2",
+   "level": "core",
+   "name": "计算与数据解读",
+   "name_en": "Calculations and data interpretation (AO2)",
+   "desc": "大纲中的计算：PED、PES、成本收入、预算差额、失业率、通胀率/CPI、经常账户差额、百分比变化与增长率；读表格和图表中的数据并引用原文材料",
+   "prereqs": [
+    {
+     "id": "MATH-LS-8N-09",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-IG-9.2-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "calculate",
+    "percentage change",
+    "data",
+    "extract",
+    "source material",
+    "interpret"
+   ],
+   "method": "计算题写公式→代数→结果→单位；Section A 案例题先读材料再答，并引用材料证据。2024 考官报告：要“use the extract material first”；2027 样卷 1(a) 计算题。",
+   "probe": "给一段材料和表格，问“Calculate the percentage change in ...”，看她是否写出公式和单位。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Assessment objectives / Scheme of assessment；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 21/23；https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）1(a)"
+  },
+  {
+   "id": "ECO-IG-X-03",
+   "strand": "EX",
+   "stage": "IGCSE",
+   "unit": "Assessment objectives AO1–AO3 / Scheme of assessment",
+   "syllabus": "AO2",
+   "level": "core",
+   "name": "画图规范与分析链",
+   "name_en": "Diagrams and chains of analysis (AO2)",
+   "desc": "大纲要求的图：PPC、供求（含移动、最高最低价、税、补贴）、PED/PES 曲线形状、劳动市场与最低工资、ATC 规模经济、外汇供求；分析题（explain/analyse，4–6 分）须写出逻辑因果链",
+   "prereqs": [
+    {
+     "id": "ECO-IG-2.5-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ECO-IG-1.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "diagram",
+    "axes",
+    "label",
+    "analyse",
+    "explain",
+    "chain of reasoning"
+   ],
+   "method": "每张图检查：轴标签、曲线名、新旧均衡、箭头。2024 考官报告：轴标签错误、新曲线不标注是各卷共性问题；样卷评分：图题只给图形分。",
+   "probe": "给一个情境让她在 3 分钟内画图，用检查清单打分。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Assessment objectives / Scheme of assessment；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Cross-paper：diagram skills；https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）1(d)"
+  },
+  {
+   "id": "ECO-IG-X-04",
+   "strand": "EX",
+   "stage": "IGCSE",
+   "unit": "Assessment objectives AO1–AO3 / Scheme of assessment",
+   "syllabus": "AO3",
+   "level": "core",
+   "name": "评价与“Discuss”讨论题",
+   "name_en": "Evaluation and discuss questions (AO3)",
+   "desc": "AO3（总分约 10%，只在 Paper 2，占该卷 15%）：(d) 小题 8 分 discuss 和 Section A (f) 6 分，需要“两面论证+有依据的结论”（Level 3：两面都合理展开）；注意时间分配给 (c)(d)",
+   "prereqs": [
+    {
+     "id": "ECO-IG-1.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "discuss",
+    "evaluate",
+    "on the one hand",
+    "on the other hand",
+    "it depends on",
+    "conclusion",
+    "judgement"
+   ],
+   "method": "模板：观点 A（分析链）→ 观点 B（分析链）→ 结论“取决于……”。2024 考官报告：一面之词、(d) 题时间不足；样卷 Level 3 要求“accurately considers two sides”。",
+   "probe": "给题“Discuss whether a government should subsidise public transport”，限时 12 分钟写，看是否两面+结论。",
+   "source": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf（Cambridge IGCSE Economics 0455 syllabus 2027–2029 v1） Assessment objectives / Scheme of assessment；考查重点佐证：https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf（0455 June 2024 Examiner Report 镜像，佐证）Paper 22/23；https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf（0455 2027 Specimen Paper 2 Mark Scheme，官方）Table A levels"
+  }
+ ]
+}
