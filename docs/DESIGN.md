@@ -285,8 +285,12 @@ FastAPI 应用（app/main.py）
 - **配置和代码分离**：提供方、模型、密钥、每日上限、按任务路由都在 `config/llm.toml`（模板 `config/llm.example.toml`），改完重启服务生效，不用改代码。值可以写成 `"${环境变量}"`。
 - **抽象**：业务代码只调用 `app.llm` 里的任务函数；任务函数把请求包装成 `ChatRequest` 交给 `service.ask_json`；`service` 按配置选出 `Provider` 调用。新增一个模型厂商 = 写一个 `Provider` 子类并 `@register("类型名")`，配置里写 `type = "类型名"`。
 - **按任务路由**：`[tasks.lookup]` 这样的段落可以给某个任务单独指定提供方、模型、effort、max_tokens（比如查词用更便宜的模型，出题用更强的模型）。
-- 所有调用在服务器端，结果按输入做缓存（同一个词在同一句里只查一次；讲解按知识点缓存）。
-- 生成的题存入题库复用，不重复花钱；题目要求「答案正确且唯一」，人工核对过的题标为 seed 优先使用。
+- 所有调用在服务器端，查词、句子讲解按输入做缓存（同一个词在同一句里只查一次）。
+- **题库沉淀**（`app/bank.py`）：AI 现场生成的东西全部存下来，以后先用库里的，不够才生成。
+  - 题目存 `items`，用 `item_kps` 挂到一个或几个知识点上。同一概念在别的教材里、语言相同的知识点的题也能用。每道题记下语言、年级、出题目的、生成记录（模型和提示词版本，见 `tasks.PROMPT_VERSION`）、做题统计（次数、正确、还不会、用时），内容相同的题只存一份（`qhash`）。
+  - 分步讲解、背景和用处、阅读短文存 `contents`（kind = teach / context / passage）。和孩子个人有关的部分不存，比如讲解前面的「你在数学里学过……」来自人工写的关联说明，用的时候再拼。阅读短文按语言、年级、话题复用，同一个孩子不会读到重复的。
+  - 孩子和家长可以标记「这道题有问题」（`flags`）。标记的人自己不再看到这道题；家长标记一次，或两个不同的孩子标记，就暂停使用，管理员在后台「题库」页恢复或下架。后台也能看各教材的覆盖情况、正确率最低的题，并导出整个题库（不含作答记录和试卷原题）。
+  - 试卷导入的原题只给这个孩子自己用。题目要求「答案正确且唯一」，人工核对过的题标为 seed。
 - 每个孩子每天调用上限 `daily_limit_per_kid`。
 - 面向国际学校的学科：题干英文 + 中文翻译，讲解用中文并标出英文术语。
 - Claude 默认启用服务端 fallback（`server_fallback = true`），模型过载时自动切换备用模型。
@@ -294,7 +298,7 @@ FastAPI 应用（app/main.py）
 
 ## 7. 数据表
 
-`users`（家长/孩子）· `enrollments`（孩子选的教材包和当前学段）· `mastery`（掌握度）· `items`（题库）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
+`users`（家长/孩子）· `enrollments`（孩子选的教材包和当前学段）· `mastery`（掌握度）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
 
 ## 8. 后续路线
 

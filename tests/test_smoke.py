@@ -702,15 +702,92 @@ def test_curricula_layers_tracks_and_bridges():
         # 学习页显示跨学科联系，讲解提示里带上孩子已学的相关内容
         page = c.get("/learn/PHY-IG-1.4-01").text
         assert "和别的学科连起来" in page and catalog.kp("PSH-MECH-14")["name"] in page
-        seen = {}
-        from app import llm
-        orig = llm.teach
-        llm.teach = lambda kp, pack, grade, user_id=None, known=None: seen.setdefault("known", known) or {"steps": []}
-        try:
-            c.get("/api/teach/PHY-IG-1.4-01")
-        finally:
-            llm.teach = orig
-        assert any("密度" in x for x in seen["known"])
+        # 讲解存进题库大家共用；孩子已学的相关内容现场拼在前面
+        t = c.get("/api/teach/PHY-IG-1.4-01").json()
+        assert t["steps"] and any(b["name"] == catalog.kp("PSH-MECH-14")["name"] for b in t["bridge"])
         # 英语阅读可以选「别的课学过的」话题
         assert any(t["kp"]["id"] in ("PSH-MECH-14", "PHY-IG-1.4-01") for t in engine.cross_topics(kid["id"], "en"))
         assert "课学过的内容" in c.get("/reading").text
+
+
+def test_content_bank():
+    """题库沉淀：生成的题、讲解、背景、短文都存下来，第二次直接用库里的；做题统计；标记有问题；后台题库页和导出。"""
+    from app import bank, db
+    calls = []
+    from app.llm import tasks
+    real = tasks.ask_json
+
+    def spy(task, *a, **kw):
+        calls.append(task)
+        out = real(task, *a, **kw)
+        if task == "passage":  # 模拟模型每次写的短文都不一样
+            out = {**out, "body": out["body"] + f" ({len(calls)})"}
+        return out
+    tasks.ask_json = spy
+    try:
+        with TestClient(app) as c:
+            kp = "PHY-IG-1.3-01"
+            c.post("/login", data={"email": "a@x.com", "password": "secret1"})
+            items = c.get(f"/api/practice/{kp}?n=3").json()["items"]
+            items = [i for i in items if not i.get("probe")]  # 去掉穿插的旧知识点题
+            assert items and "items" in calls
+            row = db.one("SELECT * FROM items WHERE id=?", items[0]["id"])
+            assert row["lang"] == "en" and row["grade"] == "G8" and row["purpose"] and row["qhash"]
+            assert db.jload(row["gen_meta"])["prompt_v"] >= 1
+            assert db.one("SELECT 1 AS x FROM item_kps WHERE item_id=? AND kp_id=?", items[0]["id"], kp)
+            # 作答更新题目统计
+            c.post("/api/answer", json={"item_id": items[0]["id"], "kp_id": kp, "answer": "zzz", "ms": 4000})
+            row2 = db.one("SELECT * FROM items WHERE id=?", items[0]["id"])
+            assert row2["n_attempts"] == row["n_attempts"] + 1 and row2["total_ms"] == row["total_ms"] + 4000
+            # 讲解、背景：第二次不再调用 AI
+            for path in (f"/api/teach/{kp}", f"/api/context/{kp}"):
+                a1, a2 = c.get(path).json(), c.get(path).json()
+                assert a1["content_id"] == a2["content_id"]
+            assert calls.count("teach") == 1 and calls.count("context") == 1
+            # 阅读短文：存下来，同话题换个孩子直接用
+            c.post("/reading/new", data={"mode": "ai", "lang": "en", "topic": "seeds"})
+            assert calls.count("passage") == 1
+            cid = db.one("SELECT content_id FROM readings WHERE user_id=(SELECT id FROM users WHERE email='a@x.com') ORDER BY id DESC LIMIT 1")["content_id"]
+            assert cid and db.one("SELECT kind FROM contents WHERE id=?", cid)["kind"] == "passage"
+            c.get("/logout")
+
+            # 另一个孩子（同年级）做同一知识点：直接用库里的题，不再出题
+            c.post("/login", data={"email": "p2@x.com", "password": "secret1"})
+            c.post("/parent/kids/save", data={"name": "同学", "email": "c@x.com", "password": "secret1", "grade": "G8",
+                                              "daily_minutes": "60", "subj_physics": "phy-cambridge", "subj_english": "eng-cambridge"})
+            c.get("/logout")
+            c.post("/login", data={"email": "c@x.com", "password": "secret1"})
+            n_items = calls.count("items")
+            from app import engine
+            again = engine.items_for(db.one("SELECT id FROM users WHERE email='c@x.com'")["id"], kp, n=3, grade="G8")
+            assert {i["id"] for i in again} & {i["id"] for i in items} and calls.count("items") == n_items
+            c.post("/reading/new", data={"mode": "ai", "lang": "en", "topic": "seeds"})
+            assert calls.count("passage") == 1
+            assert db.one("SELECT uses FROM contents WHERE id=?", cid)["uses"] >= 2
+            # 标记有问题：这个孩子不再看到；第二个人标记后暂停使用
+            bad = items[0]["id"]
+            assert c.post("/api/flag", json={"id": bad, "reason": "wrong"}).json()["status"] == "active"
+            assert c.post("/api/flag", json={"id": bad, "reason": "nope"}).status_code == 400
+            assert bad not in {i["id"] for i in c.get(f"/api/practice/{kp}?n=5").json()["items"]}
+            c.get("/logout")
+            c.post("/login", data={"email": "a@x.com", "password": "secret1"})
+            assert c.post("/api/flag", json={"id": bad, "reason": "unclear"}).json()["status"] == "review"
+            c.get("/logout")
+
+            # 管理后台：题库页能看到被标记的题，可以恢复；导出不含试卷原题
+            c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+            page = c.get("/admin?tab=bank").text
+            assert "被标记有问题" in page and "答案好像不对" in page and "各教材的题目覆盖" in page
+            c.post(f"/admin/bank/item/{bad}/status", data={"status": "active"})
+            assert db.one("SELECT status, n_flags FROM items WHERE id=?", bad) == {"status": "active", "n_flags": 0}
+            dump = c.get("/admin/bank/export.json").json()
+            assert any(i["id"] == bad for i in dump["items"]) and not any(i["source"] == "paper" for i in dump["items"])
+            assert {x["kind"] for x in dump["contents"]} >= {"teach", "context", "passage"}
+            c.get("/logout")
+    finally:
+        tasks.ask_json = real
+    # 去重：同样的题再存一次不会多出一条
+    n = db.one("SELECT COUNT(*) AS n FROM items")["n"]
+    full = bank.row_to_item(db.one("SELECT * FROM items WHERE id=?", items[0]["id"]))
+    assert bank.save_items("PHY-IG-1.3-01", [full])[0]["id"] == full["id"]
+    assert db.one("SELECT COUNT(*) AS n FROM items")["n"] == n

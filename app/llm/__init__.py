@@ -6,10 +6,11 @@
 - 任务：tasks.py（查词、讲解、出题、造句点评、写短文、试卷解析、问一问小助手）
 """
 from .base import ChatRequest, LLMError, Provider, register
-from .service import ask_json, check, enabled, ping, reload, settings
-from .tasks import ask_tutor, explain_sentence, generate_items, kp_context, lookup, make_passage, parse_paper, sentence_feedback, teach
+from .service import ask_json, check, enabled, model_of, ping, reload, settings
+from .tasks import PROMPT_VERSION, ask_tutor, explain_sentence, generate_items, kp_context, lookup, make_passage, parse_paper, sentence_feedback, teach
 
 __all__ = [
-    "ChatRequest", "LLMError", "Provider", "register", "ask_json", "check", "enabled", "ping", "reload", "settings",
+    "PROMPT_VERSION",
+    "ChatRequest", "LLMError", "Provider", "register", "ask_json", "check", "enabled", "model_of", "ping", "reload", "settings",
     "ask_tutor", "explain_sentence", "generate_items", "kp_context", "lookup", "make_passage", "parse_paper", "sentence_feedback", "teach",
 ]

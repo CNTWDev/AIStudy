@@ -45,7 +45,9 @@ $('#teachbtn').onclick = async () => {
   $('#teach').innerHTML = '<span class="loading">AI 正在准备讲解</span>';
   try {
     const t = await api('/api/teach/' + KP);
-    $('#teach').innerHTML = '<div class="card" style="margin:0">' + (t.steps || []).map((s, i) => `<p><b>${i + 1}. ${esc(s.title)}</b><br>${esc(s.text)}</p>`).join('') +
+    $('#teach').innerHTML = '<div class="card" style="margin:0">' +
+      (t.bridge && t.bridge.length ? '<div class="hint" style="margin-top:0">🔗 先连一连：' + t.bridge.map(b => `你在${esc(b.subject)}学过「${esc(b.name)}」${b.note ? '，' + esc(b.note) : ''}`).join('；') + '</div>' : '') +
+      (t.steps || []).map((s, i) => `<p><b>${i + 1}. ${esc(s.title)}</b><br>${esc(s.text)}</p>`).join('') +
       (t.example ? `<p><b>例子：</b>${esc(t.example.q)}<br><span class="muted">→ ${esc(t.example.a)}</span></p>` : '') +
       (t.terms && t.terms.length ? '<p class="small">' + t.terms.map(x => `<span class="pill">${esc(x.en)} = ${esc(x.zh)}</span>`).join(' ') + '</p>' : '') +
       (t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '') + '</div>';

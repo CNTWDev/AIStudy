@@ -9,6 +9,11 @@ TUTOR = (
 )
 
 
+# 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
+# 以后可以按版本比较质量、批量重做旧版本生成的内容。
+PROMPT_VERSION = {"items": 1, "teach": 2, "context": 1, "passage": 1}
+
+
 def _audience(grade: str, pack) -> str:
     from ..catalog import stage_label
     s = f"学生年级：{stage_label(grade)}。学科：{pack.subject_name}（{pack.edition}）。"
@@ -57,7 +62,7 @@ def teach(kp: dict, pack, grade: str, user_id=None, known: list[str] | None = No
         "最后给一个「一句话记住」。如有英文术语，给出英文和中文。\n"
         '输出：{"steps":[{"title":"..","text":".."}],"example":{"q":"..","a":".."},"remember":"..","terms":[{"en":"..","zh":".."}]}'
     )
-    return ask_json("teach", TUTOR, user, user_id=user_id, effort="medium")
+    return ask_json("teach", TUTOR, user, user_id=user_id, effort="medium", cache=False)  # 存在题库 contents 里
 
 
 def kp_context(kp: dict, pack, grade: str, user_id=None) -> dict:
@@ -72,7 +77,7 @@ def kp_context(kp: dict, pack, grade: str, user_id=None) -> dict:
         "内容必须准确，不确定的历史细节宁可不写。不要照搬教材原文。\n"
         '输出：{"story":"..","uses":[".."],"fun":"..","next":".."}'
     )
-    return ask_json("context", TUTOR, user, user_id=user_id, effort="low")
+    return ask_json("context", TUTOR, user, user_id=user_id, effort="low", cache=False)  # 存在题库 contents 里
 
 
 def lookup(query: str, context: str, lang: str, grade: str, user_id=None) -> dict:
