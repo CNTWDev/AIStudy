@@ -28,7 +28,11 @@
     "chinese": "chn-tongbian",
     "math": "math-shanghai",
     "english": "eng-shanghai",
-    "physics": "phy-shanghai"
+    "physics": "phy-shanghai",
+    "chemistry": "chem-shanghai",
+    "biology": "bio-shanghai",
+    "geography": "geo-shanghai",
+    "history": "hist-shanghai"
    }
   },
   {
@@ -43,7 +47,11 @@
     "chinese": "chn-tongbian",
     "math": "math-shanghai",
     "english": "eng-shanghai",
-    "physics": "phy-shanghai"
+    "physics": "phy-shanghai",
+    "chemistry": "chem-shanghai",
+    "biology": "bio-shanghai",
+    "geography": "geo-shanghai",
+    "history": "hist-shanghai"
    }
   },
   {
@@ -62,7 +70,11 @@
      "track": "0511"
     },
     "physics": "phy-shanghai",
-    "science": "sci-shanghai"
+    "science": "sci-shanghai",
+    "chemistry": "chem-shanghai",
+    "biology": "bio-shanghai",
+    "geography": "geo-shanghai",
+    "history": "hist-shanghai"
    }
   },
   {

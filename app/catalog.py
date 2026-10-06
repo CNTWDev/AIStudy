@@ -171,6 +171,8 @@ class Catalog:
                 c["kps"] = list(dict.fromkeys(c["kps"] + kps))
                 self.concepts[c["id"]] = c
                 for k in kps:
+                    if self.concept_of.get(k, c["id"]) != c["id"]:
+                        self.errors.append(f"{path.name}: {k} 同时属于概念 {self.concept_of[k]} 和 {c['id']}")
                     self.concept_of[k] = c["id"]
             for ln in d.get("links", []):
                 if ln.get("type") not in LINK_TYPES:
