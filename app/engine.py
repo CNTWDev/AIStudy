@@ -4,7 +4,7 @@ import random
 import uuid
 from datetime import date, timedelta
 
-from . import db, llm
+from . import bank, db, llm
 from .catalog import catalog, stage_rank
 
 # ------------------------------------------------------------------ 掌握度
@@ -122,45 +122,29 @@ def load_seed_items(seed_dir):
     return n
 
 
-def _item_row_to_dict(r) -> dict:
-    d = db.jload(r["data"], {})
-    d.update(id=r["id"], kp_id=r["kp_id"], kp_ids=db.jload(r["kp_ids"], []), type=r["type"], difficulty=r["difficulty"], source=r["source"])
-    return d
-
-
-def save_items(kp_id: str, items: list[dict], source="ai") -> list[dict]:
-    out = []
-    for it in items:
-        iid = "AI-" + uuid.uuid4().hex[:10]
-        data = {k: v for k, v in it.items() if k not in ("type", "difficulty", "id")}
-        try:
-            diff = int(it.get("difficulty", 2))
-        except (TypeError, ValueError):
-            diff = 2
-        db.run("INSERT INTO items(id,kp_id,kp_ids,type,difficulty,data,source,created_at) VALUES(?,?,?,?,?,?,?,?)",
-               iid, kp_id, db.jdump([kp_id]), it["type"], diff, db.jdump(data), source, db.now())
-        out.append(_item_row_to_dict(db.one("SELECT * FROM items WHERE id=?", iid)))
-    return out
+_item_row_to_dict = bank.row_to_item
+save_items = bank.save_items
 
 
 def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="G3") -> list[dict]:
-    """取题：优先没做过的、难度从低到高；不够且配置了 AI 时现场出题并存入题库。"""
-    rows = db.q(
-        "SELECT i.*, (SELECT COUNT(*) FROM attempts a WHERE a.item_id=i.id AND a.user_id=?) AS done, "
-        "(SELECT COUNT(*) FROM attempts a WHERE a.item_id=i.id AND a.user_id=? AND a.correct=1) AS ok "
-        "FROM items i WHERE i.kp_id=? OR i.kp_ids LIKE ?", user_id, user_id, kp_id, f'%"{kp_id}"%')
+    """取题：先用题库里的（这个知识点的，加上别的教材里同一概念的），优先没做过的、难度从低到高；
+    不够且配置了 AI 时现场出题，存进题库，以后别的孩子也能用。"""
+    rows = bank.candidates(user_id, kp_id)
     fresh = [r for r in rows if r["done"] == 0]
     redo = [r for r in rows if r["done"] > 0 and r["ok"] == 0]  # 做错过的题，换个时间再做
-    pool = sorted(fresh, key=lambda r: r["difficulty"]) + redo
+    pool = sorted(fresh, key=lambda r: (r["other"] or 0, r["difficulty"])) + redo
     if purpose == "diagnose":
-        pool = sorted(rows, key=lambda r: (r["done"] > 0, abs(r["difficulty"] - 2)))
-    picked = [_item_row_to_dict(r) for r in pool[:n]]
+        pool = sorted(rows, key=lambda r: (r["done"] > 0, r["other"] or 0, abs(r["difficulty"] - 2)))
+    picked = [{**bank.row_to_item(r), "kp_id": kp_id} for r in pool[:n]]  # 共用的题，这次记在正在学的知识点上
     if len(picked) < n and llm.enabled():
         kp = catalog.kp(kp_id)
         pack = catalog.packs[catalog.kp_pack[kp_id]]
         try:
             new = llm.generate_items(kp, pack, grade, n=max(3, n - len(picked)), purpose=purpose, user_id=user_id)
-            picked += save_items(kp_id, new)[: n - len(picked)]
+            have = {p["id"] for p in picked} | bank.flagged_by(user_id)
+            saved = [it for it in save_items(kp_id, new, purpose=purpose, grade=grade, meta=bank.gen_meta("items", purpose=purpose))
+                     if it["id"] not in have]
+            picked += saved[: n - len(picked)]
         except llm.LLMError:
             pass
     return picked[:n]
@@ -216,6 +200,8 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
     db.run("INSERT INTO attempts(user_id,item_id,kp_id,mode,correct,answer,dont_know,ms,created_at) VALUES(?,?,?,?,?,?,?,?,?)",
            user_id, item["id"] if item else None, kp_id, mode, 1 if correct else 0, str(answer)[:500],
            1 if dont_know else 0, ms, db.now())
+    if item and item.get("id"):
+        bank.record(item["id"], correct, dont_know, ms)
     if mode in ("diagnose", "probe") and correct:  # 诊断 / 摸底答对：直接算掌握
         set_mastery(user_id, kp_id, 0.8, "mastered", mode)
         status = "mastered"
@@ -330,7 +316,7 @@ def start_diagnosis(user_id: int, pack_id: str, stage: str) -> int:
     idx = pack.stages.index(stage) if stage in pack.stages else len(pack.stages) - 1
     window = pack.stages[max(0, idx - 1): idx + 1]
     cands = [k for k in catalog.pack_kps(pack_id, track=enroll_track(user_id, pack_id)) if k["stage"] in window]
-    has_items = {r["kp_id"] for r in db.q("SELECT DISTINCT kp_id FROM items")}
+    has_items = {r["kp_id"] for r in db.q("SELECT DISTINCT x.kp_id FROM item_kps x JOIN items i ON i.id=x.item_id WHERE i.status='active'")}
     # 高频 > 有现成题 > 当前学段；每个板块至少一个
     cands.sort(key=lambda k: (not k.get("hot"), k["id"] not in has_items, k["stage"] != stage))
     queue, seen_strand = [], set()

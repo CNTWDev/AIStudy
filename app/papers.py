@@ -7,7 +7,7 @@
 import base64
 import uuid
 
-from . import config, db, engine, llm
+from . import bank, config, db, engine, llm
 from .catalog import catalog, stage_rank
 
 MAX_IMAGES = 8
@@ -89,6 +89,9 @@ def create(user_id: int, pack_id: str, *, title="", exam_date="", images=None, t
             body = {k: v for k, v in it.items() if k != "type"}
             t.run("INSERT INTO items(id,kp_id,kp_ids,type,difficulty,data,source,created_at) VALUES(?,?,?,?,?,?,?,?)",
                   iid, kp or "", db.jdump([kp] if kp else []), it["type"], 2, db.jdump(body), "paper", now)
+            t.run("UPDATE items SET qhash=?, lang=?, purpose='paper' WHERE id=?", bank.item_hash(it), bank.kp_lang(kp) if kp else "", iid)
+            if kp:
+                t.run("INSERT INTO item_kps(item_id, kp_id, role) VALUES(?,?,'main')", iid, kp)
             page = q.get("page")
             t.run("INSERT INTO paper_items(paper_id,seq,label,item_id,kp_id,points,page,orig,orig_answer) VALUES(?,?,?,?,?,?,?,?,?)",
                   pid, i + 1, str(q.get("label") or i + 1)[:20], iid, kp, _num(q.get("score")),

@@ -305,3 +305,4 @@ input[type=file]{width:100%;padding:14px;border:2px dashed var(--line);border-ra
 input[type=file]:hover{border-color:var(--brand-3)}
 input[type=file]::file-selector-button{font:inherit;font-weight:600;border:0;border-radius:10px;background:var(--brand);color:var(--on-brand);padding:9px 14px;margin-right:12px;cursor:pointer}
 details:not(.card)>summary{cursor:pointer}
+.flagrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}.flagrow .linkbtn{font-size:12.5px;color:var(--muted)}

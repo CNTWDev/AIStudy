@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import auth, config, db, engine, explore, insights, llm, papers, records, sitecfg, webpage
+from . import auth, bank, config, db, engine, explore, insights, llm, papers, records, sitecfg, webpage
 from .auth import LoginRequired
 from .catalog import GRADES, catalog, stage_label, stage_rank
 from .content import content
@@ -21,6 +21,7 @@ async def lifespan(app):
     catalog.load()
     content.load()
     engine.load_seed_items(config.SEED_DIR)
+    bank.sync()
     yield
     db.close()
 
@@ -313,7 +314,7 @@ def kid_brief(k) -> dict:
 
 
 ADMIN_TABS = [("overview", "概览"), ("stats", "数据统计"), ("families", "家庭与孩子"), ("invites", "邀请码"),
-              ("tree", "邀请关系"), ("log", "安全日志"), ("system", "站点设置")]
+              ("tree", "邀请关系"), ("bank", "题库"), ("log", "安全日志"), ("system", "站点设置")]
 
 
 @app.get("/admin", response_class=HTMLResponse)
@@ -376,6 +377,8 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
         ctx["tree"] = walk(None, 0)
     elif tab == "stats":
         ctx["daily"], ctx["totals"], ctx["kid_rows"] = _site_stats(users)
+    elif tab == "bank":
+        ctx["bank"] = bank.overview()
     elif tab == "log":
         ctx["events"] = db.q("SELECT * FROM auth_events ORDER BY id DESC LIMIT 300")
     elif tab == "system":
@@ -576,6 +579,35 @@ def admin_kid_report(request: Request, kid_id: int):
     if not k:
         raise HTTPException(404)
     return render(request, "records.html", **_records_ctx(k), report_for=k)
+
+
+@app.post("/admin/bank/{target}/{tid}/status")
+def admin_bank_status(request: Request, target: str, tid: str, status: str = Form(...)):
+    auth.require_admin(request)
+    if target not in ("item", "content") or status not in ("active", "retired"):
+        raise HTTPException(400)
+    bank.set_status(target, int(tid) if target == "content" else tid, status)
+    return _admin_back("bank", "已恢复使用" if status == "active" else "已下架")
+
+
+@app.get("/admin/bank/export.json")
+def admin_bank_export(request: Request):
+    auth.require_admin(request)
+    return JSONResponse(bank.export(), headers={"Content-Disposition": f'attachment; filename="aistudy-bank-{db.today().isoformat()}.json"'})
+
+
+@app.post("/api/flag")
+def api_flag(request: Request, body: dict = Body(...)):
+    """孩子 / 家长标记「这道题有问题」。"""
+    u = auth.require_user(request)
+    target, tid, reason = body.get("target", "item"), str(body.get("id") or ""), body.get("reason", "")
+    if target not in ("item", "content") or reason not in bank.FLAG_REASONS or not tid:
+        raise HTTPException(400, "参数不对")
+    try:
+        status = bank.flag(u["id"], target, tid, reason)
+    except (KeyError, ValueError):
+        raise HTTPException(404, "没有这道题")
+    return {"ok": True, "status": status}
 
 
 @app.post("/admin/invites/create")
@@ -1018,9 +1050,12 @@ def learn(request: Request, kp_id: str, task: str = "practice"):
 def api_teach(request: Request, kp_id: str):
     k = kid_or_redirect(request)
     kp = catalog.kp(kp_id)
-    known = [f"{b['subject']}「{b['kp']['name']}」（{b['label']}{'：' + b['note'] if b['note'] else ''}）"
-             for b in engine.bridges(k["id"], kp_id) if b["status"] in ("mastered", "learning")]
-    return llm.teach(kp, catalog.packs[kp["pack"]], k["grade"], user_id=k["id"], known=known)
+    if not kp:
+        raise HTTPException(404, "没有这个知识点")
+    # 讲解本身存在题库里大家共用；「你在别的学科学过……」是每个孩子自己的，现场拼上（来自人工写的关联说明）
+    bridge = [{"subject": b["subject"], "name": b["kp"]["name"], "label": b["label"], "note": b["note"]}
+              for b in engine.bridges(k["id"], kp_id) if b["status"] in ("mastered", "learning")][:3]
+    return {**bank.teach(kp, k["grade"], user_id=k["id"]), "bridge": bridge}
 
 
 def _public_item(it: dict) -> dict:
@@ -1102,7 +1137,7 @@ def api_context(request: Request, kp_id: str):
     if not llm.enabled():
         return {}
     try:
-        return llm.kp_context(kp, catalog.packs[kp["pack"]], k["grade"], user_id=k["id"])
+        return bank.context(kp, k["grade"], user_id=k["id"])
     except llm.LLMError:
         return {}
 
@@ -1236,6 +1271,9 @@ def paper_set_kp(request: Request, paper_id: int, body: dict = Body(...)):
     with db.tx() as t:
         t.run("UPDATE paper_items SET kp_id=? WHERE id=?", kp_id, int(body["pi"]))
         t.run("UPDATE items SET kp_id=?, kp_ids=? WHERE id=?", kp_id or "", db.jdump([kp_id] if kp_id else []), pi["item_id"])
+        t.run("DELETE FROM item_kps WHERE item_id=?", pi["item_id"])
+        if kp_id:
+            t.run("INSERT INTO item_kps(item_id, kp_id, role) VALUES(?,?,'main')", pi["item_id"], kp_id)
     return {"ok": True}
 
 
@@ -1293,7 +1331,10 @@ def ask(request: Request, body: dict = Body(...)):
         context, item_id, kp_id = th["context"], th["item_id"], th["kp_id"]
     else:
         it = _ask_item(k, str(ctx.get("item_id") or ""))
-        kp = catalog.kp((it or {}).get("kp_id") or ctx.get("kp_id") or "")
+        # 题库里的题会挂在好几个知识点上：在学习页问，就按这一页正在学的知识点
+        path = str(ctx.get("path") or "")
+        page_kp = path.split("/learn/", 1)[1].split("?")[0] if path.startswith("/learn/") else ""
+        kp = catalog.kp(ctx.get("kp_id") or page_kp or (it or {}).get("kp_id") or "")
         lines = [f"页面：{str(ctx.get('title') or '')[:80]}（{str(ctx.get('path') or '')[:80]}）"]
         if kp:
             lines.append(f"知识点：{kp['name']} {kp.get('name_en', '')}；说明：{kp.get('desc', '')}")
@@ -1487,9 +1528,9 @@ async def reading_new(request: Request):
             "SELECT front FROM cards WHERE user_id=? AND kind='word' AND due<=? ORDER BY due LIMIT 8",
             k["id"], (db.today() + timedelta(days=3)).isoformat())] if lang == "en" else []
         length = form.get("length") or ("150-250 词" if lang == "en" else "500-800 字")
-        p = llm.make_passage(lang, k["grade"], form.get("topic") or "", length, review_words, user_id=k["id"])
-        rid = db.insert("INSERT INTO readings(user_id,lang,title,body,source,questions,created_at) VALUES(?,?,?,?,?,?,?)",
-                     k["id"], lang, p.get("title", "Reading"), p.get("body", ""), "ai", db.jdump(p.get("questions", [])), db.now())
+        p, cid = bank.passage(k["id"], lang, k["grade"], form.get("topic") or "", length, review_words)
+        rid = db.insert("INSERT INTO readings(user_id,lang,title,body,source,questions,content_id,created_at) VALUES(?,?,?,?,?,?,?,?)",
+                     k["id"], lang, p.get("title", "Reading"), p.get("body", ""), "ai", db.jdump(p.get("questions", [])), cid, db.now())
     else:
         body = (form.get("body") or "").strip()
         if not body:

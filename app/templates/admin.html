@@ -156,6 +156,63 @@
   {% else %}<p class="muted small">还没有账号。</p>{% endfor %}
 </div>
 
+{% elif tab == 'bank' %}
+{% set B = bank %}
+<div class="card"><div class="statline" style="margin:0">
+  <div><b>{{ B['items'] }}</b><span>道题在用</span></div>
+  <div><b>{{ B.attempts }}</b><span>次作答{% if B.acc is not none %} · 正确率 {{ B.acc }}%{% endif %}</span></div>
+  <div><b>{{ B.by_kind.get('teach', 0) }}</b><span>份分步讲解</span></div>
+  <div><b>{{ B.by_kind.get('context', 0) }}</b><span>份背景和用处</span></div>
+  <div><b>{{ B.by_kind.get('passage', 0) }}</b><span>篇阅读短文</span></div>
+</div>
+<p class="muted small" style="margin-bottom:0">AI 现场生成的题目、讲解、背景和短文都会存进来，以后先用库里的，不够才再生成。题目来源：{% for k, v in B.by_source.items() %}{{ {'ai': 'AI 出题', 'seed': '内置', 'paper': '试卷导入'}.get(k, k) }} {{ v }}{{ '，' if not loop.last }}{% endfor %}。
+  <a href="/admin/bank/export.json">导出整个题库（JSON）</a>，不含孩子的作答记录和试卷原题。</p></div>
+
+{% if B.review or B.review_contents %}
+<div class="card">
+  <div class="card-h"><span class="ico">🚩</span><h3>被标记有问题，暂停使用（{{ B.review|length + B.review_contents|length }}）</h3></div>
+  {% for it in B.review %}
+  <div class="kp" style="display:block">
+    <div><b>{{ it.q }}</b>{% if it.zh %} <span class="muted small">{{ it.zh }}</span>{% endif %}</div>
+    {% if it.options %}<div class="small">{% for o in it.options %}{{ 'ABCD'[loop.index0] }}. {{ o }}{{ ' ✓' if it.answer|string == loop.index0|string }}　{% endfor %}</div>{% else %}<div class="small">答案：{{ it.answer or it.model }}</div>{% endif %}
+    <div class="small muted">{{ it.kp_id }} · {{ it.n_flags }} 人标记：{{ it.why|join('、') }}</div>
+    <form method="post" action="/admin/bank/item/{{ it.id }}/status" class="row" style="margin-top:6px">
+      <button class="btn sm soft" name="status" value="active">没问题，恢复</button><button class="btn sm ghost" name="status" value="retired">下架</button></form>
+  </div>
+  {% endfor %}
+  {% for c in B.review_contents %}
+  <div class="kp" style="display:block">
+    <div><b>{{ c.title or c.kind }}</b> <span class="muted small">{{ c.kind }} · {{ c.kp_id }} · {{ c.n_flags }} 人标记：{{ c.why|join('、') }}</span></div>
+    <form method="post" action="/admin/bank/content/{{ c.id }}/status" class="row" style="margin-top:6px">
+      <button class="btn sm soft" name="status" value="active">没问题，恢复</button><button class="btn sm ghost" name="status" value="retired">下架</button></form>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-h"><span class="ico">📚</span><h3>各教材的题目覆盖</h3></div>
+  <p class="muted small">「有题」：至少有 1 道题的知识点；「够用」：至少 3 道。</p>
+  <table>
+    <tr class="small muted"><td>教材</td><td>知识点</td><td>有题</td><td>够用</td><td>题目</td></tr>
+    {% for p in B.packs %}
+    <tr class="small"><td>{{ p.name }}</td><td>{{ p.kps }}</td><td>{{ p.covered }}（{{ (100 * p.covered / p.kps)|round|int if p.kps else 0 }}%）</td><td>{{ p.enough }}</td><td>{{ p['items'] }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+{% if B.hard %}
+<div class="card">
+  <div class="card-h"><span class="ico">🧗</span><h3>正确率最低的题</h3></div>
+  <p class="muted small">做过至少 5 次。正确率特别低的，可能是题太难，也可能是答案有问题，值得看一眼。</p>
+  {% for it in B.hard %}
+  <div class="kp" style="display:block"><div class="small"><b>{{ it.acc }}%</b> · {{ it.n }} 次 · {{ it.kp_id }}</div><div>{{ it.q }}</div>
+    {% if it.options %}<div class="small muted">{% for o in it.options %}{{ 'ABCD'[loop.index0] }}. {{ o }}{{ ' ✓' if it.answer|string == loop.index0|string }}　{% endfor %}</div>{% else %}<div class="small muted">答案：{{ it.answer or it.model }}</div>{% endif %}
+    <form method="post" action="/admin/bank/item/{{ it.id }}/status" style="margin-top:4px"><button class="linkbtn" name="status" value="retired">下架</button></form></div>
+  {% endfor %}
+</div>
+{% endif %}
+
 {% elif tab == 'log' %}
 <div class="card">
   <table>

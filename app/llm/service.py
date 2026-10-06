@@ -61,6 +61,17 @@ def check(name: str | None = None) -> tuple[bool, str]:
     return ok, why or f"{p.cfg.name}（{p.cfg.type}，{p.cfg.model or '-'}）"
 
 
+def model_of(task: str) -> dict:
+    """这个任务现在用哪个提供方 / 模型（存进题库的生成记录里，以后好比较质量）。"""
+    try:
+        s = settings()
+        route = s.tasks.get(task)
+        p = provider(route.provider if route and route.provider else None)
+        return {"provider": p.cfg.name, "model": (route.model if route and route.model else None) or p.cfg.model or ""}
+    except LLMError:
+        return {}
+
+
 def enabled() -> bool:
     return check()[0]
 

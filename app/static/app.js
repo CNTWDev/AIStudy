@@ -32,7 +32,7 @@ function renderItem(box, item, opts) {
     `<div class="hintbox"></div><div class="fbbox"></div></div>`;
   box.innerHTML = html;
   box.classList.add('askable'); box.dataset.askItem = item.item_id || item.id || ''; delete box.dataset.answered;
-  const _done = opts.onDone; opts.onDone = res => { box.dataset.answered = '1'; _done && _done(res); };
+  const _done = opts.onDone; opts.onDone = res => { box.dataset.answered = '1'; flagRow(box, item); _done && _done(res); };
   let chosen = null;
   const t0 = Date.now();  // 做题用时：系统用它发现「会做但很慢」
   $$('.opt', box).forEach(b => b.onclick = () => { $$('.opt', box).forEach(x => x.classList.remove('sel')); b.classList.add('sel'); chosen = b.dataset.i; });
@@ -74,6 +74,22 @@ function renderItem(box, item, opts) {
       opts.onDone && opts.onDone(res);
     } catch (e) { btn.disabled = false; $('.fbbox', box).innerHTML = `<div class="err">${esc(e.message)}</div>`; }
   };
+}
+/* 做完一道题后可以标记「这道题有问题」：题库里的题会被很多孩子反复用，坏题要能被发现 */
+const FLAG_REASONS = {wrong: '答案好像不对', unclear: '题目有错或看不懂', offtopic: '和这个知识点没关系'};
+function flagRow(box, item) {
+  const id = item.item_id || item.id;
+  if (!id || $('.flagrow', box)) return;
+  const row = document.createElement('div'); row.className = 'flagrow';
+  row.innerHTML = '<button class="linkbtn">🚩 这道题有问题？</button>';
+  row.firstChild.onclick = () => {
+    row.innerHTML = '<span class="muted small">哪里不对？</span>' + Object.entries(FLAG_REASONS).map(([k, v]) => `<button class="chip" data-r="${k}">${v}</button>`).join('');
+    $$('.chip', row).forEach(b => b.onclick = async () => {
+      try { await api('/api/flag', {target: 'item', id, reason: b.dataset.r}); row.innerHTML = '<span class="muted small">✅ 谢谢！已经记下，会有人检查这道题。</span>'; }
+      catch (e) { row.innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+    });
+  };
+  box.appendChild(row);
 }
 const PRAISE = ['✅ 对了！', '✅ 漂亮！', '✅ 答对了，继续！', '✅ 很稳！', '✅ 就是这样！'];
 function feedback(res) {
