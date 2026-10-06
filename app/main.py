@@ -876,7 +876,7 @@ def paper_page(request: Request, paper_id: int):
     stage = engine.enrollment_stage(k["id"], p["pack_id"]) or k["grade"]
     return render(request, "paper.html", p=p, rows=rs, pack=pack, images=db.jload(p["images"], []),
                   cands=papers.candidates(p["pack_id"], stage) if pack else [],
-                  qs=[{"id": r["id"], "type": r["item"]["type"], "q": r["item"]["q"], "zh": r["item"].get("zh", ""),
+                  qs=[{"id": r["id"], "item_id": r["item_id"], "type": r["item"]["type"], "q": r["item"]["q"], "zh": r["item"].get("zh", ""),
                        "options": r["item"].get("options", []), "unit": r["item"].get("unit", ""),
                        "done": bool(r["answered_at"]), "flagged": bool(r["flagged"])} for r in rs])
 
@@ -942,6 +942,75 @@ def paper_delete(request: Request, paper_id: int):
     shutil.rmtree(papers.PAPER_DIR / str(paper_id), ignore_errors=True)
     engine.today_plan(k["id"], rebuild=True)
     return RedirectResponse("/papers", 303)
+
+
+# ================================================================== 问小艾：随时提问，引导式回答（不给答案）
+
+def _ask_item(k, item_id: str):
+    """孩子能看到的题：公共题库的题，或自己试卷里的题。"""
+    row = db.one("SELECT * FROM items WHERE id=?", item_id) if item_id else None
+    if not row:
+        return None
+    if row["source"] == "paper" and not db.one(
+            "SELECT 1 AS ok FROM paper_items i JOIN papers p ON p.id=i.paper_id WHERE i.item_id=? AND p.user_id=?", item_id, k["id"]):
+        return None
+    return engine._item_row_to_dict(row)
+
+
+@app.post("/api/ask")
+def ask(request: Request, body: dict = Body(...)):
+    k = kid_or_redirect(request)
+    question = (body.get("question") or "").strip()[:1000]
+    if not question:
+        raise HTTPException(400, "想问什么？写一句就行")
+    ctx = body.get("ctx") or {}
+    th = db.one("SELECT * FROM ask_threads WHERE id=? AND user_id=?", body.get("thread_id") or 0, k["id"])
+    if th:
+        context, item_id, kp_id = th["context"], th["item_id"], th["kp_id"]
+    else:
+        it = _ask_item(k, str(ctx.get("item_id") or ""))
+        kp = catalog.kp((it or {}).get("kp_id") or ctx.get("kp_id") or "")
+        lines = [f"页面：{str(ctx.get('title') or '')[:80]}（{str(ctx.get('path') or '')[:80]}）"]
+        if kp:
+            lines.append(f"知识点：{kp['name']} {kp.get('name_en', '')}；说明：{kp.get('desc', '')}")
+        if it:
+            lines.append("题目：" + it["q"] + (f"（{it['zh']}）" if it.get("zh") else ""))
+            if it.get("options"):
+                lines.append("选项：" + "；".join(f"{'ABCDEFG'[i]}. {o}" for i, o in enumerate(it["options"])))
+            lines.append("孩子已经做完这道题，看过答案了。" if ctx.get("answered") else "孩子还没做完这道题。")
+        if ctx.get("text"):
+            lines.append("页面上的内容 / 孩子选中的文字：" + str(ctx["text"])[:1500])
+        context, item_id, kp_id = "\n".join(lines), (it or {}).get("id"), kp["id"] if kp else None
+        now = db.now()
+        th = {"id": db.insert("INSERT INTO ask_threads(user_id,page,title,kp_id,item_id,context,created_at,updated_at) "
+                              "VALUES(?,?,?,?,?,?,?,?)", k["id"], str(ctx.get("path") or "")[:200],
+                              question[:80], kp_id, item_id, context, now, now)}
+    it = _ask_item(k, item_id or "")
+    secret = (engine.answer_display(it) + "。" + it.get("explain", "")) if it else ""
+    kp = catalog.kp(kp_id or "")
+    pack = catalog.packs.get(kp["pack"]) if kp else None
+    history = [(m["role"], m["text"]) for m in db.q("SELECT role, text FROM ask_messages WHERE thread_id=? ORDER BY id", th["id"])]
+    try:
+        res = llm.ask_tutor(k["grade"], pack, context, history, question, secret, user_id=k["id"])
+    except llm.LLMError:
+        if not history:  # 新对话第一句就失败：不留空对话
+            db.run("DELETE FROM ask_threads WHERE id=?", th["id"])
+        raise
+    now = db.now()
+    with db.tx() as t:
+        t.run("INSERT INTO ask_messages(thread_id,role,text,created_at) VALUES(?,?,?,?)", th["id"], "user", question, now)
+        t.run("INSERT INTO ask_messages(thread_id,role,text,created_at) VALUES(?,?,?,?)", th["id"], "ai", res["reply"], now)
+        t.run("UPDATE ask_threads SET updated_at=? WHERE id=?", now, th["id"])
+    return {"thread_id": th["id"], "reply": res["reply"]}
+
+
+@app.get("/api/ask/{thread_id}")
+def ask_history(request: Request, thread_id: int):
+    k = kid_or_redirect(request)
+    if not db.one("SELECT id FROM ask_threads WHERE id=? AND user_id=?", thread_id, k["id"]):
+        raise HTTPException(404)
+    return {"messages": [{"role": m["role"], "text": m["text"]} for m in
+                         db.q("SELECT role, text FROM ask_messages WHERE thread_id=? ORDER BY id", thread_id)]}
 
 
 # ================================================================== 诊断
@@ -1185,6 +1254,8 @@ def _records_ctx(k):
     return {"k": k, "packs": packs, "attempts": att, "weak": [(catalog.kp(w["kp_id"]), w) for w in weak[:12]],
             "cal": engine.calendar(k["id"], 12), "streak": engine.streak(k["id"]), "days": days, "lookups": lookups,
             "reads": db.q("SELECT * FROM reading_logs WHERE user_id=? ORDER BY id DESC LIMIT 30", k["id"]),
+            "asks": db.q("SELECT t.id, t.page, t.created_at, m.text FROM ask_threads t JOIN ask_messages m ON m.thread_id=t.id "
+                         "AND m.role='user' WHERE t.user_id=? ORDER BY m.id DESC LIMIT 20", k["id"]),
             "papers": [{**dict(p), "rep": db.jload(p["report"], {})} for p in
                        db.q("SELECT * FROM papers WHERE user_id=? ORDER BY id DESC LIMIT 20", k["id"])],
             "tot": tot, "mistakes": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='mistake'", k["id"])["n"],

@@ -123,6 +123,7 @@ class MockProvider(Provider):
 
 
 MOCK = {
+    "ask": {"reply": "我们一步一步来：你先说说，这道题在问什么？", "reveals_answer": False},
     "paper": {"title": "示例测验", "subject_guess": "", "notes": "示例数据",
               "questions": [
                   {"label": "1", "type": "mcq", "q": "示例：1 m = ? cm", "options": ["10", "100", "1000", "0.1"], "answer": 1,

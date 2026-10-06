@@ -31,6 +31,8 @@ function renderItem(box, item, opts) {
     (opts.dontKnow ? `<button class="btn ghost sm dkbtn">🤔 这道题还不会</button>` : '') + `</div>` +
     `<div class="hintbox"></div><div class="fbbox"></div></div>`;
   box.innerHTML = html;
+  box.classList.add('askable'); box.dataset.askItem = item.item_id || item.id || ''; delete box.dataset.answered;
+  const _done = opts.onDone; opts.onDone = res => { box.dataset.answered = '1'; _done && _done(res); };
   let chosen = null;
   $$('.opt', box).forEach(b => b.onclick = () => { $$('.opt', box).forEach(x => x.classList.remove('sel')); b.classList.add('sel'); chosen = b.dataset.i; });
   const hb = $('.hintbtn', box);
@@ -122,3 +124,53 @@ function say(text, lang) {
   const u = new SpeechSynthesisUtterance(text); u.lang = lang || 'en-US'; u.rate = .85;
   speechSynthesis.cancel(); speechSynthesis.speak(u);
 }
+
+/* ---------- 问小艾：每个页面右下角，结合当前题目引导式回答（不给答案） ---------- */
+const Ask = {
+  box: null, tid: null, key: '',
+  current() {
+    // 孩子最近点过 / 正在看的那道题；没有就用屏幕上第一道
+    const vis = $$('.askable').filter(b => { const r = b.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; });
+    return (Ask.focus && document.body.contains(Ask.focus) ? Ask.focus : null) || vis[0] || $('.askable');
+  },
+  ctx() {
+    const b = Ask.current();
+    const sel = (window.getSelection() || '').toString().trim();
+    const h1 = $('main h1');
+    let text = sel;
+    if (!text && b) text = ($('.q > div', b) || b).innerText;
+    if (!text) text = ($('main') || document.body).innerText;
+    return {path: location.pathname, title: h1 ? h1.innerText : document.title, text: text.slice(0, 1500),
+            item_id: b ? b.dataset.askItem : '', kp_id: (window.ASK_CTX || {}).kp || '', answered: !!(b && b.dataset.answered)};
+  },
+  label(c) { return c.item_id ? '这道题：' + c.text.replace(/\s+/g, ' ').slice(0, 40) : (c.text && getSelection().toString() ? '选中的：' + c.text.slice(0, 40) : '这个页面：' + c.title); },
+  open() {
+    $('#askpanel').classList.add('on');
+    const c = Ask.ctx(), key = c.item_id || c.path;
+    if (key !== Ask.key) { Ask.key = key; Ask.tid = null; $('#askmsgs').innerHTML = ''; Ask.say('ai', '我是小艾 🙋 哪里不明白就问我。我不会直接告诉你答案，但会陪你一步一步想出来！'); }
+    $('#askctx').textContent = '📎 ' + Ask.label(c);
+    $('#askq').focus();
+  },
+  say(role, text) {
+    const d = document.createElement('div'); d.className = 'am ' + role; d.textContent = text;
+    $('#askmsgs').appendChild(d); $('#askmsgs').scrollTop = 1e6; return d;
+  },
+  async send(q) {
+    q = (q || $('#askq').value).trim(); if (!q) return;
+    $('#askq').value = ''; Ask.say('user', q);
+    const wait = Ask.say('ai', '…'); wait.classList.add('loading');
+    try {
+      const r = await api('/api/ask', {question: q, thread_id: Ask.tid, ctx: Ask.tid ? {} : Ask.ctx()});
+      Ask.tid = r.thread_id; wait.remove(); Ask.say('ai', r.reply);
+    } catch (e) { wait.remove(); Ask.say('err', e.message); }
+  },
+};
+document.addEventListener('DOMContentLoaded', () => {
+  if (!$('#askbtn')) return;
+  document.addEventListener('pointerdown', e => { const b = e.target.closest && e.target.closest('.askable'); if (b) Ask.focus = b; }, true);
+  $('#askbtn').onclick = Ask.open;
+  $('#askclose').onclick = () => $('#askpanel').classList.remove('on');
+  $('#asknew').onclick = () => { Ask.key = ''; Ask.open(); };
+  $('#askform').onsubmit = e => { e.preventDefault(); Ask.send(); };
+  $$('#askchips button').forEach(b => b.onclick = () => Ask.send(b.textContent));
+});

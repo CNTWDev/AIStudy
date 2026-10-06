@@ -373,3 +373,30 @@ def test_paper_import_and_diagnosis():
         # 粘贴文字也可以
         r = c.post("/api/papers", data={"pack_id": "math-shanghai", "text": "1. 1 m = ? cm\n2. 2 + 3 = ?"})
         assert r.status_code == 200 and db.one("SELECT source FROM papers WHERE id=?", r.json()["id"])["source"] == "text"
+
+
+def test_ask_tutor():
+    from app import db
+    with TestClient(app) as c:
+        kid_b = db.one("SELECT id FROM users WHERE email='b@x.com'")["id"]
+        c.post("/login", data={"email": "b@x.com", "password": "secret1"})
+        assert 'id="askbtn"' in c.get("/today").text
+        assert 'id="askbtn"' not in c.get("/diagnose/math-shanghai").text  # 诊断时不能问
+        item = c.get("/api/practice/MATH-PRE-UNIT?n=1").json()["items"][0]
+        r = c.post("/api/ask", json={"question": "这题怎么做？", "ctx": {"path": "/learn/MATH-PRE-UNIT", "title": "单位换算",
+                                                                     "item_id": item["id"], "text": item["q"]}}).json()
+        assert r["reply"] and r["thread_id"]
+        th = db.one("SELECT * FROM ask_threads WHERE id=?", r["thread_id"])
+        assert th["user_id"] == kid_b and th["item_id"] == item["id"] and th["kp_id"] == "MATH-PRE-UNIT"
+        assert "题目：" in th["context"]
+        r2 = c.post("/api/ask", json={"question": "还是不懂", "thread_id": r["thread_id"]}).json()
+        assert r2["thread_id"] == r["thread_id"]
+        assert len(c.get(f"/api/ask/{r['thread_id']}").json()["messages"]) == 4
+        assert c.post("/api/ask", json={"question": " "}).status_code == 400
+        assert "还是不懂" in c.get("/records").text  # 家长和孩子都能在记录里看到问过什么
+        c.get("/logout")
+        # 别的孩子看不到这段对话，也不能接着问
+        c.post("/login", data={"email": "a@x.com", "password": "secret1"})
+        assert c.get(f"/api/ask/{r['thread_id']}").status_code == 404
+        r3 = c.post("/api/ask", json={"question": "hi", "thread_id": r["thread_id"]}).json()
+        assert r3["thread_id"] != r["thread_id"]

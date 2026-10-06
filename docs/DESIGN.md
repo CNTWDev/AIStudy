@@ -163,6 +163,13 @@ FastAPI 应用（app/main.py）
 - 查词结果贴合原句意思；可一键收藏（带原句进入复习）、用它造句（AI 先表扬再指出一个最重要的问题，给改正句和示范句）。
 - 读完打卡记录时长和理解题结果。
 
+### 5.7 问小艾（引导式提问）
+
+孩子页面右下角常驻按钮（诊断页除外）。前端带上当前上下文：孩子最近点过 / 屏幕上的那道题（`renderItem` 给题目框标 `askable` 和题目 id）、是否已作答、选中的文字、页面标题、知识点。
+服务器取出题目的正确答案和讲解，作为「只给小艾参考、绝不能说出」的内容放进提示词（`llm.ask_tutor`，任务名 `ask`）。
+回复要求：苏格拉底式，一次只推进一小步、以问题结尾；连续卡住就退回更基础的知识；模型自报 `reveals_answer` 为真时重新生成一次。
+对话存 `ask_threads` / `ask_messages`，同一道题接着问，换题自动开新对话；家长在学习报告里能看到。计入每个孩子每天的 AI 次数上限。
+
 ## 6. AI 抽象层与使用原则
 
 - **配置和代码分离**：提供方、模型、密钥、每日上限、按任务路由都在 `config/llm.toml`（模板 `config/llm.example.toml`），改完重启服务生效，不用改代码。值可以写成 `"${环境变量}"`。
@@ -177,7 +184,7 @@ FastAPI 应用（app/main.py）
 
 ## 7. 数据表
 
-`users`（家长/孩子）· `enrollments`（孩子选的教材包和当前学段）· `mastery`（掌握度）· `items`（题库）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
+`users`（家长/孩子）· `enrollments`（孩子选的教材包和当前学段）· `mastery`（掌握度）· `items`（题库）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
 
 ## 8. 后续路线
 

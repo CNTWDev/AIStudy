@@ -86,3 +86,14 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:6px 4px;b
 .kpchk{display:inline-flex;align-items:center;gap:4px;margin:4px 12px 4px 0;font-weight:400;font-size:14px;cursor:pointer}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%}.dot.mastered{background:var(--ok)}.dot.learning{background:var(--learn)}.dot.weak{background:var(--warn)}
 details.card>summary{cursor:pointer;list-style:none}details.card>summary::-webkit-details-marker{display:none}
+/* 问小艾 */
+#askbtn{position:fixed;right:14px;bottom:78px;z-index:40;border:none;border-radius:99px;background:var(--brand);color:#fff;padding:10px 14px;font-size:15px;box-shadow:0 4px 14px rgba(0,0,0,.18);cursor:pointer;display:flex;align-items:center;gap:4px}
+#askpanel{position:fixed;right:10px;bottom:70px;z-index:50;width:min(380px,calc(100vw - 20px));height:min(520px,70vh);background:var(--card,#fff);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.2);display:none;flex-direction:column;padding:10px}
+#askpanel.on{display:flex}
+.askhead{display:flex;align-items:center;gap:6px}
+#askctx{margin:6px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#askmsgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 0}
+.am{padding:8px 11px;border-radius:12px;max-width:88%;white-space:pre-wrap;font-size:15px;line-height:1.5}
+.am.ai{background:var(--brand-2);align-self:flex-start}.am.user{background:var(--learn-2);align-self:flex-end}.am.err{background:var(--warn-2);color:var(--warn)}
+#askchips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}#askchips button{border:1px solid var(--line);background:transparent;border-radius:99px;padding:4px 10px;font-size:13px;cursor:pointer;color:inherit}
+#askform{display:flex;gap:6px}#askform input{flex:1}

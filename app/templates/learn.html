@@ -33,6 +33,7 @@
 </div>
 <script>
 const KP = {{ kp.id|tojson }}, TASK = {{ task|tojson }};
+window.ASK_CTX = {kp: KP};
 let items = [], idx = 0, right = 0, wrongStreak = 0;
 $('#teachbtn').onclick = async () => {
   $('#teach').innerHTML = '<span class="loading">AI 正在准备讲解</span>';

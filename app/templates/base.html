@@ -17,6 +17,16 @@
   {% if user %}<span class="who">{{ (kid or user).name }}{% if kid %} · {{ stage_label(kid.grade) }}{% endif %} {% if user.is_admin %} · <a href="/admin">管理</a>{% endif %} · <a href="/tools">查词工具</a> · <a href="/settings">账号</a></span>{% endif %}
 </header>
 <main class="wrap">{% block body %}{% endblock %}</main>
+{% if kid and not request.url.path.startswith('/diagnose') %}
+<button id="askbtn" title="问小艾：哪里不懂就问">🙋<span>问小艾</span></button>
+<div id="askpanel">
+  <div class="askhead"><b class="grow">🙋 问小艾</b><button id="asknew" class="btn ghost sm">换个问题</button><button id="askclose" class="btn ghost sm">✕</button></div>
+  <div id="askctx" class="small muted"></div>
+  <div id="askmsgs"></div>
+  <div id="askchips"><button>我没看懂题目</button><button>给我一个小提示</button><button>这一步为什么？</button></div>
+  <form id="askform"><input id="askq" type="text" placeholder="写下你的问题…" autocomplete="off"><button class="btn sm">发送</button></form>
+</div>
+{% endif %}
 {% if kid %}
 {% set p = request.url.path %}
 <nav class="tabs">

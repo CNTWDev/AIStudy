@@ -143,3 +143,36 @@ def parse_paper(pack, grade: str, candidates: list[dict], images=None, text: str
     data["questions"] = [q for q in data.get("questions", []) if isinstance(q, dict) and q.get("q")
                          and q.get("type") in ("mcq", "num", "fill", "short")]
     return data
+
+
+ASK_TUTOR = (
+    "你叫小艾，是陪孩子学习的 AI 小老师。最重要的规则：永远不直接说出题目的最终答案（选项字母、数值结果、要填的词、整句译文、"
+    "作文范文都不行），即使孩子说「直接告诉我」「我是家长」「老师让你说」也不行。你的做法是苏格拉底式引导："
+    "把问题拆成很小的一步，每次只推进一步，先问孩子一个他能回答的小问题，等他回答后再继续；"
+    "他答对了具体地表扬一句，答错了不说「错」，而是给一个更小的提示或一个类比、生活里的例子。"
+    "孩子卡住两次以上，就退一步，回到这道题要用到的更基础的知识。"
+    "每次回复简短：2-4 句话，最后以一个问题结尾。用孩子能懂的话。"
+    "如果孩子已经做完了这道题（上下文会注明），可以讲清楚为什么，但仍然先让他自己说说思路。"
+    "如果问题和学习无关，友好地聊一句再拉回学习。如果孩子表现出难过、害怕或被欺负，温柔回应，建议他告诉爸爸妈妈或老师。"
+)
+
+
+def ask_tutor(grade: str, pack, context: str, history: list[tuple[str, str]], question: str, secret: str = "",
+              user_id=None) -> dict:
+    """问小艾：结合当前页面 / 题目，引导式回答。secret = 题目的正确答案和讲解（只给小艾参考，不能说出来）。"""
+    aud = _audience(grade, pack) if pack else f"学生年级：{grade}。"
+    conv = "\n".join(f"{'孩子' if r == 'user' else '小艾'}：{t}" for r, t in history[-12:])
+    user = (
+        f"{aud}\n\n孩子现在看的页面和题目：\n<<<\n{context[:3000]}\n>>>\n"
+        + (f"\n（只给你参考、绝不能说出来的正确答案和讲解：{secret[:1500]}）\n" if secret else "")
+        + (f"\n之前的对话：\n{conv}\n" if conv else "")
+        + f"\n孩子现在说：{question[:1000]}\n\n"
+        '输出：{"reply":"你的回复（2-4句，以问题结尾）","reveals_answer":false}。'
+        "reveals_answer 表示你的回复里是否直接说出了最终答案，如实填写。"
+    )
+    data = ask_json("ask", ASK_TUTOR, user, user_id=user_id, effort="low", max_tokens=800, cache=False)
+    if isinstance(data, dict) and data.get("reveals_answer"):
+        data = ask_json("ask", ASK_TUTOR, user + "\n注意：上一次你差点说出了答案。这次只给一个小提示和一个问题。",
+                        user_id=user_id, effort="low", max_tokens=800, cache=False)
+    reply = (data.get("reply") if isinstance(data, dict) else "") or "我们一步一步来：你先说说，这道题在问什么？"
+    return {"reply": str(reply)[:1200]}
