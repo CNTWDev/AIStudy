@@ -31,7 +31,8 @@ app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY, max_age=60 *
 app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), name="static")
 templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL,
-                             llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display)
+                             llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
+                             ASSISTANT=config.ASSISTANT_NAME, ASSISTANT_ICON=config.ASSISTANT_ICON)
 
 
 @app.exception_handler(LoginRequired)
@@ -944,7 +945,7 @@ def paper_delete(request: Request, paper_id: int):
     return RedirectResponse("/papers", 303)
 
 
-# ================================================================== 问小艾：随时提问，引导式回答（不给答案）
+# ================================================================== 问一问（小助手）：随时提问，引导式回答（不给答案）
 
 def _ask_item(k, item_id: str):
     """孩子能看到的题：公共题库的题，或自己试卷里的题。"""
@@ -991,7 +992,8 @@ def ask(request: Request, body: dict = Body(...)):
     pack = catalog.packs.get(kp["pack"]) if kp else None
     history = [(m["role"], m["text"]) for m in db.q("SELECT role, text FROM ask_messages WHERE thread_id=? ORDER BY id", th["id"])]
     try:
-        res = llm.ask_tutor(k["grade"], pack, context, history, question, secret, user_id=k["id"])
+        res = llm.ask_tutor(k["grade"], pack, context, history, question, secret, user_id=k["id"],
+                            name=config.ASSISTANT_NAME)
     except llm.LLMError:
         if not history:  # 新对话第一句就失败：不留空对话
             db.run("DELETE FROM ask_threads WHERE id=?", th["id"])

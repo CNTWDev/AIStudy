@@ -47,6 +47,9 @@ if os.environ.get("ALLOW_REGISTER") == "1":  # 兼容旧配置
     REGISTRATION = "open"
 # 每个家长最多同时持有几个未用完的邀请码（管理员不限）
 PARENT_INVITE_LIMIT = int(os.environ.get("PARENT_INVITE_LIMIT", "3"))
+# 「问一问」小助手的名字和图标（可以按自家孩子改，例如取孩子名字里的字）
+ASSISTANT_NAME = os.environ.get("ASSISTANT_NAME", "小艾").strip() or "小艾"
+ASSISTANT_ICON = os.environ.get("ASSISTANT_ICON", "🙋").strip() or "🙋"
 PASSWORD_MIN_LEN = int(os.environ.get("PASSWORD_MIN_LEN", "6"))
 SESSION_DAYS = int(os.environ.get("SESSION_DAYS", "60"))
 # 连续输错密码多少次后锁定，锁定多少分钟

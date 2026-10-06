@@ -125,7 +125,7 @@ function say(text, lang) {
   speechSynthesis.cancel(); speechSynthesis.speak(u);
 }
 
-/* ---------- 问小艾：每个页面右下角，结合当前题目引导式回答（不给答案） ---------- */
+/* ---------- 问一问小助手：每个页面右下角，结合当前题目引导式回答（不给答案） ---------- */
 const Ask = {
   box: null, tid: null, key: '',
   current() {
@@ -147,7 +147,7 @@ const Ask = {
   open() {
     $('#askpanel').classList.add('on');
     const c = Ask.ctx(), key = c.item_id || c.path;
-    if (key !== Ask.key) { Ask.key = key; Ask.tid = null; $('#askmsgs').innerHTML = ''; Ask.say('ai', '我是小艾 🙋 哪里不明白就问我。我不会直接告诉你答案，但会陪你一步一步想出来！'); }
+    if (key !== Ask.key) { Ask.key = key; Ask.tid = null; $('#askmsgs').innerHTML = ''; Ask.say('ai', `我是${$('#askbtn').dataset.name} ${$('#askbtn').dataset.icon} 哪里不明白就问我。我不会直接告诉你答案，但会陪你一步一步想出来！`); }
     $('#askctx').textContent = '📎 ' + Ask.label(c);
     $('#askq').focus();
   },

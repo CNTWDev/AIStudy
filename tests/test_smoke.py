@@ -400,3 +400,13 @@ def test_ask_tutor():
         assert c.get(f"/api/ask/{r['thread_id']}").status_code == 404
         r3 = c.post("/api/ask", json={"question": "hi", "thread_id": r["thread_id"]}).json()
         assert r3["thread_id"] != r["thread_id"]
+
+
+def test_assistant_name(monkeypatch):
+    from app import config
+    monkeypatch.setattr(config, "ASSISTANT_NAME", "小星")
+    from app import main
+    monkeypatch.setitem(main.templates.env.globals, "ASSISTANT", "小星")
+    with TestClient(app) as c:
+        c.post("/login", data={"email": "b@x.com", "password": "secret1"})
+        assert "问小星" in c.get("/today").text

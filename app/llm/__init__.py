@@ -3,7 +3,7 @@
 - 配置：config/llm.toml（见 config/llm.example.toml）
 - 抽象：base.Provider / ChatRequest；新增厂商见 providers.py
 - 调用：service.ask_json（缓存、限额、JSON 解析）
-- 任务：tasks.py（查词、讲解、出题、造句点评、写短文、试卷解析、问小艾）
+- 任务：tasks.py（查词、讲解、出题、造句点评、写短文、试卷解析、问一问小助手）
 """
 from .base import ChatRequest, LLMError, Provider, register
 from .service import ask_json, check, enabled, ping, reload, settings

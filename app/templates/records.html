@@ -34,7 +34,7 @@
 <table><tr><th>时间</th><th>知识点</th><th>类型</th><th>结果</th></tr>
 {% for a in attempts %}<tr><td class="small">{{ a.created_at[5:16].replace('T',' ') }}</td><td>{{ a.kp.name if a.kp else a.kp_id }}</td><td class="small">{{ {'practice':'练习','diagnose':'诊断','diagnose-self':'诊断自评','review':'复习','paper':'试卷重做','exam':'原卷'}.get(a.mode, a.mode) }}</td><td>{{ '✅' if a.correct else ('🤔 还不会' if a.dont_know else '❌') }}</td></tr>
 {% else %}<tr><td colspan="4" class="muted">还没有记录</td></tr>{% endfor %}</table>
-{% if asks %}<h2>最近问小艾的问题</h2>
+{% if asks %}<h2>最近问{{ ASSISTANT }}的问题</h2>
 <table>{% for a in asks %}<tr class="small"><td>{{ a.created_at[5:16].replace('T', ' ') }}</td><td>{{ a.text }}</td><td class="muted">{{ a.page }}</td></tr>{% endfor %}</table>{% endif %}
 {% if lookups %}<h2>最近查的词</h2><p>{% for l in lookups %}<span class="pill">{{ l.query }}</span> {% endfor %}</p>{% endif %}
 {% endblock %}
