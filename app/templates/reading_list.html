@@ -3,6 +3,15 @@
 <h1>阅读</h1>
 <p class="muted small">大量输入是提分的根本。读的时候<b>点一下不懂的词</b>就能查，觉得有用就收藏，收藏的词会自动进入复习，还可以用它造句。</p>
 <div class="card">
+  <h3 style="margin-top:0">🔗 打开一篇网页文章</h3>
+  <p class="muted small">在别的网站看到想读的文章？把链接贴进来，正文会放进这里的阅读器，点词就能查、能收藏。</p>
+  {% if url_error %}<div class="err">{{ url_error }}</div>{% endif %}
+  <form method="post" action="/reading/url" class="row" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='正在打开…'">
+    <div class="grow"><input type="url" name="url" required value="{{ url or '' }}" placeholder="https://… 新闻、科普、故事都可以"></div>
+    <div><button class="btn">打开</button></div>
+  </form>
+</div>
+<div class="card">
   <h3 style="margin-top:0">✨ AI 给我写一篇（按我的水平）</h3>
   <form method="post" action="/reading/new" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='正在写，约半分钟…'">
     <input type="hidden" name="mode" value="ai">

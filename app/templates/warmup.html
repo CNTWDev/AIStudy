@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/today" class="small">← 今天</a>
+<h1>热身 🧠</h1>
+<p class="muted small">几道小题，有新有旧，凭第一感觉答就好。不会就点「不会」，系统会记下来，以后慢慢补上。</p>
+<div class="daybar"><span id="wbar" style="width:0%"></span></div>
+<div id="wbox" class="card"><span class="loading">正在准备题目</span></div>
+<script>
+let items = [], idx = 0, right = 0, lit = 0, found = 0;
+function bar() { $('#wbar').style.width = (items.length ? 100 * idx / items.length : 0) + '%'; }
+async function load() {
+  try {
+    items = (await api('/api/warmup')).items;
+    if (!items.length) { $('#wbox').innerHTML = '<p>今天没有要热身的题，直接开始下一项吧。</p><button class="btn" onclick="finishTask(\'warmup\')">完成</button>'; return; }
+    show();
+  } catch (e) { $('#wbox').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+}
+function next(box) {
+  const nx = document.createElement('div'); nx.className = 'row'; nx.style.marginTop = '10px';
+  nx.innerHTML = `<button class="btn">${idx + 1 >= items.length ? '完成热身' : '下一题 →'}</button>`;
+  nx.querySelector('.btn').onclick = () => { idx++; show(); };
+  box.appendChild(nx);
+}
+function show() {
+  bar();
+  if (idx >= items.length) {
+    $('#wbox').innerHTML = `<p class="pop" style="font-size:20px"><b>热身完成：${right}/${items.length}</b> ${right === items.length ? '全对 🎉' : '👍'}</p>` +
+      `<p class="small muted">${lit ? `点亮了 ${lit} 个知识点 🌟 · ` : ''}${found ? `找到 ${found} 个要补的地方，已经排进以后的练习` : '你的学习地图又清楚了一些'}</p>` +
+      `<button class="btn" onclick="finishTask('warmup')">完成，回到今天</button>`;
+    if (right === items.length) confetti();
+    return;
+  }
+  const it = items[idx];
+  const box = document.createElement('div');
+  const tag = it.word ? `🔤 单词闪测 · ${esc(it.word.title)}` : `🔀 ${esc(it.probe.subject)} · ${esc(it.probe.name)}`;
+  $('#wbox').innerHTML = `<div class="probe-tag">${tag}</div><div class="muted small">第 ${idx + 1}/${items.length} 题</div>`;
+  $('#wbox').appendChild(box);
+  if (it.word) {
+    renderItem(box, it, {
+      submit: (answer) => api('/api/warmup/word', {word: it.word.w, list: it.word.list, choice: it.options[+answer]})
+        .then(r => ({correct: r.correct, answer: r.answer, explain: r.correct ? '' : (r.added ? '已放进单词复习，明天开始记。' : '')})),
+      dontKnow: () => api('/api/warmup/word', {word: it.word.w, list: it.word.list, dont_know: true})
+        .then(r => ({dont_know: true, answer: r.answer, explain: '已放进单词复习，明天开始记。'})),
+      onDone: res => { if (res.correct) right++; else found++; Combo.hit(!!res.correct, box); if (res.correct) say(it.word.w); next(box); },
+    });
+  } else {
+    const p = it.probe;
+    const body = extra => Object.assign({item_id: it.id, kp_id: p.kp, mode: 'probe', probe: {depth: p.depth, from: p.from}}, extra);
+    renderItem(box, it, {
+      submit: (answer, self, ms) => api('/api/answer', body(self ? {self, ms} : {answer, ms})),
+      dontKnow: () => api('/api/answer', body({dont_know: true})),
+      onDone: res => {
+        if (res.correct) right++; else found++;
+        if (res.lit) lit++;
+        Combo.hit(!!res.correct, box); celebrate(res, box); next(box);
+      },
+    });
+  }
+}
+load();
+</script>
+{% endblock %}

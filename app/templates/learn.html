@@ -15,6 +15,7 @@
   <li><b>看懂它</b><div>{{ kp.desc }}</div>
     {% if kp.terms %}<div class="small" style="margin-top:4px">关键词：{% for t in kp.terms %}<span class="pill">{{ t }}</span> {% endfor %}</div>{% endif %}
     {% if not readonly %}<div id="teach" style="margin-top:8px"><button class="btn ghost sm" id="teachbtn">🤖 让 AI 一步步讲给我听</button></div>{% endif %}</li>
+  <li id="ctxli" style="display:none"><b>它从哪来、用在哪</b><div id="ctx" class="ctxbox"></div></li>
   <li><b>记住方法</b><div>{{ kp.method }}</div></li>
   {% if readonly %}<li><b>做题和总结</b><div class="muted small">孩子用自己的账号登录后在这里练习。</div></li>{% else %}
   <li><b>动手做 3 题</b> <span class="muted small">从简单的开始；错了会自动进错题本</span>
@@ -58,17 +59,24 @@ async function loadItems() {
 function show() {
   if (idx >= items.length) {
     $('#items').innerHTML = `<p><b>做完了：${right}/${items.length} 正确。</b> ${right === items.length ? '太棒了 🎉' : '每做一题都算数，继续加油！'}</p>` +
+      (CTX && CTX.next ? `<div class="hint">🚀 ${esc(CTX.next)}</div>` : '') +
       `<button class="btn ghost sm" onclick="loadItems()">再来 3 题</button>`; return;
   }
   const it = items[idx];
   const box = document.createElement('div');
-  $('#items').innerHTML = `<div class="muted small">第 ${idx + 1}/${items.length} 题 · 难度 ${'★'.repeat(it.difficulty || 1)}</div>`;
+  // 穿插的「以前学过的」题：记在它自己的知识点上，答完顺便摸清过去
+  const p = it.probe, kp = p ? p.kp : KP;
+  const base = extra => Object.assign({item_id: it.id, kp_id: kp}, p ? {mode: 'probe', probe: {depth: p.depth, from: p.from}} : {}, extra);
+  $('#items').innerHTML = (p ? `<div class="probe-tag">🔀 穿插一道以前学过的：${esc(p.name)}</div>` : '') +
+    `<div class="muted small">第 ${idx + 1}/${items.length} 题 · 难度 ${'★'.repeat(it.difficulty || 1)}</div>`;
   $('#items').appendChild(box);
   renderItem(box, it, {
-    submit: (answer, self, ms) => api('/api/answer', self ? {item_id: it.id, kp_id: KP, self, ms} : {item_id: it.id, kp_id: KP, answer, ms}),
-    dontKnow: () => api('/api/answer', {item_id: it.id, kp_id: KP, dont_know: true}),
+    submit: (answer, self, ms) => api('/api/answer', base(self ? {self, ms} : {answer, ms})),
+    dontKnow: () => api('/api/answer', base({dont_know: true})),
     onDone: res => {
-      if (res.correct) { right++; wrongStreak = 0; } else wrongStreak++;
+      Combo.hit(!!res.correct, box); celebrate(res, box);
+      if (p) { if (res.correct) right++; }
+      else if (res.correct) { right++; wrongStreak = 0; } else wrongStreak++;
       const nx = document.createElement('div'); nx.className = 'row'; nx.style.marginTop = '10px';
       nx.innerHTML = `<button class="btn">下一题 →</button>` + (wrongStreak >= 2 && {{ pre|length }} ? `<a class="btn ghost" href="#" onclick="window.scrollTo(0,document.body.scrollHeight);return false">🧱 退一步：先补前置</a>` : '');
       nx.querySelector('.btn').onclick = () => { idx++; show(); };
@@ -77,6 +85,14 @@ function show() {
   });
 }
 $('#start').onclick = loadItems;
+// 知识背景和用处：让孩子知道学这个有什么用（AI 生成，按知识点缓存；没配置 AI 就不显示）
+let CTX = null;
+api('/api/context/' + KP).then(c => {
+  if (!c || !c.story) return; CTX = c;
+  $('#ctx').innerHTML = `<p>📖 ${esc(c.story)}</p>` + ((c.uses || []).length ? `<p>🔧 ${c.uses.map(esc).join('<br>🔧 ')}</p>` : '') +
+    (c.fun ? `<p class="small muted">💡 你知道吗？${esc(c.fun)}</p>` : '');
+  $('#ctxli').style.display = '';
+}).catch(() => {});
 $('#finish').onclick = async () => { await api('/api/learn/done', {kp_id: KP, summary: $('#summary').value}); sessionStorage.setItem('justDone', 'learn'); location.href = '/today'; };
 </script>{% endif %}
 {% endblock %}

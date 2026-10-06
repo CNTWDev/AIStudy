@@ -57,6 +57,21 @@ def teach(kp: dict, pack, grade: str, user_id=None) -> dict:
     return ask_json("teach", TUTOR, user, user_id=user_id, effort="medium")
 
 
+def kp_context(kp: dict, pack, grade: str, user_id=None) -> dict:
+    """知识背景和实用反馈：这个知识点从哪来、生活里用在哪、一个有意思的小事实。按知识点+年级缓存。"""
+    user = (
+        f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n\n"
+        "给学生讲讲这个知识点的「背景」和「用处」，让他觉得学这个有意思、有用：\n"
+        "- story：它是怎么来的 / 谁发现的 / 为什么需要它，2-3 句，像讲小故事；\n"
+        "- uses：生活里或以后学习中用在哪，2-3 条，每条一句话、具体到场景；\n"
+        "- fun：一个让人「哇」的小事实，一句话；\n"
+        "- next：学会它以后可以去学什么、能解决什么问题，一句话。\n"
+        "内容必须准确，不确定的历史细节宁可不写。不要照搬教材原文。\n"
+        '输出：{"story":"..","uses":[".."],"fun":"..","next":".."}'
+    )
+    return ask_json("context", TUTOR, user, user_id=user_id, effort="low")
+
+
 def lookup(query: str, context: str, lang: str, grade: str, user_id=None) -> dict:
     from ..catalog import stage_label
     if lang == "en":

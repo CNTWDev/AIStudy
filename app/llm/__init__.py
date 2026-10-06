@@ -7,9 +7,9 @@
 """
 from .base import ChatRequest, LLMError, Provider, register
 from .service import ask_json, check, enabled, ping, reload, settings
-from .tasks import ask_tutor, explain_sentence, generate_items, lookup, make_passage, parse_paper, sentence_feedback, teach
+from .tasks import ask_tutor, explain_sentence, generate_items, kp_context, lookup, make_passage, parse_paper, sentence_feedback, teach
 
 __all__ = [
     "ChatRequest", "LLMError", "Provider", "register", "ask_json", "check", "enabled", "ping", "reload", "settings",
-    "ask_tutor", "explain_sentence", "generate_items", "lookup", "make_passage", "parse_paper", "sentence_feedback", "teach",
+    "ask_tutor", "explain_sentence", "generate_items", "kp_context", "lookup", "make_passage", "parse_paper", "sentence_feedback", "teach",
 ]

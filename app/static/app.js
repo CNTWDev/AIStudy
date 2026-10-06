@@ -175,3 +175,137 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#askform').onsubmit = e => { e.preventDefault(); Ask.send(); };
   $$('#askchips button').forEach(b => b.onclick = () => Ask.send(b.textContent));
 });
+
+/* ---------- 激励：连对、点亮知识点（少而有效：只奖励真实的进步） ---------- */
+const Combo = {
+  n: 0,
+  hit(ok, el) {
+    Combo.n = ok ? Combo.n + 1 : 0;
+    let b = $('#combo');
+    if (!b) { b = document.createElement('div'); b.id = 'combo'; document.body.appendChild(b); }
+    if (Combo.n >= 2) {
+      b.textContent = `连对 ×${Combo.n} ${Combo.n >= 5 ? '🔥🔥' : '🔥'}`;
+      b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump', 'on');
+      if (Combo.n === 3 || Combo.n === 5 || Combo.n % 10 === 0) cheer(el || b);
+    } else b.classList.remove('on');
+  },
+};
+/* 答题结果里带 lit：第一次掌握这个知识点 → 点亮 */
+function celebrate(res, el) {
+  if (res && res.lit) {
+    toast(`🌟 点亮新知识点：${res.lit.name}（今天第 ${res.lit.today} 个）`, 2400);
+    confetti();
+  } else if (res && res.probe && res.probe.inferred) {
+    toast(`🗺️ 地图又亮了一块：顺带摸清 ${res.probe.inferred + 1} 个知识点`, 2000);
+  }
+}
+
+/* ---------- 划词：在网站任何页面选中文字 → 查词 / 翻译 / 加入复习 / 问一问 ----------
+   系统按行为自动记录：同一个词或句子查第二次、做题时查的，自动放进复习（不用孩子手动加）。 */
+const QuickLook = {
+  ctx: '', item: '',
+  panel() {
+    let p = $('#qlpanel');
+    if (!p) {
+      p = document.createElement('div'); p.id = 'qlpanel';
+      p.innerHTML = `<form class="row" id="qlform"><input id="qlq" class="grow" type="text" placeholder="输入英文单词、中文词语或一句话" autocomplete="off">` +
+        `<button class="btn sm">查</button><button type="button" class="btn ghost sm" id="qlx">✕</button></form><div id="qlres"></div>`;
+      document.body.appendChild(p);
+      $('#qlx').onclick = () => p.classList.remove('on');
+      $('#qlform').onsubmit = e => { e.preventDefault(); QuickLook.auto($('#qlq').value); };
+    }
+    p.classList.add('on'); return p;
+  },
+  open() { QuickLook.ctx = ''; QuickLook.item = ''; QuickLook.panel(); $('#qlq').focus(); },
+  auto(q) { q = (q || '').trim(); return QuickLook.isWord(q) ? QuickLook.go(q) : QuickLook.translate(q); },
+  isWord(q) { return /[一-鿿]/.test(q) ? q.length <= 6 : q.split(/\s+/).length <= 3 && q.length <= 30; },
+  lang(q) { return /[一-鿿]/.test(q) && !/[A-Za-z]{3,}/.test(q) ? 'zh' : 'en'; },
+  saved(r) {
+    if (r.auto_added) return `<p class="small" style="color:var(--ok)">✓ 已自动加入复习（${esc(r.auto_added)}），明天会再见到它</p>`;
+    if (r.saved) return `<p class="small muted">✓ 已经在复习里了</p>`;
+    return `<button class="btn sm" id="qlfav">➕ 加入复习</button>`;
+  },
+  bindFav(front, meaning) {
+    const b = $('#qlfav'); if (!b) return;
+    b.onclick = async () => {
+      b.disabled = true;
+      await api('/api/collect', {text: front, meaning, context: QuickLook.ctx, page: location.pathname});
+      b.textContent = '✓ 已加入复习，明天开始复习'; toast('➕ 加入复习');
+    };
+  },
+  async go(q) {
+    q = (q || '').trim(); if (!q) return;
+    QuickLook.panel(); $('#qlq').value = q;
+    const lang = QuickLook.lang(q);
+    $('#qlres').innerHTML = '<span class="loading">正在查</span>';
+    try {
+      const r = await api('/api/lookup', {q, context: QuickLook.ctx, lang, auto: true, item_id: QuickLook.item, page: location.pathname});
+      $('#qlres').innerHTML = `<h3 style="margin:8px 0 4px">${esc(r.word || q)} <span class="muted small">${esc(r.phonetic || r.pinyin || '')} ${esc(r.pos || '')}</span>` +
+        (lang === 'en' ? ` <button class="btn ghost sm" id="qlsay">🔊</button>` : '') + `</h3>` +
+        `<p style="margin:4px 0"><b>${esc(r.meaning || '')}</b>${r.simple_en ? `<br><span class="muted small">${esc(r.simple_en)}</span>` : ''}</p>` +
+        (r.example ? `<p class="small">例：${esc(r.example)}${r.example_zh ? `<br><span class="muted">${esc(r.example_zh)}</span>` : ''}</p>` : '') +
+        (r.tip ? `<div class="hint">💡 ${esc(r.tip)}</div>` : '') + QuickLook.saved(r);
+      if ($('#qlsay')) $('#qlsay').onclick = () => say(r.word || q);
+      QuickLook.bindFav(r.word || q, r.meaning || '');
+    } catch (e) { $('#qlres').innerHTML = `<div class="err">${esc(e.message)}</div>` + `<button class="btn sm" id="qlfav">➕ 先加入复习</button>`; QuickLook.bindFav(q, ''); }
+  },
+  async translate(q) {
+    q = (q || '').trim(); if (!q) return;
+    QuickLook.panel(); $('#qlq').value = q.slice(0, 200);
+    $('#qlres').innerHTML = '<span class="loading">正在翻译</span>';
+    try {
+      const r = await api('/api/translate', {text: q, item_id: QuickLook.item, page: location.pathname});
+      $('#qlres').innerHTML = `<p class="small muted" style="margin:8px 0 2px">${esc(q.slice(0, 300))}</p>` +
+        `<p style="margin:4px 0"><b>${esc(r.meaning || '')}</b></p>` +
+        (r.structure ? `<p class="small">🧩 ${esc(r.structure)}</p>` : '') +
+        ((r.points || []).length ? `<p class="small">${r.points.map(x => `<span class="pill">${esc(x.text)}：${esc(x.note)}</span>`).join(' ')}</p>` : '') +
+        QuickLook.saved(r);
+      QuickLook.bindFav(q.slice(0, 300), r.meaning || '');
+    } catch (e) { $('#qlres').innerHTML = `<div class="err">${esc(e.message)}</div>` + `<button class="btn sm" id="qlfav">➕ 先加入复习</button>`; QuickLook.bindFav(q, ''); }
+  },
+};
+const SelMenu = {
+  el: null, text: '',
+  hide() { if (SelMenu.el) SelMenu.el.classList.remove('on'); },
+  show() {
+    const sel = getSelection();
+    const text = (sel ? sel.toString() : '').trim();
+    if (!text || text.length > 600 || !sel.rangeCount) return SelMenu.hide();
+    const node = sel.anchorNode && (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement);
+    if (!node || node.closest('input,textarea,#qlpanel,#askpanel,#selmenu,.tabs,header') || node.closest('#reader')) return SelMenu.hide();
+    SelMenu.text = text;
+    const block = node.closest('p,li,.q,.card,td,div') || node;
+    QuickLook.ctx = (block.innerText || '').slice(0, 300);
+    const ab = node.closest('.askable'); QuickLook.item = ab ? (ab.dataset.askItem || '') : '';
+    if (!SelMenu.el) {
+      SelMenu.el = document.createElement('div'); SelMenu.el.id = 'selmenu';
+      document.body.appendChild(SelMenu.el);
+      SelMenu.el.addEventListener('pointerdown', e => e.preventDefault());  // 点菜单时不丢掉选区
+      SelMenu.el.onclick = e => {
+        const b = e.target.closest('button'); if (!b) return;
+        const t = SelMenu.text; SelMenu.hide();
+        if (b.dataset.a === 'look') QuickLook.go(t);
+        else if (b.dataset.a === 'tr') QuickLook.translate(t);
+        else if (b.dataset.a === 'add') { api('/api/collect', {text: t, context: QuickLook.ctx, page: location.pathname}).then(() => toast('➕ 已加入复习')).catch(err => toast(err.message)); }
+        else if (b.dataset.a === 'ask' && window.Ask && $('#askbtn')) Ask.open();
+      };
+    }
+    const word = QuickLook.isWord(text);
+    SelMenu.el.innerHTML = (word ? `<button data-a="look">🔍 查词</button>` : '') + `<button data-a="tr">🌐 翻译</button>` +
+      `<button data-a="add">➕ 加入复习</button>` + ($('#askbtn') ? `<button data-a="ask">${esc($('#askbtn').dataset.icon)} 问${esc($('#askbtn').dataset.name)}</button>` : '');
+    const r = sel.getRangeAt(0).getBoundingClientRect();
+    const top = r.top + scrollY - 46, left = Math.max(8, Math.min(r.left + scrollX + r.width / 2 - 120, scrollX + innerWidth - 260));
+    Object.assign(SelMenu.el.style, {top: (top < scrollY + 4 ? r.bottom + scrollY + 8 : top) + 'px', left: left + 'px'});
+    SelMenu.el.classList.add('on');
+  },
+};
+document.addEventListener('DOMContentLoaded', () => {
+  const b = $('#qlbtn'); if (b) b.onclick = e => { e.preventDefault(); QuickLook.open(); };
+  if (!document.body.dataset.kid) return;  // 只有孩子账号在学习状态下才有划词菜单
+  let t = null;
+  const later = () => { clearTimeout(t); t = setTimeout(SelMenu.show, 250); };
+  document.addEventListener('mouseup', later);
+  document.addEventListener('touchend', later);
+  document.addEventListener('keyup', e => { if (e.shiftKey) later(); });
+  document.addEventListener('selectionchange', () => { if (!(getSelection() || '').toString().trim()) SelMenu.hide(); });
+});

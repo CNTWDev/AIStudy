@@ -216,12 +216,12 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
     db.run("INSERT INTO attempts(user_id,item_id,kp_id,mode,correct,answer,dont_know,ms,created_at) VALUES(?,?,?,?,?,?,?,?,?)",
            user_id, item["id"] if item else None, kp_id, mode, 1 if correct else 0, str(answer)[:500],
            1 if dont_know else 0, ms, db.now())
-    if mode == "diagnose" and correct:
-        set_mastery(user_id, kp_id, 0.8, "mastered", "diagnose")
+    if mode in ("diagnose", "probe") and correct:  # 诊断 / 摸底答对：直接算掌握
+        set_mastery(user_id, kp_id, 0.8, "mastered", mode)
         status = "mastered"
     else:
         status = update_mastery(user_id, kp_id, correct, weight=0.5 if dont_know else 1.0, source=mode)
-    if item and not correct and mode in ("practice", "diagnose", "paper", "exam"):
+    if item and not correct and mode in ("practice", "diagnose", "probe", "paper", "exam"):
         # 错题自动进错题本（以卡片形式参与间隔复习）
         ans = item.get("answer")
         if item["type"] == "mcq":
@@ -541,6 +541,15 @@ def build_plan(user_id: int) -> list[dict]:
             fixed.append({"type": kind, "lang": lang, "title": f"{'英文' if lang == 'en' else '中文'}阅读 15 分钟",
                           "why": "读一篇短文，不懂的词点一下就查，收藏后自动进单词复习", "minutes": 15,
                           "url": f"/reading?lang={lang}"})
+
+    # 热身：几道小题，混着以前学过的知识点和旧单词——不知不觉中把过去摸清（见 explore.py）
+    from . import explore
+    has_probe = bool(explore.candidates(user_id, mastery)[:1])
+    has_words = bool(explore.word_lists(user_id))
+    if has_probe or has_words:
+        n = (3 if has_probe else 0) + (2 if has_words else 0)
+        fixed.insert(0, {"type": "warmup", "title": f"热身 {n} 题", "why": "先动动脑：混着以前学过的内容，答完系统更懂你",
+                         "minutes": 4, "url": "/warmup"})
 
     weak_all, back_all, pre_all, diag_needed, sync_all, check_all = [], [], [], [], [], []
     taught = taught_set(user_id)

@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import auth, config, db, engine, insights, llm, papers, sitecfg
+from . import auth, config, db, engine, explore, insights, llm, papers, sitecfg, webpage
 from .auth import LoginRequired
 from .catalog import GRADES, catalog, stage_label, stage_rank
 from .content import content
@@ -293,6 +293,7 @@ def kid_brief(k) -> dict:
             "week_min": sum(d["minutes"] for d in cal), "week_days": sum(1 for d in cal if d["minutes"] or d["checked"]),
             "today": today, "today_done": sum(1 for t in today["plan"] if t.get("done")),
             "insights": insights.open_insights(k["id"], limit=6),
+            "cov": explore.coverage(k["id"], m), "vocab": explore.word_stats(k["id"]),
             "weak": [catalog.kp(w["kp_id"]) for w in weak[:5]], "weak_n": len(weak),
             "due": len(engine.due_cards(k["id"], 500)),
             "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='word'", k["id"])["n"]}
@@ -793,8 +794,11 @@ def today(request: Request):
     st = engine.streak(k["id"])
     cal = engine.calendar(k["id"], 4)
     me = auth.current_user(request)
+    m = engine.get_mastery(k["id"])
     return render(request, "today.html", t=t, streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
                   stars=engine.total_stars(k["id"]), rec=engine.day_record(k["id"], t["day"]),
+                  cov=explore.coverage(k["id"], m), lit=explore.lit_today(k["id"]), ahead=explore.ahead(k["id"], m),
+                  vocab=explore.word_stats(k["id"]),
                   found=insights.open_insights(k["id"], for_kid=me["role"] == "kid", limit=4 if me["role"] == "kid" else 10))
 
 
@@ -973,6 +977,11 @@ def api_practice(request: Request, kp_id: str, n: int = 3, purpose: str = "pract
         raise HTTPException(404)
     purpose = purpose if purpose in ("practice", "preview") else "practice"
     items = engine.items_for(k["id"], kp_id, n=min(n, 5), purpose=purpose, grade=k["grade"])
+    # 穿插一道「以前学过的」：优先这个知识点没测过的前置，答完顺便摸清过去
+    if purpose == "practice" and len(items) >= 2:
+        probe = explore.pick(k["id"], 1, k["grade"], near_kp=kp_id, exclude={kp_id})
+        if probe:
+            items.insert(1, probe[0])
     return {"items": [_public_item(i) for i in items], "llm": llm.enabled()}
 
 
@@ -990,6 +999,9 @@ def api_answer(request: Request, body: dict = Body(...)):
     mode = body.get("mode") or "practice"
     if body.get("dont_know"):  # 「这道题还不会」：不算错，给讲解，进错题本，过几天再练
         engine.record_attempt(k["id"], it, kp_id, mode, False, "", dont_know=True)
+        if mode == "probe":
+            pr = body.get("probe") or {}
+            explore.after_probe(k["id"], kp_id, False, int(pr.get("depth") or 0), pr.get("from") or "")
         return {"correct": False, "dont_know": True, "answer": _answer_display(it), "explain": it.get("explain", ""),
                 "hint": it.get("hint", "")}
     if it["type"] == "short":
@@ -998,10 +1010,17 @@ def api_answer(request: Request, body: dict = Body(...)):
         correct = body["self"] == "ok"
     else:
         correct = engine.check_answer(it, body.get("answer"))
+    old = (db.one("SELECT status FROM mastery WHERE user_id=? AND kp_id=?", k["id"], kp_id) or {}).get("status")
     status = engine.record_attempt(k["id"], it, kp_id, mode, bool(correct), body.get("answer", body.get("self", "")),
                                    ms=body.get("ms"))
-    return {"correct": bool(correct), "answer": _answer_display(it), "explain": it.get("explain", ""),
-            "status": status, "status_label": engine.STATUS_LABEL[status]}
+    out = {"correct": bool(correct), "answer": _answer_display(it), "explain": it.get("explain", ""),
+           "status": status, "status_label": engine.STATUS_LABEL[status]}
+    if mode == "probe":
+        pr = body.get("probe") or {}
+        out["probe"] = explore.after_probe(k["id"], kp_id, bool(correct), int(pr.get("depth") or 0), pr.get("from") or "")
+    if explore.light(k["id"], kp_id, old, status):  # 第一次掌握：点亮
+        out["lit"] = {"kp": kp_id, "name": catalog.kp(kp_id)["name"], "today": len(explore.lit_today(k["id"]))}
+    return out
 
 
 @app.post("/api/learn/done")
@@ -1013,6 +1032,54 @@ def api_learn_done(request: Request, body: dict = Body(...)):
         engine.add_card(k["id"], "kp", kp["name"], body["summary"][:500], {"method": kp.get("method", "")}, kp_id)
     engine.mark_task_by(k["id"], kp=kp_id)
     return {"ok": True}
+
+
+@app.get("/api/context/{kp_id}")
+def api_context(request: Request, kp_id: str):
+    """知识背景和用处（AI 生成，按知识点缓存）。没配置 AI 就返回空。"""
+    k = kid_or_redirect(request, manage=True)
+    kp = catalog.kp(kp_id)
+    if not kp:
+        raise HTTPException(404)
+    if not llm.enabled():
+        return {}
+    try:
+        return llm.kp_context(kp, catalog.packs[kp["pack"]], k["grade"], user_id=k["id"])
+    except llm.LLMError:
+        return {}
+
+
+# ================================================================== 热身：穿插以前学过的知识点和旧单词（摸底）
+
+@app.get("/warmup", response_class=HTMLResponse)
+def warmup_page(request: Request):
+    kid_or_redirect(request)
+    return render(request, "warmup.html")
+
+
+@app.get("/api/warmup")
+def api_warmup(request: Request):
+    k = kid_or_redirect(request)
+    words = explore.pick_words(k["id"], 2)
+    kps = explore.pick(k["id"], 3 if words else 4, k["grade"])
+    out, wi = [], iter(words)
+    for it in kps:  # 知识点题和单词题交替
+        out.append(_public_item(it))
+        w = next(wi, None)
+        if w:
+            out.append(w)
+    out += list(wi)
+    return {"items": out, "llm": llm.enabled()}
+
+
+@app.post("/api/warmup/word")
+def api_warmup_word(request: Request, body: dict = Body(...)):
+    k = kid_or_redirect(request)
+    res = explore.answer_word(k["id"], body.get("word", ""), body.get("list", ""), body.get("choice"),
+                              dont_know=bool(body.get("dont_know")))
+    if res.get("error"):
+        raise HTTPException(400, res["error"])
+    return res
 
 
 # ================================================================== 试卷：拍照导入 → 在线订正 → 诊断
@@ -1374,6 +1441,20 @@ async def reading_new(request: Request):
     return RedirectResponse(f"/reading/{rid}", 303)
 
 
+@app.post("/reading/url")
+def reading_url(request: Request, url: str = Form(...), lang: str = Form("")):
+    k = kid_or_redirect(request)
+    try:
+        a = webpage.article(url)
+    except webpage.FetchError as e:
+        rows = db.q("SELECT * FROM readings WHERE user_id=? ORDER BY id DESC LIMIT 30", k["id"])
+        return render(request, "reading_list.html", rows=rows, lang="en", url_error=str(e), url=url, status_code=400)
+    lang = lang if lang in ("en", "zh") else a["lang"]
+    rid = db.insert("INSERT INTO readings(user_id,lang,title,body,source,created_at) VALUES(?,?,?,?,?,?)",
+                    k["id"], lang, a["title"], a["body"], "web:" + a["url"][:500], db.now())
+    return RedirectResponse(f"/reading/{rid}", 303)
+
+
 @app.get("/reading/{rid}", response_class=HTMLResponse)
 def reading_view(request: Request, rid: int):
     k = kid_or_redirect(request)
@@ -1387,6 +1468,27 @@ def reading_view(request: Request, rid: int):
                   looked=[{"q": l["query"], "r": db.jload(l["result"], {})} for l in looked])
 
 
+# ------------------------------------------------------------------ 划词：查词 / 翻译 / 加入复习（网站任何页面都能用）
+
+def _has_card(uid: int, front: str) -> bool:
+    return bool(db.one("SELECT id FROM cards WHERE user_id=? AND LOWER(front)=? AND kind IN ('word','phrase','term')",
+                       uid, front.strip().lower()))
+
+
+def _auto_collect(uid: int, query: str, meaning: str, extra: dict, *, in_question: bool, front: str = "") -> str:
+    """根据孩子的行为判断不熟：同一个词 / 句子查了第二次，或做题时查的，就自动放进复习（明天开始）。
+    返回原因（空串表示没加）。"""
+    front = front or query
+    if not meaning or _has_card(uid, front):
+        return ""
+    n = db.one("SELECT COUNT(*) AS n FROM lookups WHERE user_id=? AND LOWER(query)=?", uid, query.strip().lower())["n"]
+    why = "做题时查的" if in_question else ("查了 %d 次" % n if n >= 2 else "")
+    if why:
+        kind = "phrase" if (" " in front.strip() or len(front) > 12) else "word"
+        engine.add_card(uid, kind, front, meaning, {**extra, "source": "自动", "why": why})
+    return why
+
+
 @app.post("/api/lookup")
 def api_lookup(request: Request, body: dict = Body(...)):
     k = kid_or_redirect(request)
@@ -1397,7 +1499,56 @@ def api_lookup(request: Request, body: dict = Body(...)):
     res = llm.lookup(query, (body.get("context") or "")[:400], lang, k["grade"], user_id=k["id"])
     db.run("INSERT INTO lookups(user_id,reading_id,query,context,result,created_at) VALUES(?,?,?,?,?,?)",
            k["id"], body.get("reading_id"), query, (body.get("context") or "")[:400], db.jdump(res), db.now())
+    if body.get("auto"):  # 划词菜单查的：按行为自动记录
+        why = _auto_collect(k["id"], query, res.get("meaning") or "",
+                            {"phonetic": res.get("phonetic", ""), "example": res.get("example", ""),
+                             "context": (body.get("context") or "")[:300], "page": (body.get("page") or "")[:100]},
+                            in_question=bool(body.get("item_id")), front=res.get("word") or query)
+        res = {**res, "auto_added": why, "saved": bool(why) or _has_card(k["id"], res.get("word") or query)}
     return res
+
+
+@app.post("/api/translate")
+def api_translate(request: Request, body: dict = Body(...)):
+    """划词翻译一句话：给意思和难点；同一句查第二次（或做题时查的）自动进复习。"""
+    k = kid_or_redirect(request)
+    text = (body.get("text") or "").strip()[:600]
+    if not text:
+        raise HTTPException(400)
+    lang = "zh" if re.search(r"[\u4e00-\u9fff]", text) and not re.search(r"[A-Za-z]{3,}", text) else "en"
+    res = llm.explain_sentence(text, lang, k["grade"], user_id=k["id"])
+    db.run("INSERT INTO lookups(user_id,reading_id,query,context,result,created_at) VALUES(?,?,?,?,?,?)",
+           k["id"], None, text[:80], text[:400], db.jdump({"meaning": res.get("meaning", ""), "sentence": 1}), db.now())
+    why = _auto_collect(k["id"], text[:300], res.get("meaning") or "", {"structure": res.get("structure", ""),
+                        "page": (body.get("page") or "")[:100]}, in_question=bool(body.get("item_id")))
+    return {**res, "lang": lang, "auto_added": why, "saved": bool(why) or _has_card(k["id"], text[:300])}
+
+
+@app.post("/api/collect")
+def api_collect(request: Request, body: dict = Body(...)):
+    """孩子手动把选中的词 / 句子加入复习。意思由 AI 查好；AI 不可用时先存原文，复习时自己想。"""
+    k = kid_or_redirect(request)
+    text = (body.get("text") or "").strip()[:300]
+    if not text:
+        raise HTTPException(400)
+    meaning = (body.get("meaning") or "").strip()
+    word = len(text) <= 30 and len(text.split()) <= 3
+    lang = "zh" if re.search(r"[\u4e00-\u9fff]", text) and not re.search(r"[A-Za-z]{3,}", text) else "en"
+    extra = {"context": (body.get("context") or "")[:300], "page": (body.get("page") or "")[:100], "source": "划词收藏"}
+    if not meaning and llm.enabled():
+        try:
+            if word:
+                r = llm.lookup(text, extra["context"], lang, k["grade"], user_id=k["id"])
+                meaning = r.get("meaning", "")
+                extra.update(phonetic=r.get("phonetic", ""), example=r.get("example", ""))
+                text = r.get("word") or text
+            else:
+                meaning = llm.explain_sentence(text, lang, k["grade"], user_id=k["id"]).get("meaning", "")
+        except llm.LLMError:
+            pass
+    kind = "word" if word and " " not in text else "phrase"
+    cid = engine.add_card(k["id"], kind, text, meaning or "（意思还没查到，复习时想一想，或问一问）", extra, starred=1)
+    return {"id": cid, "front": text, "meaning": meaning}
 
 
 @app.post("/api/explain")
