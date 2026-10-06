@@ -14,9 +14,9 @@
 {% endif %}
 <header class="top">
   <a class="logo" href="/">📚 {{ SITE }}</a>
-  {% if user %}<span class="who">{{ (kid or user).name }}{% if kid %} · {{ stage_label(kid.grade) }}{% endif %}
-    {% if user.role == 'parent' %} · <a href="/parent">家长页</a>{% endif %}{% if user.is_admin or user.role == 'admin' %} · <a href="/admin">管理</a>{% endif %}
-    {% if user.role == 'kid' %} · <a href="#" id="qlbtn" title="查单词、词语，翻译句子；也可以直接选中页面上的文字">🔎 查词</a>{% endif %} · <a href="/settings">账号</a></span>{% endif %}
+  {% if user %}<span class="who"><span class="me">{{ (kid or user).name }}{% if kid %}<span class="g"> · {{ stage_label(kid.grade) }}</span>{% endif %}</span>
+    {% if user.role == 'parent' %}<a href="/parent">家长页</a>{% endif %}{% if user.is_admin or user.role == 'admin' %}<a href="/admin">管理</a>{% endif %}
+    {% if user.role == 'kid' %}<a href="#" id="qlbtn" title="查单词、词语，翻译句子；也可以直接选中页面上的文字">🔎 查词</a>{% endif %}<a href="/settings">账号</a></span>{% endif %}
 </header>
 <main class="wrap">{% block body %}{% endblock %}</main>
 {% if user and user.role == 'kid' and not request.url.path.startswith('/diagnose') %}

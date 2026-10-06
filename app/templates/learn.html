@@ -30,10 +30,10 @@
 </ol>
 
 <div class="grid">
-  <div class="card"><h3 style="margin-top:0">⬅️ 往回：前置知识</h3>
+  <div class="card"><div class="card-h"><span class="ico">⬅️</span><h3>往回：前置知识</h3></div>
     {% for p in pre %}{% set s2 = p.m.status if p.m else 'unknown' %}<a class="kp" href="/learn/{{ p.id }}"><span class="n">{{ p.name }} <span class="muted small">{{ stage_label(p.stage) }} · {{ p.strength }}</span></span><span class="pill st-{{ s2 }}">{{ STATUS_LABEL[s2] }}</span></a>
     {% else %}<p class="muted small">这是起点知识点。</p>{% endfor %}</div>
-  <div class="card"><h3 style="margin-top:0">➡️ 往前：学会后可以学</h3>
+  <div class="card"><div class="card-h"><span class="ico">➡️</span><h3>往前：学会后可以学</h3></div>
     {% for p in post %}{% set s2 = p.m.status if p.m else 'unknown' %}<a class="kp" href="/learn/{{ p.id }}"><span class="n">{{ p.name }} <span class="muted small">{{ stage_label(p.stage) }}</span></span><span class="pill st-{{ s2 }}">{{ STATUS_LABEL[s2] }}</span></a>
     {% else %}<p class="muted small">暂无后续知识点。</p>{% endfor %}</div>
 </div>

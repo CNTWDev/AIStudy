@@ -35,6 +35,19 @@ templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LA
                              stage_rank=stage_rank)
 
 
+def device_label(ua: str | None) -> str:
+    """把浏览器 User-Agent 变成人看得懂的「Chrome · iPad」。"""
+    ua = ua or ""
+    dev = next((n for k, n in [("iPad", "iPad"), ("iPhone", "iPhone"), ("Android", "安卓"), ("Windows", "Windows 电脑"),
+                               ("Macintosh", "Mac"), ("CrOS", "Chromebook"), ("Linux", "Linux")] if k in ua), "未知设备")
+    app_ = next((n for k, n in [("MicroMessenger", "微信"), ("Edg/", "Edge"), ("Firefox/", "Firefox"), ("Chrome/", "Chrome"),
+                                ("Safari/", "Safari")] if k in ua), "浏览器")
+    return f"{app_} · {dev}"
+
+
+templates.env.filters["device"] = device_label
+
+
 @app.exception_handler(LoginRequired)
 async def _login_required(request: Request, exc):
     if request.url.path.startswith("/api/"):
@@ -800,11 +813,12 @@ def today(request: Request):
                       text="请家长在「家长页 → 编辑孩子」里勾选要学的教材。")
     t = engine.today_plan(k["id"])
     st = engine.streak(k["id"])
-    cal = engine.calendar(k["id"], 4)
+    cal = engine.calendar(k["id"], 4, full_weeks=True)
     me = auth.current_user(request)
     m = engine.get_mastery(k["id"])
+    rec = engine.day_record(k["id"], t["day"])
     return render(request, "today.html", t=t, streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
-                  stars=engine.total_stars(k["id"]), rec=engine.day_record(k["id"], t["day"]),
+                  stars=engine.total_stars(k["id"]), rec=rec, auto=engine.day_summary(rec),
                   cov=explore.coverage(k["id"], m), lit=explore.lit_today(k["id"]), ahead=explore.ahead(k["id"], m),
                   vocab=explore.word_stats(k["id"]), weekly=records.weekly(k["id"]), mine=records.summary(k["id"]),
                   found=insights.open_insights(k["id"], for_kid=me["role"] == "kid", limit=4 if me["role"] == "kid" else 10))
@@ -857,10 +871,24 @@ def checkin(request: Request, body: dict = Body(...)):
     day = db.today().isoformat()
     engine.today_plan(k["id"])
     mood = (body.get("mood") or "")[:10]
-    db.run(f"UPDATE days SET checked_in=1, reflection=?, mood=?, minutes={db.greatest('minutes', '?')} WHERE user_id=? AND day=?",
-           (body.get("reflection") or "")[:1000], mood, int(body.get("minutes") or 0), k["id"], day)
+    # 学习时长自动记录，不再手填；「今天学了什么」自动生成，孩子只选心情，想说的话可写可不写
+    db.run("UPDATE days SET checked_in=1, reflection=?, mood=? WHERE user_id=? AND day=?",
+           (body.get("reflection") or "")[:1000], mood, k["id"], day)
     s = engine.streak(k["id"])
     return {"ok": True, "streak": s, "badges": engine.badges(s)}
+
+
+@app.post("/api/beat")
+async def api_beat(request: Request):
+    """页面自动计时的心跳（只有孩子自己的账号计时，家长查看不算）。也接受 sendBeacon 发来的请求。"""
+    user = auth.current_user(request)
+    if not user or user["role"] != "kid":
+        return {"minutes": None}
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    return {"minutes": engine.beat(user["id"], (body or {}).get("s"))}
 
 
 @app.get("/day/{day}", response_class=HTMLResponse)
@@ -870,7 +898,8 @@ def day_page(request: Request, day: str):
         date.fromisoformat(day)
     except ValueError:
         raise HTTPException(404)
-    return render(request, "day.html", r=engine.day_record(k["id"], day), streak=engine.streak(k["id"]))
+    r = engine.day_record(k["id"], day)
+    return render(request, "day.html", r=r, auto=engine.day_summary(r), streak=engine.streak(k["id"]))
 
 
 # ================================================================== 阅读进度（名著接着读 / 英文分级读物）
@@ -1475,8 +1504,9 @@ def reading_url(request: Request, url: str = Form(...), lang: str = Form("")):
     try:
         a = webpage.article(url)
     except webpage.FetchError as e:
-        rows = db.q("SELECT * FROM readings WHERE user_id=? ORDER BY id DESC LIMIT 30", k["id"])
-        return render(request, "reading_list.html", rows=rows, lang="en", url_error=str(e), url=url, status_code=400)
+        rows = db.q("SELECT id, title, lang, source, minutes, finished_at, created_at FROM readings WHERE user_id=? ORDER BY id DESC LIMIT 50", k["id"])
+        return render(request, "reading_list.html", rows=rows, lang="en", url_error=str(e), url=url, status_code=400,
+                      cross={l: engine.cross_topics(k["id"], l) for l in ("en", "zh")})
     lang = lang if lang in ("en", "zh") else a["lang"]
     rid = db.insert("INSERT INTO readings(user_id,lang,title,body,source,created_at) VALUES(?,?,?,?,?,?)",
                     k["id"], lang, a["title"], a["body"], "web:" + a["url"][:500], db.now())
@@ -1594,7 +1624,7 @@ def api_sentence(request: Request, body: dict = Body(...)):
     fb = llm.sentence_feedback(word, body.get("meaning", ""), sent[:400], body.get("lang", "en"), k["grade"], user_id=k["id"])
     db.run("INSERT INTO sentences(user_id,word,sentence,feedback,ok,created_at) VALUES(?,?,?,?,?,?)",
            k["id"], word, sent[:400], db.jdump(fb), 1 if fb.get("ok") else 0, db.now())
-    engine._touch_day(k["id"], 2)
+    engine._touch_day(k["id"])
     return fb
 
 
@@ -1613,7 +1643,7 @@ def reading_finish(request: Request, rid: int, body: dict = Body(...)):
         results.append({"ok": ok, "answer": q.get("answer"), "explain": q.get("explain", "")})
     minutes = max(1, min(120, int(body.get("minutes") or 1)))
     db.run("UPDATE readings SET finished_at=?, minutes=minutes+? WHERE id=?", db.now(), minutes, rid)
-    engine._touch_day(k["id"], minutes)
+    engine._touch_day(k["id"])  # 在线阅读的时间由页面自动计时
     engine.mark_task_by(k["id"], type="read_" + r["lang"], lang=r["lang"])
     return {"results": results}
 
@@ -1631,7 +1661,7 @@ def _records_ctx(k):
     lookups = db.q("SELECT query, created_at FROM lookups WHERE user_id=? ORDER BY id DESC LIMIT 30", k["id"])
     tot = db.one("SELECT COUNT(*) AS n, SUM(correct) AS ok FROM attempts WHERE user_id=?", k["id"])
     return {"k": k, "packs": packs, "attempts": att, "weak": [(catalog.kp(w["kp_id"]), w) for w in weak[:12]],
-            "cal": engine.calendar(k["id"], 12), "streak": engine.streak(k["id"]), "days": days, "lookups": lookups,
+            "cal": engine.calendar(k["id"], 12, full_weeks=True), "streak": engine.streak(k["id"]), "days": days, "lookups": lookups,
             "reads": db.q("SELECT * FROM reading_logs WHERE user_id=? ORDER BY id DESC LIMIT 30", k["id"]),
             "found": insights.open_insights(k["id"]), "solved": insights.resolved_recent(k["id"]),
             "asks": db.q("SELECT t.id, t.page, t.created_at, m.text FROM ask_threads t JOIN ask_messages m ON m.thread_id=t.id "

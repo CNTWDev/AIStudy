@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 {% block body %}
-<a href="/today" class="small">← 今天</a>
+<a href="/today" class="back">← 今天</a>
 <h1>学校学到哪了</h1>
 {% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
 <p class="muted small">每隔一两周更新一次就行（1 分钟）。选好「正在学」，再勾上这个学期学校已经学过的。
 每天的任务会跟着调整：跟上学校正在学的 → 回头抽查学过的 → 补前面没打牢的基础 → 提前看一眼下一个。</p>
 
+{% set ns = namespace(first=(rows|selectattr('stale')|map(attribute='pack.id')|first) or (rows[0].pack.id if rows else None)) %}
 {% for v in rows %}
 {% set pid = v.pack.id %}
-<details class="card" id="p-{{ pid }}" {{ 'open' if open_pack == pid or (not open_pack and loop.first) or v.stale }}>
+<details class="card" id="p-{{ pid }}" {{ 'open' if (open_pack == pid) or (not open_pack and pid == ns.first) }}>
   <summary class="row">
     <div class="grow"><b>{{ v.pack.subject_name }}</b> <span class="muted small">{{ v.pack.edition }} · {{ stage_label(v.stage) }}</span></div>
     {% if v.stale %}<span class="badge warn">{{ '还没设置' if not v.updated else '该更新了' }}</span>

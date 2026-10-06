@@ -4,7 +4,7 @@
 <h1>{{ pack.subject_name }} 诊断报告</h1>
 <p class="muted">共测 {{ rep.ok|length + rep.weak|length }} 个知识点：通过 {{ rep.ok|length }}，需要补 {{ rep.weak|length }}。</p>
 {% if rep.roots %}
-<div class="card"><h3 style="margin-top:0">🎯 最该先补的「断点」</h3>
+<div class="card"><div class="card-h"><span class="ico">🎯</span><h3>最该先补的「断点」</h3></div>
 <p class="muted small">这些点做错了，而它们的前置都没问题——从这里补起，后面的会跟着顺。</p>
 {% for d in rep.roots %}{% set k = kp(d.kp) %}<a class="kp" href="/learn/{{ k.id }}"><span class="n">{{ k.name }} <span class="muted small">{{ stage_label(k.stage) }}</span></span><span class="pill st-weak">去补</span></a>{% endfor %}</div>
 {% endif %}

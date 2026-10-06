@@ -108,7 +108,12 @@ def test_full_flow():
         assert fin["results"][0]["ok"] is True
         r = c.post("/reading/new", data={"mode": "paste", "lang": "zh", "title": "春", "body": "盼望着，盼望着。东风来了。"})
         assert "东风来了" in r.text
+        # 学习时长自动计时：心跳累计秒数（一次最多 75 秒），不再手填
+        assert c.post("/api/beat", json={"s": 40}).json()["minutes"] == 1
+        assert c.post("/api/beat", json={"s": 9999}).json()["minutes"] == 2
         assert c.post("/api/checkin", json={"reflection": "学会了量筒读数", "minutes": 40}).json()["streak"] == 1
+        assert db.one("SELECT minutes FROM days WHERE user_id=(SELECT id FROM users WHERE email='a@x.com')")["minutes"] == 2
+        assert "今天学到的" in c.get("/today").text
         assert "学会了量筒读数" in c.get("/records").text
         assert "seed" in c.get("/words").text
         c.get("/logout")
@@ -130,6 +135,7 @@ def test_full_flow():
         assert c.post("/api/answer", json={"item_id": "x", "dont_know": True}).status_code == 403
         assert c.post("/api/ask", json={"question": "hi"}).status_code == 403
         assert c.post("/api/checkin", json={"minutes": 5}).status_code == 403
+        assert c.post("/api/beat", json={"s": 30}).json()["minutes"] is None  # 家长查看不计时
         for path in ["/records", "/subjects", "/progress", "/papers", "/map/math-shanghai", "/learn/MATH-PRE-UNIT"]:
             assert c.get(path).status_code == 200, path
         assert 'id="start"' not in c.get("/learn/MATH-PRE-UNIT").text
@@ -701,4 +707,4 @@ def test_curricula_layers_tracks_and_bridges():
         assert any("密度" in x for x in seen["known"])
         # 英语阅读可以选「别的课学过的」话题
         assert any(t["kp"]["id"] in ("PSH-MECH-14", "PHY-IG-1.4-01") for t in engine.cross_topics(kid["id"], "en"))
-        assert "读读别的课学过的" in c.get("/reading").text
+        assert "课学过的内容" in c.get("/reading").text

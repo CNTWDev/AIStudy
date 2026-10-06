@@ -1,0 +1,58 @@
+{# 通用界面小部件：学习日历、这一周、热力图 #}
+
+{% macro legend(check=True) %}
+<div class="legend"><span>没学</span><i style="background:var(--heat-0)"></i><i style="background:var(--heat-1)"></i><i style="background:var(--heat-2)"></i><i style="background:var(--heat-3)"></i><i style="background:var(--heat-4)"></i><span>学了 1 小时以上</span>{% if check %}<span style="margin-left:auto">✓ 打过卡</span>{% endif %}</div>
+{% endmacro %}
+
+{# 按周对齐的日历：cal 来自 engine.calendar(..., full_weeks=True) #}
+{% macro month(cal, link=True) %}
+<div class="calendar" role="grid" aria-label="学习日历">
+  {% for w in '一二三四五六日' %}<div class="wh">{{ w }}</div>{% endfor %}
+  {% for d in cal %}
+  {% set tip = d.day ~ (' · 今天' if d.today else '') ~ ('' if d.future else '：学了 ' ~ d.minutes ~ ' 分钟' ~ ('，已打卡' if d.checked else '')) %}
+  {% if d.future %}<span class="d future" title="{{ d.day }}">{{ d.dn }}</span>
+  {% else %}<{{ 'a href="/day/' ~ d.day ~ '"' if link else 'span' }} class="d l{{ d.level }} {{ 'today' if d.today }}" title="{{ tip }}" aria-label="{{ tip }}">
+    {{ d.dn if d.dn != 1 else d.month ~ '月' }}{% if d.minutes %}<span class="m">{{ d.minutes }}′</span>{% endif %}{% if d.checked %}<span class="ck">✓</span>{% endif %}
+  </{{ 'a' if link else 'span' }}>{% endif %}
+  {% endfor %}
+</div>
+{{ legend() }}
+{% endmacro %}
+
+{# 这一周：每天一根柱子，虚线是每天的目标分钟数，达到目标变成金色 #}
+{% macro week(days, goal, link=True) %}
+{% set mx = [days|map(attribute='minutes')|max, goal or 0, 1]|max * 1.15 %}
+<div class="week">
+  {% for d in days %}
+  <{{ 'a href="/day/' ~ d.day ~ '"' if link and not d.future else 'div' }} class="col {{ 'today' if d.today }} {{ 'future' if d.future }}" title="{{ d.day }}{{ '' if d.future else '：' ~ d.minutes ~ ' 分钟' }}">
+    <span class="v">{{ d.minutes if d.minutes else ('·' if not d.future else '') }}</span>
+    <span class="track">{% if goal %}<i class="goal" style="bottom:{{ 100 * goal / mx }}%"></i>{% endif %}<i class="fill {{ 'hit' if goal and d.minutes >= goal }}" style="height:{{ 100 * d.minutes / mx }}%"></i></span>
+    <span class="wd">{{ d.wd }}</span>
+  </{{ 'a' if link and not d.future else 'div' }}>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{# 紧凑热力图：一列是一周（记录页） #}
+{% macro heat(cal) %}
+<div class="heat" style="grid-template-columns:auto repeat({{ (cal|length) // 7 }},minmax(14px,30px))">
+  <span class="ml"></span>{% for w in '一二三四五六日' %}<span class="wl">{{ w if w in '一三五日' else '' }}</span>{% endfor %}
+  {% for d in cal %}
+  {% if d.wi == 0 %}<span class="ml">{{ d.month ~ '月' if loop.first or d.dn <= 7 else '' }}</span>{% endif %}
+  {% if d.future %}<span class="c future" title="{{ d.day }}"></span>
+  {% else %}<a href="/day/{{ d.day }}" class="l{{ d.level }} {{ 'today' if d.today }}" title="{{ d.day }}：{{ d.minutes }} 分钟{{ '，已打卡' if d.checked }}{{ '，完成 ' ~ d.done ~ '/' ~ d.total if d.total }}"></a>{% endif %}
+  {% endfor %}
+</div>
+{{ legend(False) }}
+{% endmacro %}
+
+{# 学科的图标和颜色 #}
+{% set SUBJ = {'chinese': ('📖', 'coral'), 'english': ('🔤', 'sky'), 'math': ('📐', 'violet'), 'physics': ('⚡', 'brand'),
+  'chemistry': ('⚗️', 'learn'), 'biology': ('🌱', 'ok'), 'history': ('🏛️', 'warn'), 'geography': ('🌏', 'sky'), 'science': ('🔬', 'brand')} %}
+{% macro subj_ico(subject, size=40) %}{% set c = SUBJ.get(subject, ('📘', 'brand')) %}<span class="sico" style="width:{{ size }}px;height:{{ size }}px;font-size:{{ (size * 0.5)|int }}px;background:var(--{{ c[1] }}-2);color:var(--{{ c[1] }})">{{ c[0] }}</span>{% endmacro %}
+
+{# 掌握情况：一条分段进度条 + 图例 #}
+{% macro mastery(s) %}
+<div class="bar mb" title="已掌握 {{ s.mastered }} · 学习中 {{ s.learning }} · 薄弱 {{ s.weak }} · 未测 {{ s.unknown }}"><span style="width:{{ 100*s.mastered/s.total if s.total else 0 }}%;background:var(--ok)"></span><span style="width:{{ 100*s.learning/s.total if s.total else 0 }}%;background:var(--learn)"></span><span style="width:{{ 100*s.weak/s.total if s.total else 0 }}%;background:var(--warn)"></span></div>
+<div class="mleg"><span><i class="dot mastered"></i>已掌握 <b>{{ s.mastered }}</b></span><span><i class="dot learning"></i>学习中 <b>{{ s.learning }}</b></span><span><i class="dot weak"></i>薄弱 <b>{{ s.weak }}</b></span><span><i class="dot"></i>没测过 <b>{{ s.unknown }}</b></span></div>
+{% endmacro %}

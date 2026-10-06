@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 {% block body %}
-<a href="/today" class="small">← 今天</a>
-<h1>一日记录 · {{ r.day }} {{ r.mood }}</h1>
+<a href="/today" class="back">← 今天</a>
+<h1>一日记录 · {{ r.day[5:7]|int }} 月 {{ r.day[8:]|int }} 日 {{ r.mood }}</h1>
 <div class="stats">
   <div class="stat"><b>{{ r.done }}/{{ r.plan|length }}</b><span>完成任务 ⭐</span></div>
-  <div class="stat"><b>{{ r.minutes }}</b><span>学习分钟</span></div>
+  <div class="stat"><b>{{ r.minutes }}</b><span>学习分钟{% if r.offline_minutes %}（线下 {{ r.offline_minutes }}）{% endif %}</span></div>
   <div class="stat"><b>{{ r.attempts|length }}</b><span>做题（对 {{ r.right }}）</span></div>
   <div class="stat"><b>{{ r.reviews }}</b><span>复习卡片</span></div>
   <div class="stat"><b>{{ r.new_cards|length }}</b><span>新收藏</span></div>
 </div>
+{% if r.first_at %}<p class="small muted">⏱ 自动计时：{{ r.first_at[11:16] }} 开始，{{ r.last_at[11:16] }} 结束，中间真正在学的时间约 {{ (r.active_seconds / 60)|round|int }} 分钟（发呆、切走不算）。</p>{% endif %}
+{% if auto.text %}<div class="card autosum"><div class="tiny faint">✨ 这一天学到的（自动整理）</div><p style="margin:4px 0 0">{{ auto.text }}</p></div>{% endif %}
 {% if r.reflection %}<div class="card"><b>那天写下的：</b>{{ r.reflection }}</div>{% endif %}
 <div class="card">
   <h3 style="margin-top:0">任务</h3>

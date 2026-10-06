@@ -1,24 +1,36 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui %}
 {% block body %}
-{% if report_for %}<a href="/parent" class="small">← 家长页</a>{% endif %}
-<h1>{{ k.name }} 的学习记录</h1>
-<div class="grid">
-  <div class="card"><div class="muted small">连续打卡</div><div style="font-size:28px;font-weight:700">{{ streak }} 天</div></div>
-  <div class="card"><div class="muted small">做题</div><div style="font-size:28px;font-weight:700">{{ tot.n or 0 }}</div><div class="muted small">正确率 {{ ((tot.ok or 0) * 100 / tot.n)|int if tot.n else 0 }}%</div></div>
-  <div class="card"><div class="muted small">生词 / 错题</div><div style="font-size:28px;font-weight:700">{{ words }} / {{ mistakes }}</div></div>
+{% if report_for %}<a href="/parent" class="back">← 家长页</a>{% endif %}
+<div class="ph"><h1>{{ k.name }} 的学习记录</h1></div>
+<div class="statline" style="margin-top:14px">
+  <div><b>🔥 {{ streak }}</b><span>连续打卡（天）</span></div>
+  <div><b>{{ cal|selectattr('level')|list|length }}</b><span>近 12 周学习的天数</span></div>
+  <div><b>{{ tot.n or 0 }}</b><span>做题 · 正确率 {{ ((tot.ok or 0) * 100 / tot.n)|int if tot.n else 0 }}%</span></div>
+  <div><b>{{ words }} / {{ mistakes }}</b><span>生词 / 错题</span></div>
 </div>
-<h2>每天学习（近 12 周）</h2>
-<div class="cal" style="max-width:none;grid-template-columns:repeat(14,1fr)">{% for d in cal %}<div class="{{ 'l3' if d.minutes >= 60 else 'l2' if d.minutes >= 30 else 'l1' if d.minutes > 0 or d.checked }}" title="{{ d.day }}：{{ d.minutes }} 分钟，完成 {{ d.done }}/{{ d.total }}">.</div>{% endfor %}</div>
+<div class="card">
+  <div class="card-h"><span class="ico">📅</span><h3>每天学习 <span class="muted small" style="font-weight:400">近 12 周</span></h3></div>
+  {{ ui.heat(cal) }}
+</div>
 <h2>各科掌握情况</h2>
+<div class="cols">
 {% for p in packs %}{% set s = p.sum %}
-<div class="card" style="padding:12px"><div class="row small"><b class="grow">{{ p.pack.subject_name }} · {{ p.pack.edition }}</b>{% if not report_for %}<a href="/map/{{ p.pack.id }}">地图 →</a>{% endif %}</div>
-<div class="bar" style="margin:6px 0"><span style="width:{{ 100*s.mastered/s.total }}%;background:var(--ok)"></span><span style="width:{{ 100*s.learning/s.total }}%;background:var(--learn)"></span><span style="width:{{ 100*s.weak/s.total }}%;background:var(--warn)"></span></div>
-<div class="muted small">已掌握 {{ s.mastered }} · 学习中 {{ s.learning }} · 薄弱 {{ s.weak }} · 未测 {{ s.unknown }}</div></div>
+<div class="card subj">
+  <div class="top">{{ ui.subj_ico(p.pack.subject, 38) }}<div class="grow"><b>{{ p.pack.subject_name }}</b><div class="ed">{{ p.pack.edition }}</div></div>{% if not report_for %}<a class="small" href="/map/{{ p.pack.id }}">地图 →</a>{% endif %}</div>
+  {{ ui.mastery(s) }}
+</div>
 {% endfor %}
+</div>
 {% if weak %}<h2>薄弱知识点</h2>
 <table><tr><th>知识点</th><th>学段</th><th>掌握度</th><th>做题</th></tr>
 {% for kp, m in weak %}<tr><td>{% if not report_for %}<a href="/learn/{{ kp.id }}">{{ kp.name }}</a>{% else %}{{ kp.name }}{% endif %}</td><td>{{ stage_label(kp.stage) }}</td><td>{{ (m.score*100)|int }}%</td><td>{{ m.correct }}/{{ m.attempts }}</td></tr>{% endfor %}</table>{% endif %}
-{% if days %}<h2>每日反思</h2>{% for d in days %}<p class="small"><b>{% if not report_for %}<a href="/day/{{ d.day }}">{{ d.day }}</a>{% else %}{{ d.day }}{% endif %}</b> {{ d.mood }} {{ d.minutes }} 分钟 · {{ d.reflection or '（已打卡）' }}</p>{% endfor %}{% endif %}
+{% if days %}<h2>每天的心情和留言</h2>
+<div class="card" style="padding:6px 18px">{% for d in days %}
+<div class="refl"><div class="dt">{% if not report_for %}<a href="/day/{{ d.day }}">{{ d.day[5:] }}</a>{% else %}{{ d.day[5:] }}{% endif %}</div>
+  <div class="grow"><span class="mood">{{ d.mood or '' }}</span> {% if d.reflection %}{{ d.reflection }}{% else %}<span class="faint">打了卡</span>{% endif %}</div>
+  <span class="tiny faint" style="white-space:nowrap">{{ d.minutes }} 分钟</span></div>
+{% endfor %}</div>{% endif %}
 {% if found or solved %}<h2>🔍 系统发现</h2>
 {% for f in found %}<div class="finding sev{{ f.severity }}"><b>{{ f.title }}</b> <span class="muted small">{{ f.created_at[:10] }} 起</span><div class="small muted">{{ f.detail }}</div></div>{% endfor %}
 {% if solved %}<p class="small muted">最近已解决：{% for f in solved %}{{ f.title }}{{ '、' if not loop.last }}{% endfor %}</p>{% endif %}

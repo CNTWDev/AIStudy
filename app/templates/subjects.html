@@ -1,20 +1,26 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui %}
 {% block body %}
-<h1>学科</h1>
-<p class="small"><a class="btn ghost sm" href="/progress">📍 更新学校进度</a> <a class="btn ghost sm" href="/papers">📷 导入试卷</a>
-  <span class="muted">告诉系统学校学到哪了、考了什么，每天的任务会跟着走</span></p>
+<div class="ph"><h1>学科</h1></div>
+<div class="tiles">
+  <a class="tile" href="/progress"><span class="e">📍</span><div><b>学校学到哪了</b><span>更新进度，每天的任务跟着学校走</span></div></a>
+  <a class="tile" href="/papers"><span class="e">📷</span><div><b>导入试卷</b><span>拍照导入，错题自动进错题本</span></div></a>
+</div>
+<div class="cols">
 {% for r in rows %}
 {% set s = r.sum %}
-<div class="card">
-  <div class="row"><div class="grow"><h2 style="margin:0">{{ r.pack.subject_name }}</h2><div class="muted small">{{ r.pack.edition }} · 当前 {{ stage_label(r.e.stage) }}{% if r.e.progress_kp and catalog.kp(r.e.progress_kp) %} · 学校正在学：{{ catalog.kp(r.e.progress_kp).name }}{% endif %}</div></div></div>
-  <div class="bar" style="margin:10px 0"><span style="width:{{ 100*s.mastered/s.total }}%;background:var(--ok)"></span><span style="width:{{ 100*s.learning/s.total }}%;background:var(--learn)"></span><span style="width:{{ 100*s.weak/s.total }}%;background:var(--warn)"></span></div>
-  <div class="muted small">已掌握 {{ s.mastered }} · 学习中 {{ s.learning }} · 薄弱 {{ s.weak }} · 未测 {{ s.unknown }}</div>
-  <div class="row" style="margin-top:10px">
-    <a class="btn" href="/map/{{ r.pack.id }}">知识地图</a>
+<div class="card subj">
+  <div class="top">{{ ui.subj_ico(r.pack.subject, 46) }}<div class="grow"><h2>{{ r.pack.subject_name }}</h2><div class="ed">{{ r.pack.edition }} · {{ stage_label(r.e.stage) }}</div></div>
+    <div style="text-align:right"><div class="num-big" style="font-size:24px">{{ ((100 * s.mastered / s.total)|round|int) if s.total else 0 }}<small style="font-size:13px">%</small></div><div class="tiny faint">已掌握</div></div></div>
+  {{ ui.mastery(s) }}
+  {% if r.e.progress_kp and catalog.kp(r.e.progress_kp) %}<div class="now">🏫 学校正在学：<b>{{ catalog.kp(r.e.progress_kp).name }}</b></div>{% endif %}
+  <div class="acts">
+    <a class="btn" href="/map/{{ r.pack.id }}">🗺️ 知识地图</a>
     <a class="btn ghost" href="/diagnose/{{ r.pack.id }}">{{ '再诊断一次' if r.diag else '摸底诊断' }}</a>
-    <a class="btn ghost" href="/papers?pack={{ r.pack.id }}">导入试卷</a>
+    <a class="linkbtn" href="/papers?pack={{ r.pack.id }}">导入试卷</a>
   </div>
 </div>
 {% endfor %}
-<p class="muted small">新教材、新年级：请家长在「编辑孩子」里添加。</p>
+</div>
+<p class="muted small" style="text-align:center">想加新的科目或换教材？请家长在「家长页 → 编辑孩子」里改。</p>
 {% endblock %}
