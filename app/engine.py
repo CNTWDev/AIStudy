@@ -207,11 +207,15 @@ def answer_display(it: dict) -> str:
 
 
 def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, correct: bool, answer="", dont_know=False,
-                   touch=True):
+                   touch=True, ms=None):
     """dont_know=True：孩子点了「这道题还不会」。算一次没答对，但掌握度只轻微下调，并把讲解放进错题本。"""
-    db.run("INSERT INTO attempts(user_id,item_id,kp_id,mode,correct,answer,dont_know,created_at) VALUES(?,?,?,?,?,?,?,?)",
+    try:
+        ms = int(ms) if ms and 500 <= int(ms) <= 30 * 60000 else None  # 做题用时（毫秒），太短/太长的不算
+    except (TypeError, ValueError):
+        ms = None
+    db.run("INSERT INTO attempts(user_id,item_id,kp_id,mode,correct,answer,dont_know,ms,created_at) VALUES(?,?,?,?,?,?,?,?,?)",
            user_id, item["id"] if item else None, kp_id, mode, 1 if correct else 0, str(answer)[:500],
-           1 if dont_know else 0, db.now())
+           1 if dont_know else 0, ms, db.now())
     if mode == "diagnose" and correct:
         set_mastery(user_id, kp_id, 0.8, "mastered", "diagnose")
         status = "mastered"
@@ -591,11 +595,27 @@ def build_plan(user_id: int) -> list[dict]:
             pre_all.append({"type": "preview", "kp": k["id"], "title": f"预习：{k['name']}",
                             "why": "前置已具备" + ("，高频考点" if k.get("hot") else ""), "minutes": 8, "pack": pack_id})
 
+    # 自动发现的问题（根源前置、反复还不会、常问、做对但慢、久未复习……）排在同类任务最前面
+    from . import insights
+    auto = insights.plan_tasks(insights.refresh(user_id))
+    auto_kps = {t["kp"] for lst in auto.values() for t in lst}
+    back_all = auto["backfill"] + [t for t in back_all if t["kp"] not in auto_kps]
+    weak_all = auto["weak"] + [t for t in weak_all if t["kp"] not in auto_kps]
+    check_all = auto["check"] + [t for t in check_all if t["kp"] not in auto_kps]
+
     flex: list[dict] = []
     # 顺序：跟上学校 → 摸底诊断 → 补弱 / 补前置（交替）→ 回顾小检查 → 预习
     for t in sync_all[:2]:
         t["url"] = f"/learn/{t['kp']}?task=sync"
         flex.append(t)
+    # 系统自动发现的最重要的一条，紧跟在「跟上学校」后面（不会因为时间不够被截掉）
+    top = (auto["backfill"] + auto["weak"])[:1]
+    for t in top:
+        t["url"] = f"/learn/{t['kp']}?task={t['type']}"
+        t["keep"] = True
+        flex.append(t)
+    back_all = [t for t in back_all if t not in top]
+    weak_all = [t for t in weak_all if t not in top]
     # 导入了还没订正完的试卷
     for p in db.q("SELECT id, title FROM papers WHERE user_id=? AND status='ready' ORDER BY id LIMIT 1", user_id):
         flex.append({"type": "paper", "title": f"试卷订正：{p['title']}", "why": "把卷子上的题在线再做一遍，做完看诊断",
@@ -627,7 +647,7 @@ def build_plan(user_id: int) -> list[dict]:
                          "why": f"{'、'.join(stale_packs[:3])}：告诉系统学校学到哪了，计划才跟得上", "minutes": 2, "url": "/progress"})
     out, used, n_flex = [], 0, 0
     for is_flex, t in [(False, t) for t in fixed] + [(True, t) for t in flex]:
-        if is_flex and n_flex and used + t["minutes"] > budget:
+        if is_flex and n_flex and not t.get("keep") and used + t["minutes"] > budget:
             continue
         n_flex += is_flex
         t["id"] = f"t{len(out)}"

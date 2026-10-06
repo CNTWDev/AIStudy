@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import auth, config, db, engine, llm, papers
+from . import auth, config, db, engine, insights, llm, papers, sitecfg
 from .auth import LoginRequired
 from .catalog import GRADES, catalog, stage_label, stage_rank
 from .content import content
@@ -31,8 +31,7 @@ app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY, max_age=60 *
 app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), name="static")
 templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL,
-                             llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
-                             ASSISTANT=config.ASSISTANT_NAME, ASSISTANT_ICON=config.ASSISTANT_ICON)
+                             llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display)
 
 
 @app.exception_handler(LoginRequired)
@@ -42,32 +41,52 @@ async def _login_required(request: Request, exc):
     return RedirectResponse("/login", status_code=303)
 
 
+@app.exception_handler(HTTPException)
+async def _http_error(request: Request, exc: HTTPException):
+    p = request.url.path
+    if p.startswith("/api/") or p.startswith("/ext/") or request.method != "GET":
+        return JSONResponse({"error": exc.detail, "detail": exc.detail}, status_code=exc.status_code, headers=exc.headers)
+    return render(request, "message.html", title="提示" if exc.status_code < 500 else "出错了",
+                  text=str(exc.detail), link="/", status_code=exc.status_code)
+
+
 @app.exception_handler(llm.LLMError)
 async def _llm_error(request: Request, exc):
     return JSONResponse({"error": str(exc)}, status_code=503)
 
 
-def render(request: Request, name: str, **ctx):
+def render(request: Request, name: str, status_code: int = 200, **ctx):
     user = auth.current_user(request)
     kid = None
     if user:
         kid = user if user["role"] == "kid" else (
             db.one("SELECT * FROM users WHERE id=? AND parent_id=?", request.session.get("as_kid"), user["id"])
-            if request.session.get("as_kid") else None)
-    return templates.TemplateResponse(request, name, {"user": user, "kid": kid, **ctx})
+            if request.session.get("as_kid") and user["role"] == "parent" else None)
+    # readonly：家长在看孩子的页面——只能查看和管理，不能替孩子做题
+    base = {"user": user, "kid": kid, "readonly": bool(user and user["role"] != "kid"),
+            "SITE": sitecfg.get("site_name"), "ASSISTANT": sitecfg.get("assistant_name"),
+            "ASSISTANT_ICON": sitecfg.get("assistant_icon")}
+    return templates.TemplateResponse(request, name, {**base, **ctx}, status_code=status_code)
 
 
-def kid_or_redirect(request: Request):
-    """当前操作的孩子：孩子本人，或家长正在「以孩子视角」使用。"""
+PARENT_READONLY = "家长账号用来查看和管理。做题、阅读、复习请让孩子用自己的账号登录。"
+
+
+def kid_or_redirect(request: Request, manage: bool = False):
+    """当前操作的孩子：孩子本人；或家长在家长页选中的孩子（manage=True 的页面：查看、更新进度、导入试卷等）。
+    做题、阅读、复习这类「学习」操作只有孩子自己的账号能做。"""
     user = auth.require_user(request)
     if user["role"] == "kid":
         return user
+    if user["role"] != "parent":
+        raise HTTPException(403, "管理员账号不用来学习；在「管理 → 家庭与孩子」里可以查看每个孩子的情况。")
     kid_id = request.session.get("as_kid")
-    if kid_id:
-        k = db.one("SELECT * FROM users WHERE id=? AND parent_id=?", kid_id, user["id"])
-        if k:
-            return k
-    raise HTTPException(400, "请先在家长页选择一个孩子")
+    k = db.one("SELECT * FROM users WHERE id=? AND parent_id=?", kid_id, user["id"]) if kid_id else None
+    if not k:
+        raise HTTPException(400, "请先在家长页选择一个孩子")
+    if not manage:
+        raise HTTPException(403, PARENT_READONLY)
+    return k
 
 
 def enrollments(kid_id: int):
@@ -78,7 +97,7 @@ def enrollments(kid_id: int):
 # ================================================================== 登录 / 账号
 
 def _reg_mode() -> str:
-    return "first" if auth.user_count() == 0 else config.REGISTRATION
+    return "first" if auth.user_count() == 0 else sitecfg.registration()
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -86,7 +105,9 @@ def home(request: Request):
     user = auth.current_user(request)
     if not user:
         return RedirectResponse("/login", 303)
-    if user["role"] == "parent" and not request.session.get("as_kid"):
+    if user["role"] == "admin":
+        return RedirectResponse("/admin", 303)
+    if user["role"] == "parent":
         return RedirectResponse("/parent", 303)
     return RedirectResponse("/today", 303)
 
@@ -128,7 +149,9 @@ def register(request: Request, email: str = Form(...), password: str = Form(...)
         elif mode == "invite":
             raise ValueError("需要邀请码才能注册（向管理员或已经在用的家长索取）")
         status = "pending" if (mode == "approval" and not inv) else "active"
-        uid = auth.create_user(email, password, name, "parent", is_admin=(mode == "first"), status=status,
+        # 第一个账号是网站管理员（不带孩子）；之后注册的都是家长
+        uid = auth.create_user(email, password, name, "admin" if mode == "first" else "parent", is_admin=(mode == "first"),
+                               status=status,
                                invited_by=inv["created_by"] if inv else None, invite_code=inv["code"] if inv else None,
                                apply_note=note)
     except ValueError as e:
@@ -139,7 +162,7 @@ def register(request: Request, email: str = Form(...), password: str = Form(...)
         return render(request, "message.html", title="申请已提交",
                       text="管理员审批通过后，就可以用这个邮箱和密码登录了。", link="/login")
     auth.login(request, auth.get_user(uid))
-    return RedirectResponse("/parent", 303)
+    return RedirectResponse("/admin" if mode == "first" else "/parent", 303)
 
 
 @app.get("/logout")
@@ -235,13 +258,14 @@ def kid_brief(k) -> dict:
     return {"u": k, "packs": packs, "streak": engine.streak(k["id"]), "week": cal,
             "week_min": sum(d["minutes"] for d in cal), "week_days": sum(1 for d in cal if d["minutes"] or d["checked"]),
             "today": today, "today_done": sum(1 for t in today["plan"] if t.get("done")),
+            "insights": insights.open_insights(k["id"], limit=6),
             "weak": [catalog.kp(w["kp_id"]) for w in weak[:5]], "weak_n": len(weak),
             "due": len(engine.due_cards(k["id"], 500)),
             "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='word'", k["id"])["n"]}
 
 
-ADMIN_TABS = [("overview", "概览"), ("families", "家庭与孩子"), ("invites", "邀请码"), ("tree", "邀请关系"),
-              ("log", "安全日志"), ("system", "系统")]
+ADMIN_TABS = [("overview", "概览"), ("stats", "数据统计"), ("families", "家庭与孩子"), ("invites", "邀请码"),
+              ("tree", "邀请关系"), ("log", "安全日志"), ("system", "站点设置")]
 
 
 @app.get("/admin", response_class=HTMLResponse)
@@ -284,7 +308,7 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
                 used_by.setdefault(u["invite_code"], []).append(u)
         ctx["invites"], ctx["used_by"] = invites, used_by
     elif tab == "tree":
-        parents = [u for u in users if u["role"] == "parent"]
+        parents = [u for u in users if u["role"] in ("parent", "admin")]  # 管理员也是邀请树的起点
         children = {}
         for u in parents:
             children.setdefault(u["invited_by"] if u["invited_by"] in by_id else None, []).append(u)
@@ -302,14 +326,79 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
                     out += walk(u["id"], depth + 1)
             return out
         ctx["tree"] = walk(None, 0)
+    elif tab == "stats":
+        ctx["daily"], ctx["totals"], ctx["kid_rows"] = _site_stats(users)
     elif tab == "log":
         ctx["events"] = db.q("SELECT * FROM auth_events ORDER BY id DESC LIMIT 300")
     elif tab == "system":
         from . import migrate
-        ctx.update(reg_mode=config.REGISTRATION, llm_status=llm.check(), migrations=migrate.status(),
+        ctx["admins"] = [u for u in users if u["role"] == "admin" or u["is_admin"]]
+        ctx.update(reg_mode=sitecfg.registration(), reg_modes=sitecfg.REG_MODES, site={k: sitecfg.get(k) for k in sitecfg.DEFAULTS},
+                   llm_status=llm.check(), migrations=migrate.status(),
                    version=_version(), db_dialect=db.DIALECT)
     ctx["me"] = a
     return render(request, "admin.html", **ctx)
+
+
+def _site_stats(users):
+    """数据统计：近 14 天每天的在学孩子数、学习分钟、做题数、AI 调用次数；每个孩子近 7 天的情况。"""
+    days = [(db.today() - timedelta(days=i)).isoformat() for i in range(13, -1, -1)]
+    since = days[0]
+    per_day = {d: {"day": d, "kids": 0, "minutes": 0, "attempts": 0, "ai": 0, "asks": 0} for d in days}
+    for r in db.q("SELECT day, COUNT(DISTINCT user_id) AS kids, SUM(minutes) AS minutes FROM days "
+                  "WHERE day>=? AND (minutes>0 OR checked_in=1) GROUP BY day", since):
+        if r["day"] in per_day:
+            per_day[r["day"]].update(kids=r["kids"], minutes=r["minutes"] or 0)
+    for r in db.q("SELECT SUBSTR(created_at,1,10) AS day, COUNT(*) AS n FROM attempts WHERE created_at>=? GROUP BY SUBSTR(created_at,1,10)", since):
+        if r["day"] in per_day:
+            per_day[r["day"]]["attempts"] = r["n"]
+    for r in db.q("SELECT day, SUM(calls) AS n FROM llm_usage WHERE day>=? GROUP BY day", since):
+        if r["day"] in per_day:
+            per_day[r["day"]]["ai"] = r["n"] or 0
+    for r in db.q("SELECT SUBSTR(m.created_at,1,10) AS day, COUNT(*) AS n FROM ask_messages m WHERE m.role='user' "
+                  "AND m.created_at>=? GROUP BY SUBSTR(m.created_at,1,10)", since):
+        if r["day"] in per_day:
+            per_day[r["day"]]["asks"] = r["n"]
+    one = lambda sql, *a: db.one(sql, *a)["n"] or 0  # noqa: E731
+    totals = {"attempts": one("SELECT COUNT(*) AS n FROM attempts"),
+              "accuracy": one("SELECT CAST(100*AVG(correct) AS INTEGER) AS n FROM attempts WHERE mode<>'exam'"),
+              "cards": one("SELECT COUNT(*) AS n FROM cards"), "papers": one("SELECT COUNT(*) AS n FROM papers"),
+              "asks": one("SELECT COUNT(*) AS n FROM ask_messages WHERE role='user'"),
+              "reads": one("SELECT COUNT(*) AS n FROM reading_logs"),
+              "insights": one("SELECT COUNT(*) AS n FROM insights WHERE resolved_at IS NULL"),
+              "insights_solved": one("SELECT COUNT(*) AS n FROM insights WHERE resolved_at IS NOT NULL")}
+    week = (db.today() - timedelta(days=7)).isoformat()
+    by_id = {u["id"]: u for u in users}
+    rows = []
+    for k in users:
+        if k["role"] != "kid":
+            continue
+        r = db.one("SELECT COUNT(*) AS n, SUM(correct) AS ok, SUM(dont_know) AS dk FROM attempts WHERE user_id=? AND created_at>=?",
+                   k["id"], week)
+        d = db.one("SELECT COUNT(*) AS n, SUM(minutes) AS m FROM days WHERE user_id=? AND day>=? AND (minutes>0 OR checked_in=1)",
+                   k["id"], week)
+        rows.append({"u": k, "parent": by_id.get(k["parent_id"]), "days": d["n"], "minutes": d["m"] or 0,
+                     "attempts": r["n"], "acc": int(100 * (r["ok"] or 0) / r["n"]) if r["n"] else None, "dk": r["dk"] or 0,
+                     "asks": one("SELECT COUNT(*) AS n FROM ask_threads WHERE user_id=? AND created_at>=?", k["id"], week),
+                     "insights": one("SELECT COUNT(*) AS n FROM insights WHERE user_id=? AND resolved_at IS NULL", k["id"]),
+                     "streak": engine.streak(k["id"])})
+    rows.sort(key=lambda r: -r["minutes"])
+    return list(per_day.values()), totals, rows
+
+
+@app.post("/admin/settings")
+async def admin_settings(request: Request):
+    a = auth.require_admin(request)
+    f = await request.form()
+    vals = {k: (f.get(k) or "").strip()[:40] for k in sitecfg.DEFAULTS if k in f}
+    if vals.get("registration") and vals["registration"] not in sitecfg.REG_MODES:
+        raise HTTPException(400, "注册方式不对")
+    if vals.get("parent_invite_limit") and not vals["parent_invite_limit"].isdigit():
+        raise HTTPException(400, "邀请码上限要填数字")
+    sitecfg.set_many(vals)
+    auth.log_event("site_settings", user_id=a["id"], email=a["email"], detail=",".join(f"{k}={v}" for k, v in vals.items()),
+                   request=request)
+    return _admin_back("system", msg="站点设置已保存，立即生效")
 
 
 def _version() -> str:
@@ -330,14 +419,16 @@ def _admin_back(tab="overview", msg="", link=""):
 
 
 @app.post("/admin/users/create")
-def admin_create_user(request: Request, email: str = Form(...), name: str = Form(""), password: str = Form(...)):
+def admin_create_user(request: Request, email: str = Form(...), name: str = Form(""), password: str = Form(...),
+                      role: str = Form("parent")):
     a = auth.require_admin(request)
+    role = "admin" if role == "admin" else "parent"
     try:
-        uid = auth.create_user(email, password, name, "parent", invited_by=a["id"])
+        uid = auth.create_user(email, password, name, role, invited_by=a["id"], is_admin=role == "admin")
     except ValueError as e:
         return _admin_back("families", msg=str(e))
-    auth.log_event("admin_create_user", user_id=uid, email=email, detail=f"by {a['email']}", request=request)
-    return _admin_back("families", msg="已创建家长账号 " + email.strip().lower())
+    auth.log_event("admin_create_user", user_id=uid, email=email, detail=f"role={role} by {a['email']}", request=request)
+    return _admin_back("families", msg=f"已创建{'管理员' if role == 'admin' else '家长'}账号 " + email.strip().lower())
 
 
 @app.post("/admin/users/{uid}/status")
@@ -411,18 +502,18 @@ def my_invites(request: Request, msg: str = "", link: str = ""):
     invites = db.q("SELECT * FROM invites WHERE created_by=? ORDER BY created_at DESC", p["id"])
     joined = db.q("SELECT id, name, email, status, invite_code, created_at FROM users WHERE invited_by=? ORDER BY id", p["id"])
     return render(request, "invite.html", invites=invites, joined=joined, msg=msg, link=link, now=db.now(),
-                  limit=None if p["is_admin"] else config.PARENT_INVITE_LIMIT, open_n=auth.open_invites(p["id"]),
-                  reg_mode=config.REGISTRATION)
+                  limit=None if p["is_admin"] else sitecfg.parent_invite_limit(), open_n=auth.open_invites(p["id"]),
+                  reg_mode=sitecfg.registration())
 
 
 @app.post("/invite")
 def my_invite_create(request: Request, note: str = Form("")):
     from urllib.parse import urlencode
     p = auth.require_parent(request)
-    if config.REGISTRATION == "closed":
+    if sitecfg.registration() == "closed":
         return RedirectResponse("/invite?" + urlencode({"msg": "系统目前不开放注册，请联系管理员"}), 303)
-    if not p["is_admin"] and auth.open_invites(p["id"]) >= config.PARENT_INVITE_LIMIT:
-        return RedirectResponse("/invite?" + urlencode({"msg": f"你手里还有 {config.PARENT_INVITE_LIMIT} 个没用完的邀请码，先把它们发出去吧"}), 303)
+    if not p["is_admin"] and auth.open_invites(p["id"]) >= sitecfg.parent_invite_limit():
+        return RedirectResponse("/invite?" + urlencode({"msg": f"你手里还有 {sitecfg.parent_invite_limit()} 个没用完的邀请码，先把它们发出去吧"}), 303)
     code = auth.create_invite(p["id"], note, 1, 14)
     auth.log_event("invite_create", user_id=p["id"], email=p["email"], detail=code, request=request)
     base = config.PUBLIC_URL or str(request.base_url).rstrip("/")
@@ -590,15 +681,17 @@ def parent_as(request: Request, kid_id: int, next: str = "/today"):
 
 @app.get("/today", response_class=HTMLResponse)
 def today(request: Request):
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     if not enrollments(k["id"]):
         return render(request, "message.html", title="还没有选择学科",
                       text="请家长在「家长页 → 编辑孩子」里勾选要学的教材。")
     t = engine.today_plan(k["id"])
     st = engine.streak(k["id"])
     cal = engine.calendar(k["id"], 4)
+    me = auth.current_user(request)
     return render(request, "today.html", t=t, streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
-                  stars=engine.total_stars(k["id"]), rec=engine.day_record(k["id"], t["day"]))
+                  stars=engine.total_stars(k["id"]), rec=engine.day_record(k["id"], t["day"]),
+                  found=insights.open_insights(k["id"], for_kid=me["role"] == "kid", limit=4 if me["role"] == "kid" else 10))
 
 
 @app.post("/api/plan/rebuild")
@@ -638,7 +731,7 @@ def checkin(request: Request, body: dict = Body(...)):
 
 @app.get("/day/{day}", response_class=HTMLResponse)
 def day_page(request: Request, day: str):
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     try:
         date.fromisoformat(day)
     except ValueError:
@@ -675,7 +768,7 @@ def track_log(request: Request, tid: int, body: dict = Body(...)):
 
 @app.get("/subjects", response_class=HTMLResponse)
 def subjects(request: Request):
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     m = engine.get_mastery(k["id"])
     rows = [{"e": e, "pack": catalog.packs[e["pack_id"]], "sum": engine.pack_summary(k["id"], e["pack_id"], m),
              "diag": db.one("SELECT id, finished_at FROM diag_sessions WHERE user_id=? AND pack_id=? AND status='done' "
@@ -685,7 +778,7 @@ def subjects(request: Request):
 
 @app.get("/map/{pack_id}", response_class=HTMLResponse)
 def kmap(request: Request, pack_id: str):
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     if pack_id not in catalog.packs:
         raise HTTPException(404)
     pack = catalog.packs[pack_id]
@@ -706,7 +799,7 @@ def kmap(request: Request, pack_id: str):
 
 @app.get("/progress", response_class=HTMLResponse)
 def progress_page(request: Request, pack: str = "", msg: str = ""):
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     m = engine.get_mastery(k["id"])
     rows = []
     for e in enrollments(k["id"]):
@@ -724,7 +817,7 @@ def progress_page(request: Request, pack: str = "", msg: str = ""):
 @app.post("/progress/{pack_id}")
 async def progress_save(request: Request, pack_id: str):
     from urllib.parse import urlencode
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     if pack_id not in {e["pack_id"] for e in enrollments(k["id"])}:
         raise HTTPException(404)
     f = await request.form()
@@ -744,7 +837,7 @@ async def progress_save(request: Request, pack_id: str):
 
 @app.get("/learn/{kp_id}", response_class=HTMLResponse)
 def learn(request: Request, kp_id: str, task: str = "practice"):
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     kp = catalog.kp(kp_id)
     if not kp:
         raise HTTPException(404, "没有这个知识点")
@@ -801,7 +894,8 @@ def api_answer(request: Request, body: dict = Body(...)):
         correct = body["self"] == "ok"
     else:
         correct = engine.check_answer(it, body.get("answer"))
-    status = engine.record_attempt(k["id"], it, kp_id, mode, bool(correct), body.get("answer", body.get("self", "")))
+    status = engine.record_attempt(k["id"], it, kp_id, mode, bool(correct), body.get("answer", body.get("self", "")),
+                                   ms=body.get("ms"))
     return {"correct": bool(correct), "answer": _answer_display(it), "explain": it.get("explain", ""),
             "status": status, "status_label": engine.STATUS_LABEL[status]}
 
@@ -828,7 +922,7 @@ def _paper_or_404(k, paper_id: int):
 
 @app.get("/papers", response_class=HTMLResponse)
 def papers_page(request: Request, pack: str = ""):
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     es = enrollments(k["id"])
     lst = db.q("SELECT p.*, (SELECT COUNT(*) FROM paper_items i WHERE i.paper_id=p.id) AS n FROM papers p "
                "WHERE p.user_id=? ORDER BY p.id DESC", k["id"])
@@ -838,7 +932,7 @@ def papers_page(request: Request, pack: str = ""):
 
 @app.post("/api/papers")
 async def papers_create(request: Request):
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     u = auth.current_user(request)
     f = await request.form()
     pack_id = f.get("pack_id") or ""
@@ -870,7 +964,7 @@ async def papers_create(request: Request):
 
 @app.get("/papers/{paper_id}", response_class=HTMLResponse)
 def paper_page(request: Request, paper_id: int):
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     p = _paper_or_404(k, paper_id)
     rs = papers.rows(paper_id)
     pack = catalog.packs.get(p["pack_id"])
@@ -885,7 +979,7 @@ def paper_page(request: Request, paper_id: int):
 @app.get("/papers/{paper_id}/img/{name}")
 def paper_image(request: Request, paper_id: int, name: str):
     from fastapi.responses import FileResponse
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     p = _paper_or_404(k, paper_id)
     if name not in db.jload(p["images"], []):
         raise HTTPException(404)
@@ -902,7 +996,7 @@ def paper_answer(request: Request, paper_id: int, body: dict = Body(...)):
 @app.post("/api/papers/{paper_id}/kp")
 def paper_set_kp(request: Request, paper_id: int, body: dict = Body(...)):
     """家长 / 孩子觉得 AI 对应的知识点不对，手动改。"""
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     p = _paper_or_404(k, paper_id)
     kp_id = body.get("kp_id") or None
     if kp_id and kp_id not in catalog.packs[p["pack_id"]].kp_ids:
@@ -927,7 +1021,7 @@ def paper_finish(request: Request, paper_id: int):
 
 @app.get("/papers/{paper_id}/report", response_class=HTMLResponse)
 def paper_report(request: Request, paper_id: int):
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     p = _paper_or_404(k, paper_id)
     return render(request, "paper_report.html", p=p, r=papers.report(k["id"], p), pack=catalog.packs.get(p["pack_id"]))
 
@@ -935,7 +1029,7 @@ def paper_report(request: Request, paper_id: int):
 @app.post("/papers/{paper_id}/delete")
 def paper_delete(request: Request, paper_id: int):
     import shutil
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     _paper_or_404(k, paper_id)
     with db.tx() as t:
         t.run("DELETE FROM paper_items WHERE paper_id=?", paper_id)
@@ -993,7 +1087,7 @@ def ask(request: Request, body: dict = Body(...)):
     history = [(m["role"], m["text"]) for m in db.q("SELECT role, text FROM ask_messages WHERE thread_id=? ORDER BY id", th["id"])]
     try:
         res = llm.ask_tutor(k["grade"], pack, context, history, question, secret, user_id=k["id"],
-                            name=config.ASSISTANT_NAME)
+                            name=sitecfg.get("assistant_name"))
     except llm.LLMError:
         if not history:  # 新对话第一句就失败：不留空对话
             db.run("DELETE FROM ask_threads WHERE id=?", th["id"])
@@ -1075,7 +1169,7 @@ def diag_finish(request: Request, sid: int):
 
 @app.get("/diagnose/report/{sid}", response_class=HTMLResponse)
 def diag_report(request: Request, sid: int):
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     s = db.one("SELECT * FROM diag_sessions WHERE id=? AND user_id=?", sid, k["id"])
     if not s:
         raise HTTPException(404)
@@ -1118,7 +1212,7 @@ def review_card(request: Request, card_id: int, body: dict = Body(...)):
 
 @app.get("/words", response_class=HTMLResponse)
 def words(request: Request, kind: str = "word"):
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     cards = db.q("SELECT * FROM cards WHERE user_id=? AND kind=? ORDER BY starred DESC, id DESC LIMIT 500", k["id"], kind)
     sents = db.q("SELECT * FROM sentences WHERE user_id=? ORDER BY id DESC LIMIT 100", k["id"]) if kind == "sentence" else []
     counts = {r["kind"]: r["n"] for r in db.q("SELECT kind, COUNT(*) AS n FROM cards WHERE user_id=? GROUP BY kind", k["id"])}
@@ -1256,6 +1350,7 @@ def _records_ctx(k):
     return {"k": k, "packs": packs, "attempts": att, "weak": [(catalog.kp(w["kp_id"]), w) for w in weak[:12]],
             "cal": engine.calendar(k["id"], 12), "streak": engine.streak(k["id"]), "days": days, "lookups": lookups,
             "reads": db.q("SELECT * FROM reading_logs WHERE user_id=? ORDER BY id DESC LIMIT 30", k["id"]),
+            "found": insights.open_insights(k["id"]), "solved": insights.resolved_recent(k["id"]),
             "asks": db.q("SELECT t.id, t.page, t.created_at, m.text FROM ask_threads t JOIN ask_messages m ON m.thread_id=t.id "
                          "AND m.role='user' WHERE t.user_id=? ORDER BY m.id DESC LIMIT 20", k["id"]),
             "papers": [{**dict(p), "rep": db.jload(p["report"], {})} for p in
@@ -1266,7 +1361,7 @@ def _records_ctx(k):
 
 @app.get("/records", response_class=HTMLResponse)
 def records(request: Request):
-    k = kid_or_redirect(request)
+    k = kid_or_redirect(request, manage=True)
     return render(request, "records.html", **_records_ctx(k), report_for=None)
 
 

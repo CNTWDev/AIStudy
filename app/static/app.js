@@ -34,6 +34,7 @@ function renderItem(box, item, opts) {
   box.classList.add('askable'); box.dataset.askItem = item.item_id || item.id || ''; delete box.dataset.answered;
   const _done = opts.onDone; opts.onDone = res => { box.dataset.answered = '1'; _done && _done(res); };
   let chosen = null;
+  const t0 = Date.now();  // 做题用时：系统用它发现「会做但很慢」
   $$('.opt', box).forEach(b => b.onclick = () => { $$('.opt', box).forEach(x => x.classList.remove('sel')); b.classList.add('sel'); chosen = b.dataset.i; });
   const hb = $('.hintbtn', box);
   if (hb) hb.onclick = () => { $('.hintbox', box).innerHTML = `<div class="hint" style="margin-top:8px">💡 ${esc(item.hint)}</div>`; hb.remove(); };
@@ -56,13 +57,13 @@ function renderItem(box, item, opts) {
     if (item.type === 'mcq' && chosen === null) { alert('先选一个答案'); return; }
     btn.disabled = true;
     try {
-      const res = await opts.submit(answer);
+      const res = await opts.submit(answer, undefined, Date.now() - t0);
       if (res.reveal) {
         $('.fbbox', box).innerHTML = `<div class="fb ok"><b>参考答案：</b>${esc(res.answer)}` +
           (res.points && res.points.length ? `<ul>${res.points.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : '') +
           `<div class="row"><span>对照要点，你答到了吗？</span><button class="btn sm selfok">基本答到</button><button class="btn ghost sm selfno">还差一些</button></div></div>`;
         btn.remove();
-        const go = async v => { const r2 = await opts.submit(answer, v); $('.fbbox', box).innerHTML += feedback(r2); opts.onDone && opts.onDone(r2); $$('.selfok,.selfno', box).forEach(x => x.remove()); };
+        const go = async v => { const r2 = await opts.submit(answer, v, Date.now() - t0); $('.fbbox', box).innerHTML += feedback(r2); opts.onDone && opts.onDone(r2); $$('.selfok,.selfno', box).forEach(x => x.remove()); };
         $('.selfok', box).onclick = () => go('ok'); $('.selfno', box).onclick = () => go('no');
         return;
       }

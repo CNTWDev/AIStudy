@@ -19,13 +19,17 @@
 <table><tr><th>知识点</th><th>学段</th><th>掌握度</th><th>做题</th></tr>
 {% for kp, m in weak %}<tr><td>{% if not report_for %}<a href="/learn/{{ kp.id }}">{{ kp.name }}</a>{% else %}{{ kp.name }}{% endif %}</td><td>{{ stage_label(kp.stage) }}</td><td>{{ (m.score*100)|int }}%</td><td>{{ m.correct }}/{{ m.attempts }}</td></tr>{% endfor %}</table>{% endif %}
 {% if days %}<h2>每日反思</h2>{% for d in days %}<p class="small"><b>{% if not report_for %}<a href="/day/{{ d.day }}">{{ d.day }}</a>{% else %}{{ d.day }}{% endif %}</b> {{ d.mood }} {{ d.minutes }} 分钟 · {{ d.reflection or '（已打卡）' }}</p>{% endfor %}{% endif %}
+{% if found or solved %}<h2>🔍 系统发现</h2>
+{% for f in found %}<div class="finding sev{{ f.severity }}"><b>{{ f.title }}</b> <span class="muted small">{{ f.created_at[:10] }} 起</span><div class="small muted">{{ f.detail }}</div></div>{% endfor %}
+{% if solved %}<p class="small muted">最近已解决：{% for f in solved %}{{ f.title }}{{ '、' if not loop.last }}{% endfor %}</p>{% endif %}
+{% endif %}
 {% if papers %}<h2>试卷</h2>
 <table><tr><th>日期</th><th>试卷</th><th>原卷错</th><th>重做对</th><th>要补的知识点</th></tr>
 {% for p in papers %}<tr class="small"><td>{{ p.exam_date or p.created_at[:10] }}</td>
   <td>{% if not report_for %}<a href="/papers/{{ p.id }}{{ '/report' if p.status == 'done' }}">{{ p.title }}</a>{% else %}{{ p.title }}{% endif %}{% if p.status != 'done' %} <span class="pill st-learning">待订正</span>{% endif %}</td>
   <td>{{ p.rep.orig_wrong if p.rep.orig_marked else '-' }}</td><td>{{ p.rep.redo_right ~ '/' ~ p.rep.answered if p.rep.answered else '-' }}</td>
   <td>{% for kid in p.rep.weak_kps or [] %}{{ catalog.kp(kid).name if catalog.kp(kid) }}{{ '、' if not loop.last }}{% endfor %}</td></tr>{% endfor %}</table>
-{% if report_for %}<p class="small"><a href="/parent/as/{{ report_for.id }}?next=/papers">以孩子视角打开试卷 →</a></p>{% endif %}
+{% if report_for and user.role == 'parent' %}<p class="small"><a href="/parent/as/{{ report_for.id }}?next=/papers">打开试卷 →</a></p>{% endif %}
 {% endif %}
 {% if reads %}<h2>读书记录</h2>
 <table><tr><th>日期</th><th>书</th><th>读到</th><th>分钟</th><th>一句话</th></tr>

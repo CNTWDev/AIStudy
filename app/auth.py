@@ -4,7 +4,8 @@
 - 会话：登录后生成随机令牌放进签名 cookie，数据库只存令牌的 sha256；
   退出、改密码、停用账号、管理员强制下线都会删除对应会话，立即失效。
 - 锁定：同一账号连续输错 LOGIN_MAX_FAILS 次，锁定 LOGIN_LOCK_MINUTES 分钟。
-- 角色：parent（家长）/ kid（孩子，属于某个家长）；is_admin=1 的家长是管理员（第一个注册的账号）。
+- 角色：admin（网站管理员，第一个注册的账号；不带孩子）/ parent（家长：添加孩子、查看和管理）/
+  kid（孩子，属于某个家长；只有孩子账号能做题学习）。is_admin=1 表示有管理后台权限（旧版本的「家长 + 管理员」账号保留这个组合）。
 - 状态：active 正常 / pending 等待审批 / rejected 未通过 / disabled 已停用。
 - 邀请：管理员和家长都能生成邀请码；用邀请码注册的账号记录 invited_by（谁邀请的）和 invite_code。
 """
@@ -104,7 +105,7 @@ def create_user(email: str, password: str, name: str, role: str = "parent", *, p
     return db.insert(
         "INSERT INTO users(email,pw_hash,name,role,parent_id,is_admin,grade,school,daily_minutes,status,invited_by,"
         "invite_code,apply_note,approved_at,pw_changed_at,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-        email, hash_pw(password), (name or "").strip()[:40] or ("家长" if role == "parent" else "孩子"),
+        email, hash_pw(password), (name or "").strip()[:40] or {"parent": "家长", "admin": "管理员"}.get(role, "孩子"),
         role, parent_id, 1 if is_admin else 0, grade, school, daily_minutes, status, invited_by, invite_code,
         (apply_note or "")[:300], now if status == "active" else None, now, now)
 
@@ -283,7 +284,7 @@ def require_parent(request: Request):
 
 def require_admin(request: Request):
     u = require_user(request)
-    if not u["is_admin"]:
+    if not (u["is_admin"] or u["role"] == "admin"):
         raise HTTPException(403, "只有管理员可以访问")
     return u
 

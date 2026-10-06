@@ -28,18 +28,20 @@
     {% if r.orig_answer %} · 卷面上写的：{{ r.orig_answer }}{% endif %}</div>
   {% if r.flagged %}<p class="muted small">已标记「答案有问题」，这题不计入诊断。</p>
   {% elif r.answered_at %}<p class="small">{{ '🤔 还不会' if r.dont_know else ('✅ 重做对了' if r.correct else '❌ 重做还错') }} · 正确答案：{{ answer_display(r.item) }}</p>
+  {% elif readonly %}<p class="muted small">还没订正</p>
   {% else %}<div class="qbox" data-pi="{{ r.id }}"></div>{% endif %}
 </div>
 {% endfor %}
 
 <div class="card">
   <p class="small" id="leftmsg"></p>
-  <button class="btn" id="finish">做完了，看诊断</button>
+  {% if readonly %}<p class="small muted">孩子用自己的账号登录后，在这里在线订正；做完会出诊断。</p><a class="btn ghost sm" href="/papers/{{ p.id }}/report">看目前的诊断</a>
+  {% else %}<button class="btn" id="finish">做完了，看诊断</button>{% endif %}
   <form method="post" action="/papers/{{ p.id }}/delete" style="display:inline" onsubmit="return confirm('删除这份试卷和它的题目？（错题本里的错题会保留）')">
     <button class="btn ghost sm">删除这份试卷</button></form>
 </div>
 
-<script>
+{% if not readonly %}<script>
 const PID = {{ p.id }}, QS = {{ qs|tojson }};
 function progress() {
   const done = QS.filter(q => q.done || q.flagged).length;
@@ -55,7 +57,7 @@ QS.forEach(q => {
     box.appendChild(b);
   };
   renderItem(box, q, {
-    submit: (answer, self) => api(`/api/papers/${PID}/answer`, self ? {pi: q.id, answer, self} : {pi: q.id, answer}),
+    submit: (answer, self, ms) => api(`/api/papers/${PID}/answer`, self ? {pi: q.id, answer, self, ms} : {pi: q.id, answer, ms}),
     dontKnow: () => api(`/api/papers/${PID}/answer`, {pi: q.id, dont_know: true}),
     onDone: res => { q.done = true; progress(); if (!res.correct && !res.dont_know) flag(); },
   });
@@ -74,5 +76,5 @@ $('#finish').onclick = async () => {
   setTimeout(() => location.href = `/papers/${PID}/report`, 900);
 };
 progress();
-</script>
+</script>{% endif %}
 {% endblock %}

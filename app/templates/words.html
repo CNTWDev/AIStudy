@@ -17,10 +17,10 @@
 {% for c in cards %}
 <div class="card" style="padding:12px">
   <div class="row"><b class="grow">{{ c.front }}</b><span class="pill">第 {{ c.box }} 轮 · {{ c.due[5:] }} 复习</span>
-    <button class="btn ghost sm" onclick="if(confirm('删除？'))api('/api/cards/{{ c.id }}/delete',{}).then(()=>this.closest('.card').remove())">删除</button></div>
+    {% if not readonly %}<button class="btn ghost sm" onclick="if(confirm('删除？'))api('/api/cards/{{ c.id }}/delete',{}).then(()=>this.closest('.card').remove())">删除</button>{% endif %}</div>
   <div class="small" style="white-space:pre-wrap">{{ c.back }}</div>
   {% if c.extra.context %}<div class="small muted">原句：{{ c.extra.context }}</div>{% endif %}
-  {% if c.kind == 'word' %}<div class="row" style="margin-top:6px"><input type="text" placeholder="用 {{ c.front }} 造个句子" class="grow sent"><button class="btn sm mk" data-w="{{ c.front }}" data-m="{{ c.back.split('\n')[0] }}" data-l="{{ c.extra.lang or 'en' }}">让 AI 看看</button></div><div class="fbx"></div>{% endif %}
+  {% if c.kind == 'word' and not readonly %}<div class="row" style="margin-top:6px"><input type="text" placeholder="用 {{ c.front }} 造个句子" class="grow sent"><button class="btn sm mk" data-w="{{ c.front }}" data-m="{{ c.back.split('\n')[0] }}" data-l="{{ c.extra.lang or 'en' }}">让 AI 看看</button></div><div class="fbx"></div>{% endif %}
 </div>
 {% else %}<p class="muted">这里还是空的。</p>{% endfor %}
 {% endif %}

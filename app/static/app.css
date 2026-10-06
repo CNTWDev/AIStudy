@@ -97,3 +97,6 @@ details.card>summary{cursor:pointer;list-style:none}details.card>summary::-webki
 .am.ai{background:var(--brand-2);align-self:flex-start}.am.user{background:var(--learn-2);align-self:flex-end}.am.err{background:var(--warn-2);color:var(--warn)}
 #askchips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}#askchips button{border:1px solid var(--line);background:transparent;border-radius:99px;padding:4px 10px;font-size:13px;cursor:pointer;color:inherit}
 #askform{display:flex;gap:6px}#askform input{flex:1}
+/* 自动发现 */
+.finding{border-left:4px solid var(--line);padding:6px 10px;margin:6px 0;background:var(--bg);border-radius:0 8px 8px 0}
+.finding.sev3{border-color:var(--warn)}.finding.sev2{border-color:var(--learn)}.finding.sev1{border-color:var(--brand)}

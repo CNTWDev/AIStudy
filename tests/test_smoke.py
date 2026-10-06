@@ -28,9 +28,17 @@ def test_full_flow():
     with TestClient(app) as c:
         assert c.get("/healthz").json()["kps"] > 500
         r = c.get("/login")
-        assert "创建管理员账号" in r.text
-        c.post("/register", data={"email": "p@x.com", "password": "secret1", "name": "爸爸"})
-        assert "家长页" in c.get("/parent").text
+        assert "创建网站管理员账号" in r.text
+        # 第一个账号是网站管理员：不带孩子、不做题，只进管理后台
+        r = c.post("/register", data={"email": "admin@x.com", "password": "secret1", "name": "站长"})
+        assert r.url.path == "/admin"
+        assert c.get("/parent").status_code == 403
+        assert c.get("/today").status_code == 403
+        assert "管理员" in c.post("/admin/users/create", data={"email": "p@x.com", "password": "secret1",
+                                                               "name": "爸爸", "role": "parent"}).text
+        c.get("/logout")
+        r = c.post("/login", data={"email": "p@x.com", "password": "secret1"})
+        assert "家长页" in r.text and 'href="/admin"' not in r.text
         # 姐姐：IGCSE 物理 + 剑桥英语 + 统编语文；弟弟：上海英语 + 统编语文 + 上海数学
         c.post("/parent/kids/save", data={"name": "姐姐", "email": "a@x.com", "password": "secret1", "grade": "G8",
                                           "daily_minutes": "90", "pack_phy-cambridge": "on", "stage_phy-cambridge": "IGCSE",
@@ -115,14 +123,23 @@ def test_full_flow():
         kid_ids = [r["id"] for r in db.q("SELECT id FROM users WHERE role='kid' ORDER BY id")]
         assert "学会了量筒读数" in c.get(f"/parent/kids/{kid_ids[0]}").text 
         r = c.get(f"/parent/as/{kid_ids[1]}")
-        assert "正在以" in r.text
+        assert "正在查看" in r.text and 'id="askbtn"' not in r.text and 'id="checkin"' not in r.text
+        # 家长只能查看和管理：做题、复习、阅读、提问都不行
+        assert c.get("/review").status_code == 403
+        assert c.get("/reading").status_code == 403
+        assert c.post("/api/answer", json={"item_id": "x", "dont_know": True}).status_code == 403
+        assert c.post("/api/ask", json={"question": "hi"}).status_code == 403
+        assert c.post("/api/checkin", json={"minutes": 5}).status_code == 403
+        for path in ["/records", "/subjects", "/progress", "/papers", "/map/math-shanghai", "/learn/MATH-PRE-UNIT"]:
+            assert c.get(path).status_code == 200, path
+        assert 'id="start"' not in c.get("/learn/MATH-PRE-UNIT").text
 
 
 def test_accounts():
     from app import auth, db
     with TestClient(app) as c:
         # 管理员（第一个账号）登录，生成邀请码
-        c.post("/login", data={"email": "p@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
         assert c.get("/admin").status_code == 200
         r = c.post("/admin/invites/create", data={"note": "表姐家", "max_uses": "1", "days": "7"})
         code = r.text.split("新邀请码：")[1][:14]
@@ -159,7 +176,7 @@ def test_accounts():
         assert c.get("/parent").url.path == "/login"
 
         # 管理员停用账号 → 立刻无法使用；生成重设密码链接 → 重设后可登录
-        c.post("/login", data={"email": "p@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
         q_id = auth.by_email("q@x.com")["id"]
         c.post(f"/admin/users/{q_id}/status", data={"status": "disabled"})
         r = c.post(f"/admin/users/{q_id}/reset")
@@ -167,7 +184,7 @@ def test_accounts():
         token = [x for x in r.text.split() if "/reset/" in x][0].split("/reset/")[1].split('"')[0]
         c.get("/logout")
         assert "停用" in c.post("/login", data={"email": "q@x.com", "password": "secret2"}).text
-        c.post("/login", data={"email": "p@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
         c.post(f"/admin/users/{q_id}/status", data={"status": "active"})
         c.get("/logout")
         assert "两次输入" in c.post(f"/reset/{token}", data={"password": "newpass1", "password2": "x"}).text
@@ -201,12 +218,12 @@ def test_approval_and_admin(monkeypatch):
         c.get("/logout")
 
         # 管理员：概览里能看到待审批，通过后可以登录
-        c.post("/login", data={"email": "p@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
         r = c.get("/admin")
         assert "朋友介绍，孩子四年级" in r.text
         s_id = auth.by_email("s@x.com")["id"]
         c.post(f"/admin/users/{s_id}/status", data={"status": "active", "back": "overview"})
-        for tab in ["overview", "families", "invites", "tree", "log", "system"]:
+        for tab in ["overview", "stats", "families", "invites", "tree", "log", "system"]:
             assert c.get(f"/admin?tab={tab}").status_code == 200, tab
         fam = c.get("/admin?tab=families").text
         assert "姐姐" in fam and "连续" in fam
@@ -402,11 +419,48 @@ def test_ask_tutor():
         assert r3["thread_id"] != r["thread_id"]
 
 
-def test_assistant_name(monkeypatch):
-    from app import config
-    monkeypatch.setattr(config, "ASSISTANT_NAME", "小星")
-    from app import main
-    monkeypatch.setitem(main.templates.env.globals, "ASSISTANT", "小星")
+def test_site_settings_and_insights():
+    from app import db, engine, sitecfg
+    from app.catalog import catalog
     with TestClient(app) as c:
+        # 管理员在后台改站点设置，立即生效
+        c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+        r = c.post("/admin/settings", data={"site_name": "我家学习本", "assistant_name": "小星", "assistant_icon": "⭐",
+                                            "registration": "invite", "parent_invite_limit": "2"})
+        assert "已保存" in r.text and "我家学习本" in r.text
+        assert sitecfg.registration() == "invite" and sitecfg.parent_invite_limit() == 2
+        assert c.post("/admin/settings", data={"registration": "bad"}).status_code == 400
+        st = c.get("/admin?tab=stats").text
+        assert "近 14 天" in st and "弟弟" in st
+        c.get("/logout")
+
+        kid_b = db.one("SELECT id FROM users WHERE email='b@x.com'")["id"]
+        # 制造一些信号：两个薄弱点共用一个前置、同一知识点两次「还不会」、同一个词查了两次
+        root = next(k for k in catalog.packs["math-shanghai"].kp_ids
+                    if len([s for s in catalog.successors(k) if s["pack"] == "math-shanghai"]) >= 2
+                    and engine.get_mastery(kid_b).get(k, {}).get("status") != "mastered")
+        for s2 in [s for s in catalog.successors(root) if s["pack"] == "math-shanghai"][:2]:
+            engine.set_mastery(kid_b, s2["id"], 0.2, "weak", "test")
         c.post("/login", data={"email": "b@x.com", "password": "secret1"})
-        assert "问小星" in c.get("/today").text
+        assert "问小星" in c.get("/today").text and "我家学习本" in c.get("/today").text
+        item = c.get("/api/practice/MATH-PRE-UNIT?n=1").json()["items"][0]
+        for _ in range(2):
+            c.post("/api/answer", json={"item_id": item["id"], "kp_id": "MATH-PRE-UNIT", "dont_know": True})
+            c.post("/api/lookup", json={"q": "glacier", "context": "A glacier moves.", "lang": "en"})
+        # 做题用时记下来
+        c.post("/api/answer", json={"item_id": item["id"], "kp_id": "MATH-PRE-UNIT", "answer": "1", "ms": 42000})
+        assert db.one("SELECT ms FROM attempts WHERE user_id=? ORDER BY id DESC", kid_b)["ms"] == 42000
+        plan = c.post("/api/plan/rebuild").json()["plan"]
+        kinds = {r["kind"] for r in db.q("SELECT kind FROM insights WHERE user_id=? AND resolved_at IS NULL", kid_b)}
+        assert {"root", "dont_know", "lookup_repeat"} <= kinds, kinds
+        assert db.one("SELECT id FROM cards WHERE user_id=? AND LOWER(front)='glacier'", kid_b)  # 自动加入单词本
+        assert any(t.get("auto") and t["why"].startswith("🔍") for t in plan), plan
+        today = c.get("/today").text
+        assert "小星发现" in today and "根源可能在" in today
+        c.get("/logout")
+        # 家长页能看到系统发现
+        c.post("/login", data={"email": "p@x.com", "password": "secret1"})
+        assert "系统发现" in c.get("/parent").text
+        assert "系统发现" in c.get(f"/parent/kids/{kid_b}").text
+        c.get("/logout")
+        sitecfg.set_many({"site_name": "", "assistant_name": "", "assistant_icon": "", "registration": "", "parent_invite_limit": ""})

@@ -2,15 +2,17 @@
 {% block body %}
 <div class="row"><h1 class="grow">家长页</h1><a class="btn ghost" href="/invite">邀请亲友</a> <a class="btn" href="/parent/kids/new">＋ 添加孩子</a></div>
 {% if not llm_enabled() %}<div class="hint">提示：服务器还没有配置 AI 密钥。诊断、练习（现成题库）、复习、记录都能用；查词、讲解、AI 出题和 AI 短文需要配置后才能用（见 docs/DEPLOY.md）。</div>{% endif %}
+<p class="muted small">家长账号用来查看和安排：孩子用自己的邮箱和密码登录后才是学习状态（做题、阅读、复习、问{{ ASSISTANT }}）。</p>
 {% if not kids %}<div class="card"><p>还没有孩子账号。点「添加孩子」，给每个孩子一个邮箱和密码，选好年级和教材。</p></div>{% endif %}
 {% for k in kids %}
 <div class="card">
   <div class="row">
     <div class="grow"><h2 style="margin:0">{{ k.u.name }} <span class="pill">{{ stage_label(k.u.grade) }}</span>{% if k.u.status == 'disabled' %} <span class="pill st-weak">已暂停</span>{% endif %}</h2>
       <div class="muted small">{{ k.u.email }}{% if k.u.school %} · {{ k.u.school }}{% endif %} · 每天 {{ k.u.daily_minutes }} 分钟</div></div>
-    <a class="btn sm" href="/parent/as/{{ k.u.id }}">以孩子视角打开</a>
+    <a class="btn sm" href="/parent/as/{{ k.u.id }}">看今天的清单</a>
     <a class="btn ghost sm" href="/parent/kids/{{ k.u.id }}/plan">阅读与单词</a>
     <a class="btn ghost sm" href="/parent/as/{{ k.u.id }}?next=/progress">学校进度</a>
+    <a class="btn ghost sm" href="/parent/as/{{ k.u.id }}?next=/papers">导入试卷</a>
     <a class="btn ghost sm" href="/parent/kids/{{ k.u.id }}">学习报告</a>
     <a class="btn ghost sm" href="/parent/kids/{{ k.u.id }}/edit">编辑</a>
   </div>
@@ -25,6 +27,8 @@
     <div class="muted small">已掌握 {{ s.mastered }} · 学习中 {{ s.learning }} · 薄弱 {{ s.weak }} · 未测 {{ s.unknown }}（共 {{ s.total }}）</div>
   </div>
   {% endfor %}
+  {% if k.insights %}<div style="margin-top:8px"><b class="small">🔍 系统发现</b>
+    {% for f in k.insights %}<div class="finding sev{{ f.severity }}"><b class="small">{{ f.title }}</b>{% if not f.for_kid %} <span class="pill">只给家长看</span>{% endif %}<div class="small muted">{{ f.detail }}</div></div>{% endfor %}</div>{% endif %}
   {% if k.weak %}<p class="small">最需要补：{% for w in k.weak %}<span class="pill st-weak">{{ w.name }}</span> {% endfor %}</p>{% endif %}
 </div>
 {% endfor %}

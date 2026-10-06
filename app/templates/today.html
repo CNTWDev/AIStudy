@@ -19,7 +19,7 @@
 </div>
 
 <div class="card">
-  <div class="row"><h3 class="grow" style="margin:0">今天的任务 <span class="muted small">{{ done }}/{{ total }}</span></h3><button class="btn ghost sm" id="rebuild">重新安排</button></div>
+  <div class="row"><h3 class="grow" style="margin:0">今天的任务 <span class="muted small">{{ done }}/{{ total }}</span></h3>{% if not readonly %}<button class="btn ghost sm" id="rebuild">重新安排</button>{% endif %}</div>
   <div class="daybar"><span style="width:{{ (100 * done / total) if total else 0 }}%"></span></div>
   {% if total and done == total %}<p class="pop" style="font-size:18px">🎉 今天的任务全部完成！写一句「一日记录」再去休息吧。</p>
   {% else %}<p class="muted small">从上往下，一项一项做。不会的题点「这道题还不会」就行。 · <a href="/progress">学校学到哪了</a></p>{% endif %}
@@ -30,10 +30,18 @@
       <a class="t" href="{{ x.url }}">{{ x.title }}</a>
       <div class="muted small">{{ x.why }} · 约 {{ x.minutes }} 分钟</div>
     </div>
-    {% if x.id == ns.next %}<a class="btn" href="{{ x.url }}">开始</a>{% elif not x.done %}<button class="btn ghost sm chk" title="已经在别处做完了">做完了</button>{% endif %}
+    {% if readonly %}{% elif x.id == ns.next %}<a class="btn" href="{{ x.url }}">开始</a>{% elif not x.done %}<button class="btn ghost sm chk" title="已经在别处做完了">做完了</button>{% endif %}
   </div>
   {% else %}<p>今天没有安排。请家长在「家长页 → 阅读与单词」里安排每天的阅读和单词，或去「学科」选一个知识点。</p>{% endfor %}
 </div>
+
+{% if found %}
+<div class="card">
+  <h3 style="margin-top:0">🔍 {{ ASSISTANT }}发现{% if readonly %} <span class="muted small">（系统根据做题、复习、查词、提问、用时自动找出来的）</span>{% endif %}</h3>
+  {% for f in found %}<div class="finding sev{{ f.severity }}"><b>{{ f.title }}</b><div class="small muted">{{ f.detail }}</div></div>{% endfor %}
+  {% if not readonly %}<p class="small muted" style="margin-bottom:0">相关的练习已经放进上面的任务里了。</p>{% endif %}
+</div>
+{% endif %}
 
 <div class="card">
   <h3 style="margin-top:0">一日记录</h3>
@@ -41,11 +49,13 @@
     · 复习卡片 {{ rec.reviews }} 张 · 新收藏 {{ rec.new_cards|length }} 个{% if rec.reads %} · 读书 {{ rec.reads|length }} 次{% endif %}
     · <a href="/day/{{ t.day }}">看详细</a></p>
   {% if t.checked_in %}<p>✅ 今天已经记录。{% if t.reflection %}<br><span class="muted">「{{ t.reflection }}」</span>{% endif %}</p>{% endif %}
+  {% if readonly %}{% if rec.mood %}<p>心情：{{ rec.mood }}</p>{% endif %}{% else %}
   <label>今天的心情</label>
   <div class="moods">{% for m in ['😄','🙂','😐','😣','😴'] %}<button data-m="{{ m }}" class="{{ 'sel' if rec.mood == m }}">{{ m }}</button>{% endfor %}</div>
   <label>今天学到了什么 / 哪里还不懂？（一句话就行）</label>
   <textarea id="refl" style="min-height:70px">{{ t.reflection }}</textarea>
   <div class="row" style="margin-top:8px"><span class="muted small">学习了</span><input type="number" id="mins" value="{{ t.minutes }}" style="width:90px"><span class="muted small">分钟</span><button class="btn" id="checkin">{{ '更新记录' if t.checked_in else '写好了，打卡' }}</button></div>
+  {% endif %}
 </div>
 
 <div class="card">
@@ -56,7 +66,7 @@
 </div>
 <h3>最近四周</h3>
 <div class="cal">{% for d in cal %}<a href="/day/{{ d.day }}" class="{{ 'l3' if d.minutes >= 60 else 'l2' if d.minutes >= 30 else 'l1' if d.minutes > 0 or d.checked }} {{ 'today' if d.day == t.day }}" title="{{ d.day }}：{{ d.minutes }} 分钟">.</a>{% endfor %}</div>
-<script>
+{% if not readonly %}<script>
 const just = sessionStorage.getItem('justDone');
 if (just) {
   sessionStorage.removeItem('justDone');
@@ -75,5 +85,5 @@ $('#checkin').onclick = async () => {
   const r = await api('/api/checkin', {reflection: $('#refl').value, minutes: +$('#mins').value, mood});
   confetti(); toast('打卡成功！已经坚持 ' + r.streak + ' 天 🔥', 2200); setTimeout(() => location.reload(), 2300);
 };
-</script>
+</script>{% endif %}
 {% endblock %}

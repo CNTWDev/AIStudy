@@ -147,7 +147,7 @@ def answer(user_id: int, paper: dict, pi_id: int, body: dict) -> dict:
     else:
         correct, ans, dk = bool(engine.check_answer(it, body.get("answer"))), body.get("answer", ""), False
     if pi["kp_id"]:
-        engine.record_attempt(user_id, it, pi["kp_id"], "paper", correct, ans, dont_know=dk)
+        engine.record_attempt(user_id, it, pi["kp_id"], "paper", correct, ans, dont_know=dk, ms=body.get("ms"))
     elif not correct:
         engine.add_card(user_id, "mistake", it["q"], (reveal["answer"] + "\n" + reveal["explain"]).strip(),
                         {"item_id": it["id"], "my_answer": "（还不会）" if dk else str(ans)})
