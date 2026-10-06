@@ -817,7 +817,7 @@ def today(request: Request):
     me = auth.current_user(request)
     m = engine.get_mastery(k["id"])
     rec = engine.day_record(k["id"], t["day"])
-    return render(request, "today.html", t=t, streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
+    return render(request, "today.html", manual_done=engine.MANUAL_DONE, t=t, streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
                   stars=engine.total_stars(k["id"]), rec=rec, auto=engine.day_summary(rec),
                   cov=explore.coverage(k["id"], m), lit=explore.lit_today(k["id"]), ahead=explore.ahead(k["id"], m),
                   vocab=explore.word_stats(k["id"]), weekly=records.weekly(k["id"]), mine=records.summary(k["id"]),
@@ -833,7 +833,8 @@ def plan_rebuild(request: Request):
 @app.post("/api/plan/task")
 def plan_task(request: Request, body: dict = Body(...)):
     k = kid_or_redirect(request)
-    engine.mark_task(k["id"], body["id"], bool(body.get("done", True)))
+    if not engine.mark_task(k["id"], body["id"], bool(body.get("done", True)), manual=True):
+        raise HTTPException(400, "这一项做完会自动打勾")
     return {"ok": True}
 
 
