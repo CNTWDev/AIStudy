@@ -18,6 +18,13 @@
   <p class="small muted" style="margin:8px 0 0">坚持比做对更重要：每完成一项就得一颗 ⭐，不管对错。</p>
 </div>
 
+{% if weekly %}
+<details class="card wkcard" {{ 'open' if weekly.monday }}>
+  <summary><b>📈 上周进步卡</b> <span class="muted small">{{ weekly.from[5:] }} ~ {{ weekly.to[5:] }} · 只和自己比</span></summary>
+  <ul style="margin:8px 0 0;padding-left:20px">{% for l in weekly.lines %}<li>{{ l }}</li>{% endfor %}</ul>
+</details>
+{% endif %}
+
 <div class="card">
   <div class="row"><h3 class="grow" style="margin:0">今天的任务 <span class="muted small">{{ done }}/{{ total }}</span></h3>{% if not readonly %}<button class="btn ghost sm" id="rebuild">重新安排</button>{% endif %}</div>
   <div class="daybar"><span style="width:{{ (100 * done / total) if total else 0 }}%"></span></div>
@@ -45,6 +52,14 @@
   {% if vocab.estimate %}<p class="small" style="margin:4px 0">🔤 估计认识约 <b>{{ vocab.estimate }}</b> 个核心英语词（已测 {{ vocab.tested }} 个，测得越多越准）</p>{% endif %}
   {% if lit %}<p class="small" style="margin:6px 0 0">今天点亮 🌟 {% for k in lit %}<span class="lit">{{ k.name }}</span>{% endfor %}</p>
   {% elif not readonly %}<p class="small muted" style="margin:6px 0 0">每天的「热身」和练习里会穿插几道以前的题，答对就点亮地图。</p>{% endif %}
+</div>
+{% endif %}
+
+{% if mine.rows or mine.focus %}
+<div class="card">
+  <h3 style="margin-top:0">🏅 我的纪录 <span class="muted small">只跟自己比；正确率 80% 以上才算</span></h3>
+  {% for r in mine.rows %}<div class="row small"><b>{{ r.label }}</b><span class="grow muted" style="text-align:right">{{ r.text }}</span></div>{% endfor %}
+  {% if mine.focus %}<div class="row small"><b>最长专注</b><span class="grow muted" style="text-align:right">{{ mine.focus }}（切走、发呆不计时）</span></div>{% endif %}
 </div>
 {% endif %}
 

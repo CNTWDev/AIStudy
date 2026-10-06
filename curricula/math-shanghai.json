@@ -3,7 +3,7 @@
   "id": "math-shanghai",
   "subject": "math",
   "subject_name": "数学",
-  "edition": "沪教版（小学·初中·高中2020）",
+  "edition": "沪教版数学（五·四学制新教材 + 高中 2020 版）",
   "region": "上海公办",
   "stages": [
    "G1",
@@ -19,19 +19,20 @@
    "G11",
    "G12"
   ],
-  "version": 1,
+  "version": 2,
   "generated": "2026-10-06",
   "sources": [
-   "上海市中小学数学课程标准（试行稿）",
-   "沪教版（上海教育出版社）小学数学一至五年级教材",
-   "沪教版初中数学六至九年级教材（五四学制）",
-   "沪教版高中数学2020新教材：必修第一~四册、选择性必修第一~三册",
-   "上海市初中学业水平考试（中考）数学考纲",
-   "上海市普通高等学校招生统一考试（高考）数学考试说明",
-   "《义务教育数学课程标准（2022年版）》",
-   "《普通高中数学课程标准（2017年版2020年修订）》"
+   "教育部《义务教育数学课程标准（2022年版）》",
+   "教育部《普通高中数学课程标准（2017年版2020年修订）》",
+   "教育部办公厅《2024年义务教育国家课程教学用书目录》：上海教育出版社 义务教育教科书（五·四学制）·数学 一~五年级、六~九年级（李大潜主编）",
+   "上海市教委 2024秋/2025春/2026春/2026秋 上海市编写教学用书目录（edu.sh.gov.cn）",
+   "上海教育出版社 义务教育教科书（五·四学制）·数学 一至九年级（2024起）",
+   "上海教育出版社 普通高中教科书·数学（2020）必修第一~四册、选择性必修第一~三册",
+   "上海市教育考试院 2025/2026 中考、高考（春考、秋考）数学试卷专家点评",
+   "上海市教委《2025年上海市普通高中数学学业水平合格性考试命题要求》"
   ],
-  "notes": "上海五四学制：小学G1-G5、初中G6-G9（六年级含数的整除、分数、比和比例、圆、有理数、方程）、高中G10-G12（2020新教材，必修+选择性必修）。小学部分按单元细化、强调具体操作与口算；中考第24/25题、高考导数与圆锥曲线综合单列为综合知识点。term 为大致学期，各校进度略有差异；prereqs 中 strength 取 必须/有帮助。"
+  "notes": "版本：沪教版（上海教育出版社）：义务教育教科书（五·四学制）·数学（2024年起按年级换用，主编李大潜；2026年秋季一至九年级均已使用）＋普通高中教科书·数学（2020，必修第一~四册、选择性必修第一~三册）\n上海仍为五四学制（2026年秋季上海编写教学用书目录中义务教育教材均标“五·四学制”）：小学G1-G5、初中G6-G9、高中G10-G12。义务教育数学已换用2024年起审定的新版沪教版（五·四学制）：2024秋 一、六、七年级起用，2025秋 二、八年级，2026秋 三、四、五、九年级——即2026-2027学年一至九年级全部为新教材。新版初中六年级上册为 第1章 有理数、第2章 简单的代数式、第3章 一元一次方程…；七年级上册为 第10章 整式的加减、第11章 整式的乘除、第12章 因式分解、第13章 分式…；原六年级上册“数的整除、分数、比和比例、圆和扇形”及初中“平面向量”在新版中已调出初中（待以课本核实具体去向）。本包G2-G5及G8-G9多数单元仍按旧版“试用本”编排，标注待核实。高中2020新教材：必修一（高一上）、必修二（高一下）、必修三（高二上）、选择性必修一（高二下）、选择性必修二（高三上）；必修四、选择性必修三为数学建模活动册。高考数学（春考/秋考）满分150分、21题（12填空+4选择+5解答）；中考数学2026年起卷面为24题。term 为大致学期，各校进度略有差异；prereqs 中 strength 取 必须/有帮助。",
+  "verified": "2026-10-06"
  },
  "strands": [
   {
@@ -180,7 +181,7 @@
    "strand": "NUM",
    "stage": "G1",
    "term": "下",
-   "unit": "20以内退位减法",
+   "unit": "20以内数的加减法（二）",
    "name": "20以内退位减法（破十法）",
    "name_en": "Subtraction with regrouping within 20",
    "desc": "十几减9、8、7…，用破十法或想加算减口算。",
@@ -228,10 +229,10 @@
    "strand": "NUM",
    "stage": "G1",
    "term": "下",
-   "unit": "100以内加减法",
+   "unit": "100以内数的加减法（一）",
    "name": "100以内加减法（口算）",
    "name_en": "Mental addition and subtraction within 100",
-   "desc": "两位数加减整十数、两位数加减一位数（进位、退位）口算。",
+   "desc": "两位数加整十数、两位数加一位数（不进位、进位）、连加的口算（新版一下“100以内数的加减法（一）”）；退位减法等后续内容待核实所在册次。",
    "prereqs": [
     {
      "id": "MSH-NUM-05",
@@ -256,7 +257,7 @@
    "id": "MSH-GEO-02",
    "strand": "GEO",
    "stage": "G1",
-   "term": "下",
+   "term": "上",
    "unit": "认识图形",
    "name": "认识平面图形",
    "name_en": "Recognising 2D shapes",
@@ -282,7 +283,7 @@
    "strand": "GEO",
    "stage": "G1",
    "term": "下",
-   "unit": "认识钟表",
+   "unit": "时间的初步认识",
    "name": "认识钟表（整时、半时）",
    "name_en": "Telling time: o'clock and half past",
    "desc": "认识时针、分针，读写整时和半时。",
@@ -1929,8 +1930,8 @@
    "id": "MSH-NUM-38",
    "strand": "NUM",
    "stage": "G6",
-   "term": "下",
-   "unit": "有理数",
+   "term": "上",
+   "unit": "第1章 有理数",
    "name": "有理数与数轴",
    "name_en": "Rational numbers and the number line",
    "desc": "正负数、有理数分类，数轴，相反数，绝对值，有理数大小比较。",
@@ -1958,8 +1959,8 @@
    "id": "MSH-NUM-39",
    "strand": "NUM",
    "stage": "G6",
-   "term": "下",
-   "unit": "有理数",
+   "term": "上",
+   "unit": "第1章 有理数（1.2-1.5 加减、乘除、乘方、混合运算）",
    "name": "有理数的运算",
    "name_en": "Operations with rational numbers",
    "desc": "加减乘除、乘方及混合运算，科学记数法。",
@@ -1986,19 +1987,23 @@
    "id": "MSH-ALG-03",
    "strand": "ALG",
    "stage": "G6",
-   "term": "下",
-   "unit": "方程",
+   "term": "上",
+   "unit": "第3章 一元一次方程",
    "name": "一元一次方程",
    "name_en": "Linear equations in one variable",
    "desc": "去分母、去括号、移项、合并、系数化1，列方程解应用题。",
    "prereqs": [
     {
-     "id": "MSH-ALG-02",
+     "id": "MSH-ALG-20",
      "strength": "必须"
     },
     {
      "id": "MSH-NUM-39",
      "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-02",
+     "strength": "有帮助"
     }
    ],
    "hot": true,
@@ -2118,17 +2123,17 @@
    "strand": "ALG",
    "stage": "G7",
    "term": "上",
-   "unit": "整式",
+   "unit": "第10章 整式的加减",
    "name": "代数式与整式加减",
    "name_en": "Algebraic expressions and polynomials",
    "desc": "列代数式，单项式多项式（系数次数），同类项，去括号与整式加减。",
    "prereqs": [
     {
-     "id": "MSH-NUM-39",
+     "id": "MSH-ALG-20",
      "strength": "必须"
     },
     {
-     "id": "MSH-ALG-01",
+     "id": "MSH-NUM-39",
      "strength": "必须"
     }
    ],
@@ -2147,7 +2152,7 @@
    "strand": "ALG",
    "stage": "G7",
    "term": "上",
-   "unit": "整式",
+   "unit": "第11章 整式的乘除",
    "name": "幂的运算",
    "name_en": "Laws of exponents",
    "desc": "同底数幂乘除、幂的乘方、积的乘方，零指数。",
@@ -2175,7 +2180,7 @@
    "strand": "ALG",
    "stage": "G7",
    "term": "上",
-   "unit": "整式",
+   "unit": "第11章 整式的乘除",
    "name": "整式乘法与乘法公式",
    "name_en": "Multiplying polynomials and special products",
    "desc": "单项式与多项式乘法，平方差公式，完全平方公式。",
@@ -2199,7 +2204,7 @@
    "strand": "ALG",
    "stage": "G7",
    "term": "上",
-   "unit": "整式",
+   "unit": "第12章 因式分解",
    "name": "因式分解",
    "name_en": "Factorisation",
    "desc": "提公因式、公式法、十字相乘、分组分解。",
@@ -2223,7 +2228,7 @@
    "strand": "ALG",
    "stage": "G7",
    "term": "上",
-   "unit": "分式",
+   "unit": "第13章 分式",
    "name": "分式及其运算",
    "name_en": "Rational expressions",
    "desc": "分式有意义条件，基本性质，约分通分，加减乘除，整数指数幂。",
@@ -2964,7 +2969,7 @@
    "stage": "G9",
    "term": "下",
    "unit": "中考复习",
-   "name": "函数与几何综合（中考第24题）",
+   "name": "函数与几何综合（中考倒数第二道解答题）",
    "name_en": "Function–geometry problems (Zhongkao Q24)",
    "desc": "二次函数与三角形、四边形结合，求解析式、存在性问题（相似、等腰、平行四边形）。",
    "prereqs": [
@@ -3029,7 +3034,7 @@
      "strength": "必须"
     }
    ],
-   "hot": false,
+   "hot": true,
    "method": "全部转化为“距离与半径比较”：直线看 d 与 r，两圆看圆心距与 R±r。常见错误是两圆相切只考虑外切。",
    "probe": "两圆半径3和5，相切时圆心距是多少？",
    "terms": [
@@ -3075,7 +3080,7 @@
    "stage": "G9",
    "term": "下",
    "unit": "中考复习",
-   "name": "几何综合与动点问题（中考第25题）",
+   "name": "几何综合与动点问题（中考压轴题）",
    "name_en": "Dynamic geometry problems (Zhongkao Q25)",
    "desc": "动点、动线背景下的相似、三角比、圆综合，函数关系式与定义域，分类讨论。",
    "prereqs": [
@@ -3209,17 +3214,17 @@
    "strand": "FUN",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第4章 幂、指数与对数",
+   "unit": "必修一 第4章 幂函数、指数函数与对数函数",
    "name": "幂函数与指数函数",
    "name_en": "Power and exponential functions",
-   "desc": "有理数指数幂运算，幂函数图像，指数函数 y=aˣ 的图像与性质。",
+   "desc": "幂函数的概念、图像与性质，指数函数 y=aˣ 的图像与性质（有理数指数幂的运算见第3章）。",
    "prereqs": [
     {
      "id": "MSH-FUN-02",
      "strength": "必须"
     },
     {
-     "id": "MSH-NUM-40",
+     "id": "MSH-NUM-43",
      "strength": "必须"
     }
    ],
@@ -3237,13 +3242,17 @@
    "strand": "FUN",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第4章 幂、指数与对数",
+   "unit": "必修一 第4章 幂函数、指数函数与对数函数",
    "name": "对数与对数函数",
    "name_en": "Logarithms and logarithmic functions",
-   "desc": "对数定义与运算法则、换底公式，对数函数图像与性质，反函数。",
+   "desc": "对数函数 y=logₐx 的图像与性质，与指数函数的关系，对数型方程与不等式（对数定义、运算法则、换底公式见第3章，反函数见第5章5.4）。",
    "prereqs": [
     {
      "id": "MSH-FUN-06",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-43",
      "strength": "必须"
     }
    ],
@@ -3470,7 +3479,7 @@
      "strength": "有帮助"
     }
    ],
-   "hot": false,
+   "hot": true,
    "method": "i²=-1，除法分子分母同乘分母的共轭。复数对应复平面的点/向量，常见错误是把 a+bi 的虚部写成 bi、两个虚数比大小。",
    "probe": "计算 (1+2i)/(1-i)，并指出它在复平面的哪个象限。",
    "terms": [
@@ -3549,7 +3558,7 @@
    "id": "MSH-GEO-46",
    "strand": "GEO",
    "stage": "G11",
-   "term": "上",
+   "term": "下",
    "unit": "选必一 第1章 坐标平面上的直线",
    "name": "坐标平面上的直线",
    "name_en": "Straight lines in coordinate geometry",
@@ -3577,8 +3586,8 @@
    "id": "MSH-GEO-47",
    "strand": "GEO",
    "stage": "G11",
-   "term": "上",
-   "unit": "选必一 第2章 圆锥曲线",
+   "term": "下",
+   "unit": "选必一 第2章 圆锥曲线（2.1 圆）",
    "name": "圆的方程与直线和圆",
    "name_en": "Circles in coordinate geometry",
    "desc": "圆的标准方程与一般方程，直线与圆、圆与圆的位置关系，弦长。",
@@ -3640,7 +3649,7 @@
      "strength": "必须"
     }
    ],
-   "hot": false,
+   "hot": true,
    "method": "双曲线 c²=a²+b²（与椭圆相反），渐近线令右边为0；抛物线上点到焦点距离=到准线距离。常见错误是双曲线定义漏掉绝对值、抛物线 y²=2px 焦点写成 (p,0)。",
    "probe": "抛物线 y²=8x 上一点到焦点距离为5，求该点横坐标。",
    "terms": [
@@ -3688,7 +3697,7 @@
    "strand": "GEO",
    "stage": "G11",
    "term": "下",
-   "unit": "选必一 第3章 空间向量",
+   "unit": "选必一 第3章 空间向量及其应用",
    "name": "空间向量与立体几何",
    "name_en": "Vectors in 3D geometry",
    "desc": "空间直角坐标系，空间向量运算，法向量，用向量求空间角与距离。",
@@ -3716,8 +3725,8 @@
    "id": "MSH-STA-07",
    "strand": "STA",
    "stage": "G11",
-   "term": "下",
-   "unit": "必修四 第12章 概率",
+   "term": "上",
+   "unit": "必修三 第12章 概率初步",
    "name": "概率（古典概型与事件独立）",
    "name_en": "Probability: classical model and independence",
    "desc": "样本空间、事件关系与运算，古典概型，互斥、对立、独立事件。",
@@ -3745,8 +3754,8 @@
    "id": "MSH-STA-08",
    "strand": "STA",
    "stage": "G11",
-   "term": "下",
-   "unit": "必修四 第13章 统计",
+   "term": "上",
+   "unit": "必修三 第13章 统计",
    "name": "统计（抽样与用样本估计总体）",
    "name_en": "Statistics: sampling and estimation",
    "desc": "简单随机抽样、分层抽样，频率分布直方图，百分位数，样本数字特征估计总体。",
@@ -3768,9 +3777,9 @@
   {
    "id": "MSH-ALG-17",
    "strand": "ALG",
-   "stage": "G12",
-   "term": "上",
-   "unit": "选必二 第4章 数列",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选必一 第4章 数列",
    "name": "数列概念与等差数列",
    "name_en": "Sequences and arithmetic sequences",
    "desc": "数列通项与递推，等差数列通项、前n项和及性质。",
@@ -3792,9 +3801,9 @@
   {
    "id": "MSH-ALG-18",
    "strand": "ALG",
-   "stage": "G12",
-   "term": "上",
-   "unit": "选必二 第4章 数列",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选必一 第4章 数列",
    "name": "等比数列与数列求和",
    "name_en": "Geometric sequences and summation",
    "desc": "等比数列通项、前n项和，错位相减、裂项相消、分组求和，递推求通项。",
@@ -3816,9 +3825,9 @@
   {
    "id": "MSH-ALG-19",
    "strand": "ALG",
-   "stage": "G12",
-   "term": "上",
-   "unit": "选必二 第4章 数列",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选必一 第4章 数列（4.4 数学归纳法）",
    "name": "数学归纳法",
    "name_en": "Mathematical induction",
    "desc": "数学归纳法的原理与步骤，证明等式、不等式与整除。",
@@ -3929,8 +3938,8 @@
    "id": "MSH-STA-09",
    "strand": "STA",
    "stage": "G12",
-   "term": "下",
-   "unit": "选必三 第6章 计数原理",
+   "term": "上",
+   "unit": "选必二 第6章 计数原理",
    "name": "计数原理与二项式定理",
    "name_en": "Counting principles and binomial theorem",
    "desc": "加法与乘法原理，排列与组合，常见模型（捆绑、插空、分组），二项式定理。",
@@ -3955,8 +3964,8 @@
    "id": "MSH-STA-10",
    "strand": "STA",
    "stage": "G12",
-   "term": "下",
-   "unit": "选必三 第7章 概率初步（续）",
+   "term": "上",
+   "unit": "选必二 第7章 概率初步（续）",
    "name": "条件概率、随机变量及其分布",
    "name_en": "Conditional probability and distributions",
    "desc": "条件概率与全概率公式，离散型随机变量分布、期望与方差，二项分布、超几何分布，正态分布。",
@@ -3985,8 +3994,8 @@
    "id": "MSH-STA-11",
    "strand": "STA",
    "stage": "G12",
-   "term": "下",
-   "unit": "选必三 第8章 成对数据的统计分析",
+   "term": "上",
+   "unit": "选必二 第8章 成对数据的统计分析",
    "name": "成对数据的统计分析",
    "name_en": "Paired data: correlation and independence test",
    "desc": "散点图，相关系数，一元线性回归方程，2×2 列联表与独立性检验（χ²）。",
@@ -4033,6 +4042,294 @@
     "期望决策",
     "实际意义"
    ]
+  },
+  {
+   "id": "MSH-ALG-20",
+   "strand": "ALG",
+   "stage": "G6",
+   "term": "上",
+   "unit": "第2章 简单的代数式",
+   "name": "简单的代数式（代数式的值、一次式）",
+   "name_en": "Simple algebraic expressions",
+   "desc": "用字母表示数，列代数式，求代数式的值，一次式及其化简（同类项合并、去括号初步）。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-39",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "把文字关系逐词翻译成式子，先写“谁×谁”再加括号；求值时负数代入要加括号。常见错误是 -a² 与 (-a)² 混淆。",
+   "probe": "“比 a 的3倍少2的数”怎么写？当 a=-2 时求 3a²-a 的值。",
+   "terms": [
+    "代数式",
+    "代数式的值",
+    "一次式"
+   ],
+   "source": "原创力文档《2024-2025学年初中数学沪教版（五四制）（2024）六年级上册教学设计合集》目录（二手佐证） https://max.book118.com/html/2025/0522/8111027131007067.shtm ；同 https://max.book118.com/html/2024/1218/8022116025007010.shtm"
+  },
+  {
+   "id": "MSH-NUM-43",
+   "strand": "NUM",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第3章 幂、指数与对数",
+   "name": "指数幂与对数的运算",
+   "name_en": "Powers, exponents and logarithms",
+   "desc": "n次方根与根式，有理数指数幂及其运算性质，实数指数幂；对数的定义、运算法则（积、商、幂）、换底公式，常用对数与自然对数。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-40",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "指数与对数互化 aᵇ=N ⇔ b=logₐN 是一切运算的出发点；换底统一成 lg 或 ln。常见错误是 log(M+N) 拆成 logM+logN。",
+   "probe": "化简 (8/27)^(-2/3)；计算 log₂3·log₃8 与 lg25+lg4。",
+   "terms": [
+    "分数指数幂",
+    "对数",
+    "换底公式"
+   ],
+   "source": "沪教版2020高中数学必修第一册目录（七彩学科网目录转写，二手佐证） https://book.7cxk.com/gzsx/hjbgzsx2020/2025-02-08/3108.html ；21世纪教育网《第三章 幂、指数与对数 知识清单 高中数学沪教版（2020）必修第一册》 https://zy.21cnjy.com/18943876 ；高考考查对数运算见 上海市教育考试院《专家点评2025年上海春考数学试卷》（高考直通车转载） https://app.gaokaozhitongche.com/news/h/AwDW1VJO"
+  },
+  {
+   "id": "MSH-FUN-16",
+   "strand": "FUN",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第5章 函数的概念、性质及应用（5.4 反函数）",
+   "name": "反函数",
+   "name_en": "Inverse functions",
+   "desc": "反函数的概念与存在条件（一一对应），求反函数的步骤与定义域，互为反函数的图像关于 y=x 对称，指数函数与对数函数互为反函数。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-08",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-FUN-07",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "求反函数三步：解出 x、互换 x 与 y、写出定义域（=原函数值域）。常见错误是漏写反函数定义域。",
+   "probe": "求 y=2ˣ+1 (x∈R) 的反函数并写定义域；f(x)=x² 在 R 上有反函数吗？",
+   "terms": [
+    "反函数",
+    "一一对应",
+    "关于y=x对称"
+   ],
+   "source": "沪教版2020高中数学必修第一册目录（七彩学科网目录转写，二手佐证） https://book.7cxk.com/gzsx/hjbgzsx2020/2025-02-08/3108.html"
+  },
+  {
+   "id": "MSH-NUM-44",
+   "strand": "NUM",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第9章 复数（9.3-9.4）",
+   "name": "实系数一元二次方程与复数的三角形式",
+   "name_en": "Quadratics over C and trigonometric form",
+   "desc": "实系数一元二次方程在复数范围内的求根（虚根成对共轭）、韦达定理；复数的三角形式、辐角，三角形式下的乘除运算及几何意义。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-42",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-FUN-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "Δ<0 时根为 (-b±√(-Δ)i)/(2a)；三角形式乘法“模相乘、辐角相加”。常见错误是把 r(cosθ - i sinθ) 当成三角形式。",
+   "probe": "解 x²+2x+5=0；把 1+√3 i 写成三角形式并求其3次方。",
+   "terms": [
+    "虚根",
+    "三角形式",
+    "辐角"
+   ],
+   "source": "沪教版2020必修第二册目录（七彩学科网目录转写） https://book.7cxk.com/gzsx/hjbgzsx2020/2025-02-08/3109.html"
+  },
+  {
+   "id": "MSH-GEO-52",
+   "strand": "GEO",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选必一 第2章 圆锥曲线（2.5 曲线与方程）",
+   "name": "曲线与方程（轨迹方程）",
+   "name_en": "Curves and equations (loci)",
+   "desc": "曲线的方程与方程的曲线的概念，求动点轨迹方程的方法（直接法、定义法、代入法），由方程研究曲线性质。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-47",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-49",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "设动点(x,y)→列几何条件→坐标化→化简→检验“纯粹性与完备性”。常见错误是漏掉或多出点。",
+   "probe": "到点(1,0)与直线 x=-1 距离相等的点的轨迹方程；线段 AB 长为2，两端分别在两坐标轴上滑动，求中点轨迹。",
+   "terms": [
+    "轨迹",
+    "曲线的方程"
+   ],
+   "source": "沪教版2020选择性必修第一册目录（七彩学科网目录转写） https://book.7cxk.com/gzsx/hjbgzsx2020/2025-02-08/3112.html ；佐证：搜狐转载《选择性必修第一册教学参考资料》目录含“第4章 数列” https://m.sohu.com/a/1060497042_120904083/"
+  },
+  {
+   "id": "MSH-APP-13",
+   "strand": "APP",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修四 数学建模活动",
+   "name": "数学建模活动（必修第四册）",
+   "name_en": "Mathematical modelling activities I",
+   "desc": "数学建模的一般过程（提出问题、建立模型、求解、检验、改进），完成案例与活动：如红绿灯管理、优惠券、车辆转弯、出租车运价、家具搬运等，撰写建模报告。",
+   "prereqs": [
+    {
+     "id": "MSH-APP-11",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-STA-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "先明确问题与假设，再选函数/几何/统计工具建模，最后用真实数据检验并反思假设。",
+   "probe": "“雨中行走快一点淋雨少还是多？”请他列出假设与变量。",
+   "terms": [
+    "数学建模",
+    "模型假设",
+    "建模报告"
+   ],
+   "source": "沪教版2020必修第四册目录（七彩学科网目录转写） https://book.7cxk.com/gzsx/hjbgzsx2020/2025-02-08/3111.html ；教参使用学期：上海市教委《2024年秋季上海市编写教学用书目录》 https://edu.sh.gov.cn/cmsres/97/9705ef64871d45cf984f73d79cae5fd9/d5352cc408d180944636941826a5cdd3.pdf（高二第一学期）与 上海市教委《2026年春季上海市编写教学用书目录》 https://edu.sh.gov.cn/cmsres/3a/3a555417ed2b47a38f730ca8c9f10881/9ba8430bf7e54d3e19fce9c17b45f5fb.pdf（高一第二学期），学期待核实"
+  },
+  {
+   "id": "MSH-APP-14",
+   "strand": "APP",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选必二 第9章 数学建模 / 选择性必修第三册",
+   "name": "数学建模活动（选择性必修）",
+   "name_en": "Mathematical modelling activities II",
+   "desc": "以数列、导数、概率统计为工具的建模活动：水葫芦生长率、潜望镜、刹车距离、易拉罐设计、存款计划、电梯调度等。",
+   "prereqs": [
+    {
+     "id": "MSH-APP-13",
+     "strength": "有帮助"
+    },
+    {
+     "id": "MSH-FUN-14",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-18",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用导数求最优、用数列描述增长、用回归拟合数据；结论要回到实际情境检验。",
+   "probe": "易拉罐容积一定，怎样设计半径与高使用料最省？",
+   "terms": [
+    "数学建模",
+    "优化",
+    "拟合"
+   ],
+   "source": "沪教版2020选择性必修第二册目录（七彩学科网目录转写，第6-9章） https://book.7cxk.com/gzsx/hjbgzsx2020/2025-02-08/3113.html ；第5章导数见原创力文档《上教版（2020）选择性必修第二册教学设计合集》目录 https://max.book118.com/html/2025/0317/6011101152011055.shtm ；沪教版2020选择性必修第三册目录（七彩学科网目录转写） https://book.7cxk.com/gzsx/hjbgzsx2020/2025-02-08/3114.html"
+  },
+  {
+   "id": "MSH-GEO-53",
+   "strand": "GEO",
+   "stage": "G1",
+   "term": "下",
+   "unit": "长度的比较与测量",
+   "name": "长度的比较与测量（线段、身体上的尺子）",
+   "name_en": "Comparing and measuring length",
+   "desc": "直接比较与借助中间物比较长短，用非标准单位（身体上的尺子：拃、步等）量长度，认识线段。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-06",
+     "strength": "有帮助"
+    },
+    {
+     "id": "MSH-GEO-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "量长度要“起点对齐、首尾相接、不重叠不留空”；线段有两个端点、是直的。",
+   "probe": "用你的一拃量课桌长，和同桌结果不同，为什么？",
+   "terms": [
+    "线段",
+    "测量",
+    "非标准单位"
+   ],
+   "source": "原创力文档《2025春数学沪教版（2024）一年级下册教学设计》目录（二手佐证） https://max.book118.com/html/2025/0311/6010242231011053.shtm ；21世纪教育网《沪教版（2024版）一年级下册第二单元100以内的数》 https://zy.21cnjy.com/22604782"
+  },
+  {
+   "id": "MSH-APP-15",
+   "strand": "APP",
+   "stage": "G1",
+   "term": "下",
+   "unit": "数学广场",
+   "name": "找规律与数墙",
+   "name_en": "Patterns and number walls",
+   "desc": "发现并延续图形、数的排列规律；数墙（相邻两数之和写在上方）的计算与逆推。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-07",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "找规律先看“变了什么、怎么变”；数墙逆推用减法。",
+   "probe": "数墙底层 3、5、2，顶层是多少？若顶层是20、底层两端是3和2，中间是几？",
+   "terms": [
+    "规律",
+    "数墙"
+   ],
+   "source": "原创力文档《2025春数学沪教版（2024）一年级下册教学设计》目录（二手佐证） https://max.book118.com/html/2025/0311/6010242231011053.shtm ；21世纪教育网《沪教版（2024版）一年级下册第二单元100以内的数》 https://zy.21cnjy.com/22604782"
+  },
+  {
+   "id": "MSH-GEO-54",
+   "strand": "GEO",
+   "stage": "G6",
+   "term": "下",
+   "unit": "圆柱与圆锥（新版，待核实）",
+   "name": "圆柱与圆锥（表面积与体积）",
+   "name_en": "Cylinders and cones",
+   "desc": "圆柱、圆锥的认识与展开图，圆柱侧面积、表面积与体积，圆锥体积 V=⅓Sh。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-22",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-21",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "圆柱侧面展开是长方形（长=底面周长）；等底等高圆锥体积是圆柱的⅓。常见错误是忘乘⅓或把直径当半径。",
+   "probe": "底面半径3cm、高5cm的圆柱表面积与体积；等底等高的圆锥体积是多少？",
+   "terms": [
+    "圆柱",
+    "圆锥",
+    "侧面展开"
+   ],
+   "source": "微学网《换新教材啦！9月份开始！》（择校资讯站，二手，仅作线索） https://www.vsxue.com/1637.html （称新版“6下加入了圆柱和圆锥”；二手来源，册次待用课本核实）"
   }
  ]
 }

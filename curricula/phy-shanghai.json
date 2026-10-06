@@ -3,28 +3,27 @@
   "id": "phy-shanghai",
   "subject": "physics",
   "subject_name": "物理",
-  "edition": "沪教版（初中）+ 沪科教版（高中2020）",
+  "edition": "沪科版物理（五·四学制新教材 + 高中 2020 版）",
   "region": "上海公办",
   "stages": [
    "G6",
-   "G7",
    "G8",
    "G9",
    "G10",
    "G11",
    "G12"
   ],
-  "version": 1,
+  "version": 2,
   "generated": "2026-10-06",
   "sources": [
-   "上海科学技术出版社《物理》八年级上/下册、九年级上/下册（沪教版）",
-   "上海科学技术出版社《科学》六、七年级（初中科学基础）",
-   "上海科技教育出版社《物理》必修第一~三册、选择性必修第一~三册（2020 新教材）",
-   "上海市初中学业水平考试（中考）物理考纲",
-   "上海市普通高中学业水平等级性考试物理考纲",
-   "/mnt/project-files/aistudy/data/map_phy.json（基础数学与科学前置点）"
+   "上海科学技术出版社《义务教育教科书（五·四学制）物理》八年级上/下册、九年级上/下册（高景主编，2024年起）",
+   "上海科学技术出版社《义务教育教科书（五·四学制）科学》六年级上/下册（俞立中主编）",
+   "上海科学技术出版社《普通高中教科书 物理》必修第一~三册、选择性必修第一~三册（上海市中小学（幼儿园）课程改革委员会组织编写，蒋最敏、高景主编）",
+   "《上海市初中学业水平考试实施办法》（沪教委规〔2023〕5号）：物理笔试70分，与化学、跨学科案例分析合卷（综合测试，120分钟），物理实验操作10分",
+   "上海市普通高中学业水平等级性考试 物理（60分钟，卷面100分，依据《普通高中物理课程标准（2017年版2020年修订）》）"
   ],
-  "notes": "上海公办物理知识图谱：G6–G7 为科学课基础，G8–G9 为初中物理（声、光、运动和力、机械和功、热与能、压力与压强、电路、电与磁、原子到星系），G10–G12 按沪科教版 2020 新教材必修一~三、选择性必修一~三排列（学期安排各校略有差异）。hot 标记上海中考/等级考高频考点；MATH-PRE-*、SCI-PRE-* 前置点引用 map_phy.json。"
+  "notes": "版本：沪科版（上海科学技术出版社）：初中《义务教育教科书（五·四学制）物理》八年级上册–九年级下册（高景主编，2024 秋起）+ 高中《普通高中教科书 物理》必修第一~三册、选择性必修第一~三册（上海市课改委组织编写，蒋最敏、高景主编，2020/2021 起）；六年级为《义务教育教科书（五·四学制）科学》（俞立中主编，上海科学技术出版社）\n上海公办物理知识图谱。2024 秋起初中启用五·四学制新教材：科学课只在六年级开设（七年级改设生物学、地理），物理 8–9 年级、化学提前到 8 年级。初中物理新版目录：八上 第1章 测量、第2章 机械运动、第3章 声现象、第4章 光现象…；九上 第10章 内能、第11章 静电与电流、第12章 欧姆定律、第13章 电功率（八下、九下目录尚未核实）。高中按上海科学技术出版社 2020 版：高一上 必修一、高一下 必修二、高二上 必修三、高二下 选必一、高三上 选必二和选必三。hot 标记上海中考/等级考高频考点；MATH-PRE-*、SCI-PRE-* 前置点引用 map_phy.json。",
+  "verified": "2026-10-06"
  },
  "strands": [
   {
@@ -64,9 +63,9 @@
   {
    "id": "PSH-EXP-01",
    "strand": "EXP",
-   "stage": "G6",
-   "term": "全",
-   "unit": "科学·测量",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第1章 测量",
    "name": "长度和时间的测量",
    "name_en": "Measuring length and time",
    "desc": "刻度尺读数（估读到分度值下一位）、秒表读数；单位换算",
@@ -89,9 +88,9 @@
   {
    "id": "PSH-EXP-02",
    "strand": "EXP",
-   "stage": "G6",
-   "term": "全",
-   "unit": "科学·测量",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第1章 测量",
    "name": "质量与体积的测量",
    "name_en": "Measuring mass and volume",
    "desc": "天平使用（左物右码、游码）、量筒读数（视线与凹液面底部相平）、排水法测体积",
@@ -119,7 +118,7 @@
   {
    "id": "PSH-ELEC-01",
    "strand": "ELEC",
-   "stage": "G7",
+   "stage": "G6",
    "term": "全",
    "unit": "科学·电",
    "name": "简单电路",
@@ -145,7 +144,7 @@
   {
    "id": "PSH-MECH-01",
    "strand": "MECH",
-   "stage": "G7",
+   "stage": "G6",
    "term": "全",
    "unit": "科学·力",
    "name": "力的初步认识",
@@ -170,7 +169,7 @@
   {
    "id": "PSH-OPT-01",
    "strand": "OPT",
-   "stage": "G7",
+   "stage": "G6",
    "term": "全",
    "unit": "科学·光",
    "name": "光的直线传播",
@@ -194,7 +193,7 @@
   {
    "id": "PSH-THERM-01",
    "strand": "THERM",
-   "stage": "G7",
+   "stage": "G6",
    "term": "全",
    "unit": "科学·物质",
    "name": "物质的状态与粒子模型",
@@ -247,7 +246,7 @@
    "strand": "EXP",
    "stage": "G8",
    "term": "上",
-   "unit": "第一章",
+   "unit": "第1章 测量",
    "name": "误差与多次测量",
    "name_en": "Error and repeated measurement",
    "desc": "误差不可避免而错误可避免；多次测量取平均减小误差；有效数字",
@@ -276,7 +275,7 @@
    "strand": "MECH",
    "stage": "G8",
    "term": "上",
-   "unit": "第三章 运动和力",
+   "unit": "第2章 机械运动",
    "name": "机械运动与参照物",
    "name_en": "Motion and frame of reference",
    "desc": "运动和静止的相对性，参照物的选择",
@@ -300,7 +299,7 @@
    "strand": "MECH",
    "stage": "G8",
    "term": "上",
-   "unit": "第三章 运动和力",
+   "unit": "第2章 机械运动",
    "name": "速度与 s-t 图像",
    "name_en": "Speed and distance-time graphs",
    "desc": "v=s/t；匀速直线运动；s-t 图像斜率表示速度；两车追及相遇",
@@ -610,7 +609,7 @@
    "strand": "OPT",
    "stage": "G8",
    "term": "上",
-   "unit": "第二章 光",
+   "unit": "第4章 光现象",
    "name": "光的反射定律",
    "name_en": "Law of reflection",
    "desc": "三线共面、法线居中、反射角等于入射角；镜面反射与漫反射；光路可逆",
@@ -636,7 +635,7 @@
    "strand": "OPT",
    "stage": "G8",
    "term": "上",
-   "unit": "第二章 光",
+   "unit": "第4章 光现象",
    "name": "平面镜成像",
    "name_en": "Plane mirror images",
    "desc": "等大、等距、垂直、虚像；用玻璃板探究平面镜成像",
@@ -661,7 +660,7 @@
    "strand": "OPT",
    "stage": "G8",
    "term": "上",
-   "unit": "第二章 光",
+   "unit": "第4章 光现象",
    "name": "光的折射",
    "name_en": "Refraction of light",
    "desc": "光从空气斜射入水或玻璃时折射角小于入射角；垂直入射方向不变；生活中的折射现象",
@@ -685,7 +684,7 @@
    "strand": "OPT",
    "stage": "G8",
    "term": "上",
-   "unit": "第二章 光",
+   "unit": "第4章 光现象",
    "name": "光的色散与物体的颜色",
    "name_en": "Dispersion and colour",
    "desc": "白光由七色光组成；色光三原色红绿蓝；透明物体颜色由透过的色光决定、不透明物体由反射的色光决定",
@@ -737,7 +736,7 @@
    "strand": "SOUND",
    "stage": "G8",
    "term": "上",
-   "unit": "第一章 声",
+   "unit": "第3章 声现象",
    "name": "声音的产生与传播",
    "name_en": "Production and propagation of sound",
    "desc": "声音由物体振动产生；传播需要介质，真空不能传声；声速与介质有关",
@@ -762,7 +761,7 @@
    "strand": "SOUND",
    "stage": "G8",
    "term": "上",
-   "unit": "第一章 声",
+   "unit": "第3章 声现象",
    "name": "乐音的三个特征",
    "name_en": "Pitch, loudness and timbre",
    "desc": "音调由频率决定，响度由振幅（及距离）决定，音色由发声体材料结构决定；噪声控制",
@@ -844,9 +843,9 @@
   {
    "id": "PSH-THERM-04",
    "strand": "THERM",
-   "stage": "G8",
-   "term": "下",
-   "unit": "第五章 热与能",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第10章 内能",
    "name": "热量与比热容",
    "name_en": "Heat and specific heat capacity",
    "desc": "Q=cmΔt；水的比热容 4.2×10³ J/(kg·℃)；比热容是物质特性",
@@ -873,9 +872,9 @@
   {
    "id": "PSH-THERM-05",
    "strand": "THERM",
-   "stage": "G8",
-   "term": "下",
-   "unit": "第五章 热与能",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第10章 内能",
    "name": "内能及其改变方式",
    "name_en": "Internal energy",
    "desc": "分子动理论初步（扩散）；内能与温度；做功和热传递改变内能",
@@ -903,9 +902,9 @@
   {
    "id": "PSH-THERM-06",
    "strand": "THERM",
-   "stage": "G8",
-   "term": "下",
-   "unit": "第五章 热与能",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第10章 内能",
    "name": "热机与燃料热值",
    "name_en": "Heat engines and fuel",
    "desc": "四冲程汽油机（压缩冲程机械能→内能，做功冲程内能→机械能）；热值 Q=mq；效率",
@@ -935,7 +934,7 @@
    "strand": "ELEC",
    "stage": "G9",
    "term": "上",
-   "unit": "第七章 电路",
+   "unit": "第11章 静电与电流",
    "name": "电荷与原子结构",
    "name_en": "Electric charge",
    "desc": "摩擦起电、同种电荷相斥异种相吸；电荷量；原子由原子核和电子组成",
@@ -960,7 +959,7 @@
    "strand": "ELEC",
    "stage": "G9",
    "term": "上",
-   "unit": "第七章 电路",
+   "unit": "第11章 静电与电流",
    "name": "电流、电压及电表使用",
    "name_en": "Current, voltage and meters",
    "desc": "I=Q/t；电流表串联、电压表并联；量程选择与读数",
@@ -990,7 +989,7 @@
    "strand": "ELEC",
    "stage": "G9",
    "term": "上",
-   "unit": "第七章 电路",
+   "unit": "第12章 欧姆定律",
    "name": "电阻与滑动变阻器",
    "name_en": "Resistance and rheostat",
    "desc": "电阻与材料、长度、横截面积、温度有关；滑动变阻器“一上一下”接法",
@@ -1019,7 +1018,7 @@
    "strand": "ELEC",
    "stage": "G9",
    "term": "上",
-   "unit": "第七章 电路",
+   "unit": "第12章 欧姆定律",
    "name": "欧姆定律",
    "name_en": "Ohm's law",
    "desc": "I=U/R；电流与电压成正比（电阻一定）、与电阻成反比（电压一定）；I-U 图像",
@@ -1049,7 +1048,7 @@
    "strand": "ELEC",
    "stage": "G9",
    "term": "上",
-   "unit": "第七章 电路",
+   "unit": "第11章 静电与电流 / 第12章 欧姆定律（电阻的串联和并联）",
    "name": "串联电路",
    "name_en": "Series circuits",
    "desc": "I 处处相等；U=U1+U2；R=R1+R2；分压 U1/U2=R1/R2",
@@ -1074,7 +1073,7 @@
    "strand": "ELEC",
    "stage": "G9",
    "term": "上",
-   "unit": "第七章 电路",
+   "unit": "第11章 静电与电流 / 第12章 欧姆定律（电阻的串联和并联）",
    "name": "并联电路",
    "name_en": "Parallel circuits",
    "desc": "U 相等；I=I1+I2；1/R=1/R1+1/R2；分流 I1/I2=R2/R1",
@@ -1099,7 +1098,7 @@
    "strand": "ELEC",
    "stage": "G9",
    "term": "上",
-   "unit": "第七章 电路",
+   "unit": "第12章 欧姆定律",
    "name": "动态电路分析",
    "name_en": "Dynamic circuit analysis",
    "desc": "滑片移动或开关通断时电表示数变化；电表示数比值与变化量比值",
@@ -1128,7 +1127,7 @@
    "strand": "ELEC",
    "stage": "G9",
    "term": "上",
-   "unit": "第七章 电路",
+   "unit": "第12章 欧姆定律",
    "name": "电路故障判断",
    "name_en": "Circuit fault diagnosis",
    "desc": "断路与短路的现象；用电压表/电流表/灯泡判断故障位置",
@@ -1157,7 +1156,7 @@
    "strand": "ELEC",
    "stage": "G9",
    "term": "上",
-   "unit": "第七章 电路",
+   "unit": "第12章 欧姆定律",
    "name": "伏安法测电阻",
    "name_en": "Measuring resistance by voltmeter-ammeter method",
    "desc": "原理 R=U/I；电路连接、滑动变阻器作用；多次测量求平均；数据记录表",
@@ -1186,7 +1185,7 @@
    "strand": "ELEC",
    "stage": "G9",
    "term": "上",
-   "unit": "第七章 电路",
+   "unit": "第13章 电功率",
    "name": "电功与电功率",
    "name_en": "Electrical energy and power",
    "desc": "W=UIt；P=UI=I²R=U²/R；额定功率与实际功率；电能表 kW·h",
@@ -1216,7 +1215,7 @@
    "strand": "ELEC",
    "stage": "G9",
    "term": "上",
-   "unit": "第七章 电路",
+   "unit": "第13章 电功率",
    "name": "测定小灯泡的电功率",
    "name_en": "Measuring the power of a lamp",
    "desc": "P=UI；使灯两端电压等于额定电压时测额定功率；判断灯正常发光",
@@ -1584,7 +1583,7 @@
    "strand": "EXP",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第1章",
+   "unit": "必修一 第一章 运动的描述（图像法/DIS 贯穿全书）",
    "name": "图像法与DIS数据处理",
    "name_en": "Graphical analysis and DIS data logging",
    "desc": "描点连线、由斜率和截距读物理量；DIS（位移/速度/力传感器）获取数据",
@@ -1614,7 +1613,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第1章 运动的描述",
+   "unit": "必修一 第一章 运动的描述",
    "name": "质点、参考系、位移与路程",
    "name_en": "Particle, reference frame, displacement",
    "desc": "质点模型；时刻与时间间隔；位移是矢量、路程是标量",
@@ -1644,7 +1643,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第1章",
+   "unit": "必修一 第一章 运动的描述",
    "name": "速度与加速度",
    "name_en": "Velocity and acceleration",
    "desc": "平均速度与瞬时速度；a=Δv/Δt；加速度方向与速度变化方向相同",
@@ -1669,7 +1668,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第2章 匀变速直线运动",
+   "unit": "必修一 第二章 匀变速直线运动",
    "name": "匀变速直线运动规律",
    "name_en": "Equations of uniformly accelerated motion",
    "desc": "v=v0+at，x=v0t+½at²，v²−v0²=2ax；中间时刻速度；Δx=aT²",
@@ -1699,7 +1698,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第2章",
+   "unit": "必修一 第二章 匀变速直线运动",
    "name": "运动图像（v-t 与 x-t）",
    "name_en": "Motion graphs",
    "desc": "x-t 斜率是速度；v-t 斜率是加速度、面积是位移；追及相遇",
@@ -1728,7 +1727,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第2章",
+   "unit": "必修一 第二章 匀变速直线运动",
    "name": "自由落体与竖直上抛",
    "name_en": "Free fall and vertical projection",
    "desc": "自由落体是 v0=0、a=g 的匀加速；竖直上抛对称性",
@@ -1753,7 +1752,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第3章 相互作用",
+   "unit": "必修一 第三章 相互作用与力的平衡",
    "name": "弹力与胡克定律",
    "name_en": "Elastic force and Hooke's law",
    "desc": "弹力产生条件与方向（垂直接触面/沿绳收缩方向）；F=kx",
@@ -1782,7 +1781,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第3章",
+   "unit": "必修一 第三章 相互作用与力的平衡",
    "name": "滑动摩擦力与静摩擦力",
    "name_en": "Kinetic and static friction",
    "desc": "f=μN；静摩擦力大小由平衡或牛二决定，0<f≤fmax；方向与相对运动(趋势)方向相反",
@@ -1811,7 +1810,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第3章",
+   "unit": "必修一 第三章 相互作用与力的平衡",
    "name": "力的合成与分解",
    "name_en": "Composition and resolution of forces",
    "desc": "平行四边形定则、三角形定则；正交分解；合力范围 |F1−F2|≤F≤F1+F2",
@@ -1845,7 +1844,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第3章",
+   "unit": "必修一 第三章 相互作用与力的平衡",
    "name": "共点力平衡与动态平衡",
    "name_en": "Equilibrium of concurrent forces",
    "desc": "ΣF=0；整体法与隔离法；三力动态平衡（图解法、相似三角形）",
@@ -1879,7 +1878,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第4章 牛顿运动定律",
+   "unit": "必修一 第四章 牛顿运动定律",
    "name": "牛顿第二定律",
    "name_en": "Newton's second law",
    "desc": "F合=ma；探究加速度与力、质量的关系（DIS）；瞬时性",
@@ -1913,7 +1912,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第4章",
+   "unit": "必修一 第四章 牛顿运动定律",
    "name": "牛顿第三定律",
    "name_en": "Newton's third law",
    "desc": "作用力与反作用力等大反向共线、作用在两个物体上、同时产生同性质",
@@ -1941,7 +1940,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第4章",
+   "unit": "必修一 第四章 牛顿运动定律",
    "name": "超重与失重",
    "name_en": "Apparent weight",
    "desc": "加速度向上超重、向下失重；完全失重 a=g",
@@ -1966,7 +1965,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "上",
-   "unit": "必修一 第4章",
+   "unit": "必修一 第四章 牛顿运动定律",
    "name": "连接体、传送带与多过程问题",
    "name_en": "Connected bodies and multi-stage motion",
    "desc": "整体法求 a、隔离法求内力；板块模型；传送带",
@@ -2000,7 +1999,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "下",
-   "unit": "必修二 第5章 抛体运动",
+   "unit": "必修二 第五章 曲线运动",
    "name": "曲线运动与运动的合成分解",
    "name_en": "Curvilinear motion and composition of motions",
    "desc": "曲线运动条件（合力与速度不共线）；速度方向沿切线；小船渡河",
@@ -2030,7 +2029,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "下",
-   "unit": "必修二 第5章",
+   "unit": "必修二 第五章 曲线运动",
    "name": "平抛运动",
    "name_en": "Projectile motion",
    "desc": "水平匀速 x=v0t、竖直自由落体 y=½gt²；时间由高度决定；落在斜面上",
@@ -2059,7 +2058,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "下",
-   "unit": "必修二 第6章 圆周运动",
+   "unit": "必修二 第五章 曲线运动",
    "name": "匀速圆周运动的描述",
    "name_en": "Describing circular motion",
    "desc": "线速度、角速度、周期、转速；v=ωr；同轴同角速度、皮带传动同线速度",
@@ -2085,7 +2084,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "下",
-   "unit": "必修二 第6章",
+   "unit": "必修二 第五章 曲线运动",
    "name": "向心力与向心加速度",
    "name_en": "Centripetal force",
    "desc": "a=v²/r=ω²r；F=mv²/r；向心力由其他力的合力提供；竖直面圆周运动最高点临界",
@@ -2114,7 +2113,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "下",
-   "unit": "必修二 第7章 万有引力与宇宙航行",
+   "unit": "必修二 第六章 万有引力定律",
    "name": "万有引力定律",
    "name_en": "Law of universal gravitation",
    "desc": "开普勒定律；F=GMm/r²；引力常量的测定；地表 GM=gR²",
@@ -2143,7 +2142,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "下",
-   "unit": "必修二 第7章",
+   "unit": "必修二 第六章 万有引力定律",
    "name": "天体运动与人造卫星",
    "name_en": "Satellites and orbits",
    "desc": "引力提供向心力：v、ω、T、a 与 r 的关系（高轨低速长周期）；第一宇宙速度；同步卫星；变轨",
@@ -2168,7 +2167,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "下",
-   "unit": "必修二 第8章 机械能守恒",
+   "unit": "必修二 第七章 机械能守恒定律",
    "name": "功和功率（高中）",
    "name_en": "Work and power (advanced)",
    "desc": "W=Fxcosα，正功负功；总功；P=Fv；机车两种启动方式",
@@ -2201,7 +2200,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "下",
-   "unit": "必修二 第8章",
+   "unit": "必修二 第七章 机械能守恒定律",
    "name": "动能定理",
    "name_en": "Work-energy theorem",
    "desc": "W合=ΔEk；适用于变力、曲线、多过程",
@@ -2230,7 +2229,7 @@
    "strand": "MECH",
    "stage": "G10",
    "term": "下",
-   "unit": "必修二 第8章",
+   "unit": "必修二 第七章 机械能守恒定律",
    "name": "机械能守恒定律与功能关系",
    "name_en": "Conservation of mechanical energy",
    "desc": "只有重力/弹力做功时机械能守恒；验证机械能守恒（DIS）；除重力外其他力做功等于机械能变化",
@@ -2263,7 +2262,7 @@
    "strand": "ELEC",
    "stage": "G11",
    "term": "上",
-   "unit": "必修三 静电场",
+   "unit": "必修三 第九章 静电场",
    "name": "电荷守恒与库仑定律",
    "name_en": "Coulomb's law",
    "desc": "电荷守恒；点电荷；F=kq1q2/r²；静电力的叠加",
@@ -2296,7 +2295,7 @@
    "strand": "ELEC",
    "stage": "G11",
    "term": "上",
-   "unit": "必修三 静电场",
+   "unit": "必修三 第九章 静电场",
    "name": "电场强度与电场线",
    "name_en": "Electric field strength",
    "desc": "E=F/q（定义式），点电荷 E=kQ/r²，匀强电场；电场线疏密与方向；场强叠加",
@@ -2322,7 +2321,7 @@
    "strand": "ELEC",
    "stage": "G11",
    "term": "上",
-   "unit": "必修三 静电场",
+   "unit": "必修三 第九章 静电场",
    "name": "电势能、电势与电势差",
    "name_en": "Electric potential and potential difference",
    "desc": "W电=−ΔEp；φ=Ep/q；UAB=φA−φB=WAB/q；等势面；匀强电场 U=Ed",
@@ -2356,10 +2355,10 @@
    "strand": "ELEC",
    "stage": "G11",
    "term": "上",
-   "unit": "必修三 静电场",
+   "unit": "必修三 第九章 静电场",
    "name": "电容器",
    "name_en": "Capacitors",
-   "desc": "C=Q/U；平行板 C=εS/(4πkd)；与电源相连 U 不变、断开 Q 不变的动态分析",
+   "desc": "C=Q/U；平行板 C=εrS/(4πkd)（εr 为相对介电常数）；与电源相连 U 不变、断开 Q 不变的动态分析",
    "prereqs": [
     {
      "id": "PSH-ELEC-15",
@@ -2381,7 +2380,7 @@
    "strand": "ELEC",
    "stage": "G11",
    "term": "上",
-   "unit": "必修三 静电场",
+   "unit": "必修三 第九章 静电场",
    "name": "带电粒子在电场中的运动",
    "name_en": "Charged particles in electric fields",
    "desc": "加速 qU=½mv²；偏转（类平抛）y=qUL²/(2mdv0²)；示波管",
@@ -2414,7 +2413,7 @@
    "strand": "ELEC",
    "stage": "G11",
    "term": "上",
-   "unit": "必修三 电路及其应用",
+   "unit": "必修三 第十章 电路及其应用",
    "name": "电阻定律与伏安特性",
    "name_en": "Resistivity and I-U characteristics",
    "desc": "R=ρL/S；电阻率与温度；线性与非线性元件；电表改装（串大分压、并小分流）",
@@ -2451,7 +2450,7 @@
    "strand": "ELEC",
    "stage": "G11",
    "term": "上",
-   "unit": "必修三 电路及其应用",
+   "unit": "必修三 第十章 电路及其应用",
    "name": "闭合电路欧姆定律",
    "name_en": "Closed-circuit Ohm's law",
    "desc": "电动势 E；I=E/(R+r)；路端电压 U=E−Ir；U-I 图像；电源输出功率",
@@ -2481,7 +2480,7 @@
    "strand": "ELEC",
    "stage": "G11",
    "term": "上",
-   "unit": "必修三 电路及其应用",
+   "unit": "必修三 第十章 电路及其应用",
    "name": "电功率、焦耳定律与非纯电阻电路",
    "name_en": "Joule's law and non-ohmic circuits",
    "desc": "Q=I²Rt；纯电阻 W=Q；电动机 UI=I²R+P机",
@@ -2510,7 +2509,7 @@
    "strand": "ELEC",
    "stage": "G11",
    "term": "上",
-   "unit": "必修三 实验",
+   "unit": "必修三 第十章 电路及其应用",
    "name": "测电源电动势和内阻与多用电表",
    "name_en": "Measuring EMF and internal resistance; multimeter",
    "desc": "伏安法测 E、r 并作 U-I 图像；多用电表测电阻（欧姆调零、换挡）",
@@ -2540,7 +2539,7 @@
    "strand": "MAG",
    "stage": "G11",
    "term": "上",
-   "unit": "必修三 电磁场与电磁波初步",
+   "unit": "必修三 第十一章 电磁场与电磁波初步",
    "name": "磁感应强度与磁通量",
    "name_en": "Magnetic flux density and flux",
    "desc": "B=F/(IL)（定义）；Φ=BS（S⊥B）；产生感应电流的条件：磁通量变化",
@@ -2570,10 +2569,10 @@
    "strand": "MAG",
    "stage": "G11",
    "term": "上",
-   "unit": "必修三 电磁场与电磁波初步",
+   "unit": "必修三 第十一章 电磁场与电磁波初步",
    "name": "电磁波与电磁波谱",
    "name_en": "Electromagnetic waves",
-   "desc": "麦克斯韦理论（变化电场磁场相互激发）；c=λf；无线电波→γ射线的顺序与应用；电磁振荡与传感器简介",
+   "desc": "麦克斯韦电磁场理论（变化的电场和磁场相互激发）；c=λf；电磁波谱：无线电波、红外线、可见光、紫外线、X射线、γ射线的顺序与应用",
    "prereqs": [
     {
      "id": "PSH-MAG-05",
@@ -2581,7 +2580,7 @@
     },
     {
      "id": "PSH-SOUND-06",
-     "strength": "必须"
+     "strength": "有帮助"
     }
    ],
    "hot": false,
@@ -2600,7 +2599,7 @@
    "strand": "MECH",
    "stage": "G11",
    "term": "上",
-   "unit": "必修三 能源与可持续发展",
+   "unit": "必修三 第十二章 能源与可持续发展",
    "name": "能量守恒与能源",
    "name_en": "Energy conservation and energy resources",
    "desc": "能量守恒定律；能量转化的方向性与效率；常规能源与新能源",
@@ -2629,7 +2628,7 @@
    "strand": "MECH",
    "stage": "G11",
    "term": "下",
-   "unit": "选择性必修一 动量",
+   "unit": "选择性必修一 第一章 动量",
    "name": "动量与动量定理",
    "name_en": "Momentum and impulse",
    "desc": "p=mv（矢量）；I=Ft；I合=Δp；缓冲问题",
@@ -2658,7 +2657,7 @@
    "strand": "MECH",
    "stage": "G11",
    "term": "下",
-   "unit": "选择性必修一 动量",
+   "unit": "选择性必修一 第一章 动量",
    "name": "动量守恒定律与碰撞",
    "name_en": "Conservation of momentum and collisions",
    "desc": "守恒条件；弹性碰撞与完全非弹性碰撞；反冲与人船模型",
@@ -2687,7 +2686,7 @@
    "strand": "OPT",
    "stage": "G11",
    "term": "下",
-   "unit": "选择性必修一 光",
+   "unit": "选择性必修一 第四章 光",
    "name": "折射率与全反射",
    "name_en": "Refractive index and total internal reflection",
    "desc": "n=sin i/sin r=c/v；临界角 sinC=1/n；光纤",
@@ -2716,7 +2715,7 @@
    "strand": "OPT",
    "stage": "G11",
    "term": "下",
-   "unit": "选择性必修一 光",
+   "unit": "选择性必修一 第四章 光",
    "name": "光的干涉",
    "name_en": "Interference of light",
    "desc": "双缝干涉 Δx=Lλ/d；薄膜干涉；光的波动性",
@@ -2745,7 +2744,7 @@
    "strand": "OPT",
    "stage": "G11",
    "term": "下",
-   "unit": "选择性必修一 光",
+   "unit": "选择性必修一 第四章 光",
    "name": "光的衍射与偏振",
    "name_en": "Diffraction and polarisation of light",
    "desc": "单缝衍射中央亮纹最宽；偏振说明光是横波；激光特点",
@@ -2755,7 +2754,7 @@
      "strength": "必须"
     }
    ],
-   "hot": false,
+   "hot": true,
    "method": "衍射看“中间宽两边窄”，干涉看“等间距”。偏振只有横波才有。常见错误：认为纵波也能偏振。",
    "probe": "给两张条纹图，判断哪张是衍射。",
    "terms": [
@@ -2770,7 +2769,7 @@
    "strand": "SOUND",
    "stage": "G11",
    "term": "下",
-   "unit": "选择性必修一 机械振动",
+   "unit": "选择性必修一 第二章 机械振动",
    "name": "简谐运动",
    "name_en": "Simple harmonic motion",
    "desc": "回复力 F=-kx；位移、速度、加速度随时间变化；振动图像；周期与频率",
@@ -2804,7 +2803,7 @@
    "strand": "SOUND",
    "stage": "G11",
    "term": "下",
-   "unit": "选择性必修一 机械振动",
+   "unit": "选择性必修一 第二章 机械振动",
    "name": "单摆与用单摆测 g",
    "name_en": "Simple pendulum",
    "desc": "小角度单摆 T=2π√(L/g)，周期与摆球质量、振幅无关；单摆测重力加速度",
@@ -2833,7 +2832,7 @@
    "strand": "SOUND",
    "stage": "G11",
    "term": "下",
-   "unit": "选择性必修一 机械振动",
+   "unit": "选择性必修一 第二章 机械振动",
    "name": "受迫振动与共振",
    "name_en": "Forced oscillation and resonance",
    "desc": "受迫振动频率等于驱动力频率；驱动频率接近固有频率时振幅最大",
@@ -2857,7 +2856,7 @@
    "strand": "SOUND",
    "stage": "G11",
    "term": "下",
-   "unit": "选择性必修一 机械波",
+   "unit": "选择性必修一 第三章 机械波",
    "name": "机械波的形成与传播",
    "name_en": "Mechanical waves",
    "desc": "横波与纵波；波传播的是振动形式和能量，质点不随波迁移；v=λf",
@@ -2887,7 +2886,7 @@
    "strand": "SOUND",
    "stage": "G11",
    "term": "下",
-   "unit": "选择性必修一 机械波",
+   "unit": "选择性必修一 第三章 机械波",
    "name": "波动图像与振动图像",
    "name_en": "Wave graph vs. oscillation graph",
    "desc": "y-x 波形图与 y-t 振动图的区别和互推；波的多解问题",
@@ -2912,7 +2911,7 @@
    "strand": "SOUND",
    "stage": "G11",
    "term": "下",
-   "unit": "选择性必修一 机械波",
+   "unit": "选择性必修一 第三章 机械波",
    "name": "波的干涉、衍射与多普勒效应",
    "name_en": "Interference, diffraction, Doppler effect",
    "desc": "叠加原理；干涉加强/减弱条件（路程差）；明显衍射条件；多普勒效应",
@@ -2966,7 +2965,7 @@
    "strand": "MAG",
    "stage": "G12",
    "term": "上",
-   "unit": "选择性必修二 磁场",
+   "unit": "选择性必修二 第五章 磁场",
    "name": "安培力",
    "name_en": "Force on a current-carrying conductor",
    "desc": "F=BIL（B⊥I）；左手定则；通电导线在斜面上的平衡",
@@ -2998,7 +2997,7 @@
    "strand": "MAG",
    "stage": "G12",
    "term": "上",
-   "unit": "选择性必修二 磁场",
+   "unit": "选择性必修二 第五章 磁场",
    "name": "洛伦兹力与带电粒子在磁场中的圆周运动",
    "name_en": "Lorentz force and circular motion in B-field",
    "desc": "f=qvB；r=mv/(qB)，T=2πm/(qB)；找圆心、求半径和时间",
@@ -3028,7 +3027,7 @@
    "strand": "MAG",
    "stage": "G12",
    "term": "上",
-   "unit": "选择性必修二 磁场",
+   "unit": "选择性必修二 第五章 磁场",
    "name": "复合场与磁场应用",
    "name_en": "Combined fields and applications",
    "desc": "速度选择器 qE=qvB；质谱仪；回旋加速器；霍尔效应",
@@ -3058,7 +3057,7 @@
    "strand": "MAG",
    "stage": "G12",
    "term": "上",
-   "unit": "选择性必修二 电磁感应",
+   "unit": "选择性必修二 第六章 电磁感应定律",
    "name": "楞次定律与右手定则",
    "name_en": "Lenz's law",
    "desc": "感应电流的磁场总阻碍引起它的磁通量变化；“增反减同、来拒去留”；右手定则",
@@ -3087,7 +3086,7 @@
    "strand": "MAG",
    "stage": "G12",
    "term": "上",
-   "unit": "选择性必修二 电磁感应",
+   "unit": "选择性必修二 第六章 电磁感应定律",
    "name": "法拉第电磁感应定律",
    "name_en": "Faraday's law",
    "desc": "E=nΔΦ/Δt；导体切割 E=BLv；转动切割 E=½BL²ω",
@@ -3116,7 +3115,7 @@
    "strand": "MAG",
    "stage": "G12",
    "term": "上",
-   "unit": "选择性必修二 电磁感应",
+   "unit": "选择性必修二 第六章 电磁感应定律",
    "name": "电磁感应综合（导体棒与能量）",
    "name_en": "Electromagnetic induction problems",
    "desc": "导体棒在导轨上运动：电路+受力（安培力）+运动+能量；收尾速度；电荷量 q=ΔΦ/R总",
@@ -3154,7 +3153,7 @@
    "strand": "MAG",
    "stage": "G12",
    "term": "上",
-   "unit": "选择性必修二 电磁感应",
+   "unit": "选择性必修二 第七章 电磁感应定律的应用",
    "name": "自感与涡流",
    "name_en": "Self-induction and eddy currents",
    "desc": "自感现象（通电/断电时灯泡亮灭）；涡流、电磁阻尼",
@@ -3179,7 +3178,7 @@
    "strand": "MAG",
    "stage": "G12",
    "term": "上",
-   "unit": "选择性必修二 交变电流",
+   "unit": "选择性必修二 第七章 电磁感应定律的应用",
    "name": "交变电流",
    "name_en": "Alternating current",
    "desc": "正弦交流电的产生；峰值与有效值 I=Im/√2；周期频率；中性面",
@@ -3209,7 +3208,7 @@
    "strand": "MAG",
    "stage": "G12",
    "term": "上",
-   "unit": "选择性必修二 交变电流",
+   "unit": "选择性必修二 第七章 电磁感应定律的应用",
    "name": "变压器与远距离输电",
    "name_en": "Transformers and power transmission",
    "desc": "U1/U2=n1/n2，I1/I2=n2/n1，P入=P出；高压输电减少损耗 P损=I²R线",
@@ -3237,8 +3236,8 @@
    "id": "PSH-MOD-02",
    "strand": "MOD",
    "stage": "G12",
-   "term": "下",
-   "unit": "选择性必修三 原子结构与波粒二象性",
+   "term": "上",
+   "unit": "选择性必修三 第十四章 微观粒子的波粒二象性",
    "name": "黑体辐射与光电效应",
    "name_en": "Black-body radiation and photoelectric effect",
    "desc": "能量子 ε=hν；光电效应规律（截止频率、瞬时性）；爱因斯坦方程 Ek=hν−W0；遏止电压",
@@ -3271,8 +3270,8 @@
    "id": "PSH-MOD-03",
    "strand": "MOD",
    "stage": "G12",
-   "term": "下",
-   "unit": "选择性必修三",
+   "term": "上",
+   "unit": "选择性必修三 第十四章 微观粒子的波粒二象性",
    "name": "波粒二象性与物质波",
    "name_en": "Wave-particle duality",
    "desc": "光的波动性与粒子性；康普顿效应；德布罗意波 λ=h/p",
@@ -3304,8 +3303,8 @@
    "id": "PSH-MOD-04",
    "strand": "MOD",
    "stage": "G12",
-   "term": "下",
-   "unit": "选择性必修三 原子结构",
+   "term": "上",
+   "unit": "选择性必修三 第十三章 原子结构",
    "name": "原子结构与玻尔模型",
    "name_en": "Atomic structure and Bohr model",
    "desc": "α粒子散射实验与核式结构；氢原子能级；hν=Em−En；光谱",
@@ -3334,8 +3333,8 @@
    "id": "PSH-MOD-05",
    "strand": "MOD",
    "stage": "G12",
-   "term": "下",
-   "unit": "选择性必修三 原子核",
+   "term": "上",
+   "unit": "选择性必修三 第十五章 原子核",
    "name": "天然放射与衰变、半衰期",
    "name_en": "Radioactivity and half-life",
    "desc": "α、β、γ 三种射线性质；衰变方程（质量数、电荷数守恒）；半衰期 m=m0(1/2)^(t/T)",
@@ -3365,8 +3364,8 @@
    "id": "PSH-MOD-06",
    "strand": "MOD",
    "stage": "G12",
-   "term": "下",
-   "unit": "选择性必修三 原子核",
+   "term": "上",
+   "unit": "选择性必修三 第十五章 原子核",
    "name": "核反应、核能与质能方程",
    "name_en": "Nuclear reactions and nuclear energy",
    "desc": "人工转变（质子、中子的发现）；结合能与比结合能；ΔE=Δmc²；裂变与聚变；核电站",
@@ -3395,8 +3394,8 @@
    "id": "PSH-THERM-07",
    "strand": "THERM",
    "stage": "G12",
-   "term": "下",
-   "unit": "选择性必修三 分子动理论",
+   "term": "上",
+   "unit": "选择性必修三 第十章 分子动理论",
    "name": "分子动理论与内能（高中）",
    "name_en": "Molecular kinetic theory",
    "desc": "阿伏伽德罗常数；油膜法估测分子大小；布朗运动；分子力与分子势能曲线；温度是分子平均动能的标志",
@@ -3425,8 +3424,8 @@
    "id": "PSH-THERM-08",
    "strand": "THERM",
    "stage": "G12",
-   "term": "下",
-   "unit": "选择性必修三 气体",
+   "term": "上",
+   "unit": "选择性必修三 第十一章 气体、液体和固体",
    "name": "气体实验定律",
    "name_en": "Gas laws",
    "desc": "压强、体积、温度（热力学温度 T=t+273）；玻意耳定律、查理定律、盖-吕萨克定律；DIS 研究",
@@ -3459,8 +3458,8 @@
    "id": "PSH-THERM-09",
    "strand": "THERM",
    "stage": "G12",
-   "term": "下",
-   "unit": "选择性必修三 气体",
+   "term": "上",
+   "unit": "选择性必修三 第十一章 气体、液体和固体",
    "name": "理想气体状态方程与图像",
    "name_en": "Ideal gas equation and graphs",
    "desc": "pV/T=C；p-V、p-T、V-T 图像；变质量问题",
@@ -3488,8 +3487,8 @@
    "id": "PSH-THERM-10",
    "strand": "THERM",
    "stage": "G12",
-   "term": "下",
-   "unit": "选择性必修三 热力学定律",
+   "term": "上",
+   "unit": "选择性必修三 第十二章 热力学定律",
    "name": "热力学第一定律",
    "name_en": "First law of thermodynamics",
    "desc": "ΔU=W+Q 的符号规定；理想气体内能只与温度有关；与气体图像综合",
@@ -3521,8 +3520,8 @@
    "id": "PSH-THERM-11",
    "strand": "THERM",
    "stage": "G12",
-   "term": "下",
-   "unit": "选择性必修三 热力学定律",
+   "term": "上",
+   "unit": "选择性必修三 第十二章 热力学定律",
    "name": "热力学第二定律与熵",
    "name_en": "Second law of thermodynamics",
    "desc": "热传递的方向性；第二类永动机不可能；能量耗散",
@@ -3541,6 +3540,461 @@
     "熵",
     "第二类永动机"
    ]
+  },
+  {
+   "id": "PSH-SOUND-09",
+   "strand": "SOUND",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第3章 声现象",
+   "name": "声波的应用和控制",
+   "name_en": "Applications and control of sound",
+   "desc": "超声波（回声定位、B超、声呐）与次声波；声能传递信息和能量；噪声的危害与控制（声源处、传播中、人耳处减弱）",
+   "prereqs": [
+    {
+     "id": "PSH-SOUND-02",
+     "strength": "必须"
+    }
+   ],
+   "method": "分清“传递信息”与“传递能量”的例子；噪声控制按“三处”归类。",
+   "probe": "问：倒车雷达、超声波清洗眼镜分别利用了声的什么作用？",
+   "terms": [
+    "超声波",
+    "次声波",
+    "回声",
+    "噪声控制"
+   ],
+   "hot": false,
+   "source": "【佐证】原创力文档《2024-2025学年初中物理沪科版（五四学制）（2024）八年级上册教学设计合集》目录 https://max.book118.com/html/2025/0516/8036057125007065.shtm ——第1章 测量（长度的测量/时间的测量/质量的测量/跨学科实践：体质的测量与评价）；第2章 机械运动（运动与静止/运动的快慢/速度的测量）；第3章 声现象（声音的产生和传播/声音的特性/声波的应用和控制/跨学科实践：简单乐器的制作）；第4章 光现象"
+  },
+  {
+   "id": "PSH-ELEC-25",
+   "strand": "ELEC",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第13章 电功率",
+   "name": "焦耳定律（初中）",
+   "name_en": "Joule's law (junior)",
+   "desc": "电流通过导体产生的热量 Q=I²Rt；电流的热效应及其利用与防止；纯电阻电路中 Q=W",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-11",
+     "strength": "必须"
+    }
+   ],
+   "method": "比较热量多少先看电流是否相同（串联）再看电阻；只有纯电阻电路电能全部转化为内能。",
+   "probe": "两电阻串联，哪一个更热？为什么？",
+   "terms": [
+    "焦耳定律",
+    "Q=I²Rt",
+    "电流的热效应"
+   ],
+   "hot": false,
+   "source": "【佐证】搜狐号“环球物理”《初中物理新教材目录（九年级 全国9个版本全）》2025-08-16 https://www.sohu.com/a/924771328_472787 ——“沪科 高景版（五四学制）”九年级上册：第10章 内能（热量 比热容/内能/热机及其工作原理/热机的效率/跨学科实践 城市热岛效应）；第11章 静电与电流（简单的静电现象/电流/电压/串联电路和并联电路/串并联电路中电流、电压的特点）；第12章 欧姆定律（电阻 变阻器/电流与电压、电阻的关系/电阻的测量/电阻的串联和并联/跨学科实践 半导体材料的应用）；第13章 电功率（电功/电功率/焦耳定律/家庭电路）"
+  },
+  {
+   "id": "PSH-ELEC-26",
+   "strand": "ELEC",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第13章 电功率",
+   "name": "家庭电路与安全用电",
+   "name_en": "Household circuits and electrical safety",
+   "desc": "家庭电路组成（进户线、电能表、总开关、保险装置、插座、用电器）；火线零线地线，试电笔；家用电器并联；电流过大的原因（总功率过大、短路）；安全用电常识",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-11",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-07",
+     "strength": "必须"
+    }
+   ],
+   "method": "开关接火线、三孔插座“左零右火上接地”。",
+   "probe": "为什么大功率用电器同时使用容易跳闸？",
+   "terms": [
+    "火线",
+    "零线",
+    "地线",
+    "试电笔",
+    "空气开关"
+   ],
+   "hot": false,
+   "source": "【佐证】搜狐号“环球物理”《初中物理新教材目录（九年级 全国9个版本全）》2025-08-16 https://www.sohu.com/a/924771328_472787 ——“沪科 高景版（五四学制）”九年级上册：第10章 内能（热量 比热容/内能/热机及其工作原理/热机的效率/跨学科实践 城市热岛效应）；第11章 静电与电流（简单的静电现象/电流/电压/串联电路和并联电路/串并联电路中电流、电压的特点）；第12章 欧姆定律（电阻 变阻器/电流与电压、电阻的关系/电阻的测量/电阻的串联和并联/跨学科实践 半导体材料的应用）；第13章 电功率（电功/电功率/焦耳定律/家庭电路）；高中必修三 第十章 第八节亦为“家庭电路”（【佐证】上海市高中物理教师站“物含妙理”2021沪科版（上海科学技术出版社）教学研究目录 https://enjoyphysics.cn/Research ；必修一目录另见好多电子课本网 https://www.haoduoyun.cc/book/hkb/wuli/nqbx1c.shtml（标注上海科学技术出版社）；选必一目录另见菁优网 https://www.jyeoo.com/resource/tb/22/95347（沪科版（2020）））"
+  },
+  {
+   "id": "PSH-MECH-46",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第四章 牛顿运动定律",
+   "name": "力学单位制",
+   "name_en": "SI units in mechanics",
+   "desc": "基本量与基本单位（长度 m、质量 kg、时间 s）；导出单位（N=kg·m/s²）；用单位检验结果",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-30",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-SI",
+     "strength": "有帮助"
+    }
+   ],
+   "method": "计算前统一换算成国际单位；用量纲检查公式。",
+   "probe": "问：1 N 用基本单位怎么表示？",
+   "terms": [
+    "基本单位",
+    "导出单位",
+    "国际单位制"
+   ],
+   "hot": false,
+   "source": "【佐证】上海市高中物理教师站“物含妙理”2021沪科版（上海科学技术出版社）教学研究目录 https://enjoyphysics.cn/Research ；必修一目录另见好多电子课本网 https://www.haoduoyun.cc/book/hkb/wuli/nqbx1c.shtml（标注上海科学技术出版社）；选必一目录另见菁优网 https://www.jyeoo.com/resource/tb/22/95347（沪科版（2020））（必修一 第四章 第三节 力学单位制）"
+  },
+  {
+   "id": "PSH-MECH-47",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第五章 曲线运动",
+   "name": "圆周运动的应用与离心现象",
+   "name_en": "Applications of circular motion; centrifugal effects",
+   "desc": "火车转弯、汽车过拱桥/凹形桥、圆锥摆等实例中向心力来源分析；提供的向心力小于所需时物体做离心运动",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-37",
+     "strength": "必须"
+    }
+   ],
+   "method": "先找圆心和半径，再沿半径方向列合力=mv²/r。",
+   "probe": "汽车以 v 过拱桥顶点，对桥压力比重力大还是小？",
+   "terms": [
+    "离心运动",
+    "火车转弯",
+    "拱桥"
+   ],
+   "hot": true,
+   "source": "【佐证】上海市高中物理教师站“物含妙理”2021沪科版（上海科学技术出版社）教学研究目录 https://enjoyphysics.cn/Research ；必修一目录另见好多电子课本网 https://www.haoduoyun.cc/book/hkb/wuli/nqbx1c.shtml（标注上海科学技术出版社）；选必一目录另见菁优网 https://www.jyeoo.com/resource/tb/22/95347（沪科版（2020））（必修二 第五章 第五节 圆周运动的应用）"
+  },
+  {
+   "id": "PSH-MOD-07",
+   "strand": "MOD",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第八章 牛顿力学的局限性与相对论初步",
+   "name": "牛顿力学的局限性与相对论初步",
+   "name_en": "Limits of Newtonian mechanics; introduction to relativity",
+   "desc": "牛顿力学适用于低速、宏观、弱引力；狭义相对论两个基本假设；时间延缓、长度收缩的定性认识；宇宙的起源与演化简介",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-39",
+     "strength": "有帮助"
+    },
+    {
+     "id": "PSH-MECH-42",
+     "strength": "有帮助"
+    }
+   ],
+   "method": "记住适用范围“低速宏观”；相对论效应只在接近光速时显著。",
+   "probe": "问：高速运动的μ子为什么能到达地面？",
+   "terms": [
+    "狭义相对论",
+    "光速不变",
+    "时间延缓",
+    "长度收缩"
+   ],
+   "hot": false,
+   "source": "【佐证】上海市高中物理教师站“物含妙理”2021沪科版（上海科学技术出版社）教学研究目录 https://enjoyphysics.cn/Research ；必修一目录另见好多电子课本网 https://www.haoduoyun.cc/book/hkb/wuli/nqbx1c.shtml（标注上海科学技术出版社）；选必一目录另见菁优网 https://www.jyeoo.com/resource/tb/22/95347（沪科版（2020））（必修二 第八章：牛顿力学的局限性 / 相对论初步 / 宇宙的起源与演化）"
+  },
+  {
+   "id": "PSH-ELEC-22",
+   "strand": "ELEC",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 第九章 静电场",
+   "name": "静电现象、静电感应与静电的利用和防范",
+   "name_en": "Electrostatic phenomena, induction and applications",
+   "desc": "三种起电方式（摩擦、接触、感应）；静电感应与导体的静电平衡（内部场强为零、电荷分布在外表面）；静电屏蔽；静电除尘、静电复印及防静电",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-13",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-14",
+     "strength": "有帮助"
+    }
+   ],
+   "method": "感应起电“近异远同”；静电平衡导体是等势体。",
+   "probe": "带电球靠近不带电导体，两端各带什么电？",
+   "terms": [
+    "静电感应",
+    "静电平衡",
+    "静电屏蔽"
+   ],
+   "hot": false,
+   "source": "【佐证】上海市高中物理教师站“物含妙理”2021沪科版（上海科学技术出版社）教学研究目录 https://enjoyphysics.cn/Research ；必修一目录另见好多电子课本网 https://www.haoduoyun.cc/book/hkb/wuli/nqbx1c.shtml（标注上海科学技术出版社）；选必一目录另见菁优网 https://www.jyeoo.com/resource/tb/22/95347（沪科版（2020））（必修三 第九章 第一节 静电现象 电荷、第七节 静电的利用与防范）"
+  },
+  {
+   "id": "PSH-ELEC-23",
+   "strand": "ELEC",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 第十章 电路及其应用",
+   "name": "测量金属丝的电阻率",
+   "name_en": "Measuring the resistivity of a wire",
+   "desc": "螺旋测微器/游标卡尺测直径，刻度尺测长度，伏安法测电阻；ρ=RS/L=πd²R/(4L)；电流表内外接法的选择与误差",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-18",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-10",
+     "strength": "必须"
+    }
+   ],
+   "method": "小电阻用外接、大电阻用内接（“大内小外”）。",
+   "probe": "给出 U、I、d、L，求电阻率并判断测量值偏大还是偏小。",
+   "terms": [
+    "电阻率",
+    "螺旋测微器",
+    "内接法",
+    "外接法"
+   ],
+   "hot": false,
+   "source": "【佐证】上海市高中物理教师站“物含妙理”2021沪科版（上海科学技术出版社）教学研究目录 https://enjoyphysics.cn/Research ；必修一目录另见好多电子课本网 https://www.haoduoyun.cc/book/hkb/wuli/nqbx1c.shtml（标注上海科学技术出版社）；选必一目录另见菁优网 https://www.jyeoo.com/resource/tb/22/95347（沪科版（2020））（必修三 第十章 第三节 测量金属丝的电阻率）"
+  },
+  {
+   "id": "PSH-SOUND-10",
+   "strand": "SOUND",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选择性必修一 第三章 机械波",
+   "name": "机械波的反射和折射",
+   "name_en": "Reflection and refraction of mechanical waves",
+   "desc": "波面与波线；惠更斯原理；波的反射（回声）与折射，波在不同介质中频率不变、波速和波长改变",
+   "prereqs": [
+    {
+     "id": "PSH-SOUND-06",
+     "strength": "必须"
+    }
+   ],
+   "method": "跨介质时频率由波源决定不变，v=λf 中 λ 随 v 变。",
+   "probe": "声波从空气进入水中，频率、波速、波长如何变化？",
+   "terms": [
+    "惠更斯原理",
+    "反射",
+    "折射",
+    "频率不变"
+   ],
+   "hot": false,
+   "source": "【佐证】上海市高中物理教师站“物含妙理”2021沪科版（上海科学技术出版社）教学研究目录 https://enjoyphysics.cn/Research ；必修一目录另见好多电子课本网 https://www.haoduoyun.cc/book/hkb/wuli/nqbx1c.shtml（标注上海科学技术出版社）；选必一目录另见菁优网 https://www.jyeoo.com/resource/tb/22/95347（沪科版（2020））（选择性必修一 第三章 第三节 机械波的反射和折射）"
+  },
+  {
+   "id": "PSH-MAG-16",
+   "strand": "MAG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修二 第七章 电磁感应定律的应用",
+   "name": "发电机和电动机（高中）",
+   "name_en": "Generators and motors",
+   "desc": "交流发电机与直流电动机的工作原理；电动机的反电动势；能量转化（机械能↔电能）",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-14",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MAG-07",
+     "strength": "必须"
+    }
+   ],
+   "method": "发电机用右手定则（感应），电动机用左手定则（受力）。",
+   "probe": "电动机卡住不转为什么容易烧坏？",
+   "terms": [
+    "发电机",
+    "电动机",
+    "反电动势"
+   ],
+   "hot": false,
+   "source": "【佐证】上海市高中物理教师站“物含妙理”2021沪科版（上海科学技术出版社）教学研究目录 https://enjoyphysics.cn/Research ；必修一目录另见好多电子课本网 https://www.haoduoyun.cc/book/hkb/wuli/nqbx1c.shtml（标注上海科学技术出版社）；选必一目录另见菁优网 https://www.jyeoo.com/resource/tb/22/95347（沪科版（2020））（选择性必修二 第七章 第四节 发电机和电动机）"
+  },
+  {
+   "id": "PSH-MAG-17",
+   "strand": "MAG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修二 第八章 电磁振荡与电磁波",
+   "name": "电磁振荡与电磁波的发射和接收",
+   "name_en": "Electromagnetic oscillation; transmission and reception",
+   "desc": "LC 振荡电路中电场能与磁场能的转化，T=2π√(LC)；电磁波的发射（调制：调幅、调频）、传播与接收（调谐、解调）；电磁波的应用",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-06",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MAG-13",
+     "strength": "有帮助"
+    },
+    {
+     "id": "PSH-ELEC-16",
+     "strength": "必须"
+    }
+   ],
+   "method": "画出一个周期内 q、i 的变化图，对应电场能和磁场能。",
+   "probe": "增大电容，LC 振荡频率怎样变化？",
+   "terms": [
+    "LC振荡",
+    "调制",
+    "调谐",
+    "解调"
+   ],
+   "hot": false,
+   "source": "【佐证】上海市高中物理教师站“物含妙理”2021沪科版（上海科学技术出版社）教学研究目录 https://enjoyphysics.cn/Research ；必修一目录另见好多电子课本网 https://www.haoduoyun.cc/book/hkb/wuli/nqbx1c.shtml（标注上海科学技术出版社）；选必一目录另见菁优网 https://www.jyeoo.com/resource/tb/22/95347（沪科版（2020））（选择性必修二 第八章：麦克斯韦电磁场理论/电磁波的产生与发射/传播和接收/应用）"
+  },
+  {
+   "id": "PSH-MAG-18",
+   "strand": "MAG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修二 第九章 传感器",
+   "name": "传感器及其应用",
+   "name_en": "Sensors",
+   "desc": "传感器把非电学量转化为电学量；光敏电阻、热敏电阻、霍尔元件、电容式传感器等敏感元件的工作原理；简单自动控制电路",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-19",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MAG-09",
+     "strength": "有帮助"
+    }
+   ],
+   "method": "先判断被测量（光、温度、力、磁）再找对应敏感元件的电阻/电容如何变化。",
+   "probe": "热敏电阻温度升高时阻值减小，分析电路中电表示数变化。",
+   "terms": [
+    "传感器",
+    "光敏电阻",
+    "热敏电阻",
+    "霍尔元件"
+   ],
+   "hot": false,
+   "source": "【佐证】上海市高中物理教师站“物含妙理”2021沪科版（上海科学技术出版社）教学研究目录 https://enjoyphysics.cn/Research ；必修一目录另见好多电子课本网 https://www.haoduoyun.cc/book/hkb/wuli/nqbx1c.shtml（标注上海科学技术出版社）；选必一目录另见菁优网 https://www.jyeoo.com/resource/tb/22/95347（沪科版（2020））（选择性必修二 第九章：传感器及其敏感元件/常见传感器的工作原理/传感器的应用）"
+  },
+  {
+   "id": "PSH-THERM-12",
+   "strand": "THERM",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修三 第十章 分子动理论",
+   "name": "分子运动速率分布的统计规律",
+   "name_en": "Statistical distribution of molecular speeds",
+   "desc": "大量分子速率呈“中间多、两头少”的分布；温度升高，速率大的分子比例增大、分布曲线峰值右移；气体压强的微观解释",
+   "prereqs": [
+    {
+     "id": "PSH-THERM-07",
+     "strength": "必须"
+    }
+   ],
+   "method": "比较两条分布曲线时注意曲线下面积都等于 1（100%）。",
+   "probe": "给出两温度下的速率分布曲线，判断哪条温度高。",
+   "terms": [
+    "速率分布",
+    "统计规律",
+    "气体压强微观解释"
+   ],
+   "hot": false,
+   "source": "【佐证】上海市高中物理教师站“物含妙理”2021沪科版（上海科学技术出版社）教学研究目录 https://enjoyphysics.cn/Research ；必修一目录另见好多电子课本网 https://www.haoduoyun.cc/book/hkb/wuli/nqbx1c.shtml（标注上海科学技术出版社）；选必一目录另见菁优网 https://www.jyeoo.com/resource/tb/22/95347（沪科版（2020））（选择性必修三 第十章 第三节）"
+  },
+  {
+   "id": "PSH-THERM-13",
+   "strand": "THERM",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修三 第十一章 气体、液体和固体",
+   "name": "液体和固体的性质",
+   "name_en": "Properties of liquids and solids",
+   "desc": "液体表面张力与浸润、毛细现象；液晶；晶体与非晶体（单晶体各向异性、有固定熔点）；新材料简介",
+   "prereqs": [
+    {
+     "id": "PSH-THERM-07",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-THERM-03",
+     "strength": "有帮助"
+    }
+   ],
+   "method": "晶体看“有无固定熔点”，单晶/多晶看“是否各向异性”。",
+   "probe": "为什么小昆虫能停在水面上？",
+   "terms": [
+    "表面张力",
+    "浸润",
+    "晶体",
+    "非晶体",
+    "液晶"
+   ],
+   "hot": false,
+   "source": "【佐证】上海市高中物理教师站“物含妙理”2021沪科版（上海科学技术出版社）教学研究目录 https://enjoyphysics.cn/Research ；必修一目录另见好多电子课本网 https://www.haoduoyun.cc/book/hkb/wuli/nqbx1c.shtml（标注上海科学技术出版社）；选必一目录另见菁优网 https://www.jyeoo.com/resource/tb/22/95347（沪科版（2020））（选择性必修三 第十一章 第四节 液体的基本性质、第五节 固体的基本性质、第六节 材料及其应用简介）"
+  },
+  {
+   "id": "PSH-MOD-08",
+   "strand": "MOD",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修三 第十四章 微观粒子的波粒二象性",
+   "name": "原子结构的量子力学模型",
+   "name_en": "Quantum-mechanical model of the atom",
+   "desc": "玻尔模型的局限；电子云（概率分布）的定性认识；不确定性关系的定性介绍",
+   "prereqs": [
+    {
+     "id": "PSH-MOD-03",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MOD-04",
+     "strength": "必须"
+    }
+   ],
+   "method": "电子云描述的是“出现概率”，不是轨道。",
+   "probe": "问：电子云图中点密的地方表示什么？",
+   "terms": [
+    "电子云",
+    "概率",
+    "不确定性关系"
+   ],
+   "hot": false,
+   "source": "【佐证】上海市高中物理教师站“物含妙理”2021沪科版（上海科学技术出版社）教学研究目录 https://enjoyphysics.cn/Research ；必修一目录另见好多电子课本网 https://www.haoduoyun.cc/book/hkb/wuli/nqbx1c.shtml（标注上海科学技术出版社）；选必一目录另见菁优网 https://www.jyeoo.com/resource/tb/22/95347（沪科版（2020））（选择性必修三 第十四章 第三节 原子结构的量子力学模型）"
+  },
+  {
+   "id": "PSH-MOD-09",
+   "strand": "MOD",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修三 第十五章 原子核",
+   "name": "原子核的组成与粒子物理简介",
+   "name_en": "Composition of the nucleus; particle physics",
+   "desc": "质子、中子的发现与核子；核力；同位素；基本粒子分类（强子、轻子、媒介子）与夸克模型简介",
+   "prereqs": [
+    {
+     "id": "PSH-MOD-05",
+     "strength": "必须"
+    }
+   ],
+   "method": "写核反应方程用质量数、电荷数守恒检验。",
+   "probe": "写出卢瑟福发现质子的核反应方程。",
+   "terms": [
+    "核子",
+    "同位素",
+    "核力",
+    "夸克"
+   ],
+   "hot": false,
+   "source": "【佐证】上海市高中物理教师站“物含妙理”2021沪科版（上海科学技术出版社）教学研究目录 https://enjoyphysics.cn/Research ；必修一目录另见好多电子课本网 https://www.haoduoyun.cc/book/hkb/wuli/nqbx1c.shtml（标注上海科学技术出版社）；选必一目录另见菁优网 https://www.jyeoo.com/resource/tb/22/95347（沪科版（2020））（选择性必修三 第十五章 第二节 原子核的组成、第四节 粒子物理简介）"
   }
  ]
 }

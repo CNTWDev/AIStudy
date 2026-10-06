@@ -8,15 +8,17 @@ let cards = [], i = 0;
 const KIND = {word: '生词', term: '术语', mistake: '错题', kp: '知识点', phrase: '短语'};
 const GROUP = {{ group|tojson }}, TASK = {words: 'words', mistakes: 'mistakes', other: 'review'}[GROUP];
 let known = 0;
-async function load() { cards = (await api('/api/review/due' + (GROUP ? '?group=' + GROUP : ''))).cards; i = 0; show(); }
+const RUNKIND = {words: 'words', mistakes: 'mistakes'}[GROUP] || 'review';
+async function load() { cards = (await api('/api/review/due' + (GROUP ? '?group=' + GROUP : ''))).cards; i = 0; if (cards.length) Run.start(RUNKIND, {total: cards.length, mount: $('#flash')}); show(); }
 function show() {
   if (i >= cards.length) {
     $('#flash').innerHTML = `<div class="face pop">🎉 ${cards.length ? '完成了！记得 ' + known + ' 张' : '现在没有要复习的'}</div><button class="btn" id="back2">回到今天 +1 ⭐</button>`;
-    if (cards.length) confetti();
+    if (cards.length) { confetti(); Run.finish(); }
     $('#back2').onclick = () => TASK ? finishTask(TASK) : (location.href = '/today');
     return;
   }
   const c = cards[i], ex = c.extra || {};
+  Run.total = cards.length;
   $('#flash').innerHTML = `<div class="muted small">${KIND[c.kind] || c.kind}${c.kp_name ? ' · ' + esc(c.kp_name) : ''} · 还剩 ${cards.length - i} 张</div>` +
     `<div class="face">${esc(c.front)}${ex.zh ? `<div class="muted small">${esc(ex.zh)}</div>` : ''}${ex.context ? `<div class="muted small">“${esc(ex.context)}”</div>` : ''}</div>` +
     `<div id="back" style="display:none"><div class="back">${esc(c.back).replace(/\n/g, '<br>')}${ex.example ? `<div class="small">例：${esc(ex.example)}</div>` : ''}${ex.my_answer ? `<div class="small">我当时答：${esc(ex.my_answer)}</div>` : ''}</div>` +
@@ -25,6 +27,7 @@ function show() {
   $('#flip').onclick = () => { $('#back').style.display = ''; $('#flip').remove(); };
   $$('#flash [data-g]').forEach(b => b.onclick = async () => {
     await api('/api/review/' + c.id, {grade: b.dataset.g});
+    Run.hit(b.dataset.g === 'good');
     if (b.dataset.g === 'again') cards.push(c); else if (b.dataset.g === 'good') { known++; cheer($('#flash')); }
     i++; show();
   });

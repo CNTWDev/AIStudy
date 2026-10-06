@@ -1,0 +1,28 @@
+{
+ "unverified": [
+  {
+   "what": "所有 hot=true 标记（共 40 余个，含 1.1-09/10/11 等 school 点）",
+   "why": "Cambridge 官方大纲不给出考点频率；未查到 Cambridge 官方 examiner report 统计可作依据，故未改动，也未新增 hot。"
+  },
+  {
+   "what": "SCI-PRE-PART（粒子模型）放在 G7",
+   "why": "0893 中粒子模型属 Chemistry 子领域，本次只核对了 Physics 与 Earth and Space 两个子领域，未核实其所在 Stage。"
+  },
+  {
+   "what": "MATH-PRE-* 与 ENG-PRE-CMD 的年级",
+   "why": "属数学/英语前置，未对照 Cambridge Lower Secondary Mathematics 0862 框架核实年级。"
+  },
+  {
+   "what": "0893 框架全文（Physics 与 Earth and Space 的学习目标编号与措辞）",
+   "why": "官方全文在 Cambridge 教师支持站（需登录），公开的只有 curriculum outline（https://www.cambridgeinternational.org/Images/80617-cambridge-lower-secondary-science-curriculum-outline.pdf，只列子领域名称）；具体目标取自学校公开镜像，标题与版本（2020 年 9 月出版、2021 年 9 月首次教学，Version 1）一致，但只算佐证级。"
+  },
+  {
+   "what": "大纲 PDF 原文逐字核对",
+   "why": "本机 curl 被代理拦截（403），PDF 通过 WebFetch 文本抽取读取；Core/Supplement 两栏在抽取文本中按标题顺序区分，1.6 Momentum 的 Core 栏为空（全部为 Supplement）是按抽取顺序判断的，与 TES 资源『1.6 Momentum SUPPLEMENT』一致。少数长条目被截断，未逐字核对每个字。"
+  },
+  {
+   "what": "Stage↔年级对应（Stage 7≈G6、8≈G7、9≈G8，IGCSE≈G9–G10）",
+   "why": "Cambridge 只给年龄段（Lower Secondary 11–14 岁、IGCSE 14–16 岁）；上海各国际学校的实际年级设置可能不同（有的学校 G9 仍在 Stage 9），按年龄推算，未逐校核实。"
+  }
+ ]
+}

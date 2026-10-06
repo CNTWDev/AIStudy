@@ -3,7 +3,7 @@
   "id": "eng-cambridge",
   "subject": "english",
   "subject_name": "英语",
-  "edition": "Cambridge 国际课程（Lower Secondary → IGCSE ESL/First Language）",
+  "edition": "剑桥英语（Primary / Lower Secondary → IGCSE 0510/0511/0500）",
   "region": "国际学校",
   "stages": [
    "G3",
@@ -15,15 +15,23 @@
    "G9",
    "IGCSE"
   ],
-  "version": 1,
+  "version": 2,
   "generated": "2026-10-06",
   "sources": [
-   "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-as-a-second-language-0510/",
-   "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-as-a-second-language-speaking-endorsement-0511/",
+   "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-oral-endorsement-0510/",
+   "https://www.cambridgeinternational.org/Images/721337-2027-2029-syllabus.pdf",
+   "https://www.cambridgeinternational.org/Images/721343-2027-2029-syllabus.pdf",
+   "https://www.cambridgeinternational.org/Images/637160-2024-2026-syllabus.pdf",
+   "https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf",
    "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-first-language-0500/",
-   "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-lower-secondary-english-as-a-second-language-0876/"
+   "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-primary/curriculum/english-as-a-second-language/",
+   "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-lower-secondary/curriculum/english-as-a-second-language/",
+   "https://www.cambridgeinternational.org/languages/vietnam/Images/25130-cambridge-primary-english-as-a-second-language-curriculum-outline.pdf",
+   "https://www.cambridgeinternational.org/languages/vietnam/Images/23894-cambridge-primary-english-curriculum-outline.pdf",
+   "https://www.cambridgeinternational.org/Images/607719-cambridge-lower-secondary-brochure.pdf"
   ],
-  "notes": "覆盖小学三年级至 IGCSE 的英语知识图谱，用于诊断与回溯。IGCSE 部分按 English as a Second Language (0510/0511) 技能设计：阅读（细节、匹配、推断、态度）、笔记整理、概要写作、非正式邮件、文章/报告/评论、听力填空与多选、口语。若实际课程为 First Language English (0500)，还需补充：作者语言效果分析（writer's effect / language analysis）、定向写作（directed writing，基于材料的议论文/书信）、叙事与描写创作（composition），以及更高要求的概要；这些可在本图谱 REA-10、REA-13、WRI-10、WRI-12 基础上扩展。stage 为通常最早学习的年级，非严格对应。"
+  "notes": "版本：Cambridge 国际课程英语：Primary / Lower Secondary English as a Second Language (0057/0876) 与 English (0058/0861)（Stage 3-9）→ IGCSE English as a Second Language (0510/0511) 与 First Language English (0500)\n覆盖 Cambridge Stage 3-9 与 IGCSE 英语。学段对应：包内 G3-G9 按国际学校常见惯例记作 Cambridge Stage 3-9（Gn≈Stage n），这不是剑桥官方规定。剑桥官方年龄：Primary Stage 1-6 通常 5-11 岁，Lower Secondary Stage 7-9 通常 11-14 岁，IGCSE 面向 14-16 岁（两年课程，约 130 学时）；中国《义务教育法》第十一条规定满 6 周岁入学，所以按年龄算，中国 Gn 约等于 Cambridge Stage n+1（英国 Year n+1），按年龄 IGCSE 两年约对应中国 G9-G10。学校按哪种方式分班，以学校自己为准。stage 字段写的是该知识点通常最早系统学习的 Stage，语法点按 0057/0876 ESL 框架 Use of English 目标排。IGCSE ESL 0510（口语单独认证）和 0511（口语计入总分）从 2024 年起取消分层（Core/Extended），Paper 1 不再有 summary，原 note-making 改成 note completion（补全笔记），Listening 全部为选择题；2027-2029 版大纲官方说明 no significant changes。0500 First Language English 从 2027 年起改版：Paper 1 Reading 有三篇文本、四道题（含 120 词以内的概要和 200-250 词的作者语言效果分析），Paper 2 包括 Directed Writing（250-350 词）和 Composition（描写或记叙，350-450 词），也可以用 Coursework 代替 Paper 2。2027 年新出的 0465 IGCSE Core ESL 只在埃及开考，不适用于上海。",
+  "verified": "2026-10-06"
  },
  "strands": [
   {
@@ -419,7 +427,7 @@
   {
    "id": "ENG-GRA-09",
    "strand": "GRA",
-   "stage": "G5",
+   "stage": "G4",
    "name": "一般过去时（规则动词）",
    "name_en": "Past simple (regular verbs)",
    "desc": "用一般过去时描述过去的动作，规则动词加 -ed，否定和疑问用 did + 动词原形。",
@@ -440,7 +448,7 @@
   {
    "id": "ENG-GRA-10",
    "strand": "GRA",
-   "stage": "G5",
+   "stage": "G4",
    "name": "一般过去时（不规则动词）与过去分词",
    "name_en": "Past simple irregular verbs and past participles",
    "desc": "掌握常用不规则动词的过去式和过去分词（go-went-gone, write-wrote-written）。",
@@ -457,7 +465,7 @@
   {
    "id": "ENG-GRA-11",
    "strand": "GRA",
-   "stage": "G5",
+   "stage": "G4",
    "name": "比较级与最高级",
    "name_en": "Comparatives and superlatives",
    "desc": "掌握形容词/副词比较级和最高级（-er/-est, more/most, good-better-best），及 as…as、than 结构。",
@@ -533,7 +541,7 @@
   {
    "id": "ENG-GRA-15",
    "strand": "GRA",
-   "stage": "G6",
+   "stage": "G4",
    "name": "将来时表达",
    "name_en": "Future forms",
    "desc": "区分 will（临时决定/预测）、be going to（计划/有迹象）、现在进行时表将来（已安排）。",
@@ -571,7 +579,7 @@
   {
    "id": "ENG-GRA-17",
    "strand": "GRA",
-   "stage": "G6",
+   "stage": "G5",
    "name": "过去进行时",
    "name_en": "Past continuous",
    "desc": "用 was/were + doing 表示过去某时正在进行的动作，常与一般过去时搭配（when/while）。",
@@ -613,7 +621,7 @@
   {
    "id": "ENG-GRA-19",
    "strand": "GRA",
-   "stage": "G7",
+   "stage": "G5",
    "name": "现在完成时",
    "name_en": "Present perfect",
    "desc": "用 have/has + 过去分词表达经历、持续到现在的状态和对现在有影响的动作，搭配 ever/never/already/yet/for/since。",
@@ -676,7 +684,7 @@
   {
    "id": "ENG-GRA-22",
    "strand": "GRA",
-   "stage": "G7",
+   "stage": "G6",
    "name": "零条件句与第一条件句",
    "name_en": "Zero and first conditionals",
    "desc": "掌握 If + 一般现在时, 一般现在时（普遍事实）以及 If + 一般现在时, will + 动词原形（真实可能）。",
@@ -713,12 +721,13 @@
    ],
    "hot": false,
    "method": "每天想一个“假如”问题并回答（If I had a million yuan, I would…）。记住提建议常用 If I were you, I would…",
-   "probe": "比较 first 与 second conditional 选择，并完成 If I ___ (be) you…"
+   "probe": "比较 first 与 second conditional 选择，并完成 If I ___ (be) you…",
+   "syllabus": "0876 8Ug.10"
   },
   {
    "id": "ENG-GRA-24",
    "strand": "GRA",
-   "stage": "G8",
+   "stage": "G7",
    "name": "被动语态",
    "name_en": "Passive voice",
    "desc": "掌握一般现在时、一般过去时、现在完成时及情态动词的被动语态（be + 过去分词），并知道何时使用。",
@@ -743,7 +752,7 @@
   {
    "id": "ENG-GRA-25",
    "strand": "GRA",
-   "stage": "G8",
+   "stage": "G6",
    "name": "定语从句",
    "name_en": "Relative clauses",
    "desc": "用 who, which, that, whose, where 连接定语从句，修饰名词。",
@@ -764,7 +773,7 @@
   {
    "id": "ENG-GRA-26",
    "strand": "GRA",
-   "stage": "G8",
+   "stage": "G7",
    "name": "间接引语",
    "name_en": "Reported speech",
    "desc": "把直接引语转换为间接引语（时态后退、人称和时间状语变化），包括陈述句和疑问句。",
@@ -789,7 +798,7 @@
   {
    "id": "ENG-GRA-27",
    "strand": "GRA",
-   "stage": "G9",
+   "stage": "G8",
    "name": "过去完成时",
    "name_en": "Past perfect",
    "desc": "用 had + 过去分词表达“过去的过去”，用于叙事和间接引语。",
@@ -999,7 +1008,8 @@
    ],
    "hot": true,
    "method": "积累描述态度的形容词（critical, supportive, doubtful, enthusiastic）。读完文章问自己：作者想让读者做什么或想什么？找出 2 个带感情色彩的词作为依据。",
-   "probe": "问作者对某事的态度，选项为几个态度形容词，需从文中语气词找证据。"
+   "probe": "问作者对某事的态度，选项为几个态度形容词，需从文中语气词找证据。",
+   "syllabus": "0500 R2/R4; 0510 R2/R4"
   },
   {
    "id": "ENG-REA-11",
@@ -1007,7 +1017,7 @@
    "stage": "G8",
    "name": "多文本匹配",
    "name_en": "Multiple matching across texts",
-   "desc": "在几篇短文或多个人的观点中，把陈述与对应的人/段落匹配（ESL 阅读常见题型）。",
+   "desc": "在几篇短文或同一篇文章的几个部分中，把陈述和对应的人或段落匹配。IGCSE ESL Paper 1 Exercise 2：约 600-650 词，最多 5 个部分，9 道题，9 分（考 R1-R4）。",
    "prereqs": [
     {
      "id": "ENG-REA-04",
@@ -1024,15 +1034,16 @@
    ],
    "hot": true,
    "method": "先读题目陈述并划出关键概念，再逐篇略读找同义表达，不要找原词重复。每匹配一个就在原文中标出对应句子，防止张冠李戴。",
-   "probe": "给 4 个人的短段落和 6 个陈述，要求匹配说话人，陈述均为同义改写。"
+   "probe": "给 4 个人的短段落和 6 个陈述，要求匹配说话人，陈述均为同义改写。",
+   "syllabus": "0510/0511 Paper 1 Exercise 2"
   },
   {
    "id": "ENG-REA-12",
    "strand": "REA",
    "stage": "IGCSE",
-   "name": "笔记整理（Note-making）",
-   "name_en": "Note-making",
-   "desc": "按标题从文章中提取相关要点，以简洁笔记形式写出（IGCSE ESL 阅读常考题型）。",
+   "name": "笔记补全（Note completion）",
+   "name_en": "Note completion",
+   "desc": "读一篇约 400-500 词的文章，按给出的笔记框架补全简短笔记，每空 1 分，共 7 分（IGCSE ESL 0510/0511 Paper 1 Exercise 3，考 R1-R3）。2024 年以前的旧大纲是按小标题自己写 note-making，现在改为补全已有笔记。",
    "prereqs": [
     {
      "id": "ENG-REA-03",
@@ -1044,8 +1055,9 @@
     }
    ],
    "hot": true,
-   "method": "做题前先读清每个小标题，再按标题在原文中划出相关信息。笔记用简短短语（3-6 词）而不是整句，每点只写一个信息，不重复。",
-   "probe": "给一篇 400 词文章和两个小标题，要求在每个标题下写出 3-4 条要点。"
+   "method": "先读笔记框架的标题和已给出的条目，判断每个空需要哪类信息（原因、例子、数字等）。再按框架顺序回原文找对应段落，答案写短语，不写整句；同一条信息不要重复用在两个空里。",
+   "probe": "给一篇约 450 词文章和一个 2 个小标题、7 个空的笔记框架，检查信息定位是否准确、答案是否简洁不重复。",
+   "syllabus": "0510/0511 Paper 1 Exercise 3（R1, R2, R3）"
   },
   {
    "id": "ENG-REA-13",
@@ -1053,7 +1065,7 @@
    "stage": "IGCSE",
    "name": "概要写作（Summary）",
    "name_en": "Summary writing",
-   "desc": "根据要求从文章中选取相关要点，用自己的话写成连贯的短文（约 80-100 词）。",
+   "desc": "根据题目要求从文章中选出相关要点，用自己的话写成连贯短文。注意：IGCSE ESL 0510/0511 从 2024 年起已取消概要题；IGCSE First Language English 0500（2027 起）Paper 1 第 2(a) 题要求概要不超过 120 词（10 分阅读 + 5 分写作），第 2(b) 题另考作者态度。",
    "prereqs": [
     {
      "id": "ENG-REA-12",
@@ -1069,8 +1081,9 @@
     }
    ],
    "hot": true,
-   "method": "三步法：先列要点（可借用 note-making），再用同义词改写，最后用连接词串成一段。严格控制字数，不加个人观点和例子。写完数一数要点数量是否足够。",
-   "probe": "给一篇文章，要求按特定方面写约 80 词概要，检查要点覆盖、改写程度和连贯性。"
+   "method": "三步法：先列要点（可借用笔记方法），再用同义词改写，最后用连接词串成一段。0500 概要不超过 120 词，不加个人观点和例子。写完数一数要点数量是否足够。",
+   "probe": "给一篇文章，要求按特定方面写约 80 词概要，检查要点覆盖、改写程度和连贯性。",
+   "syllabus": "0500 Paper 1 Question 2（R1, R2, R3, R5; W 部分 5 分）"
   },
   {
    "id": "ENG-WRI-01",
@@ -1233,7 +1246,7 @@
    "stage": "G6",
    "name": "非正式邮件/书信",
    "name_en": "Informal email/letter",
-   "desc": "写给朋友或家人的非正式邮件：恰当的开头结尾、友好语气、覆盖所有要点（IGCSE ESL 写作常考）。",
+   "desc": "写给朋友或家人的非正式邮件：恰当的开头结尾、友好语气、覆盖所有要点。IGCSE ESL Paper 1 Exercise 5 要求 120-160 词，15 分（内容 6 分、语言 9 分）。",
    "prereqs": [
     {
      "id": "ENG-WRI-05",
@@ -1246,7 +1259,8 @@
    ],
    "hot": true,
    "method": "背一套开头（Hi Tom, Thanks for your email…）和结尾（Can't wait to hear from you. Best wishes,）。动笔前把题目的 3 个要点编号，每个要点写一段。可以用缩写和口语，但仍需语法正确。",
-   "probe": "给一个 ESL 风格的邮件任务（3 个要点），检查要点覆盖、语气和段落。"
+   "probe": "给一个 ESL 风格的邮件任务（3 个要点），检查要点覆盖、语气和段落。",
+   "syllabus": "0510/0511 Paper 1 Exercise 5（W1-W4）"
   },
   {
    "id": "ENG-WRI-10",
@@ -1279,7 +1293,7 @@
    "stage": "G8",
    "name": "正式邮件/书信",
    "name_en": "Formal email/letter",
-   "desc": "写给校长、公司或报社的正式书信（投诉、申请、建议），使用正式语域、清楚的目的和礼貌结尾。",
+   "desc": "写给校长、公司或报社的正式书信（投诉、申请、建议），使用正式语域、清楚的目的和礼貌结尾。注意：IGCSE ESL 0510/0511 现行 Exercise 5 只考非正式邮件，Exercise 6 不含书信；正式书信主要出现在 0500 Paper 1 Question 4（letter/report/journal/speech/interview/article）和 Coursework 作业 1。",
    "prereqs": [
     {
      "id": "ENG-WRI-09",
@@ -1304,7 +1318,7 @@
    "stage": "G8",
    "name": "文章（Article）",
    "name_en": "Article writing",
-   "desc": "为校刊或杂志写文章：吸引人的标题和开头、直接与读者对话、分段阐述观点（IGCSE ESL 常考）。",
+   "desc": "为校刊或杂志写文章：有吸引力的标题和开头、直接和读者对话、分段阐述观点。IGCSE ESL Paper 1 Exercise 6 的四种文体之一（article/report/essay/review，正式或半正式，120-160 词，15 分）。",
    "prereqs": [
     {
      "id": "ENG-WRI-08",
@@ -1317,7 +1331,8 @@
    ],
    "hot": true,
    "method": "开头用问题或惊人事实吸引读者（Have you ever wondered…?），中间每段一个观点+例子，结尾给建议或呼吁。写前列出 3 个观点再动笔。",
-   "probe": "给一个校刊文章任务，检查标题、开头吸引力、段落观点和读者意识。"
+   "probe": "给一个校刊文章任务，检查标题、开头吸引力、段落观点和读者意识。",
+   "syllabus": "0510/0511 Paper 1 Exercise 6（W1-W4）"
   },
   {
    "id": "ENG-WRI-13",
@@ -1325,7 +1340,7 @@
    "stage": "G8",
    "name": "报告与评论（Report/Review）",
    "name_en": "Report and review writing",
-   "desc": "写结构清晰的报告（可用小标题、客观语气、建议）或评论（描述+评价+推荐）。",
+   "desc": "写结构清晰的报告（可用小标题、客观语气、建议）或评论（描述、评价、推荐）。两者都是 IGCSE ESL Paper 1 Exercise 6 的指定文体（正式或半正式，120-160 词）。",
    "prereqs": [
     {
      "id": "ENG-WRI-08",
@@ -1336,9 +1351,10 @@
      "strength": "有帮助"
     }
    ],
-   "hot": false,
+   "hot": true,
    "method": "报告用固定结构：Introduction（目的）— Findings（分小标题）— Recommendations。语气客观，多用被动和 It is recommended that…。评论则描述后给出明确评价和推荐对象。",
-   "probe": "给一个学校活动报告任务，检查结构、客观语气和建议部分。"
+   "probe": "给一个学校活动报告任务，检查结构、客观语气和建议部分。",
+   "syllabus": "0510/0511 Paper 1 Exercise 6（W1-W4）"
   },
   {
    "id": "ENG-WRI-14",
@@ -1453,9 +1469,9 @@
    "id": "ENG-LIS-05",
    "strand": "LIS",
    "stage": "G8",
-   "name": "听力填空与笔记补全",
-   "name_en": "Gap-fill note completion",
-   "desc": "边听边补全笔记或表格，答案需准确拼写（IGCSE ESL 听力常见题型）。",
+   "name": "听力句子补全（三选一）",
+   "name_en": "Sentence completion (multiple choice)",
+   "desc": "听一段独白，从 A/B/C 三个词或短语中选择，补全 8 个句子（IGCSE ESL 0510/0511 Listening Exercise 3，8 分）。2024 年起听力全部是选择题，不再要求自己写出拼写。",
    "prereqs": [
     {
      "id": "ENG-LIS-03",
@@ -1467,8 +1483,9 @@
     }
    ],
    "hot": true,
-   "method": "听前读空格前后的词，预测词性和内容（名词？数字？）。听时只写关键词，最后检查拼写和单复数。复盘时对照原文找出漏听的连读和同义表达。",
-   "probe": "听一段讲座片段，完成 6 个笔记空格，考核信息准确与拼写。"
+   "method": "听前读 8 个句子和选项，预测每空的内容类型。三个选项往往都会在录音中出现，要听清哪个才真正符合句意（注意否定、更正和比较）。每段录音播放两遍，第一遍初选，第二遍确认。",
+   "probe": "听一段讲座片段，完成 8 道三选一句子补全题，检查是否被录音中出现过的干扰选项误导。",
+   "syllabus": "0510/0511 Paper 2 Exercise 3（L1-L4）"
   },
   {
    "id": "ENG-LIS-06",
@@ -1476,7 +1493,7 @@
    "stage": "G8",
    "name": "听主旨、态度与干扰项",
    "name_en": "Gist, attitude and distractors",
-   "desc": "理解说话人主旨与态度，识别听力中的干扰信息（先说后改、否定转折）。",
+   "desc": "理解说话人的观点、态度和感受，理解观点之间的联系和没有直接说出的隐含意思，并识别干扰信息（先说后改、否定转折）。对应 IGCSE ESL 听力目标 L2-L4 和 Exercise 2、4、5（短对话多选、6 段独白配 8 个陈述、访谈多选）。",
    "prereqs": [
     {
      "id": "ENG-LIS-03",
@@ -1489,7 +1506,8 @@
    ],
    "hot": true,
    "method": "注意 but, actually, no wait, I thought…but 之后才是真正答案。做多选题时听到某个选项的原词不要立刻选，要等整句听完。",
-   "probe": "听一段讨论，选择说话人的观点，选项中含原词重现的干扰项。"
+   "probe": "听一段讨论，选择说话人的观点，选项中含原词重现的干扰项。",
+   "syllabus": "0510/0511 Paper 2 Exercises 2, 4, 5（L2, L3, L4）"
   },
   {
    "id": "ENG-LIS-07",
@@ -1497,7 +1515,7 @@
    "stage": "IGCSE",
    "name": "口语考试：拓展对话",
    "name_en": "Speaking exam: extended conversation",
-   "desc": "在 IGCSE 口语考试中围绕话题进行拓展回答，展开观点、举例、回应追问。",
+   "desc": "IGCSE ESL 口语考试约 10-15 分钟：不评分的介绍和热身，然后是评分的 Part 1 Interview（约 2-3 分钟）、Part 2 Short talk（准备 1 分钟、不能写笔记，连准备共约 3-4 分钟）、Part 3 Discussion（约 3-4 分钟，围绕 Part 2 话题）。评分四项各 10 分：语法、词汇、展开（development）、发音。0510 口语单独出等级，0511 口语占总分 25%。",
    "prereqs": [
     {
      "id": "ENG-LIS-04",
@@ -1512,9 +1530,1084 @@
      "strength": "有帮助"
     }
    ],
-   "hot": false,
+   "hot": true,
    "method": "用 AREA 法回答：Answer 回答—Reason 理由—Example 例子—Alternative/Add 补充。准备 10 个常考话题，每题录音练 2 分钟。",
-   "probe": "模拟问答 3 个话题问题，评估回答长度、展开程度和词汇语法准确性。"
+   "probe": "模拟问答 3 个话题问题，评估回答长度、展开程度和词汇语法准确性。",
+   "syllabus": "0510/0511 Component 3 Speaking（S1-S4）"
+  },
+  {
+   "id": "ENG-GRA-28",
+   "strand": "GRA",
+   "stage": "G3",
+   "name": "祈使句",
+   "name_en": "Imperatives",
+   "desc": "用动词原形开头的祈使句发出指令、提出要求，包括否定形式 Don't…，以及 Let's… 提建议。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用课堂指令和菜谱步骤练习：Open your book. Don't run. Mix the eggs. 把一个游戏规则改写成 5 条祈使句。",
+   "probe": "让学生给同学写 4 条去学校图书馆的路线指令，其中包含一条否定句。",
+   "terms": [
+    "imperative",
+    "Don't",
+    "Let's"
+   ],
+   "syllabus": "0057 3Ug.02, 4Ug.03",
+   "source": "Cambridge Primary English as a Second Language Curriculum Framework (0057) v1, Sept 2020（官方文件 tcm142-592536 的全文转载，镜像 https://pdfcoffee.com/english-as-a-second-language-curriculum-framework-0057-tcm142-592536-pdf-free.html ；官方概要 https://www.cambridgeinternational.org/languages/vietnam/Images/25130-cambridge-primary-english-as-a-second-language-curriculum-outline.pdf）"
+  },
+  {
+   "id": "ENG-GRA-29",
+   "strand": "GRA",
+   "stage": "G4",
+   "name": "反意疑问句",
+   "name_en": "Tag questions",
+   "desc": "在陈述句后加简短问句（isn't it? / don't you? / can't she?）以寻求认同或确认，前肯后否、前否后肯，助动词和时态与主句一致。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "记“前肯后否、前否后肯、助动词跟着主句走”。做成对练习：It's cold today, isn't it? / You don't like coffee, do you? 注意 I am… 的反意疑问是 aren't I?",
+   "probe": "补全 5 个反意疑问句，包括一般现在时、一般过去时、情态动词和 I am 句型。",
+   "terms": [
+    "tag question"
+   ],
+   "syllabus": "0057 4Ug.01, 5Ug.01",
+   "source": "Cambridge Primary English as a Second Language Curriculum Framework (0057) v1, Sept 2020（官方文件 tcm142-592536 的全文转载，镜像 https://pdfcoffee.com/english-as-a-second-language-curriculum-framework-0057-tcm142-592536-pdf-free.html ；官方概要 https://www.cambridgeinternational.org/languages/vietnam/Images/25130-cambridge-primary-english-as-a-second-language-curriculum-outline.pdf）"
+  },
+  {
+   "id": "ENG-GRA-30",
+   "strand": "GRA",
+   "stage": "G5",
+   "name": "程度副词与 too/enough",
+   "name_en": "Adverbs of degree; too and enough",
+   "desc": "用 too、enough、quite、rather、very 等程度副词修饰形容词和副词，掌握 too + adj + to do 和 adj + enough + to do 的结构与位置。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "对比造句：The box is too heavy to carry. / He is old enough to drive. 记住 enough 放在形容词后、名词前（old enough / enough money）。",
+   "probe": "改错：He is enough tall to reach the shelf. 并用 too 改写同一个意思。",
+   "terms": [
+    "too",
+    "enough",
+    "quite",
+    "rather"
+   ],
+   "syllabus": "0057 5Uv.06",
+   "source": "Cambridge Primary English as a Second Language Curriculum Framework (0057) v1, Sept 2020（官方文件 tcm142-592536 的全文转载，镜像 https://pdfcoffee.com/english-as-a-second-language-curriculum-framework-0057-tcm142-592536-pdf-free.html ；官方概要 https://www.cambridgeinternational.org/languages/vietnam/Images/25130-cambridge-primary-english-as-a-second-language-curriculum-outline.pdf）"
+  },
+  {
+   "id": "ENG-GRA-31",
+   "strand": "GRA",
+   "stage": "G5",
+   "name": "形容词顺序与 -ed/-ing 分词形容词",
+   "name_en": "Adjective order and participle adjectives",
+   "desc": "区分 bored/boring、interested/interesting 等分词形容词（-ed 描述人的感受，-ing 描述引起感受的事物），并按“观点-大小-年龄-形状-颜色-来源-材料-用途”的顺序排列多个形容词。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-08",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "成对造句：The film was boring, so I was bored. 形容词顺序用口诀记，先练两个形容词的组合（a beautiful old house），再加到三个。",
+   "probe": "选择 excited/exciting 填空 4 题，再把 3 组形容词按正确顺序排在名词前。",
+   "terms": [
+    "participle adjective",
+    "adjective order"
+   ],
+   "syllabus": "0057 5Ug.11, 6Ug.13; 0876 7Ug.12",
+   "source": "Cambridge Primary English as a Second Language Curriculum Framework (0057) v1, Sept 2020（官方文件 tcm142-592536 的全文转载，镜像 https://pdfcoffee.com/english-as-a-second-language-curriculum-framework-0057-tcm142-592536-pdf-free.html ；官方概要 https://www.cambridgeinternational.org/languages/vietnam/Images/25130-cambridge-primary-english-as-a-second-language-curriculum-outline.pdf） ; Cambridge Lower Secondary English as a Second Language Curriculum Framework (0876)（官方文件 tcm143-592622 全文转载，镜像 https://pdfcoffee.com/0876-lower-secondary-english-as-a-second-language-curriculum-framework-2020-tcm143-592622-pdf-free.html）"
+  },
+  {
+   "id": "ENG-GRA-32",
+   "strand": "GRA",
+   "stage": "G5",
+   "name": "不定代词、相互代词与 it/there 形式结构",
+   "name_en": "Indefinite and reciprocal pronouns; it/there structures",
+   "desc": "使用 someone/anything/nobody/everyone 等不定代词，each other/one another 等相互代词，以及 It is…to…、There is/are… 等非人称结构。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-12",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-05",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "分肯定、否定、疑问三列整理 some-/any-/no-/every- 组合。注意 everyone/nobody 后动词用单数。写作中用 It is important to… 替换“To… is important”。",
+   "probe": "填空：Is there ___ in the box?（anything/something）；They helped ___ (each other)；It ___ (be) difficult to…",
+   "terms": [
+    "indefinite pronoun",
+    "each other",
+    "there is"
+   ],
+   "syllabus": "0057 4Us.02, 5Us.02, 5Uv.08, 6Us.02",
+   "source": "Cambridge Primary English as a Second Language Curriculum Framework (0057) v1, Sept 2020（官方文件 tcm142-592536 的全文转载，镜像 https://pdfcoffee.com/english-as-a-second-language-curriculum-framework-0057-tcm142-592536-pdf-free.html ；官方概要 https://www.cambridgeinternational.org/languages/vietnam/Images/25130-cambridge-primary-english-as-a-second-language-curriculum-outline.pdf）"
+  },
+  {
+   "id": "ENG-GRA-33",
+   "strand": "GRA",
+   "stage": "G6",
+   "name": "宾语从句（say/tell/think/know 后）",
+   "name_en": "Noun clauses after reporting and thinking verbs",
+   "desc": "在 think、know、believe、hope、be sure、say、tell 等词后用 that 从句或 wh- 从句，从句用陈述语序（I don't know where he lives）。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-13",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-14",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "把直接问句改成“I wonder / Do you know + 陈述语序”：Where does he live? → Do you know where he lives? 注意 tell 后要接人（tell me that…），say 后不直接接人。",
+   "probe": "改错：Can you tell me where is the station? 并把 3 个问句改写成宾语从句。",
+   "terms": [
+    "noun clause",
+    "that-clause",
+    "embedded question"
+   ],
+   "syllabus": "0057 5Us.05, 6Us.06",
+   "source": "Cambridge Primary English as a Second Language Curriculum Framework (0057) v1, Sept 2020（官方文件 tcm142-592536 的全文转载，镜像 https://pdfcoffee.com/english-as-a-second-language-curriculum-framework-0057-tcm142-592536-pdf-free.html ；官方概要 https://www.cambridgeinternational.org/languages/vietnam/Images/25130-cambridge-primary-english-as-a-second-language-curriculum-outline.pdf）"
+  },
+  {
+   "id": "ENG-GRA-34",
+   "strand": "GRA",
+   "stage": "G7",
+   "name": "复杂名词短语",
+   "name_en": "Complex noun phrases",
+   "desc": "用前置修饰（形容词、名词作定语）和后置修饰（介词短语、分词短语、定语从句）构成信息密集的名词短语，如 a newly opened sports centre near the school。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-25",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-31",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "从一个核心名词出发，每次加一层修饰：a centre → a sports centre → a new sports centre → a new sports centre near our school that opens at 7 a.m.。阅读时把长主语括起来找出核心名词。",
+   "probe": "把三句短句合并成一个含复杂名词短语的句子，并指出句子的核心名词。",
+   "terms": [
+    "noun phrase",
+    "pre-modification",
+    "post-modification"
+   ],
+   "syllabus": "0876 7Uv.04, 8Uv.04, 9Uv.03",
+   "source": "Cambridge Lower Secondary English as a Second Language Curriculum Framework (0876)（官方文件 tcm143-592622 全文转载，镜像 https://pdfcoffee.com/0876-lower-secondary-english-as-a-second-language-curriculum-framework-2020-tcm143-592622-pdf-free.html）"
+  },
+  {
+   "id": "ENG-GRA-35",
+   "strand": "GRA",
+   "stage": "G8",
+   "name": "现在完成进行时",
+   "name_en": "Present perfect continuous",
+   "desc": "用 have/has been + doing 强调从过去持续到现在（或刚刚结束）的动作及其过程，常与 for/since/how long 连用，并区分现在完成时（强调结果或次数）。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-19",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "成对对比：I've been reading this book for two hours（过程）/ I've read three chapters（结果，可数）。状态动词（know, like）一般不用进行形式。",
+   "probe": "选择 have been doing 或 have done 填空 5 题，其中含状态动词陷阱。",
+   "terms": [
+    "present perfect continuous",
+    "for",
+    "since"
+   ],
+   "syllabus": "0876 8Ug.07, 9Ug.06",
+   "source": "Cambridge Lower Secondary English as a Second Language Curriculum Framework (0876)（官方文件 tcm143-592622 全文转载，镜像 https://pdfcoffee.com/0876-lower-secondary-english-as-a-second-language-curriculum-framework-2020-tcm143-592622-pdf-free.html）"
+  },
+  {
+   "id": "ENG-GRA-36",
+   "strand": "GRA",
+   "stage": "G8",
+   "name": "wish / if only 表愿望",
+   "name_en": "wish and if only",
+   "desc": "用 I wish / If only + 一般过去时表达对现在的愿望，+ 过去完成时表达对过去的遗憾，+ would 表达对他人行为的不满。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-23",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-27",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "画“时间后退一格”图：现在→过去式，过去→过去完成时。造三组句：I wish I had more time. / I wish I hadn't eaten so much. / I wish you would stop talking.",
+   "probe": "根据情境写 wish 句：你现在不会游泳；昨天你没复习考试。",
+   "terms": [
+    "wish",
+    "if only"
+   ],
+   "syllabus": "0876 8Ug.10, 9Ug.10",
+   "source": "Cambridge Lower Secondary English as a Second Language Curriculum Framework (0876)（官方文件 tcm143-592622 全文转载，镜像 https://pdfcoffee.com/0876-lower-secondary-english-as-a-second-language-curriculum-framework-2020-tcm143-592622-pdf-free.html）"
+  },
+  {
+   "id": "ENG-GRA-37",
+   "strand": "GRA",
+   "stage": "G9",
+   "name": "第三条件句",
+   "name_en": "Third conditional",
+   "desc": "用 If + 过去完成时, would/could/might have + 过去分词，表达与过去事实相反的假设和后悔。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-23",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-27",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "先写出真实的过去事实（I didn't study, so I failed），再全部“反过来并后退时态”：If I had studied, I would have passed。注意 if 从句里不用 would。",
+   "probe": "把 3 个过去事实改写成第三条件句，并改错：If I would have known, I would have come。",
+   "terms": [
+    "third conditional",
+    "would have done"
+   ],
+   "syllabus": "0876 9Ug.10",
+   "source": "Cambridge Lower Secondary English as a Second Language Curriculum Framework (0876)（官方文件 tcm143-592622 全文转载，镜像 https://pdfcoffee.com/0876-lower-secondary-english-as-a-second-language-curriculum-framework-2020-tcm143-592622-pdf-free.html）"
+  },
+  {
+   "id": "ENG-GRA-38",
+   "strand": "GRA",
+   "stage": "G9",
+   "name": "情态动词完成式表推测与遗憾",
+   "name_en": "Past modals for deduction, speculation and regret",
+   "desc": "用 must have / can't have / might (may, could) have + 过去分词推测过去，用 should have / shouldn't have 表达遗憾或批评。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-16",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-19",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "按把握程度排列：must have（很确定）> might/could have（可能）> can't have（确定没有）。看一张“犯罪现场”图片，用这些结构推测发生了什么。",
+   "probe": "根据情境选择 must have / can't have / should have 填空 5 题。",
+   "terms": [
+    "must have",
+    "can't have",
+    "should have"
+   ],
+   "syllabus": "0876 8Ug.13, 9Ug.14",
+   "source": "Cambridge Lower Secondary English as a Second Language Curriculum Framework (0876)（官方文件 tcm143-592622 全文转载，镜像 https://pdfcoffee.com/0876-lower-secondary-english-as-a-second-language-curriculum-framework-2020-tcm143-592622-pdf-free.html）"
+  },
+  {
+   "id": "ENG-GRA-39",
+   "strand": "GRA",
+   "stage": "G9",
+   "name": "使役结构 have/get something done",
+   "name_en": "Causative have/get something done",
+   "desc": "用 have/get + 宾语 + 过去分词表示请别人做某事或遭遇某事（I had my hair cut; She got her phone stolen）。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-24",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "对比 I cut my hair（自己剪）和 I had my hair cut（请人剪）。列出生活中常用服务场景（repair, clean, deliver）各造一句。",
+   "probe": "把 “The mechanic repaired my car.” 改写为使役结构，并判断两句的意思区别。",
+   "terms": [
+    "causative",
+    "have something done"
+   ],
+   "syllabus": "0876 9Ug.13",
+   "source": "Cambridge Lower Secondary English as a Second Language Curriculum Framework (0876)（官方文件 tcm143-592622 全文转载，镜像 https://pdfcoffee.com/0876-lower-secondary-english-as-a-second-language-curriculum-framework-2020-tcm143-592622-pdf-free.html）"
+  },
+  {
+   "id": "ENG-VOC-14",
+   "strand": "VOC",
+   "stage": "G6",
+   "name": "抽象名词、复合名词与集合名词",
+   "name_en": "Abstract, compound and collective nouns",
+   "desc": "认识和使用 happiness、freedom 等抽象名词，toothbrush、sports centre 等复合名词，以及 team、family、a flock of 等集合名词。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-07",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-05",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用后缀把形容词或动词变成抽象名词（free→freedom, decide→decision）。复合名词按“用途+物品”记（swimming pool）。集合名词注意主谓一致：The team is/are…",
+   "probe": "把 5 个形容词变成抽象名词并造句；给出 4 个集合名词搭配填空。",
+   "terms": [
+    "abstract noun",
+    "compound noun",
+    "collective noun"
+   ],
+   "syllabus": "0057 5Uv.07, 6Uv.06, 6Uv.07; 0876 7Uv.05",
+   "source": "Cambridge Primary English as a Second Language Curriculum Framework (0057) v1, Sept 2020（官方文件 tcm142-592536 的全文转载，镜像 https://pdfcoffee.com/english-as-a-second-language-curriculum-framework-0057-tcm142-592536-pdf-free.html ；官方概要 https://www.cambridgeinternational.org/languages/vietnam/Images/25130-cambridge-primary-english-as-a-second-language-curriculum-outline.pdf） ; Cambridge Lower Secondary English as a Second Language Curriculum Framework (0876)（官方文件 tcm143-592622 全文转载，镜像 https://pdfcoffee.com/0876-lower-secondary-english-as-a-second-language-curriculum-framework-2020-tcm143-592622-pdf-free.html）"
+  },
+  {
+   "id": "ENG-VOC-15",
+   "strand": "VOC",
+   "stage": "G7",
+   "name": "习语与常见惯用表达",
+   "name_en": "Idioms and idiomatic expressions",
+   "desc": "理解 a piece of cake、break the ice、under the weather 等常见习语的整体意义，阅读中能根据语境推测习语含义。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-10",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-06",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "按主题（身体、天气、动物、颜色）整理习语，每个记一个情境例句。阅读中遇到字面意思说不通的短语，先怀疑是习语，再用上下文推测。",
+   "probe": "给 5 个含习语的句子，让学生选出意思，并说出线索。",
+   "terms": [
+    "idiom"
+   ],
+   "syllabus": "0876 Stage 7 Reading（explore idioms）",
+   "source": "Cambridge Lower Secondary English as a Second Language Curriculum Framework (0876)（官方文件 tcm143-592622 全文转载，镜像 https://pdfcoffee.com/0876-lower-secondary-english-as-a-second-language-curriculum-framework-2020-tcm143-592622-pdf-free.html）"
+  },
+  {
+   "id": "ENG-VOC-16",
+   "strand": "VOC",
+   "stage": "G8",
+   "name": "标准英语与非标准英语、口语与书面语",
+   "name_en": "Standard and non-standard English; spoken vs written",
+   "desc": "识别口语、方言或网络用语等非标准形式（gonna, ain't, we was），说明它们在文本中的效果，并在正式写作中使用标准英语。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-12",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "收集小说人物对话中的非标准表达，改写成标准英语，比较两种版本给读者的感觉。正式写作前检查是否混入口语缩写。",
+   "probe": "给一段人物对白，指出 3 处非标准英语并说明作者为什么这样写。",
+   "terms": [
+    "standard English",
+    "non-standard",
+    "dialect"
+   ],
+   "syllabus": "0058 6Rg; 0861 7Rg, 7Wg, 8Wg.04",
+   "source": "Cambridge Primary English Curriculum Framework (0058) v1, Sept 2020（官方文件 tcm142-592529 全文转载，镜像 https://pdfcoffee.com/english-curriculum-framework-0058-tcm142-592529-pdf-free.html） ; Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf）"
+  },
+  {
+   "id": "ENG-REA-14",
+   "strand": "REA",
+   "stage": "G4",
+   "name": "文本类型与体裁特征",
+   "name_en": "Text types and genre features",
+   "desc": "区分虚构与非虚构文本，识别故事、诗歌、剧本、说明文、指令、新闻报道、劝说文、书信、博客、广告等体裁及其结构和语言特征。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-02",
+     "strength": "有帮助"
+    },
+    {
+     "id": "ENG-REA-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "建一张体裁特征表：目的、读者、版式、典型语言（如指令用祈使句、新闻用第三人称和过去时）。每读一篇文本先判断体裁再读内容。",
+   "probe": "给 5 个文本片段（菜谱、新闻、诗、广告、剧本），让学生判断体裁并各说出 2 个依据。",
+   "terms": [
+    "fiction",
+    "non-fiction",
+    "genre",
+    "playscript"
+   ],
+   "syllabus": "0058 3Ri, 4Ri, 5Ri; 0510 Reading text types",
+   "source": "Cambridge Primary English Curriculum Framework (0058) v1, Sept 2020（官方文件 tcm142-592529 全文转载，镜像 https://pdfcoffee.com/english-curriculum-framework-0058-tcm142-592529-pdf-free.html） ; https://www.cambridgeinternational.org/Images/721337-2027-2029-syllabus.pdf"
+  },
+  {
+   "id": "ENG-REA-15",
+   "strand": "REA",
+   "stage": "G5",
+   "name": "人物、场景与主题分析",
+   "name_en": "Character, setting and theme",
+   "desc": "从人物的言行、他人的反应和叙述者的描写推断人物性格、动机和关系，分析场景如何营造气氛，概括故事的主题。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-14",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用“证据-推断”表：左列抄原文（He shoved the letter into his pocket），右列写推断（他想隐藏）。读完一篇故事用一句话写主题，不要只复述情节。",
+   "probe": "给一段故事，问人物的性格、证据和故事主题各一题。",
+   "terms": [
+    "character",
+    "setting",
+    "theme",
+    "atmosphere"
+   ],
+   "syllabus": "0058 4Ri, 5Ri; 0861 7Ri, 8Ri",
+   "source": "Cambridge Primary English Curriculum Framework (0058) v1, Sept 2020（官方文件 tcm142-592529 全文转载，镜像 https://pdfcoffee.com/english-curriculum-framework-0058-tcm142-592529-pdf-free.html） ; Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf）"
+  },
+  {
+   "id": "ENG-REA-16",
+   "strand": "REA",
+   "stage": "G7",
+   "name": "修辞手法与比喻性语言",
+   "name_en": "Literary devices and figurative language",
+   "desc": "识别明喻、暗喻、拟人、头韵、拟声、夸张、意象等修辞手法，说出它们在句子中的意思。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-08",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "每种手法记一个定义和一个例句，阅读时用不同颜色标出。不要只说“这是比喻”，要接着说“把 A 比作 B，暗示了……”。",
+   "probe": "给一段描写，找出 3 处修辞并解释每处的意思。",
+   "terms": [
+    "simile",
+    "metaphor",
+    "personification",
+    "alliteration",
+    "imagery"
+   ],
+   "syllabus": "0058 6R; 0861 7Rv.03; 0500 Reading content",
+   "source": "Cambridge Primary English Curriculum Framework (0058) v1, Sept 2020（官方文件 tcm142-592529 全文转载，镜像 https://pdfcoffee.com/english-curriculum-framework-0058-tcm142-592529-pdf-free.html） ; Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf） ; https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf"
+  },
+  {
+   "id": "ENG-REA-17",
+   "strand": "REA",
+   "stage": "G7",
+   "name": "引用原文支撑观点（PEE）",
+   "name_en": "Supporting answers with textual evidence",
+   "desc": "回答阅读题时用简短、恰当的引文或转述支撑观点，并解释引文如何证明观点（Point-Evidence-Explain）。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-08",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "每个观点配一句短引文（3-8 个词，放在引号中），再写一句 This suggests/shows… 解释。避免长段照抄。",
+   "probe": "问一个推断题，要求写 PEE 段落，检查引文是否简短、解释是否到位。",
+   "terms": [
+    "PEE",
+    "quotation",
+    "evidence"
+   ],
+   "syllabus": "0058 5Ri; 0861 7Ri, 8Ri, 9Ri; 0500 R3",
+   "source": "Cambridge Primary English Curriculum Framework (0058) v1, Sept 2020（官方文件 tcm142-592529 全文转载，镜像 https://pdfcoffee.com/english-curriculum-framework-0058-tcm142-592529-pdf-free.html） ; Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf） ; https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf"
+  },
+  {
+   "id": "ENG-REA-18",
+   "strand": "REA",
+   "stage": "G8",
+   "name": "作者语言效果分析（Writer's effects）",
+   "name_en": "Analysing how writers achieve effects",
+   "desc": "分析作者的词语选择、修辞、句式和标点如何产生效果、影响读者（意思、联想、画面、情绪）。对应 0500 阅读目标 R4，Paper 1 第 3 题需写约 200-250 词的语言分析。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-16",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-17",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-10",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "每个选词按三层写：字面意思 → 联想或言外之意 → 对读者的效果。选择 2-3 处最有力的词语深入分析，不要罗列很多。练习区分“作者用了什么”和“为什么有效”。",
+   "probe": "给一段 0500 风格的描写段落，要求选两个短语分别分析效果，检查是否超出字面解释。",
+   "terms": [
+    "writer's effect",
+    "connotation",
+    "language analysis"
+   ],
+   "syllabus": "0500 Paper 1 Q1/Q3（R4）; 0861 7Rv.02, 8Rv.02, 9Rv.02",
+   "source": "https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf ; Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf）"
+  },
+  {
+   "id": "ENG-REA-19",
+   "strand": "REA",
+   "stage": "G7",
+   "name": "文本结构分析",
+   "name_en": "Analysing text structure",
+   "desc": "分析作者如何组织内容（开头结尾、段落顺序、倒叙、句子开头和连接词）以及这些结构选择对读者的效果。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-WRI-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "读完一篇文章画“结构图”：每段一句话概括 + 箭头说明与上一段的关系（转折、举例、时间推进）。再回答：为什么作者这样开头？为什么最后一段放在这里？",
+   "probe": "给一篇打乱段落顺序的文章，让学生排序并说明依据；再问开头段的作用。",
+   "terms": [
+    "structure",
+    "flashback",
+    "cohesion"
+   ],
+   "syllabus": "0861 7Rs, 8Rs, 9Rs; 0058 6R",
+   "source": "Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf） ; Cambridge Primary English Curriculum Framework (0058) v1, Sept 2020（官方文件 tcm142-592529 全文转载，镜像 https://pdfcoffee.com/english-curriculum-framework-0058-tcm142-592529-pdf-free.html）"
+  },
+  {
+   "id": "ENG-REA-20",
+   "strand": "REA",
+   "stage": "G8",
+   "name": "识别偏见与立场",
+   "name_en": "Recognising bias and viewpoint",
+   "desc": "识别文本中的偏见、片面材料和立场（选词、省略、只举一方例子），评价信息来源的可靠性。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-09",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "读议论或新闻文本时问三个问题：谁写的？想让我相信什么？哪一方的声音缺失了？找出 2 个带评价色彩的词作为证据。",
+   "probe": "给两篇报道同一事件的短文，让学生指出哪篇有偏见并给证据。",
+   "terms": [
+    "bias",
+    "viewpoint",
+    "reliability"
+   ],
+   "syllabus": "0861 7Ri, 8Ri, 9Ri",
+   "source": "Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf）"
+  },
+  {
+   "id": "ENG-REA-21",
+   "strand": "REA",
+   "stage": "G9",
+   "name": "多文本综合与比较",
+   "name_en": "Synthesising and comparing texts",
+   "desc": "从两篇或多篇文本中提取、归并相关信息和观点，比较它们在观点、语言和写法上的异同，并用于新的写作任务。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-11",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-09",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-20",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用表格并排整理两篇文本的观点、证据和语气，相同点和不同点分栏写。写作时用 Similarly / In contrast / Both writers… 连接。",
+   "probe": "给两篇关于同一话题的短文，要求写 150 词比较段落。",
+   "terms": [
+    "synthesis",
+    "comparison"
+   ],
+   "syllabus": "0861 8Ri, 9Ri; 0500 Paper 2 Section A",
+   "source": "Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf） ; https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf"
+  },
+  {
+   "id": "ENG-REA-22",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "name": "IGCSE ESL 阅读：简答与三选一多选",
+   "name_en": "IGCSE ESL Reading: short answers and multiple choice",
+   "desc": "Paper 1 Exercise 1：读约 400-450 词文章，用单词或短语简答（共 8 分，最后一题需答 3 点）；Exercise 4：读约 550-600 词文章，做 6 道三选一，考主旨、细节、作者态度和观点。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-08",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "简答题答案只写关键词或短语，不抄整句；最后一题注意要答满 3 点。多选题先在原文找到依据句，再逐个排除选项，警惕原词重复但意思不同的干扰项。",
+   "probe": "限时 15 分钟做一套 Exercise 1 + Exercise 4 模拟题，统计因答案过长或审题偏差丢的分。",
+   "terms": [
+    "short answer",
+    "multiple choice"
+   ],
+   "syllabus": "0510/0511 Paper 1 Exercises 1, 4（R1-R4）",
+   "source": "https://www.cambridgeinternational.org/Images/721337-2027-2029-syllabus.pdf"
+  },
+  {
+   "id": "ENG-WRI-16",
+   "strand": "WRI",
+   "stage": "G6",
+   "name": "高级标点：冒号、分号、破折号、省略号、括号",
+   "name_en": "Advanced punctuation",
+   "desc": "正确使用冒号（引出列举或解释）、分号（连接两个关系紧密的完整句）、破折号与括号（插入成分）、省略号（停顿或悬念），并理解它们在阅读中的效果。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-WRI-07",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "每种标点记一个规则和一个例句；写作时有意识地每段用一种。分号两侧必须都是完整句，这一条最常错。",
+   "probe": "改正 5 个标点错误的句子，并用分号合并两个句子。",
+   "terms": [
+    "colon",
+    "semi-colon",
+    "dash",
+    "ellipsis",
+    "parenthesis"
+   ],
+   "syllabus": "0058 6Rg; 0861 7Wg.01, 8Wg.01, 9Wg.01",
+   "source": "Cambridge Primary English Curriculum Framework (0058) v1, Sept 2020（官方文件 tcm142-592529 全文转载，镜像 https://pdfcoffee.com/english-curriculum-framework-0058-tcm142-592529-pdf-free.html） ; Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf）"
+  },
+  {
+   "id": "ENG-WRI-17",
+   "strand": "WRI",
+   "stage": "G4",
+   "name": "诗歌与剧本创作",
+   "name_en": "Writing poetry and playscripts",
+   "desc": "仿写或创作简单诗歌（押韵、重复、意象），按剧本格式写对话场景（人物名、舞台说明）。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-14",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "先模仿一首范诗的结构换词改写，再自己写。剧本先把一段故事对话改成剧本格式：人物名后加冒号，舞台说明放在括号里。",
+   "probe": "把一段 6 句故事对话改写成剧本格式，并加两条舞台说明。",
+   "terms": [
+    "poem",
+    "playscript",
+    "stage directions"
+   ],
+   "syllabus": "0058 3Wc, 4Wc, 5Wc; 0861 7Wc.01",
+   "source": "Cambridge Primary English Curriculum Framework (0058) v1, Sept 2020（官方文件 tcm142-592529 全文转载，镜像 https://pdfcoffee.com/english-curriculum-framework-0058-tcm142-592529-pdf-free.html） ; Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf）"
+  },
+  {
+   "id": "ENG-WRI-18",
+   "strand": "WRI",
+   "stage": "G7",
+   "name": "句式变化与写作效果",
+   "name_en": "Varying sentences for effect",
+   "desc": "有意识地变化句子长短、句型（简单句、并列句、复合句）、句首方式和语序来制造节奏、强调和悬念。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-06",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-WRI-16",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "改写练习：把一段全是“主语开头”的句子改成用副词、分词短语、从句开头。紧张时刻用短句，描写背景用长句。",
+   "probe": "给一段平淡的描写，要求改写出至少 3 种不同句首和一个一词短句，并说明效果。",
+   "terms": [
+    "sentence variety",
+    "sentence openers"
+   ],
+   "syllabus": "0058 6Ws; 0861 7Wg.02, 8Wg.02, 9Wg.02; 0500 W3",
+   "source": "Cambridge Primary English Curriculum Framework (0058) v1, Sept 2020（官方文件 tcm142-592529 全文转载，镜像 https://pdfcoffee.com/english-curriculum-framework-0058-tcm142-592529-pdf-free.html） ; Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf） ; https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf"
+  },
+  {
+   "id": "ENG-WRI-19",
+   "strand": "WRI",
+   "stage": "G8",
+   "name": "议论文与劝说文（Essay）",
+   "name_en": "Argumentative and persuasive essays",
+   "desc": "围绕一个话题陈述观点、给出理由和例子、回应反方观点，并得出结论；劝说文还要使用修辞问句、三连排比、直接呼告等技巧。essay 是 IGCSE ESL Exercise 6 的指定文体之一。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-08",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-WRI-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-09",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "四段结构：引入并表明立场—理由 1+例子—理由 2+反方回应—结论。劝说技巧记 AFOREST（Anecdote, Facts, Opinion, Rhetorical question, Emotive language, Statistics, Triples）。写前列好正反两方要点。",
+   "probe": "给一个 ESL 风格话题（如“学生应该在学校穿校服吗”）写 120-160 词 essay，检查立场是否清楚、有无反方回应。",
+   "terms": [
+    "essay",
+    "argument",
+    "persuasive techniques"
+   ],
+   "syllabus": "0510/0511 Paper 1 Exercise 6; 0876 8-9 Writing（develop coherent arguments）",
+   "source": "https://www.cambridgeinternational.org/Images/721337-2027-2029-syllabus.pdf ; Cambridge Lower Secondary English as a Second Language Curriculum Framework (0876)（官方文件 tcm143-592622 全文转载，镜像 https://pdfcoffee.com/0876-lower-secondary-english-as-a-second-language-curriculum-framework-2020-tcm143-592622-pdf-free.html）"
+  },
+  {
+   "id": "ENG-WRI-20",
+   "strand": "WRI",
+   "stage": "G8",
+   "name": "演讲稿、日记与采访稿",
+   "name_en": "Speech, journal and interview writing",
+   "desc": "掌握演讲稿（称呼听众、口语化修辞、呼吁）、日记/journal（第一人称、情感与反思）、采访稿（问答格式、体现人物声音）的格式和语气。这些都是 0500 Paper 1 第 4 题的可选文体。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-12",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-12",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "每种文体背一个开头和结尾模板（Good morning everyone… / Dear Diary… / Interviewer: …）。同一材料分别改写成三种文体，比较语气差别。",
+   "probe": "根据一篇短文写 200 词演讲稿开头和结尾，检查是否对听众说话、是否有呼吁。",
+   "terms": [
+    "speech",
+    "journal",
+    "interview"
+   ],
+   "syllabus": "0500 Paper 1 Q4; 0861 7SLp.05",
+   "source": "https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf ; Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf）"
+  },
+  {
+   "id": "ENG-WRI-21",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "name": "0500 阅读延伸写作（Extended response）",
+   "name_en": "0500 Extended response to reading",
+   "desc": "0500 Paper 1 第 4 题：根据 Text C 的内容，用指定文体（letter, report, journal, speech, interview, article 之一）写 250-300 词，阅读 10 分加写作 10 分，要求既利用并发展原文信息，又符合文体和读者。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-20",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-WRI-11",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先在原文中划出可以用的要点（至少 8-10 个），再按题目要求的身份和读者重新组织，不要照抄原文顺序。阅读分来自“用原文并有推断和发展”，写作分来自文体、语气和结构。",
+   "probe": "限时 35 分钟按一份 0500 题目写 Q4，检查原文要点使用数量和文体语气。",
+   "terms": [
+    "extended response",
+    "voice",
+    "audience"
+   ],
+   "syllabus": "0500 Paper 1 Question 4（R1-R3, R5; W1-W5）",
+   "source": "https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf"
+  },
+  {
+   "id": "ENG-WRI-22",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "name": "0500 定向写作（Directed writing）",
+   "name_en": "0500 Directed writing",
+   "desc": "0500 Paper 2 Section A：读 550-650 词材料，1(a) 结构化分析（5 分），1(b) 写 250-350 词议论、讨论或劝说文（阅读 10 分 + 写作 25 分），要评价材料中的观点而不只是复述。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-19",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-21",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-20",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "读材料时给每个观点标“同意/反对/有疑问”，写作时每段处理一个观点并加入自己的评价（This argument ignores…）。按题目要求的文体（信、演讲、文章）调整开头结尾。",
+   "probe": "给一份 0500 风格材料，限时 60 分钟完成 1(a)+1(b)，检查是否评价了材料中的观点。",
+   "terms": [
+    "directed writing",
+    "evaluate",
+    "discursive"
+   ],
+   "syllabus": "0500 Paper 2 Section A（R3, R4; W1-W5）",
+   "source": "https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf"
+  },
+  {
+   "id": "ENG-WRI-23",
+   "strand": "WRI",
+   "stage": "IGCSE",
+   "name": "0500 描写文与记叙文（Composition）",
+   "name_en": "0500 Descriptive and narrative composition",
+   "desc": "0500 Paper 2 Section B：四个题目中选一个（两个描写、两个记叙），写 350-450 词，40 分（W1-W5）。描写重在感官细节和意象，不写成故事；记叙重在完整情节、人物和结构。Coursework 方案中描写和记叙各是一篇作业。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-10",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-16",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-WRI-18",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "描写文用“镜头移动”结构（远景-中景-特写-情绪变化），每段集中一个感官。记叙文先定结尾再写开头，控制在 1-2 个场景内，避免情节太多写不完。",
+   "probe": "给一个描写题，限时 45 分钟写 400 词，检查是否跑题成故事、意象是否具体。",
+   "terms": [
+    "composition",
+    "descriptive writing",
+    "narrative writing"
+   ],
+   "syllabus": "0500 Paper 2 Section B; Component 3 Assignments 2, 3",
+   "source": "https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf"
+  },
+  {
+   "id": "ENG-WRI-24",
+   "strand": "WRI",
+   "stage": "G7",
+   "name": "笔记方法（Note-taking）",
+   "name_en": "Note-taking methods",
+   "desc": "根据目的选择笔记形式（要点列表、思维导图、表格、时间线），用缩写和符号快速记下阅读或听力中的关键信息，用于写作和复习。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "一篇文章用两种方式做笔记（列表和思维导图），比较哪种更适合这篇文章。建立个人缩写表（e.g., b/c = because, ↑ = increase）。",
+   "probe": "听一段 2 分钟讲话做笔记，再只凭笔记复述 5 个要点。",
+   "terms": [
+    "note-taking",
+    "mind map"
+   ],
+   "syllabus": "0861 7Wp.02, 8Wp.02, 9Wp.02",
+   "source": "Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf）"
+  },
+  {
+   "id": "ENG-LIS-08",
+   "strand": "LIS",
+   "stage": "G4",
+   "name": "功能性交际用语",
+   "name_en": "Functional language for interaction",
+   "desc": "在日常交际中提出建议（What/How about…? Shall we…?）、邀请和回应（Would you like…? Yes, please / No, thank you）、请求、征求和澄清（Could you repeat that?）。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "按功能做对话卡片（建议、邀请、请求、澄清），和同伴角色扮演，每张卡片至少用两种不同说法。",
+   "probe": "给 4 个情境（邀请同学看电影、没听清老师的话等），让学生口头说出合适的句子。",
+   "terms": [
+    "suggestion",
+    "invitation",
+    "clarification"
+   ],
+   "syllabus": "0057 3Ug.07, 4Ug.02, 6Ug.02; 0876 7 Speaking（ask clarifying questions）",
+   "source": "Cambridge Primary English as a Second Language Curriculum Framework (0057) v1, Sept 2020（官方文件 tcm142-592536 的全文转载，镜像 https://pdfcoffee.com/english-as-a-second-language-curriculum-framework-0057-tcm142-592536-pdf-free.html ；官方概要 https://www.cambridgeinternational.org/languages/vietnam/Images/25130-cambridge-primary-english-as-a-second-language-curriculum-outline.pdf） ; Cambridge Lower Secondary English as a Second Language Curriculum Framework (0876)（官方文件 tcm143-592622 全文转载，镜像 https://pdfcoffee.com/0876-lower-secondary-english-as-a-second-language-curriculum-framework-2020-tcm143-592622-pdf-free.html）"
+  },
+  {
+   "id": "ENG-LIS-09",
+   "strand": "LIS",
+   "stage": "G6",
+   "name": "小组讨论与轮流发言",
+   "name_en": "Group discussion and turn-taking",
+   "desc": "在小组讨论中承担角色，礼貌地表达同意和不同意、补充他人观点、轮流发言，并总结讨论结果。",
+   "prereqs": [
+    {
+     "id": "ENG-LIS-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-LIS-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "准备一组讨论用语：I agree with… because… / I see your point, but… / Building on what X said… 讨论中轮流担任主持人、记录员、总结人。",
+   "probe": "组织 4 人讨论 5 分钟，观察学生是否回应他人、是否使用讨论用语。",
+   "terms": [
+    "turn-taking",
+    "agree/disagree"
+   ],
+   "syllabus": "0058 Speaking and listening（Group work and discussion）; 0861 7SLg, 8SLg, 9SLg",
+   "source": "Cambridge Primary English Curriculum Framework (0058) v1, Sept 2020（官方文件 tcm142-592529 全文转载，镜像 https://pdfcoffee.com/english-curriculum-framework-0058-tcm142-592529-pdf-free.html） ; Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf）"
+  },
+  {
+   "id": "ENG-LIS-10",
+   "strand": "LIS",
+   "stage": "G7",
+   "name": "朗读、演讲与展示",
+   "name_en": "Reading aloud, speeches and presentations",
+   "desc": "有表现力地朗读文本（停顿、重音、语调），做有结构的口头展示和劝说性演讲，根据听众调整语言和非语言表达。",
+   "prereqs": [
+    {
+     "id": "ENG-LIS-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-LIS-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "朗读前在文本上标出停顿（/）和重读词（下划线）。展示用“开场-3 个要点-结尾呼吁”结构，录像回看眼神和手势。",
+   "probe": "让学生做 2 分钟展示，用量表评价结构、语音语调和与听众的互动。",
+   "terms": [
+    "presentation",
+    "speech",
+    "intonation"
+   ],
+   "syllabus": "0861 7SLp, 8SLp, 9SLp; 0058 Speaking and listening（Performance）",
+   "source": "Cambridge Lower Secondary English Curriculum Framework (0861) v1, Sept 2020（官方文件全文转载，镜像 https://sktjosef.com/s/English-Curriculum-Framework-0861.pdf） ; Cambridge Primary English Curriculum Framework (0058) v1, Sept 2020（官方文件 tcm142-592529 全文转载，镜像 https://pdfcoffee.com/english-curriculum-framework-0058-tcm142-592529-pdf-free.html）"
+  },
+  {
+   "id": "ENG-LIS-11",
+   "strand": "LIS",
+   "stage": "G8",
+   "name": "语音语调：句子重音、连读与语调",
+   "name_en": "Connected speech, sentence stress and intonation",
+   "desc": "掌握句子重音（实词重读）、连读与弱读、升降调（一般疑问句升调、陈述句降调），使口语自然易懂；这也是听懂快语速录音的基础。对应 IGCSE ESL 口语目标 S4（发音和语调）。",
+   "prereqs": [
+    {
+     "id": "ENG-LIS-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "影子跟读（shadowing）：每天跟读 1 分钟原声，模仿重音和语调。在文本上标出连读处（an_apple）和弱读词（to, of, and），录音对比。",
+   "probe": "让学生朗读一段对话，评价句子重音、连读和疑问句语调。",
+   "terms": [
+    "sentence stress",
+    "connected speech",
+    "intonation"
+   ],
+   "syllabus": "0510/0511 Speaking S4",
+   "source": "https://www.cambridgeinternational.org/Images/721337-2027-2029-syllabus.pdf"
+  },
+  {
+   "id": "ENG-LIS-12",
+   "strand": "LIS",
+   "stage": "IGCSE",
+   "name": "IGCSE 口语短讲与个人陈述",
+   "name_en": "IGCSE short talk / individual talk",
+   "desc": "0510/0511 Part 2 Short talk：看话题卡准备 1 分钟（不能写笔记），然后独自讲述约 2-3 分钟；0500 Component 4 Part 1 Individual Talk：自选话题，可用一张明信片大小的提示卡，讲 3-4 分钟，随后 7-8 分钟对话。",
+   "prereqs": [
+    {
+     "id": "ENG-LIS-10",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-LIS-07",
+     "strength": "有帮助"
+    },
+    {
+     "id": "ENG-VOC-11",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "用“观点-理由-例子-个人经历”框架，在心里快速列 3 个要点；平时每天抽一张话题卡计时练习，1 分钟只用来想结构不写稿。0500 的个人陈述不要背稿，大纲明确说背诵稿子“不太可能成功”。",
+   "probe": "随机抽一张话题卡，1 分钟准备后讲 2 分钟，记录停顿、展开程度和语法错误。",
+   "terms": [
+    "short talk",
+    "individual talk",
+    "cue card"
+   ],
+   "syllabus": "0510/0511 Component 3 Part 2; 0500 Component 4 Part 1",
+   "source": "https://www.cambridgeinternational.org/Images/721337-2027-2029-syllabus.pdf ; https://www.cambridgeinternational.org/Images/718783-2027-2029-syllabus.pdf"
   }
  ]
 }

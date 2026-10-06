@@ -1,0 +1,28 @@
+{
+ "unverified": [
+  {
+   "what": "Cambridge Primary/Lower Secondary 各 Stage 对应的 CEFR 等级（如 Stage 9 ≈ B1/B2）",
+   "why": "官方 Lower Secondary 宣传册和 0057/0876 课程概要只说学习目标“基于 CEFR”，没有逐 Stage 对应表；镜像框架中也没有找到明确的逐级对应句。官方只明确：0510 总分 C 且口语 2 级约等于 B2。"
+  },
+  {
+   "what": "Cambridge Primary / Lower Secondary Checkpoint 英语（English / ESL）考试的试卷结构和题型",
+   "why": "官方 Checkpoint 说明需要 School Support Hub 登录，公开页面只说明由 Cambridge 阅卷。本次没有新增 Checkpoint 题型知识点。"
+  },
+  {
+   "what": "0057/0876/0058/0861 课程框架原文",
+   "why": "官方全文只在 Cambridge School Support Hub（需学校账号）提供。本次用的是官方 PDF（文件号 tcm142/143-xxxxx）在 pdfcoffee、sktjosef.com 上的全文转载，按 BRIEF 属于佐证级；codes 和句子已和多个转载核对一致，但没有在官方站点直接打开原件。"
+  },
+  {
+   "what": "包内语法知识点的 hot=true（如 GRA-03、06、21、24、25、26）",
+   "why": "IGCSE ESL 和 0500 都不单独考语法题，语法只在写作 language 分（W3）和口语 S2 中综合评分。这些 hot 标记缺少单列考点的依据，但也没有证据说必须改，建议家长评估后决定是否改为 false。本 patch 未改动。"
+  },
+  {
+   "what": "G3 以下（Stage 1-2）和 Primary English 0058 的拼读细项（phonics）",
+   "why": "包从 G3 开始，本次没有补 Stage 1-2 内容；0058 Stage 1-4 的 phonics 子项只对照到了 VOC-01/03 的粒度。"
+  },
+  {
+   "what": "学校实际采用 0510、0511 还是 0500，以及 Gn 与 Stage 的对应方式",
+   "why": "上海各国际学校做法不同，官方没有统一规定；需要按孩子所在学校的课程说明确认。"
+  }
+ ]
+}
