@@ -41,13 +41,11 @@ def test_full_flow():
         assert "家长页" in r.text and 'href="/admin"' not in r.text
         # 姐姐：IGCSE 物理 + 剑桥英语 + 统编语文；弟弟：上海英语 + 统编语文 + 上海数学
         c.post("/parent/kids/save", data={"name": "姐姐", "email": "a@x.com", "password": "secret1", "grade": "G8",
-                                          "daily_minutes": "90", "pack_phy-cambridge": "on", "stage_phy-cambridge": "IGCSE",
-                                          "pack_eng-cambridge": "on", "stage_eng-cambridge": "G8",
-                                          "pack_chn-tongbian": "on", "stage_chn-tongbian": "G8"})
+                                          "daily_minutes": "90", "subj_physics": "phy-cambridge",
+                                          "subj_english": "eng-cambridge", "subj_chinese": "chn-tongbian"})
         c.post("/parent/kids/save", data={"name": "弟弟", "email": "b@x.com", "password": "secret1", "grade": "G3",
-                                          "daily_minutes": "60", "pack_eng-shanghai": "on", "stage_eng-shanghai": "G3",
-                                          "pack_chn-tongbian": "on", "stage_chn-tongbian": "G3",
-                                          "pack_math-shanghai": "on", "stage_math-shanghai": "G3"})
+                                          "daily_minutes": "60", "subj_english": "eng-shanghai",
+                                          "subj_chinese": "chn-tongbian", "subj_math": "math-shanghai"})
         page = c.get("/parent").text
         assert "姐姐" in page and "弟弟" in page
         c.get("/logout")
@@ -464,3 +462,55 @@ def test_site_settings_and_insights():
         assert "系统发现" in c.get(f"/parent/kids/{kid_b}").text
         c.get("/logout")
         sitecfg.set_many({"site_name": "", "assistant_name": "", "assistant_icon": "", "registration": "", "parent_invite_limit": ""})
+
+
+def test_account_management():
+    from app import auth, db
+    with TestClient(app) as c:
+        kid_b = db.one("SELECT id FROM users WHERE email='b@x.com'")["id"]
+        parent = db.one("SELECT id FROM users WHERE email='p@x.com'")["id"]
+        # 家长：改孩子资料、换教材（只选版本，学段跟年级走）、重置密码
+        c.post("/login", data={"email": "p@x.com", "password": "secret1"})
+        r = c.get(f"/parent/kids/{kid_b}/edit")
+        assert "登录与安全" in r.text and "stage_" not in r.text and 'name="subj_math"' in r.text
+        c.post("/parent/kids/save", data={"id": kid_b, "name": "弟弟", "email": "b2@x.com", "grade": "G4", "daily_minutes": "60",
+                                          "subj_english": "eng-shanghai", "subj_math": "math-shanghai", "subj_chinese": ""})
+        assert db.one("SELECT email FROM users WHERE id=?", kid_b)["email"] == "b2@x.com"
+        st = {r["pack_id"]: r["stage"] for r in db.q("SELECT * FROM enrollments WHERE user_id=? AND active=1", kid_b)}
+        assert st == {"eng-shanghai": "G4", "math-shanghai": "G4"}, st
+        r = c.post(f"/parent/kids/{kid_b}/account", data={"action": "password", "password": ""})
+        temp = r.text.split("新密码：<b")[1].split(">")[1].split("<")[0]
+        assert len(temp) == 9 and "只显示这一次" in r.text
+        r = c.post(f"/parent/kids/{kid_b}/account", data={"action": "password", "password": "kidpass1"})
+        assert "新密码就是你刚才输入的" in r.text and "只显示这一次" not in r.text
+        other = db.insert("INSERT INTO users(email,pw_hash,name,role,status,created_at) VALUES('z@x.com','x','z','kid','active',?)", db.now())
+        assert c.post(f"/parent/kids/{other}/account", data={"action": "unlock"}).status_code == 404  # 不是自己的孩子
+        c.get("/logout")
+        assert c.post("/login", data={"email": "b2@x.com", "password": "kidpass1"}).url.path == "/today"
+        c.get("/logout")
+        # 管理员：账号详情页，改家长邮箱、给临时密码（对方登录后必须先改密码）、解锁、退出所有设备
+        c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+        r = c.get(f"/admin/users/{parent}")
+        assert "登录与安全" in r.text and "最近的账号记录" in r.text
+        assert f'/admin/users/{parent}' in c.get("/admin?tab=families").text
+        c.post(f"/admin/users/{parent}/profile", data={"name": "爸爸", "email": "p2@x.com"})
+        assert auth.get_user(parent)["email"] == "p2@x.com"
+        db.run("UPDATE users SET locked_until=? WHERE id=?", "2999-01-01", parent)
+        assert "解除锁定" in c.get(f"/admin/users/{parent}").text
+        c.post(f"/admin/users/{parent}/account", data={"action": "unlock"})
+        assert auth.get_user(parent)["locked_until"] is None
+        r = c.post(f"/admin/users/{parent}/account", data={"action": "password", "password": "", "force": "1"})
+        temp = r.text.split("新密码：<b")[1].split(">")[1].split("<")[0]
+        assert auth.get_user(parent)["must_change_pw"] == 1
+        c.get("/logout")
+        r = c.post("/login", data={"email": "p2@x.com", "password": temp})
+        assert r.url.path == "/settings" and "临时密码" in r.text
+        assert c.get("/parent").url.path == "/settings"
+        c.post("/password", data={"old": temp, "new": "secret1"})
+        assert c.get("/parent").url.path == "/parent" and auth.get_user(parent)["must_change_pw"] == 0
+        c.get("/logout")
+        c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+        assert "退出登录" in c.post(f"/admin/users/{parent}/account", data={"action": "signout"}).text
+        assert not auth.sessions_of(parent)
+        assert c.get(f"/admin/users/{db.one('SELECT id FROM users WHERE email=?', 'admin@x.com')['id']}").url.path == "/settings"
+        c.get("/logout")

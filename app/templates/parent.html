@@ -14,7 +14,7 @@
     <a class="btn ghost sm" href="/parent/as/{{ k.u.id }}?next=/progress">学校进度</a>
     <a class="btn ghost sm" href="/parent/as/{{ k.u.id }}?next=/papers">导入试卷</a>
     <a class="btn ghost sm" href="/parent/kids/{{ k.u.id }}">学习报告</a>
-    <a class="btn ghost sm" href="/parent/kids/{{ k.u.id }}/edit">编辑</a>
+    <a class="btn ghost sm" href="/parent/kids/{{ k.u.id }}/edit">资料与密码</a>
   </div>
   {% set done = k.today.plan|selectattr('done')|list|length %}
   <p>今天：完成 <b>{{ done }}/{{ k.today.plan|length }}</b> 项，学习约 <b>{{ k.today.minutes }}</b> 分钟 · 连续 <b>{{ k.streak }}</b> 天 · 本周 {{ k.week_min }} 分钟 · 待复习 {{ k.due }} 张</p>

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="small"><a href="/admin?tab=families">← 家庭与账号</a></p>
+<h1>{{ u.name }} <span class="pill">{{ {'admin': '管理员', 'parent': '家长', 'kid': '孩子'}[u.role] }}</span>
+  {% if u.status == 'disabled' %}<span class="pill st-weak">已停用</span>{% elif u.status == 'pending' %}<span class="pill st-learning">待审批</span>{% elif u.status == 'rejected' %}<span class="pill st-weak">未通过</span>{% endif %}</h1>
+{% if msg %}<div class="hint">{{ msg }}{% if link %}<br><input type="text" readonly value="{{ link }}" onclick="this.select()" style="margin-top:6px">{% endif %}</div>{% endif %}
+<p class="muted small">注册 {{ u.created_at[:10] }}{% if inviter %} · 由 {{ inviter.name }}（{{ inviter.email }}）邀请{% endif %}
+  {% if parent %} · 家长：<a href="/admin/users/{{ parent.id }}">{{ parent.name }}</a>{% endif %}</p>
+
+<form class="card" method="post" action="/admin/users/{{ u.id }}/profile">
+  <h3>基本信息</h3>
+  <div class="row">
+    <div class="grow"><label>{{ '名字' if u.role == 'kid' else '称呼' }}</label><input type="text" name="name" value="{{ u.name }}" required></div>
+    <div class="grow"><label>登录邮箱</label><input type="email" name="email" value="{{ u.email }}" required></div>
+  </div>
+  <div style="margin-top:12px"><button class="btn">保存</button>
+    {% if u.role == 'kid' %}<span class="muted small">年级、教材等学习安排由家长在家长页修改。</span>{% endif %}</div>
+</form>
+
+{% include "_account_security.html" %}
+
+<div class="card">
+  <h3>账号状态</h3>
+  <div class="row small">
+  {% if u.status == 'pending' %}
+  <form method="post" action="/admin/users/{{ u.id }}/status"><input type="hidden" name="status" value="active"><input type="hidden" name="back" value="user"><button class="btn sm">通过</button></form>
+  <form method="post" action="/admin/users/{{ u.id }}/status"><input type="hidden" name="status" value="rejected"><input type="hidden" name="back" value="user"><button class="btn ghost sm">拒绝</button></form>
+  {% elif u.status == 'active' %}
+  <form method="post" action="/admin/users/{{ u.id }}/status" onsubmit="return confirm('停用后对方立即无法登录，确定？')"><input type="hidden" name="status" value="disabled"><input type="hidden" name="back" value="user"><button class="btn ghost sm">停用这个账号</button></form>
+  {% else %}
+  <form method="post" action="/admin/users/{{ u.id }}/status"><input type="hidden" name="status" value="active"><input type="hidden" name="back" value="user"><button class="btn ghost sm">启用</button></form>
+  {% endif %}
+  {% if u.role == 'kid' %}<a class="btn ghost sm" href="/admin/kids/{{ u.id }}">学习报告</a>{% endif %}
+  </div>
+</div>
+
+{% if kids %}
+<div class="card">
+  <h3>孩子</h3>
+  <table>{% for k in kids %}
+    <tr><td><a href="/admin/users/{{ k.id }}">{{ k.name }}</a></td><td class="small muted">{{ k.email }}</td><td class="small">{{ stage_label(k.grade) }}</td>
+      <td class="small">最近登录 {{ (k.last_login_at or '—')[:10] }}</td><td class="small"><a href="/admin/kids/{{ k.id }}">报告</a></td></tr>
+  {% endfor %}</table>
+</div>
+{% endif %}
+
+<div class="card">
+  <h3>最近的账号记录</h3>
+  <table>{% for e in events %}
+    <tr class="small"><td>{{ e.created_at[:16]|replace('T',' ') }}</td><td>{{ e.event }}</td><td class="muted">{{ e.ip }}</td><td class="muted">{{ e.detail }}</td></tr>
+  {% else %}<tr><td class="muted small">还没有记录</td></tr>{% endfor %}</table>
+</div>
+{% endblock %}

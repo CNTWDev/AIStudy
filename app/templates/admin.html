@@ -15,7 +15,7 @@
   <form method="post" action="/admin/users/{{ u.id }}/status" style="display:inline"><input type="hidden" name="status" value="active"><input type="hidden" name="back" value="{{ back }}"><button class="btn ghost sm">启用</button></form>
   {% endif %}
 {% endif %}
-<form method="post" action="/admin/users/{{ u.id }}/reset" style="display:inline"><input type="hidden" name="back" value="{{ back }}"><button class="btn ghost sm">重设密码链接</button></form>
+<a class="btn ghost sm" href="/admin/users/{{ u.id }}">账号管理</a>
 {%- endmacro %}
 {% block body %}
 <h1>管理后台</h1>
@@ -82,7 +82,7 @@
 {% for f in families %}
 <div class="card">
   <div class="row">
-    <div class="grow"><h3 style="margin:0">{{ f.p.name }} {{ status_pill(f.p) }}</h3>
+    <div class="grow"><h3 style="margin:0"><a href="/admin/users/{{ f.p.id }}">{{ f.p.name }}</a> {{ status_pill(f.p) }}</h3>
       <div class="muted small">{{ f.p.email }} · 注册 {{ f.p.created_at[:10] }} · 最近活动 {{ (f.p.last_active_at or f.p.last_login_at or '—')[:10] }}
         {% if f.p.inviter_name %} · 由 {{ f.p.inviter_name }} 邀请{% endif %}{% if f.invited %} · 邀请了 {{ f.invited|length }} 个家庭{% endif %}</div></div>
     <div class="small">{{ user_actions(f.p, 'families') }}
@@ -93,7 +93,7 @@
     <tr><th>孩子</th><th>年级 / 教材</th><th>今天</th><th>坚持</th><th>本周</th><th>待复习 / 生词</th><th>薄弱点</th><th>系统发现</th><th></th></tr>
     {% for k in f.kids %}
     <tr>
-      <td><b>{{ k.u.name }}</b> {{ status_pill(k.u) }}<div class="muted small">{{ k.u.email }}</div></td>
+      <td><b><a href="/admin/users/{{ k.u.id }}">{{ k.u.name }}</a></b> {{ status_pill(k.u) }}<div class="muted small">{{ k.u.email }}</div></td>
       <td class="small">{{ stage_label(k.u.grade) }}<br><span class="muted">{% for p in k.packs %}{{ p.pack.subject_name }}{{ '、' if not loop.last }}{% else %}未选教材{% endfor %}</span></td>
       <td class="small">{{ k.today_done }}/{{ k.today.plan|length }} 项<br><span class="muted">{{ k.today.minutes }} 分钟</span></td>
       <td class="small">连续 {{ k.streak }} 天</td>
