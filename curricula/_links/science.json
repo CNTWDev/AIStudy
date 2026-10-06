@@ -1,0 +1,2351 @@
+{
+ "_doc": "理科：沪版 ↔ 剑桥的同一概念，理科之间互相用到的知识，以及中英术语对照。",
+ "concepts": [
+  {
+   "id": "phy.sound",
+   "name": "声音的产生与传播",
+   "kps": [
+    "PHY-IG-3.4-01",
+    "SCI-SH-G6-04"
+   ]
+  },
+  {
+   "id": "phy.simple-circuit",
+   "name": "简单电路",
+   "kps": [
+    "SCI-SH-G4-04"
+   ]
+  },
+  {
+   "id": "phy.magnetic-field",
+   "name": "磁体与磁场",
+   "kps": [
+    "SCI-PRE-MAG"
+   ]
+  },
+  {
+   "id": "phy.particle-model",
+   "name": "物质三态的粒子模型",
+   "kps": [
+    "PSH-THERM-01",
+    "SCI-PRE-PART",
+    "PHY-IG-2.1.2-01",
+    "CHEM-IG-1.1-01"
+   ]
+  },
+  {
+   "id": "phy.measure-length",
+   "name": "用刻度尺测长度",
+   "kps": [
+    "PSH-EXP-01",
+    "PHY-IG-1.1-01"
+   ]
+  },
+  {
+   "id": "phy.measure-volume",
+   "name": "量筒测体积",
+   "kps": [
+    "PSH-EXP-02",
+    "PHY-IG-1.1-02"
+   ]
+  },
+  {
+   "id": "phy.reduce-error",
+   "name": "多次测量取平均减小误差",
+   "kps": [
+    "PSH-EXP-04",
+    "PHY-IG-1.1-10"
+   ]
+  },
+  {
+   "id": "phy.error-types",
+   "name": "系统误差与偶然（随机）误差",
+   "kps": [
+    "PSH-EXP-06",
+    "PHY-IG-1.1-09"
+   ]
+  },
+  {
+   "id": "phy.scalar-vector",
+   "name": "标量与矢量",
+   "kps": [
+    "PSH-MECH-21",
+    "PHY-IG-1.1-13"
+   ]
+  },
+  {
+   "id": "phy.vt-graph",
+   "name": "速度-时间图像与加速度",
+   "kps": [
+    "PSH-MECH-24",
+    "PHY-IG-1.2-03"
+   ]
+  },
+  {
+   "id": "phy.weight",
+   "name": "重力与质量 G = mg",
+   "kps": [
+    "PSH-MECH-05",
+    "PHY-IG-1.3-01"
+   ]
+  },
+  {
+   "id": "phy.force-basics",
+   "name": "力的初步认识",
+   "kps": [
+    "PSH-MECH-01",
+    "SCI-PRE-FORCE"
+   ]
+  },
+  {
+   "id": "phy.hooke",
+   "name": "弹力与胡克定律",
+   "kps": [
+    "PSH-MECH-26",
+    "PHY-IG-1.5.1-01"
+   ]
+  },
+  {
+   "id": "phy.newton-first",
+   "name": "牛顿第一定律与合力",
+   "kps": [
+    "PSH-MECH-09",
+    "PHY-IG-1.5.1-02"
+   ]
+  },
+  {
+   "id": "phy.newton-second",
+   "name": "牛顿第二定律 F = ma",
+   "kps": [
+    "PSH-MECH-30",
+    "PHY-IG-1.5.1-03"
+   ]
+  },
+  {
+   "id": "phy.moment",
+   "name": "杠杆与力矩平衡",
+   "kps": [
+    "PSH-MECH-10",
+    "SCI-PRE-MOMENT",
+    "PHY-IG-1.5.2-01"
+   ]
+  },
+  {
+   "id": "phy.momentum",
+   "name": "动量与冲量",
+   "kps": [
+    "PSH-MECH-44",
+    "PHY-IG-1.6-01"
+   ]
+  },
+  {
+   "id": "phy.momentum-conservation",
+   "name": "动量守恒",
+   "kps": [
+    "PSH-MECH-45",
+    "PHY-IG-1.6-02"
+   ]
+  },
+  {
+   "id": "phy.energy-forms",
+   "name": "能量的形式与转化（入门）",
+   "kps": [
+    "SCI-SH-G6-07",
+    "SCI-PRE-ENERGY"
+   ]
+  },
+  {
+   "id": "phy.energy-conservation",
+   "name": "能量守恒",
+   "kps": [
+    "PSH-MECH-43",
+    "PHY-IG-1.7.1-01"
+   ]
+  },
+  {
+   "id": "phy.ke-pe",
+   "name": "动能与重力势能",
+   "kps": [
+    "PSH-MECH-13",
+    "PHY-IG-1.7.1-02"
+   ]
+  },
+  {
+   "id": "phy.work-power",
+   "name": "功和功率",
+   "kps": [
+    "PSH-MECH-12",
+    "PHY-IG-1.7.2-01"
+   ]
+  },
+  {
+   "id": "phy.gas-laws",
+   "name": "气体的压强、体积与温度",
+   "kps": [
+    "PSH-THERM-08",
+    "PHY-IG-2.1.3-01"
+   ]
+  },
+  {
+   "id": "phy.specific-heat",
+   "name": "比热容",
+   "kps": [
+    "PSH-THERM-04",
+    "PHY-IG-2.2.2-01"
+   ]
+  },
+  {
+   "id": "phy.change-of-state",
+   "name": "物态变化（熔化、沸腾、蒸发）",
+   "kps": [
+    "PSH-THERM-03",
+    "PHY-IG-2.2.3-01",
+    "CHEM-IG-1.1-02"
+   ]
+  },
+  {
+   "id": "phy.heat-transfer",
+   "name": "热传递：传导、对流、辐射",
+   "kps": [
+    "SCI-SH-G6-03",
+    "SCI-PRE-THERM"
+   ]
+  },
+  {
+   "id": "phy.wave-basics",
+   "name": "波的描述与 v = fλ",
+   "kps": [
+    "PSH-SOUND-06",
+    "PHY-IG-3.1-01"
+   ]
+  },
+  {
+   "id": "phy.reflection-law",
+   "name": "光的反射定律",
+   "kps": [
+    "PSH-OPT-02",
+    "SCI-PRE-LIGHT"
+   ]
+  },
+  {
+   "id": "phy.plane-mirror",
+   "name": "平面镜成像",
+   "kps": [
+    "PSH-OPT-03",
+    "PHY-IG-3.2.1-01"
+   ]
+  },
+  {
+   "id": "phy.total-internal-reflection",
+   "name": "折射率、临界角与全反射",
+   "kps": [
+    "PSH-OPT-07",
+    "PHY-IG-3.2.2-02"
+   ]
+  },
+  {
+   "id": "phy.lens",
+   "name": "凸透镜成像",
+   "kps": [
+    "PSH-OPT-06",
+    "PHY-IG-3.2.3-01"
+   ]
+  },
+  {
+   "id": "phy.colour",
+   "name": "光的色散与色光",
+   "kps": [
+    "PSH-OPT-05",
+    "SCI-PRE-COLOUR"
+   ]
+  },
+  {
+   "id": "phy.sound-features",
+   "name": "音调、响度与波形",
+   "kps": [
+    "PSH-SOUND-02",
+    "SCI-PRE-WAVEFORM"
+   ]
+  },
+  {
+   "id": "phy.current-voltage",
+   "name": "电流、电压与电表",
+   "kps": [
+    "PSH-ELEC-03",
+    "PHY-IG-4.2.2-01"
+   ]
+  },
+  {
+   "id": "phy.ohms-law",
+   "name": "欧姆定律与电阻 R = U/I",
+   "kps": [
+    "PSH-ELEC-05",
+    "SCI-PRE-RES",
+    "PHY-IG-4.2.4-01"
+   ]
+  },
+  {
+   "id": "phy.series-circuit",
+   "name": "串联电路规律",
+   "kps": [
+    "PSH-ELEC-06",
+    "PHY-IG-4.3.2-01"
+   ]
+  },
+  {
+   "id": "phy.electric-power",
+   "name": "电功率与电能",
+   "kps": [
+    "PSH-ELEC-11",
+    "PHY-IG-4.2.5-01"
+   ]
+  },
+  {
+   "id": "phy.mains-safety",
+   "name": "家庭电路与安全用电",
+   "kps": [
+    "PSH-ELEC-26",
+    "PHY-IG-4.4-01"
+   ]
+  },
+  {
+   "id": "phy.electric-field",
+   "name": "电场与电场线",
+   "kps": [
+    "PSH-ELEC-14",
+    "PHY-IG-4.2.1-02"
+   ]
+  },
+  {
+   "id": "phy.motor-effect",
+   "name": "磁场对电流的作用与电动机",
+   "kps": [
+    "PSH-MAG-03",
+    "PHY-IG-4.5.4-01"
+   ]
+  },
+  {
+   "id": "phy.induction",
+   "name": "电磁感应与发电机",
+   "kps": [
+    "PSH-MAG-04",
+    "PHY-IG-4.5.1-01"
+   ]
+  },
+  {
+   "id": "phy.transformer",
+   "name": "变压器与远距离输电",
+   "kps": [
+    "PSH-MAG-15",
+    "PHY-IG-4.5.6-01"
+   ]
+  },
+  {
+   "id": "phy.nuclear-atom",
+   "name": "原子的核式结构",
+   "kps": [
+    "PSH-MOD-01",
+    "PHY-IG-5.1.1-01"
+   ]
+  },
+  {
+   "id": "phy.fission-fusion",
+   "name": "核裂变与核聚变",
+   "kps": [
+    "PSH-MOD-06",
+    "PHY-IG-5.1.2-02"
+   ]
+  },
+  {
+   "id": "phy.radioactive-decay",
+   "name": "放射性衰变",
+   "kps": [
+    "PSH-MOD-05",
+    "PHY-IG-5.2.3-01"
+   ]
+  },
+  {
+   "id": "phy.earth-rotation",
+   "name": "地球自转与昼夜",
+   "kps": [
+    "SCI-SH-G5-08",
+    "GSH-EARTH-02",
+    "PHY-IG-6.1.1-01"
+   ]
+  },
+  {
+   "id": "phy.solar-system",
+   "name": "太阳系",
+   "kps": [
+    "SCI-SH-G6-19",
+    "GSH-EARTH-01",
+    "PHY-IG-6.1.2-01"
+   ]
+  },
+  {
+   "id": "chem.physical-chemical-change",
+   "name": "物理变化与化学变化",
+   "kps": [
+    "CSH-RXN-01",
+    "CHEM-IG-6.1-01",
+    "SCI-SH-G6-02"
+   ]
+  },
+  {
+   "id": "chem.element-compound-mixture",
+   "name": "纯净物、混合物、单质与化合物",
+   "kps": [
+    "CSH-STR-03",
+    "CHEM-IG-2.1-01"
+   ]
+  },
+  {
+   "id": "chem.diffusion",
+   "name": "扩散",
+   "kps": [
+    "CHEM-IG-1.2-01",
+    "BIO-IG-3.1-01"
+   ]
+  },
+  {
+   "id": "chem.atom-structure",
+   "name": "原子结构：质子、中子、电子",
+   "kps": [
+    "CSH-STR-05",
+    "CHEM-IG-2.2-01"
+   ]
+  },
+  {
+   "id": "chem.ion-formation",
+   "name": "离子的形成",
+   "kps": [
+    "CSH-STR-06",
+    "CHEM-LS-9-03"
+   ]
+  },
+  {
+   "id": "chem.ionic-bond",
+   "name": "离子键与离子化合物",
+   "kps": [
+    "CSH-STR-23",
+    "CHEM-IG-2.4-01"
+   ]
+  },
+  {
+   "id": "chem.periodic-table-intro",
+   "name": "元素与周期表初识",
+   "kps": [
+    "CSH-STR-07",
+    "CHEM-LS-7-01"
+   ]
+  },
+  {
+   "id": "chem.periodic-trends",
+   "name": "元素周期表与周期律",
+   "kps": [
+    "CSH-STR-20",
+    "CHEM-IG-8.1-01"
+   ]
+  },
+  {
+   "id": "chem.electron-arrangement",
+   "name": "核外电子排布（1–20 号）",
+   "kps": [
+    "CSH-STR-22",
+    "CHEM-IG-2.2-02"
+   ]
+  },
+  {
+   "id": "chem.isotopes",
+   "name": "核素与同位素",
+   "kps": [
+    "CSH-STR-21",
+    "CHEM-IG-2.3-01"
+   ]
+  },
+  {
+   "id": "chem.relative-mass",
+   "name": "相对原子质量与相对分子质量",
+   "kps": [
+    "CSH-QNT-01",
+    "CHEM-IG-3.2-01"
+   ]
+  },
+  {
+   "id": "chem.conservation-of-mass",
+   "name": "质量守恒定律",
+   "kps": [
+    "CSH-RXN-03",
+    "CHEM-LS-9-10"
+   ]
+  },
+  {
+   "id": "chem.equations",
+   "name": "化学方程式的书写与配平",
+   "kps": [
+    "CSH-RXN-04",
+    "CHEM-IG-3.1-02"
+   ]
+  },
+  {
+   "id": "chem.reacting-mass",
+   "name": "根据化学方程式计算质量",
+   "kps": [
+    "CSH-QNT-02",
+    "CHEM-IG-3.2-02"
+   ]
+  },
+  {
+   "id": "chem.mole",
+   "name": "物质的量与阿伏加德罗常数",
+   "kps": [
+    "CSH-QNT-10",
+    "CHEM-IG-3.3-02"
+   ]
+  },
+  {
+   "id": "chem.molar-volume",
+   "name": "气体摩尔体积",
+   "kps": [
+    "CSH-QNT-11",
+    "CHEM-IG-3.3-03"
+   ]
+  },
+  {
+   "id": "chem.concentration",
+   "name": "物质的量浓度",
+   "kps": [
+    "CSH-QNT-12",
+    "CHEM-IG-3.3-05"
+   ]
+  },
+  {
+   "id": "chem.titration",
+   "name": "酸碱中和滴定",
+   "kps": [
+    "CSH-PRN-18",
+    "CHEM-IG-12.2-01"
+   ]
+  },
+  {
+   "id": "chem.air-composition",
+   "name": "空气的组成",
+   "kps": [
+    "CSH-MAT-01",
+    "CHEM-IG-10.3-01"
+   ]
+  },
+  {
+   "id": "chem.air-pollution",
+   "name": "空气污染及其防治",
+   "kps": [
+    "CSH-MAT-02",
+    "CHEM-IG-10.3-02"
+   ]
+  },
+  {
+   "id": "chem.ion-tests",
+   "name": "常见离子的检验",
+   "kps": [
+    "CSH-EXP-13",
+    "CHEM-IG-12.5-01"
+   ]
+  },
+  {
+   "id": "chem.water-treatment",
+   "name": "自来水的净化",
+   "kps": [
+    "CSH-MAT-08",
+    "CHEM-IG-10.1-03"
+   ]
+  },
+  {
+   "id": "chem.separation",
+   "name": "物质的分离与提纯",
+   "kps": [
+    "CSH-EXP-12",
+    "CHEM-IG-12.4-01"
+   ]
+  },
+  {
+   "id": "chem.carbon-allotropes",
+   "name": "金刚石与石墨",
+   "kps": [
+    "CSH-MAT-09",
+    "CHEM-IG-2.6-01"
+   ]
+  },
+  {
+   "id": "chem.fossil-fuels",
+   "name": "化石燃料",
+   "kps": [
+    "CSH-SOC-08",
+    "CHEM-IG-11.3-01"
+   ]
+  },
+  {
+   "id": "chem.metal-reactions",
+   "name": "金属的化学性质",
+   "kps": [
+    "CSH-MAT-12",
+    "CHEM-IG-9.1-02"
+   ]
+  },
+  {
+   "id": "chem.reactivity-series",
+   "name": "金属活动性顺序",
+   "kps": [
+    "CSH-RXN-07",
+    "CHEM-IG-9.4-01"
+   ]
+  },
+  {
+   "id": "chem.iron-extraction",
+   "name": "炼铁（金属的冶炼）",
+   "kps": [
+    "CSH-MAT-13",
+    "CHEM-IG-9.6-02"
+   ]
+  },
+  {
+   "id": "chem.rusting",
+   "name": "铁的生锈与防护",
+   "kps": [
+    "CSH-MAT-14",
+    "CHEM-IG-9.5-01"
+   ]
+  },
+  {
+   "id": "chem.solution",
+   "name": "溶液、溶质与溶剂",
+   "kps": [
+    "CSH-MAT-15",
+    "CHEM-IG-12.1-03"
+   ]
+  },
+  {
+   "id": "chem.solubility",
+   "name": "溶解度与温度",
+   "kps": [
+    "CSH-MAT-16",
+    "CHEM-LS-8-04"
+   ]
+  },
+  {
+   "id": "chem.ph-indicators",
+   "name": "酸碱性、pH 与指示剂",
+   "kps": [
+    "CSH-MAT-18",
+    "CHEM-LS-7-05"
+   ]
+  },
+  {
+   "id": "chem.acids",
+   "name": "酸的通性",
+   "kps": [
+    "CSH-MAT-19",
+    "CHEM-IG-7.1-01"
+   ]
+  },
+  {
+   "id": "chem.bases",
+   "name": "碱的通性",
+   "kps": [
+    "CSH-MAT-20",
+    "CHEM-IG-7.1-03"
+   ]
+  },
+  {
+   "id": "chem.neutralisation",
+   "name": "中和反应 H⁺ + OH⁻ → H₂O",
+   "kps": [
+    "CSH-RXN-08",
+    "CHEM-IG-7.1-04"
+   ]
+  },
+  {
+   "id": "chem.fertilisers",
+   "name": "化学肥料（氮磷钾）",
+   "kps": [
+    "CSH-SOC-09",
+    "CHEM-IG-10.2-01"
+   ]
+  },
+  {
+   "id": "chem.redox",
+   "name": "氧化还原与电子转移",
+   "kps": [
+    "CSH-RXN-20",
+    "CHEM-IG-6.4-02"
+   ]
+  },
+  {
+   "id": "chem.ionic-equations",
+   "name": "离子反应与离子方程式",
+   "kps": [
+    "CSH-RXN-21",
+    "CHEM-IG-3.1-04"
+   ]
+  },
+  {
+   "id": "chem.haber",
+   "name": "合成氨（哈伯法）",
+   "kps": [
+    "CSH-PRN-16",
+    "CHEM-IG-6.3-03"
+   ]
+  },
+  {
+   "id": "chem.exo-endo",
+   "name": "放热反应与吸热反应",
+   "kps": [
+    "CSH-RXN-22",
+    "CHEM-IG-5.1-01"
+   ]
+  },
+  {
+   "id": "chem.bond-energy",
+   "name": "用键能计算反应热",
+   "kps": [
+    "CSH-PRN-10",
+    "CHEM-IG-5.1-05"
+   ]
+  },
+  {
+   "id": "chem.electrolysis",
+   "name": "电解原理",
+   "kps": [
+    "CSH-PRN-24",
+    "CHEM-IG-4.1-01"
+   ]
+  },
+  {
+   "id": "chem.rate-factors",
+   "name": "影响化学反应速率的因素",
+   "kps": [
+    "CSH-PRN-01",
+    "CHEM-IG-6.2-01"
+   ]
+  },
+  {
+   "id": "chem.collision-theory",
+   "name": "碰撞理论与活化能",
+   "kps": [
+    "CSH-PRN-15",
+    "CHEM-IG-6.2-03"
+   ]
+  },
+  {
+   "id": "chem.equilibrium",
+   "name": "化学平衡（动态平衡）",
+   "kps": [
+    "CSH-PRN-02",
+    "CHEM-IG-6.3-02"
+   ]
+  },
+  {
+   "id": "chem.alkanes",
+   "name": "烷烃",
+   "kps": [
+    "CSH-ORG-01",
+    "CHEM-IG-11.4-01"
+   ]
+  },
+  {
+   "id": "chem.alkenes",
+   "name": "烯烃与加成反应",
+   "kps": [
+    "CSH-ORG-02",
+    "CHEM-IG-11.5-03"
+   ]
+  },
+  {
+   "id": "chem.ethanol",
+   "name": "乙醇",
+   "kps": [
+    "CSH-ORG-03",
+    "CHEM-IG-11.6-02"
+   ]
+  },
+  {
+   "id": "chem.esterification",
+   "name": "乙酸与酯化反应",
+   "kps": [
+    "CSH-ORG-04",
+    "CHEM-IG-11.7-03"
+   ]
+  },
+  {
+   "id": "chem.isomers",
+   "name": "结构式与同分异构",
+   "kps": [
+    "CSH-ORG-11",
+    "CHEM-IG-11.1-04"
+   ]
+  },
+  {
+   "id": "chem.naming",
+   "name": "有机物命名",
+   "kps": [
+    "CSH-ORG-12",
+    "CHEM-IG-11.2-02"
+   ]
+  },
+  {
+   "id": "bio.characteristics",
+   "name": "生物的基本特征",
+   "kps": [
+    "BSH-INQ-01",
+    "BIO-LS-7Bp.01"
+   ]
+  },
+  {
+   "id": "bio.cell-unit",
+   "name": "细胞是生物体的基本单位",
+   "kps": [
+    "SCI-SH-G6-08",
+    "BIO-LS-7Bs.01"
+   ]
+  },
+  {
+   "id": "bio.cell-structure",
+   "name": "动植物细胞的结构",
+   "kps": [
+    "BSH-STR-02",
+    "BIO-LS-7Bs.02"
+   ]
+  },
+  {
+   "id": "bio.organisation",
+   "name": "细胞—组织—器官—系统",
+   "kps": [
+    "BSH-STR-06",
+    "BIO-LS-7Bs.05"
+   ]
+  },
+  {
+   "id": "bio.mitosis",
+   "name": "有丝分裂",
+   "kps": [
+    "BSH-MOL-18",
+    "BIO-IG-17.2-01"
+   ]
+  },
+  {
+   "id": "bio.meiosis",
+   "name": "减数分裂",
+   "kps": [
+    "BSH-GEN-13",
+    "BIO-IG-17.3-01"
+   ]
+  },
+  {
+   "id": "bio.germination",
+   "name": "种子萌发的条件",
+   "kps": [
+    "BSH-PLT-02",
+    "BIO-IG-16.3-04"
+   ]
+  },
+  {
+   "id": "bio.pollination",
+   "name": "传粉与受精",
+   "kps": [
+    "BSH-PLT-05",
+    "BIO-IG-16.3-03"
+   ]
+  },
+  {
+   "id": "bio.mineral-ions",
+   "name": "植物需要的无机盐（矿质元素）",
+   "kps": [
+    "BSH-PLT-04",
+    "BIO-LS-9Bp.05"
+   ]
+  },
+  {
+   "id": "bio.xylem-phloem",
+   "name": "导管与筛管（木质部与韧皮部）",
+   "kps": [
+    "BSH-PLT-07",
+    "BIO-IG-8.1-01"
+   ]
+  },
+  {
+   "id": "bio.transpiration",
+   "name": "蒸腾作用",
+   "kps": [
+    "BSH-PLT-08",
+    "BIO-IG-8.3-01"
+   ]
+  },
+  {
+   "id": "bio.starch-test-leaf",
+   "name": "绿叶在光下制造淀粉的实验",
+   "kps": [
+    "BSH-PLT-09",
+    "BIO-IG-6.1-03"
+   ]
+  },
+  {
+   "id": "bio.photosynthesis",
+   "name": "光合作用",
+   "kps": [
+    "BSH-PLT-10",
+    "BIO-IG-6.1-01",
+    "CHEM-IG-10.3-06"
+   ]
+  },
+  {
+   "id": "bio.respiration-intro",
+   "name": "呼吸作用（入门）",
+   "kps": [
+    "BSH-PLT-11",
+    "BIO-LS-8Bp.04"
+   ]
+  },
+  {
+   "id": "bio.cell-respiration",
+   "name": "细胞呼吸：有氧呼吸",
+   "kps": [
+    "BSH-MOL-15",
+    "BIO-IG-12.2-01"
+   ]
+  },
+  {
+   "id": "bio.limiting-factors",
+   "name": "影响光合作用的因素",
+   "kps": [
+    "BSH-MOL-17",
+    "BIO-IG-6.1-06"
+   ]
+  },
+  {
+   "id": "bio.classification",
+   "name": "生物分类与物种",
+   "kps": [
+    "BSH-DIV-01",
+    "BIO-IG-1.2-01"
+   ]
+  },
+  {
+   "id": "bio.virus",
+   "name": "病毒",
+   "kps": [
+    "BSH-DIV-06",
+    "BIO-IG-1.3-06"
+   ]
+  },
+  {
+   "id": "bio.bacteria",
+   "name": "细菌",
+   "kps": [
+    "BSH-DIV-07",
+    "BIO-IG-2.1-02"
+   ]
+  },
+  {
+   "id": "bio.vertebrates",
+   "name": "脊椎动物的类群",
+   "kps": [
+    "BSH-DIV-05",
+    "BIO-IG-1.3-02"
+   ]
+  },
+  {
+   "id": "bio.biodiversity",
+   "name": "生物多样性及其保护",
+   "kps": [
+    "BSH-DIV-10",
+    "BIO-IG-20.2-01"
+   ]
+  },
+  {
+   "id": "bio.food-chain",
+   "name": "食物链与分解者",
+   "kps": [
+    "BSH-ENV-04",
+    "BIO-LS-7Be.01"
+   ]
+  },
+  {
+   "id": "bio.energy-flow",
+   "name": "能量流动与能量金字塔",
+   "kps": [
+    "BSH-ENV-11",
+    "BIO-IG-19.2-04"
+   ]
+  },
+  {
+   "id": "bio.carbon-cycle",
+   "name": "碳循环（物质循环）",
+   "kps": [
+    "BSH-ENV-12",
+    "BIO-IG-19.3-01"
+   ]
+  },
+  {
+   "id": "bio.population-growth",
+   "name": "种群增长 S 形曲线",
+   "kps": [
+    "BSH-ENV-07",
+    "BIO-IG-19.4-02"
+   ]
+  },
+  {
+   "id": "bio.nutrients",
+   "name": "食物中的营养物质",
+   "kps": [
+    "BSH-HUM-01",
+    "BIO-LS-8Bp.01",
+    "SCI-SH-G6-13",
+    "CSH-SOC-10"
+   ]
+  },
+  {
+   "id": "bio.balanced-diet",
+   "name": "合理膳食",
+   "kps": [
+    "BSH-HUM-03",
+    "BIO-IG-7.1-01"
+   ]
+  },
+  {
+   "id": "bio.digestive-system",
+   "name": "消化系统",
+   "kps": [
+    "BSH-HUM-02",
+    "BIO-IG-7.2-01"
+   ]
+  },
+  {
+   "id": "bio.breathing",
+   "name": "呼吸系统与呼吸运动",
+   "kps": [
+    "BSH-HUM-04",
+    "BIO-LS-8Bs.03"
+   ]
+  },
+  {
+   "id": "bio.blood",
+   "name": "血液的组成",
+   "kps": [
+    "BSH-HUM-05",
+    "BIO-LS-8Bs.02"
+   ]
+  },
+  {
+   "id": "bio.blood-vessels",
+   "name": "血管与心脏",
+   "kps": [
+    "BSH-HUM-06",
+    "BIO-IG-9.3-01"
+   ]
+  },
+  {
+   "id": "bio.circulation",
+   "name": "血液循环（体循环与肺循环）",
+   "kps": [
+    "BSH-HUM-07",
+    "BIO-IG-9.1-02"
+   ]
+  },
+  {
+   "id": "bio.urinary",
+   "name": "泌尿系统",
+   "kps": [
+    "BSH-HUM-08",
+    "BIO-LS-9Bs.02"
+   ]
+  },
+  {
+   "id": "bio.reflex",
+   "name": "神经系统与反射弧",
+   "kps": [
+    "BSH-HUM-09",
+    "BIO-IG-14.1-02"
+   ]
+  },
+  {
+   "id": "bio.eye",
+   "name": "眼的结构与视觉",
+   "kps": [
+    "BSH-HUM-10",
+    "BIO-IG-14.2-01"
+   ]
+  },
+  {
+   "id": "bio.hormones",
+   "name": "激素与内分泌腺",
+   "kps": [
+    "BSH-HUM-11",
+    "BIO-IG-14.3-01"
+   ]
+  },
+  {
+   "id": "bio.homeostasis",
+   "name": "稳态",
+   "kps": [
+    "BSH-HUM-16",
+    "BIO-IG-14.4-01"
+   ]
+  },
+  {
+   "id": "bio.blood-glucose",
+   "name": "血糖调节与负反馈",
+   "kps": [
+    "BSH-HUM-23",
+    "BIO-IG-14.4-02"
+   ]
+  },
+  {
+   "id": "bio.joints-muscles",
+   "name": "关节与肌肉协作",
+   "kps": [
+    "BSH-HUM-12",
+    "BIO-LS-8Bs.01"
+   ]
+  },
+  {
+   "id": "bio.infectious-disease",
+   "name": "传染病与病原体",
+   "kps": [
+    "BSH-HUM-13",
+    "BIO-IG-10.1-01"
+   ]
+  },
+  {
+   "id": "bio.reproductive-system",
+   "name": "人的生殖系统",
+   "kps": [
+    "BSH-GEN-01",
+    "BIO-IG-16.4-01"
+   ]
+  },
+  {
+   "id": "bio.dna-gene-chromosome",
+   "name": "DNA、基因与染色体",
+   "kps": [
+    "BSH-GEN-03",
+    "BIO-LS-9Bs.03"
+   ]
+  },
+  {
+   "id": "bio.monohybrid",
+   "name": "显性与隐性、遗传图解",
+   "kps": [
+    "BSH-GEN-04",
+    "BIO-IG-17.4-02"
+   ]
+  },
+  {
+   "id": "bio.sex-determination",
+   "name": "人的性别决定",
+   "kps": [
+    "BSH-GEN-05",
+    "BIO-LS-9Bp.02"
+   ]
+  },
+  {
+   "id": "bio.variation",
+   "name": "变异",
+   "kps": [
+    "BSH-GEN-06",
+    "BIO-LS-9Bp.03"
+   ]
+  },
+  {
+   "id": "bio.evolution-intro",
+   "name": "生物进化与自然选择（入门）",
+   "kps": [
+    "BSH-GEN-07",
+    "BIO-LS-9Bp.04",
+    "SCI-SH-G6-10"
+   ]
+  },
+  {
+   "id": "bio.natural-selection",
+   "name": "自然选择与进化理论",
+   "kps": [
+    "BSH-GEN-22",
+    "BIO-IG-18.3-01"
+   ]
+  },
+  {
+   "id": "bio.dna-structure",
+   "name": "DNA 双螺旋结构",
+   "kps": [
+    "BSH-GEN-09",
+    "BIO-IG-4.1-03"
+   ]
+  },
+  {
+   "id": "bio.protein-synthesis",
+   "name": "基因的表达（蛋白质合成）",
+   "kps": [
+    "BSH-GEN-11",
+    "BIO-IG-17.1-03"
+   ]
+  },
+  {
+   "id": "bio.mutation",
+   "name": "基因突变",
+   "kps": [
+    "BSH-GEN-18",
+    "BIO-IG-18.1-03"
+   ]
+  },
+  {
+   "id": "bio.sex-linked",
+   "name": "伴性遗传",
+   "kps": [
+    "BSH-GEN-16",
+    "BIO-IG-17.4-06"
+   ]
+  },
+  {
+   "id": "bio.enzymes",
+   "name": "酶",
+   "kps": [
+    "BSH-MOL-13",
+    "BIO-IG-5.1-01"
+   ]
+  },
+  {
+   "id": "bio.food-tests",
+   "name": "检测糖类、脂肪和蛋白质",
+   "kps": [
+    "BSH-MOL-07",
+    "BIO-IG-4.1-02"
+   ]
+  },
+  {
+   "id": "bio.biomolecules",
+   "name": "组成细胞的化合物",
+   "kps": [
+    "BSH-MOL-02",
+    "BIO-IG-4.1-01"
+   ]
+  },
+  {
+   "id": "bio.osmosis",
+   "name": "渗透作用",
+   "kps": [
+    "BSH-MOL-12",
+    "BIO-IG-3.2-01"
+   ]
+  },
+  {
+   "id": "bio.genetic-engineering",
+   "name": "基因工程的操作步骤",
+   "kps": [
+    "BSH-TEC-07",
+    "BIO-IG-21.3-02"
+   ]
+  },
+  {
+   "id": "bio.gm-crops",
+   "name": "转基因产品的利弊与安全",
+   "kps": [
+    "BSH-TEC-09",
+    "BIO-IG-21.3-03"
+   ]
+  },
+  {
+   "id": "bio.auxin",
+   "name": "生长素",
+   "kps": [
+    "BSH-PLT-13",
+    "BIO-IG-14.5-02"
+   ]
+  }
+ ],
+ "links": [
+  {
+   "from": "CSH-STR-04",
+   "to": "PSH-THERM-01",
+   "type": "uses",
+   "note": "分子在不停运动、彼此有间隔，就是物理课的粒子模型"
+  },
+  {
+   "from": "CSH-STR-21",
+   "to": "PSH-MOD-01",
+   "type": "uses",
+   "note": "同位素建立在“原子核由质子和中子组成”的核式结构上"
+  },
+  {
+   "from": "CSH-STR-02",
+   "to": "PSH-ELEC-01",
+   "type": "uses",
+   "note": "电解水要先把电源、导线和电极连成通路"
+  },
+  {
+   "from": "CSH-PRN-24",
+   "to": "PSH-ELEC-03",
+   "type": "uses",
+   "note": "电解池接在电源上，要分清电流方向和电子流动方向"
+  },
+  {
+   "from": "CSH-PRN-24",
+   "to": "PSH-ELEC-02",
+   "type": "uses",
+   "note": "阳离子移向阴极、阴离子移向阳极，就是异种电荷相互吸引"
+  },
+  {
+   "from": "CSH-RXN-23",
+   "to": "PSH-ELEC-03",
+   "type": "uses",
+   "note": "原电池里电子从负极经导线流向正极，电流方向正好相反"
+  },
+  {
+   "from": "CSH-PRN-23",
+   "to": "PSH-ELEC-19",
+   "type": "uses",
+   "note": "化学电源就是物理课里的“电动势 E”的来源"
+  },
+  {
+   "from": "CSH-RXN-22",
+   "to": "PSH-THERM-05",
+   "type": "uses",
+   "note": "放热、吸热就是化学能和内能之间的转化"
+  },
+  {
+   "from": "CSH-PRN-11",
+   "to": "PSH-THERM-04",
+   "type": "uses",
+   "note": "测中和热要用 Q = cmΔt，比热容是物理课学的"
+  },
+  {
+   "from": "CSH-SOC-22",
+   "to": "PSH-THERM-06",
+   "type": "uses",
+   "note": "比较燃料要看热值 Q = mq，物理课讲过热值和效率"
+  },
+  {
+   "from": "CSH-MAT-17",
+   "to": "PSH-MECH-17",
+   "type": "uses",
+   "note": "打开汽水瓶冒泡，是因为瓶内压强减小、气体溶解度变小"
+  },
+  {
+   "from": "CSH-EXP-02",
+   "to": "PSH-EXP-02",
+   "type": "uses",
+   "note": "量筒读数要视线与凹液面最低处相平，和物理测体积一样"
+  },
+  {
+   "from": "CSH-EXP-12",
+   "to": "PSH-THERM-03",
+   "type": "uses",
+   "note": "蒸馏就是先汽化再液化，利用不同物质沸点不同"
+  },
+  {
+   "from": "CHEM-IG-1.1-03",
+   "to": "PHY-IG-2.1.2-02",
+   "type": "uses",
+   "note": "气体压强来自粒子撞击器壁，物理课用同样方法解释"
+  },
+  {
+   "from": "CHEM-IG-4.1-01",
+   "to": "PHY-IG-4.2.2-01",
+   "type": "uses",
+   "note": "电解要用到电流、电荷和电源正负极的知识"
+  },
+  {
+   "from": "CHEM-IG-4.2-01",
+   "to": "PHY-IG-1.7.1-01",
+   "type": "uses",
+   "note": "燃料电池把化学能储存转移为电能"
+  },
+  {
+   "from": "CHEM-IG-5.1-01",
+   "to": "PHY-IG-1.7.1-01",
+   "type": "uses",
+   "note": "放热反应把化学能转移到周围变成内能（热能）"
+  },
+  {
+   "from": "CHEM-IG-6.2-03",
+   "to": "PHY-IG-2.1.2-01",
+   "type": "uses",
+   "note": "温度越高粒子运动越快，碰撞更多更有力"
+  },
+  {
+   "from": "CHEM-IG-10.3-04",
+   "to": "PHY-IG-2.3.3-01",
+   "type": "uses",
+   "note": "温室气体吸收地面发出的红外辐射，物理课讲热辐射"
+  },
+  {
+   "from": "CHEM-IG-11.3-02",
+   "to": "PHY-IG-2.2.3-01",
+   "type": "uses",
+   "note": "分馏利用不同馏分沸点不同，先沸腾的先分出来"
+  },
+  {
+   "from": "CHEM-LS-9-10",
+   "to": "SCI-PRE-ENERGY",
+   "type": "uses",
+   "note": "化学反应中能量守恒，只是在化学能和热之间转移"
+  },
+  {
+   "from": "CHEM-LS-9-09",
+   "to": "SCI-PRE-PART",
+   "type": "uses",
+   "note": "用粒子运动和碰撞解释为什么升温、加浓会加快反应"
+  },
+  {
+   "from": "PSH-ELEC-02",
+   "to": "CSH-STR-05",
+   "type": "uses",
+   "note": "摩擦起电是电子转移，原子由原子核和核外电子构成"
+  },
+  {
+   "from": "PSH-THERM-06",
+   "to": "CSH-RXN-06",
+   "type": "uses",
+   "note": "热机靠燃料燃烧放热，燃烧需要可燃物、氧气和着火点"
+  },
+  {
+   "from": "PSH-MOD-05",
+   "to": "CSH-STR-21",
+   "type": "uses",
+   "note": "写衰变方程要用核素符号：质量数 A 和质子数 Z"
+  },
+  {
+   "from": "PSH-THERM-07",
+   "to": "CSH-QNT-10",
+   "type": "uses",
+   "note": "阿伏伽德罗常数在化学课“物质的量”里学过"
+  },
+  {
+   "from": "PSH-THERM-09",
+   "to": "CSH-QNT-11",
+   "type": "uses",
+   "note": "理想气体状态方程和化学课的气体摩尔体积是同一规律"
+  },
+  {
+   "from": "BSH-MOL-13",
+   "to": "CSH-RXN-02",
+   "type": "uses",
+   "note": "酶就是生物体内的催化剂，加快反应但自身不变"
+  },
+  {
+   "from": "BSH-MOL-15",
+   "to": "CSH-RXN-22",
+   "type": "uses",
+   "note": "细胞呼吸分解有机物、释放能量，是一种放热的化学变化"
+  },
+  {
+   "from": "BSH-MOL-05",
+   "to": "CSH-ORG-05",
+   "type": "uses",
+   "note": "葡萄糖、淀粉、油脂的结构和性质在化学课里学过"
+  },
+  {
+   "from": "BSH-MOL-03",
+   "to": "CSH-ORG-04",
+   "type": "uses",
+   "note": "氨基酸含羧基 −COOH，脱水缩合和酯化一样会脱去水"
+  },
+  {
+   "from": "BSH-MOL-07",
+   "to": "CSH-ORG-05",
+   "type": "uses",
+   "note": "还原糖和新制 Cu(OH)₂ 反应生成砖红色沉淀，是化学反应"
+  },
+  {
+   "from": "BSH-MOL-11",
+   "to": "CSH-STR-04",
+   "type": "uses",
+   "note": "自由扩散靠分子的不停运动，从浓处到稀处"
+  },
+  {
+   "from": "BSH-MOL-12",
+   "to": "CSH-MAT-15",
+   "type": "uses",
+   "note": "渗透作用要比较膜两侧溶液的浓度，先懂溶质和溶剂"
+  },
+  {
+   "from": "BSH-HUM-15",
+   "to": "CSH-MAT-18",
+   "type": "uses",
+   "note": "血浆 pH 约 7.35~7.45，pH 的含义化学课学过"
+  },
+  {
+   "from": "BSH-ENV-12",
+   "to": "CSH-SOC-07",
+   "type": "uses",
+   "note": "碳循环中的二氧化碳排放与吸收，和碳中和是同一件事"
+  },
+  {
+   "from": "BSH-ENV-12",
+   "to": "CSH-MAT-37",
+   "type": "uses",
+   "note": "氮循环里的固氮，化学课讲过氮的固定"
+  },
+  {
+   "from": "CSH-SOC-09",
+   "to": "BSH-PLT-04",
+   "type": "uses",
+   "note": "化肥补充的正是植物需要的氮、磷、钾"
+  },
+  {
+   "from": "BSH-TEC-02",
+   "to": "CSH-ORG-03",
+   "type": "uses",
+   "note": "酵母菌发酵产生乙醇，乙醇的性质化学课学过"
+  },
+  {
+   "from": "BSH-TEC-02",
+   "to": "CSH-ORG-04",
+   "type": "uses",
+   "note": "醋酸菌把乙醇变成乙酸，就是果醋的原理"
+  },
+  {
+   "from": "BSH-MOL-16",
+   "to": "CSH-EXP-12",
+   "type": "uses",
+   "note": "色素提取与分离用到溶解、过滤和层析等分离方法"
+  },
+  {
+   "from": "BSH-PLT-10",
+   "to": "SCI-SH-G5-07",
+   "type": "uses",
+   "note": "小学已知道植物用阳光、水和二氧化碳制造养分"
+  },
+  {
+   "from": "BSH-PLT-08",
+   "to": "SCI-SH-G3-06",
+   "type": "uses",
+   "note": "蒸腾作用就是叶片里的水蒸发成水蒸气散失"
+  },
+  {
+   "from": "BSH-HUM-18",
+   "to": "PSH-ELEC-15",
+   "type": "uses",
+   "note": "静息电位和动作电位，就是膜内外的电势差"
+  },
+  {
+   "from": "BSH-HUM-10",
+   "to": "PSH-OPT-06",
+   "type": "uses",
+   "note": "晶状体相当于凸透镜，在视网膜上成倒立缩小的实像"
+  },
+  {
+   "from": "BSH-HUM-12",
+   "to": "PSH-MECH-10",
+   "type": "uses",
+   "note": "骨绕关节转动，就像杠杆绕支点转动"
+  },
+  {
+   "from": "BIO-IG-5.1-01",
+   "to": "CHEM-IG-6.2-01",
+   "type": "uses",
+   "note": "酶是生物催化剂，催化剂的作用化学课讲过"
+  },
+  {
+   "from": "BIO-IG-5.1-05",
+   "to": "CHEM-IG-6.2-03",
+   "type": "uses",
+   "note": "温度升高时分子碰撞更频繁，和化学的碰撞理论一样"
+  },
+  {
+   "from": "BIO-IG-5.1-04",
+   "to": "CHEM-IG-7.1-04",
+   "type": "uses",
+   "note": "研究 pH 对酶的影响，要先懂 pH 表示酸碱程度"
+  },
+  {
+   "from": "BIO-IG-6.1-05",
+   "to": "CHEM-IG-3.1-02",
+   "type": "uses",
+   "note": "6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂ 要会配平化学方程式"
+  },
+  {
+   "from": "BIO-IG-12.3-02",
+   "to": "CHEM-IG-11.6-01",
+   "type": "uses",
+   "note": "酵母无氧呼吸产生乙醇，就是化学里的发酵制乙醇"
+  },
+  {
+   "from": "BIO-IG-12.2-01",
+   "to": "CHEM-IG-5.1-01",
+   "type": "uses",
+   "note": "有氧呼吸释放能量，是放热的化学反应"
+  },
+  {
+   "from": "BIO-IG-3.2-01",
+   "to": "CHEM-IG-12.1-03",
+   "type": "uses",
+   "note": "渗透要比较溶液浓稀，先分清溶质、溶剂和溶液"
+  },
+  {
+   "from": "BIO-IG-4.1-01",
+   "to": "CHEM-IG-11.8-05",
+   "type": "uses",
+   "note": "蛋白质是由氨基酸连成的天然聚合物"
+  },
+  {
+   "from": "BIO-IG-7.4-02",
+   "to": "CHEM-IG-7.1-04",
+   "type": "uses",
+   "note": "胆汁呈碱性，能中和来自胃的酸"
+  },
+  {
+   "from": "BIO-IG-19.3-01",
+   "to": "CHEM-IG-11.4-01",
+   "type": "uses",
+   "note": "燃烧化石燃料生成二氧化碳，是碳循环的一环"
+  },
+  {
+   "from": "BIO-IG-20.3-02",
+   "to": "CHEM-IG-10.3-04",
+   "type": "uses",
+   "note": "温室气体为什么让地球变暖，化学课讲了机理"
+  },
+  {
+   "from": "BIO-IG-20.3-03",
+   "to": "CHEM-IG-10.2-01",
+   "type": "uses",
+   "note": "富营养化来自过量的硝酸盐等化肥流入水中"
+  },
+  {
+   "from": "BIO-LS-8Bp.04",
+   "to": "CHEM-LS-8-06",
+   "type": "uses",
+   "note": "呼吸作用的文字方程：葡萄糖 + 氧气 → 二氧化碳 + 水"
+  },
+  {
+   "from": "BIO-LS-9Bp.06",
+   "to": "CHEM-LS-8-06",
+   "type": "uses",
+   "note": "光合作用也用文字方程式表示反应物和生成物"
+  },
+  {
+   "from": "BIO-LS-8Bs.04",
+   "to": "SCI-PRE-PRESS",
+   "type": "uses",
+   "note": "气体在肺泡中扩散，和科学课的扩散是同一原理"
+  },
+  {
+   "from": "BIO-IG-14.2-03",
+   "to": "PHY-IG-3.2.3-01",
+   "type": "uses",
+   "note": "晶状体是会变厚变薄的会聚透镜"
+  },
+  {
+   "from": "BIO-IG-14.4-03",
+   "to": "PHY-IG-2.2.3-01",
+   "type": "uses",
+   "note": "出汗降温是靠汗液蒸发带走热量"
+  },
+  {
+   "from": "BIO-IG-8.3-03",
+   "to": "PHY-IG-2.2.3-01",
+   "type": "uses",
+   "note": "温度高、有风时蒸发快，所以蒸腾也快"
+  },
+  {
+   "from": "BIO-LS-8Bs.01",
+   "to": "SCI-PRE-MOMENT",
+   "type": "uses",
+   "note": "肌肉拉动骨绕关节转动，可以用力矩来理解"
+  },
+  {
+   "from": "BIO-IG-19.1-01",
+   "to": "PHY-IG-1.7.1-01",
+   "type": "uses",
+   "note": "光能变成化学能再变成热能，就是能量的储存与转移"
+  },
+  {
+   "from": "BIO-IG-18.1-02",
+   "to": "PHY-IG-5.2.2-01",
+   "type": "uses",
+   "note": "电离辐射会增加突变率，物理课讲过 α、β、γ 的电离作用"
+  },
+  {
+   "from": "GSH-HS1-10",
+   "to": "PSH-THERM-03",
+   "type": "uses",
+   "note": "蒸发、凝结、降水，就是物理课的汽化和液化"
+  },
+  {
+   "from": "GSH-HS1-05",
+   "to": "PSH-THERM-05",
+   "type": "uses",
+   "note": "地面吸收太阳辐射后再加热大气，是热传递"
+  },
+  {
+   "from": "GSH-HS1-06",
+   "to": "PSH-MECH-17",
+   "type": "uses",
+   "note": "热力环流的关键是同一水平面上的气压差"
+  },
+  {
+   "from": "GSH-HS1-11",
+   "to": "PSH-MECH-14",
+   "type": "uses",
+   "note": "海水密度随温度、盐度变化，要先懂密度"
+  },
+  {
+   "from": "GSH-HS1-12",
+   "to": "PSH-MECH-38",
+   "type": "uses",
+   "note": "潮汐来自月球和太阳的引力"
+  },
+  {
+   "from": "GSH-X1-13",
+   "to": "PSH-THERM-04",
+   "type": "uses",
+   "note": "海水比热容大，升温降温都慢，影响气候"
+  },
+  {
+   "from": "GSH-HS1-15",
+   "to": "BSH-DIV-09",
+   "type": "uses",
+   "note": "土壤中的有机质要靠细菌、真菌等分解者分解"
+  },
+  {
+   "from": "GSH-X1-14",
+   "to": "BSH-ENV-12",
+   "type": "uses",
+   "note": "自然地理要素的物质交换包括生物圈的物质循环"
+  },
+  {
+   "from": "GSH-X3-07",
+   "to": "BSH-ENV-12",
+   "type": "uses",
+   "note": "碳源与碳汇要从碳循环来理解"
+  },
+  {
+   "from": "GSH-X3-06",
+   "to": "BSH-ENV-17",
+   "type": "uses",
+   "note": "建立自然保护区是保护生物多样性最有效的措施"
+  },
+  {
+   "from": "GSH-HS2-13",
+   "to": "CSH-SOC-20",
+   "type": "uses",
+   "note": "酸雨来自 SO₂、NOₓ 排放，化学课讲过成因"
+  },
+  {
+   "from": "PHY-IG-1.1-04",
+   "to": "PSH-EXP-01",
+   "type": "language",
+   "note": "measuring time intervals：用秒表测时间"
+  },
+  {
+   "from": "PHY-IG-1.1-03",
+   "to": "PSH-EXP-02",
+   "type": "language",
+   "note": "displacement method：排水法测不规则物体体积"
+  },
+  {
+   "from": "PHY-IG-1.1-08",
+   "to": "PSH-EXP-04",
+   "type": "language",
+   "note": "error：测量值与真实值之差，即误差"
+  },
+  {
+   "from": "PHY-IG-1.1-15",
+   "to": "PSH-MECH-28",
+   "type": "language",
+   "note": "resultant：两个矢量的合成，沪版叫力的合成"
+  },
+  {
+   "from": "PHY-IG-1.2-02",
+   "to": "PSH-MECH-03",
+   "type": "language",
+   "note": "distance–time graph 就是 s-t 图像"
+  },
+  {
+   "from": "PHY-IG-1.2-03",
+   "to": "PSH-MECH-22",
+   "type": "language",
+   "note": "acceleration：加速度 a = Δv/Δt"
+  },
+  {
+   "from": "PHY-IG-1.5.1-02",
+   "to": "PSH-MECH-07",
+   "type": "language",
+   "note": "resultant force = 0 时静止或匀速，即二力平衡"
+  },
+  {
+   "from": "PHY-IG-1.5.1-02",
+   "to": "PSH-MECH-08",
+   "type": "language",
+   "note": "friction：摩擦力阻碍运动"
+  },
+  {
+   "from": "PHY-IG-1.5.1-03",
+   "to": "PSH-MECH-37",
+   "type": "language",
+   "note": "circular motion：力垂直于速度，即向心力"
+  },
+  {
+   "from": "PHY-IG-1.5.3-01",
+   "to": "PSH-MECH-05",
+   "type": "language",
+   "note": "centre of gravity：重心"
+  },
+  {
+   "from": "PHY-IG-1.7.3-01",
+   "to": "PSH-MECH-43",
+   "type": "language",
+   "note": "energy resources：常规能源与新能源"
+  },
+  {
+   "from": "PHY-IG-1.7.3-02",
+   "to": "PSH-THERM-06",
+   "type": "language",
+   "note": "efficiency：效率 = 有用能量 ÷ 总能量"
+  },
+  {
+   "from": "PHY-IG-2.1.2-02",
+   "to": "PSH-THERM-07",
+   "type": "language",
+   "note": "Brownian motion：布朗运动"
+  },
+  {
+   "from": "PHY-IG-3.1-02",
+   "to": "PSH-SOUND-06",
+   "type": "language",
+   "note": "transverse / longitudinal waves：横波与纵波"
+  },
+  {
+   "from": "PHY-IG-3.1-03",
+   "to": "PSH-SOUND-10",
+   "type": "language",
+   "note": "reflection / refraction of waves：波的反射和折射"
+  },
+  {
+   "from": "PHY-IG-4.2.2-01",
+   "to": "PSH-ELEC-02",
+   "type": "language",
+   "note": "charge：电荷，摩擦起电只转移电子"
+  },
+  {
+   "from": "PHY-IG-4.2.4-01",
+   "to": "PSH-ELEC-04",
+   "type": "language",
+   "note": "resistance 与 length、cross-sectional area：电阻与长度、横截面积"
+  },
+  {
+   "from": "PHY-IG-4.2.4-01",
+   "to": "PSH-ELEC-10",
+   "type": "language",
+   "note": "用 voltmeter 和 ammeter 测电阻，即伏安法"
+  },
+  {
+   "from": "PHY-IG-4.3.2-01",
+   "to": "PSH-ELEC-07",
+   "type": "language",
+   "note": "parallel circuit：并联电路"
+  },
+  {
+   "from": "PHY-IG-4.3.3-01",
+   "to": "PSH-ELEC-06",
+   "type": "language",
+   "note": "potential divider：分压，串联电路中电压按电阻分配"
+  },
+  {
+   "from": "PHY-IG-4.3.1-01",
+   "to": "PSH-ELEC-01",
+   "type": "language",
+   "note": "circuit symbols：电路图符号"
+  },
+  {
+   "from": "PHY-IG-4.5.1-01",
+   "to": "PSH-MAG-10",
+   "type": "language",
+   "note": "感应电流阻碍引起它的变化，沪版叫楞次定律"
+  },
+  {
+   "from": "PHY-IG-4.5.4-02",
+   "to": "PSH-MAG-08",
+   "type": "language",
+   "note": "charged particles in a magnetic field：洛伦兹力"
+  },
+  {
+   "from": "PHY-IG-5.2.2-01",
+   "to": "PSH-MOD-05",
+   "type": "language",
+   "note": "alpha, beta, gamma radiation：α、β、γ 三种射线"
+  },
+  {
+   "from": "PHY-IG-5.2.4-01",
+   "to": "PSH-MOD-05",
+   "type": "language",
+   "note": "half-life：半衰期"
+  },
+  {
+   "from": "CHEM-IG-3.1-03",
+   "to": "CSH-STR-08",
+   "type": "language",
+   "note": "由离子电荷写化学式，沪版用化合价来写"
+  },
+  {
+   "from": "CHEM-IG-3.3-06",
+   "to": "CSH-PRN-18",
+   "type": "language",
+   "note": "titration calculation：中和滴定计算"
+  },
+  {
+   "from": "CHEM-IG-3.3-04",
+   "to": "CSH-QNT-02",
+   "type": "language",
+   "note": "limiting reactant：按方程式计算时找不足量的反应物"
+  },
+  {
+   "from": "CHEM-IG-6.4-03",
+   "to": "CSH-RXN-20",
+   "type": "language",
+   "note": "oxidising agent / reducing agent：氧化剂与还原剂"
+  },
+  {
+   "from": "CHEM-IG-2.5-01",
+   "to": "CSH-STR-23",
+   "type": "language",
+   "note": "covalent bond：共价键（共用电子对）"
+  },
+  {
+   "from": "CHEM-IG-2.4-02",
+   "to": "CSH-STR-38",
+   "type": "language",
+   "note": "ionic compounds：离子晶体熔点高、熔融可导电"
+  },
+  {
+   "from": "CHEM-IG-2.5-03",
+   "to": "CSH-STR-39",
+   "type": "language",
+   "note": "simple molecular substances：分子晶体熔沸点低"
+  },
+  {
+   "from": "CHEM-IG-2.7-01",
+   "to": "CSH-STR-37",
+   "type": "language",
+   "note": "metallic bonding：金属键与金属晶体"
+  },
+  {
+   "from": "CHEM-IG-1.2-01",
+   "to": "CSH-STR-04",
+   "type": "language",
+   "note": "diffusion：分子运动引起的扩散（品红扩散）"
+  },
+  {
+   "from": "CHEM-IG-8.3-02",
+   "to": "CSH-MAT-34",
+   "type": "language",
+   "note": "halogen displacement：卤素间的置换反应"
+  },
+  {
+   "from": "CHEM-IG-8.2-01",
+   "to": "CSH-MAT-40",
+   "type": "language",
+   "note": "alkali metals：钠与水反应"
+  },
+  {
+   "from": "CHEM-IG-9.5-02",
+   "to": "CSH-PRN-25",
+   "type": "language",
+   "note": "sacrificial protection：牺牲阳极保护"
+  },
+  {
+   "from": "CHEM-IG-9.6-01",
+   "to": "CSH-MAT-13",
+   "type": "language",
+   "note": "extraction of metals：金属的冶炼"
+  },
+  {
+   "from": "CHEM-IG-4.1-07",
+   "to": "CSH-PRN-24",
+   "type": "language",
+   "note": "electroplating：电镀，电解原理的应用"
+  },
+  {
+   "from": "CHEM-IG-4.1-03",
+   "to": "CSH-MAT-33",
+   "type": "language",
+   "note": "electrolysis of brine：电解饱和食盐水（氯碱工业）"
+  },
+  {
+   "from": "CHEM-IG-4.2-01",
+   "to": "CSH-PRN-23",
+   "type": "language",
+   "note": "hydrogen–oxygen fuel cell：氢氧燃料电池"
+  },
+  {
+   "from": "CHEM-IG-5.1-03",
+   "to": "CSH-PRN-10",
+   "type": "language",
+   "note": "enthalpy change ΔH：焓变；activation energy：活化能"
+  },
+  {
+   "from": "CHEM-IG-6.3-04",
+   "to": "CSH-SOC-21",
+   "type": "language",
+   "note": "Contact process：接触法制硫酸的条件选择"
+  },
+  {
+   "from": "CHEM-IG-6.3-02",
+   "to": "CSH-PRN-14",
+   "type": "language",
+   "note": "equilibrium shift：化学平衡的移动"
+  },
+  {
+   "from": "CHEM-IG-12.5-03",
+   "to": "CSH-EXP-07",
+   "type": "language",
+   "note": "tests for gases：常见气体的检验"
+  },
+  {
+   "from": "CHEM-IG-11.8-02",
+   "to": "CSH-SOC-11",
+   "type": "language",
+   "note": "plastics and the environment：塑料与白色污染"
+  },
+  {
+   "from": "CHEM-IG-10.3-03",
+   "to": "CSH-SOC-20",
+   "type": "language",
+   "note": "acid rain：酸雨的成因与防治"
+  },
+  {
+   "from": "CHEM-IG-7.1-02",
+   "to": "CSH-MAT-18",
+   "type": "language",
+   "note": "indicators：石蕊、酚酞等酸碱指示剂"
+  },
+  {
+   "from": "CHEM-IG-7.3-03",
+   "to": "CSH-RXN-09",
+   "type": "language",
+   "note": "solubility rules：酸碱盐溶解性，判断复分解反应"
+  },
+  {
+   "from": "CHEM-IG-11.8-01",
+   "to": "CSH-ORG-02",
+   "type": "language",
+   "note": "addition polymerisation：乙烯加聚成聚乙烯"
+  },
+  {
+   "from": "CHEM-IG-11.4-02",
+   "to": "CSH-ORG-01",
+   "type": "language",
+   "note": "substitution reaction：甲烷与氯气的取代反应"
+  },
+  {
+   "from": "BIO-IG-2.1-01",
+   "to": "BSH-STR-03",
+   "type": "language",
+   "note": "cell structures and functions：细胞各结构的功能"
+  },
+  {
+   "from": "BIO-IG-2.2-01",
+   "to": "BSH-STR-01",
+   "type": "language",
+   "note": "magnification：显微镜的放大倍数"
+  },
+  {
+   "from": "BIO-IG-16.3-01",
+   "to": "BSH-PLT-05",
+   "type": "language",
+   "note": "stamen, carpel, stigma, anther：雄蕊、雌蕊、柱头、花药"
+  },
+  {
+   "from": "BIO-IG-16.1-01",
+   "to": "BSH-PLT-06",
+   "type": "language",
+   "note": "asexual reproduction：无性生殖"
+  },
+  {
+   "from": "BIO-LS-9Bp.06",
+   "to": "BSH-PLT-10",
+   "type": "language",
+   "note": "photosynthesis word equation：光合作用文字表达式"
+  },
+  {
+   "from": "BIO-IG-12.3-01",
+   "to": "BSH-MOL-15",
+   "type": "language",
+   "note": "anaerobic respiration：无氧呼吸"
+  },
+  {
+   "from": "BIO-IG-6.1-04",
+   "to": "BSH-MOL-17",
+   "type": "language",
+   "note": "rate of photosynthesis：光照强度、CO₂、温度对光合速率的影响"
+  },
+  {
+   "from": "BIO-LS-8Be.02",
+   "to": "BSH-ENV-04",
+   "type": "language",
+   "note": "bioaccumulation：生物富集"
+  },
+  {
+   "from": "BIO-IG-19.1-01",
+   "to": "BSH-ENV-11",
+   "type": "language",
+   "note": "energy flow：能量流动"
+  },
+  {
+   "from": "BIO-IG-19.3-02",
+   "to": "BSH-ENV-12",
+   "type": "language",
+   "note": "nitrogen cycle：氮循环"
+  },
+  {
+   "from": "BIO-IG-PRAC-06",
+   "to": "BSH-ENV-06",
+   "type": "language",
+   "note": "quadrat, random sampling：样方法随机取样"
+  },
+  {
+   "from": "BIO-IG-7.4-01",
+   "to": "BSH-HUM-02",
+   "type": "language",
+   "note": "chemical digestion, amylase, protease：化学性消化与消化酶"
+  },
+  {
+   "from": "BIO-IG-11.1-01",
+   "to": "BSH-HUM-04",
+   "type": "language",
+   "note": "gas exchange surface, alveoli：肺泡与气体交换"
+  },
+  {
+   "from": "BIO-IG-9.4-01",
+   "to": "BSH-HUM-05",
+   "type": "language",
+   "note": "red blood cells, haemoglobin, plasma：红细胞、血红蛋白、血浆"
+  },
+  {
+   "from": "BIO-IG-9.2-01",
+   "to": "BSH-HUM-06",
+   "type": "language",
+   "note": "atrium, ventricle, valve：心房、心室、瓣膜"
+  },
+  {
+   "from": "BIO-IG-13.1-02",
+   "to": "BSH-HUM-08",
+   "type": "language",
+   "note": "nephron, glomerulus：肾单位、肾小球"
+  },
+  {
+   "from": "BIO-IG-14.1-03",
+   "to": "BSH-HUM-18",
+   "type": "language",
+   "note": "synapse, neurotransmitter：突触与神经递质"
+  },
+  {
+   "from": "BIO-IG-14.2-03",
+   "to": "BSH-HUM-10",
+   "type": "language",
+   "note": "accommodation：看远看近时晶状体的调节"
+  },
+  {
+   "from": "BIO-IG-14.4-03",
+   "to": "BSH-HUM-23",
+   "type": "language",
+   "note": "temperature control：体温调节"
+  },
+  {
+   "from": "BIO-IG-10.1-04",
+   "to": "BSH-HUM-27",
+   "type": "language",
+   "note": "vaccination：疫苗与预防接种"
+  },
+  {
+   "from": "BIO-IG-10.1-03",
+   "to": "BSH-HUM-26",
+   "type": "language",
+   "note": "antigen, antibody：抗原与抗体"
+  },
+  {
+   "from": "BIO-IG-17.4-01",
+   "to": "BSH-GEN-04",
+   "type": "language",
+   "note": "genotype, phenotype, homozygous, heterozygous：基因型、表现型、纯合、杂合"
+  },
+  {
+   "from": "BIO-IG-17.1-01",
+   "to": "BSH-GEN-03",
+   "type": "language",
+   "note": "allele：等位基因"
+  },
+  {
+   "from": "BIO-IG-17.1-02",
+   "to": "BSH-GEN-05",
+   "type": "language",
+   "note": "inheritance of sex：XX 女、XY 男"
+  },
+  {
+   "from": "BIO-IG-18.1-02",
+   "to": "BSH-GEN-18",
+   "type": "language",
+   "note": "mutation：突变"
+  },
+  {
+   "from": "BIO-IG-18.3-02",
+   "to": "BSH-GEN-06",
+   "type": "language",
+   "note": "selective breeding：人工选择育种"
+  },
+  {
+   "from": "BIO-IG-5.1-03",
+   "to": "BSH-MOL-13",
+   "type": "language",
+   "note": "active site, substrate：活性位点、底物，酶的专一性"
+  },
+  {
+   "from": "BIO-IG-5.1-04",
+   "to": "BSH-MOL-13",
+   "type": "language",
+   "note": "optimum temperature, denatured：最适温度、变性"
+  },
+  {
+   "from": "BIO-IG-3.3-01",
+   "to": "BSH-MOL-11",
+   "type": "language",
+   "note": "active transport：主动运输"
+  },
+  {
+   "from": "BIO-IG-3.2-04",
+   "to": "BSH-MOL-12",
+   "type": "language",
+   "note": "plasmolysis, turgid, flaccid：质壁分离、膨胀、萎蔫"
+  },
+  {
+   "from": "BIO-IG-17.2-02",
+   "to": "BSH-MOL-20",
+   "type": "language",
+   "note": "stem cells：干细胞与细胞分化"
+  },
+  {
+   "from": "BIO-IG-14.5-01",
+   "to": "BSH-PLT-13",
+   "type": "language",
+   "note": "phototropism, gravitropism：向光性、向重力性"
+  },
+  {
+   "from": "PHY-IG-1.2-04",
+   "to": "PSH-MECH-25",
+   "type": "language",
+   "note": "free fall, terminal velocity：自由落体（终极速度是收尾速度）"
+  },
+  {
+   "from": "PHY-IG-3.3-01",
+   "to": "PSH-MAG-06",
+   "type": "language",
+   "note": "electromagnetic spectrum：电磁波谱"
+  },
+  {
+   "from": "PHY-IG-3.3-01",
+   "to": "PSH-OPT-05",
+   "type": "language",
+   "note": "dispersion：白光经三棱镜的色散"
+  },
+  {
+   "from": "PHY-IG-5.1.2-01",
+   "to": "PSH-MOD-09",
+   "type": "language",
+   "note": "proton number, nucleon number, isotope：质子数、核子数、同位素"
+  },
+  {
+   "from": "CHEM-IG-3.1-01",
+   "to": "CSH-STR-08",
+   "type": "language",
+   "note": "chemical formula：化学式"
+  },
+  {
+   "from": "CHEM-IG-8.3-01",
+   "to": "CSH-MAT-34",
+   "type": "language",
+   "note": "halogens：卤素，从上到下活泼性减弱"
+  },
+  {
+   "from": "CHEM-IG-9.3-01",
+   "to": "CSH-MAT-11",
+   "type": "language",
+   "note": "alloy：合金，比纯金属更硬"
+  },
+  {
+   "from": "CHEM-IG-11.8-04",
+   "to": "CSH-ORG-20",
+   "type": "language",
+   "note": "condensation polymerisation：缩聚反应"
+  },
+  {
+   "from": "CHEM-IG-11.1-02",
+   "to": "CSH-ORG-10",
+   "type": "language",
+   "note": "homologous series, functional group：同系物、官能团"
+  },
+  {
+   "from": "BIO-IG-17.1-04",
+   "to": "BSH-GEN-12",
+   "type": "language",
+   "note": "gene expression：基因的选择性表达"
+  },
+  {
+   "from": "BIO-IG-19.2-01",
+   "to": "BSH-ENV-10",
+   "type": "language",
+   "note": "trophic level, producer, consumer：营养级、生产者、消费者"
+  },
+  {
+   "from": "BIO-IG-21.2-04",
+   "to": "BSH-TEC-02",
+   "type": "language",
+   "note": "fermenter：发酵罐（发酵工程）"
+  },
+  {
+   "from": "ENG-PRE-CMD",
+   "to": "ENG-VOC-13",
+   "type": "context",
+   "note": "state、describe、explain 等指令词，英语课会系统学"
+  },
+  {
+   "from": "CHEM-IG-PRAC-05",
+   "to": "ENG-VOC-13",
+   "type": "context",
+   "note": "写实验结论和评价时要读懂 suggest、explain 等指令词"
+  },
+  {
+   "from": "BIO-IG-PRAC-05",
+   "to": "ENG-VOC-13",
+   "type": "context",
+   "note": "写结论与改进时要读懂 suggest、evaluate 等指令词"
+  },
+  {
+   "from": "BIO-IG-1.1-01",
+   "to": "ENG-VOC-05",
+   "type": "context",
+   "note": "respire / respiration、excrete / excretion：生物术语常靠词性转换"
+  },
+  {
+   "from": "CHEM-IG-11.2-02",
+   "to": "ENG-VOC-07",
+   "type": "context",
+   "note": "-ane、-ene、-ol、-oic acid 这些后缀决定有机物的类别"
+  },
+  {
+   "from": "BIO-IG-PRAC-01",
+   "to": "ENG-VOC-13",
+   "type": "context",
+   "note": "biological drawing 题目要求 label、draw 等指令"
+  },
+  {
+   "from": "CHEM-IG-2.2-01",
+   "to": "PHY-IG-5.1.1-01",
+   "type": "context",
+   "note": "物理课从 α 粒子散射实验讲原子核是怎么发现的"
+  },
+  {
+   "from": "PHY-IG-5.1.2-01",
+   "to": "CHEM-IG-2.3-01",
+   "type": "context",
+   "note": "化学课也讲同位素，重点是化学性质相同"
+  }
+ ]
+}

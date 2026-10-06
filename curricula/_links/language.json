@@ -1,0 +1,1079 @@
+{
+ "_doc": "语言与人文：语文 ↔ IGCSE 中文、上海英语 ↔ 剑桥英语的同一技能，英语和语文、地理之间的融合。",
+ "concepts": [
+  {
+   "id": "chn.correct-characters",
+   "name": "字音字形与错别字",
+   "kps": [
+    "CHN-ZC-09",
+    "CIG-LAN-01"
+   ]
+  },
+  {
+   "id": "chn.punctuation",
+   "name": "标点符号规范使用",
+   "kps": [
+    "CHN-JZ-11",
+    "CIG-LAN-02"
+   ]
+  },
+  {
+   "id": "chn.locate-information",
+   "name": "提取文中明显信息",
+   "kps": [
+    "CHN-YD-02",
+    "CIG-REA-01"
+   ]
+  },
+  {
+   "id": "chn.author-purpose",
+   "name": "理解作者观点、态度与写作目的",
+   "kps": [
+    "CHN-YD-10",
+    "CIG-REA-02"
+   ]
+  },
+  {
+   "id": "chn.word-in-context",
+   "name": "结合语境理解词语含义",
+   "kps": [
+    "CHN-ZC-08",
+    "CIG-REA-03"
+   ]
+  },
+  {
+   "id": "chn.rhetoric-effect",
+   "name": "修辞手法及其表达效果",
+   "kps": [
+    "CHN-JZ-05",
+    "CIG-REA-04"
+   ]
+  },
+  {
+   "id": "chn.character-description",
+   "name": "人物描写方法与人物形象",
+   "kps": [
+    "CHN-JZ-07",
+    "CIG-REA-05"
+   ]
+  },
+  {
+   "id": "chn.writing-techniques",
+   "name": "结构与写作手法分析",
+   "kps": [
+    "CHN-YD-14",
+    "CIG-REA-06"
+   ]
+  },
+  {
+   "id": "chn.integrate-information",
+   "name": "多则材料的信息筛选与整合",
+   "kps": [
+    "CHN-YD-13",
+    "CIG-REA-09"
+   ]
+  },
+  {
+   "id": "chn.classical-content-words",
+   "name": "文言实词：一词多义与古今异义",
+   "kps": [
+    "CHN-GS-06",
+    "CIG-CLA-02"
+   ]
+  },
+  {
+   "id": "chn.classical-function-words",
+   "name": "文言虚词",
+   "kps": [
+    "CHN-GS-07",
+    "CIG-CLA-03"
+   ]
+  },
+  {
+   "id": "chn.classical-sentence-patterns",
+   "name": "文言特殊句式",
+   "kps": [
+    "CHN-GS-14",
+    "CIG-CLA-04"
+   ]
+  },
+  {
+   "id": "chn.classical-translation",
+   "name": "文言句子翻译成现代汉语",
+   "kps": [
+    "CHN-GS-08",
+    "CIG-CLA-05"
+   ]
+  },
+  {
+   "id": "chn.classical-meaning",
+   "name": "文言文内容理解与主旨寓意",
+   "kps": [
+    "CHN-GS-09",
+    "CIG-CLA-06"
+   ]
+  },
+  {
+   "id": "chn.essay-planning",
+   "name": "作文审题、立意与布局",
+   "kps": [
+    "CHN-XZW-22",
+    "CIG-WRI-01"
+   ]
+  },
+  {
+   "id": "chn.audience-register",
+   "name": "写作的对象与语气",
+   "kps": [
+    "CHN-XZW-29",
+    "CIG-WRI-04"
+   ]
+  },
+  {
+   "id": "chn.letter-format",
+   "name": "书信格式",
+   "kps": [
+    "CHN-XZW-11",
+    "CIG-WRI-05"
+   ]
+  },
+  {
+   "id": "chn.argumentative-writing",
+   "name": "议论文写作",
+   "kps": [
+    "CHN-XZW-21",
+    "CIG-WRI-08"
+   ]
+  },
+  {
+   "id": "chn.narrative-writing",
+   "name": "记叙文写作",
+   "kps": [
+    "CHN-XZW-17",
+    "CIG-WRI-11"
+   ]
+  },
+  {
+   "id": "chn.opinion-with-reasons",
+   "name": "说观点并讲理由",
+   "kps": [
+    "CHN-KY-04",
+    "CIG-SPK-02"
+   ]
+  },
+  {
+   "id": "chn.speech",
+   "name": "演讲",
+   "kps": [
+    "CHN-KY-05",
+    "CIG-SPK-03"
+   ]
+  },
+  {
+   "id": "chn.ba-bei-sentences",
+   "name": "把字句与被字句",
+   "kps": [
+    "CHN-JZ-04",
+    "CIG-GR-10"
+   ]
+  },
+  {
+   "id": "chn.measure-words",
+   "name": "量词搭配",
+   "kps": [
+    "CHN-XZ-07",
+    "CIG-GR-02"
+   ]
+  },
+  {
+   "id": "eng.be-verb",
+   "name": "be 动词 am/is/are",
+   "kps": [
+    "ESH-GRA-05",
+    "ENG-GRA-02"
+   ]
+  },
+  {
+   "id": "eng.plural-nouns",
+   "name": "名词复数",
+   "kps": [
+    "ESH-GRA-12",
+    "ENG-GRA-01"
+   ]
+  },
+  {
+   "id": "eng.present-simple",
+   "name": "一般现在时",
+   "kps": [
+    "ESH-GRA-15",
+    "ENG-GRA-03"
+   ]
+  },
+  {
+   "id": "eng.present-continuous",
+   "name": "现在进行时",
+   "kps": [
+    "ESH-GRA-16",
+    "ENG-GRA-04"
+   ]
+  },
+  {
+   "id": "eng.past-simple-regular",
+   "name": "一般过去时（规则动词）",
+   "kps": [
+    "ESH-GRA-21",
+    "ENG-GRA-09"
+   ]
+  },
+  {
+   "id": "eng.past-simple-irregular",
+   "name": "不规则动词过去式",
+   "kps": [
+    "ESH-GRA-22",
+    "ENG-GRA-10"
+   ]
+  },
+  {
+   "id": "eng.future",
+   "name": "将来时 will / be going to",
+   "kps": [
+    "ESH-GRA-23",
+    "ENG-GRA-15"
+   ]
+  },
+  {
+   "id": "eng.comparatives",
+   "name": "比较级与最高级",
+   "kps": [
+    "ESH-GRA-24",
+    "ENG-GRA-11"
+   ]
+  },
+  {
+   "id": "eng.countable-uncountable",
+   "name": "可数与不可数名词",
+   "kps": [
+    "ESH-GRA-26",
+    "ENG-GRA-05"
+   ]
+  },
+  {
+   "id": "eng.articles",
+   "name": "冠词 a/an/the",
+   "kps": [
+    "ESH-GRA-27",
+    "ENG-GRA-06"
+   ]
+  },
+  {
+   "id": "eng.prepositions-time-place",
+   "name": "时间与地点介词",
+   "kps": [
+    "ESH-GRA-30",
+    "ENG-GRA-07"
+   ]
+  },
+  {
+   "id": "eng.pronouns",
+   "name": "代词：宾格、物主、反身",
+   "kps": [
+    "ESH-GRA-29",
+    "ENG-GRA-12"
+   ]
+  },
+  {
+   "id": "eng.wh-questions",
+   "name": "特殊疑问句",
+   "kps": [
+    "ESH-GRA-17",
+    "ENG-GRA-13"
+   ]
+  },
+  {
+   "id": "eng.imperatives",
+   "name": "祈使句与 Let's",
+   "kps": [
+    "ESH-GRA-13",
+    "ENG-GRA-28"
+   ]
+  },
+  {
+   "id": "eng.modals",
+   "name": "情态动词 must/should/may",
+   "kps": [
+    "ESH-GRA-25",
+    "ENG-GRA-16"
+   ]
+  },
+  {
+   "id": "eng.present-perfect",
+   "name": "现在完成时",
+   "kps": [
+    "ESH-GRA-34",
+    "ENG-GRA-19"
+   ]
+  },
+  {
+   "id": "eng.past-continuous",
+   "name": "过去进行时",
+   "kps": [
+    "ESH-GRA-35",
+    "ENG-GRA-17"
+   ]
+  },
+  {
+   "id": "eng.gerund-infinitive",
+   "name": "动名词与不定式",
+   "kps": [
+    "ESH-GRA-37",
+    "ENG-GRA-18"
+   ]
+  },
+  {
+   "id": "eng.conjunctions",
+   "name": "并列连词",
+   "kps": [
+    "ESH-GRA-38",
+    "ENG-GRA-14"
+   ]
+  },
+  {
+   "id": "eng.first-conditional",
+   "name": "if 条件句（主将从现）",
+   "kps": [
+    "ESH-GRA-39",
+    "ENG-GRA-22"
+   ]
+  },
+  {
+   "id": "eng.passive",
+   "name": "被动语态",
+   "kps": [
+    "ESH-GRA-41",
+    "ENG-GRA-24"
+   ]
+  },
+  {
+   "id": "eng.object-clauses",
+   "name": "宾语从句",
+   "kps": [
+    "ESH-GRA-42",
+    "ENG-GRA-33"
+   ]
+  },
+  {
+   "id": "eng.tag-questions",
+   "name": "反意疑问句",
+   "kps": [
+    "ESH-GRA-43",
+    "ENG-GRA-29"
+   ]
+  },
+  {
+   "id": "eng.past-perfect",
+   "name": "过去完成时",
+   "kps": [
+    "ESH-GRA-44",
+    "ENG-GRA-27"
+   ]
+  },
+  {
+   "id": "eng.relative-clauses",
+   "name": "定语从句",
+   "kps": [
+    "ESH-GRA-49",
+    "ENG-GRA-25"
+   ]
+  },
+  {
+   "id": "eng.subject-verb-agreement",
+   "name": "主谓一致",
+   "kps": [
+    "ESH-GRA-51",
+    "ENG-GRA-21"
+   ]
+  },
+  {
+   "id": "eng.reported-speech",
+   "name": "间接引语",
+   "kps": [
+    "ESH-GRA-54",
+    "ENG-GRA-26"
+   ]
+  },
+  {
+   "id": "eng.modal-perfect",
+   "name": "情态动词 + have done",
+   "kps": [
+    "ESH-GRA-61",
+    "ENG-GRA-38"
+   ]
+  },
+  {
+   "id": "eng.too-enough",
+   "name": "too...to 与 enough",
+   "kps": [
+    "ESH-GRA-47",
+    "ENG-GRA-30"
+   ]
+  },
+  {
+   "id": "eng.phrasal-verbs",
+   "name": "常用短语动词",
+   "kps": [
+    "ESH-VOC-14",
+    "ENG-VOC-10"
+   ]
+  },
+  {
+   "id": "eng.affixes",
+   "name": "前缀后缀构词",
+   "kps": [
+    "ESH-VOC-13",
+    "ENG-VOC-07"
+   ]
+  },
+  {
+   "id": "eng.word-forms",
+   "name": "词性转换（词形转换）",
+   "kps": [
+    "ESH-VOC-15",
+    "ENG-VOC-05"
+   ]
+  },
+  {
+   "id": "eng.phonics-digraphs",
+   "name": "字母组合发音（自然拼读）",
+   "kps": [
+    "ESH-PHO-04",
+    "ENG-VOC-01"
+   ]
+  },
+  {
+   "id": "eng.word-stress",
+   "name": "单词重音",
+   "kps": [
+    "ESH-PHO-08",
+    "ENG-LIS-02"
+   ]
+  },
+  {
+   "id": "eng.sentence-stress-intonation",
+   "name": "句子重音、连读与语调",
+   "kps": [
+    "ESH-PHO-10",
+    "ENG-LIS-11"
+   ]
+  },
+  {
+   "id": "eng.main-idea",
+   "name": "段落主旨",
+   "kps": [
+    "ESH-REA-05",
+    "ENG-REA-03"
+   ]
+  },
+  {
+   "id": "eng.inference",
+   "name": "阅读推断隐含意思",
+   "kps": [
+    "ESH-REA-06",
+    "ENG-REA-08"
+   ]
+  },
+  {
+   "id": "eng.sentence-basics",
+   "name": "写完整句子：大写与标点",
+   "kps": [
+    "ESH-WRI-02",
+    "ENG-WRI-01"
+   ]
+  },
+  {
+   "id": "eng.paragraph-writing",
+   "name": "主题句段落写作",
+   "kps": [
+    "ESH-WRI-05",
+    "ENG-WRI-05"
+   ]
+  },
+  {
+   "id": "eng.informal-email",
+   "name": "书信与邮件",
+   "kps": [
+    "ESH-WRI-06",
+    "ENG-WRI-09"
+   ]
+  },
+  {
+   "id": "eng.narrative-writing",
+   "name": "英语记叙文写作",
+   "kps": [
+    "ESH-WRI-07",
+    "ENG-WRI-10"
+   ]
+  },
+  {
+   "id": "eng.formal-letter",
+   "name": "正式信函（建议、申请）",
+   "kps": [
+    "ESH-WRI-09",
+    "ENG-WRI-11"
+   ]
+  },
+  {
+   "id": "eng.summary",
+   "name": "英语概要写作",
+   "kps": [
+    "ESH-WRI-11",
+    "ENG-REA-13"
+   ]
+  },
+  {
+   "id": "eng.argumentative-essay",
+   "name": "英语议论文",
+   "kps": [
+    "ESH-WRI-12",
+    "ENG-WRI-19"
+   ]
+  },
+  {
+   "id": "eng.cohesion",
+   "name": "连接词与篇章衔接",
+   "kps": [
+    "ESH-WRI-13",
+    "ENG-WRI-08"
+   ]
+  },
+  {
+   "id": "eng.functional-language",
+   "name": "交际用语：建议、邀请、回应",
+   "kps": [
+    "ESH-LIS-10",
+    "ENG-LIS-08"
+   ]
+  },
+  {
+   "id": "eng.listen-specific-info",
+   "name": "听取关键信息",
+   "kps": [
+    "ESH-LIS-08",
+    "ENG-LIS-03"
+   ]
+  },
+  {
+   "id": "eng.listen-attitude",
+   "name": "听力：态度与推断",
+   "kps": [
+    "ESH-LIS-11",
+    "ENG-LIS-06"
+   ]
+  }
+ ],
+ "links": [
+  {
+   "from": "ESH-WRI-11",
+   "to": "CHN-YD-04",
+   "type": "uses",
+   "note": "英语概要写作要先抓住全文要点，和语文“概括文章主要内容”是同一种本领"
+  },
+  {
+   "from": "ENG-REA-13",
+   "to": "CHN-YD-04",
+   "type": "uses",
+   "note": "写英文 summary 前先把文章要点找出来，就像语文课上概括主要内容"
+  },
+  {
+   "from": "ENG-REA-03",
+   "to": "CHN-YD-03",
+   "type": "uses",
+   "note": "找英语段落的主题句，和语文“借助关键语句概括段意”方法一样"
+  },
+  {
+   "from": "ESH-REA-05",
+   "to": "CHN-JZ-06",
+   "type": "uses",
+   "note": "英语短文的主旨句，就是语文里说的中心句、总起句"
+  },
+  {
+   "from": "ENG-WRI-05",
+   "to": "CHN-XZW-05",
+   "type": "uses",
+   "note": "英语段落“主题句+支撑句”，就是语文“围绕一个意思写一段话”"
+  },
+  {
+   "from": "ESH-WRI-05",
+   "to": "CHN-XZW-05",
+   "type": "context",
+   "note": "英语主题段落和语文“围绕一个意思写一段话”结构相同：先说中心，再分几点写"
+  },
+  {
+   "from": "ESH-WRI-04",
+   "to": "CHN-XZW-09",
+   "type": "uses",
+   "note": "用英语讲一次经历，也要按起因、经过、结果把事情写清楚"
+  },
+  {
+   "from": "ENG-REA-16",
+   "to": "CHN-JZ-03",
+   "type": "uses",
+   "note": "simile 就是比喻、personification 就是拟人，语文里学过的修辞英语里也有"
+  },
+  {
+   "from": "ENG-REA-18",
+   "to": "CHN-YD-11",
+   "type": "context",
+   "note": "分析 writer's effects 和语文“品析语言”一样：看用词、修辞、句式带来的效果"
+  },
+  {
+   "from": "ESH-REA-13",
+   "to": "CHN-JZ-05",
+   "type": "context",
+   "note": "读英文诗歌小说时分析修辞的作用，和语文分析修辞表达效果的思路相同"
+  },
+  {
+   "from": "ENG-WRI-19",
+   "to": "CHN-WT-11",
+   "type": "context",
+   "note": "英语议论文的观点、理由和例子，对应语文议论文的论点和论据"
+  },
+  {
+   "from": "ESH-WRI-12",
+   "to": "CHN-XZW-21",
+   "type": "context",
+   "note": "英语高考作文要立场明确、论证有据，和语文议论文写作要求一致"
+  },
+  {
+   "from": "ENG-WRI-19",
+   "to": "CHN-WT-12",
+   "type": "context",
+   "note": "英语 essay 里举例子、作对比，就是语文学过的举例论证、对比论证"
+  },
+  {
+   "from": "ENG-REA-17",
+   "to": "CHN-WT-11",
+   "type": "context",
+   "note": "PEE（观点-证据-解释）和语文“论点-论据-论证”是同一个思路"
+  },
+  {
+   "from": "ENG-REA-09",
+   "to": "CHN-SY-01",
+   "type": "context",
+   "note": "区分 fact 和 opinion，语文读新闻评论时也要辨析事实与观点"
+  },
+  {
+   "from": "ENG-REA-09",
+   "to": "CIG-REA-08",
+   "type": "context",
+   "note": "IGCSE 英语和 IGCSE 中文都考区分事实与观点，方法可以通用"
+  },
+  {
+   "from": "ENG-REA-10",
+   "to": "CHN-YD-10",
+   "type": "context",
+   "note": "判断英语作者的写作目的和态度，和语文“理解作者观点与写作意图”一样"
+  },
+  {
+   "from": "ENG-REA-08",
+   "to": "CHN-JZ-08",
+   "type": "context",
+   "note": "读出英语文本没明说的意思，和语文体会句子深层含义是同一种能力"
+  },
+  {
+   "from": "ENG-REA-15",
+   "to": "CHN-WT-04",
+   "type": "context",
+   "note": "分析英语故事的人物、场景、主题，可借用语文小说三要素：人物、情节、环境"
+  },
+  {
+   "from": "ENG-REA-15",
+   "to": "CHN-YD-09",
+   "type": "context",
+   "note": "从言行推断人物性格，语文“分析人物形象”用的是同样方法"
+  },
+  {
+   "from": "ENG-REA-19",
+   "to": "CHN-WT-05",
+   "type": "context",
+   "note": "分析英语文本的开头结尾和段落顺序，和语文分析段落作用（总领、照应、过渡）相通"
+  },
+  {
+   "from": "ESH-REA-09",
+   "to": "CHN-YD-07",
+   "type": "context",
+   "note": "英语文章的时间顺序、总分、对比结构，语文“理清文章结构”里都学过"
+  },
+  {
+   "from": "ESH-REA-11",
+   "to": "CHN-JZ-06",
+   "type": "context",
+   "note": "六选四要看前后句的衔接，语文学过的过渡句、总起句能帮你判断"
+  },
+  {
+   "from": "ESH-REA-14",
+   "to": "CHN-YD-13",
+   "type": "context",
+   "note": "英语图表、海报类阅读和语文非连续性文本一样，要把图和文字信息合起来看"
+  },
+  {
+   "from": "ENG-REA-21",
+   "to": "CHN-SY-03",
+   "type": "context",
+   "note": "比较几篇英语文本的观点，和语文多文本信息整合的方法一样"
+  },
+  {
+   "from": "ENG-REA-20",
+   "to": "CHN-SY-07",
+   "type": "context",
+   "note": "识别英语文本的偏见和立场，语文“辨识媒介信息、判断立场”是同一种思考"
+  },
+  {
+   "from": "ENG-REA-06",
+   "to": "CHN-ZC-06",
+   "type": "context",
+   "note": "英语上下文猜词，和语文“联系上下文理解词语”方法相同"
+  },
+  {
+   "from": "ENG-VOC-08",
+   "to": "CHN-ZC-05",
+   "type": "context",
+   "note": "英语同义词、反义词的积累和辨析，和语文近义词反义词学习方法一样"
+  },
+  {
+   "from": "ENG-VOC-15",
+   "to": "CHN-XZ-18",
+   "type": "context",
+   "note": "英语习语像汉语的成语、俗语，整体记意思，不能只看字面"
+  },
+  {
+   "from": "ENG-VOC-12",
+   "to": "CIG-WRI-04",
+   "type": "context",
+   "note": "英语分正式和非正式用词，中文写作也要按读者选择口语或书面语"
+  },
+  {
+   "from": "ENG-WRI-10",
+   "to": "CHN-XZW-17",
+   "type": "context",
+   "note": "英语记叙文的开头、发展、高潮、结尾，和语文记叙文的结构安排相通"
+  },
+  {
+   "from": "ENG-WRI-10",
+   "to": "CHN-XZW-18",
+   "type": "context",
+   "note": "英语故事里用感官细节描写，和语文细节描写让文章生动是一回事"
+  },
+  {
+   "from": "ESH-WRI-07",
+   "to": "CHN-XZW-17",
+   "type": "context",
+   "note": "英语记叙文要有开头-经过-结尾和细节，和语文记叙文写作要求一致"
+  },
+  {
+   "from": "ENG-WRI-23",
+   "to": "CIG-WRI-10",
+   "type": "context",
+   "note": "IGCSE 英语和 IGCSE 中文的描写文要求一样：用文字画出画面"
+  },
+  {
+   "from": "ENG-WRI-23",
+   "to": "CIG-WRI-11",
+   "type": "context",
+   "note": "IGCSE 英语记叙文和 IGCSE 中文记叙文评分思路相近，构思方法可以互通"
+  },
+  {
+   "from": "ENG-WRI-22",
+   "to": "CIG-WRI-07",
+   "type": "context",
+   "note": "英语 directed writing 和中文指导写作都要读材料、选要点、按要求改写成新文章"
+  },
+  {
+   "from": "ENG-WRI-14",
+   "to": "CHN-XZW-22",
+   "type": "context",
+   "note": "写英语作文前审题、列提纲，和语文作文审题立意布局的步骤一样"
+  },
+  {
+   "from": "ESH-WRI-08",
+   "to": "CHN-XZW-22",
+   "type": "context",
+   "note": "中考英语写作的审题和要点覆盖，和中考语文作文审题方法相通"
+  },
+  {
+   "from": "ENG-WRI-15",
+   "to": "CHN-XZW-08",
+   "type": "context",
+   "note": "英语写完自查改错，和语文用修改符号修改习作是同一个好习惯"
+  },
+  {
+   "from": "ENG-WRI-07",
+   "to": "CHN-JZ-09",
+   "type": "context",
+   "note": "英语改破句、粘连句，就像语文改成分残缺等病句"
+  },
+  {
+   "from": "ENG-WRI-18",
+   "to": "CIG-WRI-06",
+   "type": "context",
+   "note": "英语句式长短变化，中文写作也讲究长短句结合、句式多样"
+  },
+  {
+   "from": "ENG-WRI-20",
+   "to": "CHN-XZW-20",
+   "type": "context",
+   "note": "英语演讲稿要有对象感和号召力，语文写演讲稿也是这样"
+  },
+  {
+   "from": "ENG-WRI-17",
+   "to": "CHN-WT-13",
+   "type": "context",
+   "note": "写英语小诗用到意象和节奏，语文现代诗也讲意象、节奏和分行"
+  },
+  {
+   "from": "ENG-WRI-24",
+   "to": "CHN-ZS-05",
+   "type": "context",
+   "note": "英语笔记用要点、思维导图，语文读名著做读书笔记、圈点批注方法相通"
+  },
+  {
+   "from": "ESH-WRI-14",
+   "to": "CHN-XZW-11",
+   "type": "context",
+   "note": "英语邮件和中文书信都有称呼、正文、结尾、署名，格式思路一样"
+  },
+  {
+   "from": "ENG-WRI-02",
+   "to": "CHN-JZ-01",
+   "type": "context",
+   "note": "英语也用逗号、问号、叹号、引号，但英语句号是实心点“.”，没有顿号"
+  },
+  {
+   "from": "ENG-WRI-16",
+   "to": "CHN-JZ-11",
+   "type": "context",
+   "note": "冒号、分号、破折号、省略号在中英文里作用相近，写法略有不同"
+  },
+  {
+   "from": "ENG-GRA-26",
+   "to": "CHN-JZ-04",
+   "type": "context",
+   "note": "英语间接引语和语文“直接引语改间接引语”一样，要换人称"
+  },
+  {
+   "from": "ESH-GRA-54",
+   "to": "CHN-JZ-04",
+   "type": "context",
+   "note": "把直接引语改成间接引语，语文句式变换里也练过，英语还要变时态"
+  },
+  {
+   "from": "ESH-GRA-41",
+   "to": "CHN-JZ-04",
+   "type": "context",
+   "note": "英语被动语态相当于汉语的被字句，都是把受动作的人或物放在前面"
+  },
+  {
+   "from": "ENG-GRA-24",
+   "to": "CIG-GR-10",
+   "type": "context",
+   "note": "英语 be + 过去分词的被动句，对应中文的“被”字句"
+  },
+  {
+   "from": "ESH-GRA-53",
+   "to": "CHN-JZ-10",
+   "type": "context",
+   "note": "英语五种基本句型里的主语、谓语、宾语，语文句子成分里学过同样的概念"
+  },
+  {
+   "from": "ESH-GRA-64",
+   "to": "CHN-JZ-10",
+   "type": "context",
+   "note": "拆英语长难句找主干，和语文划分句子成分、找句子主干的方法一样"
+  },
+  {
+   "from": "ESH-WRI-10",
+   "to": "CHN-JZ-10",
+   "type": "uses",
+   "note": "汉译英要先看清中文句子的主干和修饰成分，再用英语结构表达"
+  },
+  {
+   "from": "ESH-WRI-10",
+   "to": "CHN-ZC-08",
+   "type": "context",
+   "note": "翻译时要理解中文词语在句中的真实含义，不能逐字硬译"
+  },
+  {
+   "from": "ENG-LIS-09",
+   "to": "CHN-KY-04",
+   "type": "context",
+   "note": "英语小组讨论轮流发言、回应他人，和语文口语交际的小组讨论要求一样"
+  },
+  {
+   "from": "ENG-LIS-10",
+   "to": "CHN-KY-05",
+   "type": "context",
+   "note": "英语演讲注意停顿、重音和手势，语文演讲训练的要领相同"
+  },
+  {
+   "from": "ESH-LIS-15",
+   "to": "CHN-KY-08",
+   "type": "context",
+   "note": "用英语辩论和语文辩论一样：观点有依据，并回应对方"
+  },
+  {
+   "from": "ENG-LIS-04",
+   "to": "CIG-SPK-02",
+   "type": "context",
+   "note": "英语 I think... because... 和中文口试“观点+理由+例子”是同一个答题框架"
+  },
+  {
+   "from": "ESH-LIS-04",
+   "to": "CHN-KY-01",
+   "type": "context",
+   "note": "用英语问答个人信息，也要像语文口语课说的那样认真听、看着对方说"
+  },
+  {
+   "from": "ESH-REA-13",
+   "to": "CHN-WT-17",
+   "type": "context",
+   "note": "读英文小说原著或简写本，可以和语文课读过的外国文学译本对照着读"
+  },
+  {
+   "from": "ESH-REA-13",
+   "to": "CHN-ZS-09",
+   "type": "context",
+   "note": "语文快乐读书吧读过的外国名著，可以找英文简写版再读一遍"
+  },
+  {
+   "from": "ENG-REA-14",
+   "to": "CHN-WT-02",
+   "type": "context",
+   "note": "英语说明文（instructions、information texts）也用举例子、列数字等说明方法"
+  },
+  {
+   "from": "ESH-REA-03",
+   "to": "CHN-YD-04",
+   "type": "context",
+   "note": "给英语短文选标题，要先概括主要内容，和语文概括全文一样"
+  },
+  {
+   "from": "ESH-VOC-07",
+   "to": "GSH-PHYS-05",
+   "type": "context",
+   "note": "学会 sunny、rainy、windy，就能看懂英文天气预报；地理课学过天气符号"
+  },
+  {
+   "from": "ESH-VOC-07",
+   "to": "GSH-EARTH-04",
+   "type": "context",
+   "note": "四季是怎么来的？地理课讲了地球公转，英语课学四季单词"
+  },
+  {
+   "from": "ESH-LIS-07",
+   "to": "GSH-TOOL-04",
+   "type": "context",
+   "note": "用英语指路要分清方向，地理课学的地图“上北下南、左西右东”能帮上忙"
+  },
+  {
+   "from": "ENG-GRA-07",
+   "to": "GSH-TOOL-04",
+   "type": "context",
+   "note": "next to、opposite、between 描述位置，和看地图找方向是同一件事"
+  },
+  {
+   "from": "ENG-VOC-11",
+   "to": "GSH-HS2-13",
+   "type": "context",
+   "note": "英语“环境”话题的词汇（pollution、climate change），地理课讲了这些问题的原因"
+  },
+  {
+   "from": "ENG-VOC-11",
+   "to": "GSH-RES-02",
+   "type": "context",
+   "note": "写英语环保话题时，可以用地理课学的全球变暖和北极熊例子"
+  },
+  {
+   "from": "ENG-VOC-11",
+   "to": "GSH-CHN-19",
+   "type": "context",
+   "note": "谈 environment 话题，可以举中国治理雾霾、长江大保护的例子"
+  },
+  {
+   "from": "ESH-WRI-12",
+   "to": "GSH-HS2-14",
+   "type": "context",
+   "note": "高考英语作文常写环保与可持续发展，地理课的“可持续发展”提供论据"
+  },
+  {
+   "from": "ENG-WRI-19",
+   "to": "GSH-HS2-06",
+   "type": "context",
+   "note": "英语 essay 常写城市生活利弊，地理课讲过城镇化带来的问题与对策"
+  },
+  {
+   "from": "ESH-LIS-15",
+   "to": "GSH-HUM-02",
+   "type": "context",
+   "note": "英语是使用范围最广的语言、汉语使用人数最多，地理课讲过世界语言分布"
+  },
+  {
+   "from": "ENG-LIS-12",
+   "to": "GSH-CHN-31",
+   "type": "context",
+   "note": "口语短讲介绍家乡上海时，可以用地理课学的位置、气候和长江口知识"
+  },
+  {
+   "from": "ENG-WRI-12",
+   "to": "GSH-CHN-27",
+   "type": "context",
+   "note": "给校刊写英文文章介绍上海和长三角，地理课的知识就是好素材"
+  },
+  {
+   "from": "ESH-GRA-24",
+   "to": "GSH-PHYS-01",
+   "type": "context",
+   "note": "用比较级描述世界：Asia is the largest continent，地理课学过七大洲面积排序"
+  },
+  {
+   "from": "ESH-LIS-15",
+   "to": "CIG-SPK-08",
+   "type": "context",
+   "note": "用英语介绍春节、中秋等传统节日，先用中文积累节日的基本事实"
+  },
+  {
+   "from": "ESH-LIS-15",
+   "to": "CHN-XZW-28",
+   "type": "context",
+   "note": "语文课学过介绍家乡风俗，用英语讲中国文化时可以用同样的内容"
+  },
+  {
+   "from": "ESH-WRI-14",
+   "to": "CHN-GS-21",
+   "type": "context",
+   "note": "写英文邮件申请“传统文化项目组”时，语文学的古代文化常识可以当素材"
+  },
+  {
+   "from": "ESH-WRI-10",
+   "to": "CHN-GS-10",
+   "type": "context",
+   "note": "汉译英题常出现中国文化内容，语文积累的古诗文名句是翻译素材"
+  },
+  {
+   "from": "ENG-WRI-17",
+   "to": "CHN-GS-04",
+   "type": "context",
+   "note": "写英文小诗的意象，可以和古诗里月、柳、雁等意象比较着体会"
+  },
+  {
+   "from": "ESH-REA-13",
+   "to": "CHN-GS-31",
+   "type": "context",
+   "note": "读英文诗歌时，可以和语文学的《诗经》、唐诗宋词比较抒情方式"
+  },
+  {
+   "from": "ENG-LIS-07",
+   "to": "GSH-HS2-13",
+   "type": "context",
+   "note": "口语考试遇到环境类话题时，地理课学的环境问题知识能帮你说出理由和例子"
+  }
+ ]
+}

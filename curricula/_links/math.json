@@ -1,0 +1,1048 @@
+{
+ "_doc": "数学：沪教 ↔ 剑桥 ↔ 前置的同一概念，以及理科用到的数学。",
+ "concepts": [
+  {
+   "id": "math.pythagoras",
+   "name": "勾股定理",
+   "kps": [
+    "MSH-GEO-31",
+    "MATH-PRE-PYTH",
+    "MATH-IG-6.1-01"
+   ]
+  },
+  {
+   "id": "math.hcf-lcm",
+   "name": "最大公因数与最小公倍数",
+   "kps": [
+    "MSH-NUM-33",
+    "MATH-LS-7N-03"
+   ]
+  },
+  {
+   "id": "math.prime-factorisation",
+   "name": "质数与分解质因数",
+   "kps": [
+    "MSH-NUM-32",
+    "MATH-LS-8N-02"
+   ]
+  },
+  {
+   "id": "math.signed-number-operations",
+   "name": "正负数（有理数）的四则运算",
+   "kps": [
+    "MSH-NUM-39",
+    "MATH-LS-8N-01"
+   ]
+  },
+  {
+   "id": "math.square-cube-roots",
+   "name": "平方根与立方根",
+   "kps": [
+    "MSH-NUM-40",
+    "MATH-LS-8N-05"
+   ]
+  },
+  {
+   "id": "math.surds",
+   "name": "二次根式化简与分母有理化",
+   "kps": [
+    "MSH-NUM-41",
+    "MATH-IG-1.18-01"
+   ]
+  },
+  {
+   "id": "math.index-laws",
+   "name": "幂的运算（同底数幂乘除、零指数）",
+   "kps": [
+    "MSH-ALG-07",
+    "MATH-LS-8N-04"
+   ]
+  },
+  {
+   "id": "math.standard-form",
+   "name": "科学记数法（标准式）",
+   "kps": [
+    "MATH-IG-1.8-01",
+    "MATH-PRE-STDF"
+   ]
+  },
+  {
+   "id": "math.fraction-decimal-equivalence",
+   "name": "分数、小数（百分数）的互化与比较",
+   "kps": [
+    "MSH-NUM-34",
+    "MATH-LS-7N-06"
+   ]
+  },
+  {
+   "id": "math.fraction-mult-div",
+   "name": "分数乘除法",
+   "kps": [
+    "MSH-NUM-36",
+    "MATH-LS-7N-07"
+   ]
+  },
+  {
+   "id": "math.decimal-mult-div",
+   "name": "小数乘除法",
+   "kps": [
+    "MSH-NUM-30",
+    "MATH-LS-8N-06"
+   ]
+  },
+  {
+   "id": "math.percentage-change",
+   "name": "百分数及增减应用",
+   "kps": [
+    "MSH-APP-08",
+    "MATH-LS-8N-09"
+   ]
+  },
+  {
+   "id": "math.ratio-proportion",
+   "name": "比与比例、按比分配",
+   "kps": [
+    "MSH-NUM-37",
+    "MATH-LS-7N-10",
+    "MATH-PRE-RATIO"
+   ]
+  },
+  {
+   "id": "math.direct-inverse-proportion",
+   "name": "正比例与反比例关系（函数）",
+   "kps": [
+    "MSH-FUN-02",
+    "MATH-IG-2.8-01"
+   ]
+  },
+  {
+   "id": "math.letters-for-numbers",
+   "name": "用字母表示数",
+   "kps": [
+    "MSH-ALG-01",
+    "MATH-LS-7A-01"
+   ]
+  },
+  {
+   "id": "math.simplify-linear-expressions",
+   "name": "合并同类项与去括号",
+   "kps": [
+    "MSH-ALG-20",
+    "MATH-LS-7A-02"
+   ]
+  },
+  {
+   "id": "math.expand-brackets",
+   "name": "整式乘法与乘法公式（展开括号）",
+   "kps": [
+    "MSH-ALG-08",
+    "MATH-LS-9A-01"
+   ]
+  },
+  {
+   "id": "math.factorisation",
+   "name": "因式分解",
+   "kps": [
+    "MSH-ALG-09",
+    "MATH-IG-2.2-02"
+   ]
+  },
+  {
+   "id": "math.algebraic-fractions",
+   "name": "分式（代数分式）的运算",
+   "kps": [
+    "MSH-ALG-10",
+    "MATH-IG-2.3-01"
+   ]
+  },
+  {
+   "id": "math.simple-equations",
+   "name": "简易方程（未知数在一边）",
+   "kps": [
+    "MSH-ALG-02",
+    "MATH-LS-7A-04"
+   ]
+  },
+  {
+   "id": "math.linear-equations",
+   "name": "一元一次方程",
+   "kps": [
+    "MSH-ALG-03",
+    "MATH-LS-8A-04"
+   ]
+  },
+  {
+   "id": "math.simultaneous-linear",
+   "name": "二元一次方程组",
+   "kps": [
+    "MSH-ALG-05",
+    "MATH-LS-9A-05"
+   ]
+  },
+  {
+   "id": "math.linear-inequalities",
+   "name": "一元一次不等式",
+   "kps": [
+    "MSH-ALG-04",
+    "MATH-LS-9A-06"
+   ]
+  },
+  {
+   "id": "math.quadratic-equations",
+   "name": "一元二次方程的解法",
+   "kps": [
+    "MSH-ALG-11",
+    "MATH-IG-2.5-06"
+   ]
+  },
+  {
+   "id": "math.fractional-equations",
+   "name": "分式方程",
+   "kps": [
+    "MSH-ALG-12",
+    "MATH-IG-2.5-05"
+   ]
+  },
+  {
+   "id": "math.rearrange-formula",
+   "name": "公式变形（变换主元）",
+   "kps": [
+    "MATH-PRE-REARR",
+    "MATH-IG-2.5-03"
+   ]
+  },
+  {
+   "id": "math.cartesian-coordinates",
+   "name": "平面直角坐标系",
+   "kps": [
+    "MSH-FUN-01",
+    "MATH-IG-3.1-01"
+   ]
+  },
+  {
+   "id": "math.linear-function",
+   "name": "一次函数 y = kx + b（斜率与截距）",
+   "kps": [
+    "MSH-FUN-03",
+    "MATH-LS-8A-07"
+   ]
+  },
+  {
+   "id": "math.quadratic-function",
+   "name": "二次函数的图像与最值",
+   "kps": [
+    "MSH-FUN-04",
+    "MATH-AM-2-01"
+   ]
+  },
+  {
+   "id": "math.quadratic-inequalities",
+   "name": "一元二次不等式",
+   "kps": [
+    "MSH-ALG-15",
+    "MATH-AM-2-02"
+   ]
+  },
+  {
+   "id": "math.function-concept",
+   "name": "函数的概念、定义域与值域",
+   "kps": [
+    "MSH-FUN-08",
+    "MATH-AM-1-01"
+   ]
+  },
+  {
+   "id": "math.inverse-function",
+   "name": "反函数",
+   "kps": [
+    "MSH-FUN-16",
+    "MATH-AM-1-02"
+   ]
+  },
+  {
+   "id": "math.exponential-power-functions",
+   "name": "幂函数与指数函数",
+   "kps": [
+    "MSH-FUN-06",
+    "MATH-IG-2.10-02"
+   ]
+  },
+  {
+   "id": "math.logarithmic-function",
+   "name": "对数函数",
+   "kps": [
+    "MSH-FUN-07",
+    "MATH-AM-6-01"
+   ]
+  },
+  {
+   "id": "math.logarithm-rules",
+   "name": "对数的运算法则与换底公式",
+   "kps": [
+    "MSH-NUM-43",
+    "MATH-AM-6-02"
+   ]
+  },
+  {
+   "id": "math.sets",
+   "name": "集合及其运算",
+   "kps": [
+    "MSH-ALG-13",
+    "MATH-IG-1.2-01"
+   ]
+  },
+  {
+   "id": "math.arithmetic-geometric-sequences",
+   "name": "等差数列与等比数列",
+   "kps": [
+    "MSH-ALG-17",
+    "MATH-AM-12-02"
+   ]
+  },
+  {
+   "id": "math.permutations-combinations",
+   "name": "排列与组合",
+   "kps": [
+    "MSH-STA-09",
+    "MATH-AM-11-01"
+   ]
+  },
+  {
+   "id": "math.derivative",
+   "name": "导数的概念与求导",
+   "kps": [
+    "MSH-FUN-13",
+    "MATH-AM-14-01"
+   ]
+  },
+  {
+   "id": "math.derivative-applications",
+   "name": "导数的应用（单调性、极值、最值）",
+   "kps": [
+    "MSH-FUN-14",
+    "MATH-AM-14-02"
+   ]
+  },
+  {
+   "id": "math.right-triangle-trig",
+   "name": "锐角三角比（sin、cos、tan）",
+   "kps": [
+    "MSH-GEO-38",
+    "MATH-IG-6.2-01",
+    "MATH-PRE-TRIG"
+   ]
+  },
+  {
+   "id": "math.elevation-depression",
+   "name": "仰角俯角等解直角三角形的应用",
+   "kps": [
+    "MSH-APP-10",
+    "MATH-IG-6.2-02"
+   ]
+  },
+  {
+   "id": "math.sine-cosine-rule",
+   "name": "正弦定理与余弦定理",
+   "kps": [
+    "MSH-FUN-11",
+    "MATH-IG-6.5-01"
+   ]
+  },
+  {
+   "id": "math.trig-graphs",
+   "name": "三角函数的图像与性质",
+   "kps": [
+    "MSH-FUN-12",
+    "MATH-AM-10-01"
+   ]
+  },
+  {
+   "id": "math.line-equations",
+   "name": "直线方程与两直线位置关系",
+   "kps": [
+    "MSH-GEO-46",
+    "MATH-AM-7-01"
+   ]
+  },
+  {
+   "id": "math.circle-equation",
+   "name": "圆的方程及直线与圆",
+   "kps": [
+    "MSH-GEO-47",
+    "MATH-AM-8-01"
+   ]
+  },
+  {
+   "id": "math.vector-addition",
+   "name": "向量的加减法",
+   "kps": [
+    "MSH-GEO-35",
+    "MATH-IG-7.2-01"
+   ]
+  },
+  {
+   "id": "math.vector-geometry",
+   "name": "向量的线性运算与平行共线",
+   "kps": [
+    "MSH-GEO-39",
+    "MATH-IG-7.4-01"
+   ]
+  },
+  {
+   "id": "math.parallelogram-trapezium-area",
+   "name": "平行四边形与梯形面积",
+   "kps": [
+    "MSH-GEO-17",
+    "MATH-LS-8G-04"
+   ]
+  },
+  {
+   "id": "math.composite-area",
+   "name": "组合图形面积",
+   "kps": [
+    "MSH-GEO-18",
+    "MATH-LS-7G-05"
+   ]
+  },
+  {
+   "id": "math.circle-area",
+   "name": "圆的周长与面积",
+   "kps": [
+    "MSH-GEO-22",
+    "MATH-LS-9G-01"
+   ]
+  },
+  {
+   "id": "math.cuboid-volume",
+   "name": "长方体的体积",
+   "kps": [
+    "MSH-GEO-21",
+    "MATH-LS-7G-07"
+   ]
+  },
+  {
+   "id": "math.cylinder",
+   "name": "圆柱的表面积与体积",
+   "kps": [
+    "MSH-GEO-54",
+    "MATH-LS-9G-02"
+   ]
+  },
+  {
+   "id": "math.solids-surface-volume",
+   "name": "棱柱、棱锥、圆锥、球的表面积与体积",
+   "kps": [
+    "MSH-GEO-45",
+    "MATH-IG-5.4-01"
+   ]
+  },
+  {
+   "id": "math.area-units-hectare",
+   "name": "面积单位换算（含公顷）",
+   "kps": [
+    "MSH-GEO-14",
+    "MATH-LS-7G-04"
+   ]
+  },
+  {
+   "id": "math.draw-parallel-perpendicular",
+   "name": "画平行线与垂线",
+   "kps": [
+    "MSH-GEO-13",
+    "MATH-LS-7G-09"
+   ]
+  },
+  {
+   "id": "math.parallel-line-angles",
+   "name": "相交线、平行线与求角",
+   "kps": [
+    "MSH-GEO-26",
+    "MATH-IG-4.6-01"
+   ]
+  },
+  {
+   "id": "math.triangle-exterior-angle",
+   "name": "三角形的外角性质",
+   "kps": [
+    "MSH-GEO-27",
+    "MATH-LS-8G-07"
+   ]
+  },
+  {
+   "id": "math.congruence",
+   "name": "全等图形（全等三角形）",
+   "kps": [
+    "MSH-GEO-28",
+    "MATH-LS-7G-02"
+   ]
+  },
+  {
+   "id": "math.similar-triangles",
+   "name": "相似三角形（面积比与判定）",
+   "kps": [
+    "MSH-GEO-37",
+    "MATH-IG-4.4-02"
+   ]
+  },
+  {
+   "id": "math.transformations",
+   "name": "平移、旋转与翻折（反射）",
+   "kps": [
+    "MSH-GEO-25",
+    "MATH-LS-7G-12"
+   ]
+  },
+  {
+   "id": "math.special-quadrilaterals",
+   "name": "矩形、菱形、正方形等特殊四边形",
+   "kps": [
+    "MSH-GEO-33",
+    "MATH-LS-8G-01"
+   ]
+  },
+  {
+   "id": "math.chord-symmetry",
+   "name": "圆的对称性：垂径定理与弦",
+   "kps": [
+    "MSH-GEO-40",
+    "MATH-IG-4.8-01"
+   ]
+  },
+  {
+   "id": "math.probability-language",
+   "name": "可能性大小（概率刻度）",
+   "kps": [
+    "MSH-STA-04",
+    "MATH-LS-7S-05"
+   ]
+  },
+  {
+   "id": "math.combined-events",
+   "name": "两步事件的概率（列表、树状图）",
+   "kps": [
+    "MSH-STA-05",
+    "MATH-LS-8S-04"
+   ]
+  },
+  {
+   "id": "math.averages-spread",
+   "name": "平均数、中位数、众数与离散程度",
+   "kps": [
+    "MSH-STA-06",
+    "MATH-IG-9.3-01"
+   ]
+  }
+ ],
+ "links": [
+  {
+   "from": "PSH-EXP-04",
+   "to": "MSH-STA-03",
+   "type": "uses",
+   "note": "多次测量取平均值减小误差，用的就是数学里求平均数的方法"
+  },
+  {
+   "from": "PSH-EXP-04",
+   "to": "MSH-NUM-40",
+   "type": "uses",
+   "note": "测量结果保留几位有效数字，在数学的近似数与有效数字里学过"
+  },
+  {
+   "from": "PSH-THERM-02",
+   "to": "MSH-NUM-38",
+   "type": "uses",
+   "note": "零下 5 ℃ 记作 −5 ℃，温度计就像一条竖着的数轴"
+  },
+  {
+   "from": "PSH-MECH-05",
+   "to": "MSH-FUN-02",
+   "type": "uses",
+   "note": "G = mg 说明重力和质量成正比，图像是过原点的直线"
+  },
+  {
+   "from": "PSH-MECH-06",
+   "to": "MSH-NUM-39",
+   "type": "uses",
+   "note": "把一个方向规定为正，反方向的力记为负，合力就是带符号的数相加"
+  },
+  {
+   "from": "PSH-MECH-10",
+   "to": "MSH-NUM-37",
+   "type": "uses",
+   "note": "杠杆平衡时 F1L1 = F2L2，力和力臂成反比，要会列比例式"
+  },
+  {
+   "from": "PSH-MECH-15",
+   "to": "MSH-GEO-14",
+   "type": "uses",
+   "note": "算压强常要把 cm² 换成 m²，用到面积单位换算"
+  },
+  {
+   "from": "PSH-MECH-17",
+   "to": "MSH-NUM-39",
+   "type": "uses",
+   "note": "1 标准大气压约 1.01×10⁵ Pa，要用科学记数法读写"
+  },
+  {
+   "from": "PSH-MOD-01",
+   "to": "MSH-NUM-39",
+   "type": "uses",
+   "note": "原子小到 10⁻¹⁰ m、星系大到 10²¹ m，只能用科学记数法表示"
+  },
+  {
+   "from": "PSH-THERM-04",
+   "to": "MSH-NUM-39",
+   "type": "uses",
+   "note": "水的比热容 4.2×10³ J/(kg·℃) 是科学记数法，计算时要会处理 10 的幂"
+  },
+  {
+   "from": "PSH-ELEC-05",
+   "to": "MSH-FUN-02",
+   "type": "uses",
+   "note": "电阻一定时 I 与 U 成正比，电压一定时 I 与 R 成反比，对应正比例和反比例函数"
+  },
+  {
+   "from": "PSH-ELEC-06",
+   "to": "MSH-NUM-37",
+   "type": "uses",
+   "note": "串联分压 U1 : U2 = R1 : R2，要会用比和比例计算"
+  },
+  {
+   "from": "PSH-ELEC-07",
+   "to": "MSH-ALG-10",
+   "type": "uses",
+   "note": "并联总电阻 1/R = 1/R1 + 1/R2，要会做分式的通分和加法"
+  },
+  {
+   "from": "PSH-EXP-05",
+   "to": "MSH-FUN-03",
+   "type": "uses",
+   "note": "把实验数据画成直线后，斜率和截距就是一次函数里的 k 和 b"
+  },
+  {
+   "from": "PSH-ELEC-19",
+   "to": "MSH-FUN-03",
+   "type": "uses",
+   "note": "U = E − Ir 是一次函数，U-I 图像纵截距是 E，斜率的绝对值是 r"
+  },
+  {
+   "from": "PSH-MECH-26",
+   "to": "MSH-FUN-02",
+   "type": "uses",
+   "note": "F = kx：弹力与形变量成正比，k 就是正比例函数的系数"
+  },
+  {
+   "from": "PSH-MECH-23",
+   "to": "MSH-FUN-04",
+   "type": "uses",
+   "note": "x = v0t + ½at² 是关于 t 的二次函数"
+  },
+  {
+   "from": "PSH-MECH-24",
+   "to": "MSH-GEO-17",
+   "type": "uses",
+   "note": "v-t 图线下的面积是位移，匀加速时这块面积是梯形"
+  },
+  {
+   "from": "PSH-MECH-28",
+   "to": "MSH-GEO-35",
+   "type": "uses",
+   "note": "力的合成用平行四边形定则，和数学里向量加法的平行四边形法则完全一样"
+  },
+  {
+   "from": "PSH-MECH-28",
+   "to": "MSH-GEO-38",
+   "type": "uses",
+   "note": "正交分解时 Fx = Fcosθ、Fy = Fsinθ，要用锐角三角比"
+  },
+  {
+   "from": "PSH-MECH-29",
+   "to": "MSH-GEO-37",
+   "type": "uses",
+   "note": "三力动态平衡常用力的三角形与几何三角形相似来求解"
+  },
+  {
+   "from": "PSH-MECH-35",
+   "to": "MSH-FUN-04",
+   "type": "uses",
+   "note": "平抛的轨迹 y = gx²/(2v0²) 是一条抛物线（二次函数）"
+  },
+  {
+   "from": "PSH-MECH-36",
+   "to": "MSH-FUN-09",
+   "type": "uses",
+   "note": "角速度用弧度/秒，v = ωr 来自弧度制下的弧长公式 l = θr"
+  },
+  {
+   "from": "PSH-MECH-40",
+   "to": "MSH-FUN-09",
+   "type": "uses",
+   "note": "W = Fxcosα 中 α 可以是钝角，cosα 为负就是负功，要用任意角的三角函数"
+  },
+  {
+   "from": "PSH-OPT-07",
+   "to": "MSH-GEO-38",
+   "type": "uses",
+   "note": "折射率 n = sin i / sin r，要会求角的正弦值"
+  },
+  {
+   "from": "PSH-SOUND-03",
+   "to": "MSH-FUN-12",
+   "type": "uses",
+   "note": "简谐运动的振动图像是正弦曲线 x = Asin(ωt + φ)"
+  },
+  {
+   "from": "PSH-MOD-05",
+   "to": "MSH-FUN-06",
+   "type": "uses",
+   "note": "剩余质量 m = m0(1/2)^(t/T) 是指数函数，每过一个半衰期减半"
+  },
+  {
+   "from": "PSH-THERM-09",
+   "to": "MSH-FUN-02",
+   "type": "uses",
+   "note": "温度不变时 p 与 V 成反比，p-V 图像是反比例函数的双曲线"
+  },
+  {
+   "from": "PHY-IG-1.1-15",
+   "to": "MATH-IG-6.1-01",
+   "type": "uses",
+   "note": "两个互相垂直的力合成，合力大小用勾股定理计算"
+  },
+  {
+   "from": "PHY-IG-1.1-15",
+   "to": "MATH-IG-6.2-01",
+   "type": "uses",
+   "note": "合力的方向用 tan 求出夹角"
+  },
+  {
+   "from": "PHY-IG-1.1-12",
+   "to": "MATH-IG-1.10-01",
+   "type": "uses",
+   "note": "读数 ±0.1 表示真实值的范围，和数学里近似数的上下界是同一个意思"
+  },
+  {
+   "from": "PHY-IG-1.2-01",
+   "to": "MATH-IG-1.12-01",
+   "type": "uses",
+   "note": "平均速度 = 总路程 ÷ 总时间，数学速率一节专门练过"
+  },
+  {
+   "from": "PHY-IG-1.2-02",
+   "to": "MATH-IG-3.3-01",
+   "type": "uses",
+   "note": "路程-时间图的斜率就是速度，要会由两点求直线斜率"
+  },
+  {
+   "from": "PHY-IG-1.2-03",
+   "to": "MATH-IG-2.9-02",
+   "type": "uses",
+   "note": "速度-时间图的斜率是加速度、面积是路程，数学大纲里有同样的内容"
+  },
+  {
+   "from": "PHY-IG-1.4-01",
+   "to": "MATH-IG-2.5-03",
+   "type": "uses",
+   "note": "由 ρ = m/V 求 m 或 V，就是变换公式主元"
+  },
+  {
+   "from": "PHY-IG-1.5.1-01",
+   "to": "MATH-IG-2.8-01",
+   "type": "uses",
+   "note": "弹簧伸长量与拉力成正比（F ∝ x），先求比例常数 k 再算"
+  },
+  {
+   "from": "PHY-IG-1.7.1-02",
+   "to": "MATH-IG-2.5-04",
+   "type": "uses",
+   "note": "由 Ek = ½mv² 求速度要开平方，属于含乘方的公式变形"
+  },
+  {
+   "from": "PHY-IG-1.7.3-02",
+   "to": "MATH-IG-1.13-01",
+   "type": "uses",
+   "note": "效率 = 有用输出 ÷ 总输入 × 100%，就是把一个量表示成另一个量的百分数"
+  },
+  {
+   "from": "PHY-IG-1.8-01",
+   "to": "MATH-IG-5.1-01",
+   "type": "uses",
+   "note": "算压强前常要把 cm² 换成 m²（1 m² = 10 000 cm²）"
+  },
+  {
+   "from": "PHY-IG-2.1.3-01",
+   "to": "MATH-IG-2.8-01",
+   "type": "uses",
+   "note": "温度不变时 p 与 V 成反比（pV = 常数），用反比例来计算"
+  },
+  {
+   "from": "PHY-IG-3.2.2-01",
+   "to": "MATH-IG-6.2-01",
+   "type": "uses",
+   "note": "折射率 n = sin i / sin r，要会用计算器求正弦和反求角度"
+  },
+  {
+   "from": "PHY-IG-3.3-01",
+   "to": "MATH-IG-1.8-01",
+   "type": "uses",
+   "note": "电磁波速 3×10⁸ m/s、频率和波长常是很大或很小的数，要用标准式"
+  },
+  {
+   "from": "PHY-IG-4.2.4-01",
+   "to": "MATH-IG-2.8-01",
+   "type": "uses",
+   "note": "电阻与导线长度成正比、与横截面积成反比"
+  },
+  {
+   "from": "PHY-IG-4.3.3-01",
+   "to": "MATH-IG-1.11-01",
+   "type": "uses",
+   "note": "分压器两电阻上的电压按电阻之比分配，就是按比分配"
+  },
+  {
+   "from": "PHY-IG-4.5.6-01",
+   "to": "MATH-IG-1.11-01",
+   "type": "uses",
+   "note": "变压器 Vp : Vs = Np : Ns，用比例求次级电压或匝数"
+  },
+  {
+   "from": "PHY-IG-5.2.4-01",
+   "to": "MATH-IG-1.17-01",
+   "type": "uses",
+   "note": "放射性衰变是指数衰减，每过一个半衰期数量减半"
+  },
+  {
+   "from": "PHY-IG-6.2.3-01",
+   "to": "MATH-IG-1.8-01",
+   "type": "uses",
+   "note": "星系距离以光年计、数值极大，要用标准式表示和计算"
+  },
+  {
+   "from": "SCI-PRE-SPEED",
+   "to": "MATH-LS-7A-08",
+   "type": "uses",
+   "note": "画和读路程-时间图，数学里读行程图、解释图像形状时练过"
+  },
+  {
+   "from": "SCI-PRE-RES",
+   "to": "MATH-LS-8A-03",
+   "type": "uses",
+   "note": "由 R = V/I 求 V 或 I，要用逆运算变形公式"
+  },
+  {
+   "from": "CSH-QNT-01",
+   "to": "MSH-APP-08",
+   "type": "uses",
+   "note": "元素质量分数 = 该元素质量 ÷ 相对分子质量 × 100%，是百分数计算"
+  },
+  {
+   "from": "CSH-QNT-02",
+   "to": "MSH-NUM-37",
+   "type": "uses",
+   "note": "根据化学方程式计算要列比例式，按比例求未知质量"
+  },
+  {
+   "from": "CSH-QNT-03",
+   "to": "MSH-APP-08",
+   "type": "uses",
+   "note": "溶质质量分数 = 溶质质量 ÷ 溶液质量 × 100%"
+  },
+  {
+   "from": "CSH-MAT-16",
+   "to": "MSH-FUN-01",
+   "type": "uses",
+   "note": "读溶解度曲线就是在坐标系里读点的横、纵坐标，交点表示溶解度相等"
+  },
+  {
+   "from": "CSH-QNT-10",
+   "to": "MSH-NUM-39",
+   "type": "uses",
+   "note": "阿伏加德罗常数 6.02×10²³ 用科学记数法表示和计算"
+  },
+  {
+   "from": "CSH-QNT-12",
+   "to": "MSH-NUM-37",
+   "type": "uses",
+   "note": "稀释前后 c1V1 = c2V2，浓度和体积成反比"
+  },
+  {
+   "from": "CSH-PRN-17",
+   "to": "MSH-NUM-43",
+   "type": "uses",
+   "note": "pH = −lg c(H⁺)，要会求以 10 为底的对数"
+  },
+  {
+   "from": "CSH-STR-21",
+   "to": "MSH-STA-03",
+   "type": "uses",
+   "note": "元素的相对原子质量是各同位素按丰度求的加权平均数"
+  },
+  {
+   "from": "CHEM-IG-2.3-02",
+   "to": "MATH-IG-1.13-01",
+   "type": "uses",
+   "note": "按丰度百分数求相对原子质量，要会求一个量的百分之几"
+  },
+  {
+   "from": "CHEM-IG-3.2-02",
+   "to": "MATH-IG-1.11-01",
+   "type": "uses",
+   "note": "按方程式中质量的比例放大或缩小，就是比例推理"
+  },
+  {
+   "from": "CHEM-IG-3.3-02",
+   "to": "MATH-IG-1.8-01",
+   "type": "uses",
+   "note": "1 mol 含 6.02 × 10²³ 个粒子，要用标准式计算"
+  },
+  {
+   "from": "CHEM-IG-3.3-05",
+   "to": "MATH-IG-5.1-01",
+   "type": "uses",
+   "note": "浓度计算常要把 cm³ 换成 dm³（÷1000）"
+  },
+  {
+   "from": "CHEM-IG-3.3-07",
+   "to": "MATH-IG-1.11-01",
+   "type": "uses",
+   "note": "求经验式就是把各原子的物质的量之比化成最简整数比"
+  },
+  {
+   "from": "CHEM-IG-3.3-08",
+   "to": "MATH-IG-1.13-01",
+   "type": "uses",
+   "note": "产率、纯度、质量分数都是把一个量表示成另一个量的百分数"
+  },
+  {
+   "from": "CHEM-IG-PRAC-04",
+   "to": "MATH-IG-3.3-01",
+   "type": "uses",
+   "note": "实验作图后要求直线的斜率（梯度）和截距"
+  },
+  {
+   "from": "CHEM-IG-6.2-02",
+   "to": "MATH-IG-2.12-01",
+   "type": "uses",
+   "note": "速率图上某点的速率是曲线在该点的切线斜率，曲线越陡速率越大"
+  },
+  {
+   "from": "CHEM-LS-8-04",
+   "to": "MATH-LS-8A-08",
+   "type": "uses",
+   "note": "比较几条溶解度曲线、解释交点的意义，和数学里读多条图像一样"
+  },
+  {
+   "from": "BIO-IG-2.2-01",
+   "to": "MATH-IG-2.5-03",
+   "type": "uses",
+   "note": "由 放大倍数 = 像长 ÷ 实际长 求实际大小，需要变换公式"
+  },
+  {
+   "from": "BIO-IG-2.2-02",
+   "to": "MATH-IG-5.1-01",
+   "type": "uses",
+   "note": "mm 与 μm 换算和数学里的公制单位换算一样，都是乘除 10 的幂"
+  },
+  {
+   "from": "BIO-IG-3.2-02",
+   "to": "MATH-IG-1.13-01",
+   "type": "uses",
+   "note": "马铃薯条质量变化要算百分比变化，便于不同样品比较"
+  },
+  {
+   "from": "BIO-IG-PRAC-08",
+   "to": "MATH-IG-5.4-01",
+   "type": "uses",
+   "note": "求表面积与体积比要先算长方体、圆柱的表面积和体积"
+  },
+  {
+   "from": "BIO-IG-PRAC-06",
+   "to": "MATH-LS-8S-01",
+   "type": "uses",
+   "note": "随机取样避免偏差，正是数学里抽样方法与偏差的内容"
+  },
+  {
+   "from": "BIO-IG-17.4-02",
+   "to": "MATH-IG-8.3-01",
+   "type": "uses",
+   "note": "Punnett 方格就是概率里的样本空间图，用来求后代表型比例"
+  },
+  {
+   "from": "BIO-LS-9Bp.02",
+   "to": "MATH-LS-7S-06",
+   "type": "uses",
+   "note": "精子含 X 或 Y 两种等可能结果，所以生男生女概率各为 1/2"
+  },
+  {
+   "from": "BSH-GEN-04",
+   "to": "MSH-STA-05",
+   "type": "uses",
+   "note": "用遗传图解推算 Aa×Aa 后代比例，就是用列表法求等可能事件的概率"
+  },
+  {
+   "from": "BSH-GEN-15",
+   "to": "MSH-STA-05",
+   "type": "uses",
+   "note": "两对性状分开算再相乘（3:1 × 3:1 = 9:3:3:1），用到两步事件的概率"
+  },
+  {
+   "from": "BSH-ENV-07",
+   "to": "MSH-FUN-06",
+   "type": "uses",
+   "note": "J 形增长 Nₜ = N₀λᵗ 是指数函数"
+  },
+  {
+   "from": "BSH-ENV-06",
+   "to": "MSH-STA-08",
+   "type": "uses",
+   "note": "样方法随机取样、用样本平均密度估计种群密度，就是用样本估计总体"
+  },
+  {
+   "from": "GSH-TOOL-04",
+   "to": "MSH-NUM-37",
+   "type": "uses",
+   "note": "比例尺 = 图上距离 ÷ 实地距离，是比的应用"
+  },
+  {
+   "from": "GSH-TOOL-01",
+   "to": "MSH-GEO-22",
+   "type": "uses",
+   "note": "赤道周长约 4 万千米，可以用圆周长 C = 2πr 由地球半径算出"
+  },
+  {
+   "from": "GSH-PHYS-06",
+   "to": "MSH-STA-03",
+   "type": "uses",
+   "note": "日平均气温是几次观测气温的平均数"
+  },
+  {
+   "from": "GSH-PHYS-07",
+   "to": "MSH-STA-02",
+   "type": "uses",
+   "note": "气温曲线就是折线统计图，读最高、最低和变化趋势"
+  },
+  {
+   "from": "GSH-HUM-01",
+   "to": "MSH-APP-08",
+   "type": "uses",
+   "note": "自然增长率用百分数（千分数）表示，人口密度 = 人口数 ÷ 面积"
+  },
+  {
+   "from": "GSH-X1-03",
+   "to": "MSH-NUM-38",
+   "type": "uses",
+   "note": "H = 90° − |纬度差| 中要用绝对值，南纬当作负数处理"
+  },
+  {
+   "from": "GSH-X1-03",
+   "to": "MSH-APP-10",
+   "type": "uses",
+   "note": "计算楼间距、太阳能板倾角要用正午太阳高度解直角三角形"
+  },
+  {
+   "from": "SCI-SH-G4-01",
+   "to": "MSH-APP-05",
+   "type": "uses",
+   "note": "比较运动快慢就是比较速度：路程 ÷ 时间"
+  }
+ ]
+}
