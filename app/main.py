@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import auth, bank, config, db, engine, explore, insights, llm, papers, records, sitecfg, webpage
+from . import auth, bank, config, db, engine, evidence, explore, insights, llm, papers, records, sitecfg, webpage
 from .auth import LoginRequired
 from .catalog import GRADES, catalog, stage_label, stage_rank
 from .content import content
@@ -22,6 +22,7 @@ async def lifespan(app):
     content.load()
     engine.load_seed_items(config.SEED_DIR)
     bank.sync()
+    evidence.rebuild()
     yield
     db.close()
 
@@ -1042,7 +1043,7 @@ def learn(request: Request, kp_id: str, task: str = "practice"):
     post = [{**s, "m": m.get(s["id"])} for s in catalog.successors(kp_id)]
     pack = catalog.packs[kp["pack"]]
     vocab = db.q("SELECT front, back FROM cards WHERE user_id=? AND kp_id=? AND kind='term'", k["id"], kp_id)
-    return render(request, "learn.html", kp=kp, pack=pack, pre=pre, post=post, me=m.get(kp_id), task=task,
+    return render(request, "learn.html", kp=kp, pack=pack, pre=pre, post=post, me=m.get(kp_id), task=task, ev=evidence.explain(m.get(kp_id)),
                   strand=catalog.strand_name(pack.id, kp["strand"]), vocab=vocab, bridges=engine.bridges(k["id"], kp_id, m))
 
 
@@ -1169,7 +1170,7 @@ def api_warmup(request: Request):
 def api_warmup_word(request: Request, body: dict = Body(...)):
     k = kid_or_redirect(request)
     res = explore.answer_word(k["id"], body.get("word", ""), body.get("list", ""), body.get("choice"),
-                              dont_know=bool(body.get("dont_know")))
+                              dont_know=bool(body.get("dont_know")), recheck=bool(body.get("recheck")))
     if res.get("error"):
         raise HTTPException(400, res["error"])
     return res

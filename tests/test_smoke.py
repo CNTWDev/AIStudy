@@ -569,11 +569,14 @@ def test_explore_warmup_and_selection(monkeypatch):
         it = explore.engine.items_for(kid, target, n=1, purpose="diagnose", grade="G8")[0]
         good = it["answer"] if it["type"] == "mcq" else (it["answer"][0] if isinstance(it["answer"], list) else it["answer"])
         r = c.post("/api/answer", json={"item_id": it["id"], "kp_id": target, "mode": "probe", "answer": good, "probe": {}}).json()
-        assert r["correct"] and r["lit"]["name"] and r["probe"]["inferred"] >= 1
+        assert r["correct"] and r["probe"]["inferred"] >= 1
+        # 摸底答对一题只是一条证据：概率升高，但要隔天换题再对才算掌握（不点亮）
+        mrow = db.one("SELECT status, score FROM mastery WHERE user_id=? AND kp_id=?", kid, target)
+        assert mrow["status"] == "learning" and mrow["score"] > 0.6 and not r.get("lit")
         cov1 = {x["pack"].id: x["known"] for x in explore.coverage(kid)}
         assert cov1[tpack] > cov0.get(tpack, 0)
         today = c.get("/today").text
-        assert "我的学习地图" in today and "今天点亮" in today and "前方" in today and "核心英语词" in today
+        assert "我的学习地图" in today and "前方" in today and "核心英语词" in today
         assert "data-kid" in today and 'id="qlbtn"' in today
         # 知识背景（mock AI）
         assert c.get(f"/api/context/{target}").json()["story"]
@@ -791,3 +794,64 @@ def test_content_bank():
     full = bank.row_to_item(db.one("SELECT * FROM items WHERE id=?", items[0]["id"]))
     assert bank.save_items("PHY-IG-1.3-01", [full])[0]["id"] == full["id"]
     assert db.one("SELECT COUNT(*) AS n FROM items")["n"] == n
+
+
+def test_evidence_model():
+    """掌握判定：BKT + 遗忘模型 + 交叉验证（换题、隔天、换题型）。"""
+    from datetime import timedelta
+    from app import db, engine, evidence, explore
+    kid = db.one("SELECT id FROM users WHERE email='a@x.com'")["id"]
+    kp = "PHY-IG-2.1-01"
+    mcq = lambda i: {"id": f"T-M{i}", "type": "mcq", "options": ["a", "b", "c", "d"]}  # noqa: E731
+    fill = lambda i: {"id": f"T-F{i}", "type": "fill"}  # noqa: E731
+    row = lambda: db.one("SELECT * FROM mastery WHERE user_id=? AND kp_id=?", kid, kp)  # noqa: E731
+    # 一道四选一答对：概率只升一点，不算掌握
+    assert engine.update_mastery(kid, kp, True, item=mcq(1)) == "learning"
+    p1 = row()["score"]
+    assert p1 < 0.75
+    # 同一天再答对两道不同题型：概率很高，但没有隔天的证据，还不算掌握
+    engine.update_mastery(kid, kp, True, item=fill(1))
+    assert engine.update_mastery(kid, kp, True, item=fill(2)) == "learning" and row()["score"] >= 0.85
+    assert "隔天再答对一次" in evidence.missing(dict(row()))
+    # 当天反复答对，记忆稳定性几乎不涨（间隔效应）
+    s_same_day = row()["stability"]
+    assert s_same_day < 4
+    # 模拟两天后：还记得的概率下降；这时答对 → 掌握，稳定性明显变大
+    ev = db.jload(row()["evidence"])
+    ev["days"] = [(db.today() - timedelta(days=2)).isoformat()]
+    two_days_ago = (db.today() - timedelta(days=2)).isoformat() + "T08:00:00"
+    db.run("UPDATE mastery SET last_ev=?, evidence=? WHERE user_id=? AND kp_id=?", two_days_ago, db.jdump(ev), kid, kp)
+    assert evidence.recall(2, s_same_day) < 1
+    assert engine.update_mastery(kid, kp, True, item=fill(3)) == "mastered"
+    assert row()["stability"] > s_same_day * 1.5
+    # 掌握后粗心错一次：概率下降，但不会直接变「薄弱」
+    assert engine.update_mastery(kid, kp, False, item=fill(4)) != "weak"
+    # 不同的题错两次、概率很低，才算薄弱
+    kp2 = "PHY-IG-2.1-02"
+    engine.update_mastery(kid, kp2, False, item=fill(5))
+    assert db.one("SELECT status FROM mastery WHERE user_id=? AND kp_id=?", kid, kp2)["status"] == "learning"
+    assert engine.update_mastery(kid, kp2, False, item=fill(6)) == "weak"
+    # 遗忘模型：学会过、隔了很久的，排进复查
+    db.run("UPDATE mastery SET last_ev=? WHERE user_id=? AND kp_id=?", "2020-01-01T08:00:00", kid, kp)
+    assert any(m["kp_id"] == kp for m in evidence.due_checks(engine.get_mastery(kid), limit=50))
+    # 复习卡片：按稳定性排期，记得的越久间隔越长
+    cid = engine.add_card(kid, "word", "evidence-test", "测试")
+    r1 = engine.review_card(kid, cid, "good")
+    db.run("UPDATE cards SET last_review=? WHERE id=?", (db.today() - timedelta(days=3)).isoformat() + "T08:00:00", cid)
+    r2 = engine.review_card(kid, cid, "good")
+    assert r2["due"] > r1["due"]
+    # 单词：几天前四选一认出来的词，换成「看中文写英文」复查；写不出来，就不算认识
+    from app.content import content
+    lst = explore.word_lists(kid)[0]
+    w = lst["words"][0]
+    old = (db.today() - timedelta(days=5)).isoformat() + "T08:00:00"
+    db.run("INSERT INTO probes(user_id,kind,kp_id,ref,reason,status,result,created_at,done_at) VALUES(?,'word',?,?,?,'done',1,?,?)",
+           kid, lst["id"], w["w"], lst["title"], old, old)
+    known0 = next(x for x in explore.word_stats(kid)["lists"] if x["id"] == lst["id"])["known"]
+    picked = explore.pick_words(kid, 2)
+    rc = [x for x in picked if x["word"].get("recheck")]
+    assert rc and rc[0]["type"] == "fill" and content.word_lists[lst["id"]]
+    res = explore.answer_word(kid, rc[0]["word"]["w"], rc[0]["word"]["list"], "zzz", recheck=True)
+    assert not res["correct"] and res["answer"] == rc[0]["word"]["w"]
+    known1 = next(x for x in explore.word_stats(kid)["lists"] if x["id"] == rc[0]["word"]["list"])["known"]
+    assert known1 < known0 or rc[0]["word"]["list"] != lst["id"]
