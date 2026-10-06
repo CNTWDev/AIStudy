@@ -115,7 +115,7 @@ FastAPI 应用（app/main.py）
 
 教材包之间互不引用（基础前置点除外），跨学科的融合单独放在关联文件里。加关联不动教材，删掉一个关联文件也不影响教材。
 
-现有关联文件按领域分：`core.json`（第一批）、`math.json`（沪教 ↔ 剑桥 ↔ 前置，理科用到的数学）、`science.json`（理科同一概念、理科互用、中英术语）、`language.json`（语文 ↔ IGCSE 中文、上海英语 ↔ 剑桥英语，英语和语文、地理的融合）、`history.json`（历史和语文、地理、英语、理科）。同一个知识点只能属于一个概念，`check-curricula` 会检查。
+现有关联文件按领域分：`core.json`（第一批）、`math.json`（沪教 ↔ 剑桥 ↔ 前置，理科用到的数学）、`science.json`（理科同一概念、理科互用、中英术语）、`language.json`（语文 ↔ IGCSE 中文、上海英语 ↔ 剑桥英语，英语和语文、地理的融合）、`history.json`（历史和语文、地理、英语、理科）、`economics.json`（经济和数学、地理）。同一个知识点只能属于一个概念，`check-curricula` 会检查。
 
 - **concepts**：同一个概念在不同教材里的知识点。例如「密度」在沪科版物理、剑桥物理、Lower Secondary Science 里各有一个点。
   - 孩子学会其中一个，其它几个如果还没测过，就推断为「学习中」（`engine.infer_equivalents`）。

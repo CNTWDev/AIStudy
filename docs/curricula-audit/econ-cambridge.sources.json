@@ -1,0 +1,397 @@
+{
+ "sources": [
+  {
+   "url": "https://www.cambridgeinternational.org/Images/718148-2027-2029-syllabus.pdf",
+   "what": "Cambridge IGCSE Economics 0455 2027–2029 syllabus v1（2024-09）：Assessment overview（Paper 1 40 MCQ 1h 40 分 30%；Paper 2 2h 80 分 70%）、AO 权重、6 个 Section 全部学习目标 1.1.1–6.4.4、Changes to syllabus",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/736034-2027-2029-syllabus-update.pdf",
+   "what": "0455 2027–2029 syllabus update（2025-06）：更新 Specimen Paper 2 评分方案 1(a)、3(b)、5(a)",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/697154-2026-syllabus.pdf",
+   "what": "0455 2026 年考试用旧版大纲（v2, 2025-12）：Paper 1 30 题 45 分钟、Paper 2 2h15m 90 分；同 6 个 Section",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/718805-2027-specimen-paper-2-mark-scheme.pdf",
+   "what": "0455 2027 Specimen Paper 2 Mark Scheme：各题考点、图形题只给图形分、Discuss 题 Level 1–3 评分",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/Images/663781-syllabus-changes-international-.pdf",
+   "what": "Cambridge Syllabus Changes (International)：0455、0987、2281 于 2027 年为 New and Revised；0455 March 系列仅限印度",
+   "level": "官方"
+  },
+  {
+   "url": "https://cambridgeinternational.org/Images/718206-2027-2029-syllabus.pdf",
+   "what": "O Level Economics 2281 2027–2029：结构同 0455；与 IGCSE 共享内容、IGCSE 教材适用；不可与 0455/0987 同季报考",
+   "level": "官方"
+  },
+  {
+   "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-lower-secondary/curriculum/",
+   "what": "Cambridge Lower Secondary 科目列表：无经济/商科独立科目；含 Humanities 0839、Global Perspectives 1129",
+   "level": "官方"
+  },
+  {
+   "url": "https://cambridge-community.org.uk/guide-to/cambridge-lower-secondary/humanities/",
+   "what": "Lower Secondary Humanities 指南：People / Past / Places 三线，People 线涉及 psychology、sociology、economics；学习目标需在支持站下载框架",
+   "level": "佐证"
+  },
+  {
+   "url": "https://www.ibo.org/programmes/middle-years-programme/curriculum/individuals-and-societies/",
+   "what": "IB MYP Individuals and societies：可开设 economics 等独立学科课程，或 integrated humanities（含 economics、geography、history）参加 eAssessment",
+   "level": "官方"
+  },
+  {
+   "url": "https://dynamicpapers.com/wp-content/uploads/2015/09/0455_s24_er.pdf",
+   "what": "0455 June 2024 Examiner Report（Paper 11–13、21–23）第三方镜像：薄弱点（PED 公式倒置、factor/reward 混淆、extension vs shift、关税移动供给、汇率方向、PPC 画法、fiscal vs monetary、profit vs revenue、讨论题一面之词）",
+   "level": "佐证"
+  }
+ ],
+ "coverage": [
+  {
+   "section": "0455 1.1",
+   "kp_ids": [
+    "ECO-IG-1.1-01",
+    "ECO-IG-1.1-02",
+    "ECO-IG-1.1-03"
+   ]
+  },
+  {
+   "section": "0455 1.2",
+   "kp_ids": [
+    "ECO-IG-1.2-01",
+    "ECO-IG-1.2-02"
+   ]
+  },
+  {
+   "section": "0455 1.3",
+   "kp_ids": [
+    "ECO-IG-1.3-01",
+    "ECO-IG-1.3-02"
+   ]
+  },
+  {
+   "section": "0455 1.4",
+   "kp_ids": [
+    "ECO-IG-1.4-01",
+    "ECO-IG-1.4-02",
+    "ECO-IG-1.4-03",
+    "ECO-IG-1.4-04"
+   ]
+  },
+  {
+   "section": "0455 2.1",
+   "kp_ids": [
+    "ECO-IG-2.1-01"
+   ]
+  },
+  {
+   "section": "0455 2.2",
+   "kp_ids": [
+    "ECO-IG-2.2-01",
+    "ECO-IG-2.2-02",
+    "ECO-IG-2.2-03"
+   ]
+  },
+  {
+   "section": "0455 2.3",
+   "kp_ids": [
+    "ECO-IG-2.3-01",
+    "ECO-IG-2.3-02",
+    "ECO-IG-2.3-03"
+   ]
+  },
+  {
+   "section": "0455 2.4",
+   "kp_ids": [
+    "ECO-IG-2.4-01",
+    "ECO-IG-2.4-02",
+    "ECO-IG-2.4-03"
+   ]
+  },
+  {
+   "section": "0455 2.5",
+   "kp_ids": [
+    "ECO-IG-2.5-01",
+    "ECO-IG-2.5-02"
+   ]
+  },
+  {
+   "section": "0455 2.6",
+   "kp_ids": [
+    "ECO-IG-2.6-01",
+    "ECO-IG-2.6-02",
+    "ECO-IG-2.6-03",
+    "ECO-IG-2.6-04",
+    "ECO-IG-2.6-05"
+   ]
+  },
+  {
+   "section": "0455 2.7",
+   "kp_ids": [
+    "ECO-IG-2.7-01",
+    "ECO-IG-2.7-02",
+    "ECO-IG-2.7-02"
+   ]
+  },
+  {
+   "section": "0455 2.8",
+   "kp_ids": [
+    "ECO-IG-2.8-01",
+    "ECO-IG-2.8-01"
+   ]
+  },
+  {
+   "section": "0455 2.9",
+   "kp_ids": [
+    "ECO-IG-2.9-01",
+    "ECO-IG-2.9-01",
+    "ECO-IG-2.9-02",
+    "ECO-IG-2.9-02"
+   ]
+  },
+  {
+   "section": "0455 2.10",
+   "kp_ids": [
+    "ECO-IG-2.10-01",
+    "ECO-IG-2.10-01",
+    "ECO-IG-2.10-02",
+    "ECO-IG-2.10-03",
+    "ECO-IG-2.10-04",
+    "ECO-IG-2.10-05"
+   ]
+  },
+  {
+   "section": "0455 3.1",
+   "kp_ids": [
+    "ECO-IG-3.1-01",
+    "ECO-IG-3.1-02"
+   ]
+  },
+  {
+   "section": "0455 3.2",
+   "kp_ids": [
+    "ECO-IG-3.2-01"
+   ]
+  },
+  {
+   "section": "0455 3.3",
+   "kp_ids": [
+    "ECO-IG-3.3-01",
+    "ECO-IG-3.3-02",
+    "ECO-IG-3.3-03",
+    "ECO-IG-3.3-04",
+    "ECO-IG-3.3-05"
+   ]
+  },
+  {
+   "section": "0455 3.4",
+   "kp_ids": [
+    "ECO-IG-3.4-01",
+    "ECO-IG-3.4-02",
+    "ECO-IG-3.4-03"
+   ]
+  },
+  {
+   "section": "0455 3.6",
+   "kp_ids": [
+    "ECO-IG-3.6-01",
+    "ECO-IG-3.6-01",
+    "ECO-IG-3.6-02",
+    "ECO-IG-3.6-02",
+    "ECO-IG-3.6-03"
+   ]
+  },
+  {
+   "section": "0455 3.5",
+   "kp_ids": [
+    "ECO-IG-3.5-01",
+    "ECO-IG-3.5-02",
+    "ECO-IG-3.5-03"
+   ]
+  },
+  {
+   "section": "0455 3.7",
+   "kp_ids": [
+    "ECO-IG-3.7-01",
+    "ECO-IG-3.7-02"
+   ]
+  },
+  {
+   "section": "0455 4.1",
+   "kp_ids": [
+    "ECO-IG-4.1-01"
+   ]
+  },
+  {
+   "section": "0455 4.2",
+   "kp_ids": [
+    "ECO-IG-4.2-01",
+    "ECO-IG-4.2-02",
+    "ECO-IG-4.2-03",
+    "ECO-IG-4.2-04",
+    "ECO-IG-4.2-04",
+    "ECO-IG-4.2-04"
+   ]
+  },
+  {
+   "section": "0455 4.3",
+   "kp_ids": [
+    "ECO-IG-4.3-01",
+    "ECO-IG-4.3-01",
+    "ECO-IG-4.3-01"
+   ]
+  },
+  {
+   "section": "0455 4.4",
+   "kp_ids": [
+    "ECO-IG-4.4-01",
+    "ECO-IG-4.4-01",
+    "ECO-IG-4.4-01"
+   ]
+  },
+  {
+   "section": "0455 4.5",
+   "kp_ids": [
+    "ECO-IG-4.5-01",
+    "ECO-IG-4.5-01",
+    "ECO-IG-4.5-02",
+    "ECO-IG-4.5-03",
+    "ECO-IG-4.5-04"
+   ]
+  },
+  {
+   "section": "0455 4.6",
+   "kp_ids": [
+    "ECO-IG-4.6-01",
+    "ECO-IG-4.6-01",
+    "ECO-IG-4.6-02",
+    "ECO-IG-4.6-03",
+    "ECO-IG-4.6-03"
+   ]
+  },
+  {
+   "section": "0455 4.7",
+   "kp_ids": [
+    "ECO-IG-4.7-01",
+    "ECO-IG-4.7-01",
+    "ECO-IG-4.7-02",
+    "ECO-IG-4.7-02",
+    "ECO-IG-4.7-03"
+   ]
+  },
+  {
+   "section": "0455 5.1",
+   "kp_ids": [
+    "ECO-IG-5.1-01",
+    "ECO-IG-5.1-02"
+   ]
+  },
+  {
+   "section": "0455 5.2",
+   "kp_ids": [
+    "ECO-IG-5.2-01",
+    "ECO-IG-5.2-01",
+    "ECO-IG-5.2-02"
+   ]
+  },
+  {
+   "section": "0455 5.3",
+   "kp_ids": [
+    "ECO-IG-5.3-01",
+    "ECO-IG-5.3-02"
+   ]
+  },
+  {
+   "section": "0455 5.4",
+   "kp_ids": [
+    "ECO-IG-5.4-01"
+   ]
+  },
+  {
+   "section": "0455 6.1",
+   "kp_ids": [
+    "ECO-IG-6.1-01",
+    "ECO-IG-6.1-02"
+   ]
+  },
+  {
+   "section": "0455 6.2",
+   "kp_ids": [
+    "ECO-IG-6.2-01",
+    "ECO-IG-6.2-01",
+    "ECO-IG-6.2-02",
+    "ECO-IG-6.2-03",
+    "ECO-IG-6.2-04",
+    "ECO-IG-6.2-05"
+   ]
+  },
+  {
+   "section": "0455 6.3",
+   "kp_ids": [
+    "ECO-IG-6.3-01",
+    "ECO-IG-6.3-01",
+    "ECO-IG-6.3-02",
+    "ECO-IG-6.3-03"
+   ]
+  },
+  {
+   "section": "0455 6.4",
+   "kp_ids": [
+    "ECO-IG-6.4-01",
+    "ECO-IG-6.4-02",
+    "ECO-IG-6.4-02",
+    "ECO-IG-6.4-03"
+   ]
+  },
+  {
+   "section": "0455 AO1",
+   "kp_ids": [
+    "ECO-IG-X-01"
+   ]
+  },
+  {
+   "section": "0455 AO2",
+   "kp_ids": [
+    "ECO-IG-X-02",
+    "ECO-IG-X-03"
+   ]
+  },
+  {
+   "section": "0455 AO3",
+   "kp_ids": [
+    "ECO-IG-X-04"
+   ]
+  }
+ ],
+ "unverified": [
+  {
+   "what": "大纲学习目标的逐字措辞",
+   "why": "官方 PDF 只能经 WebFetch（小模型转写）读取，curl 被代理拒绝（403）；编号与标题结构完整一致，但个别子项措辞为转写版，建议对照原 PDF 复核。"
+  },
+  {
+   "what": "Cambridge Lower Secondary Humanities 0839 中经济相关学习目标、首次教学年份",
+   "why": "课程框架仅在 School Support Hub（需登录）；只取得第三方指南说明 People 线含 economics，故未建 G7–G8 预备点。"
+  },
+  {
+   "what": "2024 Examiner Report 原文",
+   "why": "Cambridge 官网考官报告需登录，使用第三方镜像 dynamicpapers.com，内容经 WebFetch 摘要，标为佐证。"
+  },
+  {
+   "what": "0455 2030 年及以后版本",
+   "why": "Syllabus Changes 文件只列到 2027 年新版；未查到 2030 版信息。"
+  },
+  {
+   "what": "各学习目标在历年真题中的出现频率",
+   "why": "官方不公布；hot 仅依据 2027 样卷与 2024 考官报告。"
+  },
+  {
+   "what": "HDI 组成（预期寿命、平均/预期受教育年限、人均 GNI PPP）",
+   "why": "大纲只写 “HDI and its components”，具体组成来自 UNDP 通行定义，未在本次检索中逐条核对 UNDP 页面。"
+  }
+ ]
+}
