@@ -23,15 +23,15 @@
 </form>
 <div class="card">
   <h3>登录中的设备</h3>
-  <table>
-    <tr><th>设备</th><th>最近使用</th><th></th></tr>
-    {% for s in sessions %}
-    <tr><td class="small">{{ (s.user_agent or '未知')[:60] }}<br><span class="muted">{{ s.ip }}</span></td>
-      <td class="small">{{ s.last_seen[:16]|replace('T',' ') }}</td>
-      <td>{% if s.token_hash == this_sid %}<span class="pill">当前</span>{% else %}
-        <form method="post" action="/settings/sessions/revoke"><input type="hidden" name="token_hash" value="{{ s.token_hash }}"><button class="btn ghost sm">退出</button></form>{% endif %}</td></tr>
-    {% endfor %}
-  </table>
+  {% for s in sessions %}
+  <div class="kp" {{ 'hidden' if loop.index > 4 and s.token_hash != this_sid }} data-more="{{ 1 if loop.index > 4 else 0 }}">
+    <span style="font-size:22px">{{ '📱' if 'iPhone' in (s.user_agent or '') or 'Android' in (s.user_agent or '') else '💻' }}</span>
+    <span class="n"><b style="font-weight:600">{{ s.user_agent|device }}</b><br><span class="tiny faint">最近使用 {{ s.last_seen[5:16]|replace('T',' ') }} · {{ s.ip }}</span></span>
+    {% if s.token_hash == this_sid %}<span class="pill">这台设备</span>{% else %}
+    <form method="post" action="/settings/sessions/revoke"><input type="hidden" name="token_hash" value="{{ s.token_hash }}"><button class="linkbtn">退出</button></form>{% endif %}
+  </div>
+  {% endfor %}
+  {% if sessions|length > 4 %}<button class="linkbtn" onclick="$$('[data-more=&quot;1&quot;]').forEach(x=>x.hidden=false);this.remove()">再显示 {{ sessions|length - 4 }} 台 ▾</button>{% endif %}
   {% if sessions|length > 1 %}<form method="post" action="/settings/sessions/revoke" style="margin-top:8px"><input type="hidden" name="all_others" value="1"><button class="btn ghost sm">退出其他所有设备</button></form>{% endif %}
 </div>
 {% if user.role != 'admin' %}<div class="card"><h3 style="margin-top:0">在别的网站上查词（可选）</h3>

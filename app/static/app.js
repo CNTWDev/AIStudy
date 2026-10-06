@@ -25,10 +25,10 @@ function renderItem(box, item, opts) {
     html += `<div class="row" style="margin-top:8px"><input type="text" class="ans grow" placeholder="你的答案" autocomplete="off">` +
       (item.unit ? `<span class="muted">${esc(item.unit)}</span>` : '') + `</div>`;
   }
-  html += `<div class="row" style="margin-top:10px">` +
-    (item.hint ? `<button class="btn ghost sm hintbtn">💡 提示</button>` : '') +
+  html += `<div class="qacts">` +
     `<button class="btn submit">${item.type === 'short' ? '看参考答案' : '提交'}</button>` +
-    (opts.dontKnow ? `<button class="btn ghost sm dkbtn">🤔 这道题还不会</button>` : '') + `</div>` +
+    (item.hint ? `<button class="btn soft hintbtn">💡 提示</button>` : '') +
+    (opts.dontKnow ? `<button class="linkbtn dkbtn">🤔 这道题还不会</button>` : '') + `</div>` +
     `<div class="hintbox"></div><div class="fbbox"></div></div>`;
   box.innerHTML = html;
   box.classList.add('askable'); box.dataset.askItem = item.item_id || item.id || ''; delete box.dataset.answered;
@@ -381,3 +381,32 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keyup', e => { if (e.shiftKey) later(); });
   document.addEventListener('selectionchange', () => { if (!(getSelection() || '').toString().trim()) SelMenu.hide(); });
 });
+
+/* 学习时长自动记录：页面在前台、最近有操作（读文章时放宽到 3 分钟）才计时；每 30 秒报一次，离开页面时用 sendBeacon 补报。
+   只有孩子自己的账号计时，家长查看不算。 */
+const Beat = {
+  acc: 0, last: Date.now(), tick: Date.now(),
+  init() {
+    if (!document.body.dataset.kid) return;
+    ['pointerdown', 'keydown', 'scroll', 'touchstart', 'wheel', 'input'].forEach(e => addEventListener(e, () => { Beat.last = Date.now(); }, {passive: true, capture: true}));
+    document.addEventListener('visibilitychange', () => { Beat.tick = Date.now(); if (document.hidden) Beat.send(true); else Beat.last = Date.now(); });
+    addEventListener('pagehide', () => Beat.send(true));
+    setInterval(Beat.step, 1000);
+    setInterval(() => Beat.send(false), 30000);
+  },
+  step() {
+    const now = Date.now(), idle = $('.reader') ? 180000 : 90000;
+    if (!document.hidden && now - Beat.last < idle) Beat.acc += Math.min(now - Beat.tick, 5000);
+    Beat.tick = now;
+  },
+  send(leaving) {
+    const s = Math.floor(Beat.acc / 1000);
+    if (s < 1) return;
+    Beat.acc -= s * 1000;
+    const body = JSON.stringify({s});
+    if (leaving && navigator.sendBeacon) { navigator.sendBeacon('/api/beat', new Blob([body], {type: 'application/json'})); return; }
+    fetch('/api/beat', {method: 'POST', headers: {'Content-Type': 'application/json'}, body, keepalive: true})
+      .then(r => r.json()).then(r => document.dispatchEvent(new CustomEvent('beat', {detail: r.minutes}))).catch(() => { Beat.acc += s * 1000; });
+  },
+};
+document.addEventListener('DOMContentLoaded', Beat.init);

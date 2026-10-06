@@ -21,7 +21,7 @@
 {% endmacro %}
 
 <div class="card">
-  <h3 style="margin-top:0">📕 中文名著接着读</h3>
+  <div class="card-h"><span class="ico">📕</span><h3>中文名著接着读</h3></div>
   {{ current('read_zh', '读') }}
   <form method="post" action="/parent/kids/{{ k.id }}/tracks">
     <input type="hidden" name="kind" value="read_zh">
@@ -47,7 +47,7 @@
 </div>
 
 <div class="card">
-  <h3 style="margin-top:0">📘 英语阅读</h3>
+  <div class="card-h"><span class="ico">📘</span><h3>英语阅读</h3></div>
   {{ current('read_en', '读') }}
   <p class="muted small">不安排具体书时，每天的英语阅读是 AI 按孩子水平写的短文。读纸质分级读物的话在这里选一本，孩子每天记录读到哪里。</p>
   {% if content.for_kids %}<details class="small"><summary>起点建议</summary>{% for who, v in content.for_kids.items() %}
@@ -74,7 +74,7 @@
 </div>
 
 <div class="card">
-  <h3 style="margin-top:0">🔤 每天学新词</h3>
+  <div class="card-h"><span class="ico">🔤</span><h3>每天学新词</h3></div>
   {{ current('words', '学') }}
   <p class="muted small">每天自动从词表里取几个新词放进「单词复习」，之后按 1→2→4→7→15→30 天重复。孩子阅读时自己收藏的生词也会一起复习。</p>
   <form method="post" action="/parent/kids/{{ k.id }}/tracks">

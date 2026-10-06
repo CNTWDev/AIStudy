@@ -1,39 +1,121 @@
 {% extends "base.html" %}
 {% block body %}
-<h1>阅读</h1>
-<p class="muted small">大量输入是提分的根本。读的时候<b>点一下不懂的词</b>就能查，觉得有用就收藏，收藏的词会自动进入复习，还可以用它造句。</p>
+<div class="ph"><h1>阅读</h1></div>
+<p class="lead">大量读是提分的根本。读的时候<b>点一下不懂的词</b>就能查，觉得有用就收藏，收藏的词会自动进入复习。</p>
+
 <div class="card">
-  <h3 style="margin-top:0">🔗 打开一篇网页文章</h3>
-  <p class="muted small">在别的网站看到想读的文章？把链接贴进来，正文会放进这里的阅读器，点词就能查、能收藏。</p>
-  {% if url_error %}<div class="err">{{ url_error }}</div>{% endif %}
-  <form method="post" action="/reading/url" class="row" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='正在打开…'">
-    <div class="grow"><input type="url" name="url" required value="{{ url or '' }}" placeholder="https://… 新闻、科普、故事都可以"></div>
-    <div><button class="btn">打开</button></div>
-  </form>
-</div>
-<div class="card">
-  <h3 style="margin-top:0">✨ AI 给我写一篇（按我的水平）</h3>
-  <form method="post" action="/reading/new" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='正在写，约半分钟…'">
+  <div class="tabset" role="tablist">
+    <button type="button" role="tab" data-tab="ai" aria-selected="{{ 'false' if url_error else 'true' }}">✨ AI 写一篇</button>
+    <button type="button" role="tab" data-tab="url" aria-selected="{{ 'true' if url_error else 'false' }}">🔗 贴链接</button>
+    <button type="button" role="tab" data-tab="paste" aria-selected="false">📋 贴课文</button>
+  </div>
+
+  {# 1. AI 按孩子的水平写一篇 #}
+  <form class="tabpane" data-pane="ai" method="post" action="/reading/new" {{ 'hidden' if url_error }}>
     <input type="hidden" name="mode" value="ai">
-    <div class="row"><div class="grow"><label>语言</label><select name="lang"><option value="en" {{ 'selected' if lang=='en' }}>英文</option><option value="zh" {{ 'selected' if lang=='zh' }}>中文</option></select></div>
-    <div class="grow"><label>长度</label><select name="length"><option value="">标准</option><option value="很短，80-120 词（中文 300 字左右）">短一点</option><option value="长一些，300-400 词（中文 1000 字左右）">长一点</option></select></div></div>
-    <label>想读什么？（选填）</label><input type="text" name="topic" placeholder="例如：恐龙、足球、太空、友谊、电和磁…">
-    {% if cross and (cross.en or cross.zh) %}<p class="small" style="margin:6px 0">🔗 读读别的课学过的：{% for l in ('en', 'zh') %}{% for c in cross[l] %}<button type="button" class="pill xt" data-lang="{{ l }}" data-topic="{{ c.topic }}">{{ '英文' if l == 'en' else '中文' }} · {{ c.subject }}「{{ c.kp.name }}」</button> {% endfor %}{% endfor %}</p>
-    <script>document.querySelectorAll('.xt').forEach(b => b.onclick = () => { const f = b.closest('form'); f.lang.value = b.dataset.lang; f.topic.value = b.dataset.topic; });</script>{% endif %}
-    <p class="muted small">英文短文会自动用上你最近要复习的生词。</p>
-    <button class="btn">生成短文</button>
+    <div class="row" style="align-items:flex-start;gap:4px 14px">
+      <div><label>语言</label>
+        <div class="seg">
+          <label><input type="radio" name="lang" value="en" {{ 'checked' if lang != 'zh' }}><span>英文</span></label>
+          <label><input type="radio" name="lang" value="zh" {{ 'checked' if lang == 'zh' }}><span>中文</span></label>
+        </div></div>
+      <div><label>长度</label>
+        <div class="seg">
+          <label><input type="radio" name="length" value="很短，80-120 词（中文 300 字左右）"><span>短</span></label>
+          <label><input type="radio" name="length" value="" checked><span>标准</span></label>
+          <label><input type="radio" name="length" value="长一些，300-400 词（中文 1000 字左右）"><span>长</span></label>
+        </div></div>
+    </div>
+    <label for="topic">想读什么？<span class="faint" style="font-weight:400">（不填就由 AI 挑）</span></label>
+    <input type="text" id="topic" name="topic" placeholder="写一个话题，或点下面的建议" autocomplete="off" maxlength="60">
+    <div class="chips" id="topics">
+      {% for l in ('en', 'zh') %}{% for c in (cross or {}).get(l, []) %}<button type="button" class="chip" data-lang="{{ l }}" data-topic="{{ c.topic }}" title="用{{ '英文' if l == 'en' else '中文' }}读读{{ c.subject }}课学过的内容">🔗 {{ c.kp.name }}<span class="sub">{{ c.subject }}</span></button>{% endfor %}{% endfor %}
+      {% for t in ['🦖 恐龙', '🚀 太空', '⚽ 足球', '🐼 动物', '🧪 科学小实验', '🌍 环保', '🎨 艺术家', '🕵️ 侦探故事'] %}<button type="button" class="chip" data-topic="{{ t[2:] }}">{{ t }}</button>{% endfor %}
+    </div>
+    <p class="field-tip">💡 英文短文会自动用上你最近要复习的生词，读着读着就记住了。</p>
+    <button class="btn lg block" style="margin-top:14px" data-busy="正在写，大约半分钟…">✨ 生成短文</button>
+  </form>
+
+  {# 2. 把别的网站上的文章放进阅读器 #}
+  <form class="tabpane" data-pane="url" method="post" action="/reading/url" id="urlform" {{ '' if url_error else 'hidden' }} novalidate>
+    <p class="muted small" style="margin:0 0 10px">在别的网站看到想读的文章？把链接贴进来，正文会放进这里的阅读器，同样能点词查、能收藏。</p>
+    <div class="ig">
+      <span class="ig-ico">🔗</span>
+      <input type="text" name="url" id="url" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" value="{{ url or '' }}" placeholder="https://…" aria-label="文章链接">
+      <button type="button" class="btn soft" id="pastebtn" hidden>粘贴</button>
+      <button class="btn" data-busy="正在打开…">打开</button>
+    </div>
+    <div class="err" id="urlerr" {{ '' if url_error else 'hidden' }}>{{ url_error or '' }}</div>
+    <ul class="small muted" style="margin:12px 0 0;padding-left:20px;line-height:1.8">
+      <li>适合：新闻、科普、百科、故事这类以文字为主的网页。</li>
+      <li>要登录、要付费、视频页打不开时，可以把文字复制下来，用「贴课文」。</li>
+    </ul>
+  </form>
+
+  {# 3. 自己的书、课文 #}
+  <form class="tabpane" data-pane="paste" method="post" action="/reading/new" hidden>
+    <input type="hidden" name="mode" value="paste">
+    <label>语言</label>
+    <div class="seg">
+      <label><input type="radio" name="lang" value="en" checked><span>英文</span></label>
+      <label><input type="radio" name="lang" value="zh"><span>中文</span></label>
+    </div>
+    <label for="ptitle">标题</label><input type="text" id="ptitle" name="title" placeholder="例如：Charlotte's Web 第 3 章">
+    <label for="pbody">正文</label><textarea id="pbody" name="body" required placeholder="把要读的段落粘贴到这里" style="min-height:180px"></textarea>
+    <button class="btn lg block" style="margin-top:14px">开始读</button>
   </form>
 </div>
-<details class="card"><summary><b>📋 读自己的书 / 课文：粘贴进来</b></summary>
-  <form method="post" action="/reading/new">
-    <input type="hidden" name="mode" value="paste">
-    <label>语言</label><select name="lang"><option value="en">英文</option><option value="zh">中文</option></select>
-    <label>标题</label><input type="text" name="title" placeholder="例如：Charlotte's Web 第 3 章">
-    <label>正文</label><textarea name="body" required placeholder="把要读的段落粘贴到这里"></textarea>
-    <div style="margin-top:8px"><button class="btn">开始读</button></div>
-  </form></details>
-<h2>我读过的</h2>
+
+<h2>我读过的 {% if rows %}<span class="muted small" style="font-weight:400">{{ rows|length }} 篇</span>{% endif %}</h2>
 {% for r in rows %}
-<a class="kp" href="/reading/{{ r.id }}"><span class="n">{{ r.title }} <span class="muted small">{{ '英文' if r.lang=='en' else '中文' }} · {{ r.created_at[:10] }}</span></span><span class="pill {{ 'st-mastered' if r.finished_at else 'st-unknown' }}">{{ '读完 ' ~ r.minutes ~ ' 分钟' if r.finished_at else '未读完' }}</span></a>
-{% else %}<p class="muted">还没有阅读记录。</p>{% endfor %}
+<a class="kp" href="/reading/{{ r.id }}">
+  <span class="pill" style="background:{{ 'var(--sky-2)' if r.lang == 'en' else 'var(--coral-2)' }};color:{{ 'var(--sky)' if r.lang == 'en' else 'var(--coral)' }}">{{ 'EN' if r.lang == 'en' else '中' }}</span>
+  <span class="n"><b style="font-weight:600">{{ r.title }}</b><br><span class="tiny faint">{{ r.created_at[:10] }} · {{ '网页' if (r.source or '').startswith('web:') else 'AI 写的' if r.source == 'ai' else '自己粘贴' }}</span></span>
+  {% if r.finished_at %}<span class="pill st-mastered">✓ 读完 {{ r.minutes }} 分钟</span>{% else %}<span class="pill st-learning">接着读</span>{% endif %}
+</a>
+{% else %}
+<div class="empty card"><div class="e">📚</div><b>还没有读过</b>选上面任意一种方式，开始第一篇吧。</div>
+{% endfor %}
+
+<script>
+// 标签页切换
+$$('.tabset button').forEach(b => b.onclick = () => {
+  $$('.tabset button').forEach(x => x.setAttribute('aria-selected', x === b));
+  $$('.tabpane').forEach(p => p.hidden = p.dataset.pane !== b.dataset.tab);
+  if (b.dataset.tab === 'url') $('#url').focus();
+});
+// 话题建议：点一下填进去；「别的课学过的」会顺便切换语言
+$$('#topics .chip').forEach(c => c.onclick = () => {
+  const f = c.closest('form'), on = !c.classList.contains('on');
+  $$('#topics .chip').forEach(x => x.classList.remove('on'));
+  f.topic.value = on ? c.dataset.topic : '';
+  if (on) c.classList.add('on');
+  if (on && c.dataset.lang) f.querySelector(`input[name=lang][value=${c.dataset.lang}]`).checked = true;
+});
+$('#topic').oninput = () => $$('#topics .chip').forEach(x => x.classList.remove('on'));
+// 提交时按钮显示「正在…」，防止连点
+$$('form.tabpane').forEach(f => f.addEventListener('submit', e => setTimeout(() => {
+  if (e.defaultPrevented) return;
+  const b = f.querySelector('button[data-busy]') || f.querySelector('button:not([type=button])');
+  if (b) { b.setAttribute('aria-busy', 'true'); if (b.dataset.busy) b.textContent = b.dataset.busy; }
+})));
+// 链接：自动补 https://，先在本地检查一下
+const urlIn = $('#url'), urlErr = $('#urlerr');
+$('#urlform').addEventListener('submit', e => {
+  let v = urlIn.value.trim();
+  if (v && !/^https?:\/\//i.test(v)) v = 'https://' + v;
+  urlIn.value = v;
+  if (!/^https?:\/\/[^\s/]+\.[^\s]+/i.test(v)) {
+    e.preventDefault(); urlErr.hidden = false; urlErr.textContent = v ? '这个看起来不像网址，检查一下？' : '先把文章链接贴进来'; urlIn.focus();
+  }
+}, true);
+urlIn.oninput = () => { urlErr.hidden = true; };
+if (navigator.clipboard && navigator.clipboard.readText) {
+  const pb = $('#pastebtn'); pb.hidden = false;
+  pb.onclick = async () => {
+    try { const t = (await navigator.clipboard.readText()).trim(); if (t) { urlIn.value = t; urlErr.hidden = true; } else toast('剪贴板是空的'); }
+    catch (e) { urlIn.focus(); toast('请长按输入框选「粘贴」'); }
+  };
+}
+</script>
 {% endblock %}

@@ -239,7 +239,7 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
         add_card(user_id, "mistake", item["q"], back.strip(), {"item_id": item["id"], "zh": item.get("zh", ""),
                  "my_answer": "（还不会）" if dont_know else str(answer)}, kp_id)
     if touch:
-        _touch_day(user_id, 2)
+        _touch_day(user_id)
     return status
 
 
@@ -424,10 +424,36 @@ def diag_report(sid: int):
 
 # ------------------------------------------------------------------ 每日计划
 
-def _touch_day(user_id: int, minutes: int):
+def _touch_day(user_id: int, offline_minutes: int = 0):
+    """确保今天有一行记录。学习时长由页面自动计时（beat），这里只加孩子登记的线下学习（读纸质书等）。"""
     day = db.today().isoformat()
-    db.run("INSERT INTO days(user_id,day,plan,minutes) VALUES(?,?,'[]',?) "
-           "ON CONFLICT(user_id,day) DO UPDATE SET minutes=days.minutes+?", user_id, day, minutes, minutes)
+    m = max(0, int(offline_minutes or 0))
+    db.run("INSERT INTO days(user_id,day,plan,minutes,offline_minutes) VALUES(?,?,'[]',?,?) "
+           "ON CONFLICT(user_id,day) DO UPDATE SET minutes=days.minutes+?, offline_minutes=days.offline_minutes+?",
+           user_id, day, m, m, m, m)
+
+
+BEAT_MAX = 75             # 一次心跳最多记 75 秒（前端每 30 秒报一次）
+DAY_MAX = 14 * 3600       # 一天最多记 14 小时，防止异常数据
+
+
+def beat(user_id: int, seconds) -> int:
+    """页面自动计时：前端只在页面在前台、孩子最近有操作时累计秒数，每 30 秒报一次。返回今天的总分钟数。"""
+    try:
+        s = max(0, min(int(seconds or 0), BEAT_MAX))
+    except (TypeError, ValueError):
+        s = 0
+    day, now = db.today().isoformat(), db.now()
+    _touch_day(user_id)
+    if s:
+        db.run("UPDATE days SET active_seconds=active_seconds+?, first_at=COALESCE(first_at, ?), last_at=? WHERE user_id=? AND day=?",
+               s, now, now, user_id, day)
+        r = db.one("SELECT active_seconds, offline_minutes, minutes FROM days WHERE user_id=? AND day=?", user_id, day)
+        sec = min(r["active_seconds"], DAY_MAX)
+        auto = round(sec / 60) + (r["offline_minutes"] or 0)
+        if auto > r["minutes"]:
+            db.run("UPDATE days SET minutes=? WHERE user_id=? AND day=?", auto, user_id, day)
+    return db.one("SELECT minutes FROM days WHERE user_id=? AND day=?", user_id, day)["minutes"]
 
 
 def frontier(user_id: int, pack_id: str, stage: str, mastery: dict) -> list[dict]:
@@ -572,7 +598,7 @@ def log_reading(user_id: int, track_id: int | None, *, to_pos=0, minutes=0, summ
     db.run("INSERT INTO reading_logs(user_id,track_id,day,title,from_pos,to_pos,pages,minutes,summary,feeling,created_at) "
            "VALUES(?,?,?,?,?,?,?,?,?,?,?)", user_id, track_id, db.today().isoformat(), title, from_pos, to_pos or 0,
            pages[:100], int(minutes or 0), summary[:500], feeling[:10], db.now())
-    _touch_day(user_id, int(minutes or 0))
+    _touch_day(user_id, int(minutes or 0))  # 读书登记：多半是读纸质书，算线下学习时间
     if t:
         mark_task_by(user_id, type=t["kind"])
 
@@ -806,7 +832,37 @@ def day_record(user_id: int, day: str) -> dict:
                         user_id, day, nxt),
         "reviews": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND last_review>=? AND last_review<?",
                           user_id, day, nxt)["n"],
+        "active_seconds": (row["active_seconds"] or 0) if row else 0, "offline_minutes": (row["offline_minutes"] or 0) if row else 0,
+        "first_at": row["first_at"] if row else None, "last_at": row["last_at"] if row else None,
     }
+
+
+def day_summary(rec: dict) -> dict:
+    """自动生成「今天学了什么」：练过的知识点（会了 / 还要再练）、新收藏的词、读过的文章。不用孩子自己写。"""
+    by_kp = {}
+    for a in rec["attempts"]:
+        if not a["kp"]:
+            continue
+        s = by_kp.setdefault(a["kp_id"], {"kp": a["kp"], "n": 0, "ok": 0})
+        s["n"] += 1
+        s["ok"] += 1 if a["correct"] else 0
+    got = [s["kp"] for s in by_kp.values() if s["ok"] and s["ok"] * 2 >= s["n"]]
+    todo = [s["kp"] for s in by_kp.values() if not (s["ok"] and s["ok"] * 2 >= s["n"])]
+    words = [c["front"] for c in rec["new_cards"] if c["kind"] == "word"]  # 术语卡是选教材时自动加的，不算
+    reads = [r["title"] for r in rec["readings"]] + [f"《{r['title']}》" for r in rec["reads"]]
+    parts = []
+    if got:
+        parts.append(f"练会了「{'」「'.join(k['name'] for k in got[:3])}」" + (f"等 {len(got)} 个知识点" if len(got) > 3 else ""))
+    if todo:
+        parts.append(f"「{'」「'.join(k['name'] for k in todo[:2])}」还要再练练")
+    if words:
+        parts.append(f"收藏了 {len(words)} 个新词（{'、'.join(words[:4])}{'…' if len(words) > 4 else ''}）")
+    if reads:
+        parts.append(f"读了 {'、'.join(reads[:2])}")
+    if rec["reviews"]:
+        parts.append(f"复习了 {rec['reviews']} 张卡片")
+    return {"got": got, "todo": todo, "words": words, "reads": reads,
+            "text": "；".join(parts) + "。" if parts else ""}
 
 
 STREAK_BADGES = [(3, "🌱", "坚持 3 天"), (7, "🌿", "坚持一周"), (14, "🌳", "坚持两周"), (30, "🏅", "坚持一个月"),
@@ -848,18 +904,27 @@ def pack_summary(user_id: int, pack_id: str, mastery=None) -> dict:
     return c
 
 
-def calendar(user_id: int, weeks=8) -> list[dict]:
-    start = db.today() - timedelta(days=weeks * 7 - 1)
+def calendar(user_id: int, weeks=8, full_weeks=False) -> list[dict]:
+    """每天的学习记录。full_weeks=True 时按周对齐：从 weeks 周前的周一到本周日，今天以后的日子标 future。"""
+    today = db.today()
+    if full_weeks:
+        start = today - timedelta(days=today.weekday() + (weeks - 1) * 7)
+    else:
+        start = today - timedelta(days=weeks * 7 - 1)
     rows = {r["day"]: r for r in db.q("SELECT * FROM days WHERE user_id=? AND day>=?", user_id, start.isoformat())}
     out = []
     for i in range(weeks * 7):
-        d = (start + timedelta(days=i)).isoformat()
+        dt = start + timedelta(days=i)
+        d = dt.isoformat()
         r = rows.get(d)
         plan = db.jload(r["plan"], []) if r else []
         done = sum(1 for t in plan if t.get("done"))
-        out.append({"day": d, "wd": "一二三四五六日"[(start + timedelta(days=i)).weekday()],
-                    "minutes": r["minutes"] if r else 0, "checked": bool(r and r["checked_in"]),
-                    "done": done, "total": len(plan)})
+        m = r["minutes"] if r else 0
+        checked = bool(r and r["checked_in"])
+        out.append({"day": d, "wd": "一二三四五六日"[dt.weekday()], "wi": dt.weekday(), "dn": dt.day, "month": dt.month,
+                    "minutes": m, "checked": checked, "done": done, "total": len(plan),
+                    "future": dt > today, "today": dt == today,
+                    "level": 4 if m >= 60 else 3 if m >= 40 else 2 if m >= 20 else 1 if (m > 0 or checked or done) else 0})
     return out
 
 
