@@ -57,7 +57,7 @@ def set_mastery(user_id: int, kp_id: str, score: float, status: str, source: str
 INTERVALS = [1, 2, 4, 7, 15, 30, 60]
 
 
-def add_card(user_id: int, kind: str, front: str, back: str, extra=None, kp_id=None, starred=0) -> int | None:
+def add_card(user_id: int, kind: str, front: str, back: str, extra=None, kp_id=None, starred=0, due=None) -> int | None:
     front = front.strip()[:300]
     if not front:
         return None
@@ -68,7 +68,7 @@ def add_card(user_id: int, kind: str, front: str, back: str, extra=None, kp_id=N
         return exist["id"]
     return db.insert(
         "INSERT INTO cards(user_id,kind,front,back,extra,kp_id,box,due,created_at,starred) VALUES(?,?,?,?,?,?,0,?,?,?)",
-        user_id, kind, front, back, db.jdump(extra or {}), kp_id, (db.today() + timedelta(days=1)).isoformat(), db.now(), starred)
+        user_id, kind, front, back, db.jdump(extra or {}), kp_id, (due or db.today() + timedelta(days=1)).isoformat(), db.now(), starred)
 
 
 def review_card(user_id: int, card_id: int, grade: str):
@@ -91,7 +91,15 @@ def review_card(user_id: int, card_id: int, grade: str):
     return {"box": box, "due": due.isoformat()}
 
 
-def due_cards(user_id: int, limit=50):
+CARD_GROUPS = {"words": ("word", "phrase", "term"), "mistakes": ("mistake",), "other": ("kp",)}
+
+
+def due_cards(user_id: int, limit=50, group: str | None = None):
+    if group in CARD_GROUPS:
+        kinds = CARD_GROUPS[group]
+        marks = ",".join("?" * len(kinds))
+        return db.q(f"SELECT * FROM cards WHERE user_id=? AND due<=? AND kind IN ({marks}) ORDER BY box, due LIMIT ?",
+                    user_id, db.today().isoformat(), *kinds, limit)
     return db.q("SELECT * FROM cards WHERE user_id=? AND due<=? ORDER BY box, due LIMIT ?",
                 user_id, db.today().isoformat(), limit)
 
@@ -184,15 +192,36 @@ def check_answer(item: dict, answer) -> bool | None:
     return False
 
 
-def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, correct: bool, answer=""):
-    db.run("INSERT INTO attempts(user_id,item_id,kp_id,mode,correct,answer,created_at) VALUES(?,?,?,?,?,?,?)",
-           user_id, item["id"] if item else None, kp_id, mode, 1 if correct else 0, str(answer)[:500], db.now())
+def answer_display(it: dict) -> str:
+    a = it.get("answer")
+    if it["type"] == "mcq":
+        try:
+            return f"{'ABCD'[int(a)]}. {it['options'][int(a)]}"
+        except (TypeError, ValueError, IndexError, KeyError):
+            return str(a)
+    if it["type"] == "short":
+        return it.get("model", "")
+    if isinstance(a, list):
+        return " / ".join(map(str, a))
+    return f"{a} {it.get('unit', '')}".strip()
+
+
+def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, correct: bool, answer="", dont_know=False,
+                   touch=True, ms=None):
+    """dont_know=True：孩子点了「这道题还不会」。算一次没答对，但掌握度只轻微下调，并把讲解放进错题本。"""
+    try:
+        ms = int(ms) if ms and 500 <= int(ms) <= 30 * 60000 else None  # 做题用时（毫秒），太短/太长的不算
+    except (TypeError, ValueError):
+        ms = None
+    db.run("INSERT INTO attempts(user_id,item_id,kp_id,mode,correct,answer,dont_know,ms,created_at) VALUES(?,?,?,?,?,?,?,?,?)",
+           user_id, item["id"] if item else None, kp_id, mode, 1 if correct else 0, str(answer)[:500],
+           1 if dont_know else 0, ms, db.now())
     if mode == "diagnose" and correct:
         set_mastery(user_id, kp_id, 0.8, "mastered", "diagnose")
         status = "mastered"
     else:
-        status = update_mastery(user_id, kp_id, correct, source=mode)
-    if item and not correct and mode in ("practice", "diagnose"):
+        status = update_mastery(user_id, kp_id, correct, weight=0.5 if dont_know else 1.0, source=mode)
+    if item and not correct and mode in ("practice", "diagnose", "paper", "exam"):
         # 错题自动进错题本（以卡片形式参与间隔复习）
         ans = item.get("answer")
         if item["type"] == "mcq":
@@ -205,8 +234,10 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
         elif isinstance(ans, list):
             ans = " / ".join(map(str, ans))
         back = f"{ans}{(' ' + item.get('unit', '')) if item.get('unit') else ''}\n{item.get('explain', '')}"
-        add_card(user_id, "mistake", item["q"], back.strip(), {"item_id": item["id"], "zh": item.get("zh", ""), "my_answer": str(answer)}, kp_id)
-    _touch_day(user_id, 2)
+        add_card(user_id, "mistake", item["q"], back.strip(), {"item_id": item["id"], "zh": item.get("zh", ""),
+                 "my_answer": "（还不会）" if dont_know else str(answer)}, kp_id)
+    if touch:
+        _touch_day(user_id, 2)
     return status
 
 
@@ -343,23 +374,203 @@ def frontier(user_id: int, pack_id: str, stage: str, mastery: dict) -> list[dict
     return out
 
 
+# ------------------------------------------------------------------ 课程进度（学校学到哪了）
+
+PROGRESS_STALE_DAYS = 14
+
+
+def taught_set(user_id: int) -> set[str]:
+    return {r["kp_id"] for r in db.q("SELECT kp_id FROM kp_taught WHERE user_id=?", user_id)}
+
+
+def set_progress(user_id: int, pack_id: str, current_kp: str | None, taught: list[str] | None = None,
+                 stage: str | None = None) -> None:
+    """孩子 / 家长更新进度：current_kp = 现在学校正在学的知识点；taught = 本学段里学校已经学过的。"""
+    pack = catalog.packs[pack_id]
+    now = db.now()
+    with db.tx() as t:
+        if stage and stage in pack.stages:
+            t.run("UPDATE enrollments SET stage=? WHERE user_id=? AND pack_id=?", stage, user_id, pack_id)
+        t.run("UPDATE enrollments SET progress_kp=?, progress_at=? WHERE user_id=? AND pack_id=?",
+              current_kp if current_kp in pack.kp_ids else None, now, user_id, pack_id)
+        if taught is not None:
+            cur_stage = stage or (t.one("SELECT stage FROM enrollments WHERE user_id=? AND pack_id=?", user_id, pack_id) or {}).get("stage")
+            stage_ids = [k for k in pack.kp_ids if catalog.kps[k]["stage"] == cur_stage]
+            if stage_ids:
+                marks = ",".join("?" * len(stage_ids))
+                t.run(f"DELETE FROM kp_taught WHERE user_id=? AND kp_id IN ({marks})", user_id, *stage_ids)
+            for k in set(taught) | ({current_kp} if current_kp else set()):
+                if k in pack.kp_ids:
+                    t.run("INSERT INTO kp_taught(user_id,kp_id,marked_at) VALUES(?,?,?) ON CONFLICT(user_id,kp_id) DO NOTHING",
+                          user_id, k, now)
+
+
+def progress_view(user_id: int, e) -> dict:
+    """一个教材包的进度概况：学过的（以前学段 + 本学段勾选的）、正在学的、接下来的。"""
+    pack = catalog.packs[e["pack_id"]]
+    taught = taught_set(user_id)
+    cur = e["stage"]
+    learned = [k for k in pack.kp_ids if stage_rank(catalog.kps[k]["stage"]) < stage_rank(cur) or k in taught]
+    stale = not e["progress_at"] or e["progress_at"] < (db.today() - timedelta(days=PROGRESS_STALE_DAYS)).isoformat()
+    return {"pack": pack, "stage": cur, "current": catalog.kp(e["progress_kp"]) if e["progress_kp"] else None,
+            "learned": learned, "taught_here": [k for k in pack.kp_ids if catalog.kps[k]["stage"] == cur and k in taught],
+            "stage_kps": [catalog.kps[k] for k in pack.kp_ids if catalog.kps[k]["stage"] == cur],
+            "updated": e["progress_at"], "stale": stale}
+
+
+def next_after(pack_id: str, kp_id: str, mastery: dict, taught: set) -> dict | None:
+    """进度之后的下一个知识点：优先同一条线（strand）里、本学段或下一学段、前置都已学过的。"""
+    pack = catalog.packs[pack_id]
+    cur = catalog.kp(kp_id)
+    if not cur:
+        return None
+    ids = pack.kp_ids
+    i = ids.index(kp_id) if kp_id in ids else -1
+    rank = stage_rank(cur["stage"])
+    for k in ids[i + 1:] + ids[:i]:
+        kp = catalog.kps[k]
+        if kp.get("strand") != cur.get("strand") or k in taught or mastery.get(k, {}).get("status") not in (None, "unknown"):
+            continue
+        if not (rank <= stage_rank(kp["stage"]) <= rank + 1):
+            continue
+        if all(p["id"] in taught or mastery.get(p["id"], {}).get("status") in ("mastered", "learning")
+               for p in catalog.prereqs(k, required_only=True)):
+            return kp
+    return None
+
+
+# ------------------------------------------------------------------ 阅读 / 单词进度（tracks）
+
+TRACK_KINDS = {"read_zh": "中文名著", "read_en": "英文阅读", "words": "每天新词"}
+
+
+def tracks(user_id: int, active_only=True) -> list:
+    sql = "SELECT * FROM tracks WHERE user_id=?" + (" AND active=1" if active_only else "") + " ORDER BY id"
+    return db.q(sql, user_id)
+
+
+def track_today(t) -> dict:
+    """今天这一段读什么：返回 {from, to, label}。position = 已读完的单元数。"""
+    units = db.jload(t["units"], [])
+    start = t["position"] + 1
+    end = start + max(1, t["daily_amount"]) - 1
+    if t["total_units"]:
+        end = min(end, t["total_units"])
+    def name(n):
+        if 0 < n <= len(units):
+            u = units[n - 1]
+            return u if isinstance(u, str) else u.get("title", f"第 {n} {t['unit_name']}")
+        return f"第 {n} {t['unit_name']}"
+    if t["total_units"] and start > t["total_units"]:
+        return {"from": start, "to": start, "label": "已经读完啦，可以请家长换一本", "names": []}
+    label = f"第 {start} {t['unit_name']}" if start == end else f"第 {start}–{end} {t['unit_name']}"
+    return {"from": start, "to": end, "label": label, "names": [name(n) for n in range(start, end + 1)]}
+
+
+def add_daily_words(user_id: int) -> int:
+    """每天第一次排计划时，把词表里接下来的 N 个新词加进今天的复习。返回新加的个数。"""
+    from .content import content
+    today = db.today()
+    added = 0
+    for t in tracks(user_id):
+        if t["kind"] != "words" or t["last_day"] == today.isoformat():
+            continue
+        wl = content.word_lists.get(t["ref"])
+        words = wl["words"] if wl else []
+        chunk = words[t["position"]: t["position"] + max(0, t["daily_amount"])]
+        for w in chunk:
+            if add_card(user_id, "word", w["w"], w.get("zh", ""), {"pos": w.get("pos", ""), "list": t["ref"], "new": 1},
+                        due=today):
+                added += 1
+        pos = t["position"] + len(chunk)
+        db.run("UPDATE tracks SET position=?, last_day=?, finished_at=? WHERE id=?", pos, today.isoformat(),
+               db.now() if words and pos >= len(words) else None, t["id"])
+    return added
+
+
+def log_reading(user_id: int, track_id: int | None, *, to_pos=0, minutes=0, summary="", feeling="", pages="", title=""):
+    t = db.one("SELECT * FROM tracks WHERE id=? AND user_id=?", track_id, user_id) if track_id else None
+    from_pos = t["position"] + 1 if t else 0
+    if t:
+        to_pos = max(t["position"], min(int(to_pos or 0), t["total_units"] or 10_000))
+        title = t["title"]
+        db.run("UPDATE tracks SET position=?, finished_at=? WHERE id=?", to_pos,
+               db.now() if t["total_units"] and to_pos >= t["total_units"] else None, t["id"])
+    db.run("INSERT INTO reading_logs(user_id,track_id,day,title,from_pos,to_pos,pages,minutes,summary,feeling,created_at) "
+           "VALUES(?,?,?,?,?,?,?,?,?,?,?)", user_id, track_id, db.today().isoformat(), title, from_pos, to_pos or 0,
+           pages[:100], int(minutes or 0), summary[:500], feeling[:10], db.now())
+    _touch_day(user_id, int(minutes or 0))
+    if t:
+        mark_task_by(user_id, type=t["kind"])
+
+
+# ------------------------------------------------------------------ 每日任务
+
 def build_plan(user_id: int) -> list[dict]:
+    """一天的任务，按固定顺序从上到下做：（进度提醒）→ 单词 → 错题 → 英语阅读 → 中文阅读 →
+    跟上学校 → 试卷订正 → 诊断 → 补弱 / 补前置 → 回顾小检查 → 预习 → 知识点回顾。
+    单词、错题、阅读每天都有（坚持比做对更重要）；学知识点的任务按每天可用时间截断。"""
     user = db.one("SELECT * FROM users WHERE id=?", user_id)
     budget = user["daily_minutes"] or 60
     mastery = get_mastery(user_id)
     enrolls = db.q("SELECT * FROM enrollments WHERE user_id=? AND active=1", user_id)
-    tasks: list[dict] = []
+    active_tracks = tracks(user_id)
+    fixed: list[dict] = []
 
-    ncards = len(due_cards(user_id, 200))
-    if ncards:
-        tasks.append({"type": "review", "title": f"复习到期卡片 {ncards} 张", "why": "间隔复习：今天不复习就会开始忘",
-                      "minutes": min(15, 3 + ncards // 3), "url": "/review"})
+    new_words = add_daily_words(user_id)
+    n_words = len(due_cards(user_id, 300, "words"))
+    if n_words:
+        title = f"单词：复习 {n_words} 个" + (f"（含新词 {new_words} 个）" if new_words else "")
+        fixed.append({"type": "words", "title": title, "why": "记得点「记得」，忘了就点「忘了」，明天再来",
+                      "minutes": min(15, 3 + n_words // 4), "url": "/review?group=words"})
+    n_mis = len(due_cards(user_id, 300, "mistakes"))
+    if n_mis:
+        fixed.append({"type": "mistakes", "title": f"错题回顾 {min(n_mis, 8)} 道", "why": "先想再翻答案，想不起来也没关系",
+                      "minutes": min(10, 2 + min(n_mis, 8)), "url": "/review?group=mistakes"})
 
-    weak_all, back_all, pre_all, diag_needed = [], [], [], []
+    langs = {catalog.packs[e["pack_id"]].lang for e in enrolls if e["pack_id"] in catalog.packs} - {""}
+    for kind, lang, label in (("read_en", "en", "英语阅读"), ("read_zh", "zh", "名著接着读")):
+        tr = [t for t in active_tracks if t["kind"] == kind]
+        if tr:
+            t = tr[0]
+            seg = track_today(t)
+            fixed.append({"type": kind, "track": t["id"], "title": f"{label}：《{t['title']}》{seg['label']}",
+                          "why": f"读 {t['daily_minutes']} 分钟，读完用一句话说说讲了什么",
+                          "minutes": t["daily_minutes"], "url": f"/track/{t['id']}"})
+        elif lang in langs:
+            fixed.append({"type": kind, "lang": lang, "title": f"{'英文' if lang == 'en' else '中文'}阅读 15 分钟",
+                          "why": "读一篇短文，不懂的词点一下就查，收藏后自动进单词复习", "minutes": 15,
+                          "url": f"/reading?lang={lang}"})
+
+    weak_all, back_all, pre_all, diag_needed, sync_all, check_all = [], [], [], [], [], []
+    taught = taught_set(user_id)
+    stale_packs = []
+    day_seed = db.today().toordinal()
     for e in enrolls:
         pack_id, stage = e["pack_id"], e["stage"]
         if pack_id not in catalog.packs:
             continue
+        pv = progress_view(user_id, e)
+        if pv["stale"]:
+            stale_packs.append(catalog.packs[pack_id].subject_name)
+        # 跟上学校：正在学的知识点没掌握，就练它；进度之后的下一个可以预习
+        if e["progress_kp"] and catalog.kp(e["progress_kp"]):
+            cur = catalog.kp(e["progress_kp"])
+            if mastery.get(cur["id"], {}).get("status") != "mastered":
+                sync_all.append({"type": "sync", "kp": cur["id"], "title": f"跟上学校：{cur['name']}",
+                                 "why": "学校正在学这个，趁热练一练", "minutes": 12, "pack": pack_id})
+            nxt = next_after(pack_id, cur["id"], mastery, taught)
+            if nxt:
+                pre_all.append({"type": "preview", "kp": nxt["id"], "title": f"预习：{nxt['name']}",
+                                "why": "学校马上要学，先看一眼", "minutes": 8, "pack": pack_id})
+        # 往回巩固：学校学过、但系统里还没检测过的知识点，每天轮一个做个小检查
+        unchecked = [k for k in pv["learned"] if mastery.get(k, {}).get("status") in (None, "unknown")
+                     and stage_rank(catalog.kps[k]["stage"]) >= stage_rank(stage) - 2]
+        if unchecked:
+            k = catalog.kps[unchecked[day_seed % len(unchecked)]]
+            check_all.append({"type": "check", "kp": k["id"], "title": f"回顾小检查：{k['name']}",
+                              "why": f"{'学校学过' if k['id'] in taught else '以前学过'}，看看还记得吗（会就很快过）",
+                              "minutes": 6, "pack": pack_id})
         diag = db.one("SELECT id FROM diag_sessions WHERE user_id=? AND pack_id=? AND status='done'", user_id, pack_id)
         if not diag:
             diag_needed.append(pack_id)
@@ -369,7 +580,6 @@ def build_plan(user_id: int) -> list[dict]:
         weak.sort(key=lambda m: m["score"])
         for w in weak[:3]:
             kp = catalog.kp(w["kp_id"])
-            # 回溯：薄弱点的必须前置里，有没掌握的就先补前置
             gap = [p for p, _ in catalog.ancestors(w["kp_id"], depth=3)
                    if mastery.get(p["id"], {}).get("status") in (None, "weak", "unknown")]
             if gap:
@@ -378,18 +588,43 @@ def build_plan(user_id: int) -> list[dict]:
                                  "title": f"补前置：{g['name']}", "why": f"「{kp['name']}」要用到它", "minutes": 10, "pack": pack_id})
             else:
                 weak_all.append({"type": "weak", "kp": w["kp_id"], "title": f"攻克：{kp['name']}",
-                                 "why": f"掌握度 {int(w['score'] * 100)}%，{'刚学' if w['status'] == 'learning' else '薄弱'}", "minutes": 12, "pack": pack_id})
-        fr = frontier(user_id, pack_id, stage, mastery)[:2] if diag else []  # 诊断前不安排预习
+                                 "why": f"掌握度 {int(w['score'] * 100)}%，{'刚学' if w['status'] == 'learning' else '薄弱'}",
+                                 "minutes": 12, "pack": pack_id})
+        fr = frontier(user_id, pack_id, stage, mastery)[:2] if diag and not e["progress_kp"] else []  # 诊断前不安排预习
         for k in fr:
             pre_all.append({"type": "preview", "kp": k["id"], "title": f"预习：{k['name']}",
                             "why": "前置已具备" + ("，高频考点" if k.get("hot") else ""), "minutes": 8, "pack": pack_id})
 
+    # 自动发现的问题（根源前置、反复还不会、常问、做对但慢、久未复习……）排在同类任务最前面
+    from . import insights
+    auto = insights.plan_tasks(insights.refresh(user_id))
+    auto_kps = {t["kp"] for lst in auto.values() for t in lst}
+    back_all = auto["backfill"] + [t for t in back_all if t["kp"] not in auto_kps]
+    weak_all = auto["weak"] + [t for t in weak_all if t["kp"] not in auto_kps]
+    check_all = auto["check"] + [t for t in check_all if t["kp"] not in auto_kps]
+
+    flex: list[dict] = []
+    # 顺序：跟上学校 → 摸底诊断 → 补弱 / 补前置（交替）→ 回顾小检查 → 预习
+    for t in sync_all[:2]:
+        t["url"] = f"/learn/{t['kp']}?task=sync"
+        flex.append(t)
+    # 系统自动发现的最重要的一条，紧跟在「跟上学校」后面（不会因为时间不够被截掉）
+    top = (auto["backfill"] + auto["weak"])[:1]
+    for t in top:
+        t["url"] = f"/learn/{t['kp']}?task={t['type']}"
+        t["keep"] = True
+        flex.append(t)
+    back_all = [t for t in back_all if t not in top]
+    weak_all = [t for t in weak_all if t not in top]
+    # 导入了还没订正完的试卷
+    for p in db.q("SELECT id, title FROM papers WHERE user_id=? AND status='ready' ORDER BY id LIMIT 1", user_id):
+        flex.append({"type": "paper", "title": f"试卷订正：{p['title']}", "why": "把卷子上的题在线再做一遍，做完看诊断",
+                     "minutes": 20, "url": f"/papers/{p['id']}"})
     for p in diag_needed[:1]:
         pk = catalog.packs[p]
-        tasks.append({"type": "diagnose", "pack": p, "title": f"{pk.subject_name}摸底诊断（约 10 分钟）",
-                      "why": "先找到真正的薄弱点，计划才准", "minutes": 12, "url": f"/diagnose/{p}"})
+        flex.append({"type": "diagnose", "pack": p, "title": f"{pk.subject_name}摸底诊断（约 10 分钟）",
+                     "why": "先找到真正的薄弱点，计划才准", "minutes": 12, "url": f"/diagnose/{p}"})
 
-    # 比例约 50% 补弱 / 20% 回溯 / 20% 复习(上面) / 10% 预习，按时间预算截断
     def interleave(*lists):
         out, i = [], 0
         while any(i < len(l) for l in lists):
@@ -399,19 +634,22 @@ def build_plan(user_id: int) -> list[dict]:
             i += 1
         return out
 
-    for t in interleave(weak_all, back_all) + pre_all[:2]:
+    for t in interleave(weak_all, back_all) + check_all[:2] + pre_all[:1]:
         t["url"] = f"/learn/{t['kp']}?task={t['type']}"
-        tasks.append(t)
+        flex.append(t)
+    n_other = len(due_cards(user_id, 100, "other"))
+    if n_other:
+        flex.append({"type": "review", "title": f"知识点回顾 {n_other} 张", "why": "间隔复习学过的知识点",
+                     "minutes": min(10, 2 + n_other), "url": "/review?group=other"})
 
-    langs = {catalog.packs[e["pack_id"]].lang for e in enrolls if e["pack_id"] in catalog.packs} - {""}
-    for lang in sorted(langs):
-        tasks.append({"type": "reading", "lang": lang, "title": "英文阅读 15 分钟" if lang == "en" else "中文阅读 15 分钟",
-                      "why": "大量输入：不懂的词点一下就查，收藏后自动进复习", "minutes": 15, "url": f"/reading?lang={lang}"})
-
-    out, used = [], 0
-    for t in tasks:
-        if used + t["minutes"] > budget and out and t["type"] not in ("review", "reading"):
+    if stale_packs:
+        fixed.insert(0, {"type": "progress", "title": "更新一下学校进度（1 分钟）",
+                         "why": f"{'、'.join(stale_packs[:3])}：告诉系统学校学到哪了，计划才跟得上", "minutes": 2, "url": "/progress"})
+    out, used, n_flex = [], 0, 0
+    for is_flex, t in [(False, t) for t in fixed] + [(True, t) for t in flex]:
+        if is_flex and n_flex and not t.get("keep") and used + t["minutes"] > budget:
             continue
+        n_flex += is_flex
         t["id"] = f"t{len(out)}"
         t["done"] = False
         out.append(t)
@@ -424,10 +662,14 @@ def today_plan(user_id: int, rebuild=False) -> dict:
     row = db.one("SELECT * FROM days WHERE user_id=? AND day=?", user_id, day)
     plan = db.jload(row["plan"], []) if row else []
     if rebuild or not plan:
-        old_done = {t["title"] for t in plan if t.get("done")}
+        old_done = [t for t in plan if t.get("done")]
         plan = build_plan(user_id)
+        titles = {t["title"] for t in old_done}
         for t in plan:
-            t["done"] = t["title"] in old_done
+            t["done"] = t["title"] in titles
+        # 已经做完的任务即使新计划里没有了（比如进度更新后不再需要），也保留在今天的清单里
+        kept = {t["title"] for t in plan}
+        plan = [t for t in old_done if t["title"] not in kept] + plan
         db.run("INSERT INTO days(user_id,day,plan) VALUES(?,?,?) ON CONFLICT(user_id,day) DO UPDATE SET plan=excluded.plan",
                user_id, day, db.jdump(plan))
         row = db.one("SELECT * FROM days WHERE user_id=? AND day=?", user_id, day)
@@ -460,6 +702,49 @@ def mark_task_by(user_id: int, **match):
 
 # ------------------------------------------------------------------ 统计
 
+def day_record(user_id: int, day: str) -> dict:
+    """「一日记录」：这一天做了什么。"""
+    nxt = (date.fromisoformat(day) + timedelta(days=1)).isoformat()
+    row = db.one("SELECT * FROM days WHERE user_id=? AND day=?", user_id, day)
+    plan = db.jload(row["plan"], []) if row else []
+    att = db.q("SELECT * FROM attempts WHERE user_id=? AND created_at>=? AND created_at<? ORDER BY id", user_id, day, nxt)
+    return {
+        "day": day, "plan": plan, "done": sum(1 for t in plan if t.get("done")),
+        "minutes": row["minutes"] if row else 0, "checked_in": bool(row and row["checked_in"]),
+        "reflection": row["reflection"] if row else "", "mood": (row["mood"] if row else "") or "",
+        "attempts": [{**dict(a), "kp": catalog.kp(a["kp_id"])} for a in att],
+        "right": sum(1 for a in att if a["correct"]), "dont_know": sum(1 for a in att if a["dont_know"]),
+        "wrong": sum(1 for a in att if not a["correct"] and not a["dont_know"]),
+        "reads": db.q("SELECT * FROM reading_logs WHERE user_id=? AND day=? ORDER BY id", user_id, day),
+        "readings": db.q("SELECT id, title, lang, minutes FROM readings WHERE user_id=? AND finished_at>=? AND finished_at<?",
+                         user_id, day, nxt),
+        "new_cards": db.q("SELECT kind, front, back FROM cards WHERE user_id=? AND created_at>=? AND created_at<? ORDER BY id",
+                          user_id, day, nxt),
+        "lookups": db.q("SELECT query FROM lookups WHERE user_id=? AND created_at>=? AND created_at<? ORDER BY id",
+                        user_id, day, nxt),
+        "reviews": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND last_review>=? AND last_review<?",
+                          user_id, day, nxt)["n"],
+    }
+
+
+STREAK_BADGES = [(3, "🌱", "坚持 3 天"), (7, "🌿", "坚持一周"), (14, "🌳", "坚持两周"), (30, "🏅", "坚持一个月"),
+                 (60, "🏆", "坚持两个月"), (100, "👑", "坚持 100 天")]
+
+
+def badges(n: int) -> dict:
+    got = [b for b in STREAK_BADGES if n >= b[0]]
+    nxt = next((b for b in STREAK_BADGES if n < b[0]), None)
+    return {"got": got, "next": nxt, "to_next": (nxt[0] - n) if nxt else 0}
+
+
+def total_stars(user_id: int) -> int:
+    """⭐ = 完成的任务数（只看做没做，不看对错）。"""
+    n = 0
+    for r in db.q("SELECT plan FROM days WHERE user_id=?", user_id):
+        n += sum(1 for t in db.jload(r["plan"], []) if t.get("done"))
+    return n
+
+
 def streak(user_id: int) -> int:
     days = {r["day"] for r in db.q("SELECT day FROM days WHERE user_id=? AND (checked_in=1 OR minutes>0)", user_id)}
     d, n = db.today(), 0
@@ -490,7 +775,8 @@ def calendar(user_id: int, weeks=8) -> list[dict]:
         r = rows.get(d)
         plan = db.jload(r["plan"], []) if r else []
         done = sum(1 for t in plan if t.get("done"))
-        out.append({"day": d, "minutes": r["minutes"] if r else 0, "checked": bool(r and r["checked_in"]),
+        out.append({"day": d, "wd": "一二三四五六日"[(start + timedelta(days=i)).weekday()],
+                    "minutes": r["minutes"] if r else 0, "checked": bool(r and r["checked_in"]),
                     "done": done, "total": len(plan)})
     return out
 

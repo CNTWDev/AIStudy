@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/today" class="small">← 今天</a>
+<h1>{{ '📕' if t.kind == 'read_zh' else '📘' }} 《{{ t.title }}》</h1>
+<div class="card">
+  <div class="muted small">{{ '中文名著接着读' if t.kind == 'read_zh' else '英语阅读' }} · 已读 {{ t.position }}{% if t.total_units %}/{{ t.total_units }}{% endif %} {{ t.unit_name }}</div>
+  {% if t.total_units %}<div class="daybar"><span style="width:{{ 100 * t.position / t.total_units }}%"></span></div>{% endif %}
+  <h2 style="margin:8px 0">今天读：{{ seg.label }}</h2>
+  {% for n in seg.names %}<div>{{ n }}</div>{% endfor %}
+  <p class="muted small">大约 {{ t.daily_minutes }} 分钟。{% if book.edition_tip %}{{ book.edition_tip }}。{% endif %}读的时候遇到不认识的字词，先猜一猜，读完再查。</p>
+  <div class="row"><button class="btn" id="timer">开始计时</button><span id="clock" style="font-size:22px;font-variant-numeric:tabular-nums">00:00</span></div>
+</div>
+<div class="card">
+  <h3 style="margin-top:0">读完了，记一下</h3>
+  {% if t.total_units %}
+  <label>读到了第几{{ t.unit_name }}</label>
+  <select id="to">{% for n in range(t.position + 1, t.total_units + 1) %}<option value="{{ n }}" {{ 'selected' if n == seg.to }}>第 {{ n }} {{ t.unit_name }}{% if n <= units|length %}：{{ (units[n-1] if units[n-1] is string else units[n-1].title)[:30] }}{% endif %}</option>{% endfor %}</select>
+  {% else %}
+  <label>读到哪里了（页码或章节，随便写）</label><input type="text" id="pages" placeholder="例如：第 23 页 / Chapter 3">
+  {% endif %}
+  <label>用一句话说说读了什么（写一个词也行）</label>
+  <textarea id="summary" style="min-height:60px" placeholder="{{ '例如：孙悟空大闹天宫，被如来佛压在五行山下。' if t.kind == 'read_zh' else 'In English or 中文 都可以' }}"></textarea>
+  <label>读得怎么样</label>
+  <div class="moods">{% for m in ['😄','🙂','😐','😣'] %}<button data-m="{{ m }}">{{ m }}</button>{% endfor %}</div>
+  <div class="row" style="margin-top:10px"><span class="muted small">读了</span><input type="number" id="mins" value="{{ t.daily_minutes }}" style="width:90px"><span class="muted small">分钟</span><button class="btn" id="save">完成 ✓</button></div>
+</div>
+{% if logs %}<div class="card"><h3 style="margin-top:0">之前的记录</h3>
+{% for l in logs %}<p class="small"><b>{{ l.day[5:] }}</b> {{ l.feeling }} {% if l.to_pos %}读到第 {{ l.to_pos }} {{ t.unit_name }}{% endif %}{{ l.pages }} · {{ l.minutes }} 分钟{% if l.summary %}<br><span class="muted">「{{ l.summary }}」</span>{% endif %}</p>{% endfor %}</div>{% endif %}
+<script>
+let start = null, tick = null, feeling = '';
+$('#timer').onclick = () => {
+  if (tick) { clearInterval(tick); tick = null; $('#timer').textContent = '继续计时'; $('#mins').value = Math.max(1, Math.round((Date.now() - start) / 60000)); return; }
+  start = start || Date.now(); $('#timer').textContent = '暂停';
+  tick = setInterval(() => { const s = Math.floor((Date.now() - start) / 1000); $('#clock').textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); $('#mins').value = Math.max(1, Math.round(s / 60)); }, 1000);
+};
+$$('.moods button').forEach(b => b.onclick = () => { $$('.moods button').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); feeling = b.dataset.m; });
+$('#save').onclick = async () => {
+  $('#save').disabled = true;
+  await api('/api/track/{{ t.id }}/log', {to: $('#to') ? +$('#to').value : 0, pages: $('#pages') ? $('#pages').value : '',
+    summary: $('#summary').value, feeling, minutes: +$('#mins').value});
+  sessionStorage.setItem('justDone', '{{ t.kind }}'); location.href = '/today';
+};
+</script>
+{% endblock %}

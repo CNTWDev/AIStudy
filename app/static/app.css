@@ -52,3 +52,51 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:6px 4px;b
 .err{background:var(--warn-2);color:var(--warn);padding:10px 12px;border-radius:10px}
 .loading{color:var(--muted);font-size:14px}.loading::after{content:"…";animation:dots 1s infinite}@keyframes dots{50%{opacity:.2}}
 .banner{background:var(--learn-2);padding:8px 16px;text-align:center;font-size:14px}
+/* 管理后台 */
+.subnav{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}.subnav a{padding:6px 12px;border-radius:99px;background:var(--brand-2);color:var(--brand);text-decoration:none;font-size:14px}.subnav a.on{background:var(--brand);color:#fff}
+.badge{display:inline-block;min-width:18px;padding:0 5px;border-radius:9px;background:var(--warn);color:#fff;font-size:12px;text-align:center}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:14px}.stat{background:var(--card,#fff);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}.stat b{display:block;font-size:26px}.stat span{font-size:13px;color:var(--muted,#888)}
+.card table{display:block;overflow-x:auto}
+/* 即时反馈动画 */
+@keyframes pop{0%{transform:scale(.85);opacity:0}60%{transform:scale(1.04);opacity:1}100%{transform:scale(1)}}
+.pop{animation:pop .35s ease-out}
+.fb.dk{background:var(--learn-2)}
+.toast{position:fixed;left:50%;top:18%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:99px;font-size:18px;z-index:100;animation:pop .3s ease-out;transition:opacity .4s,transform .4s;box-shadow:0 6px 24px rgba(0,0,0,.2)}
+.toast.out{opacity:0;transform:translate(-50%,-20px)}
+@keyframes spark{to{transform:translate(var(--dx),var(--dy)) scale(.4);opacity:0}}
+.spark{position:fixed;pointer-events:none;font-size:20px;z-index:100;animation:spark .9s ease-out forwards}
+@keyframes fall{0%{top:-10px}100%{top:105vh;transform:rotate(720deg)}}
+.confetti{position:fixed;top:-10px;width:8px;height:14px;border-radius:2px;z-index:99;pointer-events:none;animation:fall 2.4s linear forwards}
+@keyframes flame{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.12) rotate(3deg)}}
+.flame{display:inline-block;animation:flame 1.2s ease-in-out infinite}
+/* 每日任务清单 */
+.daybar{height:14px;border-radius:99px;background:var(--line);overflow:hidden;margin:8px 0}.daybar span{display:block;height:100%;background:linear-gradient(90deg,var(--ok),#e0a100);transition:width .8s ease}
+.step{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.step .num{flex:0 0 34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;background:var(--brand-2);color:var(--brand)}
+.step.done .num{background:var(--ok);color:#fff}.step.done .t{color:var(--muted);text-decoration:line-through}
+.step.next{background:var(--brand-2);border-radius:12px;padding:12px 10px;border-bottom:none;margin:4px 0}
+.step.next .num{background:var(--brand);color:#fff}
+.step.justdone .num{animation:pop .6s ease-out}
+.streakbox{display:flex;gap:14px;align-items:center}.streakbox .big{font-size:40px;line-height:1}
+.badges span{font-size:22px;margin-right:4px}
+.moods button{font-size:26px;background:none;border:2px solid transparent;border-radius:12px;padding:2px 6px;cursor:pointer}.moods button.sel{border-color:var(--brand)}
+.mini-bars{display:flex;gap:4px;align-items:flex-end;height:60px}.mini-bars div{flex:1;background:var(--brand);border-radius:4px 4px 0 0;min-height:2px;opacity:.8}
+/* 课程进度 */
+.kpset{border:1px solid var(--line);border-radius:10px;margin:8px 0;padding:6px 10px 10px}.kpset legend{font-size:13px;color:var(--muted);padding:0 4px}
+.kpchk{display:inline-flex;align-items:center;gap:4px;margin:4px 12px 4px 0;font-weight:400;font-size:14px;cursor:pointer}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%}.dot.mastered{background:var(--ok)}.dot.learning{background:var(--learn)}.dot.weak{background:var(--warn)}
+details.card>summary{cursor:pointer;list-style:none}details.card>summary::-webkit-details-marker{display:none}
+/* 问一问小助手 */
+#askbtn{position:fixed;right:14px;bottom:78px;z-index:40;border:none;border-radius:99px;background:var(--brand);color:#fff;padding:10px 14px;font-size:15px;box-shadow:0 4px 14px rgba(0,0,0,.18);cursor:pointer;display:flex;align-items:center;gap:4px}
+#askpanel{position:fixed;right:10px;bottom:70px;z-index:50;width:min(380px,calc(100vw - 20px));height:min(520px,70vh);background:var(--card,#fff);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.2);display:none;flex-direction:column;padding:10px}
+#askpanel.on{display:flex}
+.askhead{display:flex;align-items:center;gap:6px}
+#askctx{margin:6px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#askmsgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 0}
+.am{padding:8px 11px;border-radius:12px;max-width:88%;white-space:pre-wrap;font-size:15px;line-height:1.5}
+.am.ai{background:var(--brand-2);align-self:flex-start}.am.user{background:var(--learn-2);align-self:flex-end}.am.err{background:var(--warn-2);color:var(--warn)}
+#askchips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}#askchips button{border:1px solid var(--line);background:transparent;border-radius:99px;padding:4px 10px;font-size:13px;cursor:pointer;color:inherit}
+#askform{display:flex;gap:6px}#askform input{flex:1}
+/* 自动发现 */
+.finding{border-left:4px solid var(--line);padding:6px 10px;margin:6px 0;background:var(--bg);border-radius:0 8px 8px 0}
+.finding.sev3{border-color:var(--warn)}.finding.sev2{border-color:var(--learn)}.finding.sev1{border-color:var(--brand)}

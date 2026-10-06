@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>邀请亲友</h1>
+{% if msg %}<div class="hint">{{ msg }}{% if link %}<br><input type="text" readonly value="{{ link }}" onclick="this.select()" style="margin-top:6px">{% endif %}</div>{% endif %}
+<div class="card">
+  <p>把邀请链接发给其他家长，对方用它注册后直接开通，并会显示为「由你邀请」。每个邀请码只能用一次，14 天内有效。</p>
+  {% if limit %}<p class="muted small">你现在有 {{ open_n }} 个没用完的邀请码（最多 {{ limit }} 个）。</p>{% endif %}
+  <form method="post" action="/invite" class="row">
+    <div class="grow"><input type="text" name="note" placeholder="备注：发给谁（例如：表姐家）"></div>
+    <div><button class="btn">生成邀请链接</button></div>
+  </form>
+</div>
+<div class="card">
+  <h3>我生成的邀请码</h3>
+  <table>
+    <tr><th>邀请码</th><th>备注</th><th>状态</th></tr>
+    {% for i in invites %}
+    <tr><td><code>{{ i.code }}</code></td><td class="small">{{ i.note }}</td>
+      <td class="small">{% if i.used >= i.max_uses %}已使用{% elif i.expires_at and i.expires_at < now %}已过期{% else %}可用，{{ i.expires_at[:10] }} 前{% endif %}</td></tr>
+    {% else %}<tr><td colspan="3" class="muted small">还没有</td></tr>{% endfor %}
+  </table>
+</div>
+<div class="card">
+  <h3>通过我加入的家庭</h3>
+  {% for u in joined %}<p class="small">{{ u.name }} <span class="muted">{{ u.email }} · {{ u.created_at[:10] }}{% if u.status != 'active' %} · {{ {'pending':'待审批','disabled':'已停用','rejected':'未通过'}[u.status] }}{% endif %}</span></p>
+  {% else %}<p class="muted small">还没有</p>{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/subjects" class="small">← 学科</a>
+<h1>试卷订正与诊断</h1>
+<p class="muted small">学校的测验、月考、作业单拍照传上来：AI 会把卷子拆成一道道题、对上知识点、读出老师批改的对错。
+判错的题自动进错题本；再在线把卷子做一遍，最后看诊断：哪些是真的不会、哪些是粗心、要往回补哪些基础。</p>
+
+{% if not llm_on %}<div class="hint">服务器还没有配置 AI，暂时不能解析试卷（家长在 config/llm.toml 里填密钥后就能用）。</div>{% endif %}
+
+<div class="card">
+  <h3 style="margin-top:0">📷 导入一份试卷</h3>
+  <form id="pf">
+    <div class="row">
+      <div class="grow"><label>学科</label>
+        <select name="pack_id">{% for e, pk in es %}<option value="{{ pk.id }}" {{ 'selected' if pk.id == pack }}>{{ pk.subject_name }} · {{ pk.edition }}</option>{% endfor %}</select></div>
+      <div><label>考试日期</label><input type="date" name="exam_date"></div>
+    </div>
+    <label>名称（可不填，AI 会从卷子上读）</label><input type="text" name="title" placeholder="例如：第三单元测验">
+    <label>拍照（每页一张，最多 {{ max_images }} 张；拍正、拍清楚，带老师批改的更好）</label>
+    <input type="file" id="photos" accept="image/*" multiple>
+    <div id="thumbs" class="row" style="flex-wrap:wrap;margin-top:6px"></div>
+    <details style="margin-top:10px"><summary class="small">没有照片？粘贴题目文字</summary>
+      <textarea name="text" style="min-height:120px" placeholder="把题目复制粘贴到这里（电子版作业、网上的练习都可以）"></textarea></details>
+    <button class="btn" id="go" style="margin-top:12px" {{ 'disabled' if not llm_on }}>上传并解析</button>
+    <div id="msg" class="small" style="margin-top:8px"></div>
+  </form>
+</div>
+
+{% if papers %}
+<h3>导入过的试卷</h3>
+{% for p in papers %}
+<a class="card row" href="/papers/{{ p.id }}{{ '/report' if p.status == 'done' }}" style="display:flex;text-decoration:none;color:inherit">
+  <div class="grow"><b>{{ p.title }}</b>
+    <div class="muted small">{{ catalog.packs[p.pack_id].subject_name if p.pack_id in catalog.packs else p.pack_id }} · {{ p.exam_date or p.created_at[:10] }} · {{ p.n }} 题</div></div>
+  <span class="pill {{ 'st-mastered' if p.status == 'done' else 'st-learning' }}">{{ '已诊断' if p.status == 'done' else '待订正' }}</span>
+</a>
+{% endfor %}
+{% endif %}
+
+<script>
+// 在手机上先把照片缩小（长边 1800px），上传快、AI 也看得清
+const files = [];
+function shrink(file) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, 1800 / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      c.toBlob(b => resolve(b || file), 'image/jpeg', 0.85);
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = () => resolve(file);
+    img.src = URL.createObjectURL(file);
+  });
+}
+$('#photos').onchange = async e => {
+  for (const f of e.target.files) {
+    if (files.length >= {{ max_images }}) { toast('最多 {{ max_images }} 张'); break; }
+    const b = await shrink(f); files.push(b);
+    const im = document.createElement('img'); im.src = URL.createObjectURL(b);
+    im.style.cssText = 'height:80px;border-radius:8px;margin:2px;border:1px solid var(--line)';
+    $('#thumbs').appendChild(im);
+  }
+  e.target.value = '';
+};
+$('#pf').onsubmit = async e => {
+  e.preventDefault();
+  const fd = new FormData($('#pf'));
+  files.forEach((b, i) => fd.append('photos', b, `page${i + 1}.jpg`));
+  if (!files.length && (fd.get('text') || '').trim().length < 10) { toast('先拍照，或者粘贴题目文字'); return; }
+  $('#go').disabled = true;
+  $('#msg').innerHTML = '🤖 AI 正在看卷子、对知识点……一般要半分钟到两分钟，请不要关闭页面。';
+  try {
+    const r = await fetch('/api/papers', {method: 'POST', body: fd});
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || d.detail || ('出错了 ' + r.status));
+    location.href = '/papers/' + d.id;
+  } catch (err) { $('#msg').innerHTML = `<span class="err">${esc(err.message)}</span>`; $('#go').disabled = false; }
+};
+</script>
+{% endblock %}

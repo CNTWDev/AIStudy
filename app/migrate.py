@@ -31,7 +31,11 @@ def _files() -> list[tuple[str, Path]]:
 
 
 def render(sql: str) -> str:
+    """{{ID}} / {{FLOAT}} 换成对应数据库的类型；只适用于某一种数据库的语句写在
+    「-- @postgres」或「-- @sqlite」和「-- @end」之间。"""
     types = _TYPES[db.DIALECT]
+    sql = re.sub(r"^-- @(postgres|sqlite)\s*\n(.*?)^-- @end\s*$",
+                 lambda m: m.group(2) if m.group(1) == db.DIALECT else "", sql, flags=re.S | re.M)
     return re.sub(r"\{\{(\w+)\}\}", lambda m: types[m.group(1)], sql)
 
 

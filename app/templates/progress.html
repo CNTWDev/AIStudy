@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/today" class="small">← 今天</a>
+<h1>学校学到哪了</h1>
+{% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
+<p class="muted small">每隔一两周更新一次就行（1 分钟）。选好「正在学」，再勾上这个学期学校已经学过的。
+每天的任务会跟着调整：跟上学校正在学的 → 回头抽查学过的 → 补前面没打牢的基础 → 提前看一眼下一个。</p>
+
+{% for v in rows %}
+{% set pid = v.pack.id %}
+<details class="card" id="p-{{ pid }}" {{ 'open' if open_pack == pid or (not open_pack and loop.first) or v.stale }}>
+  <summary class="row">
+    <div class="grow"><b>{{ v.pack.subject_name }}</b> <span class="muted small">{{ v.pack.edition }} · {{ stage_label(v.stage) }}</span></div>
+    {% if v.stale %}<span class="badge warn">{{ '还没设置' if not v.updated else '该更新了' }}</span>
+    {% else %}<span class="muted small">{{ v.updated[:10] }} 更新</span>{% endif %}
+  </summary>
+  <div class="bar" style="margin:10px 0"><span style="width:{{ 100 * v.learned|length / (v.total or 1) }}%;background:var(--learn)"></span></div>
+  <div class="muted small">学校已学 {{ v.learned|length }} / {{ v.total }} 个知识点
+    {% if v.current %} · 正在学 <a href="/learn/{{ v.current.id }}">{{ v.current.name }}</a>{% endif %}
+    {% if v.next %} · 接下来 <a href="/learn/{{ v.next.id }}?task=preview">{{ v.next.name }}</a>{% endif %}
+    · <a href="/map/{{ pid }}">知识地图</a></div>
+
+  <form method="post" action="/progress/{{ pid }}" class="prog" style="margin-top:12px">
+    <div class="row">
+      <div><label>年级 / 学段</label>
+        <select name="stage">{% for st in v.pack.stages %}<option value="{{ st }}" {{ 'selected' if st == v.stage }}>{{ stage_label(st) }}</option>{% endfor %}</select></div>
+      <div class="grow"><label>现在学校正在学</label>
+        <select name="current" class="cur">
+          <option value="">（不确定 / 放假中）</option>
+          {% for sname, kps in v.strands %}<optgroup label="{{ sname }}">
+            {% for kp in kps %}<option value="{{ kp.id }}" {{ 'selected' if v.current and v.current.id == kp.id }}>{{ kp.name }}</option>{% endfor %}
+          </optgroup>{% endfor %}
+        </select></div>
+    </div>
+    <div class="row small" style="margin:10px 0 4px">
+      <b class="grow">本学段学校已经学过的</b>
+      <a href="#" class="upto">勾上「正在学」之前的</a> · <a href="#" class="none">全不选</a>
+    </div>
+    {% for sname, kps in v.strands %}
+    <fieldset class="kpset"><legend>{{ sname }}</legend>
+      {% for kp in kps %}
+      <label class="kpchk" data-strand="{{ kp.strand }}">
+        <input type="checkbox" name="taught" value="{{ kp.id }}" data-strand="{{ kp.strand }}" {{ 'checked' if kp.id in v.taught_here }}>
+        {{ kp.name }}{% if kp.m and kp.m.status in ('mastered', 'learning', 'weak') %} <span class="dot {{ kp.m.status }}" title="{{ STATUS_LABEL[kp.m.status] }}"></span>{% endif %}
+      </label>
+      {% endfor %}
+    </fieldset>
+    {% endfor %}
+    <button class="btn" style="margin-top:10px">保存进度</button>
+  </form>
+</details>
+{% endfor %}
+
+<script>
+document.querySelectorAll('form.prog').forEach(f => {
+  const boxes = [...f.querySelectorAll('input[name=taught]')];
+  f.querySelector('.upto').onclick = e => {
+    e.preventDefault();
+    const cur = f.querySelector('.cur').value;
+    if (!cur) { toast('先选「现在学校正在学」'); return; }
+    // 同一板块里排在「正在学」之前的都算学过；其他板块不动
+    const curBox = boxes.find(b => b.value === cur);
+    const strand = curBox.dataset.strand;
+    let before = true;
+    boxes.filter(b => b.dataset.strand === strand).forEach(b => {
+      if (b.value === cur) before = false;
+      b.checked = before || b.value === cur;
+    });
+  };
+  f.querySelector('.none').onclick = e => { e.preventDefault(); boxes.forEach(b => b.checked = false); };
+  f.querySelector('select[name=stage]').onchange = () => f.submit();
+});
+</script>
+{% endblock %}

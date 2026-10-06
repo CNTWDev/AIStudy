@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/papers" class="small">← 试卷</a>
+<h1>诊断：{{ p.title }}</h1>
+<div class="card">
+  <div class="stats">
+    <div class="stat"><b>{{ r.total }}</b><span>道题</span></div>
+    {% if r.orig_marked %}<div class="stat"><b>{{ r.orig_wrong }}</b><span>原卷错/扣分{% if r.lost %}（约 {{ r.lost|round(1)|string|replace('.0', '') }} 分）{% endif %}</span></div>{% endif %}
+    <div class="stat"><b>{{ r.answered }}</b><span>在线重做</span></div>
+    <div class="stat"><b>{{ r.redo_right }}</b><span>重做做对</span></div>
+  </div>
+  {% if r.answered < r.total %}<p class="small">还有 {{ r.total - r.answered }} 题没重做，<a href="/papers/{{ p.id }}">接着做</a>，诊断会更准。</p>{% endif %}
+  <p class="small muted" style="margin-bottom:0">「重做还错 / 还不会」的知识点已经标成薄弱，接下来几天的「今天」任务里会自动安排练习和补前置；错题都在错题本里按天复习。</p>
+</div>
+
+{% set need = r.groups|selectattr('need')|list %}
+{% if need %}
+<h3>要补的知识点</h3>
+{% for g in need %}
+<div class="card">
+  <div class="row"><b class="grow">{% if g.kp %}<a href="/learn/{{ g.kp.id }}">{{ g.kp.name }}</a>{% else %}未对应知识点的题{% endif %}</b>
+    {% if g.status %}<span class="pill st-{{ g.status }}">{{ STATUS_LABEL[g.status] }}</span>{% endif %}</div>
+  <div class="muted small">第 {{ g.labels|join('、') }} 题 · 原卷错 {{ g.orig_wrong }}{% if g.lost %}（{{ g.lost|round(1)|string|replace('.0', '') }} 分）{% endif %}
+    · 重做 对 {{ g.redo_right }} / 错 {{ g.redo_wrong }}{% if g.dont_know %} / 还不会 {{ g.dont_know }}{% endif %}</div>
+  {% if g.gaps %}<div class="small" style="margin-top:6px">往回补：{% for x in g.gaps %}<a href="/learn/{{ x.id }}?task=backfill">{{ x.name }}</a>（{{ stage_label(x.stage) }}）{{ '、' if not loop.last }}{% endfor %}</div>{% endif %}
+  {% if g.kp %}<a class="btn sm" style="margin-top:8px" href="/learn/{{ g.kp.id }}?task=weak">去练这个</a>{% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+{% if r.careless %}
+<h3>可能是粗心</h3>
+<p class="small muted">原卷错了、但在线重做都对了：多半是会的，考试时看错、算错或时间紧。下次考试做完留 5 分钟检查这几类题。</p>
+<ul class="small">{% for g in r.careless %}<li>{{ g.kp.name if g.kp else '未对应知识点' }}（第 {{ g.labels|join('、') }} 题）</li>{% endfor %}</ul>
+{% endif %}
+
+{% set ok = r.good %}
+{% if ok %}
+<h3>掌握得不错</h3>
+<p class="small">{% for g in ok %}{{ g.kp.name if g.kp else '其他' }}{{ '、' if not loop.last }}{% endfor %}</p>
+{% endif %}
+<p><a class="btn ghost" href="/today">回到今天</a></p>
+{% endblock %}

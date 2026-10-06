@@ -1,0 +1,541 @@
+{
+ "meta": {
+  "version": 1,
+  "generated": "2026-10-06",
+  "notes": [
+   "CEFR 与分级读物级别是近似对应，不同出版社定级略有差异；Oxford Bookworms 目录偶有调整，以出版社当前书目为准。",
+   "words 为全书大约词数（估计值），用于安排每日阅读量，不是精确数字。",
+   "初中生读分级读物优先选 Oxford Bookworms / Cambridge Experience Readers（题材适合青少年），小学生优先绘本和英美章节书。"
+  ]
+ },
+ "levels": [
+  {
+   "id": "PreA1",
+   "cefr": "Pre-A1",
+   "for": "一二年级；三年级刚起步、牛津上海版 1A–2B 词汇还不熟的孩子",
+   "series": [
+    "Oxford Reading Tree (Biff, Chip and Kipper) Stages 1–4",
+    "Read with Oxford Stages 1–2",
+    "经典图画书（一页一两句、句型重复）"
+   ],
+   "headwords": "~100–250",
+   "daily_minutes": 10,
+   "how": "先听音频/家长读，再指读，最后孩子自己读；同一本读 3 遍再换",
+   "books": [
+    {
+     "id": "en-brown-bear-brown-bear-what-do-you-see",
+     "title": "Brown Bear, Brown Bear, What Do You See?",
+     "author": "Bill Martin Jr. / Eric Carle",
+     "series": "Picture book",
+     "level": "Pre-A1",
+     "words": "~200（重复句型）",
+     "notes": "颜色+动物，句型 What do you see?"
+    },
+    {
+     "id": "en-the-very-hungry-caterpillar",
+     "title": "The Very Hungry Caterpillar",
+     "author": "Eric Carle",
+     "series": "Picture book",
+     "level": "Pre-A1",
+     "words": "~220",
+     "notes": "星期、数字、食物"
+    },
+    {
+     "id": "en-dear-zoo",
+     "title": "Dear Zoo",
+     "author": "Rod Campbell",
+     "series": "Picture book",
+     "level": "Pre-A1",
+     "words": "~100",
+     "notes": "动物+形容词 too big / too tall"
+    },
+    {
+     "id": "en-from-head-to-toe",
+     "title": "From Head to Toe",
+     "author": "Eric Carle",
+     "series": "Picture book",
+     "level": "Pre-A1",
+     "words": "~150",
+     "notes": "身体部位+动作 Can you do it?"
+    },
+    {
+     "id": "en-go-away-big-green-monster",
+     "title": "Go Away, Big Green Monster!",
+     "author": "Ed Emberley",
+     "series": "Picture book",
+     "level": "Pre-A1",
+     "words": "~100",
+     "notes": "五官+颜色"
+    },
+    {
+     "id": "en-we-are-in-a-book",
+     "title": "We Are in a Book!",
+     "author": "Mo Willems",
+     "series": "Elephant & Piggie",
+     "level": "Pre-A1",
+     "words": "~300",
+     "notes": "对话体，适合分角色读"
+    }
+   ]
+  },
+  {
+   "id": "A1",
+   "cefr": "A1",
+   "for": "三年级上海牛津版学生（3A–3B），能认读课本单词后开始",
+   "series": [
+    "Oxford Reading Tree Stages 5–7",
+    "Read with Oxford Stages 3–4",
+    "Elephant & Piggie（全系列）",
+    "I Can Read! Level 1",
+    "Oxford Bookworms Starter（适合高年级/初中的 A1）"
+   ],
+   "headwords": "~250–400",
+   "daily_minutes": 15,
+   "how": "每天 1 本小绘本或 1 章；读完说一句 I like…because…；不认识的词点读查询，最多收藏 3 个",
+   "books": [
+    {
+     "id": "en-i-will-surprise-my-friend",
+     "title": "I Will Surprise My Friend!",
+     "author": "Mo Willems",
+     "series": "Elephant & Piggie",
+     "level": "A1",
+     "words": "~300",
+     "notes": ""
+    },
+    {
+     "id": "en-should-i-share-my-ice-cream",
+     "title": "Should I Share My Ice Cream?",
+     "author": "Mo Willems",
+     "series": "Elephant & Piggie",
+     "level": "A1",
+     "words": "~350",
+     "notes": ""
+    },
+    {
+     "id": "en-there-is-a-bird-on-your-head",
+     "title": "There Is a Bird on Your Head!",
+     "author": "Mo Willems",
+     "series": "Elephant & Piggie",
+     "level": "A1",
+     "words": "~300",
+     "notes": ""
+    },
+    {
+     "id": "en-hi-fly-guy",
+     "title": "Hi! Fly Guy",
+     "author": "Tedd Arnold",
+     "series": "Fly Guy",
+     "level": "A1",
+     "words": "~300",
+     "notes": "I Can Read 式短章节，幽默"
+    },
+    {
+     "id": "en-biscuit",
+     "title": "Biscuit",
+     "author": "Alyssa Satin Capucilli",
+     "series": "I Can Read! My First",
+     "level": "A1",
+     "words": "~150",
+     "notes": ""
+    },
+    {
+     "id": "en-the-magic-key",
+     "title": "The Magic Key",
+     "series": "Oxford Reading Tree",
+     "level": "Stage 5",
+     "words": "~500",
+     "notes": "Biff、Chip、Kipper 魔法钥匙冒险的开始"
+    },
+    {
+     "id": "en-robin-hood",
+     "title": "Robin Hood",
+     "series": "Oxford Bookworms Starter",
+     "level": "Starter (250 headwords)",
+     "words": "~1,600",
+     "notes": "较适合英语偏弱的初中生用作热身"
+    },
+    {
+     "id": "en-sing-to-win",
+     "title": "Sing to Win",
+     "series": "Oxford Bookworms Starter",
+     "level": "Starter (250 headwords)",
+     "words": "~1,500",
+     "notes": ""
+    }
+   ]
+  },
+  {
+   "id": "A2",
+   "cefr": "A2",
+   "for": "四五年级；英语偏弱的国际学校初中生的起点",
+   "series": [
+    "Frog and Toad / Mercy Watson / Nate the Great（英美低年级章节书）",
+    "Magic Tree House #1–#28",
+    "Oxford Bookworms Stage 1–2",
+    "Cambridge Experience Readers Level 1–2",
+    "Penguin Readers Level 1–3"
+   ],
+   "headwords": "~400–700",
+   "daily_minutes": 20,
+   "how": "每天 1 章；读前看标题猜内容，读后用 2–3 句英文复述；每章收藏 ≤5 个生词进复习",
+   "books": [
+    {
+     "id": "en-frog-and-toad-are-friends",
+     "title": "Frog and Toad Are Friends",
+     "author": "Arnold Lobel",
+     "series": "I Can Read! Level 2",
+     "level": "A1–A2",
+     "words": "~2,000",
+     "notes": "5 个小故事"
+    },
+    {
+     "id": "en-mercy-watson-to-the-rescue",
+     "title": "Mercy Watson to the Rescue",
+     "author": "Kate DiCamillo",
+     "series": "Mercy Watson",
+     "level": "A2",
+     "words": "~2,000",
+     "notes": ""
+    },
+    {
+     "id": "en-nate-the-great",
+     "title": "Nate the Great",
+     "author": "Marjorie Weinman Sharmat",
+     "series": "Nate the Great",
+     "level": "A2",
+     "words": "~1,600",
+     "notes": "小侦探故事"
+    },
+    {
+     "id": "en-dinosaurs-before-dark",
+     "title": "Dinosaurs Before Dark",
+     "author": "Mary Pope Osborne",
+     "series": "Magic Tree House #1",
+     "level": "A2",
+     "words": "~4,700",
+     "notes": "10 章"
+    },
+    {
+     "id": "en-the-knight-at-dawn",
+     "title": "The Knight at Dawn",
+     "author": "Mary Pope Osborne",
+     "series": "Magic Tree House #2",
+     "level": "A2",
+     "words": "~5,000",
+     "notes": "10 章"
+    },
+    {
+     "id": "en-mummies-in-the-morning",
+     "title": "Mummies in the Morning",
+     "author": "Mary Pope Osborne",
+     "series": "Magic Tree House #3",
+     "level": "A2",
+     "words": "~5,000",
+     "notes": "10 章"
+    },
+    {
+     "id": "en-pirates-past-noon",
+     "title": "Pirates Past Noon",
+     "author": "Mary Pope Osborne",
+     "series": "Magic Tree House #4",
+     "level": "A2",
+     "words": "~5,000",
+     "notes": "10 章"
+    },
+    {
+     "id": "en-the-phantom-of-the-opera",
+     "title": "The Phantom of the Opera",
+     "series": "Oxford Bookworms Stage 1",
+     "level": "Stage 1 (400 headwords)",
+     "words": "~5,000",
+     "notes": "青少年题材，适合初中生"
+    },
+    {
+     "id": "en-the-elephant-man",
+     "title": "The Elephant Man",
+     "series": "Oxford Bookworms Stage 1",
+     "level": "Stage 1 (400 headwords)",
+     "words": "~5,000",
+     "notes": "真实故事"
+    },
+    {
+     "id": "en-the-monkey-s-paw",
+     "title": "The Monkey's Paw",
+     "series": "Oxford Bookworms Stage 1",
+     "level": "Stage 1 (400 headwords)",
+     "words": "~5,000",
+     "notes": "悬疑短篇"
+    },
+    {
+     "id": "en-inspector-logan",
+     "title": "Inspector Logan",
+     "series": "Cambridge Experience Readers",
+     "level": "Level 1",
+     "words": "~4,000",
+     "notes": ""
+    },
+    {
+     "id": "en-the-canterville-ghost",
+     "title": "The Canterville Ghost",
+     "series": "Oxford Bookworms Stage 2",
+     "level": "Stage 2 (700 headwords)",
+     "words": "~6,000",
+     "notes": ""
+    },
+    {
+     "id": "en-alice-s-adventures-in-wonderland",
+     "title": "Alice's Adventures in Wonderland",
+     "series": "Oxford Bookworms Stage 2",
+     "level": "Stage 2 (700 headwords)",
+     "words": "~6,000",
+     "notes": "可与中文版对照"
+    },
+    {
+     "id": "en-sherlock-holmes-short-stories",
+     "title": "Sherlock Holmes Short Stories",
+     "series": "Oxford Bookworms Stage 2",
+     "level": "Stage 2 (700 headwords)",
+     "words": "~6,000",
+     "notes": ""
+    },
+    {
+     "id": "en-fantastic-mr-fox",
+     "title": "Fantastic Mr Fox",
+     "author": "Roald Dahl",
+     "series": "Original novel",
+     "level": "A2–B1",
+     "words": "~9,000",
+     "notes": "达尔最短的小说，适合作第一本原著"
+    }
+   ]
+  },
+  {
+   "id": "B1",
+   "cefr": "B1",
+   "for": "六七年级；英语偏弱的初中生约 1 学期后的目标；IGCSE 前的必经阶段",
+   "series": [
+    "Oxford Bookworms Stage 3–4",
+    "Cambridge Experience Readers Level 3–4",
+    "Penguin Readers Level 4–5",
+    "英美儿童小说原著（Diary of a Wimpy Kid、Roald Dahl 等）"
+   ],
+   "headwords": "~1,000–1,400",
+   "daily_minutes": 25,
+   "how": "每天 1 章或 10–15 页；每周写一段 60–80 词英文读后感；可以跳过不影响理解的生词",
+   "books": [
+    {
+     "id": "en-the-secret-garden",
+     "title": "The Secret Garden",
+     "series": "Oxford Bookworms Stage 3",
+     "level": "Stage 3 (1,000 headwords)",
+     "words": "~10,000",
+     "notes": ""
+    },
+    {
+     "id": "en-the-call-of-the-wild",
+     "title": "The Call of the Wild",
+     "series": "Oxford Bookworms Stage 3",
+     "level": "Stage 3 (1,000 headwords)",
+     "words": "~10,000",
+     "notes": ""
+    },
+    {
+     "id": "en-frankenstein",
+     "title": "Frankenstein",
+     "series": "Oxford Bookworms Stage 3",
+     "level": "Stage 3 (1,000 headwords)",
+     "words": "~10,000",
+     "notes": ""
+    },
+    {
+     "id": "en-treasure-island",
+     "title": "Treasure Island",
+     "series": "Oxford Bookworms Stage 4",
+     "level": "Stage 4 (1,400 headwords)",
+     "words": "~15,000",
+     "notes": ""
+    },
+    {
+     "id": "en-little-women",
+     "title": "Little Women",
+     "series": "Oxford Bookworms Stage 4",
+     "level": "Stage 4 (1,400 headwords)",
+     "words": "~15,000",
+     "notes": ""
+    },
+    {
+     "id": "en-the-hound-of-the-baskervilles",
+     "title": "The Hound of the Baskervilles",
+     "series": "Oxford Bookworms Stage 4",
+     "level": "Stage 4 (1,400 headwords)",
+     "words": "~15,000",
+     "notes": ""
+    },
+    {
+     "id": "en-diary-of-a-wimpy-kid",
+     "title": "Diary of a Wimpy Kid",
+     "author": "Jeff Kinney",
+     "series": "Diary of a Wimpy Kid #1",
+     "level": "B1",
+     "words": "~19,000",
+     "notes": "日记体+漫画，口语多；适合作为第一本「长」原著"
+    },
+    {
+     "id": "en-charlie-and-the-chocolate-factory",
+     "title": "Charlie and the Chocolate Factory",
+     "author": "Roald Dahl",
+     "series": "Original novel",
+     "level": "B1",
+     "words": "~31,000",
+     "notes": "30 章"
+    },
+    {
+     "id": "en-charlotte-s-web",
+     "title": "Charlotte's Web",
+     "author": "E. B. White",
+     "series": "Original novel",
+     "level": "B1",
+     "words": "~32,000",
+     "notes": "22 章；可与中文《夏洛的网》对照"
+    },
+    {
+     "id": "en-because-of-winn-dixie",
+     "title": "Because of Winn-Dixie",
+     "author": "Kate DiCamillo",
+     "series": "Original novel",
+     "level": "B1",
+     "words": "~22,000",
+     "notes": ""
+    },
+    {
+     "id": "en-frindle",
+     "title": "Frindle",
+     "author": "Andrew Clements",
+     "series": "Original novel",
+     "level": "B1",
+     "words": "~20,000",
+     "notes": ""
+    }
+   ]
+  },
+  {
+   "id": "B2",
+   "cefr": "B2",
+   "for": "八九年级；IGCSE（英语第二语言/文学课）阶段的目标",
+   "series": [
+    "Oxford Bookworms Stage 5–6",
+    "Penguin Readers Level 6–7",
+    "青少年小说原著"
+   ],
+   "headwords": "~1,800–2,500+",
+   "daily_minutes": 30,
+   "how": "每天 15–20 页；做「人物—主题—语言」三栏笔记；每周用 IGCSE 题型写一段分析（PEE：观点-证据-解释）",
+   "books": [
+    {
+     "id": "en-great-expectations",
+     "title": "Great Expectations",
+     "series": "Oxford Bookworms Stage 5",
+     "level": "Stage 5 (1,800 headwords)",
+     "words": "~25,000",
+     "notes": ""
+    },
+    {
+     "id": "en-wuthering-heights",
+     "title": "Wuthering Heights",
+     "series": "Oxford Bookworms Stage 5",
+     "level": "Stage 5 (1,800 headwords)",
+     "words": "~25,000",
+     "notes": ""
+    },
+    {
+     "id": "en-pride-and-prejudice",
+     "title": "Pride and Prejudice",
+     "series": "Oxford Bookworms Stage 6",
+     "level": "Stage 6 (2,500 headwords)",
+     "words": "~30,000",
+     "notes": ""
+    },
+    {
+     "id": "en-wonder",
+     "title": "Wonder",
+     "author": "R. J. Palacio",
+     "series": "Original novel",
+     "level": "B1–B2",
+     "words": "~73,000",
+     "notes": "多视角叙事，篇幅长但语言不难"
+    },
+    {
+     "id": "en-holes",
+     "title": "Holes",
+     "author": "Louis Sachar",
+     "series": "Original novel",
+     "level": "B2",
+     "words": "~47,000",
+     "notes": ""
+    },
+    {
+     "id": "en-matilda",
+     "title": "Matilda",
+     "author": "Roald Dahl",
+     "series": "Original novel",
+     "level": "B1–B2",
+     "words": "~40,000",
+     "notes": ""
+    },
+    {
+     "id": "en-harry-potter-and-the-philosopher-s-stone",
+     "title": "Harry Potter and the Philosopher's Stone",
+     "author": "J. K. Rowling",
+     "series": "Original novel",
+     "level": "B2",
+     "words": "~77,000",
+     "notes": ""
+    },
+    {
+     "id": "en-percy-jackson-and-the-lightning-thief",
+     "title": "Percy Jackson and the Lightning Thief",
+     "author": "Rick Riordan",
+     "series": "Original novel",
+     "level": "B2",
+     "words": "~87,000",
+     "notes": ""
+    },
+    {
+     "id": "en-the-boy-in-the-striped-pyjamas",
+     "title": "The Boy in the Striped Pyjamas",
+     "author": "John Boyne",
+     "series": "Original novel",
+     "level": "B2",
+     "words": "~47,000",
+     "notes": "内容沉重，建议家长先了解"
+    },
+    {
+     "id": "en-of-mice-and-men",
+     "title": "Of Mice and Men",
+     "author": "John Steinbeck",
+     "series": "Original novel",
+     "level": "B2",
+     "words": "~30,000",
+     "notes": "IGCSE 英语文学常见篇目之一（以学校选定书单为准）"
+    }
+   ]
+  }
+ ],
+ "for_kids": {
+  "brother": {
+   "profile": "小学三年级，公办，牛津上海版",
+   "start": "PreA1",
+   "now_to": "A1",
+   "plan": "三上：Pre-A1 图画书（Brown Bear、Dear Zoo、From Head to Toe）+ Elephant & Piggie 过渡；三下：进入 A1（Elephant & Piggie、Fly Guy、Oxford Reading Tree Stage 5 起）；四年级末目标 A2 入门（Frog and Toad、Magic Tree House #1）。",
+   "target_end_of_g5": "A2"
+  },
+  "sister": {
+   "profile": "初二，国际学校 IGCSE 方向，英语基础偏弱",
+   "start": "A2",
+   "now_to": "B1",
+   "plan": "第 1–8 周：A2 Oxford Bookworms Stage 1（The Elephant Man、The Phantom of the Opera）+ Magic Tree House 提速；第 9–20 周：Stage 2 → Stage 3 + Diary of a Wimpy Kid；之后 B1 原著（Charlie and the Chocolate Factory、Wonder）。",
+   "target_by_igcse": "B2（IGCSE 英语第二语言 Extended 大致需要 B1+/B2）",
+   "note": "起点比年级低约两级是正常的；先求读得懂、读得多，再求难度。"
+  }
+ }
+}

@@ -18,10 +18,27 @@
 {% if weak %}<h2>薄弱知识点</h2>
 <table><tr><th>知识点</th><th>学段</th><th>掌握度</th><th>做题</th></tr>
 {% for kp, m in weak %}<tr><td>{% if not report_for %}<a href="/learn/{{ kp.id }}">{{ kp.name }}</a>{% else %}{{ kp.name }}{% endif %}</td><td>{{ stage_label(kp.stage) }}</td><td>{{ (m.score*100)|int }}%</td><td>{{ m.correct }}/{{ m.attempts }}</td></tr>{% endfor %}</table>{% endif %}
-{% if days %}<h2>每日反思</h2>{% for d in days %}<p class="small"><b>{{ d.day }}</b> {{ d.minutes }} 分钟 · {{ d.reflection or '（已打卡）' }}</p>{% endfor %}{% endif %}
+{% if days %}<h2>每日反思</h2>{% for d in days %}<p class="small"><b>{% if not report_for %}<a href="/day/{{ d.day }}">{{ d.day }}</a>{% else %}{{ d.day }}{% endif %}</b> {{ d.mood }} {{ d.minutes }} 分钟 · {{ d.reflection or '（已打卡）' }}</p>{% endfor %}{% endif %}
+{% if found or solved %}<h2>🔍 系统发现</h2>
+{% for f in found %}<div class="finding sev{{ f.severity }}"><b>{{ f.title }}</b> <span class="muted small">{{ f.created_at[:10] }} 起</span><div class="small muted">{{ f.detail }}</div></div>{% endfor %}
+{% if solved %}<p class="small muted">最近已解决：{% for f in solved %}{{ f.title }}{{ '、' if not loop.last }}{% endfor %}</p>{% endif %}
+{% endif %}
+{% if papers %}<h2>试卷</h2>
+<table><tr><th>日期</th><th>试卷</th><th>原卷错</th><th>重做对</th><th>要补的知识点</th></tr>
+{% for p in papers %}<tr class="small"><td>{{ p.exam_date or p.created_at[:10] }}</td>
+  <td>{% if not report_for %}<a href="/papers/{{ p.id }}{{ '/report' if p.status == 'done' }}">{{ p.title }}</a>{% else %}{{ p.title }}{% endif %}{% if p.status != 'done' %} <span class="pill st-learning">待订正</span>{% endif %}</td>
+  <td>{{ p.rep.orig_wrong if p.rep.orig_marked else '-' }}</td><td>{{ p.rep.redo_right ~ '/' ~ p.rep.answered if p.rep.answered else '-' }}</td>
+  <td>{% for kid in p.rep.weak_kps or [] %}{{ catalog.kp(kid).name if catalog.kp(kid) }}{{ '、' if not loop.last }}{% endfor %}</td></tr>{% endfor %}</table>
+{% if report_for and user.role == 'parent' %}<p class="small"><a href="/parent/as/{{ report_for.id }}?next=/papers">打开试卷 →</a></p>{% endif %}
+{% endif %}
+{% if reads %}<h2>读书记录</h2>
+<table><tr><th>日期</th><th>书</th><th>读到</th><th>分钟</th><th>一句话</th></tr>
+{% for r in reads %}<tr class="small"><td>{{ r.day[5:] }}</td><td>{{ r.title }}</td><td>{{ r.to_pos or r.pages or '' }}</td><td>{{ r.minutes }}</td><td>{{ r.feeling }} {{ r.summary }}</td></tr>{% endfor %}</table>{% endif %}
 <h2>最近做题</h2>
 <table><tr><th>时间</th><th>知识点</th><th>类型</th><th>结果</th></tr>
-{% for a in attempts %}<tr><td class="small">{{ a.created_at[5:16].replace('T',' ') }}</td><td>{{ a.kp.name if a.kp else a.kp_id }}</td><td class="small">{{ {'practice':'练习','diagnose':'诊断','diagnose-self':'诊断自评','review':'复习'}.get(a.mode, a.mode) }}</td><td>{{ '✅' if a.correct else '❌' }}</td></tr>
+{% for a in attempts %}<tr><td class="small">{{ a.created_at[5:16].replace('T',' ') }}</td><td>{{ a.kp.name if a.kp else a.kp_id }}</td><td class="small">{{ {'practice':'练习','diagnose':'诊断','diagnose-self':'诊断自评','review':'复习','paper':'试卷重做','exam':'原卷'}.get(a.mode, a.mode) }}</td><td>{{ '✅' if a.correct else ('🤔 还不会' if a.dont_know else '❌') }}</td></tr>
 {% else %}<tr><td colspan="4" class="muted">还没有记录</td></tr>{% endfor %}</table>
+{% if asks %}<h2>最近问{{ ASSISTANT }}的问题</h2>
+<table>{% for a in asks %}<tr class="small"><td>{{ a.created_at[5:16].replace('T', ' ') }}</td><td>{{ a.text }}</td><td class="muted">{{ a.page }}</td></tr>{% endfor %}</table>{% endif %}
 {% if lookups %}<h2>最近查的词</h2><p>{% for l in lookups %}<span class="pill">{{ l.query }}</span> {% endfor %}</p>{% endif %}
 {% endblock %}

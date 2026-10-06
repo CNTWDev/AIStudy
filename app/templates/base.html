@@ -3,27 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>{% block title %}AIStudy 学习本{% endblock %}</title>
+<title>{% block title %}{{ SITE }} 学习本{% endblock %}</title>
 <link rel="stylesheet" href="/static/app.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
 <script src="/static/app.js"></script>
 </head>
 <body>
 {% if user and user.role == 'parent' and kid %}
-<div class="banner">正在以 <b>{{ kid.name }}</b> 的身份使用 · <a href="/parent">回到家长页</a></div>
+<div class="banner">正在查看 <b>{{ kid.name }}</b> 的学习（家长只查看和管理，做题请用孩子的账号）· <a href="/parent">回到家长页</a></div>
 {% endif %}
 <header class="top">
-  <a class="logo" href="/">📚 AIStudy</a>
-  {% if user %}<span class="who">{{ (kid or user).name }}{% if kid %} · {{ stage_label(kid.grade) }}{% endif %} {% if user.is_admin %} · <a href="/admin">管理</a>{% endif %} · <a href="/settings">账号</a></span>{% endif %}
+  <a class="logo" href="/">📚 {{ SITE }}</a>
+  {% if user %}<span class="who">{{ (kid or user).name }}{% if kid %} · {{ stage_label(kid.grade) }}{% endif %}
+    {% if user.role == 'parent' %} · <a href="/parent">家长页</a>{% endif %}{% if user.is_admin or user.role == 'admin' %} · <a href="/admin">管理</a>{% endif %}
+    {% if user.role != 'admin' %} · <a href="/tools">查词工具</a>{% endif %} · <a href="/settings">账号</a></span>{% endif %}
 </header>
 <main class="wrap">{% block body %}{% endblock %}</main>
+{% if user and user.role == 'kid' and not request.url.path.startswith('/diagnose') %}
+<button id="askbtn" data-name="{{ ASSISTANT }}" data-icon="{{ ASSISTANT_ICON }}" title="问{{ ASSISTANT }}：哪里不懂就问">{{ ASSISTANT_ICON }}<span>问{{ ASSISTANT }}</span></button>
+<div id="askpanel">
+  <div class="askhead"><b class="grow">{{ ASSISTANT_ICON }} 问{{ ASSISTANT }}</b><button id="asknew" class="btn ghost sm">换个问题</button><button id="askclose" class="btn ghost sm">✕</button></div>
+  <div id="askctx" class="small muted"></div>
+  <div id="askmsgs"></div>
+  <div id="askchips"><button>我没看懂题目</button><button>给我一个小提示</button><button>这一步为什么？</button></div>
+  <form id="askform"><input id="askq" type="text" placeholder="写下你的问题…" autocomplete="off"><button class="btn sm">发送</button></form>
+</div>
+{% endif %}
 {% if kid %}
 {% set p = request.url.path %}
 <nav class="tabs">
   <a href="/today" class="{{ 'on' if p.startswith('/today') }}"><span class="i">☀️</span>今天</a>
-  <a href="/subjects" class="{{ 'on' if p.startswith('/subjects') or p.startswith('/map') or p.startswith('/learn') or p.startswith('/diagnose') }}"><span class="i">🗺️</span>学科</a>
-  <a href="/reading" class="{{ 'on' if p.startswith('/reading') }}"><span class="i">📖</span>阅读</a>
-  <a href="/review" class="{{ 'on' if p.startswith('/review') or p.startswith('/words') }}"><span class="i">🔁</span>复习</a>
+  <a href="/subjects" class="{{ 'on' if p.startswith('/subjects') or p.startswith('/papers') or p.startswith('/progress') or p.startswith('/map') or p.startswith('/learn') or p.startswith('/diagnose') }}"><span class="i">🗺️</span>学科</a>
+  {% if not readonly %}<a href="/reading" class="{{ 'on' if p.startswith('/reading') }}"><span class="i">📖</span>阅读</a>
+  <a href="/review" class="{{ 'on' if p.startswith('/review') or p.startswith('/words') }}"><span class="i">🔁</span>复习</a>{% endif %}
   <a href="/records" class="{{ 'on' if p.startswith('/records') }}"><span class="i">📅</span>记录</a>
 </nav>
 {% endif %}

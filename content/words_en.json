@@ -1,0 +1,7391 @@
+{
+ "meta": {
+  "version": 1,
+  "generated": "2026-10-06",
+  "pos_note": "n. 名词 v. 动词 adj. 形容词 adv. 副词 prep. 介词 conj. 连词 pron. 代词 det. 限定词 num. 数词 interj. 感叹词 phr. 短语",
+  "notes": [
+   "不同列表之间允许少量重复（同一个词在高年级以新的意思/用法再出现，如 compare、describe）。"
+  ]
+ },
+ "lists": [
+  {
+   "id": "en-core-g1-2",
+   "title": "小学1-2年级核心词",
+   "stage": "G1-G2",
+   "source_note": "高频核心词（参考上海牛津版及常见低年级词表整理，不对应具体课本单元）",
+   "count": 166,
+   "words": [
+    {
+     "w": "one",
+     "zh": "一",
+     "pos": "num."
+    },
+    {
+     "w": "two",
+     "zh": "二",
+     "pos": "num."
+    },
+    {
+     "w": "three",
+     "zh": "三",
+     "pos": "num."
+    },
+    {
+     "w": "four",
+     "zh": "四",
+     "pos": "num."
+    },
+    {
+     "w": "five",
+     "zh": "五",
+     "pos": "num."
+    },
+    {
+     "w": "six",
+     "zh": "六",
+     "pos": "num."
+    },
+    {
+     "w": "seven",
+     "zh": "七",
+     "pos": "num."
+    },
+    {
+     "w": "eight",
+     "zh": "八",
+     "pos": "num."
+    },
+    {
+     "w": "nine",
+     "zh": "九",
+     "pos": "num."
+    },
+    {
+     "w": "ten",
+     "zh": "十",
+     "pos": "num."
+    },
+    {
+     "w": "red",
+     "zh": "红色（的）",
+     "pos": "adj./n."
+    },
+    {
+     "w": "yellow",
+     "zh": "黄色（的）",
+     "pos": "adj./n."
+    },
+    {
+     "w": "blue",
+     "zh": "蓝色（的）",
+     "pos": "adj./n."
+    },
+    {
+     "w": "green",
+     "zh": "绿色（的）",
+     "pos": "adj./n."
+    },
+    {
+     "w": "orange",
+     "zh": "橙子；橙色（的）",
+     "pos": "n./adj."
+    },
+    {
+     "w": "purple",
+     "zh": "紫色（的）",
+     "pos": "adj./n."
+    },
+    {
+     "w": "pink",
+     "zh": "粉红色（的）",
+     "pos": "adj./n."
+    },
+    {
+     "w": "black",
+     "zh": "黑色（的）",
+     "pos": "adj./n."
+    },
+    {
+     "w": "white",
+     "zh": "白色（的）",
+     "pos": "adj./n."
+    },
+    {
+     "w": "brown",
+     "zh": "棕色（的）",
+     "pos": "adj./n."
+    },
+    {
+     "w": "mother",
+     "zh": "妈妈；母亲",
+     "pos": "n."
+    },
+    {
+     "w": "father",
+     "zh": "爸爸；父亲",
+     "pos": "n."
+    },
+    {
+     "w": "sister",
+     "zh": "姐姐；妹妹",
+     "pos": "n."
+    },
+    {
+     "w": "brother",
+     "zh": "哥哥；弟弟",
+     "pos": "n."
+    },
+    {
+     "w": "grandma",
+     "zh": "奶奶；外婆",
+     "pos": "n."
+    },
+    {
+     "w": "grandpa",
+     "zh": "爷爷；外公",
+     "pos": "n."
+    },
+    {
+     "w": "baby",
+     "zh": "婴儿",
+     "pos": "n."
+    },
+    {
+     "w": "family",
+     "zh": "家庭；家人",
+     "pos": "n."
+    },
+    {
+     "w": "friend",
+     "zh": "朋友",
+     "pos": "n."
+    },
+    {
+     "w": "boy",
+     "zh": "男孩",
+     "pos": "n."
+    },
+    {
+     "w": "girl",
+     "zh": "女孩",
+     "pos": "n."
+    },
+    {
+     "w": "eye",
+     "zh": "眼睛",
+     "pos": "n."
+    },
+    {
+     "w": "ear",
+     "zh": "耳朵",
+     "pos": "n."
+    },
+    {
+     "w": "nose",
+     "zh": "鼻子",
+     "pos": "n."
+    },
+    {
+     "w": "mouth",
+     "zh": "嘴",
+     "pos": "n."
+    },
+    {
+     "w": "face",
+     "zh": "脸",
+     "pos": "n."
+    },
+    {
+     "w": "hand",
+     "zh": "手",
+     "pos": "n."
+    },
+    {
+     "w": "head",
+     "zh": "头",
+     "pos": "n."
+    },
+    {
+     "w": "leg",
+     "zh": "腿",
+     "pos": "n."
+    },
+    {
+     "w": "foot",
+     "zh": "脚",
+     "pos": "n."
+    },
+    {
+     "w": "arm",
+     "zh": "手臂",
+     "pos": "n."
+    },
+    {
+     "w": "hair",
+     "zh": "头发",
+     "pos": "n."
+    },
+    {
+     "w": "cat",
+     "zh": "猫",
+     "pos": "n."
+    },
+    {
+     "w": "dog",
+     "zh": "狗",
+     "pos": "n."
+    },
+    {
+     "w": "bird",
+     "zh": "鸟",
+     "pos": "n."
+    },
+    {
+     "w": "fish",
+     "zh": "鱼",
+     "pos": "n."
+    },
+    {
+     "w": "duck",
+     "zh": "鸭子",
+     "pos": "n."
+    },
+    {
+     "w": "pig",
+     "zh": "猪",
+     "pos": "n."
+    },
+    {
+     "w": "cow",
+     "zh": "奶牛",
+     "pos": "n."
+    },
+    {
+     "w": "sheep",
+     "zh": "绵羊",
+     "pos": "n."
+    },
+    {
+     "w": "horse",
+     "zh": "马",
+     "pos": "n."
+    },
+    {
+     "w": "rabbit",
+     "zh": "兔子",
+     "pos": "n."
+    },
+    {
+     "w": "monkey",
+     "zh": "猴子",
+     "pos": "n."
+    },
+    {
+     "w": "panda",
+     "zh": "熊猫",
+     "pos": "n."
+    },
+    {
+     "w": "tiger",
+     "zh": "老虎",
+     "pos": "n."
+    },
+    {
+     "w": "lion",
+     "zh": "狮子",
+     "pos": "n."
+    },
+    {
+     "w": "elephant",
+     "zh": "大象",
+     "pos": "n."
+    },
+    {
+     "w": "bear",
+     "zh": "熊",
+     "pos": "n."
+    },
+    {
+     "w": "chicken",
+     "zh": "鸡；鸡肉",
+     "pos": "n."
+    },
+    {
+     "w": "frog",
+     "zh": "青蛙",
+     "pos": "n."
+    },
+    {
+     "w": "apple",
+     "zh": "苹果",
+     "pos": "n."
+    },
+    {
+     "w": "banana",
+     "zh": "香蕉",
+     "pos": "n."
+    },
+    {
+     "w": "pear",
+     "zh": "梨",
+     "pos": "n."
+    },
+    {
+     "w": "grape",
+     "zh": "葡萄",
+     "pos": "n."
+    },
+    {
+     "w": "egg",
+     "zh": "鸡蛋",
+     "pos": "n."
+    },
+    {
+     "w": "cake",
+     "zh": "蛋糕",
+     "pos": "n."
+    },
+    {
+     "w": "bread",
+     "zh": "面包",
+     "pos": "n."
+    },
+    {
+     "w": "milk",
+     "zh": "牛奶",
+     "pos": "n."
+    },
+    {
+     "w": "water",
+     "zh": "水",
+     "pos": "n."
+    },
+    {
+     "w": "juice",
+     "zh": "果汁",
+     "pos": "n."
+    },
+    {
+     "w": "rice",
+     "zh": "米饭；大米",
+     "pos": "n."
+    },
+    {
+     "w": "noodles",
+     "zh": "面条",
+     "pos": "n."
+    },
+    {
+     "w": "sweet",
+     "zh": "糖果；甜的",
+     "pos": "n./adj."
+    },
+    {
+     "w": "ice cream",
+     "zh": "冰淇淋",
+     "pos": "n."
+    },
+    {
+     "w": "hamburger",
+     "zh": "汉堡包",
+     "pos": "n."
+    },
+    {
+     "w": "book",
+     "zh": "书",
+     "pos": "n."
+    },
+    {
+     "w": "pen",
+     "zh": "钢笔",
+     "pos": "n."
+    },
+    {
+     "w": "pencil",
+     "zh": "铅笔",
+     "pos": "n."
+    },
+    {
+     "w": "ruler",
+     "zh": "尺子",
+     "pos": "n."
+    },
+    {
+     "w": "rubber",
+     "zh": "橡皮",
+     "pos": "n."
+    },
+    {
+     "w": "bag",
+     "zh": "包；书包",
+     "pos": "n."
+    },
+    {
+     "w": "desk",
+     "zh": "课桌",
+     "pos": "n."
+    },
+    {
+     "w": "chair",
+     "zh": "椅子",
+     "pos": "n."
+    },
+    {
+     "w": "teacher",
+     "zh": "老师",
+     "pos": "n."
+    },
+    {
+     "w": "school",
+     "zh": "学校",
+     "pos": "n."
+    },
+    {
+     "w": "class",
+     "zh": "班级；课",
+     "pos": "n."
+    },
+    {
+     "w": "ball",
+     "zh": "球",
+     "pos": "n."
+    },
+    {
+     "w": "doll",
+     "zh": "玩偶；娃娃",
+     "pos": "n."
+    },
+    {
+     "w": "kite",
+     "zh": "风筝",
+     "pos": "n."
+    },
+    {
+     "w": "car",
+     "zh": "小汽车",
+     "pos": "n."
+    },
+    {
+     "w": "bike",
+     "zh": "自行车",
+     "pos": "n."
+    },
+    {
+     "w": "balloon",
+     "zh": "气球",
+     "pos": "n."
+    },
+    {
+     "w": "robot",
+     "zh": "机器人",
+     "pos": "n."
+    },
+    {
+     "w": "door",
+     "zh": "门",
+     "pos": "n."
+    },
+    {
+     "w": "window",
+     "zh": "窗户",
+     "pos": "n."
+    },
+    {
+     "w": "bed",
+     "zh": "床",
+     "pos": "n."
+    },
+    {
+     "w": "table",
+     "zh": "桌子",
+     "pos": "n."
+    },
+    {
+     "w": "room",
+     "zh": "房间",
+     "pos": "n."
+    },
+    {
+     "w": "house",
+     "zh": "房子",
+     "pos": "n."
+    },
+    {
+     "w": "sun",
+     "zh": "太阳",
+     "pos": "n."
+    },
+    {
+     "w": "moon",
+     "zh": "月亮",
+     "pos": "n."
+    },
+    {
+     "w": "star",
+     "zh": "星星",
+     "pos": "n."
+    },
+    {
+     "w": "tree",
+     "zh": "树",
+     "pos": "n."
+    },
+    {
+     "w": "flower",
+     "zh": "花",
+     "pos": "n."
+    },
+    {
+     "w": "sky",
+     "zh": "天空",
+     "pos": "n."
+    },
+    {
+     "w": "rain",
+     "zh": "雨；下雨",
+     "pos": "n./v."
+    },
+    {
+     "w": "big",
+     "zh": "大的",
+     "pos": "adj."
+    },
+    {
+     "w": "small",
+     "zh": "小的",
+     "pos": "adj."
+    },
+    {
+     "w": "long",
+     "zh": "长的",
+     "pos": "adj."
+    },
+    {
+     "w": "short",
+     "zh": "短的；矮的",
+     "pos": "adj."
+    },
+    {
+     "w": "tall",
+     "zh": "高的",
+     "pos": "adj."
+    },
+    {
+     "w": "fat",
+     "zh": "胖的",
+     "pos": "adj."
+    },
+    {
+     "w": "thin",
+     "zh": "瘦的；薄的",
+     "pos": "adj."
+    },
+    {
+     "w": "happy",
+     "zh": "快乐的",
+     "pos": "adj."
+    },
+    {
+     "w": "sad",
+     "zh": "难过的",
+     "pos": "adj."
+    },
+    {
+     "w": "hot",
+     "zh": "热的",
+     "pos": "adj."
+    },
+    {
+     "w": "cold",
+     "zh": "冷的",
+     "pos": "adj."
+    },
+    {
+     "w": "new",
+     "zh": "新的",
+     "pos": "adj."
+    },
+    {
+     "w": "old",
+     "zh": "旧的；老的",
+     "pos": "adj."
+    },
+    {
+     "w": "good",
+     "zh": "好的",
+     "pos": "adj."
+    },
+    {
+     "w": "nice",
+     "zh": "好的；美好的",
+     "pos": "adj."
+    },
+    {
+     "w": "look",
+     "zh": "看",
+     "pos": "v."
+    },
+    {
+     "w": "see",
+     "zh": "看见",
+     "pos": "v."
+    },
+    {
+     "w": "run",
+     "zh": "跑",
+     "pos": "v."
+    },
+    {
+     "w": "jump",
+     "zh": "跳",
+     "pos": "v."
+    },
+    {
+     "w": "swim",
+     "zh": "游泳",
+     "pos": "v."
+    },
+    {
+     "w": "fly",
+     "zh": "飞",
+     "pos": "v."
+    },
+    {
+     "w": "sing",
+     "zh": "唱歌",
+     "pos": "v."
+    },
+    {
+     "w": "dance",
+     "zh": "跳舞",
+     "pos": "v."
+    },
+    {
+     "w": "draw",
+     "zh": "画",
+     "pos": "v."
+    },
+    {
+     "w": "read",
+     "zh": "读",
+     "pos": "v."
+    },
+    {
+     "w": "write",
+     "zh": "写",
+     "pos": "v."
+    },
+    {
+     "w": "eat",
+     "zh": "吃",
+     "pos": "v."
+    },
+    {
+     "w": "drink",
+     "zh": "喝；饮料",
+     "pos": "v./n."
+    },
+    {
+     "w": "sleep",
+     "zh": "睡觉",
+     "pos": "v."
+    },
+    {
+     "w": "sit",
+     "zh": "坐",
+     "pos": "v."
+    },
+    {
+     "w": "stand",
+     "zh": "站",
+     "pos": "v."
+    },
+    {
+     "w": "open",
+     "zh": "打开",
+     "pos": "v."
+    },
+    {
+     "w": "close",
+     "zh": "关上",
+     "pos": "v."
+    },
+    {
+     "w": "like",
+     "zh": "喜欢",
+     "pos": "v."
+    },
+    {
+     "w": "have",
+     "zh": "有；吃",
+     "pos": "v."
+    },
+    {
+     "w": "go",
+     "zh": "去",
+     "pos": "v."
+    },
+    {
+     "w": "come",
+     "zh": "来",
+     "pos": "v."
+    },
+    {
+     "w": "play",
+     "zh": "玩；踢（球）",
+     "pos": "v."
+    },
+    {
+     "w": "walk",
+     "zh": "走；散步",
+     "pos": "v."
+    },
+    {
+     "w": "hello",
+     "zh": "你好",
+     "pos": "interj."
+    },
+    {
+     "w": "goodbye",
+     "zh": "再见",
+     "pos": "interj."
+    },
+    {
+     "w": "please",
+     "zh": "请",
+     "pos": "adv."
+    },
+    {
+     "w": "thank",
+     "zh": "感谢",
+     "pos": "v."
+    },
+    {
+     "w": "yes",
+     "zh": "是；对",
+     "pos": "adv."
+    },
+    {
+     "w": "no",
+     "zh": "不；没有",
+     "pos": "adv."
+    },
+    {
+     "w": "I",
+     "zh": "我",
+     "pos": "pron."
+    },
+    {
+     "w": "you",
+     "zh": "你；你们",
+     "pos": "pron."
+    },
+    {
+     "w": "he",
+     "zh": "他",
+     "pos": "pron."
+    },
+    {
+     "w": "she",
+     "zh": "她",
+     "pos": "pron."
+    },
+    {
+     "w": "it",
+     "zh": "它",
+     "pos": "pron."
+    },
+    {
+     "w": "we",
+     "zh": "我们",
+     "pos": "pron."
+    },
+    {
+     "w": "they",
+     "zh": "他们；她们；它们",
+     "pos": "pron."
+    },
+    {
+     "w": "my",
+     "zh": "我的",
+     "pos": "pron."
+    },
+    {
+     "w": "your",
+     "zh": "你的；你们的",
+     "pos": "pron."
+    },
+    {
+     "w": "this",
+     "zh": "这；这个",
+     "pos": "pron."
+    },
+    {
+     "w": "that",
+     "zh": "那；那个",
+     "pos": "pron."
+    },
+    {
+     "w": "what",
+     "zh": "什么",
+     "pos": "pron."
+    },
+    {
+     "w": "who",
+     "zh": "谁",
+     "pos": "pron."
+    },
+    {
+     "w": "where",
+     "zh": "在哪里",
+     "pos": "adv."
+    },
+    {
+     "w": "how",
+     "zh": "怎样；多么",
+     "pos": "adv."
+    }
+   ]
+  },
+  {
+   "id": "en-core-g3",
+   "title": "小学3年级核心词",
+   "stage": "G3",
+   "source_note": "按上海牛津版三年级常见话题整理（家庭、身体、动物、食物、文具、颜色、100以内数字、天气、玩具、动作、衣物、星期），不对应具体课本单元",
+   "count": 217,
+   "words": [
+    {
+     "w": "eleven",
+     "zh": "十一",
+     "pos": "num."
+    },
+    {
+     "w": "twelve",
+     "zh": "十二",
+     "pos": "num."
+    },
+    {
+     "w": "thirteen",
+     "zh": "十三",
+     "pos": "num."
+    },
+    {
+     "w": "fourteen",
+     "zh": "十四",
+     "pos": "num."
+    },
+    {
+     "w": "fifteen",
+     "zh": "十五",
+     "pos": "num."
+    },
+    {
+     "w": "sixteen",
+     "zh": "十六",
+     "pos": "num."
+    },
+    {
+     "w": "seventeen",
+     "zh": "十七",
+     "pos": "num."
+    },
+    {
+     "w": "eighteen",
+     "zh": "十八",
+     "pos": "num."
+    },
+    {
+     "w": "nineteen",
+     "zh": "十九",
+     "pos": "num."
+    },
+    {
+     "w": "twenty",
+     "zh": "二十",
+     "pos": "num."
+    },
+    {
+     "w": "thirty",
+     "zh": "三十",
+     "pos": "num."
+    },
+    {
+     "w": "forty",
+     "zh": "四十",
+     "pos": "num."
+    },
+    {
+     "w": "fifty",
+     "zh": "五十",
+     "pos": "num."
+    },
+    {
+     "w": "sixty",
+     "zh": "六十",
+     "pos": "num."
+    },
+    {
+     "w": "seventy",
+     "zh": "七十",
+     "pos": "num."
+    },
+    {
+     "w": "eighty",
+     "zh": "八十",
+     "pos": "num."
+    },
+    {
+     "w": "ninety",
+     "zh": "九十",
+     "pos": "num."
+    },
+    {
+     "w": "hundred",
+     "zh": "百",
+     "pos": "num."
+    },
+    {
+     "w": "number",
+     "zh": "数字",
+     "pos": "n."
+    },
+    {
+     "w": "how many",
+     "zh": "多少（个）",
+     "pos": "phr."
+    },
+    {
+     "w": "how old",
+     "zh": "几岁",
+     "pos": "phr."
+    },
+    {
+     "w": "grey",
+     "zh": "灰色（的）",
+     "pos": "adj./n."
+    },
+    {
+     "w": "colour",
+     "zh": "颜色",
+     "pos": "n."
+    },
+    {
+     "w": "uncle",
+     "zh": "叔叔；舅舅",
+     "pos": "n."
+    },
+    {
+     "w": "aunt",
+     "zh": "阿姨；姑姑",
+     "pos": "n."
+    },
+    {
+     "w": "cousin",
+     "zh": "堂/表兄弟姐妹",
+     "pos": "n."
+    },
+    {
+     "w": "parents",
+     "zh": "父母",
+     "pos": "n."
+    },
+    {
+     "w": "grandmother",
+     "zh": "祖母；外祖母",
+     "pos": "n."
+    },
+    {
+     "w": "grandfather",
+     "zh": "祖父；外祖父",
+     "pos": "n."
+    },
+    {
+     "w": "son",
+     "zh": "儿子",
+     "pos": "n."
+    },
+    {
+     "w": "daughter",
+     "zh": "女儿",
+     "pos": "n."
+    },
+    {
+     "w": "man",
+     "zh": "男人",
+     "pos": "n."
+    },
+    {
+     "w": "woman",
+     "zh": "女人",
+     "pos": "n."
+    },
+    {
+     "w": "shoulder",
+     "zh": "肩膀",
+     "pos": "n."
+    },
+    {
+     "w": "knee",
+     "zh": "膝盖",
+     "pos": "n."
+    },
+    {
+     "w": "toe",
+     "zh": "脚趾",
+     "pos": "n."
+    },
+    {
+     "w": "finger",
+     "zh": "手指",
+     "pos": "n."
+    },
+    {
+     "w": "tooth",
+     "zh": "牙齿（复数 teeth）",
+     "pos": "n."
+    },
+    {
+     "w": "neck",
+     "zh": "脖子",
+     "pos": "n."
+    },
+    {
+     "w": "body",
+     "zh": "身体",
+     "pos": "n."
+    },
+    {
+     "w": "giraffe",
+     "zh": "长颈鹿",
+     "pos": "n."
+    },
+    {
+     "w": "zebra",
+     "zh": "斑马",
+     "pos": "n."
+    },
+    {
+     "w": "kangaroo",
+     "zh": "袋鼠",
+     "pos": "n."
+    },
+    {
+     "w": "snake",
+     "zh": "蛇",
+     "pos": "n."
+    },
+    {
+     "w": "bee",
+     "zh": "蜜蜂",
+     "pos": "n."
+    },
+    {
+     "w": "butterfly",
+     "zh": "蝴蝶",
+     "pos": "n."
+    },
+    {
+     "w": "ant",
+     "zh": "蚂蚁",
+     "pos": "n."
+    },
+    {
+     "w": "hen",
+     "zh": "母鸡",
+     "pos": "n."
+    },
+    {
+     "w": "goat",
+     "zh": "山羊",
+     "pos": "n."
+    },
+    {
+     "w": "dolphin",
+     "zh": "海豚",
+     "pos": "n."
+    },
+    {
+     "w": "whale",
+     "zh": "鲸",
+     "pos": "n."
+    },
+    {
+     "w": "squirrel",
+     "zh": "松鼠",
+     "pos": "n."
+    },
+    {
+     "w": "owl",
+     "zh": "猫头鹰",
+     "pos": "n."
+    },
+    {
+     "w": "parrot",
+     "zh": "鹦鹉",
+     "pos": "n."
+    },
+    {
+     "w": "mouse",
+     "zh": "老鼠（复数 mice）",
+     "pos": "n."
+    },
+    {
+     "w": "animal",
+     "zh": "动物",
+     "pos": "n."
+    },
+    {
+     "w": "tail",
+     "zh": "尾巴",
+     "pos": "n."
+    },
+    {
+     "w": "soup",
+     "zh": "汤",
+     "pos": "n."
+    },
+    {
+     "w": "jelly",
+     "zh": "果冻",
+     "pos": "n."
+    },
+    {
+     "w": "biscuit",
+     "zh": "饼干",
+     "pos": "n."
+    },
+    {
+     "w": "sandwich",
+     "zh": "三明治",
+     "pos": "n."
+    },
+    {
+     "w": "pizza",
+     "zh": "比萨饼",
+     "pos": "n."
+    },
+    {
+     "w": "sausage",
+     "zh": "香肠",
+     "pos": "n."
+    },
+    {
+     "w": "chocolate",
+     "zh": "巧克力",
+     "pos": "n."
+    },
+    {
+     "w": "tea",
+     "zh": "茶",
+     "pos": "n."
+    },
+    {
+     "w": "coffee",
+     "zh": "咖啡",
+     "pos": "n."
+    },
+    {
+     "w": "vegetable",
+     "zh": "蔬菜",
+     "pos": "n."
+    },
+    {
+     "w": "carrot",
+     "zh": "胡萝卜",
+     "pos": "n."
+    },
+    {
+     "w": "potato",
+     "zh": "土豆",
+     "pos": "n."
+    },
+    {
+     "w": "tomato",
+     "zh": "西红柿",
+     "pos": "n."
+    },
+    {
+     "w": "meat",
+     "zh": "肉",
+     "pos": "n."
+    },
+    {
+     "w": "fruit",
+     "zh": "水果",
+     "pos": "n."
+    },
+    {
+     "w": "peach",
+     "zh": "桃子",
+     "pos": "n."
+    },
+    {
+     "w": "watermelon",
+     "zh": "西瓜",
+     "pos": "n."
+    },
+    {
+     "w": "food",
+     "zh": "食物",
+     "pos": "n."
+    },
+    {
+     "w": "breakfast",
+     "zh": "早餐",
+     "pos": "n."
+    },
+    {
+     "w": "lunch",
+     "zh": "午餐",
+     "pos": "n."
+    },
+    {
+     "w": "dinner",
+     "zh": "晚餐",
+     "pos": "n."
+    },
+    {
+     "w": "hungry",
+     "zh": "饿的",
+     "pos": "adj."
+    },
+    {
+     "w": "classroom",
+     "zh": "教室",
+     "pos": "n."
+    },
+    {
+     "w": "blackboard",
+     "zh": "黑板",
+     "pos": "n."
+    },
+    {
+     "w": "crayon",
+     "zh": "蜡笔",
+     "pos": "n."
+    },
+    {
+     "w": "pencil case",
+     "zh": "铅笔盒",
+     "pos": "n."
+    },
+    {
+     "w": "notebook",
+     "zh": "笔记本",
+     "pos": "n."
+    },
+    {
+     "w": "schoolbag",
+     "zh": "书包",
+     "pos": "n."
+    },
+    {
+     "w": "storybook",
+     "zh": "故事书",
+     "pos": "n."
+    },
+    {
+     "w": "scissors",
+     "zh": "剪刀",
+     "pos": "n."
+    },
+    {
+     "w": "glue",
+     "zh": "胶水",
+     "pos": "n."
+    },
+    {
+     "w": "paper",
+     "zh": "纸",
+     "pos": "n."
+    },
+    {
+     "w": "playground",
+     "zh": "操场",
+     "pos": "n."
+    },
+    {
+     "w": "library",
+     "zh": "图书馆",
+     "pos": "n."
+    },
+    {
+     "w": "student",
+     "zh": "学生",
+     "pos": "n."
+    },
+    {
+     "w": "lesson",
+     "zh": "课",
+     "pos": "n."
+    },
+    {
+     "w": "weather",
+     "zh": "天气",
+     "pos": "n."
+    },
+    {
+     "w": "sunny",
+     "zh": "晴朗的",
+     "pos": "adj."
+    },
+    {
+     "w": "cloudy",
+     "zh": "多云的",
+     "pos": "adj."
+    },
+    {
+     "w": "rainy",
+     "zh": "下雨的",
+     "pos": "adj."
+    },
+    {
+     "w": "windy",
+     "zh": "有风的",
+     "pos": "adj."
+    },
+    {
+     "w": "snowy",
+     "zh": "下雪的",
+     "pos": "adj."
+    },
+    {
+     "w": "warm",
+     "zh": "温暖的",
+     "pos": "adj."
+    },
+    {
+     "w": "cool",
+     "zh": "凉爽的；酷",
+     "pos": "adj."
+    },
+    {
+     "w": "spring",
+     "zh": "春天",
+     "pos": "n."
+    },
+    {
+     "w": "summer",
+     "zh": "夏天",
+     "pos": "n."
+    },
+    {
+     "w": "autumn",
+     "zh": "秋天",
+     "pos": "n."
+    },
+    {
+     "w": "winter",
+     "zh": "冬天",
+     "pos": "n."
+    },
+    {
+     "w": "season",
+     "zh": "季节",
+     "pos": "n."
+    },
+    {
+     "w": "snow",
+     "zh": "雪；下雪",
+     "pos": "n./v."
+    },
+    {
+     "w": "wind",
+     "zh": "风",
+     "pos": "n."
+    },
+    {
+     "w": "cloud",
+     "zh": "云",
+     "pos": "n."
+    },
+    {
+     "w": "toy",
+     "zh": "玩具",
+     "pos": "n."
+    },
+    {
+     "w": "train",
+     "zh": "火车",
+     "pos": "n."
+    },
+    {
+     "w": "teddy bear",
+     "zh": "泰迪熊",
+     "pos": "n."
+    },
+    {
+     "w": "puzzle",
+     "zh": "拼图；谜",
+     "pos": "n."
+    },
+    {
+     "w": "plane",
+     "zh": "飞机",
+     "pos": "n."
+    },
+    {
+     "w": "ship",
+     "zh": "轮船",
+     "pos": "n."
+    },
+    {
+     "w": "bus",
+     "zh": "公共汽车",
+     "pos": "n."
+    },
+    {
+     "w": "climb",
+     "zh": "爬",
+     "pos": "v."
+    },
+    {
+     "w": "catch",
+     "zh": "接住；抓住",
+     "pos": "v."
+    },
+    {
+     "w": "throw",
+     "zh": "扔",
+     "pos": "v."
+    },
+    {
+     "w": "kick",
+     "zh": "踢",
+     "pos": "v."
+    },
+    {
+     "w": "ride",
+     "zh": "骑",
+     "pos": "v."
+    },
+    {
+     "w": "skip",
+     "zh": "跳绳；蹦跳",
+     "pos": "v."
+    },
+    {
+     "w": "hop",
+     "zh": "单脚跳",
+     "pos": "v."
+    },
+    {
+     "w": "clap",
+     "zh": "拍手",
+     "pos": "v."
+    },
+    {
+     "w": "touch",
+     "zh": "摸",
+     "pos": "v."
+    },
+    {
+     "w": "wash",
+     "zh": "洗",
+     "pos": "v."
+    },
+    {
+     "w": "brush",
+     "zh": "刷",
+     "pos": "v."
+    },
+    {
+     "w": "clean",
+     "zh": "打扫；干净的",
+     "pos": "v./adj."
+    },
+    {
+     "w": "help",
+     "zh": "帮助",
+     "pos": "v./n."
+    },
+    {
+     "w": "listen",
+     "zh": "听",
+     "pos": "v."
+    },
+    {
+     "w": "speak",
+     "zh": "说（语言）",
+     "pos": "v."
+    },
+    {
+     "w": "say",
+     "zh": "说",
+     "pos": "v."
+    },
+    {
+     "w": "tell",
+     "zh": "告诉；讲",
+     "pos": "v."
+    },
+    {
+     "w": "think",
+     "zh": "想；认为",
+     "pos": "v."
+    },
+    {
+     "w": "know",
+     "zh": "知道",
+     "pos": "v."
+    },
+    {
+     "w": "want",
+     "zh": "想要",
+     "pos": "v."
+    },
+    {
+     "w": "need",
+     "zh": "需要",
+     "pos": "v."
+    },
+    {
+     "w": "make",
+     "zh": "做；制作",
+     "pos": "v."
+    },
+    {
+     "w": "cook",
+     "zh": "做饭；厨师",
+     "pos": "v./n."
+    },
+    {
+     "w": "buy",
+     "zh": "买",
+     "pos": "v."
+    },
+    {
+     "w": "give",
+     "zh": "给",
+     "pos": "v."
+    },
+    {
+     "w": "take",
+     "zh": "拿；带走",
+     "pos": "v."
+    },
+    {
+     "w": "put",
+     "zh": "放",
+     "pos": "v."
+    },
+    {
+     "w": "heavy",
+     "zh": "重的",
+     "pos": "adj."
+    },
+    {
+     "w": "light",
+     "zh": "轻的；灯；光",
+     "pos": "adj./n."
+    },
+    {
+     "w": "soft",
+     "zh": "软的",
+     "pos": "adj."
+    },
+    {
+     "w": "hard",
+     "zh": "硬的；努力地",
+     "pos": "adj./adv."
+    },
+    {
+     "w": "loud",
+     "zh": "大声的",
+     "pos": "adj."
+    },
+    {
+     "w": "quiet",
+     "zh": "安静的",
+     "pos": "adj."
+    },
+    {
+     "w": "sour",
+     "zh": "酸的",
+     "pos": "adj."
+    },
+    {
+     "w": "salty",
+     "zh": "咸的",
+     "pos": "adj."
+    },
+    {
+     "w": "bitter",
+     "zh": "苦的",
+     "pos": "adj."
+    },
+    {
+     "w": "clever",
+     "zh": "聪明的",
+     "pos": "adj."
+    },
+    {
+     "w": "kind",
+     "zh": "善良的；种类",
+     "pos": "adj./n."
+    },
+    {
+     "w": "beautiful",
+     "zh": "美丽的",
+     "pos": "adj."
+    },
+    {
+     "w": "strong",
+     "zh": "强壮的",
+     "pos": "adj."
+    },
+    {
+     "w": "young",
+     "zh": "年轻的",
+     "pos": "adj."
+    },
+    {
+     "w": "little",
+     "zh": "小的；一点",
+     "pos": "adj."
+    },
+    {
+     "w": "lovely",
+     "zh": "可爱的",
+     "pos": "adj."
+    },
+    {
+     "w": "park",
+     "zh": "公园",
+     "pos": "n."
+    },
+    {
+     "w": "zoo",
+     "zh": "动物园",
+     "pos": "n."
+    },
+    {
+     "w": "shop",
+     "zh": "商店",
+     "pos": "n."
+    },
+    {
+     "w": "supermarket",
+     "zh": "超市",
+     "pos": "n."
+    },
+    {
+     "w": "farm",
+     "zh": "农场",
+     "pos": "n."
+    },
+    {
+     "w": "street",
+     "zh": "街道",
+     "pos": "n."
+    },
+    {
+     "w": "home",
+     "zh": "家",
+     "pos": "n."
+    },
+    {
+     "w": "hospital",
+     "zh": "医院",
+     "pos": "n."
+    },
+    {
+     "w": "shirt",
+     "zh": "衬衫",
+     "pos": "n."
+    },
+    {
+     "w": "T-shirt",
+     "zh": "T恤衫",
+     "pos": "n."
+    },
+    {
+     "w": "skirt",
+     "zh": "短裙",
+     "pos": "n."
+    },
+    {
+     "w": "dress",
+     "zh": "连衣裙",
+     "pos": "n."
+    },
+    {
+     "w": "coat",
+     "zh": "外套",
+     "pos": "n."
+    },
+    {
+     "w": "hat",
+     "zh": "帽子（有檐）",
+     "pos": "n."
+    },
+    {
+     "w": "cap",
+     "zh": "帽子（鸭舌帽）",
+     "pos": "n."
+    },
+    {
+     "w": "shoes",
+     "zh": "鞋",
+     "pos": "n."
+    },
+    {
+     "w": "socks",
+     "zh": "袜子",
+     "pos": "n."
+    },
+    {
+     "w": "jacket",
+     "zh": "夹克衫",
+     "pos": "n."
+    },
+    {
+     "w": "trousers",
+     "zh": "长裤",
+     "pos": "n."
+    },
+    {
+     "w": "morning",
+     "zh": "早上；上午",
+     "pos": "n."
+    },
+    {
+     "w": "afternoon",
+     "zh": "下午",
+     "pos": "n."
+    },
+    {
+     "w": "evening",
+     "zh": "傍晚；晚上",
+     "pos": "n."
+    },
+    {
+     "w": "night",
+     "zh": "夜晚",
+     "pos": "n."
+    },
+    {
+     "w": "today",
+     "zh": "今天",
+     "pos": "n./adv."
+    },
+    {
+     "w": "day",
+     "zh": "一天；白天",
+     "pos": "n."
+    },
+    {
+     "w": "week",
+     "zh": "星期；周",
+     "pos": "n."
+    },
+    {
+     "w": "Monday",
+     "zh": "星期一",
+     "pos": "n."
+    },
+    {
+     "w": "Tuesday",
+     "zh": "星期二",
+     "pos": "n."
+    },
+    {
+     "w": "Wednesday",
+     "zh": "星期三",
+     "pos": "n."
+    },
+    {
+     "w": "Thursday",
+     "zh": "星期四",
+     "pos": "n."
+    },
+    {
+     "w": "Friday",
+     "zh": "星期五",
+     "pos": "n."
+    },
+    {
+     "w": "Saturday",
+     "zh": "星期六",
+     "pos": "n."
+    },
+    {
+     "w": "Sunday",
+     "zh": "星期日",
+     "pos": "n."
+    },
+    {
+     "w": "circle",
+     "zh": "圆形",
+     "pos": "n."
+    },
+    {
+     "w": "square",
+     "zh": "正方形",
+     "pos": "n."
+    },
+    {
+     "w": "triangle",
+     "zh": "三角形",
+     "pos": "n."
+    },
+    {
+     "w": "shape",
+     "zh": "形状",
+     "pos": "n."
+    },
+    {
+     "w": "can",
+     "zh": "能；会",
+     "pos": "v."
+    },
+    {
+     "w": "can't",
+     "zh": "不能；不会",
+     "pos": "v."
+    },
+    {
+     "w": "here",
+     "zh": "这里",
+     "pos": "adv."
+    },
+    {
+     "w": "there",
+     "zh": "那里",
+     "pos": "adv."
+    },
+    {
+     "w": "in",
+     "zh": "在……里面",
+     "pos": "prep."
+    },
+    {
+     "w": "on",
+     "zh": "在……上面",
+     "pos": "prep."
+    },
+    {
+     "w": "under",
+     "zh": "在……下面",
+     "pos": "prep."
+    },
+    {
+     "w": "near",
+     "zh": "在……附近",
+     "pos": "prep."
+    },
+    {
+     "w": "behind",
+     "zh": "在……后面",
+     "pos": "prep."
+    },
+    {
+     "w": "and",
+     "zh": "和",
+     "pos": "conj."
+    },
+    {
+     "w": "but",
+     "zh": "但是",
+     "pos": "conj."
+    },
+    {
+     "w": "very",
+     "zh": "非常",
+     "pos": "adv."
+    },
+    {
+     "w": "too",
+     "zh": "也；太",
+     "pos": "adv."
+    },
+    {
+     "w": "some",
+     "zh": "一些",
+     "pos": "det."
+    },
+    {
+     "w": "many",
+     "zh": "许多（可数）",
+     "pos": "det."
+    },
+    {
+     "w": "much",
+     "zh": "许多（不可数）",
+     "pos": "det."
+    },
+    {
+     "w": "all",
+     "zh": "全部",
+     "pos": "det."
+    },
+    {
+     "w": "our",
+     "zh": "我们的",
+     "pos": "pron."
+    },
+    {
+     "w": "his",
+     "zh": "他的",
+     "pos": "pron."
+    },
+    {
+     "w": "her",
+     "zh": "她的；她",
+     "pos": "pron."
+    },
+    {
+     "w": "their",
+     "zh": "他们的",
+     "pos": "pron."
+    }
+   ]
+  },
+  {
+   "id": "en-core-g4-5",
+   "title": "小学4-5年级核心词",
+   "stage": "G4-G5",
+   "source_note": "按上海牛津版四五年级常见话题（职业、地点、月份、交通、情绪、自然、爱好、健康、环保、时间）及高频动词形容词整理",
+   "count": 270,
+   "words": [
+    {
+     "w": "doctor",
+     "zh": "医生",
+     "pos": "n."
+    },
+    {
+     "w": "nurse",
+     "zh": "护士",
+     "pos": "n."
+    },
+    {
+     "w": "driver",
+     "zh": "司机",
+     "pos": "n."
+    },
+    {
+     "w": "farmer",
+     "zh": "农民",
+     "pos": "n."
+    },
+    {
+     "w": "police officer",
+     "zh": "警察",
+     "pos": "n."
+    },
+    {
+     "w": "firefighter",
+     "zh": "消防员",
+     "pos": "n."
+    },
+    {
+     "w": "postman",
+     "zh": "邮递员",
+     "pos": "n."
+    },
+    {
+     "w": "pilot",
+     "zh": "飞行员",
+     "pos": "n."
+    },
+    {
+     "w": "engineer",
+     "zh": "工程师",
+     "pos": "n."
+    },
+    {
+     "w": "scientist",
+     "zh": "科学家",
+     "pos": "n."
+    },
+    {
+     "w": "worker",
+     "zh": "工人",
+     "pos": "n."
+    },
+    {
+     "w": "job",
+     "zh": "工作；职业",
+     "pos": "n."
+    },
+    {
+     "w": "cinema",
+     "zh": "电影院",
+     "pos": "n."
+    },
+    {
+     "w": "museum",
+     "zh": "博物馆",
+     "pos": "n."
+    },
+    {
+     "w": "bank",
+     "zh": "银行",
+     "pos": "n."
+    },
+    {
+     "w": "post office",
+     "zh": "邮局",
+     "pos": "n."
+    },
+    {
+     "w": "restaurant",
+     "zh": "餐馆",
+     "pos": "n."
+    },
+    {
+     "w": "hotel",
+     "zh": "宾馆",
+     "pos": "n."
+    },
+    {
+     "w": "airport",
+     "zh": "机场",
+     "pos": "n."
+    },
+    {
+     "w": "station",
+     "zh": "车站",
+     "pos": "n."
+    },
+    {
+     "w": "bridge",
+     "zh": "桥",
+     "pos": "n."
+    },
+    {
+     "w": "city",
+     "zh": "城市",
+     "pos": "n."
+    },
+    {
+     "w": "village",
+     "zh": "村庄",
+     "pos": "n."
+    },
+    {
+     "w": "road",
+     "zh": "路",
+     "pos": "n."
+    },
+    {
+     "w": "building",
+     "zh": "建筑物",
+     "pos": "n."
+    },
+    {
+     "w": "January",
+     "zh": "一月",
+     "pos": "n."
+    },
+    {
+     "w": "February",
+     "zh": "二月",
+     "pos": "n."
+    },
+    {
+     "w": "March",
+     "zh": "三月",
+     "pos": "n."
+    },
+    {
+     "w": "April",
+     "zh": "四月",
+     "pos": "n."
+    },
+    {
+     "w": "May",
+     "zh": "五月",
+     "pos": "n."
+    },
+    {
+     "w": "June",
+     "zh": "六月",
+     "pos": "n."
+    },
+    {
+     "w": "July",
+     "zh": "七月",
+     "pos": "n."
+    },
+    {
+     "w": "August",
+     "zh": "八月",
+     "pos": "n."
+    },
+    {
+     "w": "September",
+     "zh": "九月",
+     "pos": "n."
+    },
+    {
+     "w": "October",
+     "zh": "十月",
+     "pos": "n."
+    },
+    {
+     "w": "November",
+     "zh": "十一月",
+     "pos": "n."
+    },
+    {
+     "w": "December",
+     "zh": "十二月",
+     "pos": "n."
+    },
+    {
+     "w": "month",
+     "zh": "月份",
+     "pos": "n."
+    },
+    {
+     "w": "year",
+     "zh": "年",
+     "pos": "n."
+    },
+    {
+     "w": "first",
+     "zh": "第一",
+     "pos": "num."
+    },
+    {
+     "w": "second",
+     "zh": "第二；秒",
+     "pos": "num./n."
+    },
+    {
+     "w": "third",
+     "zh": "第三",
+     "pos": "num."
+    },
+    {
+     "w": "birthday",
+     "zh": "生日",
+     "pos": "n."
+    },
+    {
+     "w": "taxi",
+     "zh": "出租车",
+     "pos": "n."
+    },
+    {
+     "w": "underground",
+     "zh": "地铁",
+     "pos": "n."
+    },
+    {
+     "w": "boat",
+     "zh": "小船",
+     "pos": "n."
+    },
+    {
+     "w": "bicycle",
+     "zh": "自行车",
+     "pos": "n."
+    },
+    {
+     "w": "by",
+     "zh": "乘坐；在……旁边",
+     "pos": "prep."
+    },
+    {
+     "w": "get up",
+     "zh": "起床",
+     "pos": "phr."
+    },
+    {
+     "w": "go to bed",
+     "zh": "上床睡觉",
+     "pos": "phr."
+    },
+    {
+     "w": "have breakfast",
+     "zh": "吃早饭",
+     "pos": "phr."
+    },
+    {
+     "w": "do homework",
+     "zh": "做作业",
+     "pos": "phr."
+    },
+    {
+     "w": "angry",
+     "zh": "生气的",
+     "pos": "adj."
+    },
+    {
+     "w": "tired",
+     "zh": "累的",
+     "pos": "adj."
+    },
+    {
+     "w": "thirsty",
+     "zh": "口渴的",
+     "pos": "adj."
+    },
+    {
+     "w": "bored",
+     "zh": "无聊的",
+     "pos": "adj."
+    },
+    {
+     "w": "excited",
+     "zh": "兴奋的",
+     "pos": "adj."
+    },
+    {
+     "w": "afraid",
+     "zh": "害怕的",
+     "pos": "adj."
+    },
+    {
+     "w": "nervous",
+     "zh": "紧张的",
+     "pos": "adj."
+    },
+    {
+     "w": "surprised",
+     "zh": "惊讶的",
+     "pos": "adj."
+    },
+    {
+     "w": "worried",
+     "zh": "担心的",
+     "pos": "adj."
+    },
+    {
+     "w": "feel",
+     "zh": "感觉",
+     "pos": "v."
+    },
+    {
+     "w": "river",
+     "zh": "河流",
+     "pos": "n."
+    },
+    {
+     "w": "mountain",
+     "zh": "山",
+     "pos": "n."
+    },
+    {
+     "w": "lake",
+     "zh": "湖",
+     "pos": "n."
+    },
+    {
+     "w": "sea",
+     "zh": "大海",
+     "pos": "n."
+    },
+    {
+     "w": "forest",
+     "zh": "森林",
+     "pos": "n."
+    },
+    {
+     "w": "hill",
+     "zh": "小山",
+     "pos": "n."
+    },
+    {
+     "w": "island",
+     "zh": "岛",
+     "pos": "n."
+    },
+    {
+     "w": "beach",
+     "zh": "海滩",
+     "pos": "n."
+    },
+    {
+     "w": "desert",
+     "zh": "沙漠",
+     "pos": "n."
+    },
+    {
+     "w": "sand",
+     "zh": "沙子",
+     "pos": "n."
+    },
+    {
+     "w": "stone",
+     "zh": "石头",
+     "pos": "n."
+    },
+    {
+     "w": "grass",
+     "zh": "草",
+     "pos": "n."
+    },
+    {
+     "w": "leaf",
+     "zh": "叶子（复数 leaves）",
+     "pos": "n."
+    },
+    {
+     "w": "plant",
+     "zh": "植物；种植",
+     "pos": "n./v."
+    },
+    {
+     "w": "seed",
+     "zh": "种子",
+     "pos": "n."
+    },
+    {
+     "w": "root",
+     "zh": "根",
+     "pos": "n."
+    },
+    {
+     "w": "hobby",
+     "zh": "爱好",
+     "pos": "n."
+    },
+    {
+     "w": "collect",
+     "zh": "收集",
+     "pos": "v."
+    },
+    {
+     "w": "stamp",
+     "zh": "邮票",
+     "pos": "n."
+    },
+    {
+     "w": "photo",
+     "zh": "照片",
+     "pos": "n."
+    },
+    {
+     "w": "piano",
+     "zh": "钢琴",
+     "pos": "n."
+    },
+    {
+     "w": "violin",
+     "zh": "小提琴",
+     "pos": "n."
+    },
+    {
+     "w": "chess",
+     "zh": "国际象棋",
+     "pos": "n."
+    },
+    {
+     "w": "football",
+     "zh": "足球",
+     "pos": "n."
+    },
+    {
+     "w": "basketball",
+     "zh": "篮球",
+     "pos": "n."
+    },
+    {
+     "w": "badminton",
+     "zh": "羽毛球",
+     "pos": "n."
+    },
+    {
+     "w": "table tennis",
+     "zh": "乒乓球",
+     "pos": "n."
+    },
+    {
+     "w": "team",
+     "zh": "队",
+     "pos": "n."
+    },
+    {
+     "w": "cabbage",
+     "zh": "卷心菜",
+     "pos": "n."
+    },
+    {
+     "w": "onion",
+     "zh": "洋葱",
+     "pos": "n."
+    },
+    {
+     "w": "bean",
+     "zh": "豆子",
+     "pos": "n."
+    },
+    {
+     "w": "dumpling",
+     "zh": "饺子",
+     "pos": "n."
+    },
+    {
+     "w": "mooncake",
+     "zh": "月饼",
+     "pos": "n."
+    },
+    {
+     "w": "festival",
+     "zh": "节日",
+     "pos": "n."
+    },
+    {
+     "w": "Spring Festival",
+     "zh": "春节",
+     "pos": "n."
+    },
+    {
+     "w": "Christmas",
+     "zh": "圣诞节",
+     "pos": "n."
+    },
+    {
+     "w": "always",
+     "zh": "总是",
+     "pos": "adv."
+    },
+    {
+     "w": "usually",
+     "zh": "通常",
+     "pos": "adv."
+    },
+    {
+     "w": "often",
+     "zh": "经常",
+     "pos": "adv."
+    },
+    {
+     "w": "sometimes",
+     "zh": "有时",
+     "pos": "adv."
+    },
+    {
+     "w": "never",
+     "zh": "从不",
+     "pos": "adv."
+    },
+    {
+     "w": "between",
+     "zh": "在……之间",
+     "pos": "prep."
+    },
+    {
+     "w": "next to",
+     "zh": "紧挨着",
+     "pos": "prep."
+    },
+    {
+     "w": "opposite",
+     "zh": "在……对面",
+     "pos": "prep."
+    },
+    {
+     "w": "above",
+     "zh": "在……上方",
+     "pos": "prep."
+    },
+    {
+     "w": "below",
+     "zh": "在……下方",
+     "pos": "prep."
+    },
+    {
+     "w": "in front of",
+     "zh": "在……前面",
+     "pos": "prep."
+    },
+    {
+     "w": "along",
+     "zh": "沿着",
+     "pos": "prep."
+    },
+    {
+     "w": "across",
+     "zh": "穿过；横过",
+     "pos": "prep."
+    },
+    {
+     "w": "through",
+     "zh": "穿过（内部）",
+     "pos": "prep."
+    },
+    {
+     "w": "healthy",
+     "zh": "健康的",
+     "pos": "adj."
+    },
+    {
+     "w": "ill",
+     "zh": "生病的",
+     "pos": "adj."
+    },
+    {
+     "w": "cough",
+     "zh": "咳嗽",
+     "pos": "n./v."
+    },
+    {
+     "w": "fever",
+     "zh": "发烧",
+     "pos": "n."
+    },
+    {
+     "w": "medicine",
+     "zh": "药",
+     "pos": "n."
+    },
+    {
+     "w": "dentist",
+     "zh": "牙医",
+     "pos": "n."
+    },
+    {
+     "w": "exercise",
+     "zh": "锻炼；练习",
+     "pos": "n./v."
+    },
+    {
+     "w": "rubbish",
+     "zh": "垃圾",
+     "pos": "n."
+    },
+    {
+     "w": "recycle",
+     "zh": "回收利用",
+     "pos": "v."
+    },
+    {
+     "w": "pollution",
+     "zh": "污染",
+     "pos": "n."
+    },
+    {
+     "w": "save",
+     "zh": "节约；救",
+     "pos": "v."
+    },
+    {
+     "w": "waste",
+     "zh": "浪费",
+     "pos": "v./n."
+    },
+    {
+     "w": "plastic",
+     "zh": "塑料（的）",
+     "pos": "n./adj."
+    },
+    {
+     "w": "environment",
+     "zh": "环境",
+     "pos": "n."
+    },
+    {
+     "w": "hour",
+     "zh": "小时",
+     "pos": "n."
+    },
+    {
+     "w": "minute",
+     "zh": "分钟",
+     "pos": "n."
+    },
+    {
+     "w": "half",
+     "zh": "一半",
+     "pos": "n."
+    },
+    {
+     "w": "quarter",
+     "zh": "一刻钟；四分之一",
+     "pos": "n."
+    },
+    {
+     "w": "o'clock",
+     "zh": "……点钟",
+     "pos": "adv."
+    },
+    {
+     "w": "time",
+     "zh": "时间；次",
+     "pos": "n."
+    },
+    {
+     "w": "arrive",
+     "zh": "到达",
+     "pos": "v."
+    },
+    {
+     "w": "leave",
+     "zh": "离开",
+     "pos": "v."
+    },
+    {
+     "w": "visit",
+     "zh": "参观；拜访",
+     "pos": "v."
+    },
+    {
+     "w": "travel",
+     "zh": "旅行",
+     "pos": "v."
+    },
+    {
+     "w": "borrow",
+     "zh": "借（入）",
+     "pos": "v."
+    },
+    {
+     "w": "lend",
+     "zh": "借（出）",
+     "pos": "v."
+    },
+    {
+     "w": "return",
+     "zh": "归还；返回",
+     "pos": "v."
+    },
+    {
+     "w": "remember",
+     "zh": "记得",
+     "pos": "v."
+    },
+    {
+     "w": "forget",
+     "zh": "忘记",
+     "pos": "v."
+    },
+    {
+     "w": "learn",
+     "zh": "学习",
+     "pos": "v."
+    },
+    {
+     "w": "teach",
+     "zh": "教",
+     "pos": "v."
+    },
+    {
+     "w": "practise",
+     "zh": "练习",
+     "pos": "v."
+    },
+    {
+     "w": "finish",
+     "zh": "完成",
+     "pos": "v."
+    },
+    {
+     "w": "begin",
+     "zh": "开始",
+     "pos": "v."
+    },
+    {
+     "w": "carry",
+     "zh": "搬；携带",
+     "pos": "v."
+    },
+    {
+     "w": "send",
+     "zh": "发送；寄",
+     "pos": "v."
+    },
+    {
+     "w": "build",
+     "zh": "建造",
+     "pos": "v."
+    },
+    {
+     "w": "grow",
+     "zh": "生长；种植",
+     "pos": "v."
+    },
+    {
+     "w": "pick",
+     "zh": "摘；挑选",
+     "pos": "v."
+    },
+    {
+     "w": "fall",
+     "zh": "落下；秋天（美）",
+     "pos": "v./n."
+    },
+    {
+     "w": "break",
+     "zh": "打破",
+     "pos": "v."
+    },
+    {
+     "w": "lose",
+     "zh": "丢失",
+     "pos": "v."
+    },
+    {
+     "w": "find",
+     "zh": "找到",
+     "pos": "v."
+    },
+    {
+     "w": "hurt",
+     "zh": "弄伤；疼",
+     "pos": "v."
+    },
+    {
+     "w": "worry",
+     "zh": "担心",
+     "pos": "v."
+    },
+    {
+     "w": "try",
+     "zh": "尝试",
+     "pos": "v."
+    },
+    {
+     "w": "smell",
+     "zh": "闻；气味",
+     "pos": "v./n."
+    },
+    {
+     "w": "taste",
+     "zh": "尝；味道",
+     "pos": "v./n."
+    },
+    {
+     "w": "sound",
+     "zh": "声音；听起来",
+     "pos": "n./v."
+    },
+    {
+     "w": "answer",
+     "zh": "回答；答案",
+     "pos": "v./n."
+    },
+    {
+     "w": "ask",
+     "zh": "问",
+     "pos": "v."
+    },
+    {
+     "w": "show",
+     "zh": "展示",
+     "pos": "v./n."
+    },
+    {
+     "w": "watch",
+     "zh": "观看；手表",
+     "pos": "v./n."
+    },
+    {
+     "w": "wait",
+     "zh": "等待",
+     "pos": "v."
+    },
+    {
+     "w": "stop",
+     "zh": "停止",
+     "pos": "v."
+    },
+    {
+     "w": "turn",
+     "zh": "转弯；轮到",
+     "pos": "v./n."
+    },
+    {
+     "w": "cross",
+     "zh": "穿过；十字",
+     "pos": "v."
+    },
+    {
+     "w": "follow",
+     "zh": "跟随",
+     "pos": "v."
+    },
+    {
+     "w": "change",
+     "zh": "改变；零钱",
+     "pos": "v./n."
+    },
+    {
+     "w": "choose",
+     "zh": "选择",
+     "pos": "v."
+    },
+    {
+     "w": "hope",
+     "zh": "希望",
+     "pos": "v./n."
+    },
+    {
+     "w": "believe",
+     "zh": "相信",
+     "pos": "v."
+    },
+    {
+     "w": "understand",
+     "zh": "理解",
+     "pos": "v."
+    },
+    {
+     "w": "bring",
+     "zh": "带来",
+     "pos": "v."
+    },
+    {
+     "w": "keep",
+     "zh": "保持；保留",
+     "pos": "v."
+    },
+    {
+     "w": "fast",
+     "zh": "快的；快地",
+     "pos": "adj./adv."
+    },
+    {
+     "w": "slow",
+     "zh": "慢的",
+     "pos": "adj."
+    },
+    {
+     "w": "early",
+     "zh": "早的",
+     "pos": "adj."
+    },
+    {
+     "w": "late",
+     "zh": "晚的；迟的",
+     "pos": "adj."
+    },
+    {
+     "w": "easy",
+     "zh": "容易的",
+     "pos": "adj."
+    },
+    {
+     "w": "difficult",
+     "zh": "困难的",
+     "pos": "adj."
+    },
+    {
+     "w": "busy",
+     "zh": "忙的",
+     "pos": "adj."
+    },
+    {
+     "w": "free",
+     "zh": "空闲的；免费的",
+     "pos": "adj."
+    },
+    {
+     "w": "famous",
+     "zh": "著名的",
+     "pos": "adj."
+    },
+    {
+     "w": "favourite",
+     "zh": "最喜欢的",
+     "pos": "adj."
+    },
+    {
+     "w": "different",
+     "zh": "不同的",
+     "pos": "adj."
+    },
+    {
+     "w": "same",
+     "zh": "相同的",
+     "pos": "adj."
+    },
+    {
+     "w": "dangerous",
+     "zh": "危险的",
+     "pos": "adj."
+    },
+    {
+     "w": "safe",
+     "zh": "安全的",
+     "pos": "adj."
+    },
+    {
+     "w": "interesting",
+     "zh": "有趣的",
+     "pos": "adj."
+    },
+    {
+     "w": "boring",
+     "zh": "无聊的",
+     "pos": "adj."
+    },
+    {
+     "w": "wonderful",
+     "zh": "精彩的",
+     "pos": "adj."
+    },
+    {
+     "w": "special",
+     "zh": "特别的",
+     "pos": "adj."
+    },
+    {
+     "w": "important",
+     "zh": "重要的",
+     "pos": "adj."
+    },
+    {
+     "w": "useful",
+     "zh": "有用的",
+     "pos": "adj."
+    },
+    {
+     "w": "careful",
+     "zh": "小心的",
+     "pos": "adj."
+    },
+    {
+     "w": "quickly",
+     "zh": "快速地",
+     "pos": "adv."
+    },
+    {
+     "w": "slowly",
+     "zh": "慢慢地",
+     "pos": "adv."
+    },
+    {
+     "w": "carefully",
+     "zh": "小心地",
+     "pos": "adv."
+    },
+    {
+     "w": "well",
+     "zh": "好地",
+     "pos": "adv."
+    },
+    {
+     "w": "than",
+     "zh": "比",
+     "pos": "conj."
+    },
+    {
+     "w": "more",
+     "zh": "更多",
+     "pos": "det./adv."
+    },
+    {
+     "w": "most",
+     "zh": "最多；大多数",
+     "pos": "det./adv."
+    },
+    {
+     "w": "better",
+     "zh": "更好的",
+     "pos": "adj."
+    },
+    {
+     "w": "best",
+     "zh": "最好的",
+     "pos": "adj."
+    },
+    {
+     "w": "because",
+     "zh": "因为",
+     "pos": "conj."
+    },
+    {
+     "w": "so",
+     "zh": "所以",
+     "pos": "conj."
+    },
+    {
+     "w": "if",
+     "zh": "如果",
+     "pos": "conj."
+    },
+    {
+     "w": "when",
+     "zh": "当……时；什么时候",
+     "pos": "conj./adv."
+    },
+    {
+     "w": "why",
+     "zh": "为什么",
+     "pos": "adv."
+    },
+    {
+     "w": "which",
+     "zh": "哪一个",
+     "pos": "pron."
+    },
+    {
+     "w": "whose",
+     "zh": "谁的",
+     "pos": "pron."
+    },
+    {
+     "w": "everyone",
+     "zh": "每个人",
+     "pos": "pron."
+    },
+    {
+     "w": "something",
+     "zh": "某事；某物",
+     "pos": "pron."
+    },
+    {
+     "w": "nothing",
+     "zh": "没有什么",
+     "pos": "pron."
+    },
+    {
+     "w": "other",
+     "zh": "其他的",
+     "pos": "adj."
+    },
+    {
+     "w": "another",
+     "zh": "另一个",
+     "pos": "det."
+    },
+    {
+     "w": "every",
+     "zh": "每个",
+     "pos": "det."
+    },
+    {
+     "w": "each",
+     "zh": "每个",
+     "pos": "det."
+    },
+    {
+     "w": "both",
+     "zh": "两者都",
+     "pos": "det."
+    },
+    {
+     "w": "world",
+     "zh": "世界",
+     "pos": "n."
+    },
+    {
+     "w": "country",
+     "zh": "国家；乡村",
+     "pos": "n."
+    },
+    {
+     "w": "China",
+     "zh": "中国",
+     "pos": "n."
+    },
+    {
+     "w": "Chinese",
+     "zh": "中文；中国的",
+     "pos": "n./adj."
+    },
+    {
+     "w": "English",
+     "zh": "英语；英国的",
+     "pos": "n./adj."
+    },
+    {
+     "w": "language",
+     "zh": "语言",
+     "pos": "n."
+    },
+    {
+     "w": "map",
+     "zh": "地图",
+     "pos": "n."
+    },
+    {
+     "w": "money",
+     "zh": "钱",
+     "pos": "n."
+    },
+    {
+     "w": "price",
+     "zh": "价格",
+     "pos": "n."
+    },
+    {
+     "w": "ticket",
+     "zh": "票",
+     "pos": "n."
+    },
+    {
+     "w": "letter",
+     "zh": "信；字母",
+     "pos": "n."
+    },
+    {
+     "w": "email",
+     "zh": "电子邮件",
+     "pos": "n."
+    },
+    {
+     "w": "computer",
+     "zh": "电脑",
+     "pos": "n."
+    },
+    {
+     "w": "internet",
+     "zh": "互联网",
+     "pos": "n."
+    },
+    {
+     "w": "phone",
+     "zh": "电话",
+     "pos": "n."
+    },
+    {
+     "w": "television",
+     "zh": "电视",
+     "pos": "n."
+    },
+    {
+     "w": "newspaper",
+     "zh": "报纸",
+     "pos": "n."
+    },
+    {
+     "w": "story",
+     "zh": "故事",
+     "pos": "n."
+    },
+    {
+     "w": "picture",
+     "zh": "图画；照片",
+     "pos": "n."
+    },
+    {
+     "w": "idea",
+     "zh": "主意；想法",
+     "pos": "n."
+    },
+    {
+     "w": "question",
+     "zh": "问题",
+     "pos": "n."
+    },
+    {
+     "w": "problem",
+     "zh": "问题；难题",
+     "pos": "n."
+    },
+    {
+     "w": "word",
+     "zh": "单词",
+     "pos": "n."
+    },
+    {
+     "w": "sentence",
+     "zh": "句子",
+     "pos": "n."
+    },
+    {
+     "w": "page",
+     "zh": "页",
+     "pos": "n."
+    },
+    {
+     "w": "test",
+     "zh": "测试",
+     "pos": "n."
+    },
+    {
+     "w": "subject",
+     "zh": "科目",
+     "pos": "n."
+    },
+    {
+     "w": "maths",
+     "zh": "数学",
+     "pos": "n."
+    },
+    {
+     "w": "science",
+     "zh": "科学",
+     "pos": "n."
+    },
+    {
+     "w": "music",
+     "zh": "音乐",
+     "pos": "n."
+    },
+    {
+     "w": "art",
+     "zh": "美术",
+     "pos": "n."
+    },
+    {
+     "w": "PE",
+     "zh": "体育课",
+     "pos": "n."
+    },
+    {
+     "w": "history",
+     "zh": "历史",
+     "pos": "n."
+    },
+    {
+     "w": "geography",
+     "zh": "地理",
+     "pos": "n."
+    },
+    {
+     "w": "clothes",
+     "zh": "衣服",
+     "pos": "n."
+    },
+    {
+     "w": "wear",
+     "zh": "穿；戴",
+     "pos": "v."
+    },
+    {
+     "w": "glasses",
+     "zh": "眼镜",
+     "pos": "n."
+    },
+    {
+     "w": "umbrella",
+     "zh": "雨伞",
+     "pos": "n."
+    },
+    {
+     "w": "kitchen",
+     "zh": "厨房",
+     "pos": "n."
+    },
+    {
+     "w": "bedroom",
+     "zh": "卧室",
+     "pos": "n."
+    },
+    {
+     "w": "bathroom",
+     "zh": "浴室；卫生间",
+     "pos": "n."
+    },
+    {
+     "w": "living room",
+     "zh": "客厅",
+     "pos": "n."
+    },
+    {
+     "w": "garden",
+     "zh": "花园",
+     "pos": "n."
+    },
+    {
+     "w": "floor",
+     "zh": "地板；楼层",
+     "pos": "n."
+    },
+    {
+     "w": "wall",
+     "zh": "墙",
+     "pos": "n."
+    },
+    {
+     "w": "fridge",
+     "zh": "冰箱",
+     "pos": "n."
+    },
+    {
+     "w": "sofa",
+     "zh": "沙发",
+     "pos": "n."
+    },
+    {
+     "w": "lamp",
+     "zh": "台灯",
+     "pos": "n."
+    }
+   ]
+  },
+  {
+   "id": "en-core-g6-7",
+   "title": "初中预备-初一核心词（含 KS3 通用学术词）",
+   "stage": "G6-G7",
+   "source_note": "社会、文化、科学、自然、品格、学习方法等话题高频词，含 Cambridge Lower Secondary/KS3 常用学术词",
+   "count": 299,
+   "words": [
+    {
+     "w": "community",
+     "zh": "社区",
+     "pos": "n."
+    },
+    {
+     "w": "culture",
+     "zh": "文化",
+     "pos": "n."
+    },
+    {
+     "w": "tradition",
+     "zh": "传统",
+     "pos": "n."
+    },
+    {
+     "w": "custom",
+     "zh": "习俗",
+     "pos": "n."
+    },
+    {
+     "w": "celebrate",
+     "zh": "庆祝",
+     "pos": "v."
+    },
+    {
+     "w": "population",
+     "zh": "人口",
+     "pos": "n."
+    },
+    {
+     "w": "government",
+     "zh": "政府",
+     "pos": "n."
+    },
+    {
+     "w": "society",
+     "zh": "社会",
+     "pos": "n."
+    },
+    {
+     "w": "citizen",
+     "zh": "公民",
+     "pos": "n."
+    },
+    {
+     "w": "neighbour",
+     "zh": "邻居",
+     "pos": "n."
+    },
+    {
+     "w": "volunteer",
+     "zh": "志愿者；自愿做",
+     "pos": "n./v."
+    },
+    {
+     "w": "charity",
+     "zh": "慈善（机构）",
+     "pos": "n."
+    },
+    {
+     "w": "experiment",
+     "zh": "实验",
+     "pos": "n."
+    },
+    {
+     "w": "result",
+     "zh": "结果",
+     "pos": "n."
+    },
+    {
+     "w": "reason",
+     "zh": "原因；理由",
+     "pos": "n."
+    },
+    {
+     "w": "example",
+     "zh": "例子",
+     "pos": "n."
+    },
+    {
+     "w": "information",
+     "zh": "信息",
+     "pos": "n."
+    },
+    {
+     "w": "opinion",
+     "zh": "观点",
+     "pos": "n."
+    },
+    {
+     "w": "fact",
+     "zh": "事实",
+     "pos": "n."
+    },
+    {
+     "w": "agree",
+     "zh": "同意",
+     "pos": "v."
+    },
+    {
+     "w": "disagree",
+     "zh": "不同意",
+     "pos": "v."
+    },
+    {
+     "w": "similar",
+     "zh": "相似的",
+     "pos": "adj."
+    },
+    {
+     "w": "solution",
+     "zh": "解决办法；溶液",
+     "pos": "n."
+    },
+    {
+     "w": "decide",
+     "zh": "决定",
+     "pos": "v."
+    },
+    {
+     "w": "discuss",
+     "zh": "讨论",
+     "pos": "v."
+    },
+    {
+     "w": "improve",
+     "zh": "改善；提高",
+     "pos": "v."
+    },
+    {
+     "w": "develop",
+     "zh": "发展；开发",
+     "pos": "v."
+    },
+    {
+     "w": "increase",
+     "zh": "增加",
+     "pos": "v./n."
+    },
+    {
+     "w": "decrease",
+     "zh": "减少",
+     "pos": "v./n."
+    },
+    {
+     "w": "cause",
+     "zh": "原因；导致",
+     "pos": "n./v."
+    },
+    {
+     "w": "effect",
+     "zh": "结果；影响",
+     "pos": "n."
+    },
+    {
+     "w": "energy",
+     "zh": "能量；精力",
+     "pos": "n."
+    },
+    {
+     "w": "material",
+     "zh": "材料",
+     "pos": "n."
+    },
+    {
+     "w": "temperature",
+     "zh": "温度",
+     "pos": "n."
+    },
+    {
+     "w": "natural",
+     "zh": "自然的",
+     "pos": "adj."
+    },
+    {
+     "w": "local",
+     "zh": "当地的",
+     "pos": "adj."
+    },
+    {
+     "w": "global",
+     "zh": "全球的",
+     "pos": "adj."
+    },
+    {
+     "w": "international",
+     "zh": "国际的",
+     "pos": "adj."
+    },
+    {
+     "w": "national",
+     "zh": "国家的",
+     "pos": "adj."
+    },
+    {
+     "w": "ancient",
+     "zh": "古代的",
+     "pos": "adj."
+    },
+    {
+     "w": "modern",
+     "zh": "现代的",
+     "pos": "adj."
+    },
+    {
+     "w": "future",
+     "zh": "未来",
+     "pos": "n."
+    },
+    {
+     "w": "past",
+     "zh": "过去",
+     "pos": "n."
+    },
+    {
+     "w": "present",
+     "zh": "现在；礼物；呈现",
+     "pos": "n./v."
+    },
+    {
+     "w": "century",
+     "zh": "世纪",
+     "pos": "n."
+    },
+    {
+     "w": "period",
+     "zh": "时期；一段时间",
+     "pos": "n."
+    },
+    {
+     "w": "event",
+     "zh": "事件",
+     "pos": "n."
+    },
+    {
+     "w": "adventure",
+     "zh": "冒险",
+     "pos": "n."
+    },
+    {
+     "w": "character",
+     "zh": "人物；性格",
+     "pos": "n."
+    },
+    {
+     "w": "journey",
+     "zh": "旅程",
+     "pos": "n."
+    },
+    {
+     "w": "author",
+     "zh": "作者",
+     "pos": "n."
+    },
+    {
+     "w": "title",
+     "zh": "标题",
+     "pos": "n."
+    },
+    {
+     "w": "chapter",
+     "zh": "章节",
+     "pos": "n."
+    },
+    {
+     "w": "paragraph",
+     "zh": "段落",
+     "pos": "n."
+    },
+    {
+     "w": "novel",
+     "zh": "小说",
+     "pos": "n."
+    },
+    {
+     "w": "poem",
+     "zh": "诗",
+     "pos": "n."
+    },
+    {
+     "w": "diary",
+     "zh": "日记",
+     "pos": "n."
+    },
+    {
+     "w": "article",
+     "zh": "文章",
+     "pos": "n."
+    },
+    {
+     "w": "report",
+     "zh": "报告",
+     "pos": "n./v."
+    },
+    {
+     "w": "project",
+     "zh": "项目；课题",
+     "pos": "n."
+    },
+    {
+     "w": "presentation",
+     "zh": "展示；陈述",
+     "pos": "n."
+    },
+    {
+     "w": "research",
+     "zh": "研究",
+     "pos": "n./v."
+    },
+    {
+     "w": "knowledge",
+     "zh": "知识",
+     "pos": "n."
+    },
+    {
+     "w": "skill",
+     "zh": "技能",
+     "pos": "n."
+    },
+    {
+     "w": "ability",
+     "zh": "能力",
+     "pos": "n."
+    },
+    {
+     "w": "education",
+     "zh": "教育",
+     "pos": "n."
+    },
+    {
+     "w": "career",
+     "zh": "职业生涯",
+     "pos": "n."
+    },
+    {
+     "w": "goal",
+     "zh": "目标",
+     "pos": "n."
+    },
+    {
+     "w": "plan",
+     "zh": "计划",
+     "pos": "n./v."
+    },
+    {
+     "w": "prepare",
+     "zh": "准备",
+     "pos": "v."
+    },
+    {
+     "w": "organise",
+     "zh": "组织",
+     "pos": "v."
+    },
+    {
+     "w": "manage",
+     "zh": "管理；设法做到",
+     "pos": "v."
+    },
+    {
+     "w": "achieve",
+     "zh": "实现；达到",
+     "pos": "v."
+    },
+    {
+     "w": "succeed",
+     "zh": "成功",
+     "pos": "v."
+    },
+    {
+     "w": "success",
+     "zh": "成功",
+     "pos": "n."
+    },
+    {
+     "w": "fail",
+     "zh": "失败；不及格",
+     "pos": "v."
+    },
+    {
+     "w": "mistake",
+     "zh": "错误",
+     "pos": "n."
+    },
+    {
+     "w": "correct",
+     "zh": "正确的；改正",
+     "pos": "adj./v."
+    },
+    {
+     "w": "check",
+     "zh": "检查",
+     "pos": "v."
+    },
+    {
+     "w": "notice",
+     "zh": "注意到；通知",
+     "pos": "v./n."
+    },
+    {
+     "w": "observe",
+     "zh": "观察",
+     "pos": "v."
+    },
+    {
+     "w": "record",
+     "zh": "记录",
+     "pos": "v./n."
+    },
+    {
+     "w": "measure",
+     "zh": "测量",
+     "pos": "v."
+    },
+    {
+     "w": "compare",
+     "zh": "比较",
+     "pos": "v."
+    },
+    {
+     "w": "describe",
+     "zh": "描述",
+     "pos": "v."
+    },
+    {
+     "w": "explain",
+     "zh": "解释",
+     "pos": "v."
+    },
+    {
+     "w": "predict",
+     "zh": "预测",
+     "pos": "v."
+    },
+    {
+     "w": "suggest",
+     "zh": "建议",
+     "pos": "v."
+    },
+    {
+     "w": "include",
+     "zh": "包括",
+     "pos": "v."
+    },
+    {
+     "w": "contain",
+     "zh": "包含；容纳",
+     "pos": "v."
+    },
+    {
+     "w": "produce",
+     "zh": "生产",
+     "pos": "v."
+    },
+    {
+     "w": "provide",
+     "zh": "提供",
+     "pos": "v."
+    },
+    {
+     "w": "protect",
+     "zh": "保护",
+     "pos": "v."
+    },
+    {
+     "w": "prevent",
+     "zh": "预防；阻止",
+     "pos": "v."
+    },
+    {
+     "w": "reduce",
+     "zh": "减少",
+     "pos": "v."
+    },
+    {
+     "w": "reuse",
+     "zh": "再利用",
+     "pos": "v."
+    },
+    {
+     "w": "pollute",
+     "zh": "污染",
+     "pos": "v."
+    },
+    {
+     "w": "damage",
+     "zh": "损害",
+     "pos": "v./n."
+    },
+    {
+     "w": "destroy",
+     "zh": "毁坏",
+     "pos": "v."
+    },
+    {
+     "w": "survive",
+     "zh": "幸存",
+     "pos": "v."
+    },
+    {
+     "w": "disappear",
+     "zh": "消失",
+     "pos": "v."
+    },
+    {
+     "w": "appear",
+     "zh": "出现",
+     "pos": "v."
+    },
+    {
+     "w": "discover",
+     "zh": "发现",
+     "pos": "v."
+    },
+    {
+     "w": "invent",
+     "zh": "发明",
+     "pos": "v."
+    },
+    {
+     "w": "invention",
+     "zh": "发明",
+     "pos": "n."
+    },
+    {
+     "w": "technology",
+     "zh": "技术",
+     "pos": "n."
+    },
+    {
+     "w": "machine",
+     "zh": "机器",
+     "pos": "n."
+    },
+    {
+     "w": "device",
+     "zh": "设备",
+     "pos": "n."
+    },
+    {
+     "w": "screen",
+     "zh": "屏幕",
+     "pos": "n."
+    },
+    {
+     "w": "online",
+     "zh": "在线的",
+     "pos": "adj."
+    },
+    {
+     "w": "website",
+     "zh": "网站",
+     "pos": "n."
+    },
+    {
+     "w": "message",
+     "zh": "信息；留言",
+     "pos": "n."
+    },
+    {
+     "w": "communicate",
+     "zh": "交流",
+     "pos": "v."
+    },
+    {
+     "w": "conversation",
+     "zh": "对话",
+     "pos": "n."
+    },
+    {
+     "w": "advice",
+     "zh": "建议（不可数）",
+     "pos": "n."
+    },
+    {
+     "w": "suggestion",
+     "zh": "建议（可数）",
+     "pos": "n."
+    },
+    {
+     "w": "attitude",
+     "zh": "态度",
+     "pos": "n."
+    },
+    {
+     "w": "behaviour",
+     "zh": "行为",
+     "pos": "n."
+    },
+    {
+     "w": "habit",
+     "zh": "习惯",
+     "pos": "n."
+    },
+    {
+     "w": "health",
+     "zh": "健康",
+     "pos": "n."
+    },
+    {
+     "w": "diet",
+     "zh": "饮食",
+     "pos": "n."
+    },
+    {
+     "w": "balanced",
+     "zh": "均衡的",
+     "pos": "adj."
+    },
+    {
+     "w": "stress",
+     "zh": "压力",
+     "pos": "n."
+    },
+    {
+     "w": "relax",
+     "zh": "放松",
+     "pos": "v."
+    },
+    {
+     "w": "confident",
+     "zh": "自信的",
+     "pos": "adj."
+    },
+    {
+     "w": "patient",
+     "zh": "耐心的；病人",
+     "pos": "adj./n."
+    },
+    {
+     "w": "polite",
+     "zh": "有礼貌的",
+     "pos": "adj."
+    },
+    {
+     "w": "honest",
+     "zh": "诚实的",
+     "pos": "adj."
+    },
+    {
+     "w": "brave",
+     "zh": "勇敢的",
+     "pos": "adj."
+    },
+    {
+     "w": "generous",
+     "zh": "慷慨的",
+     "pos": "adj."
+    },
+    {
+     "w": "responsible",
+     "zh": "负责任的",
+     "pos": "adj."
+    },
+    {
+     "w": "independent",
+     "zh": "独立的",
+     "pos": "adj."
+    },
+    {
+     "w": "creative",
+     "zh": "有创造力的",
+     "pos": "adj."
+    },
+    {
+     "w": "curious",
+     "zh": "好奇的",
+     "pos": "adj."
+    },
+    {
+     "w": "friendly",
+     "zh": "友好的",
+     "pos": "adj."
+    },
+    {
+     "w": "lonely",
+     "zh": "孤独的",
+     "pos": "adj."
+    },
+    {
+     "w": "proud",
+     "zh": "自豪的",
+     "pos": "adj."
+    },
+    {
+     "w": "embarrassed",
+     "zh": "尴尬的",
+     "pos": "adj."
+    },
+    {
+     "w": "disappointed",
+     "zh": "失望的",
+     "pos": "adj."
+    },
+    {
+     "w": "anxious",
+     "zh": "焦虑的",
+     "pos": "adj."
+    },
+    {
+     "w": "grateful",
+     "zh": "感激的",
+     "pos": "adj."
+    },
+    {
+     "w": "calm",
+     "zh": "平静的",
+     "pos": "adj."
+    },
+    {
+     "w": "serious",
+     "zh": "严肃的；严重的",
+     "pos": "adj."
+    },
+    {
+     "w": "terrible",
+     "zh": "糟糕的",
+     "pos": "adj."
+    },
+    {
+     "w": "amazing",
+     "zh": "令人惊奇的",
+     "pos": "adj."
+    },
+    {
+     "w": "excellent",
+     "zh": "优秀的",
+     "pos": "adj."
+    },
+    {
+     "w": "popular",
+     "zh": "受欢迎的",
+     "pos": "adj."
+    },
+    {
+     "w": "common",
+     "zh": "常见的；共同的",
+     "pos": "adj."
+    },
+    {
+     "w": "rare",
+     "zh": "稀有的",
+     "pos": "adj."
+    },
+    {
+     "w": "necessary",
+     "zh": "必要的",
+     "pos": "adj."
+    },
+    {
+     "w": "possible",
+     "zh": "可能的",
+     "pos": "adj."
+    },
+    {
+     "w": "impossible",
+     "zh": "不可能的",
+     "pos": "adj."
+    },
+    {
+     "w": "available",
+     "zh": "可获得的",
+     "pos": "adj."
+    },
+    {
+     "w": "suitable",
+     "zh": "合适的",
+     "pos": "adj."
+    },
+    {
+     "w": "probably",
+     "zh": "很可能",
+     "pos": "adv."
+    },
+    {
+     "w": "especially",
+     "zh": "尤其",
+     "pos": "adv."
+    },
+    {
+     "w": "actually",
+     "zh": "实际上",
+     "pos": "adv."
+    },
+    {
+     "w": "suddenly",
+     "zh": "突然",
+     "pos": "adv."
+    },
+    {
+     "w": "finally",
+     "zh": "最后",
+     "pos": "adv."
+    },
+    {
+     "w": "however",
+     "zh": "然而",
+     "pos": "adv."
+    },
+    {
+     "w": "therefore",
+     "zh": "因此",
+     "pos": "adv."
+    },
+    {
+     "w": "although",
+     "zh": "虽然",
+     "pos": "conj."
+    },
+    {
+     "w": "unless",
+     "zh": "除非",
+     "pos": "conj."
+    },
+    {
+     "w": "while",
+     "zh": "当……时；而",
+     "pos": "conj."
+    },
+    {
+     "w": "since",
+     "zh": "自从；因为",
+     "pos": "conj./prep."
+    },
+    {
+     "w": "during",
+     "zh": "在……期间",
+     "pos": "prep."
+    },
+    {
+     "w": "without",
+     "zh": "没有",
+     "pos": "prep."
+    },
+    {
+     "w": "instead",
+     "zh": "代替",
+     "pos": "adv."
+    },
+    {
+     "w": "either",
+     "zh": "（两者）任一",
+     "pos": "det."
+    },
+    {
+     "w": "neither",
+     "zh": "两者都不",
+     "pos": "det."
+    },
+    {
+     "w": "whole",
+     "zh": "整个的",
+     "pos": "adj."
+    },
+    {
+     "w": "several",
+     "zh": "几个",
+     "pos": "det."
+    },
+    {
+     "w": "enough",
+     "zh": "足够的",
+     "pos": "adj."
+    },
+    {
+     "w": "amount",
+     "zh": "数量",
+     "pos": "n."
+    },
+    {
+     "w": "total",
+     "zh": "总数；总的",
+     "pos": "n./adj."
+    },
+    {
+     "w": "percent",
+     "zh": "百分之……",
+     "pos": "n."
+    },
+    {
+     "w": "average",
+     "zh": "平均（数）",
+     "pos": "n./adj."
+    },
+    {
+     "w": "data",
+     "zh": "数据",
+     "pos": "n."
+    },
+    {
+     "w": "chart",
+     "zh": "图表",
+     "pos": "n."
+    },
+    {
+     "w": "graph",
+     "zh": "曲线图",
+     "pos": "n."
+    },
+    {
+     "w": "table of contents",
+     "zh": "目录",
+     "pos": "n."
+    },
+    {
+     "w": "list",
+     "zh": "列表；列出",
+     "pos": "n./v."
+    },
+    {
+     "w": "order",
+     "zh": "顺序；命令；点（菜）",
+     "pos": "n./v."
+    },
+    {
+     "w": "step",
+     "zh": "步骤；台阶",
+     "pos": "n."
+    },
+    {
+     "w": "method",
+     "zh": "方法",
+     "pos": "n."
+    },
+    {
+     "w": "process",
+     "zh": "过程",
+     "pos": "n."
+    },
+    {
+     "w": "system",
+     "zh": "系统",
+     "pos": "n."
+    },
+    {
+     "w": "structure",
+     "zh": "结构",
+     "pos": "n."
+    },
+    {
+     "w": "pattern",
+     "zh": "规律；图案",
+     "pos": "n."
+    },
+    {
+     "w": "type",
+     "zh": "类型",
+     "pos": "n."
+    },
+    {
+     "w": "group",
+     "zh": "组；群",
+     "pos": "n."
+    },
+    {
+     "w": "part",
+     "zh": "部分",
+     "pos": "n."
+    },
+    {
+     "w": "whole number",
+     "zh": "整数",
+     "pos": "n."
+    },
+    {
+     "w": "fraction",
+     "zh": "分数",
+     "pos": "n."
+    },
+    {
+     "w": "decimal",
+     "zh": "小数",
+     "pos": "n."
+    },
+    {
+     "w": "equation",
+     "zh": "方程",
+     "pos": "n."
+    },
+    {
+     "w": "area",
+     "zh": "面积；地区",
+     "pos": "n."
+    },
+    {
+     "w": "volume",
+     "zh": "体积；音量",
+     "pos": "n."
+    },
+    {
+     "w": "length",
+     "zh": "长度",
+     "pos": "n."
+    },
+    {
+     "w": "width",
+     "zh": "宽度",
+     "pos": "n."
+    },
+    {
+     "w": "height",
+     "zh": "高度",
+     "pos": "n."
+    },
+    {
+     "w": "weight",
+     "zh": "重量",
+     "pos": "n."
+    },
+    {
+     "w": "distance",
+     "zh": "距离",
+     "pos": "n."
+    },
+    {
+     "w": "speed",
+     "zh": "速度",
+     "pos": "n."
+    },
+    {
+     "w": "direction",
+     "zh": "方向",
+     "pos": "n."
+    },
+    {
+     "w": "north",
+     "zh": "北",
+     "pos": "n."
+    },
+    {
+     "w": "south",
+     "zh": "南",
+     "pos": "n."
+    },
+    {
+     "w": "east",
+     "zh": "东",
+     "pos": "n."
+    },
+    {
+     "w": "west",
+     "zh": "西",
+     "pos": "n."
+    },
+    {
+     "w": "continent",
+     "zh": "大洲",
+     "pos": "n."
+    },
+    {
+     "w": "ocean",
+     "zh": "海洋",
+     "pos": "n."
+    },
+    {
+     "w": "coast",
+     "zh": "海岸",
+     "pos": "n."
+    },
+    {
+     "w": "valley",
+     "zh": "山谷",
+     "pos": "n."
+    },
+    {
+     "w": "climate",
+     "zh": "气候",
+     "pos": "n."
+    },
+    {
+     "w": "rainforest",
+     "zh": "雨林",
+     "pos": "n."
+    },
+    {
+     "w": "earthquake",
+     "zh": "地震",
+     "pos": "n."
+    },
+    {
+     "w": "flood",
+     "zh": "洪水",
+     "pos": "n."
+    },
+    {
+     "w": "storm",
+     "zh": "暴风雨",
+     "pos": "n."
+    },
+    {
+     "w": "drought",
+     "zh": "干旱",
+     "pos": "n."
+    },
+    {
+     "w": "wildlife",
+     "zh": "野生动物",
+     "pos": "n."
+    },
+    {
+     "w": "species",
+     "zh": "物种",
+     "pos": "n."
+    },
+    {
+     "w": "habitat",
+     "zh": "栖息地",
+     "pos": "n."
+    },
+    {
+     "w": "extinct",
+     "zh": "灭绝的",
+     "pos": "adj."
+    },
+    {
+     "w": "endangered",
+     "zh": "濒危的",
+     "pos": "adj."
+    },
+    {
+     "w": "insect",
+     "zh": "昆虫",
+     "pos": "n."
+    },
+    {
+     "w": "mammal",
+     "zh": "哺乳动物",
+     "pos": "n."
+    },
+    {
+     "w": "reptile",
+     "zh": "爬行动物",
+     "pos": "n."
+    },
+    {
+     "w": "cell",
+     "zh": "细胞",
+     "pos": "n."
+    },
+    {
+     "w": "organ",
+     "zh": "器官",
+     "pos": "n."
+    },
+    {
+     "w": "heart",
+     "zh": "心脏",
+     "pos": "n."
+    },
+    {
+     "w": "brain",
+     "zh": "大脑",
+     "pos": "n."
+    },
+    {
+     "w": "blood",
+     "zh": "血液",
+     "pos": "n."
+    },
+    {
+     "w": "bone",
+     "zh": "骨头",
+     "pos": "n."
+    },
+    {
+     "w": "muscle",
+     "zh": "肌肉",
+     "pos": "n."
+    },
+    {
+     "w": "skin",
+     "zh": "皮肤",
+     "pos": "n."
+    },
+    {
+     "w": "oxygen",
+     "zh": "氧气",
+     "pos": "n."
+    },
+    {
+     "w": "carbon dioxide",
+     "zh": "二氧化碳",
+     "pos": "n."
+    },
+    {
+     "w": "air",
+     "zh": "空气",
+     "pos": "n."
+    },
+    {
+     "w": "gas",
+     "zh": "气体",
+     "pos": "n."
+    },
+    {
+     "w": "liquid",
+     "zh": "液体",
+     "pos": "n."
+    },
+    {
+     "w": "solid",
+     "zh": "固体；坚固的",
+     "pos": "n./adj."
+    },
+    {
+     "w": "metal",
+     "zh": "金属",
+     "pos": "n."
+    },
+    {
+     "w": "wood",
+     "zh": "木头",
+     "pos": "n."
+    },
+    {
+     "w": "glass",
+     "zh": "玻璃；玻璃杯",
+     "pos": "n."
+    },
+    {
+     "w": "electricity",
+     "zh": "电",
+     "pos": "n."
+    },
+    {
+     "w": "power",
+     "zh": "能量；电力；权力",
+     "pos": "n."
+    },
+    {
+     "w": "fuel",
+     "zh": "燃料",
+     "pos": "n."
+    },
+    {
+     "w": "planet",
+     "zh": "行星",
+     "pos": "n."
+    },
+    {
+     "w": "space",
+     "zh": "太空；空间",
+     "pos": "n."
+    },
+    {
+     "w": "Earth",
+     "zh": "地球",
+     "pos": "n."
+    },
+    {
+     "w": "universe",
+     "zh": "宇宙",
+     "pos": "n."
+    },
+    {
+     "w": "force",
+     "zh": "力；强迫",
+     "pos": "n./v."
+    },
+    {
+     "w": "push",
+     "zh": "推",
+     "pos": "v."
+    },
+    {
+     "w": "pull",
+     "zh": "拉",
+     "pos": "v."
+    },
+    {
+     "w": "float",
+     "zh": "漂浮",
+     "pos": "v."
+    },
+    {
+     "w": "sink",
+     "zh": "下沉；水槽",
+     "pos": "v./n."
+    },
+    {
+     "w": "melt",
+     "zh": "融化",
+     "pos": "v."
+    },
+    {
+     "w": "freeze",
+     "zh": "结冰",
+     "pos": "v."
+    },
+    {
+     "w": "boil",
+     "zh": "沸腾；煮",
+     "pos": "v."
+    },
+    {
+     "w": "heat",
+     "zh": "热；加热",
+     "pos": "n./v."
+    },
+    {
+     "w": "shadow",
+     "zh": "影子",
+     "pos": "n."
+    },
+    {
+     "w": "mirror",
+     "zh": "镜子",
+     "pos": "n."
+    },
+    {
+     "w": "magnet",
+     "zh": "磁铁",
+     "pos": "n."
+    },
+    {
+     "w": "attract",
+     "zh": "吸引",
+     "pos": "v."
+    },
+    {
+     "w": "rule",
+     "zh": "规则",
+     "pos": "n."
+    },
+    {
+     "w": "law",
+     "zh": "法律；定律",
+     "pos": "n."
+    },
+    {
+     "w": "right",
+     "zh": "权利；正确的；右边",
+     "pos": "n./adj."
+    },
+    {
+     "w": "duty",
+     "zh": "责任；义务",
+     "pos": "n."
+    },
+    {
+     "w": "respect",
+     "zh": "尊重",
+     "pos": "v./n."
+    },
+    {
+     "w": "support",
+     "zh": "支持",
+     "pos": "v./n."
+    },
+    {
+     "w": "encourage",
+     "zh": "鼓励",
+     "pos": "v."
+    },
+    {
+     "w": "allow",
+     "zh": "允许",
+     "pos": "v."
+    },
+    {
+     "w": "refuse",
+     "zh": "拒绝",
+     "pos": "v."
+    },
+    {
+     "w": "accept",
+     "zh": "接受",
+     "pos": "v."
+    },
+    {
+     "w": "compete",
+     "zh": "竞争",
+     "pos": "v."
+    },
+    {
+     "w": "competition",
+     "zh": "比赛；竞争",
+     "pos": "n."
+    },
+    {
+     "w": "prize",
+     "zh": "奖品；奖项",
+     "pos": "n."
+    },
+    {
+     "w": "win",
+     "zh": "赢",
+     "pos": "v."
+    },
+    {
+     "w": "match",
+     "zh": "比赛；火柴；匹配",
+     "pos": "n./v."
+    },
+    {
+     "w": "score",
+     "zh": "得分",
+     "pos": "n./v."
+    },
+    {
+     "w": "practice",
+     "zh": "练习（名词）",
+     "pos": "n."
+    },
+    {
+     "w": "member",
+     "zh": "成员",
+     "pos": "n."
+    },
+    {
+     "w": "leader",
+     "zh": "领导者",
+     "pos": "n."
+    },
+    {
+     "w": "captain",
+     "zh": "队长；船长",
+     "pos": "n."
+    },
+    {
+     "w": "guide",
+     "zh": "向导；指导",
+     "pos": "n./v."
+    },
+    {
+     "w": "tourist",
+     "zh": "游客",
+     "pos": "n."
+    },
+    {
+     "w": "passport",
+     "zh": "护照",
+     "pos": "n."
+    },
+    {
+     "w": "abroad",
+     "zh": "在国外",
+     "pos": "adv."
+    },
+    {
+     "w": "foreign",
+     "zh": "外国的",
+     "pos": "adj."
+    },
+    {
+     "w": "crowded",
+     "zh": "拥挤的",
+     "pos": "adj."
+    },
+    {
+     "w": "convenient",
+     "zh": "方便的",
+     "pos": "adj."
+    },
+    {
+     "w": "comfortable",
+     "zh": "舒适的",
+     "pos": "adj."
+    },
+    {
+     "w": "expensive",
+     "zh": "昂贵的",
+     "pos": "adj."
+    },
+    {
+     "w": "cheap",
+     "zh": "便宜的",
+     "pos": "adj."
+    },
+    {
+     "w": "spend",
+     "zh": "花费（时间/钱）",
+     "pos": "v."
+    },
+    {
+     "w": "cost",
+     "zh": "花费（价钱）",
+     "pos": "v./n."
+    },
+    {
+     "w": "pay",
+     "zh": "付钱",
+     "pos": "v."
+    },
+    {
+     "w": "earn",
+     "zh": "挣得",
+     "pos": "v."
+    },
+    {
+     "w": "afford",
+     "zh": "负担得起",
+     "pos": "v."
+    }
+   ]
+  },
+  {
+   "id": "en-core-g8-igcse",
+   "title": "初二 / IGCSE 预备：学术词与考试指令词",
+   "stage": "G8",
+   "source_note": "IGCSE 各科试卷常见指令词（command words）、学术通用词、阅读写作术语、图表描述用语",
+   "count": 290,
+   "words": [
+    {
+     "w": "analyse",
+     "zh": "分析",
+     "pos": "v."
+    },
+    {
+     "w": "assess",
+     "zh": "评估",
+     "pos": "v."
+    },
+    {
+     "w": "calculate",
+     "zh": "计算",
+     "pos": "v."
+    },
+    {
+     "w": "compare",
+     "zh": "比较（异同）",
+     "pos": "v."
+    },
+    {
+     "w": "consider",
+     "zh": "考虑",
+     "pos": "v."
+    },
+    {
+     "w": "contrast",
+     "zh": "对比（差异）",
+     "pos": "v./n."
+    },
+    {
+     "w": "define",
+     "zh": "下定义",
+     "pos": "v."
+    },
+    {
+     "w": "demonstrate",
+     "zh": "证明；演示",
+     "pos": "v."
+    },
+    {
+     "w": "describe",
+     "zh": "描述",
+     "pos": "v."
+    },
+    {
+     "w": "determine",
+     "zh": "确定；测定",
+     "pos": "v."
+    },
+    {
+     "w": "discuss",
+     "zh": "讨论",
+     "pos": "v."
+    },
+    {
+     "w": "evaluate",
+     "zh": "评价（权衡利弊）",
+     "pos": "v."
+    },
+    {
+     "w": "examine",
+     "zh": "仔细检查；考查",
+     "pos": "v."
+    },
+    {
+     "w": "explain",
+     "zh": "解释（说明原因）",
+     "pos": "v."
+    },
+    {
+     "w": "identify",
+     "zh": "找出；识别",
+     "pos": "v."
+    },
+    {
+     "w": "illustrate",
+     "zh": "举例说明；图示",
+     "pos": "v."
+    },
+    {
+     "w": "interpret",
+     "zh": "解读；解释（数据）",
+     "pos": "v."
+    },
+    {
+     "w": "justify",
+     "zh": "说明理由",
+     "pos": "v."
+    },
+    {
+     "w": "outline",
+     "zh": "概述",
+     "pos": "v./n."
+    },
+    {
+     "w": "predict",
+     "zh": "预测",
+     "pos": "v."
+    },
+    {
+     "w": "state",
+     "zh": "陈述；（简要）写出",
+     "pos": "v."
+    },
+    {
+     "w": "suggest",
+     "zh": "提出（可能的解释）",
+     "pos": "v."
+    },
+    {
+     "w": "summarise",
+     "zh": "总结",
+     "pos": "v."
+    },
+    {
+     "w": "deduce",
+     "zh": "推断",
+     "pos": "v."
+    },
+    {
+     "w": "estimate",
+     "zh": "估算",
+     "pos": "v./n."
+    },
+    {
+     "w": "measure",
+     "zh": "测量",
+     "pos": "v."
+    },
+    {
+     "w": "plot",
+     "zh": "描点作图；情节",
+     "pos": "v./n."
+    },
+    {
+     "w": "sketch",
+     "zh": "画草图",
+     "pos": "v./n."
+    },
+    {
+     "w": "label",
+     "zh": "标注；标签",
+     "pos": "v./n."
+    },
+    {
+     "w": "list",
+     "zh": "列举",
+     "pos": "v."
+    },
+    {
+     "w": "give",
+     "zh": "给出",
+     "pos": "v."
+    },
+    {
+     "w": "comment",
+     "zh": "评论",
+     "pos": "v./n."
+    },
+    {
+     "w": "develop",
+     "zh": "展开；发展",
+     "pos": "v."
+    },
+    {
+     "w": "argue",
+     "zh": "论证；争论",
+     "pos": "v."
+    },
+    {
+     "w": "annotate",
+     "zh": "注释；批注",
+     "pos": "v."
+    },
+    {
+     "w": "classify",
+     "zh": "分类",
+     "pos": "v."
+    },
+    {
+     "w": "complete",
+     "zh": "完成；填写",
+     "pos": "v."
+    },
+    {
+     "w": "construct",
+     "zh": "构造；画出",
+     "pos": "v."
+    },
+    {
+     "w": "derive",
+     "zh": "推导",
+     "pos": "v."
+    },
+    {
+     "w": "draw",
+     "zh": "画（图）",
+     "pos": "v."
+    },
+    {
+     "w": "investigate",
+     "zh": "调查；探究",
+     "pos": "v."
+    },
+    {
+     "w": "show that",
+     "zh": "证明……",
+     "pos": "phr."
+    },
+    {
+     "w": "verify",
+     "zh": "验证",
+     "pos": "v."
+    },
+    {
+     "w": "approach",
+     "zh": "方法；接近",
+     "pos": "n./v."
+    },
+    {
+     "w": "assume",
+     "zh": "假设",
+     "pos": "v."
+    },
+    {
+     "w": "assumption",
+     "zh": "假设",
+     "pos": "n."
+    },
+    {
+     "w": "benefit",
+     "zh": "好处；受益",
+     "pos": "n./v."
+    },
+    {
+     "w": "concept",
+     "zh": "概念",
+     "pos": "n."
+    },
+    {
+     "w": "conclude",
+     "zh": "得出结论",
+     "pos": "v."
+    },
+    {
+     "w": "conclusion",
+     "zh": "结论",
+     "pos": "n."
+    },
+    {
+     "w": "consist of",
+     "zh": "由……组成",
+     "pos": "phr."
+    },
+    {
+     "w": "constant",
+     "zh": "恒定的；常量",
+     "pos": "adj./n."
+    },
+    {
+     "w": "context",
+     "zh": "上下文；背景",
+     "pos": "n."
+    },
+    {
+     "w": "criteria",
+     "zh": "标准（复数）",
+     "pos": "n."
+    },
+    {
+     "w": "data",
+     "zh": "数据",
+     "pos": "n."
+    },
+    {
+     "w": "evidence",
+     "zh": "证据",
+     "pos": "n."
+    },
+    {
+     "w": "factor",
+     "zh": "因素",
+     "pos": "n."
+    },
+    {
+     "w": "feature",
+     "zh": "特征",
+     "pos": "n."
+    },
+    {
+     "w": "function",
+     "zh": "功能；函数",
+     "pos": "n."
+    },
+    {
+     "w": "impact",
+     "zh": "影响",
+     "pos": "n."
+    },
+    {
+     "w": "indicate",
+     "zh": "表明",
+     "pos": "v."
+    },
+    {
+     "w": "method",
+     "zh": "方法",
+     "pos": "n."
+    },
+    {
+     "w": "process",
+     "zh": "过程",
+     "pos": "n."
+    },
+    {
+     "w": "require",
+     "zh": "需要；要求",
+     "pos": "v."
+    },
+    {
+     "w": "significant",
+     "zh": "显著的；重要的",
+     "pos": "adj."
+    },
+    {
+     "w": "source",
+     "zh": "来源",
+     "pos": "n."
+    },
+    {
+     "w": "structure",
+     "zh": "结构",
+     "pos": "n."
+    },
+    {
+     "w": "theory",
+     "zh": "理论",
+     "pos": "n."
+    },
+    {
+     "w": "hypothesis",
+     "zh": "假说",
+     "pos": "n."
+    },
+    {
+     "w": "variable",
+     "zh": "变量",
+     "pos": "n."
+    },
+    {
+     "w": "independent variable",
+     "zh": "自变量",
+     "pos": "n."
+    },
+    {
+     "w": "dependent variable",
+     "zh": "因变量",
+     "pos": "n."
+    },
+    {
+     "w": "control variable",
+     "zh": "控制变量",
+     "pos": "n."
+    },
+    {
+     "w": "fair test",
+     "zh": "公平测试",
+     "pos": "n."
+    },
+    {
+     "w": "accurate",
+     "zh": "准确的",
+     "pos": "adj."
+    },
+    {
+     "w": "precise",
+     "zh": "精确的",
+     "pos": "adj."
+    },
+    {
+     "w": "reliable",
+     "zh": "可靠的",
+     "pos": "adj."
+    },
+    {
+     "w": "valid",
+     "zh": "有效的",
+     "pos": "adj."
+    },
+    {
+     "w": "anomaly",
+     "zh": "异常值",
+     "pos": "n."
+    },
+    {
+     "w": "range",
+     "zh": "范围；极差",
+     "pos": "n."
+    },
+    {
+     "w": "mean",
+     "zh": "平均值；意思是",
+     "pos": "n./v."
+    },
+    {
+     "w": "trend",
+     "zh": "趋势",
+     "pos": "n."
+    },
+    {
+     "w": "proportional",
+     "zh": "成比例的",
+     "pos": "adj."
+    },
+    {
+     "w": "relationship",
+     "zh": "关系",
+     "pos": "n."
+    },
+    {
+     "w": "vary",
+     "zh": "变化",
+     "pos": "v."
+    },
+    {
+     "w": "variation",
+     "zh": "变化",
+     "pos": "n."
+    },
+    {
+     "w": "affect",
+     "zh": "影响",
+     "pos": "v."
+    },
+    {
+     "w": "occur",
+     "zh": "发生",
+     "pos": "v."
+    },
+    {
+     "w": "obtain",
+     "zh": "获得",
+     "pos": "v."
+    },
+    {
+     "w": "apply",
+     "zh": "应用；申请",
+     "pos": "v."
+    },
+    {
+     "w": "achieve",
+     "zh": "达到",
+     "pos": "v."
+    },
+    {
+     "w": "maintain",
+     "zh": "保持",
+     "pos": "v."
+    },
+    {
+     "w": "involve",
+     "zh": "涉及",
+     "pos": "v."
+    },
+    {
+     "w": "establish",
+     "zh": "建立",
+     "pos": "v."
+    },
+    {
+     "w": "error",
+     "zh": "误差；错误",
+     "pos": "n."
+    },
+    {
+     "w": "uncertainty",
+     "zh": "不确定度",
+     "pos": "n."
+    },
+    {
+     "w": "procedure",
+     "zh": "步骤；程序",
+     "pos": "n."
+    },
+    {
+     "w": "apparatus",
+     "zh": "仪器",
+     "pos": "n."
+    },
+    {
+     "w": "equipment",
+     "zh": "设备",
+     "pos": "n."
+    },
+    {
+     "w": "sample",
+     "zh": "样本",
+     "pos": "n."
+    },
+    {
+     "w": "observation",
+     "zh": "观察（结果）",
+     "pos": "n."
+    },
+    {
+     "w": "calculation",
+     "zh": "计算",
+     "pos": "n."
+    },
+    {
+     "w": "formula",
+     "zh": "公式",
+     "pos": "n."
+    },
+    {
+     "w": "unit",
+     "zh": "单位",
+     "pos": "n."
+    },
+    {
+     "w": "quantity",
+     "zh": "量",
+     "pos": "n."
+    },
+    {
+     "w": "value",
+     "zh": "数值；价值",
+     "pos": "n."
+    },
+    {
+     "w": "approximately",
+     "zh": "大约",
+     "pos": "adv."
+    },
+    {
+     "w": "respectively",
+     "zh": "分别地",
+     "pos": "adv."
+    },
+    {
+     "w": "consequently",
+     "zh": "因此",
+     "pos": "adv."
+    },
+    {
+     "w": "furthermore",
+     "zh": "此外",
+     "pos": "adv."
+    },
+    {
+     "w": "moreover",
+     "zh": "而且",
+     "pos": "adv."
+    },
+    {
+     "w": "nevertheless",
+     "zh": "然而；不过",
+     "pos": "adv."
+    },
+    {
+     "w": "whereas",
+     "zh": "然而；鉴于",
+     "pos": "conj."
+    },
+    {
+     "w": "despite",
+     "zh": "尽管",
+     "pos": "prep."
+    },
+    {
+     "w": "in contrast",
+     "zh": "相比之下",
+     "pos": "phr."
+    },
+    {
+     "w": "on the other hand",
+     "zh": "另一方面",
+     "pos": "phr."
+    },
+    {
+     "w": "for instance",
+     "zh": "例如",
+     "pos": "phr."
+    },
+    {
+     "w": "as a result",
+     "zh": "结果",
+     "pos": "phr."
+    },
+    {
+     "w": "in addition",
+     "zh": "另外",
+     "pos": "phr."
+    },
+    {
+     "w": "to sum up",
+     "zh": "总之",
+     "pos": "phr."
+    },
+    {
+     "w": "infer",
+     "zh": "推断",
+     "pos": "v."
+    },
+    {
+     "w": "imply",
+     "zh": "暗示",
+     "pos": "v."
+    },
+    {
+     "w": "implication",
+     "zh": "含意；影响",
+     "pos": "n."
+    },
+    {
+     "w": "purpose",
+     "zh": "目的",
+     "pos": "n."
+    },
+    {
+     "w": "audience",
+     "zh": "读者；观众",
+     "pos": "n."
+    },
+    {
+     "w": "tone",
+     "zh": "语气",
+     "pos": "n."
+    },
+    {
+     "w": "mood",
+     "zh": "氛围；心情",
+     "pos": "n."
+    },
+    {
+     "w": "theme",
+     "zh": "主题",
+     "pos": "n."
+    },
+    {
+     "w": "narrator",
+     "zh": "叙述者",
+     "pos": "n."
+    },
+    {
+     "w": "setting",
+     "zh": "背景；环境",
+     "pos": "n."
+    },
+    {
+     "w": "protagonist",
+     "zh": "主人公",
+     "pos": "n."
+    },
+    {
+     "w": "viewpoint",
+     "zh": "观点；视角",
+     "pos": "n."
+    },
+    {
+     "w": "perspective",
+     "zh": "视角",
+     "pos": "n."
+    },
+    {
+     "w": "persuade",
+     "zh": "说服",
+     "pos": "v."
+    },
+    {
+     "w": "persuasive",
+     "zh": "有说服力的",
+     "pos": "adj."
+    },
+    {
+     "w": "formal",
+     "zh": "正式的",
+     "pos": "adj."
+    },
+    {
+     "w": "informal",
+     "zh": "非正式的",
+     "pos": "adj."
+    },
+    {
+     "w": "register",
+     "zh": "语域（正式程度）",
+     "pos": "n."
+    },
+    {
+     "w": "quotation",
+     "zh": "引文",
+     "pos": "n."
+    },
+    {
+     "w": "summary",
+     "zh": "摘要；总结",
+     "pos": "n."
+    },
+    {
+     "w": "metaphor",
+     "zh": "暗喻",
+     "pos": "n."
+    },
+    {
+     "w": "simile",
+     "zh": "明喻",
+     "pos": "n."
+    },
+    {
+     "w": "personification",
+     "zh": "拟人",
+     "pos": "n."
+    },
+    {
+     "w": "alliteration",
+     "zh": "头韵",
+     "pos": "n."
+    },
+    {
+     "w": "imagery",
+     "zh": "意象",
+     "pos": "n."
+    },
+    {
+     "w": "exaggeration",
+     "zh": "夸张",
+     "pos": "n."
+    },
+    {
+     "w": "rhetorical question",
+     "zh": "反问",
+     "pos": "n."
+    },
+    {
+     "w": "emphasise",
+     "zh": "强调",
+     "pos": "v."
+    },
+    {
+     "w": "convey",
+     "zh": "传达",
+     "pos": "v."
+    },
+    {
+     "w": "reveal",
+     "zh": "揭示",
+     "pos": "v."
+    },
+    {
+     "w": "suggestive",
+     "zh": "暗示性的",
+     "pos": "adj."
+    },
+    {
+     "w": "effective",
+     "zh": "有效的",
+     "pos": "adj."
+    },
+    {
+     "w": "appropriate",
+     "zh": "恰当的",
+     "pos": "adj."
+    },
+    {
+     "w": "relevant",
+     "zh": "相关的",
+     "pos": "adj."
+    },
+    {
+     "w": "specific",
+     "zh": "具体的",
+     "pos": "adj."
+    },
+    {
+     "w": "detail",
+     "zh": "细节",
+     "pos": "n."
+    },
+    {
+     "w": "key point",
+     "zh": "要点",
+     "pos": "n."
+    },
+    {
+     "w": "main idea",
+     "zh": "主旨",
+     "pos": "n."
+    },
+    {
+     "w": "paraphrase",
+     "zh": "改述",
+     "pos": "v./n."
+    },
+    {
+     "w": "synonym",
+     "zh": "同义词",
+     "pos": "n."
+    },
+    {
+     "w": "vocabulary",
+     "zh": "词汇",
+     "pos": "n."
+    },
+    {
+     "w": "grammar",
+     "zh": "语法",
+     "pos": "n."
+    },
+    {
+     "w": "tense",
+     "zh": "时态",
+     "pos": "n."
+    },
+    {
+     "w": "passive",
+     "zh": "被动的",
+     "pos": "adj."
+    },
+    {
+     "w": "clause",
+     "zh": "从句",
+     "pos": "n."
+    },
+    {
+     "w": "phrase",
+     "zh": "短语",
+     "pos": "n."
+    },
+    {
+     "w": "punctuation",
+     "zh": "标点",
+     "pos": "n."
+    },
+    {
+     "w": "spelling",
+     "zh": "拼写",
+     "pos": "n."
+    },
+    {
+     "w": "draft",
+     "zh": "草稿",
+     "pos": "n./v."
+    },
+    {
+     "w": "edit",
+     "zh": "编辑；修改",
+     "pos": "v."
+    },
+    {
+     "w": "proofread",
+     "zh": "校对",
+     "pos": "v."
+    },
+    {
+     "w": "essay",
+     "zh": "文章；作文",
+     "pos": "n."
+    },
+    {
+     "w": "introduction",
+     "zh": "引言",
+     "pos": "n."
+    },
+    {
+     "w": "body paragraph",
+     "zh": "正文段落",
+     "pos": "n."
+    },
+    {
+     "w": "argument",
+     "zh": "论点；争论",
+     "pos": "n."
+    },
+    {
+     "w": "counter-argument",
+     "zh": "反方论点",
+     "pos": "n."
+    },
+    {
+     "w": "opinion",
+     "zh": "观点",
+     "pos": "n."
+    },
+    {
+     "w": "fact",
+     "zh": "事实",
+     "pos": "n."
+    },
+    {
+     "w": "bias",
+     "zh": "偏见",
+     "pos": "n."
+    },
+    {
+     "w": "reliable source",
+     "zh": "可靠来源",
+     "pos": "n."
+    },
+    {
+     "w": "advantage",
+     "zh": "优点",
+     "pos": "n."
+    },
+    {
+     "w": "disadvantage",
+     "zh": "缺点",
+     "pos": "n."
+    },
+    {
+     "w": "cause",
+     "zh": "原因",
+     "pos": "n."
+    },
+    {
+     "w": "effect",
+     "zh": "结果；影响",
+     "pos": "n."
+    },
+    {
+     "w": "solution",
+     "zh": "解决办法",
+     "pos": "n."
+    },
+    {
+     "w": "issue",
+     "zh": "问题；议题",
+     "pos": "n."
+    },
+    {
+     "w": "debate",
+     "zh": "辩论",
+     "pos": "n./v."
+    },
+    {
+     "w": "propose",
+     "zh": "提议",
+     "pos": "v."
+    },
+    {
+     "w": "recommend",
+     "zh": "推荐",
+     "pos": "v."
+    },
+    {
+     "w": "respond",
+     "zh": "回应",
+     "pos": "v."
+    },
+    {
+     "w": "response",
+     "zh": "回答；反应",
+     "pos": "n."
+    },
+    {
+     "w": "attempt",
+     "zh": "尝试",
+     "pos": "v./n."
+    },
+    {
+     "w": "challenge",
+     "zh": "挑战",
+     "pos": "n./v."
+    },
+    {
+     "w": "opportunity",
+     "zh": "机会",
+     "pos": "n."
+    },
+    {
+     "w": "responsibility",
+     "zh": "责任",
+     "pos": "n."
+    },
+    {
+     "w": "contribute",
+     "zh": "贡献",
+     "pos": "v."
+    },
+    {
+     "w": "participate",
+     "zh": "参加",
+     "pos": "v."
+    },
+    {
+     "w": "cooperate",
+     "zh": "合作",
+     "pos": "v."
+    },
+    {
+     "w": "negotiate",
+     "zh": "协商",
+     "pos": "v."
+    },
+    {
+     "w": "focus",
+     "zh": "集中；焦点",
+     "pos": "v./n."
+    },
+    {
+     "w": "concentrate",
+     "zh": "集中注意力",
+     "pos": "v."
+    },
+    {
+     "w": "revise",
+     "zh": "复习；修改",
+     "pos": "v."
+    },
+    {
+     "w": "revision",
+     "zh": "复习",
+     "pos": "n."
+    },
+    {
+     "w": "memorise",
+     "zh": "记住",
+     "pos": "v."
+    },
+    {
+     "w": "schedule",
+     "zh": "日程",
+     "pos": "n."
+    },
+    {
+     "w": "deadline",
+     "zh": "截止日期",
+     "pos": "n."
+    },
+    {
+     "w": "instruction",
+     "zh": "说明；指令",
+     "pos": "n."
+    },
+    {
+     "w": "question paper",
+     "zh": "试卷",
+     "pos": "n."
+    },
+    {
+     "w": "answer booklet",
+     "zh": "答题册",
+     "pos": "n."
+    },
+    {
+     "w": "mark",
+     "zh": "分数；打分",
+     "pos": "n./v."
+    },
+    {
+     "w": "marks available",
+     "zh": "分值",
+     "pos": "phr."
+    },
+    {
+     "w": "grade",
+     "zh": "等级；年级",
+     "pos": "n."
+    },
+    {
+     "w": "candidate",
+     "zh": "考生",
+     "pos": "n."
+    },
+    {
+     "w": "examiner",
+     "zh": "考官",
+     "pos": "n."
+    },
+    {
+     "w": "extended",
+     "zh": "扩展的（IGCSE Extended 卷）",
+     "pos": "adj."
+    },
+    {
+     "w": "core",
+     "zh": "核心的（IGCSE Core 卷）",
+     "pos": "adj."
+    },
+    {
+     "w": "multiple choice",
+     "zh": "选择题",
+     "pos": "n."
+    },
+    {
+     "w": "structured question",
+     "zh": "结构化问答题",
+     "pos": "n."
+    },
+    {
+     "w": "practical",
+     "zh": "实验的；实际的",
+     "pos": "adj."
+    },
+    {
+     "w": "theory paper",
+     "zh": "理论卷",
+     "pos": "n."
+    },
+    {
+     "w": "coursework",
+     "zh": "课程作业",
+     "pos": "n."
+    },
+    {
+     "w": "syllabus",
+     "zh": "考纲",
+     "pos": "n."
+    },
+    {
+     "w": "past paper",
+     "zh": "往年真题",
+     "pos": "n."
+    },
+    {
+     "w": "mark scheme",
+     "zh": "评分标准",
+     "pos": "n."
+    },
+    {
+     "w": "command word",
+     "zh": "指令词",
+     "pos": "n."
+    },
+    {
+     "w": "in your own words",
+     "zh": "用你自己的话",
+     "pos": "phr."
+    },
+    {
+     "w": "refer to",
+     "zh": "参考；提及",
+     "pos": "phr."
+    },
+    {
+     "w": "with reference to",
+     "zh": "参照",
+     "pos": "phr."
+    },
+    {
+     "w": "using the information",
+     "zh": "利用所给信息",
+     "pos": "phr."
+    },
+    {
+     "w": "give a reason",
+     "zh": "给出一个理由",
+     "pos": "phr."
+    },
+    {
+     "w": "show your working",
+     "zh": "写出计算过程",
+     "pos": "phr."
+    },
+    {
+     "w": "to two significant figures",
+     "zh": "保留两位有效数字",
+     "pos": "phr."
+    },
+    {
+     "w": "significant figures",
+     "zh": "有效数字",
+     "pos": "n."
+    },
+    {
+     "w": "decimal places",
+     "zh": "小数位",
+     "pos": "n."
+    },
+    {
+     "w": "diagram",
+     "zh": "示意图",
+     "pos": "n."
+    },
+    {
+     "w": "axis",
+     "zh": "坐标轴（复数 axes）",
+     "pos": "n."
+    },
+    {
+     "w": "gradient",
+     "zh": "斜率；梯度",
+     "pos": "n."
+    },
+    {
+     "w": "intercept",
+     "zh": "截距",
+     "pos": "n."
+    },
+    {
+     "w": "origin",
+     "zh": "原点；起源",
+     "pos": "n."
+    },
+    {
+     "w": "scale",
+     "zh": "比例；刻度",
+     "pos": "n."
+    },
+    {
+     "w": "straight line",
+     "zh": "直线",
+     "pos": "n."
+    },
+    {
+     "w": "curve",
+     "zh": "曲线",
+     "pos": "n."
+    },
+    {
+     "w": "best-fit line",
+     "zh": "最佳拟合线",
+     "pos": "n."
+    },
+    {
+     "w": "increase steadily",
+     "zh": "稳定增加",
+     "pos": "phr."
+    },
+    {
+     "w": "decrease sharply",
+     "zh": "急剧下降",
+     "pos": "phr."
+    },
+    {
+     "w": "remain constant",
+     "zh": "保持不变",
+     "pos": "phr."
+    },
+    {
+     "w": "reach a peak",
+     "zh": "达到峰值",
+     "pos": "phr."
+    },
+    {
+     "w": "directly proportional",
+     "zh": "成正比",
+     "pos": "phr."
+    },
+    {
+     "w": "inversely proportional",
+     "zh": "成反比",
+     "pos": "phr."
+    },
+    {
+     "w": "maximum",
+     "zh": "最大值",
+     "pos": "n."
+    },
+    {
+     "w": "minimum",
+     "zh": "最小值",
+     "pos": "n."
+    },
+    {
+     "w": "ratio",
+     "zh": "比率",
+     "pos": "n."
+    },
+    {
+     "w": "percentage",
+     "zh": "百分比",
+     "pos": "n."
+    },
+    {
+     "w": "rate",
+     "zh": "速率；比率",
+     "pos": "n."
+    },
+    {
+     "w": "efficient",
+     "zh": "高效的",
+     "pos": "adj."
+    },
+    {
+     "w": "efficiency",
+     "zh": "效率",
+     "pos": "n."
+    },
+    {
+     "w": "sustainable",
+     "zh": "可持续的",
+     "pos": "adj."
+    },
+    {
+     "w": "renewable",
+     "zh": "可再生的",
+     "pos": "adj."
+    },
+    {
+     "w": "resource",
+     "zh": "资源",
+     "pos": "n."
+    },
+    {
+     "w": "consumption",
+     "zh": "消耗",
+     "pos": "n."
+    },
+    {
+     "w": "emission",
+     "zh": "排放",
+     "pos": "n."
+    },
+    {
+     "w": "climate change",
+     "zh": "气候变化",
+     "pos": "n."
+    },
+    {
+     "w": "global warming",
+     "zh": "全球变暖",
+     "pos": "n."
+    },
+    {
+     "w": "economy",
+     "zh": "经济",
+     "pos": "n."
+    },
+    {
+     "w": "industry",
+     "zh": "工业；行业",
+     "pos": "n."
+    },
+    {
+     "w": "agriculture",
+     "zh": "农业",
+     "pos": "n."
+    },
+    {
+     "w": "urban",
+     "zh": "城市的",
+     "pos": "adj."
+    },
+    {
+     "w": "rural",
+     "zh": "农村的",
+     "pos": "adj."
+    },
+    {
+     "w": "migration",
+     "zh": "迁移；移民",
+     "pos": "n."
+    },
+    {
+     "w": "poverty",
+     "zh": "贫困",
+     "pos": "n."
+    },
+    {
+     "w": "equality",
+     "zh": "平等",
+     "pos": "n."
+    },
+    {
+     "w": "diversity",
+     "zh": "多样性",
+     "pos": "n."
+    },
+    {
+     "w": "identity",
+     "zh": "身份；特征",
+     "pos": "n."
+    },
+    {
+     "w": "generation",
+     "zh": "一代人",
+     "pos": "n."
+    },
+    {
+     "w": "influence",
+     "zh": "影响",
+     "pos": "n./v."
+    },
+    {
+     "w": "consequence",
+     "zh": "后果",
+     "pos": "n."
+    },
+    {
+     "w": "benefit from",
+     "zh": "从……中受益",
+     "pos": "phr."
+    },
+    {
+     "w": "depend on",
+     "zh": "取决于；依赖",
+     "pos": "phr."
+    },
+    {
+     "w": "result in",
+     "zh": "导致",
+     "pos": "phr."
+    },
+    {
+     "w": "result from",
+     "zh": "由……造成",
+     "pos": "phr."
+    },
+    {
+     "w": "lead to",
+     "zh": "导致",
+     "pos": "phr."
+    },
+    {
+     "w": "be responsible for",
+     "zh": "对……负责；是……的原因",
+     "pos": "phr."
+    },
+    {
+     "w": "in terms of",
+     "zh": "就……而言",
+     "pos": "phr."
+    },
+    {
+     "w": "according to",
+     "zh": "根据",
+     "pos": "phr."
+    },
+    {
+     "w": "compared with",
+     "zh": "与……相比",
+     "pos": "phr."
+    },
+    {
+     "w": "due to",
+     "zh": "由于",
+     "pos": "phr."
+    },
+    {
+     "w": "rather than",
+     "zh": "而不是",
+     "pos": "phr."
+    },
+    {
+     "w": "as well as",
+     "zh": "以及",
+     "pos": "phr."
+    },
+    {
+     "w": "in order to",
+     "zh": "为了",
+     "pos": "phr."
+    },
+    {
+     "w": "so that",
+     "zh": "以便",
+     "pos": "phr."
+    }
+   ]
+  },
+  {
+   "id": "igcse-physics-terms",
+   "title": "IGCSE 物理术语（英中对照）",
+   "stage": "G8-G10",
+   "source_note": "按 Cambridge IGCSE Physics 考纲主题顺序整理（测量与运动、力、能量、热、波、电磁、原子核、太空）；中文用国内初高中物理通用译名",
+   "count": 223,
+   "words": [
+    {
+     "w": "physical quantity",
+     "zh": "物理量",
+     "pos": "n."
+    },
+    {
+     "w": "SI unit",
+     "zh": "国际单位",
+     "pos": "n."
+    },
+    {
+     "w": "length",
+     "zh": "长度",
+     "pos": "n."
+    },
+    {
+     "w": "mass",
+     "zh": "质量",
+     "pos": "n."
+    },
+    {
+     "w": "volume",
+     "zh": "体积",
+     "pos": "n."
+    },
+    {
+     "w": "density",
+     "zh": "密度",
+     "pos": "n."
+    },
+    {
+     "w": "measuring cylinder",
+     "zh": "量筒",
+     "pos": "n."
+    },
+    {
+     "w": "micrometer screw gauge",
+     "zh": "螺旋测微器",
+     "pos": "n."
+    },
+    {
+     "w": "vernier calipers",
+     "zh": "游标卡尺",
+     "pos": "n."
+    },
+    {
+     "w": "stopwatch",
+     "zh": "秒表",
+     "pos": "n."
+    },
+    {
+     "w": "period",
+     "zh": "周期",
+     "pos": "n."
+    },
+    {
+     "w": "oscillation",
+     "zh": "振荡；一次全振动",
+     "pos": "n."
+    },
+    {
+     "w": "scalar",
+     "zh": "标量",
+     "pos": "n."
+    },
+    {
+     "w": "vector",
+     "zh": "矢量",
+     "pos": "n."
+    },
+    {
+     "w": "distance",
+     "zh": "路程；距离",
+     "pos": "n."
+    },
+    {
+     "w": "displacement",
+     "zh": "位移",
+     "pos": "n."
+    },
+    {
+     "w": "speed",
+     "zh": "速率；速度大小",
+     "pos": "n."
+    },
+    {
+     "w": "velocity",
+     "zh": "速度（矢量）",
+     "pos": "n."
+    },
+    {
+     "w": "acceleration",
+     "zh": "加速度",
+     "pos": "n."
+    },
+    {
+     "w": "deceleration",
+     "zh": "减速度",
+     "pos": "n."
+    },
+    {
+     "w": "average speed",
+     "zh": "平均速率",
+     "pos": "n."
+    },
+    {
+     "w": "distance–time graph",
+     "zh": "路程-时间图像",
+     "pos": "n."
+    },
+    {
+     "w": "speed–time graph",
+     "zh": "速度-时间图像",
+     "pos": "n."
+    },
+    {
+     "w": "gradient",
+     "zh": "斜率",
+     "pos": "n."
+    },
+    {
+     "w": "area under the graph",
+     "zh": "图线下面积",
+     "pos": "n."
+    },
+    {
+     "w": "free fall",
+     "zh": "自由落体",
+     "pos": "n."
+    },
+    {
+     "w": "acceleration of free fall",
+     "zh": "自由落体加速度 g",
+     "pos": "n."
+    },
+    {
+     "w": "terminal velocity",
+     "zh": "终端速度（收尾速度）",
+     "pos": "n."
+    },
+    {
+     "w": "air resistance",
+     "zh": "空气阻力",
+     "pos": "n."
+    },
+    {
+     "w": "drag",
+     "zh": "阻力（流体）",
+     "pos": "n."
+    },
+    {
+     "w": "friction",
+     "zh": "摩擦力",
+     "pos": "n."
+    },
+    {
+     "w": "force",
+     "zh": "力",
+     "pos": "n."
+    },
+    {
+     "w": "weight",
+     "zh": "重力；重量",
+     "pos": "n."
+    },
+    {
+     "w": "gravitational field strength",
+     "zh": "重力场强度",
+     "pos": "n."
+    },
+    {
+     "w": "newton",
+     "zh": "牛顿（力的单位 N）",
+     "pos": "n."
+    },
+    {
+     "w": "resultant force",
+     "zh": "合力",
+     "pos": "n."
+    },
+    {
+     "w": "balanced forces",
+     "zh": "平衡力",
+     "pos": "n."
+    },
+    {
+     "w": "equilibrium",
+     "zh": "平衡",
+     "pos": "n."
+    },
+    {
+     "w": "inertia",
+     "zh": "惯性",
+     "pos": "n."
+    },
+    {
+     "w": "load",
+     "zh": "负载；所挂重物",
+     "pos": "n."
+    },
+    {
+     "w": "extension",
+     "zh": "伸长量",
+     "pos": "n."
+    },
+    {
+     "w": "spring constant",
+     "zh": "劲度系数（弹簧常数）",
+     "pos": "n."
+    },
+    {
+     "w": "limit of proportionality",
+     "zh": "比例极限",
+     "pos": "n."
+    },
+    {
+     "w": "elastic",
+     "zh": "弹性的",
+     "pos": "adj."
+    },
+    {
+     "w": "deformation",
+     "zh": "形变",
+     "pos": "n."
+    },
+    {
+     "w": "momentum",
+     "zh": "动量",
+     "pos": "n."
+    },
+    {
+     "w": "impulse",
+     "zh": "冲量",
+     "pos": "n."
+    },
+    {
+     "w": "conservation of momentum",
+     "zh": "动量守恒",
+     "pos": "n."
+    },
+    {
+     "w": "moment",
+     "zh": "力矩",
+     "pos": "n."
+    },
+    {
+     "w": "pivot",
+     "zh": "支点",
+     "pos": "n."
+    },
+    {
+     "w": "principle of moments",
+     "zh": "力矩平衡原理",
+     "pos": "n."
+    },
+    {
+     "w": "centre of gravity",
+     "zh": "重心",
+     "pos": "n."
+    },
+    {
+     "w": "stability",
+     "zh": "稳定性",
+     "pos": "n."
+    },
+    {
+     "w": "circular motion",
+     "zh": "圆周运动",
+     "pos": "n."
+    },
+    {
+     "w": "energy",
+     "zh": "能量",
+     "pos": "n."
+    },
+    {
+     "w": "kinetic energy",
+     "zh": "动能",
+     "pos": "n."
+    },
+    {
+     "w": "gravitational potential energy",
+     "zh": "重力势能",
+     "pos": "n."
+    },
+    {
+     "w": "elastic potential energy",
+     "zh": "弹性势能",
+     "pos": "n."
+    },
+    {
+     "w": "chemical energy",
+     "zh": "化学能",
+     "pos": "n."
+    },
+    {
+     "w": "thermal energy",
+     "zh": "热能",
+     "pos": "n."
+    },
+    {
+     "w": "internal energy",
+     "zh": "内能",
+     "pos": "n."
+    },
+    {
+     "w": "nuclear energy",
+     "zh": "核能",
+     "pos": "n."
+    },
+    {
+     "w": "energy store",
+     "zh": "能量储存形式",
+     "pos": "n."
+    },
+    {
+     "w": "energy transfer",
+     "zh": "能量转移",
+     "pos": "n."
+    },
+    {
+     "w": "conservation of energy",
+     "zh": "能量守恒",
+     "pos": "n."
+    },
+    {
+     "w": "work done",
+     "zh": "做功",
+     "pos": "n."
+    },
+    {
+     "w": "joule",
+     "zh": "焦耳（J）",
+     "pos": "n."
+    },
+    {
+     "w": "power",
+     "zh": "功率",
+     "pos": "n."
+    },
+    {
+     "w": "watt",
+     "zh": "瓦特（W）",
+     "pos": "n."
+    },
+    {
+     "w": "efficiency",
+     "zh": "效率",
+     "pos": "n."
+    },
+    {
+     "w": "renewable energy",
+     "zh": "可再生能源",
+     "pos": "n."
+    },
+    {
+     "w": "non-renewable",
+     "zh": "不可再生的",
+     "pos": "adj."
+    },
+    {
+     "w": "fossil fuel",
+     "zh": "化石燃料",
+     "pos": "n."
+    },
+    {
+     "w": "solar energy",
+     "zh": "太阳能",
+     "pos": "n."
+    },
+    {
+     "w": "hydroelectric",
+     "zh": "水力发电的",
+     "pos": "adj."
+    },
+    {
+     "w": "geothermal",
+     "zh": "地热的",
+     "pos": "adj."
+    },
+    {
+     "w": "tidal energy",
+     "zh": "潮汐能",
+     "pos": "n."
+    },
+    {
+     "w": "pressure",
+     "zh": "压强",
+     "pos": "n."
+    },
+    {
+     "w": "pascal",
+     "zh": "帕斯卡（Pa）",
+     "pos": "n."
+    },
+    {
+     "w": "atmospheric pressure",
+     "zh": "大气压",
+     "pos": "n."
+    },
+    {
+     "w": "liquid pressure",
+     "zh": "液体压强",
+     "pos": "n."
+    },
+    {
+     "w": "particle",
+     "zh": "粒子；微粒",
+     "pos": "n."
+    },
+    {
+     "w": "kinetic particle model",
+     "zh": "分子动理论模型",
+     "pos": "n."
+    },
+    {
+     "w": "Brownian motion",
+     "zh": "布朗运动",
+     "pos": "n."
+    },
+    {
+     "w": "absolute zero",
+     "zh": "绝对零度",
+     "pos": "n."
+    },
+    {
+     "w": "kelvin",
+     "zh": "开尔文（K）",
+     "pos": "n."
+    },
+    {
+     "w": "evaporation",
+     "zh": "蒸发",
+     "pos": "n."
+    },
+    {
+     "w": "boiling",
+     "zh": "沸腾",
+     "pos": "n."
+    },
+    {
+     "w": "condensation",
+     "zh": "液化；凝结",
+     "pos": "n."
+    },
+    {
+     "w": "melting",
+     "zh": "熔化",
+     "pos": "n."
+    },
+    {
+     "w": "solidification",
+     "zh": "凝固",
+     "pos": "n."
+    },
+    {
+     "w": "melting point",
+     "zh": "熔点",
+     "pos": "n."
+    },
+    {
+     "w": "boiling point",
+     "zh": "沸点",
+     "pos": "n."
+    },
+    {
+     "w": "thermal expansion",
+     "zh": "热膨胀",
+     "pos": "n."
+    },
+    {
+     "w": "specific heat capacity",
+     "zh": "比热容",
+     "pos": "n."
+    },
+    {
+     "w": "specific latent heat",
+     "zh": "比潜热",
+     "pos": "n."
+    },
+    {
+     "w": "conduction",
+     "zh": "热传导",
+     "pos": "n."
+    },
+    {
+     "w": "convection",
+     "zh": "对流",
+     "pos": "n."
+    },
+    {
+     "w": "thermal radiation",
+     "zh": "热辐射",
+     "pos": "n."
+    },
+    {
+     "w": "infrared radiation",
+     "zh": "红外辐射",
+     "pos": "n."
+    },
+    {
+     "w": "conductor",
+     "zh": "导体",
+     "pos": "n."
+    },
+    {
+     "w": "insulator",
+     "zh": "绝缘体",
+     "pos": "n."
+    },
+    {
+     "w": "wave",
+     "zh": "波",
+     "pos": "n."
+    },
+    {
+     "w": "transverse wave",
+     "zh": "横波",
+     "pos": "n."
+    },
+    {
+     "w": "longitudinal wave",
+     "zh": "纵波",
+     "pos": "n."
+    },
+    {
+     "w": "amplitude",
+     "zh": "振幅",
+     "pos": "n."
+    },
+    {
+     "w": "wavelength",
+     "zh": "波长",
+     "pos": "n."
+    },
+    {
+     "w": "frequency",
+     "zh": "频率",
+     "pos": "n."
+    },
+    {
+     "w": "hertz",
+     "zh": "赫兹（Hz）",
+     "pos": "n."
+    },
+    {
+     "w": "wave speed",
+     "zh": "波速",
+     "pos": "n."
+    },
+    {
+     "w": "wavefront",
+     "zh": "波前",
+     "pos": "n."
+    },
+    {
+     "w": "compression",
+     "zh": "密部（压缩）",
+     "pos": "n."
+    },
+    {
+     "w": "rarefaction",
+     "zh": "疏部",
+     "pos": "n."
+    },
+    {
+     "w": "reflection",
+     "zh": "反射",
+     "pos": "n."
+    },
+    {
+     "w": "refraction",
+     "zh": "折射",
+     "pos": "n."
+    },
+    {
+     "w": "diffraction",
+     "zh": "衍射",
+     "pos": "n."
+    },
+    {
+     "w": "normal",
+     "zh": "法线",
+     "pos": "n."
+    },
+    {
+     "w": "angle of incidence",
+     "zh": "入射角",
+     "pos": "n."
+    },
+    {
+     "w": "angle of reflection",
+     "zh": "反射角",
+     "pos": "n."
+    },
+    {
+     "w": "angle of refraction",
+     "zh": "折射角",
+     "pos": "n."
+    },
+    {
+     "w": "refractive index",
+     "zh": "折射率",
+     "pos": "n."
+    },
+    {
+     "w": "critical angle",
+     "zh": "临界角",
+     "pos": "n."
+    },
+    {
+     "w": "total internal reflection",
+     "zh": "全反射",
+     "pos": "n."
+    },
+    {
+     "w": "optical fibre",
+     "zh": "光纤",
+     "pos": "n."
+    },
+    {
+     "w": "converging lens",
+     "zh": "会聚透镜（凸透镜）",
+     "pos": "n."
+    },
+    {
+     "w": "diverging lens",
+     "zh": "发散透镜（凹透镜）",
+     "pos": "n."
+    },
+    {
+     "w": "focal length",
+     "zh": "焦距",
+     "pos": "n."
+    },
+    {
+     "w": "principal focus",
+     "zh": "主焦点",
+     "pos": "n."
+    },
+    {
+     "w": "principal axis",
+     "zh": "主光轴",
+     "pos": "n."
+    },
+    {
+     "w": "real image",
+     "zh": "实像",
+     "pos": "n."
+    },
+    {
+     "w": "virtual image",
+     "zh": "虚像",
+     "pos": "n."
+    },
+    {
+     "w": "magnification",
+     "zh": "放大率",
+     "pos": "n."
+    },
+    {
+     "w": "dispersion",
+     "zh": "色散",
+     "pos": "n."
+    },
+    {
+     "w": "spectrum",
+     "zh": "光谱",
+     "pos": "n."
+    },
+    {
+     "w": "electromagnetic spectrum",
+     "zh": "电磁波谱",
+     "pos": "n."
+    },
+    {
+     "w": "radio waves",
+     "zh": "无线电波",
+     "pos": "n."
+    },
+    {
+     "w": "microwaves",
+     "zh": "微波",
+     "pos": "n."
+    },
+    {
+     "w": "visible light",
+     "zh": "可见光",
+     "pos": "n."
+    },
+    {
+     "w": "ultraviolet",
+     "zh": "紫外线",
+     "pos": "n."
+    },
+    {
+     "w": "X-rays",
+     "zh": "X射线",
+     "pos": "n."
+    },
+    {
+     "w": "gamma rays",
+     "zh": "γ射线",
+     "pos": "n."
+    },
+    {
+     "w": "sound wave",
+     "zh": "声波",
+     "pos": "n."
+    },
+    {
+     "w": "echo",
+     "zh": "回声",
+     "pos": "n."
+    },
+    {
+     "w": "ultrasound",
+     "zh": "超声波",
+     "pos": "n."
+    },
+    {
+     "w": "pitch",
+     "zh": "音调",
+     "pos": "n."
+    },
+    {
+     "w": "loudness",
+     "zh": "响度",
+     "pos": "n."
+    },
+    {
+     "w": "vacuum",
+     "zh": "真空",
+     "pos": "n."
+    },
+    {
+     "w": "magnet",
+     "zh": "磁体",
+     "pos": "n."
+    },
+    {
+     "w": "magnetic field",
+     "zh": "磁场",
+     "pos": "n."
+    },
+    {
+     "w": "magnetic field lines",
+     "zh": "磁感线",
+     "pos": "n."
+    },
+    {
+     "w": "north pole",
+     "zh": "北极（N极）",
+     "pos": "n."
+    },
+    {
+     "w": "attract",
+     "zh": "吸引",
+     "pos": "v."
+    },
+    {
+     "w": "repel",
+     "zh": "排斥",
+     "pos": "v."
+    },
+    {
+     "w": "induced magnetism",
+     "zh": "感应磁性（磁化）",
+     "pos": "n."
+    },
+    {
+     "w": "electromagnet",
+     "zh": "电磁铁",
+     "pos": "n."
+    },
+    {
+     "w": "solenoid",
+     "zh": "螺线管",
+     "pos": "n."
+    },
+    {
+     "w": "electric charge",
+     "zh": "电荷",
+     "pos": "n."
+    },
+    {
+     "w": "electron",
+     "zh": "电子",
+     "pos": "n."
+    },
+    {
+     "w": "electrostatic",
+     "zh": "静电的",
+     "pos": "adj."
+    },
+    {
+     "w": "electric field",
+     "zh": "电场",
+     "pos": "n."
+    },
+    {
+     "w": "current",
+     "zh": "电流",
+     "pos": "n."
+    },
+    {
+     "w": "ampere",
+     "zh": "安培（A）",
+     "pos": "n."
+    },
+    {
+     "w": "potential difference",
+     "zh": "电势差（电压）",
+     "pos": "n."
+    },
+    {
+     "w": "voltage",
+     "zh": "电压",
+     "pos": "n."
+    },
+    {
+     "w": "volt",
+     "zh": "伏特（V）",
+     "pos": "n."
+    },
+    {
+     "w": "electromotive force",
+     "zh": "电动势（e.m.f.）",
+     "pos": "n."
+    },
+    {
+     "w": "resistance",
+     "zh": "电阻",
+     "pos": "n."
+    },
+    {
+     "w": "ohm",
+     "zh": "欧姆（Ω）",
+     "pos": "n."
+    },
+    {
+     "w": "resistor",
+     "zh": "电阻器",
+     "pos": "n."
+    },
+    {
+     "w": "variable resistor",
+     "zh": "滑动变阻器",
+     "pos": "n."
+    },
+    {
+     "w": "ammeter",
+     "zh": "电流表",
+     "pos": "n."
+    },
+    {
+     "w": "voltmeter",
+     "zh": "电压表",
+     "pos": "n."
+    },
+    {
+     "w": "circuit",
+     "zh": "电路",
+     "pos": "n."
+    },
+    {
+     "w": "series circuit",
+     "zh": "串联电路",
+     "pos": "n."
+    },
+    {
+     "w": "parallel circuit",
+     "zh": "并联电路",
+     "pos": "n."
+    },
+    {
+     "w": "thermistor",
+     "zh": "热敏电阻",
+     "pos": "n."
+    },
+    {
+     "w": "light-dependent resistor",
+     "zh": "光敏电阻（LDR）",
+     "pos": "n."
+    },
+    {
+     "w": "diode",
+     "zh": "二极管",
+     "pos": "n."
+    },
+    {
+     "w": "light-emitting diode",
+     "zh": "发光二极管（LED）",
+     "pos": "n."
+    },
+    {
+     "w": "fuse",
+     "zh": "保险丝",
+     "pos": "n."
+    },
+    {
+     "w": "circuit breaker",
+     "zh": "断路器",
+     "pos": "n."
+    },
+    {
+     "w": "live wire",
+     "zh": "火线",
+     "pos": "n."
+    },
+    {
+     "w": "neutral wire",
+     "zh": "零线",
+     "pos": "n."
+    },
+    {
+     "w": "earth wire",
+     "zh": "地线",
+     "pos": "n."
+    },
+    {
+     "w": "short circuit",
+     "zh": "短路",
+     "pos": "n."
+    },
+    {
+     "w": "electrical power",
+     "zh": "电功率",
+     "pos": "n."
+    },
+    {
+     "w": "kilowatt-hour",
+     "zh": "千瓦时（度）",
+     "pos": "n."
+    },
+    {
+     "w": "electromagnetic induction",
+     "zh": "电磁感应",
+     "pos": "n."
+    },
+    {
+     "w": "induced e.m.f.",
+     "zh": "感应电动势",
+     "pos": "n."
+    },
+    {
+     "w": "generator",
+     "zh": "发电机",
+     "pos": "n."
+    },
+    {
+     "w": "electric motor",
+     "zh": "电动机",
+     "pos": "n."
+    },
+    {
+     "w": "transformer",
+     "zh": "变压器",
+     "pos": "n."
+    },
+    {
+     "w": "alternating current",
+     "zh": "交流电（a.c.）",
+     "pos": "n."
+    },
+    {
+     "w": "direct current",
+     "zh": "直流电（d.c.）",
+     "pos": "n."
+    },
+    {
+     "w": "step-up transformer",
+     "zh": "升压变压器",
+     "pos": "n."
+    },
+    {
+     "w": "step-down transformer",
+     "zh": "降压变压器",
+     "pos": "n."
+    },
+    {
+     "w": "atom",
+     "zh": "原子",
+     "pos": "n."
+    },
+    {
+     "w": "nucleus",
+     "zh": "原子核",
+     "pos": "n."
+    },
+    {
+     "w": "proton",
+     "zh": "质子",
+     "pos": "n."
+    },
+    {
+     "w": "neutron",
+     "zh": "中子",
+     "pos": "n."
+    },
+    {
+     "w": "nucleon",
+     "zh": "核子",
+     "pos": "n."
+    },
+    {
+     "w": "proton number",
+     "zh": "质子数",
+     "pos": "n."
+    },
+    {
+     "w": "nucleon number",
+     "zh": "核子数（质量数）",
+     "pos": "n."
+    },
+    {
+     "w": "isotope",
+     "zh": "同位素",
+     "pos": "n."
+    },
+    {
+     "w": "radioactivity",
+     "zh": "放射性",
+     "pos": "n."
+    },
+    {
+     "w": "radioactive decay",
+     "zh": "放射性衰变",
+     "pos": "n."
+    },
+    {
+     "w": "alpha particle",
+     "zh": "α粒子",
+     "pos": "n."
+    },
+    {
+     "w": "beta particle",
+     "zh": "β粒子",
+     "pos": "n."
+    },
+    {
+     "w": "gamma radiation",
+     "zh": "γ辐射",
+     "pos": "n."
+    },
+    {
+     "w": "ionising radiation",
+     "zh": "电离辐射",
+     "pos": "n."
+    },
+    {
+     "w": "half-life",
+     "zh": "半衰期",
+     "pos": "n."
+    },
+    {
+     "w": "background radiation",
+     "zh": "本底辐射",
+     "pos": "n."
+    },
+    {
+     "w": "nuclear fission",
+     "zh": "核裂变",
+     "pos": "n."
+    },
+    {
+     "w": "nuclear fusion",
+     "zh": "核聚变",
+     "pos": "n."
+    },
+    {
+     "w": "solar system",
+     "zh": "太阳系",
+     "pos": "n."
+    },
+    {
+     "w": "orbit",
+     "zh": "轨道；绕……运行",
+     "pos": "n./v."
+    },
+    {
+     "w": "planet",
+     "zh": "行星",
+     "pos": "n."
+    },
+    {
+     "w": "comet",
+     "zh": "彗星",
+     "pos": "n."
+    },
+    {
+     "w": "galaxy",
+     "zh": "星系",
+     "pos": "n."
+    },
+    {
+     "w": "Milky Way",
+     "zh": "银河系",
+     "pos": "n."
+    },
+    {
+     "w": "light-year",
+     "zh": "光年",
+     "pos": "n."
+    },
+    {
+     "w": "redshift",
+     "zh": "红移",
+     "pos": "n."
+    },
+    {
+     "w": "Big Bang theory",
+     "zh": "大爆炸理论",
+     "pos": "n."
+    }
+   ]
+  }
+ ]
+}

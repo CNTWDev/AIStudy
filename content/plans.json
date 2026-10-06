@@ -1,0 +1,310 @@
+{
+ "meta": {
+  "version": 1,
+  "generated": "2026-10-06",
+  "refs": "book_ids 对应 content/books_zh.json 与 books_en.json 的 id；list_id 对应 content/words_en.json"
+ },
+ "templates": [
+  {
+   "id": "brother-g3",
+   "for": "三年级（公立，统编+牛津上海版）",
+   "kid_hint": "弟弟",
+   "weekday_minutes": 60,
+   "weekend_minutes": 90,
+   "term_books": {
+    "三上（9月–1月）": [
+     "zh-gelin-tonghua",
+     "zh-antusheng-tonghua",
+     "zh-daocaoren"
+    ],
+    "三下（2月–6月）": [
+     "zh-zhongguo-yuyan",
+     "zh-yisuo-yuyan",
+     "zh-keliluofu-yuyan"
+    ],
+    "英语": [
+     "en-brown-bear-brown-bear-what-do-you-see",
+     "en-dear-zoo",
+     "en-from-head-to-toe",
+     "en-we-are-in-a-book",
+     "en-i-will-surprise-my-friend",
+     "en-hi-fly-guy"
+    ]
+   },
+   "tasks": [
+    {
+     "type": "read_zh",
+     "title": "中文名著接着读",
+     "minutes": 20,
+     "book_ids": [
+      "zh-gelin-tonghua",
+      "zh-antusheng-tonghua",
+      "zh-daocaoren"
+     ],
+     "what": "按三上快乐读书吧顺序：格林童话 → 安徒生童话 → 稻草人，每天 1 篇；读完说一句话概括",
+     "example": "周一读《格林童话》选编本第 3 篇《小红帽》（约 6 页），读完对家长说：「小红帽不听妈妈的话走进森林，被狼骗了，最后被猎人救出来。」再说一个最喜欢的人物。"
+    },
+    {
+     "type": "read_en",
+     "title": "英语阅读",
+     "minutes": 15,
+     "book_ids": [
+      "en-from-head-to-toe",
+      "en-dear-zoo",
+      "en-we-are-in-a-book"
+     ],
+     "what": "Pre-A1 图画书：先听/家长读 1 遍，再指读 1 遍，最后自己读 1 遍；一本读 3 天再换",
+     "example": "本周读 From Head to Toe（约 150 词）：周一听读+指读，周二自己读，周三边读边做动作（I can clap my hands!），点读查最多 3 个生词收藏（如 clap、wave、kick）。"
+    },
+    {
+     "type": "words",
+     "title": "背单词",
+     "minutes": 10,
+     "list_id": "en-core-g3",
+     "what": "en-core-g3 每天 8 个新词 + 系统推送的到期复习卡；看图/听音说中文，再拼写其中 3 个",
+     "example": "今天的新词：shoulder、knee、toe、finger、tooth、neck、body、clap。复习昨天的 8 个；拼写 knee、finger、tooth。约 27 个工作日学完 217 词。"
+    },
+    {
+     "type": "mistakes",
+     "title": "错题回顾",
+     "minutes": 5,
+     "what": "只看最近 3 天的错题，每天重做 2–3 道（语文听写错字、数学计算、英语单词），做对一题就移出",
+     "example": "重做昨天数学口算错的 2 道（如 36+47、5×8），语文听写错字「蝴蝶」再写 3 遍并组一个词。"
+    },
+    {
+     "type": "practice",
+     "title": "课内练习",
+     "minutes": 10,
+     "what": "跟课本进度：语文本课生字词/课文朗读，或英语课本当天单元的句型，或数学一页口算",
+     "example": "语文《司马光》朗读 3 遍并背第一句；或英语 3A 本单元句型 How many…? 用 5 个实物各问答一次。"
+    }
+   ],
+   "week_example": [
+    {
+     "day": "周一",
+     "items": [
+      "中文 20′：《格林童话》1 篇（小红帽），一句话概括",
+      "英语 15′：From Head to Toe 听读+指读",
+      "单词 10′：en-core-g3 新词 8 个（身体）+ 复习",
+      "错题 5′：数学口算 2 道",
+      "练习 10′：语文本课生字"
+     ]
+    },
+    {
+     "day": "周二",
+     "items": [
+      "中文 20′：《格林童话》1 篇（不来梅的音乐家）",
+      "英语 15′：From Head to Toe 自己读",
+      "单词 10′：新词 8 个（动物 giraffe…owl）+ 复习",
+      "错题 5′：听写错字",
+      "练习 10′：英语句型 Can you…?"
+     ]
+    },
+    {
+     "day": "周三",
+     "items": [
+      "中文 20′：《格林童话》1 篇，画一幅最喜欢的场景",
+      "英语 15′：From Head to Toe 边读边做动作",
+      "单词 10′：新词 8 个 + 复习",
+      "错题 5′",
+      "练习 10′：数学口算 1 页"
+     ]
+    },
+    {
+     "day": "周四",
+     "items": [
+      "中文 20′：《格林童话》1 篇",
+      "英语 15′：换新书 Dear Zoo 听读",
+      "单词 10′：复习为主（不学新词），拼写 5 个",
+      "错题 5′",
+      "练习 10′：语文朗读课文"
+     ]
+    },
+    {
+     "day": "周五",
+     "items": [
+      "中文 20′：《格林童话》1 篇，给家长讲故事",
+      "英语 15′：Dear Zoo 自己读",
+      "单词 10′：新词 8 个 + 复习",
+      "错题 5′：本周错题再做一遍",
+      "练习 10′：自由选"
+     ]
+    },
+    {
+     "day": "周六",
+     "items": [
+      "中文 30′：《格林童话》2 篇 + 说说这周最喜欢哪篇",
+      "英语 25′：Dear Zoo 分角色读 + 看对应动画/听音频",
+      "单词 15′：本周 32 个词大复习（拼写 10 个）",
+      "错题 10′：本周错题清零",
+      "自由阅读 10′"
+     ]
+    },
+    {
+     "day": "周日",
+     "items": [
+      "亲子共读 30′：中文或英文任选，家长读一半孩子读一半",
+      "单词 10′：到期复习卡",
+      "其余时间休息（周日不加新内容）"
+     ]
+    }
+   ],
+   "notes": [
+    "坚持比做对更重要：每天完成 60 分钟就是胜利，不追加。",
+    "作业多的日子只保留「中文阅读 15′ + 单词 10′」，其余跳过。",
+    "中文阅读按教材册次：三上童话（格林→安徒生→稻草人），三下寓言（中国古代寓言→伊索→克雷洛夫）。",
+    "英语三上读 Pre-A1，寒假后进入 A1（Elephant & Piggie、Fly Guy），见 books_en.json for_kids.brother。"
+   ]
+  },
+  {
+   "id": "sister-g8-igcse",
+   "for": "初二（国际学校 IGCSE 方向；英语基础偏弱，物理英文授课）",
+   "kid_hint": "姐姐",
+   "weekday_minutes": 90,
+   "weekend_minutes": 120,
+   "term_books": {
+    "第1–8周": [
+     "en-the-elephant-man",
+     "en-the-phantom-of-the-opera",
+     "en-dinosaurs-before-dark"
+    ],
+    "第9–20周": [
+     "en-the-canterville-ghost",
+     "en-sherlock-holmes-short-stories",
+     "en-the-secret-garden",
+     "en-diary-of-a-wimpy-kid"
+    ],
+    "之后": [
+     "en-charlie-and-the-chocolate-factory",
+     "en-wonder"
+    ],
+    "中文（周末，可选）": [
+     "zh-zhaohua-xishi",
+     "zh-hongxing"
+    ]
+   },
+   "tasks": [
+    {
+     "type": "read_en",
+     "title": "英语阅读（A2 起步）",
+     "minutes": 30,
+     "book_ids": [
+      "en-the-elephant-man",
+      "en-the-phantom-of-the-opera",
+      "en-the-canterville-ghost"
+     ],
+     "what": "从 A2 分级读物起步：每天 1 章（Bookworms Stage 1 约 600–800 词/章），读前看标题猜，读后用 3 句英文复述；每章收藏不超过 5 个生词",
+     "example": "今天读 Oxford Bookworms Stage 1《The Elephant Man》Chapter 2（约 6 页）。读完写 3 句：Joseph Merrick lived in a shop. People paid money to see him. Dr Treves wanted to help him. 收藏生词 frightened、disease、crowd。"
+    },
+    {
+     "type": "words",
+     "title": "学术词 + 指令词",
+     "minutes": 15,
+     "list_id": "en-core-g8-igcse",
+     "what": "en-core-g8-igcse 每天 10 个新词 + 到期复习；指令词（describe、explain、compare、suggest、state、calculate、evaluate…）优先，每个词造 1 个与学科有关的短句",
+     "example": "今天：describe、explain、compare、contrast、state、suggest、calculate、evaluate、identify、outline。造句：Explain why the ice melts. / Compare the speeds of car A and car B. 约 29 个工作日学完 290 词。"
+    },
+    {
+     "type": "physics_terms",
+     "title": "物理术语",
+     "minutes": 20,
+     "list_id": "igcse-physics-terms",
+     "what": "跟学校物理进度：每天 8 个术语卡（英→中、中→英各一遍）+ 读课本对应一小节，用英文写 2 句定义；遇到题目先圈出指令词和术语",
+     "example": "本周学校在 Motion：今天术语 scalar、vector、distance、displacement、speed、velocity、acceleration、gradient。读课本 Speed, velocity and acceleration 一节，写：Velocity is speed in a given direction. Acceleration is the change in velocity per unit time. 再做 3 道 distance–time 图像题。"
+    },
+    {
+     "type": "mistakes",
+     "title": "错题回顾",
+     "minutes": 10,
+     "what": "物理/数学错题重做 2 道，英语阅读理解错题 1 道；重点写「错在哪：看不懂题 / 术语不会 / 计算错」",
+     "example": "重做上周物理小测第 4 题（求加速度），标注错因「没看懂 deceleration」，把 deceleration 加入术语卡；英语错题：把原句中不认识的 2 个词查出来。"
+    },
+    {
+     "type": "writing",
+     "title": "英语小输出",
+     "minutes": 15,
+     "what": "每天写 40–60 词：今天读的内容复述，或用今天的指令词回答一个物理小问题；周末写一段 80 词读后感",
+     "example": "Describe the motion of a car on a distance–time graph with a straight, sloping line.（答：The car moves at a constant speed because the gradient is constant.）AI 先表扬再指出一个最重要的问题。"
+    }
+   ],
+   "week_example": [
+    {
+     "day": "周一",
+     "items": [
+      "英语阅读 30′：The Elephant Man Ch.1 + 3 句复述",
+      "指令词 15′：describe/explain/state…10 个新词",
+      "物理术语 20′：Motion 8 个术语 + 课本一节",
+      "错题 10′：物理 2 道",
+      "输出 15′：用 explain 回答一题"
+     ]
+    },
+    {
+     "day": "周二",
+     "items": [
+      "英语阅读 30′：Ch.2",
+      "指令词 15′：10 个新词 + 复习",
+      "物理术语 20′：8 个 + distance–time 图像 3 题",
+      "错题 10′",
+      "输出 15′：复述 Ch.2（50 词）"
+     ]
+    },
+    {
+     "day": "周三",
+     "items": [
+      "英语阅读 30′：Ch.3",
+      "指令词 15′：复习为主",
+      "物理术语 20′：8 个 + speed–time 图像",
+      "错题 10′",
+      "输出 15′"
+     ]
+    },
+    {
+     "day": "周四",
+     "items": [
+      "英语阅读 30′：Ch.4",
+      "指令词 15′：10 个新词",
+      "物理术语 20′：本周术语中英互译测一遍",
+      "错题 10′",
+      "输出 15′：用 compare 写 2 句"
+     ]
+    },
+    {
+     "day": "周五",
+     "items": [
+      "英语阅读 30′：Ch.5（读完一本，做书后练习）",
+      "指令词 15′：本周 40 词复习",
+      "物理术语 20′：做一份 past paper 选择题 10 道，圈出指令词",
+      "错题 10′",
+      "输出 15′"
+     ]
+    },
+    {
+     "day": "周六",
+     "items": [
+      "英语阅读 40′：Magic Tree House #1 Dinosaurs Before Dark 2–3 章（提速、读得轻松）",
+      "英语写作 20′：80 词读后感 The Elephant Man",
+      "物理 30′：本周错题清零 + 术语大复习",
+      "中文 15′（可选）：《朝花夕拾》1 篇",
+      "复习卡 15′"
+     ]
+    },
+    {
+     "day": "周日",
+     "items": [
+      "英语听读 30′：本周书的音频跟读 1 章",
+      "复习卡 15′",
+      "下周预习 15′：看物理下一节的术语表",
+      "其余时间休息"
+     ]
+    }
+   ],
+   "notes": [
+    "起点 A2（比年级低约两级）是正常的：先求读懂、读多，读得轻松再升级。",
+    "每本分级读物读完换下一本；连续两本都觉得容易（生词 <2%）就升一级。",
+    "物理术语与学校进度同步，比单独背更有效；题目中先圈指令词再作答。",
+    "作业多的日子保留：英语阅读 20′ + 物理术语 10′ + 复习卡 10′。",
+    "目标：一学期到 B1，IGCSE 前到 B2（见 books_en.json for_kids.sister）。"
+   ]
+  }
+ ]
+}

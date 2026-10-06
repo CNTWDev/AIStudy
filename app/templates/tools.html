@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>划词查词小工具</h1>
+<p class="muted">装在电脑的 Chrome / Edge 浏览器上。孩子在任何网页上选中不认识的英文单词（或中文词），
+旁边会出现「🔍 查」，也可以右键「用 AIStudy 查」：显示音标、发音、意思、近义词和例句，点「⭐ 加入单词本」，
+这个词就会出现在每天的「单词」任务里，按 1/2/4/7 天自动复习。</p>
+
+{% if user.role == 'parent' %}
+<div class="card">
+  {% if kids %}
+  <form method="get" action="/tools" class="row"><label class="grow" style="margin:0">给哪个孩子用</label>
+    <select name="kid" onchange="this.form.submit()">{% for c in kids %}<option value="{{ c.id }}" {{ 'selected' if target and target.id == c.id }}>{{ c.name }}</option>{% endfor %}</select></form>
+  {% else %}<p>还没有孩子账号，请先在<a href="/parent">家长页</a>添加。</p>{% endif %}
+</div>
+{% endif %}
+
+<div class="card">
+  <h3 style="margin-top:0">第 1 步：下载并安装插件</h3>
+  <p><a class="btn" href="/tools/extension.zip">⬇️ 下载插件（zip）</a></p>
+  <ol class="small">
+    <li>解压下载的 zip，得到 <code>aistudy-extension</code> 文件夹。</li>
+    <li>Chrome 地址栏打开 <code>chrome://extensions</code>（Edge 打开 <code>edge://extensions</code>），打开右上角「开发者模式」。</li>
+    <li>点「加载已解压的扩展程序」，选择 <code>aistudy-extension</code> 文件夹。</li>
+    <li>把工具栏里的 📚 图标固定出来，方便看连接状态。</li>
+  </ol>
+</div>
+
+{% if target %}
+<div class="card">
+  <h3 style="margin-top:0">第 2 步：连接 {{ target.name }} 的账号</h3>
+  {% if token %}
+  <div class="hint">连接码（<b>只显示这一次</b>，请马上复制）：<br>
+    <code id="tok" style="font-size:16px;word-break:break-all">{{ token }}</code>
+    <button class="btn sm" onclick="navigator.clipboard.writeText(document.getElementById('tok').textContent).then(() => toast('已复制'))">复制</button></div>
+  {% endif %}
+  <p class="small">点插件图标 → 「设置」，填两项：</p>
+  <ul class="small">
+    <li>网站地址：<code>{{ server }}</code>（下载的插件里已经预填好）</li>
+    <li>连接码：点下面按钮生成</li>
+  </ul>
+  <form method="post" action="/tools/token"><input type="hidden" name="kid" value="{{ target.id if user.role == 'parent' else 0 }}">
+    <button class="btn">生成新的连接码</button></form>
+  {% if tokens %}
+  <h4>已经生成的连接码</h4>
+  <table class="tbl small"><tr><th>名称</th><th>生成时间</th><th>最近使用</th><th></th></tr>
+  {% for t in tokens %}<tr><td>{{ t.name or '插件' }}</td><td>{{ (t.created_at or '')[:16] }}</td><td>{{ (t.last_used or '从未')[:16] }}</td>
+    <td><form method="post" action="/tools/token" onsubmit="return confirm('作废后，用这个连接码的插件就不能查词了。确定吗？')">
+      <input type="hidden" name="kid" value="{{ target.id if user.role == 'parent' else 0 }}"><input type="hidden" name="token_hash" value="{{ t.token_hash }}">
+      <button class="btn ghost sm" name="action" value="revoke">作废</button></form></td></tr>{% endfor %}
+  </table>
+  <p class="muted small">换电脑或担心连接码泄露时，作废旧的再生成一个。</p>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="card">
+  <h3 style="margin-top:0">怎么用</h3>
+  <ul class="small">
+    <li>读英文网页、做 IGCSE 练习时，选中单词 → 点「🔍 查」。</li>
+    <li>觉得要记住的，点「⭐ 加入单词本」。查过但没加的也会记在「记录」里。</li>
+    <li>每天「今天」页的第一项「单词」就会复习这些词，不用另外找入口。</li>
+    <li>查词需要服务器配置好 AI（家长在 <code>config/llm.toml</code> 里填密钥）。</li>
+  </ul>
+</div>
+{% endblock %}
