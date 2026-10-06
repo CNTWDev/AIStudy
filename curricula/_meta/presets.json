@@ -106,7 +106,8 @@
     "math": {
      "pack": "math-cambridge",
      "track": "extended"
-    }
+    },
+    "economics": "econ-cambridge"
    }
   }
  ]
