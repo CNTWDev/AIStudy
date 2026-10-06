@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/subjects" class="small">← 学科</a>
+<h1>{{ pack.subject_name }} 摸底诊断</h1>
+<div class="card" id="intro">
+  <p>从 <b>{{ stage_label(stage) }}</b> 的核心知识点开始，每个点 1 道题。<br>
+  做错了不要紧：系统会自动<b>往回追</b>它的前置知识，最多追 3 层，直到找到真正的「断点」。</p>
+  <p class="muted small">大约 10–15 分钟，最多 18 题。不会就选「不会」，不要猜——诊断越真实，计划越准。</p>
+  <div class="row">
+    <button class="btn" id="go">开始诊断</button>
+    {% if running %}<button class="btn ghost" id="resume" data-sid="{{ running.id }}">继续上次</button>{% endif %}
+  </div>
+  {% if history %}<p class="small" style="margin-top:12px">历史报告：{% for h in history %}<a href="/diagnose/report/{{ h.id }}">{{ h.finished_at[:10] }}</a> {% endfor %}</p>{% endif %}
+</div>
+<div id="stage" style="display:none">
+  <div class="row small muted"><span class="grow" id="prog"></span><button class="btn ghost sm" id="stop">结束并看报告</button></div>
+  <div class="card" id="box"></div>
+</div>
+<script>
+let sid = null;
+async function start(resume) {
+  sid = resume || (await api('/api/diag/start', {pack_id: {{ pack.id|tojson }}})).sid;
+  $('#intro').style.display = 'none'; $('#stage').style.display = ''; next();
+}
+async function next() {
+  $('#box').innerHTML = '<span class="loading">正在准备下一题</span>';
+  let r;
+  try { r = await api(`/api/diag/${sid}/next`); } catch (e) { $('#box').innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn" onclick="next()">重试</button>`; return; }
+  if (r.done) { location.href = r.report; return; }
+  $('#prog').textContent = `第 ${r.n} 题` + (r.depth ? ` · 往回追第 ${r.depth} 层` : '');
+  const head = `<div class="small muted">${esc(r.kp.stage)} · ${esc(r.kp.name)}${r.kp.name_en ? ' · ' + esc(r.kp.name_en) : ''}</div>` +
+    (r.from ? `<div class="hint small" style="margin:6px 0">刚才「${esc(r.from)}」没做对，看看是不是这个基础没打牢。</div>` : '');
+  if (r.item) {
+    $('#box').innerHTML = head + '<div id="q"></div>';
+    renderItem($('#q'), r.item, {
+      submit: (answer, self) => api(`/api/diag/${sid}/answer`, self ? {self: self === 'ok' ? 'know' : 'dont'} : {answer}),
+      onDone: () => { const b = document.createElement('button'); b.className = 'btn'; b.style.marginTop = '10px'; b.textContent = '下一题 →'; b.onclick = next; $('#q').appendChild(b); }
+    });
+    const skip = document.createElement('button'); skip.className = 'btn ghost sm'; skip.textContent = '不会，跳过'; skip.style.marginTop = '8px';
+    skip.onclick = async () => { await api(`/api/diag/${sid}/answer`, {answer: '', self: 'dont'}); next(); };
+    $('#box').appendChild(skip);
+  } else {
+    $('#box').innerHTML = head + `<p><b>${esc(r.kp.desc)}</b></p><p class="muted small">自测：${esc(r.kp.probe)}</p>` +
+      `<p>你觉得自己会吗？</p><div class="row"><button class="btn" data-v="know">会，能做对</button><button class="btn ghost" data-v="dont">不太会</button></div>`;
+    $$('#box [data-v]').forEach(b => b.onclick = async () => { await api(`/api/diag/${sid}/answer`, {self: b.dataset.v}); next(); });
+  }
+}
+$('#go').onclick = () => start();
+if ($('#resume')) $('#resume').onclick = () => start(+$('#resume').dataset.sid);
+$('#stop').onclick = async () => { const r = await api(`/api/diag/${sid}/finish`, {}); location.href = r.report; };
+</script>
+{% endblock %}

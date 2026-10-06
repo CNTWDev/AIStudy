@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>管理</h1>
+{% if msg %}<div class="hint">{{ msg }}{% if link %}<br><input type="text" readonly value="{{ link }}" onclick="this.select()" style="margin-top:6px">{% endif %}</div>{% endif %}
+
+<div class="card">
+  <h3>系统状态</h3>
+  <p class="small">注册方式：<b>{{ {'closed':'关闭（只能由管理员创建家长账号）','invite':'凭邀请码注册','open':'开放注册'}.get(reg_mode, reg_mode) }}</b>
+    <span class="muted">（在服务器 .env 的 REGISTRATION 修改）</span></p>
+  <p class="small">AI：{% if llm_status[0] %}<b>可用</b> · {{ llm_status[1] }}{% else %}<b>未就绪</b> · {{ llm_status[1] }}{% endif %}
+    <span class="muted">（在服务器 config/llm.toml 修改）</span></p>
+</div>
+
+<div class="card">
+  <h3>账号</h3>
+  <table>
+    <tr><th>账号</th><th>角色</th><th>最近登录</th><th>操作</th></tr>
+    {% for u in users %}
+    <tr>
+      <td>{% if u.parent_id %}　└ {% endif %}<b>{{ u.name }}</b> <span class="muted small">{{ u.email }}</span>
+        {% if u.status == 'disabled' %}<span class="pill st-weak">已停用</span>{% endif %}
+        {% if u.locked_until and u.locked_until > now %}<span class="pill st-weak">锁定中</span>{% endif %}</td>
+      <td class="small">{{ '孩子' if u.role == 'kid' else '家长' }}{% if u.is_admin %} · 管理员{% endif %}</td>
+      <td class="small">{{ (u.last_login_at or '从未')[:16]|replace('T',' ') }}</td>
+      <td class="small">
+        <form method="post" action="/admin/users/{{ u.id }}/reset" style="display:inline"><button class="btn ghost sm">重设密码链接</button></form>
+        {% if u.id != user.id %}
+        <form method="post" action="/admin/users/{{ u.id }}/status" style="display:inline"><input type="hidden" name="status" value="{{ 'active' if u.status == 'disabled' else 'disabled' }}"><button class="btn ghost sm">{{ '启用' if u.status == 'disabled' else '停用' }}</button></form>
+        {% if u.role == 'parent' %}<form method="post" action="/admin/users/{{ u.id }}/admin" style="display:inline"><input type="hidden" name="on" value="{{ '' if u.is_admin else '1' }}"><button class="btn ghost sm">{{ '取消管理员' if u.is_admin else '设为管理员' }}</button></form>{% endif %}
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<form class="card" method="post" action="/admin/users/create">
+  <h3>直接创建家长账号</h3>
+  <div class="row">
+    <div class="grow"><label>称呼</label><input type="text" name="name" placeholder="例如：妈妈"></div>
+    <div class="grow"><label>邮箱</label><input type="email" name="email" required></div>
+    <div class="grow"><label>初始密码</label><input type="text" name="password" required minlength="6" autocomplete="off"></div>
+  </div>
+  <div style="margin-top:12px"><button class="btn">创建</button></div>
+</form>
+
+<div class="card">
+  <h3>邀请码</h3>
+  <form method="post" action="/admin/invites/create" class="row">
+    <div class="grow"><label>备注</label><input type="text" name="note" placeholder="例如：表姐家"></div>
+    <div><label>可用次数</label><input type="number" name="max_uses" value="1" min="1" max="100"></div>
+    <div><label>有效天数</label><input type="number" name="days" value="14" min="1" max="365"></div>
+    <div style="align-self:flex-end"><button class="btn">生成</button></div>
+  </form>
+  <table style="margin-top:10px">
+    <tr><th>邀请码</th><th>备注</th><th>已用</th><th>到期</th><th></th></tr>
+    {% for i in invites %}
+    <tr><td><code>{{ i.code }}</code></td><td class="small">{{ i.note }}</td><td class="small">{{ i.used }}/{{ i.max_uses }}</td>
+      <td class="small">{{ (i.expires_at or '')[:10] }}</td>
+      <td><form method="post" action="/admin/invites/{{ i.code }}/delete"><button class="btn ghost sm">删除</button></form></td></tr>
+    {% else %}<tr><td colspan="5" class="muted small">还没有邀请码</td></tr>{% endfor %}
+  </table>
+</div>
+
+<div class="card">
+  <h3>最近的登录与安全记录</h3>
+  <table>
+    {% for e in events %}
+    <tr class="small"><td>{{ e.created_at[:16]|replace('T',' ') }}</td><td>{{ e.event }}</td><td>{{ e.email }}</td><td class="muted">{{ e.ip }}</td><td class="muted">{{ e.detail }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

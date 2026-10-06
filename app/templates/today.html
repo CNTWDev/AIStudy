@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block body %}
+{% set done = t.plan|selectattr('done')|list|length %}
+<h1>今天 · {{ t.day[5:] }}</h1>
+<p class="muted">已完成 <b>{{ done }}/{{ t.plan|length }}</b> · 今天学了约 {{ t.minutes }} 分钟 · 连续打卡 <b>{{ streak }}</b> 天 🔥</p>
+<div class="card">
+  <div class="row"><h3 class="grow" style="margin:0">今日计划</h3><button class="btn ghost sm" id="rebuild">重新安排</button></div>
+  <p class="muted small">按顺序做就行。每一项都拆成小步骤，卡住了就点「退一步」。</p>
+  {% for x in t.plan %}
+  <div class="task {{ 'done' if x.done }}" data-id="{{ x.id }}">
+    <button class="chk" title="标记完成">{{ '✓' if x.done }}</button>
+    <div class="grow">
+      <a class="t" href="{{ x.url }}"><span class="kind k-{{ x.type }}">{{ {'review':'复习','weak':'补弱','backfill':'回溯','preview':'预习','reading':'阅读','diagnose':'诊断'}[x.type] }}</span>{{ x.title }}</a>
+      <div class="muted small">{{ x.why }} · 约 {{ x.minutes }} 分钟{% if x.pack %} · {{ catalog.packs[x.pack].subject_name }}{% endif %}</div>
+    </div>
+    <a class="btn sm" href="{{ x.url }}">开始</a>
+  </div>
+  {% else %}<p>今天没有安排。可以去「学科」选一个知识点练练，或读一篇文章。</p>{% endfor %}
+</div>
+<div class="card">
+  <h3 style="margin-top:0">今日打卡</h3>
+  {% if t.checked_in %}<p>✅ 今天已打卡。{% if t.reflection %}<br><span class="muted">「{{ t.reflection }}」</span>{% endif %}</p>{% endif %}
+  <label>今天学到了什么 / 哪里还不懂？（一句话就行）</label>
+  <textarea id="refl" style="min-height:70px">{{ t.reflection }}</textarea>
+  <div class="row" style="margin-top:8px"><span class="muted small">学习了</span><input type="number" id="mins" value="{{ t.minutes }}" style="width:90px"><span class="muted small">分钟</span><button class="btn" id="checkin">打卡</button></div>
+</div>
+<h3>最近四周</h3>
+<div class="cal">{% for d in cal %}<div class="{{ 'l3' if d.minutes >= 60 else 'l2' if d.minutes >= 30 else 'l1' if d.minutes > 0 or d.checked }} {{ 'today' if d.day == t.day }}" title="{{ d.day }}：{{ d.minutes }} 分钟">.</div>{% endfor %}</div>
+<script>
+$$('.task .chk').forEach(b => b.onclick = async () => {
+  const row = b.closest('.task'); const done = !row.classList.contains('done');
+  await api('/api/plan/task', {id: row.dataset.id, done}); row.classList.toggle('done', done); b.textContent = done ? '✓' : '';
+});
+$('#rebuild').onclick = async () => { await api('/api/plan/rebuild', {}); location.reload(); };
+$('#checkin').onclick = async () => { const r = await api('/api/checkin', {reflection: $('#refl').value, minutes: +$('#mins').value}); alert('打卡成功！连续 ' + r.streak + ' 天'); location.reload(); };
+</script>
+{% endblock %}

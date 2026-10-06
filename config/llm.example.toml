@@ -1,0 +1,64 @@
+# AIStudy 的 AI（大模型）配置。
+# 使用方法：复制为 config/llm.toml（install.sh 会自动复制），填上你自己的 API Key，然后重启服务：
+#     sudo systemctl restart aistudy
+# 检查配置是否可用：
+#     sudo /opt/aistudy/install.sh check --llm
+#
+# config/llm.toml 里有密钥，已被 .gitignore 忽略，不会提交到 git。
+# 任何值都可以写成 "${环境变量名}"，从环境变量读取（适合不想把密钥写进文件的情况）。
+
+# 默认用哪个提供方（下面 [providers.xxx] 的名字）。设为 "none" 则关闭全部 AI 功能，其余功能照常。
+default = "claude"
+
+# 每个孩子每天最多调用 AI 次数（查词、讲解、出题等都算），防止费用失控
+daily_limit_per_kid = 300
+
+# 相同的问题（例如同一个词在同一句里）直接用缓存结果，不重复花钱
+cache = true
+
+# ---------------------------------------------------------------- 提供方
+# type 可选：
+#   anthropic      Claude 官方 API（https://console.anthropic.com 申请 API Key）
+#   openai_compat  任何 OpenAI 兼容接口：DeepSeek、通义千问、Kimi、智谱等（服务器在中国大陆时用）
+#   mock           假数据，只用于本地演示和自动测试
+
+[providers.claude]
+type = "anthropic"
+api_key = ""                       # 填 sk-ant-... ；或写 "${ANTHROPIC_API_KEY}"
+model = "claude-opus-5-5"
+# base_url = ""                    # 通过代理/网关访问时填写，否则留空
+timeout = 120                      # 秒
+max_retries = 2
+# 模型不可用（过载等）时自动切换到备用模型
+server_fallback = true
+
+[providers.deepseek]
+type = "openai_compat"
+base_url = "https://api.deepseek.com/v1"
+api_key = ""
+model = "deepseek-chat"
+timeout = 120
+
+# [providers.qwen]
+# type = "openai_compat"
+# base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+# api_key = ""
+# model = "qwen-plus"
+
+[providers.mock]
+type = "mock"
+
+# ---------------------------------------------------------------- 按任务单独设置（可选）
+# 不写就用 default 提供方和它的 model。可以给某个任务换提供方、换模型或调整思考强度。
+# 任务名：lookup 查词 / explain 讲句子 / sentence 造句点评 / teach 知识点讲解 /
+#         items 出题 / passage 写阅读短文
+# effort 可选 low / medium / high（只对 anthropic 有效，越高越准越慢越贵）
+#
+# [tasks.lookup]
+# effort = "low"
+#
+# [tasks.items]
+# effort = "medium"
+#
+# [tasks.passage]
+# provider = "deepseek"

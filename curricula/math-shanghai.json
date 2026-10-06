@@ -1,0 +1,4038 @@
+{
+ "pack": {
+  "id": "math-shanghai",
+  "subject": "math",
+  "subject_name": "数学",
+  "edition": "沪教版（小学·初中·高中2020）",
+  "region": "上海公办",
+  "stages": [
+   "G1",
+   "G2",
+   "G3",
+   "G4",
+   "G5",
+   "G6",
+   "G7",
+   "G8",
+   "G9",
+   "G10",
+   "G11",
+   "G12"
+  ],
+  "version": 1,
+  "generated": "2026-10-06",
+  "sources": [
+   "上海市中小学数学课程标准（试行稿）",
+   "沪教版（上海教育出版社）小学数学一至五年级教材",
+   "沪教版初中数学六至九年级教材（五四学制）",
+   "沪教版高中数学2020新教材：必修第一~四册、选择性必修第一~三册",
+   "上海市初中学业水平考试（中考）数学考纲",
+   "上海市普通高等学校招生统一考试（高考）数学考试说明",
+   "《义务教育数学课程标准（2022年版）》",
+   "《普通高中数学课程标准（2017年版2020年修订）》"
+  ],
+  "notes": "上海五四学制：小学G1-G5、初中G6-G9（六年级含数的整除、分数、比和比例、圆、有理数、方程）、高中G10-G12（2020新教材，必修+选择性必修）。小学部分按单元细化、强调具体操作与口算；中考第24/25题、高考导数与圆锥曲线综合单列为综合知识点。term 为大致学期，各校进度略有差异；prereqs 中 strength 取 必须/有帮助。"
+ },
+ "strands": [
+  {
+   "id": "NUM",
+   "name": "数与运算"
+  },
+  {
+   "id": "ALG",
+   "name": "代数（方程与不等式、数列）"
+  },
+  {
+   "id": "FUN",
+   "name": "函数"
+  },
+  {
+   "id": "GEO",
+   "name": "图形与几何"
+  },
+  {
+   "id": "STA",
+   "name": "统计与概率"
+  },
+  {
+   "id": "APP",
+   "name": "应用与建模"
+  }
+ ],
+ "kps": [
+  {
+   "id": "MSH-NUM-01",
+   "strand": "NUM",
+   "stage": "G1",
+   "term": "上",
+   "unit": "10以内数的认识",
+   "name": "10以内数的认识",
+   "name_en": "Numbers to 10",
+   "desc": "数数、读写0-10，比较大小（>、<、=），序数（第几），数的分与合。",
+   "prereqs": [],
+   "hot": false,
+   "method": "用小棒、手指一边点一边数，强调“最后数到几就是几个”。分与合用“小树分叉”图反复说，常见错误是把“几个”和“第几个”混淆。",
+   "probe": "摆出7个圆片，问“一共有几个？从左数第3个是哪个？7可以分成3和几？”",
+   "terms": [
+    "数数",
+    "比大小",
+    "分与合",
+    "序数"
+   ]
+  },
+  {
+   "id": "MSH-NUM-02",
+   "strand": "NUM",
+   "stage": "G1",
+   "term": "上",
+   "unit": "10以内加减法",
+   "name": "10以内加减法",
+   "name_en": "Addition and subtraction within 10",
+   "desc": "理解加法是合起来、减法是去掉，熟练口算10以内加减。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先用实物“合起来/拿走”讲意义，再借分与合口算（5可以分成2和3，所以2+3=5、5-2=3）。每天2分钟口算卡保持熟练，常见错误是减法数数时多数或少数1。",
+   "probe": "限时1分钟做20道10以内加减口算，看正确率和是否还在掰手指。",
+   "terms": [
+    "加法",
+    "减法",
+    "口算"
+   ]
+  },
+  {
+   "id": "MSH-NUM-03",
+   "strand": "NUM",
+   "stage": "G1",
+   "term": "上",
+   "unit": "20以内数的认识",
+   "name": "20以内数的认识",
+   "name_en": "Numbers to 20",
+   "desc": "十几由1个十和几个一组成；数位初步（十位、个位）；数的顺序与比较。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "用一捆小棒（10根）加散的小棒表示十几，让孩子说“13是1个十和3个一”。常见错误是把13写成31或说成“三十一”。",
+   "probe": "问“1个十和6个一是多少？比15大1的数是几？”",
+   "terms": [
+    "十位",
+    "个位",
+    "一捆"
+   ]
+  },
+  {
+   "id": "MSH-NUM-04",
+   "strand": "NUM",
+   "stage": "G1",
+   "term": "上",
+   "unit": "20以内进位加法",
+   "name": "20以内进位加法（凑十法）",
+   "name_en": "Addition with regrouping within 20 (make-ten)",
+   "desc": "9+几、8+几、7+几等进位加法，用凑十法口算。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-02",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "熟背“10的好朋友”（1和9、2和8……），看大数缺几凑成10，把小数拆开：8+5→8+2+3=13。常见错误是拆错数或忘记加剩下的部分。",
+   "probe": "让他口述8+6怎么算，听是否会“凑十”，而不是从8往后数6个。",
+   "terms": [
+    "凑十法",
+    "进位"
+   ]
+  },
+  {
+   "id": "MSH-GEO-01",
+   "strand": "GEO",
+   "stage": "G1",
+   "term": "上",
+   "unit": "认识图形",
+   "name": "认识立体图形",
+   "name_en": "Recognising 3D shapes",
+   "desc": "长方体、正方体、圆柱、球的认识与区分。",
+   "prereqs": [],
+   "hot": false,
+   "method": "用家里的纸盒、易拉罐、皮球实物摸一摸、滚一滚，说出面是平的还是弯的。常见错误是把正方体叫成“正方形”。",
+   "probe": "拿出纸巾盒、魔方、水杯、乒乓球，让他说出各是什么形体。",
+   "terms": [
+    "长方体",
+    "正方体",
+    "圆柱",
+    "球"
+   ]
+  },
+  {
+   "id": "MSH-NUM-05",
+   "strand": "NUM",
+   "stage": "G1",
+   "term": "下",
+   "unit": "20以内退位减法",
+   "name": "20以内退位减法（破十法）",
+   "name_en": "Subtraction with regrouping within 20",
+   "desc": "十几减9、8、7…，用破十法或想加算减口算。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "破十法：13-8→10-8=2，2+3=5；或者想“8加几等于13”。先让孩子固定用一种方法，熟练后再比较，常见错误是把个位直接相减变成8-3=5再写成15。",
+   "probe": "做15-7、12-9、16-8三题，让他说出思路，看是否卡在个位不够减。",
+   "terms": [
+    "破十法",
+    "退位",
+    "想加算减"
+   ]
+  },
+  {
+   "id": "MSH-NUM-06",
+   "strand": "NUM",
+   "stage": "G1",
+   "term": "下",
+   "unit": "100以内数的认识",
+   "name": "100以内数的认识",
+   "name_en": "Numbers to 100",
+   "desc": "数数（一个一个、十个十个）、数位、读写、比较大小、百数表规律。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "用百数表找规律：往右一格多1，往下一格多10。比较两位数先比十位，常见错误是47和74混淆或只看个位比较大小。",
+   "probe": "问“68里有几个十几个一？68和86谁大？比50少1的数是几？”",
+   "terms": [
+    "百数表",
+    "数位",
+    "十位"
+   ]
+  },
+  {
+   "id": "MSH-NUM-07",
+   "strand": "NUM",
+   "stage": "G1",
+   "term": "下",
+   "unit": "100以内加减法",
+   "name": "100以内加减法（口算）",
+   "name_en": "Mental addition and subtraction within 100",
+   "desc": "两位数加减整十数、两位数加减一位数（进位、退位）口算。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-05",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把数拆成“几十”和“几”：36+20先算30+20；36+7个位先凑十。常见错误是把整十数加到个位上（36+20=38）。",
+   "probe": "口算45+30、45+8、52-6、70-24，看错在哪一类。",
+   "terms": [
+    "整十数",
+    "口算",
+    "进位",
+    "退位"
+   ]
+  },
+  {
+   "id": "MSH-GEO-02",
+   "strand": "GEO",
+   "stage": "G1",
+   "term": "下",
+   "unit": "认识图形",
+   "name": "认识平面图形",
+   "name_en": "Recognising 2D shapes",
+   "desc": "长方形、正方形、三角形、圆的认识，七巧板拼图。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "从立体图形的面“印”出平面图形，玩七巧板拼搭。常见错误是认为斜放的正方形就不是正方形。",
+   "probe": "画一个旋转45°的正方形和一个细长三角形，问分别是什么图形。",
+   "terms": [
+    "长方形",
+    "三角形",
+    "圆",
+    "七巧板"
+   ]
+  },
+  {
+   "id": "MSH-GEO-03",
+   "strand": "GEO",
+   "stage": "G1",
+   "term": "下",
+   "unit": "认识钟表",
+   "name": "认识钟表（整时、半时）",
+   "name_en": "Telling time: o'clock and half past",
+   "desc": "认识时针、分针，读写整时和半时。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-06",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "先认清“短粗的是时针、长细的是分针”，分针指12是整时、指6是半时。常见错误是半时读时针时读成了后一个数（7:30读成8:30）。",
+   "probe": "拨钟到7点半，问“现在是几时？”",
+   "terms": [
+    "时针",
+    "分针",
+    "整时",
+    "半时"
+   ]
+  },
+  {
+   "id": "MSH-APP-01",
+   "strand": "APP",
+   "stage": "G1",
+   "term": "下",
+   "unit": "用数学",
+   "name": "简单加减应用题",
+   "name_en": "Simple word problems with + and −",
+   "desc": "求一共、还剩、相差多少，会看图列式并写单位。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "读题后先圈出“一共/还剩/多/少”，再用画图或摆物理解谁和谁比。常见错误是看到“多”就加、看到“少”就减。",
+   "probe": "“小明有12支笔，比小红多4支，小红有几支？”看他是否误用加法。",
+   "terms": [
+    "应用题",
+    "一共",
+    "还剩",
+    "相差"
+   ]
+  },
+  {
+   "id": "MSH-NUM-08",
+   "strand": "NUM",
+   "stage": "G2",
+   "term": "上",
+   "unit": "两位数加减法",
+   "name": "两位数加减法（竖式）",
+   "name_en": "Two-digit addition and subtraction (column method)",
+   "desc": "两位数加减两位数的竖式计算，进位、退位与验算。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "竖式要数位对齐、从个位算起，进位写小“1”、退位点小圆点。常见错误是忘记加进位的1或退位后十位没减1。",
+   "probe": "做47+38、62-27，观察进位、退位记号是否写对。",
+   "terms": [
+    "竖式",
+    "进位",
+    "退位",
+    "验算"
+   ]
+  },
+  {
+   "id": "MSH-NUM-09",
+   "strand": "NUM",
+   "stage": "G2",
+   "term": "上",
+   "unit": "乘法",
+   "name": "乘法的意义",
+   "name_en": "Meaning of multiplication",
+   "desc": "几个相同加数相加用乘法表示，认识乘数、积。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "用“每盘3个，4盘”摆出来，再写3+3+3+3=3×4。常见错误是把不同加数相加也写成乘法。",
+   "probe": "给出“2+2+2+2+2”和“2+3+4”，问哪个能写成乘法、怎么写。",
+   "terms": [
+    "乘法",
+    "乘数",
+    "积"
+   ]
+  },
+  {
+   "id": "MSH-NUM-10",
+   "strand": "NUM",
+   "stage": "G2",
+   "term": "上",
+   "unit": "乘法口诀",
+   "name": "乘法口诀（1-9）",
+   "name_en": "Multiplication tables 1–9",
+   "desc": "2、5、10、4、8、3、6、9、7的乘法口诀及应用。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "按沪教顺序先学2、5、10，再学4、8、3、6、9、7，每句口诀配一道“几个几”的图。每天打乱顺序抽背，常见错误是6、7、8的口诀串记（如七八五十四）。",
+   "probe": "随机抽问7×8、6×9、4×7等，记录反应时间和错题。",
+   "terms": [
+    "口诀",
+    "乘法表"
+   ]
+  },
+  {
+   "id": "MSH-NUM-11",
+   "strand": "NUM",
+   "stage": "G2",
+   "term": "上",
+   "unit": "除法",
+   "name": "除法的意义（平均分）",
+   "name_en": "Meaning of division (equal sharing)",
+   "desc": "平均分与包含除，认识被除数、除数、商。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "用糖果“平均分给3人”和“每3个装一袋能装几袋”两种分法动手分。常见错误是不理解“平均”而随便分。",
+   "probe": "“12个苹果平均分给4人”和“12个苹果每4个一盘”分别怎么列式？",
+   "terms": [
+    "平均分",
+    "被除数",
+    "除数",
+    "商"
+   ]
+  },
+  {
+   "id": "MSH-NUM-12",
+   "strand": "NUM",
+   "stage": "G2",
+   "term": "上",
+   "unit": "用乘法口诀求商",
+   "name": "用乘法口诀求商",
+   "name_en": "Division using multiplication facts",
+   "desc": "想乘法口诀求商，乘除互逆关系。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-10",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-11",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "看到42÷6就想“六几四十二”。把一道乘法写成“一乘两除”的三道题巩固互逆，常见错误是口诀不熟导致商算错。",
+   "probe": "口算56÷8、36÷4、63÷9，让他说出想的是哪句口诀。",
+   "terms": [
+    "求商",
+    "乘除互逆"
+   ]
+  },
+  {
+   "id": "MSH-GEO-04",
+   "strand": "GEO",
+   "stage": "G2",
+   "term": "上",
+   "unit": "长度",
+   "name": "长度单位（米、厘米）与测量",
+   "name_en": "Length units: m and cm",
+   "desc": "用尺测量，1米=100厘米，估测长度。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-06",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用身体尺：一拃约10厘米、伸开双臂约1米。量东西要从0刻度对齐，常见错误是从尺子的1刻度开始量或忘写单位。",
+   "probe": "让他用尺量一支铅笔，再估一下门的高度是2米还是2厘米。",
+   "terms": [
+    "米",
+    "厘米",
+    "测量"
+   ]
+  },
+  {
+   "id": "MSH-APP-02",
+   "strand": "APP",
+   "stage": "G2",
+   "term": "上",
+   "unit": "人民币",
+   "name": "人民币（元、角、分）",
+   "name_en": "Money: yuan, jiao, fen",
+   "desc": "认识人民币，1元=10角、1角=10分，简单购物计算。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "玩“小超市”游戏，用真钱或玩具钱找零。常见错误是把元角分混在一起直接相加（3元5角+4角写成7角）。",
+   "probe": "“一支笔2元5角，付5元找回多少？”",
+   "terms": [
+    "元",
+    "角",
+    "分",
+    "找零"
+   ]
+  },
+  {
+   "id": "MSH-NUM-13",
+   "strand": "NUM",
+   "stage": "G2",
+   "term": "下",
+   "unit": "有余数的除法",
+   "name": "有余数的除法",
+   "name_en": "Division with remainders",
+   "desc": "有余数除法的意义与竖式，余数必须小于除数。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-12",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "用摆小棒理解“剩下不够再分一份”。做完一定检查“余数<除数”，常见错误是商小了、余数比除数还大。",
+   "probe": "做23÷4和50÷7的竖式，看商和余数是否正确。",
+   "terms": [
+    "余数",
+    "竖式除法"
+   ]
+  },
+  {
+   "id": "MSH-NUM-14",
+   "strand": "NUM",
+   "stage": "G2",
+   "term": "下",
+   "unit": "千以内数",
+   "name": "千以内数的认识（含万以内初步）",
+   "name_en": "Numbers to 1000 (and 10000)",
+   "desc": "百、千的认识，数位顺序，读写含0的数，比较大小。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "用计数器拨数：个、十、百、千位，中间有0要读一个“零”。常见错误是把“三百零五”写成3005。",
+   "probe": "听写“六百零八”“一千零二十”，并比较508和580。",
+   "terms": [
+    "百位",
+    "千位",
+    "计数器"
+   ]
+  },
+  {
+   "id": "MSH-NUM-15",
+   "strand": "NUM",
+   "stage": "G2",
+   "term": "下",
+   "unit": "三位数加减法",
+   "name": "三位数加减法",
+   "name_en": "Three-digit addition and subtraction",
+   "desc": "三位数加减的口算、笔算与估算。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-08",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-14",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "与两位数竖式同法，多一位而已；连续退位时百位、十位都要记得减1。常见错误是中间有0的连续退位（如503-148）。",
+   "probe": "做503-148和276+459，看连续进位退位。",
+   "terms": [
+    "连续退位",
+    "估算"
+   ]
+  },
+  {
+   "id": "MSH-GEO-05",
+   "strand": "GEO",
+   "stage": "G2",
+   "term": "下",
+   "unit": "时间",
+   "name": "时、分、秒",
+   "name_en": "Hours, minutes and seconds",
+   "desc": "1时=60分、1分=60秒，读写几时几分，经过时间初步。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "分针每走一大格是5分钟，可以5个5个数。计算经过时间画时间线，常见错误是把时间换算按100进位。",
+   "probe": "钟面显示8:45，问是几时几分，再问到9:10经过多少分钟。",
+   "terms": [
+    "时",
+    "分",
+    "秒",
+    "经过时间"
+   ]
+  },
+  {
+   "id": "MSH-GEO-06",
+   "strand": "GEO",
+   "stage": "G2",
+   "term": "下",
+   "unit": "角",
+   "name": "角的初步认识",
+   "name_en": "Introduction to angles",
+   "desc": "角的组成（顶点、边），直角、锐角、钝角的辨认。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "用三角尺的直角去比一比：比直角小的是锐角、大的是钝角。常见错误是认为边画得长角就大。",
+   "probe": "画两条边长短不同但张口相同的角，问哪个大。",
+   "terms": [
+    "顶点",
+    "直角",
+    "锐角",
+    "钝角"
+   ]
+  },
+  {
+   "id": "MSH-APP-03",
+   "strand": "APP",
+   "stage": "G2",
+   "term": "下",
+   "unit": "倍",
+   "name": "倍的认识与乘除应用题",
+   "name_en": "Multiples ('times as many') word problems",
+   "desc": "求一个数的几倍、一个数是另一个数的几倍、乘除两步应用题。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-12",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-APP-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "画线段图，把“1倍量”画成一段，几倍就画几段。常见错误是把“是几倍”和“多几”混淆。",
+   "probe": "“红花8朵，黄花是红花的3倍，黄花比红花多几朵？”看他是否分两步。",
+   "terms": [
+    "倍",
+    "线段图"
+   ]
+  },
+  {
+   "id": "MSH-NUM-16",
+   "strand": "NUM",
+   "stage": "G3",
+   "term": "上",
+   "unit": "口算与估算",
+   "name": "整十整百数乘除口算与估算",
+   "name_en": "Mental multiplication/division and estimation",
+   "desc": "整十、整百数乘除一位数，乘除法估算。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把末尾的0先“藏起来”：30×4想3×4=12再添0。估算把数看成整十、整百，常见错误是末尾0添错个数（50×4=20或2000）。",
+   "probe": "口算60×5、800÷4、估算298×3大约是多少。",
+   "terms": [
+    "口算",
+    "估算",
+    "整十数"
+   ]
+  },
+  {
+   "id": "MSH-NUM-17",
+   "strand": "NUM",
+   "stage": "G3",
+   "term": "上",
+   "unit": "乘法",
+   "name": "两、三位数乘一位数（笔算）",
+   "name_en": "Multiplying 2/3-digit by 1-digit",
+   "desc": "竖式乘法，进位乘法，中间或末尾有0的乘法。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-10",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-08",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-16",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "从个位乘起，满几十向前进几，进位数先小字写在旁边、乘完再加。常见错误是先加进位再乘或忘加进位。",
+   "probe": "做37×6、408×5的竖式，看进位处理。",
+   "terms": [
+    "竖式乘法",
+    "进位"
+   ]
+  },
+  {
+   "id": "MSH-NUM-18",
+   "strand": "NUM",
+   "stage": "G3",
+   "term": "上",
+   "unit": "除法",
+   "name": "除数是一位数的除法（笔算）",
+   "name_en": "Division by a 1-digit number (long division)",
+   "desc": "两、三位数除以一位数，商中间或末尾有0，验算。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-13",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-17",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "用“一商二乘三减四比五落”口诀，每一步都写在固定位置。常见错误是被除数某位不够商1时漏写0（612÷6=12）。",
+   "probe": "做612÷6、735÷7，检查商中间的0。",
+   "terms": [
+    "长除法",
+    "商",
+    "验算"
+   ]
+  },
+  {
+   "id": "MSH-NUM-19",
+   "strand": "NUM",
+   "stage": "G3",
+   "term": "上",
+   "unit": "分数的初步认识",
+   "name": "分数的初步认识",
+   "name_en": "Introduction to fractions",
+   "desc": "几分之一、几分之几的意义，同分母分数比大小与加减。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-11",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "折纸、切披萨：先“平均分”成几份，取其中几份就是几分之几。常见错误是没有平均分也说成分数，或认为分母大的分数就大。",
+   "probe": "比较1/3和1/5哪个大，并让他画图说明。",
+   "terms": [
+    "分数",
+    "分子",
+    "分母",
+    "平均分"
+   ]
+  },
+  {
+   "id": "MSH-GEO-07",
+   "strand": "GEO",
+   "stage": "G3",
+   "term": "上",
+   "unit": "长度",
+   "name": "千米、毫米与长度换算",
+   "name_en": "Kilometres, millimetres and conversion",
+   "desc": "认识千米、分米、毫米，长度单位间的换算。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "画单位阶梯：千米—(×1000)—米—(×10)—分米—(×10)—厘米—(×10)—毫米。常见错误是千米换米也乘10或100。",
+   "probe": "3千米=多少米？45毫米=几厘米几毫米？",
+   "terms": [
+    "千米",
+    "毫米",
+    "分米",
+    "换算"
+   ]
+  },
+  {
+   "id": "MSH-GEO-08",
+   "strand": "GEO",
+   "stage": "G3",
+   "term": "上",
+   "unit": "质量",
+   "name": "质量单位（克、千克、吨）",
+   "name_en": "Mass: g, kg, tonne",
+   "desc": "认识克、千克、吨，1千克=1000克，1吨=1000千克。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-14",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "掂一掂：一枚2分硬币约1克，一袋盐约500克，一头牛约1吨。常见错误是给物体配错单位（一只鸡重2吨）。",
+   "probe": "让他给鸡蛋、自己、卡车各选合适的质量单位。",
+   "terms": [
+    "克",
+    "千克",
+    "吨"
+   ]
+  },
+  {
+   "id": "MSH-GEO-09",
+   "strand": "GEO",
+   "stage": "G3",
+   "term": "上",
+   "unit": "周长",
+   "name": "长方形和正方形的周长",
+   "name_en": "Perimeter of rectangles and squares",
+   "desc": "周长的意义，长方形周长=(长+宽)×2，正方形周长=边长×4。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-04",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "用绳子绕图形一圈再拉直，理解周长是“一圈的长度”。常见错误是长方形周长写成长+宽忘记×2。",
+   "probe": "一个长8厘米、宽5厘米的长方形，周长是多少？",
+   "terms": [
+    "周长",
+    "长",
+    "宽",
+    "边长"
+   ]
+  },
+  {
+   "id": "MSH-NUM-20",
+   "strand": "NUM",
+   "stage": "G3",
+   "term": "下",
+   "unit": "乘法",
+   "name": "两位数乘两位数",
+   "name_en": "Two-digit by two-digit multiplication",
+   "desc": "竖式计算，第二部分积的末位与十位对齐。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-17",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "把24×13拆成24×3和24×10两部分，第二部分积写在十位对齐处。常见错误是第二个部分积和个位对齐。",
+   "probe": "做36×24，让他解释第二行为什么往左错一位。",
+   "terms": [
+    "部分积",
+    "数位对齐"
+   ]
+  },
+  {
+   "id": "MSH-NUM-21",
+   "strand": "NUM",
+   "stage": "G3",
+   "term": "下",
+   "unit": "混合运算",
+   "name": "四则混合运算与运算顺序",
+   "name_en": "Order of operations",
+   "desc": "同级从左往右，先乘除后加减，有括号先算括号内。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-17",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-18",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先用铅笔在先算的部分下面画线，再写递等式。常见错误是从左往右一路算到底，或抄错数。",
+   "probe": "算 48-12÷3×2 和 (48-12)÷3×2，比较结果。",
+   "terms": [
+    "运算顺序",
+    "递等式",
+    "括号"
+   ]
+  },
+  {
+   "id": "MSH-NUM-22",
+   "strand": "NUM",
+   "stage": "G3",
+   "term": "下",
+   "unit": "小数的初步认识",
+   "name": "小数的初步认识",
+   "name_en": "Introduction to decimals",
+   "desc": "结合元角分、米厘米认识一位小数，读写与简单比较。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-19",
+     "strength": "有帮助"
+    },
+    {
+     "id": "MSH-APP-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "从价钱入手：3元5角=3.5元，1角就是0.1元。常见错误是把0.5元读成“零点五元”可以，但写成5元。",
+   "probe": "“2元8角写成小数是多少元？1.2米和1.08米谁长？”",
+   "terms": [
+    "小数",
+    "小数点",
+    "十分之几"
+   ]
+  },
+  {
+   "id": "MSH-GEO-10",
+   "strand": "GEO",
+   "stage": "G3",
+   "term": "下",
+   "unit": "面积",
+   "name": "面积与长方形、正方形面积",
+   "name_en": "Area of rectangles and squares",
+   "desc": "面积意义，平方厘米/平方分米/平方米，长×宽。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-09",
+     "strength": "有帮助"
+    },
+    {
+     "id": "MSH-NUM-17",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "用1平方厘米的小方块铺满图形数一数，再推出“长×宽”。周长看“边框”、面积看“里面”，常见错误是周长和面积公式及单位混用。",
+   "probe": "长6米宽4米的房间，问铺地面积和贴踢脚线长度各是多少。",
+   "terms": [
+    "面积",
+    "平方厘米",
+    "平方米"
+   ]
+  },
+  {
+   "id": "MSH-GEO-11",
+   "strand": "GEO",
+   "stage": "G3",
+   "term": "下",
+   "unit": "年月日",
+   "name": "年、月、日",
+   "name_en": "Years, months and days",
+   "desc": "大月小月，平年闰年，24时计时法。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "用拳头记大小月，四年一闰（整百年看400）。24时计时法下午几时加12，常见错误是计算经过天数时首尾都算或都不算。",
+   "probe": "2028年2月有几天？下午3时用24时计时法怎么写？",
+   "terms": [
+    "大月",
+    "小月",
+    "闰年",
+    "24时计时"
+   ]
+  },
+  {
+   "id": "MSH-STA-01",
+   "strand": "STA",
+   "stage": "G3",
+   "term": "下",
+   "unit": "统计",
+   "name": "数据的收集与整理（统计表、条形图）",
+   "name_en": "Collecting data: tables and bar charts",
+   "desc": "简单统计表，象形图与条形统计图的读与画。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-14",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "先“画正字”记录，再整理成表，最后画条形图要注意每格代表几。常见错误是条形图纵轴刻度不均匀。",
+   "probe": "给一张每格代表2人的条形图，请他读出数量并回答“多几人”。",
+   "terms": [
+    "统计表",
+    "条形图",
+    "正字"
+   ]
+  },
+  {
+   "id": "MSH-APP-04",
+   "strand": "APP",
+   "stage": "G3",
+   "term": "下",
+   "unit": "应用题",
+   "name": "两步计算应用题（归一、归总）",
+   "name_en": "Two-step word problems",
+   "desc": "两步计算应用题，归一、归总问题，画线段图分析。",
+   "prereqs": [
+    {
+     "id": "MSH-APP-03",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-21",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先找“中间问题”：要求A必须先知道B。归一问题先求“1份”，常见错误是一步列式乱用数据。",
+   "probe": "“3支笔15元，买7支要多少元？”看是否先求一支价钱。",
+   "terms": [
+    "归一",
+    "归总",
+    "线段图"
+   ]
+  },
+  {
+   "id": "MSH-NUM-23",
+   "strand": "NUM",
+   "stage": "G4",
+   "term": "上",
+   "unit": "大数的认识",
+   "name": "大数的认识（万、亿）",
+   "name_en": "Large numbers: ten-thousands to hundred-millions",
+   "desc": "数位顺序表，四位一级读写，改写成万/亿作单位，四舍五入求近似数。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-14",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "从右往左四位一分节（个级、万级、亿级），按级读。常见错误是中间连续几个0读错或改写近似数漏写“万”。",
+   "probe": "读写30060500，并把它四舍五入到万位。",
+   "terms": [
+    "数位顺序表",
+    "四舍五入",
+    "近似数"
+   ]
+  },
+  {
+   "id": "MSH-NUM-24",
+   "strand": "NUM",
+   "stage": "G4",
+   "term": "上",
+   "unit": "乘法",
+   "name": "三位数乘两位数",
+   "name_en": "Three-digit by two-digit multiplication",
+   "desc": "竖式乘法，积的变化规律，末尾有0的简写。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-20",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "方法同两位数乘两位数；末尾有0的先把0前面的数相乘再补0。常见错误是部分积错位或补0个数错。",
+   "probe": "做350×24和206×38。",
+   "terms": [
+    "积的变化规律"
+   ]
+  },
+  {
+   "id": "MSH-NUM-25",
+   "strand": "NUM",
+   "stage": "G4",
+   "term": "上",
+   "unit": "除法",
+   "name": "除数是两位数的除法（试商）",
+   "name_en": "Division by 2-digit divisors",
+   "desc": "把除数看作整十数试商，调商，商的变化规律。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-18",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-24",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "除数“四舍五入”看成整十数试商，余数大于除数就把商调大、不够减就调小。常见错误是试商后不检查直接写。",
+   "probe": "做 391÷23 和 486÷58，看调商过程。",
+   "terms": [
+    "试商",
+    "调商",
+    "商不变"
+   ]
+  },
+  {
+   "id": "MSH-GEO-12",
+   "strand": "GEO",
+   "stage": "G4",
+   "term": "上",
+   "unit": "角",
+   "name": "线段、射线、直线与角的度量",
+   "name_en": "Lines, rays and measuring angles",
+   "desc": "线段射线直线区别，量角器量角画角，角的分类（平角周角）。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "量角两重合：中心点对顶点、0刻度线对一条边，再看内外圈。常见错误是读错内外圈（把60°读成120°）。",
+   "probe": "请他量一个约110°的角并画一个75°的角。",
+   "terms": [
+    "射线",
+    "量角器",
+    "平角",
+    "周角"
+   ]
+  },
+  {
+   "id": "MSH-GEO-13",
+   "strand": "GEO",
+   "stage": "G4",
+   "term": "上",
+   "unit": "垂直与平行",
+   "name": "垂直与平行",
+   "name_en": "Perpendicular and parallel lines",
+   "desc": "同一平面内两直线的位置关系，画垂线与平行线，点到直线距离。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-12",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "用三角尺“一靠二移三画”画平行线。点到直线的垂线段最短，常见错误是忽略“同一平面内”。",
+   "probe": "过直线外一点画已知直线的垂线和平行线。",
+   "terms": [
+    "垂直",
+    "平行",
+    "垂线段"
+   ]
+  },
+  {
+   "id": "MSH-GEO-14",
+   "strand": "GEO",
+   "stage": "G4",
+   "term": "上",
+   "unit": "面积",
+   "name": "大面积单位（公顷、平方千米）与换算",
+   "name_en": "Hectares, square kilometres and conversions",
+   "desc": "1平方米=100平方分米，1公顷=10000平方米，1平方千米=100公顷。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "边长10倍，面积就100倍：用“边长×边长”推进率而不是死记。常见错误是面积单位按10进换算。",
+   "probe": "3平方米=多少平方分米？2公顷=多少平方米？",
+   "terms": [
+    "公顷",
+    "平方千米",
+    "进率"
+   ]
+  },
+  {
+   "id": "MSH-APP-05",
+   "strand": "APP",
+   "stage": "G4",
+   "term": "上",
+   "unit": "应用题",
+   "name": "常见数量关系（速度、单价、工作效率）",
+   "name_en": "Rate problems: speed, price, work",
+   "desc": "速度×时间=路程、单价×数量=总价、工效×时间=工作总量，相遇问题初步。",
+   "prereqs": [
+    {
+     "id": "MSH-APP-04",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-25",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "三组关系是同一个结构“每份×份数=总数”，列表格写出已知未知。常见错误是单位不统一（分钟与小时混用）。",
+   "probe": "“两车同时相向而行，速度60和40千米/时，3小时相遇，两地相距多少？”",
+   "terms": [
+    "速度",
+    "路程",
+    "单价",
+    "总价",
+    "相遇"
+   ]
+  },
+  {
+   "id": "MSH-NUM-26",
+   "strand": "NUM",
+   "stage": "G4",
+   "term": "下",
+   "unit": "运算律",
+   "name": "运算律与简便运算",
+   "name_en": "Laws of operations and shortcuts",
+   "desc": "加法交换律结合律、乘法交换律结合律、分配律，凑整简算。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-21",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先找“好朋友数”：25和4、125和8凑整。分配律用“买3件衣服和3条裤子”理解，常见错误是(a+b)×c只乘了一个。",
+   "probe": "简算 25×(40+4)、125×32、99×37+37。",
+   "terms": [
+    "交换律",
+    "结合律",
+    "分配律",
+    "简便运算"
+   ]
+  },
+  {
+   "id": "MSH-NUM-27",
+   "strand": "NUM",
+   "stage": "G4",
+   "term": "下",
+   "unit": "小数",
+   "name": "小数的意义和性质",
+   "name_en": "Meaning and properties of decimals",
+   "desc": "小数数位、计数单位，末尾添0去0不变，比较大小，小数点移动引起大小变化。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-22",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-23",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "用米尺：0.1米=1分米、0.01米=1厘米，建立“十分之几、百分之几”。小数点右移一位扩大10倍，常见错误是比大小看位数多少（以为0.15>0.2）。",
+   "probe": "比较0.15和0.2；把3.6的小数点向右移两位是多少？",
+   "terms": [
+    "计数单位",
+    "小数点移动"
+   ]
+  },
+  {
+   "id": "MSH-NUM-28",
+   "strand": "NUM",
+   "stage": "G4",
+   "term": "下",
+   "unit": "小数",
+   "name": "小数加减法",
+   "name_en": "Decimal addition and subtraction",
+   "desc": "小数点对齐即数位对齐，小数加减混合运算。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-27",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-15",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "竖式先对齐小数点，位数不够末尾补0再减。常见错误是把末位对齐（像整数那样）。",
+   "probe": "做 12.5-3.78 的竖式。",
+   "terms": [
+    "小数点对齐"
+   ]
+  },
+  {
+   "id": "MSH-GEO-15",
+   "strand": "GEO",
+   "stage": "G4",
+   "term": "下",
+   "unit": "三角形",
+   "name": "三角形（分类、内角和、三边关系）",
+   "name_en": "Triangles: types, angle sum, side inequality",
+   "desc": "按角、按边分类，内角和180°，任意两边之和大于第三边。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-12",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "撕下三个角拼成平角体会180°。判断能否围成三角形只需“两短边之和>最长边”，常见错误是用等于也算能围成。",
+   "probe": "3cm、4cm、7cm能否围成三角形？一个三角形两个角是35°和65°，第三个角？",
+   "terms": [
+    "内角和",
+    "三边关系",
+    "等腰",
+    "直角三角形"
+   ]
+  },
+  {
+   "id": "MSH-GEO-16",
+   "strand": "GEO",
+   "stage": "G4",
+   "term": "下",
+   "unit": "四边形",
+   "name": "平行四边形与梯形的认识",
+   "name_en": "Parallelograms and trapezia",
+   "desc": "特征、底和高，画高。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "高是从对边一点向底作的垂线段，用三角尺直角边贴着底画。常见错误是画成斜线或底和高不对应。",
+   "probe": "在平行四边形中以某边为底画一条高。",
+   "terms": [
+    "平行四边形",
+    "梯形",
+    "底",
+    "高"
+   ]
+  },
+  {
+   "id": "MSH-STA-02",
+   "strand": "STA",
+   "stage": "G4",
+   "term": "下",
+   "unit": "统计",
+   "name": "折线统计图",
+   "name_en": "Line graphs",
+   "desc": "单式折线图的读、画，分析变化趋势。",
+   "prereqs": [
+    {
+     "id": "MSH-STA-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "条形图看“多少”，折线图看“变化”。先描点再连线，常见错误是横轴时间间隔不均匀。",
+   "probe": "给出一周气温，请他判断用哪种统计图并说出变化趋势。",
+   "terms": [
+    "折线图",
+    "趋势"
+   ]
+  },
+  {
+   "id": "MSH-NUM-29",
+   "strand": "NUM",
+   "stage": "G5",
+   "term": "上",
+   "unit": "小数乘除法",
+   "name": "小数乘法",
+   "name_en": "Decimal multiplication",
+   "desc": "小数乘整数、小数乘小数，积的小数位数，积的近似数。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-28",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-24",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先按整数乘，再数两个因数一共几位小数，从积的右边点上小数点。常见错误是像加法一样对齐小数点或积末尾0先去掉再点小数点。",
+   "probe": "算 0.25×0.4 并说明小数点怎么点。",
+   "terms": [
+    "积的小数位数",
+    "近似数"
+   ]
+  },
+  {
+   "id": "MSH-NUM-30",
+   "strand": "NUM",
+   "stage": "G5",
+   "term": "上",
+   "unit": "小数乘除法",
+   "name": "小数除法（含循环小数）",
+   "name_en": "Decimal division and recurring decimals",
+   "desc": "除数是整数/小数的除法，商不变性质，商的近似值，循环小数。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-29",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-25",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "除数是小数先把除数变整数，被除数小数点同步右移，位数不够补0。常见错误是只移除数的小数点。",
+   "probe": "算 1.26÷0.18 和 5÷6（保留两位小数）。",
+   "terms": [
+    "商不变",
+    "循环小数"
+   ]
+  },
+  {
+   "id": "MSH-ALG-01",
+   "strand": "ALG",
+   "stage": "G5",
+   "term": "上",
+   "unit": "简易方程",
+   "name": "用字母表示数",
+   "name_en": "Using letters to represent numbers",
+   "desc": "用字母表示数、运算律和公式，含字母式子的化简与求值。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-26",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "把字母当成“装数字的盒子”，a×b可写成ab，a×a写成a²。常见错误是把a²当成a×2，或把3+a写成3a。",
+   "probe": "若 a=4，求 2a 和 a² 的值；化简 5x+3x。",
+   "terms": [
+    "字母表示数",
+    "化简",
+    "求值"
+   ]
+  },
+  {
+   "id": "MSH-STA-03",
+   "strand": "STA",
+   "stage": "G5",
+   "term": "上",
+   "unit": "统计",
+   "name": "平均数",
+   "name_en": "Mean (average)",
+   "desc": "平均数的意义与计算，移多补少，用平均数比较。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-18",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-STA-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "移多补少想“削峰填谷”；平均数=总数÷总份数。常见错误是求总份数时漏掉0分的数据。",
+   "probe": "5次成绩 90、0（缺考记0）、85、95、80，平均多少？",
+   "terms": [
+    "平均数",
+    "移多补少"
+   ]
+  },
+  {
+   "id": "MSH-GEO-17",
+   "strand": "GEO",
+   "stage": "G5",
+   "term": "上",
+   "unit": "多边形面积",
+   "name": "平行四边形、三角形、梯形面积",
+   "name_en": "Area of parallelograms, triangles and trapezia",
+   "desc": "割补与拼合推导面积公式，底与高对应。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-16",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "平行四边形剪拼成长方形；两个相同三角形或梯形拼成平行四边形，所以要÷2。常见错误是三角形面积忘记÷2，或用斜边当高。",
+   "probe": "底8、高5的三角形面积；上底3下底7高4的梯形面积。",
+   "terms": [
+    "底",
+    "高",
+    "割补",
+    "拼合"
+   ]
+  },
+  {
+   "id": "MSH-GEO-18",
+   "strand": "GEO",
+   "stage": "G5",
+   "term": "上",
+   "unit": "多边形面积",
+   "name": "组合图形面积",
+   "name_en": "Area of composite shapes",
+   "desc": "分割、添补法求组合图形面积。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-17",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "先在图上用虚线分割成会算的基本图形，或补成大图形再减去多余部分。常见错误是分割后边长找错。",
+   "probe": "一个L形图形，请他用两种方法求面积。",
+   "terms": [
+    "分割",
+    "添补",
+    "组合图形"
+   ]
+  },
+  {
+   "id": "MSH-ALG-02",
+   "strand": "ALG",
+   "stage": "G5",
+   "term": "下",
+   "unit": "简易方程",
+   "name": "简易方程（等式性质）",
+   "name_en": "Simple equations",
+   "desc": "方程的意义，等式性质，解形如 ax±b=c 的方程，检验。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把方程看成天平，两边做同样的事保持平衡。每题解完代回检验，常见错误是移项不变号或解完不写“x=”。",
+   "probe": "解 3x+8=29 并检验。",
+   "terms": [
+    "方程",
+    "等式性质",
+    "解方程"
+   ]
+  },
+  {
+   "id": "MSH-APP-06",
+   "strand": "APP",
+   "stage": "G5",
+   "term": "下",
+   "unit": "列方程解应用题",
+   "name": "列方程解应用题",
+   "name_en": "Solving word problems with equations",
+   "desc": "找等量关系、设未知数、列方程，和倍差倍、行程问题。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-02",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-APP-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "四步走：设x→找等量关系（用“一句话”写出）→列方程→检验作答。常见错误是设了x又在方程里用算术思路，等量关系两边不对等。",
+   "probe": "“鸡兔同笼共10头28脚，各几只？”看他能否设未知数列方程。",
+   "terms": [
+    "等量关系",
+    "设未知数"
+   ]
+  },
+  {
+   "id": "MSH-NUM-31",
+   "strand": "NUM",
+   "stage": "G5",
+   "term": "下",
+   "unit": "正数和负数",
+   "name": "正数和负数初步",
+   "name_en": "Introduction to negative numbers",
+   "desc": "用正负数表示相反意义的量，数轴初步。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-27",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用温度计、海拔、电梯楼层理解负数。0既不是正数也不是负数，常见错误是认为-5比-2大。",
+   "probe": "温度计上-3℃和-8℃哪个更冷？",
+   "terms": [
+    "负数",
+    "数轴",
+    "相反意义的量"
+   ]
+  },
+  {
+   "id": "MSH-GEO-19",
+   "strand": "GEO",
+   "stage": "G5",
+   "term": "下",
+   "unit": "长方体和正方体",
+   "name": "长方体和正方体的认识",
+   "name_en": "Cuboids and cubes",
+   "desc": "面、棱、顶点，长宽高，展开图。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "拿纸盒拆开看展开图，12条棱分成3组。常见错误是棱长总和只算了长+宽+高。",
+   "probe": "长5宽4高3的长方体，棱长总和是多少？",
+   "terms": [
+    "面",
+    "棱",
+    "顶点",
+    "展开图"
+   ]
+  },
+  {
+   "id": "MSH-GEO-20",
+   "strand": "GEO",
+   "stage": "G5",
+   "term": "下",
+   "unit": "长方体和正方体",
+   "name": "长方体和正方体的表面积",
+   "name_en": "Surface area of cuboids and cubes",
+   "desc": "6个面面积之和，无盖、有缺面的实际问题。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-19",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "按“上下、前后、左右”三组成对计算。实际问题先想清楚有几个面（鱼缸无盖），常见错误是少算或多算面。",
+   "probe": "做一个无盖鱼缸（长6宽4高5分米）要多少玻璃？",
+   "terms": [
+    "表面积"
+   ]
+  },
+  {
+   "id": "MSH-GEO-21",
+   "strand": "GEO",
+   "stage": "G5",
+   "term": "下",
+   "unit": "体积",
+   "name": "体积与容积（长方体、正方体体积）",
+   "name_en": "Volume and capacity",
+   "desc": "体积单位立方厘米/分米/米，升与毫升，长×宽×高。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-19",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "用1立方厘米小方块堆一堆理解体积。1立方分米=1升=1000毫升，常见错误是体积进率用100，或把表面积和体积混淆。",
+   "probe": "2.5立方分米=多少毫升？长方体长宽高5、4、3厘米，体积？",
+   "terms": [
+    "体积",
+    "容积",
+    "升",
+    "毫升"
+   ]
+  },
+  {
+   "id": "MSH-STA-04",
+   "strand": "STA",
+   "stage": "G5",
+   "term": "下",
+   "unit": "可能性",
+   "name": "可能性",
+   "name_en": "Likelihood",
+   "desc": "一定、可能、不可能，可能性大小比较。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-19",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用摸球实验记录结果，看哪种颜色多，摸到的可能性就大。常见错误是认为“可能性小”就“不可能”。",
+   "probe": "袋中8红2白，摸一个，可能是白球吗？哪种可能性大？",
+   "terms": [
+    "可能性",
+    "一定",
+    "不可能"
+   ]
+  },
+  {
+   "id": "MSH-NUM-32",
+   "strand": "NUM",
+   "stage": "G6",
+   "term": "上",
+   "unit": "数的整除",
+   "name": "因数与倍数、质数与合数",
+   "name_en": "Factors, multiples and primes",
+   "desc": "整除，因数倍数，2、3、5倍数特征，质数合数，分解质因数。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-18",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "背熟20以内质数，用短除法分解质因数。3的倍数看各位数字之和，常见错误是认为1是质数或9是质数。",
+   "probe": "把60分解质因数；判断51是不是质数。",
+   "terms": [
+    "因数",
+    "倍数",
+    "质数",
+    "合数",
+    "分解质因数"
+   ]
+  },
+  {
+   "id": "MSH-NUM-33",
+   "strand": "NUM",
+   "stage": "G6",
+   "term": "上",
+   "unit": "数的整除",
+   "name": "最大公因数与最小公倍数",
+   "name_en": "GCD and LCM",
+   "desc": "求两三个数的最大公因数、最小公倍数及应用。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-32",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "短除法：一直除到两商互质，左边相乘是最大公因数，左边和下边全乘是最小公倍数。常见错误是两个结果混用，或应用题判断不了该求哪个。",
+   "probe": "求12和18的最大公因数与最小公倍数；“两路公交每8分钟和12分钟一班，同时发车后多久再同时发？”",
+   "terms": [
+    "最大公因数",
+    "最小公倍数",
+    "互质"
+   ]
+  },
+  {
+   "id": "MSH-NUM-34",
+   "strand": "NUM",
+   "stage": "G6",
+   "term": "上",
+   "unit": "分数",
+   "name": "分数的意义与基本性质",
+   "name_en": "Fractions: meaning and equivalence",
+   "desc": "分数与除法，基本性质，约分通分，假分数带分数，分数与小数互化。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-19",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-33",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "约分用最大公因数、通分用最小公倍数；分子分母同乘同除不能是0。常见错误是约分不彻底或只改了分子没改分母。",
+   "probe": "把18/24约成最简分数，比较5/6和7/9大小，3/8化小数。",
+   "terms": [
+    "约分",
+    "通分",
+    "最简分数",
+    "假分数"
+   ]
+  },
+  {
+   "id": "MSH-NUM-35",
+   "strand": "NUM",
+   "stage": "G6",
+   "term": "上",
+   "unit": "分数",
+   "name": "分数加减法",
+   "name_en": "Adding and subtracting fractions",
+   "desc": "异分母分数加减，带分数加减。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-34",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "异分母先通分再加减分子，结果要化简；带分数整数部分和分数部分分开算，不够减借1。常见错误是分子加分子、分母加分母。",
+   "probe": "算 2/3+3/4 和 3又1/5-1又2/3。",
+   "terms": [
+    "异分母",
+    "通分",
+    "带分数"
+   ]
+  },
+  {
+   "id": "MSH-NUM-36",
+   "strand": "NUM",
+   "stage": "G6",
+   "term": "上",
+   "unit": "分数",
+   "name": "分数乘除法",
+   "name_en": "Multiplying and dividing fractions",
+   "desc": "分数乘法、倒数、分数除法，混合运算。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-34",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-35",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "乘法先约分再乘；除以一个数等于乘它的倒数。常见错误是带分数直接整数乘整数、分数乘分数，或除法时把被除数也倒过来。",
+   "probe": "算 2又1/2×4/5 和 3/4÷9/8。",
+   "terms": [
+    "倒数",
+    "约分"
+   ]
+  },
+  {
+   "id": "MSH-APP-07",
+   "strand": "APP",
+   "stage": "G6",
+   "term": "上",
+   "unit": "分数",
+   "name": "分数应用题",
+   "name_en": "Fraction word problems",
+   "desc": "求一个数的几分之几、已知几分之几求整体、比多（少）几分之几。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-36",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-APP-06",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "先找单位“1”（“的”字前面、“比”字后面的量），已知单位1用乘，求单位1用除或列方程。常见错误是单位1找错。",
+   "probe": "“甲比乙多1/4，乙是40，甲是多少？若甲是40，乙是多少？”",
+   "terms": [
+    "单位1",
+    "量率对应"
+   ]
+  },
+  {
+   "id": "MSH-NUM-37",
+   "strand": "NUM",
+   "stage": "G6",
+   "term": "上",
+   "unit": "比和比例",
+   "name": "比与比例",
+   "name_en": "Ratio and proportion",
+   "desc": "比的意义与性质，化简比，比例的基本性质，按比例分配，正比例与反比例初步。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-36",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "比就是除法，比的前后项同乘同除不变；内项积=外项积用来解比例。常见错误是化简比时带着单位或写成带分数。",
+   "probe": "化简 0.75:2/3；解比例 x:12=3:8；把60按2:3分配。",
+   "terms": [
+    "比",
+    "比例",
+    "按比分配"
+   ]
+  },
+  {
+   "id": "MSH-APP-08",
+   "strand": "APP",
+   "stage": "G6",
+   "term": "上",
+   "unit": "百分比",
+   "name": "百分比及其应用",
+   "name_en": "Percentages and applications",
+   "desc": "百分数与分数小数互化，折扣、利率、增长率、税率。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-37",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-30",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "百分数就是分母为100的分数；增长率=增长量÷原来量。常见错误是先涨10%再降10%以为回到原价。",
+   "probe": "商品先提价20%再打八折，现价比原价高还是低？",
+   "terms": [
+    "百分比",
+    "折扣",
+    "利率",
+    "增长率"
+   ]
+  },
+  {
+   "id": "MSH-GEO-22",
+   "strand": "GEO",
+   "stage": "G6",
+   "term": "上",
+   "unit": "圆和扇形",
+   "name": "圆和扇形（周长、面积、弧长）",
+   "name_en": "Circles and sectors",
+   "desc": "圆周率π，圆周长、面积，弧长与扇形面积，环形面积。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-17",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-36",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "C=2πr、S=πr²，扇形是圆的 n/360。先确认给的是半径还是直径，常见错误是周长和面积公式混用或直径当半径。",
+   "probe": "半径4cm、圆心角90°的扇形，求弧长和面积（保留π）。",
+   "terms": [
+    "圆周率",
+    "半径",
+    "弧长",
+    "扇形"
+   ]
+  },
+  {
+   "id": "MSH-NUM-38",
+   "strand": "NUM",
+   "stage": "G6",
+   "term": "下",
+   "unit": "有理数",
+   "name": "有理数与数轴",
+   "name_en": "Rational numbers and the number line",
+   "desc": "正负数、有理数分类，数轴，相反数，绝对值，有理数大小比较。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-31",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-34",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "一切比较画数轴：右边总比左边大。绝对值是到原点的距离一定非负，常见错误是认为|-a|=a对一切a成立、或-a一定是负数。",
+   "probe": "比较 -3/4 和 -2/3；|x|=5 的 x 是多少？",
+   "terms": [
+    "有理数",
+    "数轴",
+    "相反数",
+    "绝对值"
+   ]
+  },
+  {
+   "id": "MSH-NUM-39",
+   "strand": "NUM",
+   "stage": "G6",
+   "term": "下",
+   "unit": "有理数",
+   "name": "有理数的运算",
+   "name_en": "Operations with rational numbers",
+   "desc": "加减乘除、乘方及混合运算，科学记数法。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-38",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-36",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先定符号再算绝对值；负数个数是奇数积为负。注意 -2² 与 (-2)² 不同，常见错误是减负数没变号、乘方符号错误。",
+   "probe": "算 -3²+(-2)³÷(-1/2)。",
+   "terms": [
+    "乘方",
+    "科学记数法",
+    "符号法则"
+   ]
+  },
+  {
+   "id": "MSH-ALG-03",
+   "strand": "ALG",
+   "stage": "G6",
+   "term": "下",
+   "unit": "方程",
+   "name": "一元一次方程",
+   "name_en": "Linear equations in one variable",
+   "desc": "去分母、去括号、移项、合并、系数化1，列方程解应用题。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-02",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-39",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "去分母时每一项都要乘（含不带分母的项），分子是多项式要加括号。常见错误是移项不变号、去分母漏乘。",
+   "probe": "解 (x-1)/2 - (2x+1)/3 = 1。",
+   "terms": [
+    "移项",
+    "去分母",
+    "去括号"
+   ]
+  },
+  {
+   "id": "MSH-ALG-04",
+   "strand": "ALG",
+   "stage": "G6",
+   "term": "下",
+   "unit": "不等式",
+   "name": "一元一次不等式（组）",
+   "name_en": "Linear inequalities",
+   "desc": "不等式性质，解一元一次不等式（组），数轴表示解集。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "和解方程一样，唯一区别：两边乘除负数要变号。解集在数轴上画，空心实心分清，常见错误是乘负数忘记变号。",
+   "probe": "解 -2x+3>7 并在数轴上表示；求不等式组的整数解。",
+   "terms": [
+    "不等式",
+    "解集",
+    "变号"
+   ]
+  },
+  {
+   "id": "MSH-ALG-05",
+   "strand": "ALG",
+   "stage": "G6",
+   "term": "下",
+   "unit": "方程组",
+   "name": "二元（三元）一次方程组",
+   "name_en": "Systems of linear equations",
+   "desc": "代入消元法、加减消元法，三元一次方程组，应用题。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "核心是“消元”：系数相同或相反用加减，有一个系数为1用代入。常见错误是加减时符号出错或只乘了一边。",
+   "probe": "解 {2x+3y=12, 3x-2y=5}。",
+   "terms": [
+    "消元",
+    "代入法",
+    "加减法"
+   ]
+  },
+  {
+   "id": "MSH-GEO-23",
+   "strand": "GEO",
+   "stage": "G6",
+   "term": "下",
+   "unit": "线段与角",
+   "name": "线段与角的画法和计算",
+   "name_en": "Segments and angles: construction and calculation",
+   "desc": "线段和差与中点，角的和差、角平分线，余角补角，尺规作图初步。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-12",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "画图后标好字母再列式；余角和为90°、补角和为180°。常见错误是忽略点的位置有两种情况（在线段上/延长线上）。",
+   "probe": "线段AB=10，点C在直线AB上且BC=4，求AC（注意两种情况）。",
+   "terms": [
+    "中点",
+    "角平分线",
+    "余角",
+    "补角",
+    "尺规作图"
+   ]
+  },
+  {
+   "id": "MSH-GEO-24",
+   "strand": "GEO",
+   "stage": "G6",
+   "term": "下",
+   "unit": "长方体的再认识",
+   "name": "长方体的再认识（棱与面的平行垂直）",
+   "name_en": "Cuboids revisited: parallel/perpendicular edges and faces",
+   "desc": "长方体中棱与棱、棱与面、面与面的位置关系，斜二测直观图。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-19",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-13",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用纸盒实物指认，先找“同一组”平行棱。异面的棱既不平行也不相交，常见错误是看到不相交就说平行。",
+   "probe": "长方体中与棱AB平行的棱有几条？与面ABCD垂直的棱有几条？",
+   "terms": [
+    "平行",
+    "垂直",
+    "异面",
+    "直观图"
+   ]
+  },
+  {
+   "id": "MSH-ALG-06",
+   "strand": "ALG",
+   "stage": "G7",
+   "term": "上",
+   "unit": "整式",
+   "name": "代数式与整式加减",
+   "name_en": "Algebraic expressions and polynomials",
+   "desc": "列代数式，单项式多项式（系数次数），同类项，去括号与整式加减。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-39",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "同类项“字母相同、相同字母指数也相同”才能合并。去括号前面是负号括号里全变号，常见错误是只变第一项。",
+   "probe": "化简 3a-(2a-5b)+2(a-b)。",
+   "terms": [
+    "单项式",
+    "多项式",
+    "同类项",
+    "次数"
+   ]
+  },
+  {
+   "id": "MSH-ALG-07",
+   "strand": "ALG",
+   "stage": "G7",
+   "term": "上",
+   "unit": "整式",
+   "name": "幂的运算",
+   "name_en": "Laws of exponents",
+   "desc": "同底数幂乘除、幂的乘方、积的乘方，零指数。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-06",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-39",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "口诀：同底相乘指数加、幂的乘方指数乘、积的乘方各自乘。常见错误是 a²·a³=a⁶ 或 (a²)³=a⁵。",
+   "probe": "计算 (-2a²b)³ 和 a⁵÷a²·a。",
+   "terms": [
+    "同底数幂",
+    "幂的乘方",
+    "积的乘方"
+   ]
+  },
+  {
+   "id": "MSH-ALG-08",
+   "strand": "ALG",
+   "stage": "G7",
+   "term": "上",
+   "unit": "整式",
+   "name": "整式乘法与乘法公式",
+   "name_en": "Multiplying polynomials and special products",
+   "desc": "单项式与多项式乘法，平方差公式，完全平方公式。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "完全平方展开记“首平方尾平方，二倍乘积放中央”。常见错误是 (a+b)²=a²+b² 漏中间项、平方差符号用错。",
+   "probe": "展开 (2x-3)² 和 (x+2y)(x-2y)；简算 99²。",
+   "terms": [
+    "平方差",
+    "完全平方",
+    "多项式乘法"
+   ]
+  },
+  {
+   "id": "MSH-ALG-09",
+   "strand": "ALG",
+   "stage": "G7",
+   "term": "上",
+   "unit": "整式",
+   "name": "因式分解",
+   "name_en": "Factorisation",
+   "desc": "提公因式、公式法、十字相乘、分组分解。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "顺序：一提二套三十字四分组，分到每个因式都不能再分为止。常见错误是提公因式后漏写1，或分解不彻底（x⁴-1只分成(x²+1)(x²-1)）。",
+   "probe": "分解 2x³-8x、x²-5x+6、x⁴-1。",
+   "terms": [
+    "提公因式",
+    "公式法",
+    "十字相乘"
+   ]
+  },
+  {
+   "id": "MSH-ALG-10",
+   "strand": "ALG",
+   "stage": "G7",
+   "term": "上",
+   "unit": "分式",
+   "name": "分式及其运算",
+   "name_en": "Rational expressions",
+   "desc": "分式有意义条件，基本性质，约分通分，加减乘除，整数指数幂。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-09",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-35",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先因式分解再约分通分，就和分数一样。注意分母不为0，常见错误是约分时约掉多项式中的单项（(x+2)/2 约成 x）。",
+   "probe": "化简 (x²-4)/(x²+4x+4) ÷ (x-2)/(x+2)。",
+   "terms": [
+    "分式",
+    "约分",
+    "通分",
+    "负整数指数幂"
+   ]
+  },
+  {
+   "id": "MSH-GEO-25",
+   "strand": "GEO",
+   "stage": "G7",
+   "term": "上",
+   "unit": "图形的运动",
+   "name": "图形的运动（平移、旋转、翻折）",
+   "name_en": "Transformations: translation, rotation, reflection",
+   "desc": "三种运动的性质，轴对称与中心对称图形。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-23",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "运动前后图形全等，对应点连线：平移平行且相等、旋转到中心距离相等、翻折被对称轴垂直平分。常见错误是混淆轴对称图形和中心对称图形。",
+   "probe": "判断正五边形、平行四边形、圆是轴对称还是中心对称图形。",
+   "terms": [
+    "平移",
+    "旋转",
+    "翻折",
+    "轴对称",
+    "中心对称"
+   ]
+  },
+  {
+   "id": "MSH-NUM-40",
+   "strand": "NUM",
+   "stage": "G7",
+   "term": "下",
+   "unit": "实数",
+   "name": "实数（平方根、立方根、无理数）",
+   "name_en": "Real numbers: roots and irrationals",
+   "desc": "平方根、算术平方根、立方根，无理数，实数与数轴，分数指数幂，近似数与有效数字。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-39",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-07",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "正数有两个平方根，√a 只表示非负那个。用夹逼估算无理数大小，常见错误是 √16=±4、或以为带根号的都是无理数。",
+   "probe": "√16的平方根是多少？估计√30在哪两个整数之间？",
+   "terms": [
+    "平方根",
+    "立方根",
+    "无理数",
+    "实数"
+   ]
+  },
+  {
+   "id": "MSH-GEO-26",
+   "strand": "GEO",
+   "stage": "G7",
+   "term": "下",
+   "unit": "相交线与平行线",
+   "name": "相交线与平行线",
+   "name_en": "Intersecting and parallel lines",
+   "desc": "对顶角、邻补角，同位角、内错角、同旁内角，平行线判定与性质，垂线。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-23",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "用“F、Z、U”字母形状认三线八角。判定是由角推平行，性质是由平行推角，常见错误是不说明“两直线平行”就用角相等。",
+   "probe": "给一个两平行线被截的图，求未知角并写出推理依据。",
+   "terms": [
+    "同位角",
+    "内错角",
+    "同旁内角",
+    "平行线"
+   ]
+  },
+  {
+   "id": "MSH-GEO-27",
+   "strand": "GEO",
+   "stage": "G7",
+   "term": "下",
+   "unit": "三角形",
+   "name": "三角形的有关概念与性质",
+   "name_en": "Triangle properties",
+   "desc": "三角形三边关系、内角和、外角性质，高、中线、角平分线。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-15",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-26",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "外角等于不相邻两内角之和，可用来快速求角。钝角三角形的高可能在外面，常见错误是高画在内部。",
+   "probe": "画钝角三角形三条高；已知外角120°和一个不相邻内角50°，求另一个内角。",
+   "terms": [
+    "外角",
+    "中线",
+    "高",
+    "角平分线"
+   ]
+  },
+  {
+   "id": "MSH-GEO-28",
+   "strand": "GEO",
+   "stage": "G7",
+   "term": "下",
+   "unit": "全等三角形",
+   "name": "全等三角形",
+   "name_en": "Congruent triangles",
+   "desc": "全等的性质，判定 SSS、SAS、ASA、AAS，证明书写格式。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-27",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先标出已知相等的边角，再对照判定条件找缺的那一个。SSA 不能判定全等，常见错误是“边边角”误用、对应顶点顺序写错。",
+   "probe": "给出两条边和其中一边的对角相等，问能否判定全等并举反例。",
+   "terms": [
+    "全等",
+    "SSS",
+    "SAS",
+    "ASA",
+    "AAS"
+   ]
+  },
+  {
+   "id": "MSH-GEO-29",
+   "strand": "GEO",
+   "stage": "G7",
+   "term": "下",
+   "unit": "等腰三角形",
+   "name": "等腰三角形与等边三角形",
+   "name_en": "Isosceles and equilateral triangles",
+   "desc": "等边对等角、等角对等边，三线合一，等边三角形性质与判定。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-28",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "看到等腰就想“三线合一”作底边上的高。已知角或边求等腰三角形时要分类讨论顶角/底角、腰/底，常见错误是只考虑一种情况。",
+   "probe": "等腰三角形一个角是40°，求另两个角（两种情况）。",
+   "terms": [
+    "三线合一",
+    "等边对等角",
+    "分类讨论"
+   ]
+  },
+  {
+   "id": "MSH-FUN-01",
+   "strand": "FUN",
+   "stage": "G7",
+   "term": "下",
+   "unit": "平面直角坐标系",
+   "name": "平面直角坐标系",
+   "name_en": "Cartesian coordinate plane",
+   "desc": "点的坐标，象限，对称点坐标，点的平移。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-38",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-25",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "先横后纵（x,y），四个象限符号(+,+)(-,+)(-,-)(+,-)。常见错误是横纵坐标写反、关于x轴对称时改错坐标。",
+   "probe": "点P(-3,2)关于x轴、y轴、原点的对称点分别是什么？",
+   "terms": [
+    "坐标",
+    "象限",
+    "对称点"
+   ]
+  },
+  {
+   "id": "MSH-NUM-41",
+   "strand": "NUM",
+   "stage": "G8",
+   "term": "上",
+   "unit": "二次根式",
+   "name": "二次根式",
+   "name_en": "Surds (quadratic radicals)",
+   "desc": "二次根式性质 √(a²)=|a|，最简二次根式，同类二次根式，运算与分母有理化。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-40",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "化简先把被开方数分解出完全平方因数；分母有理化乘以共轭式。常见错误是 √(a²)=a（忘记绝对值）或 √a+√b=√(a+b)。",
+   "probe": "化简 √48-√(1/3)，并将 1/(√3-1) 分母有理化。",
+   "terms": [
+    "最简二次根式",
+    "分母有理化"
+   ]
+  },
+  {
+   "id": "MSH-ALG-11",
+   "strand": "ALG",
+   "stage": "G8",
+   "term": "上",
+   "unit": "一元二次方程",
+   "name": "一元二次方程",
+   "name_en": "Quadratic equations",
+   "desc": "开平方法、配方法、公式法、因式分解法，根的判别式，根与系数关系。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-09",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-41",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先看能否因式分解，不行再用公式法；Δ=b²-4ac 决定根的个数。常见错误是两边同除以含 x 的式子丢根、二次项系数含参忘记 a≠0。",
+   "probe": "解 x²-4x-5=0 与 2x²-3x-1=0；k 为何值时 kx²+2x+1=0 有两个实根？",
+   "terms": [
+    "配方法",
+    "求根公式",
+    "判别式",
+    "韦达定理"
+   ]
+  },
+  {
+   "id": "MSH-FUN-02",
+   "strand": "FUN",
+   "stage": "G8",
+   "term": "上",
+   "unit": "正比例函数与反比例函数",
+   "name": "函数概念与正比例、反比例函数",
+   "name_en": "Functions: direct and inverse proportion",
+   "desc": "变量与函数，定义域，正比例函数 y=kx、反比例函数 y=k/x 的图像与性质。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-37",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "列表—描点—连线画图，看 k 的符号决定所在象限。反比例函数“在每个象限内”增减，常见错误是说“y随x增大而减小”而不加限定。",
+   "probe": "y=-6/x，当 x 从 1 增加到 3 时 y 怎么变？图像在哪些象限？",
+   "terms": [
+    "函数",
+    "正比例",
+    "反比例",
+    "定义域"
+   ]
+  },
+  {
+   "id": "MSH-GEO-30",
+   "strand": "GEO",
+   "stage": "G8",
+   "term": "上",
+   "unit": "几何证明",
+   "name": "几何证明（演绎推理）",
+   "name_en": "Geometric proof",
+   "desc": "命题与定理，证明格式，线段垂直平分线、角平分线性质与逆定理，轨迹。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-28",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-29",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "每一步“因为…所以…”后标依据；从结论倒推需要什么（分析法）。常见错误是循环论证或用图形“看起来”代替依据。",
+   "probe": "证明角平分线上的点到角两边距离相等，看书写是否完整。",
+   "terms": [
+    "命题",
+    "逆命题",
+    "垂直平分线",
+    "轨迹"
+   ]
+  },
+  {
+   "id": "MSH-GEO-31",
+   "strand": "GEO",
+   "stage": "G8",
+   "term": "上",
+   "unit": "直角三角形",
+   "name": "直角三角形与勾股定理",
+   "name_en": "Right triangles and Pythagoras",
+   "desc": "HL 判定，斜边中线等于斜边一半，30°角所对直角边，勾股定理及逆定理，两点距离公式。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-30",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-41",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "记住几组勾股数（3-4-5、5-12-13、8-15-17）。用勾股定理前确认哪条是斜边，常见错误是把直角边当斜边、或不确定直角时漏解。",
+   "probe": "直角三角形两边为3和4，第三边是多少（两种情况）？",
+   "terms": [
+    "勾股定理",
+    "斜边中线",
+    "HL",
+    "距离公式"
+   ]
+  },
+  {
+   "id": "MSH-FUN-03",
+   "strand": "FUN",
+   "stage": "G8",
+   "term": "下",
+   "unit": "一次函数",
+   "name": "一次函数",
+   "name_en": "Linear functions",
+   "desc": "y=kx+b 图像与性质，k、b 的意义，待定系数法，与方程、不等式的关系。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-02",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "k 管倾斜（正升负降），b 管与y轴交点。求解析式用两点代入解方程组，常见错误是把截距当距离（忽略正负）。",
+   "probe": "直线过(1,3)和(-1,-1)，求解析式及与坐标轴围成三角形面积。",
+   "terms": [
+    "一次函数",
+    "斜率",
+    "截距",
+    "待定系数法"
+   ]
+  },
+  {
+   "id": "MSH-ALG-12",
+   "strand": "ALG",
+   "stage": "G8",
+   "term": "下",
+   "unit": "代数方程",
+   "name": "分式方程、无理方程与二元二次方程组",
+   "name_en": "Fractional, radical and simultaneous quadratic equations",
+   "desc": "去分母化整式方程，验增根；两边平方解无理方程须检验；代入/分解法解二元二次方程组。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-11",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "分式方程和无理方程都要“验根”，写在答案中。换元法处理重复出现的式子，常见错误是漏检验导致保留增根。",
+   "probe": "解 2/(x-1) = 4/(x²-1) 和 √(x+3)=x-3。",
+   "terms": [
+    "增根",
+    "换元法",
+    "无理方程"
+   ]
+  },
+  {
+   "id": "MSH-APP-09",
+   "strand": "APP",
+   "stage": "G8",
+   "term": "下",
+   "unit": "方程应用",
+   "name": "列方程（组）解应用题",
+   "name_en": "Equation word problems (fractional/quadratic)",
+   "desc": "工程、行程、增长率、销售利润等，列分式方程或一元二次方程。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-12",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-11",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "列表格整理“量×率=总”，等量关系常藏在“比…多/少”“同时到达”。解完检验是否符合实际（负数、非整数舍去），常见错误是不检验实际意义。",
+   "probe": "“某产品两年产量从100增至144，年平均增长率？”",
+   "terms": [
+    "增长率",
+    "工程问题",
+    "检验"
+   ]
+  },
+  {
+   "id": "MSH-GEO-32",
+   "strand": "GEO",
+   "stage": "G8",
+   "term": "下",
+   "unit": "四边形",
+   "name": "平行四边形的性质与判定",
+   "name_en": "Parallelograms: properties and tests",
+   "desc": "对边、对角、对角线性质，五种判定方法，中心对称性。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-28",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-30",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "证平行四边形先看已有条件靠哪个判定：两组对边/一组对边平行且相等/对角线互相平分。常见错误是“一组对边平行另一组对边相等”误判。",
+   "probe": "给出条件“一组对边平行，另一组对边相等”，问能否判定并画反例（等腰梯形）。",
+   "terms": [
+    "平行四边形",
+    "对角线互相平分"
+   ]
+  },
+  {
+   "id": "MSH-GEO-33",
+   "strand": "GEO",
+   "stage": "G8",
+   "term": "下",
+   "unit": "四边形",
+   "name": "矩形、菱形、正方形",
+   "name_en": "Rectangles, rhombi and squares",
+   "desc": "特殊平行四边形的性质与判定，对角线特征。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-32",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-31",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "抓对角线：矩形相等、菱形垂直、正方形既等又垂直。常见错误是“对角线垂直的四边形是菱形”（缺“平行四边形”前提）。",
+   "probe": "判断“对角线相等且互相垂直的四边形是正方形”对不对。",
+   "terms": [
+    "矩形",
+    "菱形",
+    "正方形",
+    "对角线"
+   ]
+  },
+  {
+   "id": "MSH-GEO-34",
+   "strand": "GEO",
+   "stage": "G8",
+   "term": "下",
+   "unit": "梯形",
+   "name": "梯形与中位线",
+   "name_en": "Trapezia and midlines",
+   "desc": "等腰梯形性质判定，三角形中位线、梯形中位线定理，常用辅助线。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-32",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "梯形常用辅助线：平移腰、平移对角线、作高。中位线平行于底且等于底和的一半，常见错误是三角形中位线没写“平行”。",
+   "probe": "四边形各边中点连线组成什么图形？请证明。",
+   "terms": [
+    "等腰梯形",
+    "中位线",
+    "辅助线"
+   ]
+  },
+  {
+   "id": "MSH-GEO-35",
+   "strand": "GEO",
+   "stage": "G8",
+   "term": "下",
+   "unit": "平面向量",
+   "name": "平面向量初步",
+   "name_en": "Introduction to vectors",
+   "desc": "向量的概念，相等向量、相反向量，向量的加法与减法（三角形法则、平行四边形法则）。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-32",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "向量有大小和方向，加法“首尾相接”、减法“同起点指向被减”。常见错误是减法方向画反。",
+   "probe": "在平行四边形ABCD中，用 AB、AD 表示 AC 和 BD。",
+   "terms": [
+    "向量",
+    "三角形法则",
+    "平行四边形法则"
+   ]
+  },
+  {
+   "id": "MSH-STA-05",
+   "strand": "STA",
+   "stage": "G8",
+   "term": "下",
+   "unit": "概率初步",
+   "name": "概率初步",
+   "name_en": "Introduction to probability",
+   "desc": "确定事件与随机事件，等可能事件概率，树状图与列表法。",
+   "prereqs": [
+    {
+     "id": "MSH-STA-04",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-34",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "先用树状图或表格把所有等可能结果列全，再数符合条件的。常见错误是“放回”和“不放回”混淆，或结果不等可能就直接数。",
+   "probe": "掷两枚硬币，“一正一反”的概率是1/3还是1/2？",
+   "terms": [
+    "随机事件",
+    "等可能",
+    "树状图"
+   ]
+  },
+  {
+   "id": "MSH-GEO-36",
+   "strand": "GEO",
+   "stage": "G9",
+   "term": "上",
+   "unit": "相似三角形",
+   "name": "比例线段与平行线分线段成比例",
+   "name_en": "Proportional segments",
+   "desc": "比例线段、黄金分割，三角形一边的平行线定理及推论，重心。",
+   "prereqs": [
+    {
+     "id": "MSH-NUM-37",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-34",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "“上比下=上比下，上比全=上比全”，对应线段一定在同一条直线上找。常见错误是把平行线截出的不对应线段写成比例。",
+   "probe": "在△ABC中DE∥BC，AD=2，DB=3，AE=4，求EC。",
+   "terms": [
+    "比例线段",
+    "平行线分线段成比例",
+    "黄金分割"
+   ]
+  },
+  {
+   "id": "MSH-GEO-37",
+   "strand": "GEO",
+   "stage": "G9",
+   "term": "上",
+   "unit": "相似三角形",
+   "name": "相似三角形",
+   "name_en": "Similar triangles",
+   "desc": "相似的判定（AA、SAS、SSS）与性质（对应边、周长比、面积比）。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-36",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-28",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先找等角（公共角、对顶角、直角），写相似时顶点按对应顺序。面积比等于相似比的平方，常见错误是面积比直接用相似比。",
+   "probe": "两个相似三角形相似比为2:3，周长比和面积比？以及“一线三等角”模型找相似。",
+   "terms": [
+    "相似",
+    "相似比",
+    "面积比",
+    "一线三等角"
+   ]
+  },
+  {
+   "id": "MSH-GEO-38",
+   "strand": "GEO",
+   "stage": "G9",
+   "term": "上",
+   "unit": "锐角三角比",
+   "name": "锐角三角比与解直角三角形",
+   "name_en": "Trigonometric ratios in right triangles",
+   "desc": "正弦、余弦、正切、余切的定义，特殊角三角比，解直角三角形。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-37",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-31",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "记“对比斜是正弦、邻比斜是余弦、对比邻是正切”，特殊角用 30-60-90、45-45-90 三角板记。常见错误是在非直角三角形中直接用定义，要先作高构造直角。",
+   "probe": "Rt△ABC中∠C=90°，AC=3，BC=4，求 sinA、tanB。",
+   "terms": [
+    "正弦",
+    "余弦",
+    "正切",
+    "特殊角"
+   ]
+  },
+  {
+   "id": "MSH-APP-10",
+   "strand": "APP",
+   "stage": "G9",
+   "term": "上",
+   "unit": "锐角三角比",
+   "name": "解直角三角形的应用",
+   "name_en": "Applications: elevation, depression, slope",
+   "desc": "仰角、俯角、坡度（坡比）、方位角的实际问题。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-38",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "画示意图，把实际问题转成含直角的三角形，公共边作为桥梁列方程。常见错误是坡度 i=铅直高度:水平宽度 写反、仰俯角位置画错。",
+   "probe": "在楼顶测得旗杆顶端俯角30°、底端俯角45°，楼高20米，求旗杆高。",
+   "terms": [
+    "仰角",
+    "俯角",
+    "坡度",
+    "方位角"
+   ]
+  },
+  {
+   "id": "MSH-GEO-39",
+   "strand": "GEO",
+   "stage": "G9",
+   "term": "上",
+   "unit": "向量的线性运算",
+   "name": "向量的线性运算",
+   "name_en": "Linear operations on vectors",
+   "desc": "实数与向量相乘，平行向量定理，向量的线性组合与分解。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-35",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "k·a 与 a 共线，k 的正负决定方向。用已知两个不共线向量表示其他向量时沿图形“走路径”，常见错误是方向弄反导致符号错。",
+   "probe": "在△ABC中D为BC中点，用 AB、AC 表示 AD。",
+   "terms": [
+    "数乘向量",
+    "平行向量",
+    "向量分解"
+   ]
+  },
+  {
+   "id": "MSH-FUN-04",
+   "strand": "FUN",
+   "stage": "G9",
+   "term": "上",
+   "unit": "二次函数",
+   "name": "二次函数",
+   "name_en": "Quadratic functions",
+   "desc": "y=ax²+bx+c 的图像与性质，配方求顶点、对称轴，图像平移，三种解析式求法。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-03",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-11",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先配方成顶点式 y=a(x-h)²+k，再读开口、对称轴、顶点、增减性。平移口诀“左加右减（对x）、上加下减”，常见错误是顶点坐标符号写反。",
+   "probe": "把 y=2x²-8x+5 化成顶点式，写出顶点和对称轴，并说明何时 y 随 x 增大而减小。",
+   "terms": [
+    "抛物线",
+    "顶点式",
+    "对称轴",
+    "平移"
+   ]
+  },
+  {
+   "id": "MSH-FUN-05",
+   "strand": "FUN",
+   "stage": "G9",
+   "term": "下",
+   "unit": "中考复习",
+   "name": "函数与几何综合（中考第24题）",
+   "name_en": "Function–geometry problems (Zhongkao Q24)",
+   "desc": "二次函数与三角形、四边形结合，求解析式、存在性问题（相似、等腰、平行四边形）。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-04",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-37",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "第一问稳拿解析式，后面把几何条件翻译成坐标关系（距离、斜率、相似比）。存在性问题要分类讨论，常见错误是漏情况或点不在规定范围内。",
+   "probe": "抛物线与x轴交于A、B，与y轴交于C，问是否存在点P使△PBC与△ABC相似，看分类是否完整。",
+   "terms": [
+    "存在性",
+    "分类讨论",
+    "坐标法"
+   ]
+  },
+  {
+   "id": "MSH-GEO-40",
+   "strand": "GEO",
+   "stage": "G9",
+   "term": "下",
+   "unit": "圆",
+   "name": "圆的基本性质与垂径定理",
+   "name_en": "Circle theorems: chords and arcs",
+   "desc": "圆心角、弧、弦、弦心距关系，垂径定理及推论。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-22",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-31",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "有弦就作弦心距，构造“半径-弦一半-弦心距”的直角三角形用勾股。常见错误是平行弦在圆心同侧/异侧漏解。",
+   "probe": "半径5的圆中，两条平行弦长6和8，求它们的距离（两种情况）。",
+   "terms": [
+    "垂径定理",
+    "弦心距",
+    "圆心角"
+   ]
+  },
+  {
+   "id": "MSH-GEO-41",
+   "strand": "GEO",
+   "stage": "G9",
+   "term": "下",
+   "unit": "圆",
+   "name": "直线与圆、圆与圆的位置关系，正多边形",
+   "name_en": "Positions of lines and circles; regular polygons",
+   "desc": "用 d 与 r 判断位置关系，切线判定与性质，两圆位置关系，正多边形与圆。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-40",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "全部转化为“距离与半径比较”：直线看 d 与 r，两圆看圆心距与 R±r。常见错误是两圆相切只考虑外切。",
+   "probe": "两圆半径3和5，相切时圆心距是多少？",
+   "terms": [
+    "切线",
+    "圆心距",
+    "内切",
+    "外切",
+    "正多边形"
+   ]
+  },
+  {
+   "id": "MSH-STA-06",
+   "strand": "STA",
+   "stage": "G9",
+   "term": "下",
+   "unit": "统计初步",
+   "name": "统计初步（中位数、众数、方差、频率分布）",
+   "name_en": "Statistics: median, mode, variance, frequency",
+   "desc": "平均数、中位数、众数、方差、标准差，频数分布直方图，样本估计总体。",
+   "prereqs": [
+    {
+     "id": "MSH-STA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-STA-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "求中位数先排序，偶数个取中间两数平均；方差反映波动大小。常见错误是没排序直接取中间数、频率直方图把纵轴当频数。",
+   "probe": "数据 3,7,5,9,5,7,5 的中位数、众数、方差。",
+   "terms": [
+    "中位数",
+    "众数",
+    "方差",
+    "频率分布直方图"
+   ]
+  },
+  {
+   "id": "MSH-GEO-42",
+   "strand": "GEO",
+   "stage": "G9",
+   "term": "下",
+   "unit": "中考复习",
+   "name": "几何综合与动点问题（中考第25题）",
+   "name_en": "Dynamic geometry problems (Zhongkao Q25)",
+   "desc": "动点、动线背景下的相似、三角比、圆综合，函数关系式与定义域，分类讨论。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-37",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-38",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-41",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "先画出特殊位置图，用相似或三角比把线段都用 x 表示，再列函数式并求定义域。常见错误是不写定义域、分类不全。",
+   "probe": "动点P在边AB上运动，设AP=x，求△PCD面积 y 关于 x 的函数及定义域，看是否会写定义域。",
+   "terms": [
+    "动点",
+    "定义域",
+    "分类讨论"
+   ]
+  },
+  {
+   "id": "MSH-ALG-13",
+   "strand": "ALG",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第1章 集合与逻辑",
+   "name": "集合",
+   "name_en": "Sets",
+   "desc": "集合的表示、元素与集合关系，子集，交并补运算。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "运算用数轴（连续）或 Venn 图（离散）画出来。常见错误是忽略空集（A⊆B 时 A 可以是∅）和端点开闭。",
+   "probe": "A={x|x²-3x+2=0}，B={x|ax=1}，若 B⊆A 求 a（看是否考虑 a=0）。",
+   "terms": [
+    "集合",
+    "子集",
+    "交集",
+    "并集",
+    "补集"
+   ]
+  },
+  {
+   "id": "MSH-ALG-14",
+   "strand": "ALG",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第1章 集合与逻辑",
+   "name": "常用逻辑用语（充分必要条件）",
+   "name_en": "Logic: necessary and sufficient conditions",
+   "desc": "命题，充分条件、必要条件、充要条件，全称与存在量词及其否定。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "“小范围推大范围”：p 对应集合⊆q 对应集合时 p 是 q 的充分条件。常见错误是充分与必要方向弄反、否定全称命题时没改量词。",
+   "probe": "“x>1”是“x²>1”的什么条件？写出“∀x∈R, x²≥0”的否定。",
+   "terms": [
+    "充分条件",
+    "必要条件",
+    "量词",
+    "否定"
+   ]
+  },
+  {
+   "id": "MSH-ALG-15",
+   "strand": "ALG",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第2章 等式与不等式",
+   "name": "不等式的性质与解法",
+   "name_en": "Inequalities: properties and solving",
+   "desc": "不等式性质，一元二次不等式、分式不等式、绝对值不等式的解法。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-04",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "一元二次不等式“画抛物线看x轴上下”；分式不等式化为整式乘积且分母≠0。常见错误是二次项系数为负没先变正、分式不等式直接去分母。",
+   "probe": "解 (x-1)/(x+2)≤0 和 |2x-1|<3。",
+   "terms": [
+    "一元二次不等式",
+    "分式不等式",
+    "绝对值不等式"
+   ]
+  },
+  {
+   "id": "MSH-ALG-16",
+   "strand": "ALG",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第2章 等式与不等式",
+   "name": "基本不等式及其应用",
+   "name_en": "AM–GM inequality",
+   "desc": "a+b≥2√(ab) 及应用求最值，“一正二定三相等”。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-15",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "用前先检查三条件：正数、和或积为定值、等号能取到。常见错误是等号取不到仍给出最值（如 x+4/x 在 x≥3 上）。",
+   "probe": "x>0时求 x+9/x 的最小值；x≥4 时呢？",
+   "terms": [
+    "基本不等式",
+    "最值",
+    "一正二定三相等"
+   ]
+  },
+  {
+   "id": "MSH-FUN-06",
+   "strand": "FUN",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第4章 幂、指数与对数",
+   "name": "幂函数与指数函数",
+   "name_en": "Power and exponential functions",
+   "desc": "有理数指数幂运算，幂函数图像，指数函数 y=aˣ 的图像与性质。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-02",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-NUM-40",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "以 a>1 和 0<a<1 两类画图，图像都过(0,1)。比较大小同底看单调、同指看底、都不同找中间量1，常见错误是忽略 0<a<1 时递减。",
+   "probe": "比较 0.7^0.3、0.3^0.7、1 的大小。",
+   "terms": [
+    "指数幂",
+    "幂函数",
+    "指数函数"
+   ]
+  },
+  {
+   "id": "MSH-FUN-07",
+   "strand": "FUN",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第4章 幂、指数与对数",
+   "name": "对数与对数函数",
+   "name_en": "Logarithms and logarithmic functions",
+   "desc": "对数定义与运算法则、换底公式，对数函数图像与性质，反函数。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "对数就是“指数”：logₐN=b ⇔ aᵇ=N。真数必须>0，常见错误是 log(M+N)=logM+logN、解对数方程忘记验真数。",
+   "probe": "计算 log₂3·log₃8；解 lg(x-1)+lg(x+2)=1。",
+   "terms": [
+    "对数",
+    "换底公式",
+    "对数函数"
+   ]
+  },
+  {
+   "id": "MSH-FUN-08",
+   "strand": "FUN",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第5章 函数的概念、性质及应用",
+   "name": "函数的概念与性质",
+   "name_en": "Functions: domain, monotonicity, parity",
+   "desc": "函数定义、定义域值域、表示，单调性、奇偶性、最值，分段函数。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-04",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "研究函数先求定义域；判断奇偶先看定义域是否关于原点对称。常见错误是证明单调性只代两个特殊值、定义域不对称也判断奇偶。",
+   "probe": "f(x)=x+1/x 在 (0,1) 上的单调性怎么证？判断 f(x)=x² (x∈[-1,2]) 的奇偶性。",
+   "terms": [
+    "定义域",
+    "单调性",
+    "奇偶性",
+    "最值"
+   ]
+  },
+  {
+   "id": "MSH-APP-11",
+   "strand": "APP",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第5章 函数的概念、性质及应用",
+   "name": "函数的零点与函数建模",
+   "name_en": "Zeros of functions and modelling",
+   "desc": "零点存在定理，二分法，函数模型（指数增长、分段计价）。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-08",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-FUN-07",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "零点就是方程的根、图像与x轴交点，常用“数形结合”转为两个函数交点个数。常见错误是零点存在定理反过来用（f(a)f(b)>0 就判没有零点）。",
+   "probe": "讨论方程 2ˣ=x+2 的实根个数。",
+   "terms": [
+    "零点",
+    "二分法",
+    "数形结合",
+    "建模"
+   ]
+  },
+  {
+   "id": "MSH-FUN-09",
+   "strand": "FUN",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第6章 三角",
+   "name": "任意角、弧度制与三角函数定义",
+   "name_en": "Angles, radians and trig functions",
+   "desc": "任意角与弧度制，单位圆上的三角函数定义，同角关系。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-38",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-22",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "180°=π，记几个常用弧度。三角函数符号用“一全正二正弦三正切四余弦”，常见错误是同角关系开方时符号不看象限。",
+   "probe": "已知 sinα=3/5 且 α 在第二象限，求 cosα、tanα。",
+   "terms": [
+    "弧度制",
+    "单位圆",
+    "同角三角函数关系"
+   ]
+  },
+  {
+   "id": "MSH-FUN-10",
+   "strand": "FUN",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第6章 三角",
+   "name": "三角恒等变换（诱导公式、和差角、二倍角）",
+   "name_en": "Trig identities",
+   "desc": "诱导公式，两角和差公式，二倍角、半角公式，辅助角公式。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "诱导公式“奇变偶不变，符号看象限”；asinx+bcosx 统一化成 √(a²+b²)sin(x+φ)。常见错误是诱导公式符号判错、二倍角降幂公式记反。",
+   "probe": "化简 sin(π-α)cos(3π/2+α)；把 sinx+√3cosx 化成一个三角函数。",
+   "terms": [
+    "诱导公式",
+    "二倍角",
+    "辅助角公式"
+   ]
+  },
+  {
+   "id": "MSH-FUN-11",
+   "strand": "FUN",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第6章 三角",
+   "name": "正弦定理与余弦定理（解三角形）",
+   "name_en": "Sine and cosine rules",
+   "desc": "正弦定理、余弦定理、三角形面积公式及应用。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-09",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-FUN-10",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "已知两边一对角用正弦定理要考虑“两解”；求角优先用余弦定理（唯一）。常见错误是漏解或多解，忘记“大边对大角”检验。",
+   "probe": "a=√3、b=1、A=60° 时求 B；a=2、b=√2、B=30° 时 A 有几解？",
+   "terms": [
+    "正弦定理",
+    "余弦定理",
+    "面积公式"
+   ]
+  },
+  {
+   "id": "MSH-FUN-12",
+   "strand": "FUN",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第7章 三角函数",
+   "name": "三角函数的图像与性质",
+   "name_en": "Graphs of trig functions",
+   "desc": "正弦、余弦、正切函数的周期性、单调性、最值，y=Asin(ωx+φ) 的图像变换。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-10",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-FUN-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "“五点法”画图；先化成 Asin(ωx+φ) 再整体代换 ωx+φ 求单调区间。图像平移“对 x 本身”平移，常见错误是 ω≠1 时平移量没除以 ω。",
+   "probe": "把 y=sin2x 图像变为 y=sin(2x+π/3) 需向左平移多少？",
+   "terms": [
+    "周期",
+    "五点法",
+    "图像变换"
+   ]
+  },
+  {
+   "id": "MSH-GEO-43",
+   "strand": "GEO",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第8章 平面向量",
+   "name": "平面向量（坐标与数量积）",
+   "name_en": "Plane vectors: coordinates and dot product",
+   "desc": "向量坐标运算，数量积、夹角、投影，平行与垂直的坐标条件。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-39",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-FUN-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "a·b=|a||b|cosθ=x₁x₂+y₁y₂；垂直 ⇔ a·b=0，平行 ⇔ x₁y₂=x₂y₁。常见错误是夹角为钝角时没排除反向共线。",
+   "probe": "a=(1,2)，b=(x,1)，a与b夹角为锐角，求 x 的范围。",
+   "terms": [
+    "数量积",
+    "夹角",
+    "投影",
+    "坐标运算"
+   ]
+  },
+  {
+   "id": "MSH-NUM-42",
+   "strand": "NUM",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第9章 复数",
+   "name": "复数",
+   "name_en": "Complex numbers",
+   "desc": "复数概念、几何意义（复平面），四则运算，共轭复数，模。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-11",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-43",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "i²=-1，除法分子分母同乘分母的共轭。复数对应复平面的点/向量，常见错误是把 a+bi 的虚部写成 bi、两个虚数比大小。",
+   "probe": "计算 (1+2i)/(1-i)，并指出它在复平面的哪个象限。",
+   "terms": [
+    "虚数单位",
+    "共轭复数",
+    "复平面",
+    "模"
+   ]
+  },
+  {
+   "id": "MSH-GEO-44",
+   "strand": "GEO",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 第10章 空间直线与平面",
+   "name": "空间直线与平面",
+   "name_en": "Lines and planes in space",
+   "desc": "平面基本性质，空间两直线、直线与平面、平面与平面的平行和垂直，异面直线所成角、线面角、二面角。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-26",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-31",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-24",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "证线面平行找“面内一条平行线”，证线面垂直找“面内两条相交直线”。用长方体模型想象位置关系，常见错误是判定定理缺条件（如漏写“直线在平面外”）。",
+   "probe": "在正方体中求异面直线 A₁B 与 AD₁ 所成角，并证明 BD⊥平面 ACC₁A₁。",
+   "terms": [
+    "异面直线",
+    "线面垂直",
+    "二面角"
+   ]
+  },
+  {
+   "id": "MSH-GEO-45",
+   "strand": "GEO",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 第11章 简单几何体",
+   "name": "简单几何体（表面积与体积）",
+   "name_en": "Solids: surface area and volume",
+   "desc": "棱柱、棱锥、圆柱、圆锥、球的结构特征、表面积和体积，直观图。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-44",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-21",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-22",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "锥体体积是同底等高柱体的 1/3；外接球找球心（补成长方体最方便）。常见错误是忘乘 1/3、圆锥侧面积用错母线。",
+   "probe": "棱长为2的正四面体的外接球半径和体积。",
+   "terms": [
+    "棱锥",
+    "圆锥",
+    "球",
+    "外接球"
+   ]
+  },
+  {
+   "id": "MSH-GEO-46",
+   "strand": "GEO",
+   "stage": "G11",
+   "term": "上",
+   "unit": "选必一 第1章 坐标平面上的直线",
+   "name": "坐标平面上的直线",
+   "name_en": "Straight lines in coordinate geometry",
+   "desc": "倾斜角与斜率，直线方程的几种形式，两直线位置关系，点到直线距离。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-03",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-FUN-09",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "用点斜式最方便，但要单独考虑斜率不存在（竖直线）。点到直线距离公式先化一般式，常见错误是漏掉竖直线、平行线距离公式未统一系数。",
+   "probe": "过点(1,2)且与原点距离为1的直线方程（两条）。",
+   "terms": [
+    "斜率",
+    "倾斜角",
+    "点到直线距离"
+   ]
+  },
+  {
+   "id": "MSH-GEO-47",
+   "strand": "GEO",
+   "stage": "G11",
+   "term": "上",
+   "unit": "选必一 第2章 圆锥曲线",
+   "name": "圆的方程与直线和圆",
+   "name_en": "Circles in coordinate geometry",
+   "desc": "圆的标准方程与一般方程，直线与圆、圆与圆的位置关系，弦长。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-46",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-41",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "直线与圆一律用“圆心到直线距离 d 与 r 比较”，弦长=2√(r²-d²)。常见错误是一般方程没检验 D²+E²-4F>0。",
+   "probe": "直线 y=x+b 与圆 x²+y²=4 相交弦长为2√2，求 b。",
+   "terms": [
+    "圆的方程",
+    "弦长",
+    "切线"
+   ]
+  },
+  {
+   "id": "MSH-GEO-48",
+   "strand": "GEO",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选必一 第2章 圆锥曲线",
+   "name": "椭圆",
+   "name_en": "Ellipses",
+   "desc": "椭圆定义、标准方程、几何性质（离心率、焦点三角形）。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-47",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "回到定义：|PF₁|+|PF₂|=2a。a²=b²+c²，离心率 e=c/a 越大越扁，常见错误是焦点在y轴时 a、b 位置弄反。",
+   "probe": "椭圆 x²/25+y²/9=1 上点 P 到一个焦点距离为4，到另一焦点距离？离心率？",
+   "terms": [
+    "椭圆",
+    "焦点",
+    "离心率"
+   ]
+  },
+  {
+   "id": "MSH-GEO-49",
+   "strand": "GEO",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选必一 第2章 圆锥曲线",
+   "name": "双曲线与抛物线",
+   "name_en": "Hyperbolas and parabolas",
+   "desc": "双曲线定义、方程、渐近线；抛物线定义、方程、焦点准线。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-48",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "双曲线 c²=a²+b²（与椭圆相反），渐近线令右边为0；抛物线上点到焦点距离=到准线距离。常见错误是双曲线定义漏掉绝对值、抛物线 y²=2px 焦点写成 (p,0)。",
+   "probe": "抛物线 y²=8x 上一点到焦点距离为5，求该点横坐标。",
+   "terms": [
+    "双曲线",
+    "渐近线",
+    "抛物线",
+    "准线"
+   ]
+  },
+  {
+   "id": "MSH-GEO-50",
+   "strand": "GEO",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选必一 第2章 圆锥曲线",
+   "name": "直线与圆锥曲线综合",
+   "name_en": "Lines meeting conics",
+   "desc": "联立、判别式、韦达定理，弦长、中点弦、定点定值、最值问题（高考压轴题型）。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-49",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-11",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-43",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "固定流程：设直线（注意斜率不存在）→联立→Δ>0→韦达→把目标用 x₁+x₂、x₁x₂ 表示。常见错误是漏斜率不存在情况、忘写 Δ>0 限制参数范围。",
+   "probe": "过椭圆焦点的直线交椭圆于A、B，求 |AB| 的最小值，看流程是否完整。",
+   "terms": [
+    "联立",
+    "韦达定理",
+    "弦长",
+    "定点定值"
+   ]
+  },
+  {
+   "id": "MSH-GEO-51",
+   "strand": "GEO",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选必一 第3章 空间向量",
+   "name": "空间向量与立体几何",
+   "name_en": "Vectors in 3D geometry",
+   "desc": "空间直角坐标系，空间向量运算，法向量，用向量求空间角与距离。",
+   "prereqs": [
+    {
+     "id": "MSH-GEO-43",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-GEO-44",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "建系后求平面法向量（令一个坐标为1），线面角用 sin、二面角用 cos 且需判断锐钝。常见错误是点坐标写错、线面角误用 cos。",
+   "probe": "在正方体中建系，求直线 A₁C 与平面 AB₁D₁ 所成角的正弦。",
+   "terms": [
+    "法向量",
+    "线面角",
+    "二面角",
+    "空间坐标"
+   ]
+  },
+  {
+   "id": "MSH-STA-07",
+   "strand": "STA",
+   "stage": "G11",
+   "term": "下",
+   "unit": "必修四 第12章 概率",
+   "name": "概率（古典概型与事件独立）",
+   "name_en": "Probability: classical model and independence",
+   "desc": "样本空间、事件关系与运算，古典概型，互斥、对立、独立事件。",
+   "prereqs": [
+    {
+     "id": "MSH-STA-05",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-13",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "先写出样本空间并确认等可能；“至少一个”用对立事件。常见错误是互斥与独立混淆（互斥不能同时发生，独立是互不影响）。",
+   "probe": "甲乙投篮命中率0.6和0.5，求至少一人命中的概率。",
+   "terms": [
+    "样本空间",
+    "古典概型",
+    "互斥",
+    "独立"
+   ]
+  },
+  {
+   "id": "MSH-STA-08",
+   "strand": "STA",
+   "stage": "G11",
+   "term": "下",
+   "unit": "必修四 第13章 统计",
+   "name": "统计（抽样与用样本估计总体）",
+   "name_en": "Statistics: sampling and estimation",
+   "desc": "简单随机抽样、分层抽样，频率分布直方图，百分位数，样本数字特征估计总体。",
+   "prereqs": [
+    {
+     "id": "MSH-STA-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "直方图纵轴是“频率/组距”，面积才是频率；百分位数先排序再按 n×p% 定位。常见错误是把纵轴值直接当频率。",
+   "probe": "根据直方图估计平均数、中位数和第80百分位数。",
+   "terms": [
+    "分层抽样",
+    "频率分布直方图",
+    "百分位数"
+   ]
+  },
+  {
+   "id": "MSH-ALG-17",
+   "strand": "ALG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选必二 第4章 数列",
+   "name": "数列概念与等差数列",
+   "name_en": "Sequences and arithmetic sequences",
+   "desc": "数列通项与递推，等差数列通项、前n项和及性质。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "aₙ 与 Sₙ 的关系：aₙ=Sₙ-Sₙ₋₁（n≥2），n=1 单独验证。等差性质 m+n=p+q ⇒ aₘ+aₙ=aₚ+a_q，常见错误是忘记验证 n=1。",
+   "probe": "已知 Sₙ=n²+n+1，求 aₙ（看是否检查首项）。",
+   "terms": [
+    "通项公式",
+    "前n项和",
+    "等差数列"
+   ]
+  },
+  {
+   "id": "MSH-ALG-18",
+   "strand": "ALG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选必二 第4章 数列",
+   "name": "等比数列与数列求和",
+   "name_en": "Geometric sequences and summation",
+   "desc": "等比数列通项、前n项和，错位相减、裂项相消、分组求和，递推求通项。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-17",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "等比求和要分 q=1 和 q≠1；错位相减乘 q 后错一位对齐，最后整理。常见错误是 q=1 漏讨论、错位相减末项符号错。",
+   "probe": "求 Sₙ=1·2+2·2²+…+n·2ⁿ；求 Σ1/(k(k+1))。",
+   "terms": [
+    "等比数列",
+    "错位相减",
+    "裂项相消"
+   ]
+  },
+  {
+   "id": "MSH-ALG-19",
+   "strand": "ALG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选必二 第4章 数列",
+   "name": "数学归纳法",
+   "name_en": "Mathematical induction",
+   "desc": "数学归纳法的原理与步骤，证明等式、不等式与整除。",
+   "prereqs": [
+    {
+     "id": "MSH-ALG-18",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "两步缺一不可：验证 n=1，假设 n=k 成立推 n=k+1 时必须用到假设。常见错误是第二步不用归纳假设直接算。",
+   "probe": "用数学归纳法证明 1+3+…+(2n-1)=n²，看第二步是否用到假设。",
+   "terms": [
+    "归纳奠基",
+    "归纳假设"
+   ]
+  },
+  {
+   "id": "MSH-FUN-13",
+   "strand": "FUN",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选必二 第5章 导数及其应用",
+   "name": "导数的概念与运算",
+   "name_en": "Derivatives: concept and rules",
+   "desc": "导数定义、几何意义（切线斜率），基本初等函数导数，四则运算与复合函数求导。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-08",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-FUN-07",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-FUN-12",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "背熟导数表，复合函数“外导乘内导”。求切线先分清“在点处”还是“过点”，常见错误是过某点的切线把该点当切点。",
+   "probe": "求曲线 y=x³ 过点(1,1)的切线方程（两条）。",
+   "terms": [
+    "导数",
+    "切线",
+    "复合函数求导"
+   ]
+  },
+  {
+   "id": "MSH-FUN-14",
+   "strand": "FUN",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选必二 第5章 导数及其应用",
+   "name": "导数的应用（单调性、极值、最值）",
+   "name_en": "Applications of derivatives",
+   "desc": "用导数判断单调性，求极值与闭区间最值，优化问题。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "列表：定义域→求导→找 f'=0 的点→分区间判符号→得单调与极值。常见错误是忘求定义域、把 f'(x₀)=0 直接当极值点。",
+   "probe": "f(x)=x³-3x，求单调区间、极值及在[-2,3]上的最值；问 y=x³ 在 0 处有没有极值。",
+   "terms": [
+    "单调性",
+    "极值",
+    "最值",
+    "定义域"
+   ]
+  },
+  {
+   "id": "MSH-FUN-15",
+   "strand": "FUN",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选必二 第5章 导数及其应用",
+   "name": "导数综合（含参讨论与不等式）",
+   "name_en": "Advanced derivative problems",
+   "desc": "含参函数单调性分类讨论，恒成立与存在性问题，零点个数，构造函数证明不等式（高考压轴）。",
+   "prereqs": [
+    {
+     "id": "MSH-FUN-14",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-ALG-16",
+     "strength": "有帮助"
+    },
+    {
+     "id": "MSH-APP-11",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "恒成立问题优先“分离参数”转为求最值；分类讨论按导函数零点与定义域的位置分层。常见错误是分类标准不清导致重漏、构造函数后不求最值就下结论。",
+   "probe": "若 eˣ≥ax+1 对一切 x 恒成立，求 a 的取值。",
+   "terms": [
+    "分离参数",
+    "分类讨论",
+    "构造函数"
+   ]
+  },
+  {
+   "id": "MSH-STA-09",
+   "strand": "STA",
+   "stage": "G12",
+   "term": "下",
+   "unit": "选必三 第6章 计数原理",
+   "name": "计数原理与二项式定理",
+   "name_en": "Counting principles and binomial theorem",
+   "desc": "加法与乘法原理，排列与组合，常见模型（捆绑、插空、分组），二项式定理。",
+   "prereqs": [
+    {
+     "id": "MSH-STA-07",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "先问“分类还是分步、有序还是无序”。特殊元素优先、相邻捆绑、不相邻插空，常见错误是平均分组没除以组数的阶乘、重复计数。",
+   "probe": "5人排成一排，甲乙必须相邻、丙不在两端，有几种排法？(1+2x)⁶ 中 x³ 的系数？",
+   "terms": [
+    "排列",
+    "组合",
+    "捆绑法",
+    "插空法",
+    "二项式定理"
+   ]
+  },
+  {
+   "id": "MSH-STA-10",
+   "strand": "STA",
+   "stage": "G12",
+   "term": "下",
+   "unit": "选必三 第7章 概率初步（续）",
+   "name": "条件概率、随机变量及其分布",
+   "name_en": "Conditional probability and distributions",
+   "desc": "条件概率与全概率公式，离散型随机变量分布、期望与方差，二项分布、超几何分布，正态分布。",
+   "prereqs": [
+    {
+     "id": "MSH-STA-09",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-STA-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先判模型：“有放回/独立重复”是二项分布，“不放回抽取”是超几何分布。写分布列后检查概率和为1，常见错误是模型判断错、期望公式套错。",
+   "probe": "10件产品含3件次品，不放回抽3件，次品数 X 的分布列与期望。",
+   "terms": [
+    "条件概率",
+    "分布列",
+    "期望",
+    "二项分布",
+    "正态分布"
+   ]
+  },
+  {
+   "id": "MSH-STA-11",
+   "strand": "STA",
+   "stage": "G12",
+   "term": "下",
+   "unit": "选必三 第8章 成对数据的统计分析",
+   "name": "成对数据的统计分析",
+   "name_en": "Paired data: correlation and independence test",
+   "desc": "散点图，相关系数，一元线性回归方程，2×2 列联表与独立性检验（χ²）。",
+   "prereqs": [
+    {
+     "id": "MSH-STA-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "回归直线一定过样本中心(x̄,ȳ)；|r| 越接近1线性相关越强。独立性检验按 χ² 与临界值比较下结论，常见错误是把“有关”说成“一定导致”。",
+   "probe": "给定数据求回归方程并预测，看他是否利用样本中心点。",
+   "terms": [
+    "相关系数",
+    "回归方程",
+    "列联表",
+    "独立性检验"
+   ]
+  },
+  {
+   "id": "MSH-APP-12",
+   "strand": "APP",
+   "stage": "G12",
+   "term": "下",
+   "unit": "高考复习",
+   "name": "数学建模与概率统计决策（高考应用题）",
+   "name_en": "Mathematical modelling and decision problems",
+   "desc": "读懂实际情境，建立函数、数列或概率模型，用期望等做决策。",
+   "prereqs": [
+    {
+     "id": "MSH-STA-10",
+     "strength": "必须"
+    },
+    {
+     "id": "MSH-APP-11",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "先用自己的话复述题意，列出变量和约束，再选模型；结论要回到实际意义。常见错误是被长题干吓到、模型选错或忽略实际取值范围。",
+   "probe": "给一个“是否购买保修服务”的概率决策题，看他能否用期望比较方案。",
+   "terms": [
+    "建模",
+    "期望决策",
+    "实际意义"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,3546 @@
+{
+ "pack": {
+  "id": "phy-shanghai",
+  "subject": "physics",
+  "subject_name": "物理",
+  "edition": "沪教版（初中）+ 沪科教版（高中2020）",
+  "region": "上海公办",
+  "stages": [
+   "G6",
+   "G7",
+   "G8",
+   "G9",
+   "G10",
+   "G11",
+   "G12"
+  ],
+  "version": 1,
+  "generated": "2026-10-06",
+  "sources": [
+   "上海科学技术出版社《物理》八年级上/下册、九年级上/下册（沪教版）",
+   "上海科学技术出版社《科学》六、七年级（初中科学基础）",
+   "上海科技教育出版社《物理》必修第一~三册、选择性必修第一~三册（2020 新教材）",
+   "上海市初中学业水平考试（中考）物理考纲",
+   "上海市普通高中学业水平等级性考试物理考纲",
+   "/mnt/project-files/aistudy/data/map_phy.json（基础数学与科学前置点）"
+  ],
+  "notes": "上海公办物理知识图谱：G6–G7 为科学课基础，G8–G9 为初中物理（声、光、运动和力、机械和功、热与能、压力与压强、电路、电与磁、原子到星系），G10–G12 按沪科教版 2020 新教材必修一~三、选择性必修一~三排列（学期安排各校略有差异）。hot 标记上海中考/等级考高频考点；MATH-PRE-*、SCI-PRE-* 前置点引用 map_phy.json。"
+ },
+ "strands": [
+  {
+   "id": "MECH",
+   "name": "力学"
+  },
+  {
+   "id": "THERM",
+   "name": "热学"
+  },
+  {
+   "id": "OPT",
+   "name": "光学"
+  },
+  {
+   "id": "SOUND",
+   "name": "声学与波"
+  },
+  {
+   "id": "ELEC",
+   "name": "电学"
+  },
+  {
+   "id": "MAG",
+   "name": "电磁学"
+  },
+  {
+   "id": "MOD",
+   "name": "近代物理"
+  },
+  {
+   "id": "EXP",
+   "name": "实验与方法"
+  }
+ ],
+ "kps": [
+  {
+   "id": "PSH-EXP-01",
+   "strand": "EXP",
+   "stage": "G6",
+   "term": "全",
+   "unit": "科学·测量",
+   "name": "长度和时间的测量",
+   "name_en": "Measuring length and time",
+   "desc": "刻度尺读数（估读到分度值下一位）、秒表读数；单位换算",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-UNIT",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "读数三步：看量程、看分度值、估读一位。常见错误是忘记估读或起点不是零刻度时没减去起点。",
+   "probe": "给一张起点在 1.00 cm 的刻度尺图，看孩子能否读出物体长度并保留估读位。",
+   "terms": [
+    "分度值",
+    "估读",
+    "量程",
+    "1 m=100 cm"
+   ]
+  },
+  {
+   "id": "PSH-EXP-02",
+   "strand": "EXP",
+   "stage": "G6",
+   "term": "全",
+   "unit": "科学·测量",
+   "name": "质量与体积的测量",
+   "name_en": "Measuring mass and volume",
+   "desc": "天平使用（左物右码、游码）、量筒读数（视线与凹液面底部相平）、排水法测体积",
+   "prereqs": [
+    {
+     "id": "PSH-EXP-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-UNIT",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "天平口诀“放平、归零、调平衡，左物右码游码加”；量筒先看单位 mL。常见错误：调平衡时还在移动游码，或俯视读数导致偏大。",
+   "probe": "给天平砝码与游码示意图，让孩子读出质量；再给量筒前后液面求石块体积。",
+   "terms": [
+    "天平",
+    "游码",
+    "量筒",
+    "1 mL=1 cm³",
+    "排水法"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-01",
+   "strand": "ELEC",
+   "stage": "G7",
+   "term": "全",
+   "unit": "科学·电",
+   "name": "简单电路",
+   "name_en": "Simple circuits",
+   "desc": "电路组成、通路断路短路、电路图符号",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-CIRC",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "画电路图用标准符号、横平竖直。常见错误：开关闭合会使电源短路的连接没看出来。",
+   "probe": "给实物连接图，画出对应电路图。",
+   "terms": [
+    "电源",
+    "开关",
+    "通路",
+    "断路",
+    "短路"
+   ]
+  },
+  {
+   "id": "PSH-MECH-01",
+   "strand": "MECH",
+   "stage": "G7",
+   "term": "全",
+   "unit": "科学·力",
+   "name": "力的初步认识",
+   "name_en": "Introduction to forces",
+   "desc": "力是物体对物体的作用，力能改变形状和运动状态；弹簧测力计",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-FORCE",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "找力先找“谁对谁”。常见错误：认为不接触就不会有力（磁力、重力可以不接触）。",
+   "probe": "问弹簧测力计使用前要做什么。",
+   "terms": [
+    "施力物体",
+    "受力物体",
+    "牛顿",
+    "弹簧测力计"
+   ]
+  },
+  {
+   "id": "PSH-OPT-01",
+   "strand": "OPT",
+   "stage": "G7",
+   "term": "全",
+   "unit": "科学·光",
+   "name": "光的直线传播",
+   "name_en": "Rectilinear propagation of light",
+   "desc": "光在同种均匀介质中沿直线传播；影子、小孔成像、日月食；光速",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-LIGHT",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "画光路一定用带箭头的直线，从光源出发。常见错误：小孔成像认为像的形状与孔的形状有关。",
+   "probe": "问小孔成像中把小孔从三角形换成圆形，像会怎样。",
+   "terms": [
+    "直线传播",
+    "小孔成像",
+    "光速 3×10⁸ m/s"
+   ]
+  },
+  {
+   "id": "PSH-THERM-01",
+   "strand": "THERM",
+   "stage": "G7",
+   "term": "全",
+   "unit": "科学·物质",
+   "name": "物质的状态与粒子模型",
+   "name_en": "States of matter and particle model",
+   "desc": "固液气三态的粒子排列与运动",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-PART",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用“排得紧不紧、动得快不快”描述三态。常见错误：认为物质由连续的整体构成。",
+   "probe": "画出固液气三态的粒子示意图。",
+   "terms": [
+    "固态",
+    "液态",
+    "气态",
+    "粒子模型"
+   ]
+  },
+  {
+   "id": "PSH-EXP-03",
+   "strand": "EXP",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第一章 前言",
+   "name": "科学探究方法",
+   "name_en": "Scientific methods: control variables, conversion, equivalence",
+   "desc": "控制变量法、转换法、等效替代法、理想实验法、类比法；提出问题→猜想→设计→结论",
+   "prereqs": [
+    {
+     "id": "PSH-EXP-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "上海中考常问“本实验用到的研究方法”。先找“改变了什么、保持什么不变”就是控制变量；“用看得见的现象反映看不见的量”是转换法。常见错误是把等效替代和控制变量混淆。",
+   "probe": "给“探究液体压强与深度关系”的实验描述，问孩子哪些量要保持不变、用了什么方法。",
+   "terms": [
+    "控制变量法",
+    "转换法",
+    "等效替代法",
+    "理想实验",
+    "归纳"
+   ]
+  },
+  {
+   "id": "PSH-EXP-04",
+   "strand": "EXP",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第一章",
+   "name": "误差与多次测量",
+   "name_en": "Error and repeated measurement",
+   "desc": "误差不可避免而错误可避免；多次测量取平均减小误差；有效数字",
+   "prereqs": [
+    {
+     "id": "PSH-EXP-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-AVG",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "先剔除明显错误的数据，再求平均，结果位数与原测量一致。常见错误：把错误数据也平均进去，或平均值多保留很多位小数。",
+   "probe": "给 5 次刻度尺测量数据（含一个离群值），问最终结果。",
+   "terms": [
+    "误差",
+    "错误",
+    "平均值",
+    "有效数字"
+   ]
+  },
+  {
+   "id": "PSH-MECH-02",
+   "strand": "MECH",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第三章 运动和力",
+   "name": "机械运动与参照物",
+   "name_en": "Motion and frame of reference",
+   "desc": "运动和静止的相对性，参照物的选择",
+   "prereqs": [
+    {
+     "id": "PSH-EXP-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "先问“以谁为参照”，再看位置有无变化。常见错误：默认只能以地面为参照物。",
+   "probe": "坐在行驶的车里，问以车为参照物乘客是运动还是静止。",
+   "terms": [
+    "参照物",
+    "相对静止",
+    "机械运动"
+   ]
+  },
+  {
+   "id": "PSH-MECH-03",
+   "strand": "MECH",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第三章 运动和力",
+   "name": "速度与 s-t 图像",
+   "name_en": "Speed and distance-time graphs",
+   "desc": "v=s/t；匀速直线运动；s-t 图像斜率表示速度；两车追及相遇",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-02",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "上海中考 s-t 图像题常考：从图上读一组 (t,s) 先算速度，再算“经过几秒相距多少”。常见错误：单位不统一（km/h 与 m/s 换算：÷3.6）。",
+   "probe": "给甲乙两车 s-t 图像，问 6 s 后两车相距多少（同向/反向两种）。",
+   "terms": [
+    "v=s/t",
+    "s-t图像",
+    "m/s",
+    "km/h",
+    "匀速直线运动"
+   ]
+  },
+  {
+   "id": "PSH-MECH-04",
+   "strand": "MECH",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第三章 运动和力",
+   "name": "力的三要素与力的图示",
+   "name_en": "Force: magnitude, direction, point of application",
+   "desc": "大小、方向、作用点；力的示意图和图示（标度）",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "上海中考作图题：先定作用点，再按标度画线段，最后标箭头和力的大小。常见错误：图示忘了画标度或线段长度不是标度整数倍。",
+   "probe": "画出静止在斜面上物体所受重力的图示（给标度）。",
+   "terms": [
+    "三要素",
+    "力的图示",
+    "标度",
+    "示意图"
+   ]
+  },
+  {
+   "id": "PSH-MECH-05",
+   "strand": "MECH",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第三章 运动和力",
+   "name": "重力",
+   "name_en": "Gravity and weight",
+   "desc": "G=mg，g=9.8 N/kg；重力方向竖直向下；重心",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-04",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-EXP-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "记“质量是物体本身的，重力是地球给的”。常见错误：把方向写成“垂直向下”，或认为质量会随位置改变。",
+   "probe": "一个 2 kg 物体在月球上质量和重力如何变化。",
+   "terms": [
+    "G=mg",
+    "g=9.8 N/kg",
+    "竖直向下",
+    "重心"
+   ]
+  },
+  {
+   "id": "PSH-MECH-06",
+   "strand": "MECH",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第三章 运动和力",
+   "name": "同一直线上二力的合成",
+   "name_en": "Resultant of collinear forces",
+   "desc": "同向相加、反向相减，合力方向与较大的力相同",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先规定正方向，同向加、反向减。常见错误：题目说“两个力”但没说方向时只算一种情况（应讨论两种）。",
+   "probe": "3 N 和 5 N 两个力在同一直线上，问合力可能是多少。",
+   "terms": [
+    "合力",
+    "同向相加",
+    "反向相减"
+   ]
+  },
+  {
+   "id": "PSH-MECH-07",
+   "strand": "MECH",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第三章 运动和力",
+   "name": "二力平衡",
+   "name_en": "Equilibrium of two forces",
+   "desc": "同体、等大、反向、共线；平衡状态（静止或匀速直线运动）；与相互作用力的区别",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-06",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "判断平衡力先看“是不是作用在同一个物体上”。常见错误：把桌子对书的支持力与书对桌子的压力当成一对平衡力。",
+   "probe": "书静止在桌面上，找出一对平衡力和一对相互作用力。",
+   "terms": [
+    "二力平衡",
+    "相互作用力",
+    "平衡状态",
+    "匀速直线运动"
+   ]
+  },
+  {
+   "id": "PSH-MECH-08",
+   "strand": "MECH",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第三章 运动和力",
+   "name": "摩擦力",
+   "name_en": "Friction",
+   "desc": "滑动摩擦力与压力、接触面粗糙程度有关，与速度、接触面积无关；增大减小摩擦的方法",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "实验中必须“水平匀速拉动”，拉力才等于摩擦力（二力平衡）。常见错误：认为拉得越快摩擦力越大。",
+   "probe": "水平匀速拉木块时测力计读数 2 N，加速拉时摩擦力是多少。",
+   "terms": [
+    "滑动摩擦力",
+    "压力",
+    "粗糙程度",
+    "匀速拉动"
+   ]
+  },
+  {
+   "id": "PSH-MECH-09",
+   "strand": "MECH",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第三章 运动和力",
+   "name": "牛顿第一定律与惯性",
+   "name_en": "Newton's first law and inertia",
+   "desc": "力不是维持运动的原因；惯性只与质量有关；伽利略理想实验",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-07",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-EXP-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "惯性是“性质”，不能说“受到惯性作用”。常见错误：认为速度越大惯性越大。",
+   "probe": "问急刹车时人为什么向前倾，并判断“由于受到惯性”说法对不对。",
+   "terms": [
+    "牛顿第一定律",
+    "惯性",
+    "理想实验",
+    "质量"
+   ]
+  },
+  {
+   "id": "PSH-MECH-10",
+   "strand": "MECH",
+   "stage": "G8",
+   "term": "下",
+   "unit": "第四章 机械和功",
+   "name": "杠杆及其平衡条件",
+   "name_en": "Levers",
+   "desc": "支点、动力臂、阻力臂；F1L1=F2L2；省力/费力/等臂杠杆；力臂作图与最小力",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-04",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "力臂是支点到力的作用线的“垂直距离”。求最小力：连支点和作用点作为最长力臂。常见错误：把支点到作用点的距离当力臂。",
+   "probe": "给一根杠杆和挂钩码位置，求平衡时另一侧拉力，并判断是哪类杠杆。",
+   "terms": [
+    "F1L1=F2L2",
+    "力臂",
+    "支点",
+    "省力杠杆",
+    "费力杠杆"
+   ]
+  },
+  {
+   "id": "PSH-MECH-11",
+   "strand": "MECH",
+   "stage": "G8",
+   "term": "下",
+   "unit": "第四章 机械和功",
+   "name": "滑轮",
+   "name_en": "Pulleys",
+   "desc": "定滑轮改变方向不省力；动滑轮省一半力费距离；不计摩擦和滑轮重的理想情况",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把滑轮看成杠杆：定滑轮等臂、动滑轮动力臂是阻力臂两倍。常见错误：动滑轮绳端移动距离与物体相同。",
+   "probe": "用动滑轮提 20 N 物体上升 1 m，问拉力和绳端移动距离。",
+   "terms": [
+    "定滑轮",
+    "动滑轮",
+    "省力",
+    "费距离"
+   ]
+  },
+  {
+   "id": "PSH-MECH-12",
+   "strand": "MECH",
+   "stage": "G8",
+   "term": "下",
+   "unit": "第四章 机械和功",
+   "name": "功和功率",
+   "name_en": "Work and power",
+   "desc": "W=Fs（力与力方向上的距离）；P=W/t=Fv；做功的两个必要因素",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-03",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先判断“有没有力、在力方向上有没有移动”。常见错误：人提着桶水平走也说重力做功。",
+   "probe": "水平推车 10 m 用 50 N，求推力做功；问重力做功多少。",
+   "terms": [
+    "W=Fs",
+    "P=W/t",
+    "P=Fv",
+    "焦耳",
+    "瓦特"
+   ]
+  },
+  {
+   "id": "PSH-MECH-13",
+   "strand": "MECH",
+   "stage": "G8",
+   "term": "下",
+   "unit": "第四章 机械和功",
+   "name": "动能、势能与机械能",
+   "name_en": "Kinetic and potential energy",
+   "desc": "动能与质量和速度有关，重力势能与质量和高度有关，弹性势能；动能势能相互转化",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-12",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-ENERGY",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "比较动能/势能时用控制变量：同时看两个因素。常见错误：匀速下降的物体认为机械能守恒（其实动能不变、势能减小）。",
+   "probe": "匀速上升的电梯里，乘客的动能、势能、机械能如何变化。",
+   "terms": [
+    "动能",
+    "重力势能",
+    "弹性势能",
+    "机械能",
+    "转化"
+   ]
+  },
+  {
+   "id": "PSH-OPT-02",
+   "strand": "OPT",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第二章 光",
+   "name": "光的反射定律",
+   "name_en": "Law of reflection",
+   "desc": "三线共面、法线居中、反射角等于入射角；镜面反射与漫反射；光路可逆",
+   "prereqs": [
+    {
+     "id": "PSH-OPT-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "角度都从法线量起，先画法线（虚线）。常见错误：把入射光线与镜面的夹角当成入射角。",
+   "probe": "入射光线与镜面成 30°，问反射角是多少。",
+   "terms": [
+    "入射角",
+    "反射角",
+    "法线",
+    "漫反射",
+    "光路可逆"
+   ]
+  },
+  {
+   "id": "PSH-OPT-03",
+   "strand": "OPT",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第二章 光",
+   "name": "平面镜成像",
+   "name_en": "Plane mirror images",
+   "desc": "等大、等距、垂直、虚像；用玻璃板探究平面镜成像",
+   "prereqs": [
+    {
+     "id": "PSH-OPT-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "作图用“对称法”：先找物点关于镜面的对称点，再连线。常见错误：人走近镜子认为像变大；实验中用镜子替代玻璃板。",
+   "probe": "人以 1 m/s 走向平面镜，问像相对人的速度。",
+   "terms": [
+    "虚像",
+    "对称",
+    "玻璃板",
+    "等大"
+   ]
+  },
+  {
+   "id": "PSH-OPT-04",
+   "strand": "OPT",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第二章 光",
+   "name": "光的折射",
+   "name_en": "Refraction of light",
+   "desc": "光从空气斜射入水或玻璃时折射角小于入射角；垂直入射方向不变；生活中的折射现象",
+   "prereqs": [
+    {
+     "id": "PSH-OPT-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "记“空气中的角大”。常见错误：认为垂直入射也会偏折，或把池水看浅的原因说成反射。",
+   "probe": "画光从水中斜射入空气的光路，问折射角比入射角大还是小。",
+   "terms": [
+    "折射角",
+    "入射角",
+    "折射现象"
+   ]
+  },
+  {
+   "id": "PSH-OPT-05",
+   "strand": "OPT",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第二章 光",
+   "name": "光的色散与物体的颜色",
+   "name_en": "Dispersion and colour",
+   "desc": "白光由七色光组成；色光三原色红绿蓝；透明物体颜色由透过的色光决定、不透明物体由反射的色光决定",
+   "prereqs": [
+    {
+     "id": "PSH-OPT-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "“透什么色是什么色、反什么色是什么色”。常见错误：把色光三原色（红绿蓝）和颜料三原色混淆。",
+   "probe": "红光照到绿色叶子上，问看到什么颜色。",
+   "terms": [
+    "色散",
+    "三原色",
+    "红绿蓝"
+   ]
+  },
+  {
+   "id": "PSH-OPT-06",
+   "strand": "OPT",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第二章 光",
+   "name": "凸透镜成像规律",
+   "name_en": "Convex lens imaging",
+   "desc": "焦点焦距；u>2f 倒立缩小实像、f<u<2f 倒立放大实像、u<f 正立放大虚像；照相机/投影仪/放大镜",
+   "prereqs": [
+    {
+     "id": "PSH-OPT-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "以 f、2f 为分界画一条数轴，“物近像远像变大”。常见错误：忘记实验前调节烛焰、透镜、光屏三心等高；用像距反推焦距范围时不等式写反。",
+   "probe": "给 u=30 cm 成缩小实像，问焦距的可能范围。",
+   "terms": [
+    "焦距",
+    "物距",
+    "像距",
+    "实像",
+    "虚像",
+    "u>2f",
+    "f<u<2f"
+   ]
+  },
+  {
+   "id": "PSH-SOUND-01",
+   "strand": "SOUND",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第一章 声",
+   "name": "声音的产生与传播",
+   "name_en": "Production and propagation of sound",
+   "desc": "声音由物体振动产生；传播需要介质，真空不能传声；声速与介质有关",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-ENERGY",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "记住“振动发声、介质传声”。常见错误：认为声音在真空中也能传播，或认为固体中声速比空气慢。",
+   "probe": "问“月球上宇航员为什么要用无线电交谈”。",
+   "terms": [
+    "振动",
+    "介质",
+    "声速 340 m/s",
+    "回声"
+   ]
+  },
+  {
+   "id": "PSH-SOUND-02",
+   "strand": "SOUND",
+   "stage": "G8",
+   "term": "上",
+   "unit": "第一章 声",
+   "name": "乐音的三个特征",
+   "name_en": "Pitch, loudness and timbre",
+   "desc": "音调由频率决定，响度由振幅（及距离）决定，音色由发声体材料结构决定；噪声控制",
+   "prereqs": [
+    {
+     "id": "PSH-SOUND-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "看到“高低”想频率、看到“大小/强弱”想振幅、看到“辨别是谁”想音色。常见错误：把“声音高”（音调）和“声音大”（响度）混用。",
+   "probe": "给钢尺伸出桌面长度不同的实验，问改变的是哪一个特征。",
+   "terms": [
+    "音调",
+    "响度",
+    "音色",
+    "频率",
+    "振幅",
+    "赫兹"
+   ]
+  },
+  {
+   "id": "PSH-THERM-02",
+   "strand": "THERM",
+   "stage": "G8",
+   "term": "下",
+   "unit": "第五章 热与能",
+   "name": "温度与温度计",
+   "name_en": "Temperature and thermometers",
+   "desc": "摄氏温度规定；液体温度计原理与使用；体温计",
+   "prereqs": [
+    {
+     "id": "PSH-THERM-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-EXP-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "读数前看零上零下，读数时不离开被测物体（体温计除外）。常见错误：−5 ℃ 读成 5 ℃。",
+   "probe": "温度计液柱在 0 ℃ 以下第 3 小格（分度值 1 ℃），读数是多少。",
+   "terms": [
+    "摄氏度",
+    "热胀冷缩",
+    "体温计",
+    "分度值"
+   ]
+  },
+  {
+   "id": "PSH-THERM-03",
+   "strand": "THERM",
+   "stage": "G8",
+   "term": "下",
+   "unit": "第五章 热与能",
+   "name": "物态变化",
+   "name_en": "Changes of state",
+   "desc": "熔化凝固、汽化液化、升华凝华；吸放热；晶体熔点；沸腾条件",
+   "prereqs": [
+    {
+     "id": "PSH-THERM-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先判断“从什么态变成什么态”，再记吸放热：固→液→气吸热，反之放热。常见错误：把“白气”说成水蒸气（其实是液化的小水滴）。",
+   "probe": "冬天窗户内侧的冰花是什么物态变化、吸热还是放热。",
+   "terms": [
+    "熔化",
+    "汽化",
+    "液化",
+    "升华",
+    "凝华",
+    "熔点",
+    "沸点"
+   ]
+  },
+  {
+   "id": "PSH-THERM-04",
+   "strand": "THERM",
+   "stage": "G8",
+   "term": "下",
+   "unit": "第五章 热与能",
+   "name": "热量与比热容",
+   "name_en": "Heat and specific heat capacity",
+   "desc": "Q=cmΔt；水的比热容 4.2×10³ J/(kg·℃)；比热容是物质特性",
+   "prereqs": [
+    {
+     "id": "PSH-THERM-02",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-EXP-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "Δt 是温度变化量，“升高到”与“升高了”要分清。常见错误：“升高到 60 ℃”直接代 60。",
+   "probe": "1 kg 水从 20 ℃ 加热到 70 ℃，吸收多少热量。",
+   "terms": [
+    "Q=cmΔt",
+    "比热容",
+    "4.2×10³ J/(kg·℃)",
+    "温度变化量"
+   ]
+  },
+  {
+   "id": "PSH-THERM-05",
+   "strand": "THERM",
+   "stage": "G8",
+   "term": "下",
+   "unit": "第五章 热与能",
+   "name": "内能及其改变方式",
+   "name_en": "Internal energy",
+   "desc": "分子动理论初步（扩散）；内能与温度；做功和热传递改变内能",
+   "prereqs": [
+    {
+     "id": "PSH-THERM-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-THERM-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "做功是能量“转化”，热传递是能量“转移”。常见错误：认为温度高的物体含有的热量多（热量是过程量）。",
+   "probe": "搓手取暖和用热水袋取暖各属于哪种方式。",
+   "terms": [
+    "内能",
+    "扩散",
+    "做功",
+    "热传递",
+    "热量"
+   ]
+  },
+  {
+   "id": "PSH-THERM-06",
+   "strand": "THERM",
+   "stage": "G8",
+   "term": "下",
+   "unit": "第五章 热与能",
+   "name": "热机与燃料热值",
+   "name_en": "Heat engines and fuel",
+   "desc": "四冲程汽油机（压缩冲程机械能→内能，做功冲程内能→机械能）；热值 Q=mq；效率",
+   "prereqs": [
+    {
+     "id": "PSH-THERM-05",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "看气门开关和活塞方向识别冲程。常见错误：把压缩冲程和做功冲程的能量转化说反。",
+   "probe": "给四幅冲程图，指出哪个是做功冲程。",
+   "terms": [
+    "四冲程",
+    "压缩冲程",
+    "做功冲程",
+    "热值",
+    "Q=mq"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-02",
+   "strand": "ELEC",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第七章 电路",
+   "name": "电荷与原子结构",
+   "name_en": "Electric charge",
+   "desc": "摩擦起电、同种电荷相斥异种相吸；电荷量；原子由原子核和电子组成",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "摩擦起电是电子转移，不是创造电荷。常见错误：轻小物体被吸引就断定带异种电荷（也可能不带电）。",
+   "probe": "带电体吸引一个轻小球，问轻小球一定带电吗。",
+   "terms": [
+    "正电荷",
+    "负电荷",
+    "电子转移",
+    "库仑"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-03",
+   "strand": "ELEC",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第七章 电路",
+   "name": "电流、电压及电表使用",
+   "name_en": "Current, voltage and meters",
+   "desc": "I=Q/t；电流表串联、电压表并联；量程选择与读数",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-02",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "电流表“串、正进负出、不直接接电源”；电压表“并”。读数先看量程（0~0.6 A 还是 0~3 A）。常见错误：量程看错导致读数差 5 倍。",
+   "probe": "给电流表指针图（两种量程），读出电流。",
+   "terms": [
+    "I=Q/t",
+    "安培",
+    "伏特",
+    "串联电流表",
+    "并联电压表"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-04",
+   "strand": "ELEC",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第七章 电路",
+   "name": "电阻与滑动变阻器",
+   "name_en": "Resistance and rheostat",
+   "desc": "电阻与材料、长度、横截面积、温度有关；滑动变阻器“一上一下”接法",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-03",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-EXP-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "电阻是导体本身的性质，与电压电流无关。滑动变阻器看“接入的是哪一段电阻丝”。常见错误：由 R=U/I 推出“电阻与电压成正比”。",
+   "probe": "判断滑片向右移动时接入电路的电阻如何变化。",
+   "terms": [
+    "电阻",
+    "欧姆",
+    "滑动变阻器",
+    "一上一下"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-05",
+   "strand": "ELEC",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第七章 电路",
+   "name": "欧姆定律",
+   "name_en": "Ohm's law",
+   "desc": "I=U/R；电流与电压成正比（电阻一定）、与电阻成反比（电压一定）；I-U 图像",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-04",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "使用时 I、U、R 必须是“同一段导体、同一时刻”。常见错误：串联电路中把总电压和某一电阻的电流代入同一公式。",
+   "probe": "给 I-U 图像比较两个电阻大小。",
+   "terms": [
+    "I=U/R",
+    "正比",
+    "反比",
+    "I-U图像",
+    "同一性"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-06",
+   "strand": "ELEC",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第七章 电路",
+   "name": "串联电路",
+   "name_en": "Series circuits",
+   "desc": "I 处处相等；U=U1+U2；R=R1+R2；分压 U1/U2=R1/R2",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "串联“电流一样、电压按电阻分”。常见错误：认为靠近电源正极的灯电流更大。",
+   "probe": "R1=10 Ω、R2=20 Ω 串联在 6 V 电源上，求各自电压。",
+   "terms": [
+    "I=I1=I2",
+    "U=U1+U2",
+    "R=R1+R2",
+    "分压"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-07",
+   "strand": "ELEC",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第七章 电路",
+   "name": "并联电路",
+   "name_en": "Parallel circuits",
+   "desc": "U 相等；I=I1+I2；1/R=1/R1+1/R2；分流 I1/I2=R2/R1",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "并联“电压一样、电流按电阻反比分”，并联总电阻小于任一支路。常见错误：并联再多加一个支路以为总电阻变大。",
+   "probe": "两个 10 Ω 电阻并联，求总电阻。",
+   "terms": [
+    "U=U1=U2",
+    "I=I1+I2",
+    "1/R=1/R1+1/R2",
+    "分流"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-08",
+   "strand": "ELEC",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第七章 电路",
+   "name": "动态电路分析",
+   "name_en": "Dynamic circuit analysis",
+   "desc": "滑片移动或开关通断时电表示数变化；电表示数比值与变化量比值",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-06",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "上海中考高频：先识别串并联、电表测谁，再按“局部 R→总 R→总 I→各部分 U”推。ΔU/ΔI 等于定值电阻。常见错误：电压表测的对象判断错误。",
+   "probe": "滑片右移，判断电流表和两个电压表示数变化，以及 V 与 A 示数比值变化。",
+   "terms": [
+    "动态电路",
+    "电表测量对象",
+    "ΔU/ΔI",
+    "比值"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-09",
+   "strand": "ELEC",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第七章 电路",
+   "name": "电路故障判断",
+   "name_en": "Circuit fault diagnosis",
+   "desc": "断路与短路的现象；用电压表/电流表/灯泡判断故障位置",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-06",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "上海中考固定题型：电压表有示数且接近电源电压→与它并联的部分断路；电流表有示数灯不亮→灯短路。列表逐一假设验证。常见错误：只考虑一种故障，没有讨论所有可能。",
+   "probe": "串联两灯，闭合开关后一灯亮一灯不亮，电压表示数为 0，判断故障。",
+   "terms": [
+    "断路",
+    "短路",
+    "假设法",
+    "电压表判断"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-10",
+   "strand": "ELEC",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第七章 电路",
+   "name": "伏安法测电阻",
+   "name_en": "Measuring resistance by voltmeter-ammeter method",
+   "desc": "原理 R=U/I；电路连接、滑动变阻器作用；多次测量求平均；数据记录表",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-05",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-EXP-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "上海中考实验题常给“数据不全”的情境，要用电源电压和滑动变阻器最大值推出缺失数据。常见错误：闭合开关前滑片没放在阻值最大处。",
+   "probe": "给三组测量数据和电源电压，补全表格并求待测电阻平均值。",
+   "terms": [
+    "R=U/I",
+    "伏安法",
+    "滑动变阻器",
+    "多次测量取平均"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-11",
+   "strand": "ELEC",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第七章 电路",
+   "name": "电功与电功率",
+   "name_en": "Electrical energy and power",
+   "desc": "W=UIt；P=UI=I²R=U²/R；额定功率与实际功率；电能表 kW·h",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-05",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-12",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "先求不变量（通常是灯的电阻 R=U额²/P额），再算实际功率。常见错误：把额定功率当实际功率；kW·h 与 J 换算（1 kW·h=3.6×10⁶ J）。",
+   "probe": "“6 V 3 W”的灯接到 3 V 电源，求实际功率。",
+   "terms": [
+    "W=UIt",
+    "P=UI",
+    "P=U²/R",
+    "额定功率",
+    "kW·h"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-12",
+   "strand": "ELEC",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第七章 电路",
+   "name": "测定小灯泡的电功率",
+   "name_en": "Measuring the power of a lamp",
+   "desc": "P=UI；使灯两端电压等于额定电压时测额定功率；判断灯正常发光",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-11",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "上海中考压轴实验：根据电源电压、滑动变阻器规格和电表示数推断灯的额定电压/电流。常见错误：对实际功率求平均值（不同电压下的功率不能平均）。",
+   "probe": "电压表只有 0~3 V 量程但灯额定电压 3.8 V，问如何连接测量。",
+   "terms": [
+    "P=UI",
+    "额定电压",
+    "正常发光",
+    "电压表并联在变阻器两端"
+   ]
+  },
+  {
+   "id": "PSH-MAG-01",
+   "strand": "MAG",
+   "stage": "G9",
+   "term": "下",
+   "unit": "第八章 电能与磁",
+   "name": "磁体与磁场",
+   "name_en": "Magnets and magnetic fields",
+   "desc": "磁极相互作用；磁场方向（小磁针 N 极所指）；磁感线；地磁场",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "磁感线在磁体外部从 N 到 S。常见错误：认为磁感线真实存在，或地磁北极在地理北极。",
+   "probe": "画出条形磁铁周围磁感线，并标出小磁针 N 极方向。",
+   "terms": [
+    "N极",
+    "S极",
+    "磁感线",
+    "地磁场"
+   ]
+  },
+  {
+   "id": "PSH-MAG-02",
+   "strand": "MAG",
+   "stage": "G9",
+   "term": "下",
+   "unit": "第八章 电能与磁",
+   "name": "电流的磁场与安培定则",
+   "name_en": "Magnetic effect of current",
+   "desc": "奥斯特实验；通电螺线管；安培定则（右手螺旋）；电磁铁",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "右手握螺线管，四指沿电流方向，大拇指指 N 极。常见错误：电流方向从电源负极出发标错。",
+   "probe": "给螺线管绕法和电源正负极，判断 N 极和小磁针指向。",
+   "terms": [
+    "奥斯特实验",
+    "安培定则",
+    "通电螺线管",
+    "电磁铁"
+   ]
+  },
+  {
+   "id": "PSH-MAG-03",
+   "strand": "MAG",
+   "stage": "G9",
+   "term": "下",
+   "unit": "第八章 电能与磁",
+   "name": "磁场对电流的作用与电动机",
+   "name_en": "Motor effect",
+   "desc": "通电导体在磁场中受力，方向与电流和磁场方向有关；电动机能量转化",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "改变电流方向或磁场方向之一，受力方向反向；两者同时改变方向不变。常见错误：把电动机和发电机原理图混淆（有电源的是电动机）。",
+   "probe": "给两幅装置图，判断哪个是电动机原理。",
+   "terms": [
+    "磁场对电流的作用",
+    "电动机",
+    "电能→机械能"
+   ]
+  },
+  {
+   "id": "PSH-MAG-04",
+   "strand": "MAG",
+   "stage": "G9",
+   "term": "下",
+   "unit": "第八章 电能与磁",
+   "name": "电磁感应与发电机",
+   "name_en": "Electromagnetic induction (intro)",
+   "desc": "闭合电路部分导体切割磁感线产生感应电流；发电机；机械能→电能",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "两个条件：电路闭合、导体切割磁感线。常见错误：导体沿磁感线方向运动也认为有电流。",
+   "probe": "导体棒沿不同方向运动，判断是否产生感应电流。",
+   "terms": [
+    "电磁感应",
+    "切割磁感线",
+    "发电机",
+    "法拉第"
+   ]
+  },
+  {
+   "id": "PSH-MECH-14",
+   "strand": "MECH",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第六章 压力与压强",
+   "name": "密度",
+   "name_en": "Density",
+   "desc": "ρ=m/V，密度是物质的特性；测固体液体密度；水的密度 1.0×10³ kg/m³",
+   "prereqs": [
+    {
+     "id": "PSH-EXP-02",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-SI",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-STDF",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "单位换算 1 g/cm³=1000 kg/m³。测液体密度用“剩余法”减小误差。常见错误：认为密度与质量成正比；冰化成水质量变了。",
+   "probe": "给一块金属的质量和排水体积，求密度并判断是什么金属。",
+   "terms": [
+    "ρ=m/V",
+    "kg/m³",
+    "g/cm³",
+    "密度特性"
+   ]
+  },
+  {
+   "id": "PSH-MECH-15",
+   "strand": "MECH",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第六章 压力与压强",
+   "name": "压力与压强",
+   "name_en": "Pressure",
+   "desc": "压力垂直于接触面；p=F/S；帕斯卡；增大减小压强；柱形固体 p=ρgh",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-05",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-14",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "压力不一定等于重力，水平面上才相等。S 是“接触面积”要换成 m²。常见错误：cm² 直接代入；柱体竖放横放时用错面积。",
+   "probe": "边长 0.1 m、质量 2 kg 的正方体放在桌面中央，求压强。",
+   "terms": [
+    "p=F/S",
+    "帕斯卡",
+    "受力面积",
+    "压力"
+   ]
+  },
+  {
+   "id": "PSH-MECH-16",
+   "strand": "MECH",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第六章 压力与压强",
+   "name": "液体内部压强与连通器",
+   "name_en": "Liquid pressure and communicating vessels",
+   "desc": "p=ρgh，h 是深度（到液面的竖直距离）；同深度各方向相等；连通器原理；U形管压强计",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-15",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "h 从液面往下量，不是从容器底往上量。容器底受到的压力不一定等于液体重力（看容器形状）。常见错误：把高度当深度。",
+   "probe": "给不规则容器，求液体对容器底的压强和压力。",
+   "terms": [
+    "p=ρgh",
+    "深度",
+    "连通器",
+    "U形管压强计"
+   ]
+  },
+  {
+   "id": "PSH-MECH-17",
+   "strand": "MECH",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第六章 压力与压强",
+   "name": "大气压强",
+   "name_en": "Atmospheric pressure",
+   "desc": "马德堡半球、托里拆利实验，1 标准大气压≈1.01×10⁵ Pa（760 mm 汞柱）；海拔越高气压越低；吸管、吸盘",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-16",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "解释现象模板：“内部气压减小，外界大气压把……压进来/压在……”。常见错误：说吸管是“吸”上来的；托里拆利管倾斜后竖直高度会变。",
+   "probe": "托里拆利实验中把管子倾斜，问水银柱竖直高度变不变。",
+   "terms": [
+    "大气压",
+    "托里拆利",
+    "1.01×10⁵ Pa",
+    "760 mmHg"
+   ]
+  },
+  {
+   "id": "PSH-MECH-18",
+   "strand": "MECH",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第六章 压力与压强",
+   "name": "浮力与阿基米德原理",
+   "name_en": "Buoyancy and Archimedes' principle",
+   "desc": "浮力产生原因（上下表面压力差）；称重法 F浮=G−F拉；F浮=ρ液gV排",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-16",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-14",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "V排 是“排开液体的体积”，只有浸没时才等于物体体积。常见错误：认为物体越深浮力越大（浸没后与深度无关）。",
+   "probe": "弹簧测力计在空气中读 5 N、浸没水中读 3 N，求浮力和物体体积。",
+   "terms": [
+    "F浮=ρ液gV排",
+    "称重法",
+    "压力差",
+    "排开液体"
+   ]
+  },
+  {
+   "id": "PSH-MECH-19",
+   "strand": "MECH",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第六章 压力与压强",
+   "name": "物体的浮沉条件",
+   "name_en": "Floating and sinking",
+   "desc": "比较 F浮与 G 或 ρ物与 ρ液；漂浮 F浮=G；轮船、潜水艇、密度计",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-18",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "漂浮/悬浮都用 F浮=G，再结合阿基米德原理列方程。常见错误：认为漂浮物体浮力大于重力。",
+   "probe": "同一密度计放入两种液体，问哪种液体密度大、浮力是否相同。",
+   "terms": [
+    "漂浮",
+    "悬浮",
+    "下沉",
+    "F浮=G",
+    "密度计"
+   ]
+  },
+  {
+   "id": "PSH-MECH-20",
+   "strand": "MECH",
+   "stage": "G9",
+   "term": "上",
+   "unit": "第六章 压力与压强",
+   "name": "压强变化综合（切割、叠放、倒入）",
+   "name_en": "Pressure change problems",
+   "desc": "柱体切割/叠放、容器中倒入抽出液体、放入物体后的压强变化量 Δp 计算与比较",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-15",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-16",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-19",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "上海中考压轴题型：柱形固体统一用 p=ρgh 比较，变化量用 Δp=ΔF/S 或 ρgΔh。先列初始状态表格再推变化。常见错误：切割方向（竖切/横切）不分就套公式。",
+   "probe": "甲乙两个均匀正方体对地压强相等，沿水平方向切去相同高度后比较剩余压强。",
+   "terms": [
+    "Δp=ΔF/S",
+    "Δp=ρgΔh",
+    "竖切",
+    "横切",
+    "比例法"
+   ]
+  },
+  {
+   "id": "PSH-MOD-01",
+   "strand": "MOD",
+   "stage": "G9",
+   "term": "下",
+   "unit": "第九章 从原子到星系",
+   "name": "从原子到星系",
+   "name_en": "From atoms to galaxies",
+   "desc": "原子的核式结构（卢瑟福）；质子中子电子；太阳系与银河系尺度",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "从小到大排序：电子/夸克→原子核→原子→分子→地球→太阳系→银河系。常见错误：认为电子在原子核内。",
+   "probe": "把原子、原子核、电子、分子按大小排序。",
+   "terms": [
+    "原子核",
+    "质子",
+    "中子",
+    "电子",
+    "太阳系",
+    "银河系"
+   ]
+  },
+  {
+   "id": "PSH-EXP-05",
+   "strand": "EXP",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第1章",
+   "name": "图像法与DIS数据处理",
+   "name_en": "Graphical analysis and DIS data logging",
+   "desc": "描点连线、由斜率和截距读物理量；DIS（位移/速度/力传感器）获取数据",
+   "prereqs": [
+    {
+     "id": "PSH-EXP-04",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先写出物理关系式，再对照 y=kx+b 找斜率和截距的物理意义。常见错误：直接读坐标而不看单位与坐标起点，或把曲线硬连成折线。",
+   "probe": "给一组 v-t 数据，让孩子作图并由斜率求加速度。",
+   "terms": [
+    "斜率",
+    "截距",
+    "DIS",
+    "传感器",
+    "线性化"
+   ]
+  },
+  {
+   "id": "PSH-MECH-21",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第1章 运动的描述",
+   "name": "质点、参考系、位移与路程",
+   "name_en": "Particle, reference frame, displacement",
+   "desc": "质点模型；时刻与时间间隔；位移是矢量、路程是标量",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-02",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "位移看“起点指向终点”的有向线段。常见错误：绕圆一周说位移是周长。",
+   "probe": "绕 400 m 跑道跑一圈，问位移和路程。",
+   "terms": [
+    "质点",
+    "位移",
+    "路程",
+    "矢量",
+    "标量"
+   ]
+  },
+  {
+   "id": "PSH-MECH-22",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第1章",
+   "name": "速度与加速度",
+   "name_en": "Velocity and acceleration",
+   "desc": "平均速度与瞬时速度；a=Δv/Δt；加速度方向与速度变化方向相同",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-21",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "加速度表示速度“变化得快慢”，与速度大小无关。常见错误：认为加速度为负就一定减速（要看与速度方向是否一致）。",
+   "probe": "举例说明“速度很大但加速度为零”和“速度为零但加速度不为零”。",
+   "terms": [
+    "a=Δv/Δt",
+    "瞬时速度",
+    "平均速度",
+    "m/s²"
+   ]
+  },
+  {
+   "id": "PSH-MECH-23",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第2章 匀变速直线运动",
+   "name": "匀变速直线运动规律",
+   "name_en": "Equations of uniformly accelerated motion",
+   "desc": "v=v0+at，x=v0t+½at²，v²−v0²=2ax；中间时刻速度；Δx=aT²",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-22",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先列已知“五量”（v0、v、a、t、x）中的三个，选不含未知无关量的公式。刹车问题先算停下时间。常见错误：刹车题直接代入超过停止时间的 t。",
+   "probe": "汽车以 20 m/s 刹车，a=5 m/s²，求 6 s 内位移。",
+   "terms": [
+    "v=v0+at",
+    "x=v0t+½at²",
+    "v²−v0²=2ax",
+    "Δx=aT²",
+    "刹车问题"
+   ]
+  },
+  {
+   "id": "PSH-MECH-24",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第2章",
+   "name": "运动图像（v-t 与 x-t）",
+   "name_en": "Motion graphs",
+   "desc": "x-t 斜率是速度；v-t 斜率是加速度、面积是位移；追及相遇",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-23",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-EXP-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先看纵轴是 x 还是 v。v-t 图中“交点”表示速度相等（追及问题临界），不是相遇。常见错误：把 v-t 交点当相遇点。",
+   "probe": "给两车 v-t 图像，问何时相距最远。",
+   "terms": [
+    "v-t图像",
+    "面积=位移",
+    "斜率=加速度",
+    "追及相遇"
+   ]
+  },
+  {
+   "id": "PSH-MECH-25",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第2章",
+   "name": "自由落体与竖直上抛",
+   "name_en": "Free fall and vertical projection",
+   "desc": "自由落体是 v0=0、a=g 的匀加速；竖直上抛对称性",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-23",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "取向上为正，a=−g，整段直接套公式，不必分段。常见错误：上抛题把 g 的符号写错。",
+   "probe": "小球以 20 m/s 竖直上抛，求 3 s 末的速度和位置。",
+   "terms": [
+    "g≈9.8 m/s²",
+    "自由落体",
+    "竖直上抛",
+    "对称性"
+   ]
+  },
+  {
+   "id": "PSH-MECH-26",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第3章 相互作用",
+   "name": "弹力与胡克定律",
+   "name_en": "Elastic force and Hooke's law",
+   "desc": "弹力产生条件与方向（垂直接触面/沿绳收缩方向）；F=kx",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-04",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "x 是“形变量”不是弹簧长度。轻绳弹力沿绳、杆的弹力不一定沿杆。常见错误：把弹簧总长代入 F=kx。",
+   "probe": "弹簧原长 10 cm，挂 2 N 后长 12 cm，求 k；挂 3 N 长多少。",
+   "terms": [
+    "F=kx",
+    "劲度系数",
+    "形变量",
+    "弹力方向"
+   ]
+  },
+  {
+   "id": "PSH-MECH-27",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第3章",
+   "name": "滑动摩擦力与静摩擦力",
+   "name_en": "Kinetic and static friction",
+   "desc": "f=μN；静摩擦力大小由平衡或牛二决定，0<f≤fmax；方向与相对运动(趋势)方向相反",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-08",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-26",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先判断“动还是静”：静摩擦不能用 μN。常见错误：认为摩擦力方向总与运动方向相反（传送带上的物体被摩擦力带着走）。",
+   "probe": "用 10 N 水平推力推静止的箱子没推动，问摩擦力多大。",
+   "terms": [
+    "f=μN",
+    "静摩擦力",
+    "最大静摩擦",
+    "相对运动趋势"
+   ]
+  },
+  {
+   "id": "PSH-MECH-28",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第3章",
+   "name": "力的合成与分解",
+   "name_en": "Composition and resolution of forces",
+   "desc": "平行四边形定则、三角形定则；正交分解；合力范围 |F1−F2|≤F≤F1+F2",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-06",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-TRIG",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-PYTH",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "能正交分解就正交分解：沿运动方向和垂直方向建坐标。常见错误：分力和合力同时画在受力图上重复计算。",
+   "probe": "斜面上物体重力沿斜面和垂直斜面的分力各是多少（θ=30°）。",
+   "terms": [
+    "平行四边形定则",
+    "正交分解",
+    "合力范围",
+    "Fcosθ",
+    "Fsinθ"
+   ]
+  },
+  {
+   "id": "PSH-MECH-29",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第3章",
+   "name": "共点力平衡与动态平衡",
+   "name_en": "Equilibrium of concurrent forces",
+   "desc": "ΣF=0；整体法与隔离法；三力动态平衡（图解法、相似三角形）",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-28",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-27",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "受力分析顺序：重力→弹力→摩擦力→其他力。动态平衡画矢量三角形看边长变化。常见错误：漏画或多画力（如凭空加一个“下滑力”）。",
+   "probe": "用两根绳吊重物，一根绳逐渐转动，问两绳拉力如何变化。",
+   "terms": [
+    "ΣF=0",
+    "整体法",
+    "隔离法",
+    "图解法",
+    "动态平衡"
+   ]
+  },
+  {
+   "id": "PSH-MECH-30",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第4章 牛顿运动定律",
+   "name": "牛顿第二定律",
+   "name_en": "Newton's second law",
+   "desc": "F合=ma；探究加速度与力、质量的关系（DIS）；瞬时性",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-29",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-23",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "解题“两头连中间”：受力分析求 a，再用运动学公式。常见错误：探究实验中忘记平衡摩擦力，或没满足“钩码质量远小于小车质量”。",
+   "probe": "斜面上物体 μ 已知，求下滑加速度。",
+   "terms": [
+    "F=ma",
+    "牛顿",
+    "控制变量",
+    "平衡摩擦力",
+    "瞬时性"
+   ]
+  },
+  {
+   "id": "PSH-MECH-31",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第4章",
+   "name": "牛顿第三定律",
+   "name_en": "Newton's third law",
+   "desc": "作用力与反作用力等大反向共线、作用在两个物体上、同时产生同性质",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-30",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "“甲对乙、乙对甲”就是相互作用力。常见错误：认为拔河赢的一方拉力大。",
+   "probe": "马拉车加速前进，问马拉车的力和车拉马的力谁大。",
+   "terms": [
+    "作用力与反作用力",
+    "同性质",
+    "同时"
+   ]
+  },
+  {
+   "id": "PSH-MECH-32",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第4章",
+   "name": "超重与失重",
+   "name_en": "Apparent weight",
+   "desc": "加速度向上超重、向下失重；完全失重 a=g",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-30",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "只看加速度方向，与速度方向无关。常见错误：认为上升就是超重。",
+   "probe": "电梯减速下降时，体重计示数比真实重力大还是小。",
+   "terms": [
+    "超重",
+    "失重",
+    "完全失重",
+    "视重"
+   ]
+  },
+  {
+   "id": "PSH-MECH-33",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修一 第4章",
+   "name": "连接体、传送带与多过程问题",
+   "name_en": "Connected bodies and multi-stage motion",
+   "desc": "整体法求 a、隔离法求内力；板块模型；传送带",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-30",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-31",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-24",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "多过程按“一段一个 a”分段，交界处速度是桥梁。常见错误：板块模型没判断是否发生相对滑动就统一用一个 a。",
+   "probe": "两个物块用绳相连在水平面上被拉动，求绳中张力。",
+   "terms": [
+    "整体法",
+    "隔离法",
+    "板块模型",
+    "传送带",
+    "临界条件"
+   ]
+  },
+  {
+   "id": "PSH-MECH-34",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第5章 抛体运动",
+   "name": "曲线运动与运动的合成分解",
+   "name_en": "Curvilinear motion and composition of motions",
+   "desc": "曲线运动条件（合力与速度不共线）；速度方向沿切线；小船渡河",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-28",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-30",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "合运动与分运动具有等时性、独立性。渡河时间只看垂直河岸的分速度。常见错误：认为“最短时间”与“最短位移”是同一种划法。",
+   "probe": "河宽 100 m，船速 5 m/s，水速 3 m/s，求最短渡河时间。",
+   "terms": [
+    "曲线运动条件",
+    "合运动",
+    "分运动",
+    "等时性",
+    "小船渡河"
+   ]
+  },
+  {
+   "id": "PSH-MECH-35",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第5章",
+   "name": "平抛运动",
+   "name_en": "Projectile motion",
+   "desc": "水平匀速 x=v0t、竖直自由落体 y=½gt²；时间由高度决定；落在斜面上",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-34",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-25",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "化曲为直：分别写水平和竖直方程，用 t 连接。常见错误：认为平抛时间与初速度有关。",
+   "probe": "从 5 m 高处以 10 m/s 水平抛出，求落地点水平距离和落地速度。",
+   "terms": [
+    "x=v0t",
+    "y=½gt²",
+    "t=√(2h/g)",
+    "速度偏角"
+   ]
+  },
+  {
+   "id": "PSH-MECH-36",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第6章 圆周运动",
+   "name": "匀速圆周运动的描述",
+   "name_en": "Describing circular motion",
+   "desc": "线速度、角速度、周期、转速；v=ωr；同轴同角速度、皮带传动同线速度",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-21",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "传动问题先标“谁相等”：同轴 ω 相等、皮带/齿轮边缘 v 相等。常见错误：皮带传动两轮认为角速度相等。",
+   "probe": "两轮半径比 2:1 由皮带连接，求角速度之比。",
+   "terms": [
+    "v=ωr",
+    "ω=2π/T",
+    "线速度",
+    "角速度",
+    "转速"
+   ]
+  },
+  {
+   "id": "PSH-MECH-37",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第6章",
+   "name": "向心力与向心加速度",
+   "name_en": "Centripetal force",
+   "desc": "a=v²/r=ω²r；F=mv²/r；向心力由其他力的合力提供；竖直面圆周运动最高点临界",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-36",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-30",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "向心力不是新的力，先受力分析再找“指向圆心的合力”。常见错误：受力图上多画一个“向心力”。绳模型最高点 v≥√(gr)。",
+   "probe": "汽车过拱桥顶点，求桥面支持力。",
+   "terms": [
+    "F=mv²/r",
+    "a=ω²r",
+    "临界速度",
+    "火车转弯"
+   ]
+  },
+  {
+   "id": "PSH-MECH-38",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第7章 万有引力与宇宙航行",
+   "name": "万有引力定律",
+   "name_en": "Law of universal gravitation",
+   "desc": "开普勒定律；F=GMm/r²；引力常量的测定；地表 GM=gR²",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-37",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-STDF",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "r 是两球心距离。地面附近用“黄金代换”GM=gR²。常见错误：卫星高度 h 直接当成 r（应 r=R+h）。",
+   "probe": "离地高度等于地球半径处，重力加速度是地表的几倍。",
+   "terms": [
+    "F=GMm/r²",
+    "开普勒定律",
+    "GM=gR²",
+    "引力常量"
+   ]
+  },
+  {
+   "id": "PSH-MECH-39",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第7章",
+   "name": "天体运动与人造卫星",
+   "name_en": "Satellites and orbits",
+   "desc": "引力提供向心力：v、ω、T、a 与 r 的关系（高轨低速长周期）；第一宇宙速度；同步卫星；变轨",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-38",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "统一列 GMm/r²=mv²/r=mω²r=m(4π²/T²)r，记“越高越慢、周期越长”。常见错误：变轨时认为加速后立刻到高轨速度更大。",
+   "probe": "比较两颗不同轨道卫星的线速度和周期。",
+   "terms": [
+    "第一宇宙速度 7.9 km/s",
+    "同步卫星",
+    "高轨低速",
+    "变轨"
+   ]
+  },
+  {
+   "id": "PSH-MECH-40",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第8章 机械能守恒",
+   "name": "功和功率（高中）",
+   "name_en": "Work and power (advanced)",
+   "desc": "W=Fxcosα，正功负功；总功；P=Fv；机车两种启动方式",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-12",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-28",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-30",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "求功先找力与位移的夹角。机车启动：恒定功率时 a 减小，恒定加速度时 P 增大到额定后转为恒功率。常见错误：用 P=Fv 时 F 用成合力。",
+   "probe": "机车额定功率 60 kW，阻力 3000 N，求最大速度。",
+   "terms": [
+    "W=Fxcosα",
+    "P=Fv",
+    "机车启动",
+    "负功"
+   ]
+  },
+  {
+   "id": "PSH-MECH-41",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第8章",
+   "name": "动能定理",
+   "name_en": "Work-energy theorem",
+   "desc": "W合=ΔEk；适用于变力、曲线、多过程",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-40",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "“合外力做的总功 = 末动能 − 初动能”，选好研究过程后只看首末状态。常见错误：漏掉摩擦力做的负功，或把重力势能和重力做功重复算。",
+   "probe": "物体从粗糙曲面滑下，已知高度和末速度，求摩擦力做功。",
+   "terms": [
+    "W合=ΔEk",
+    "Ek=½mv²",
+    "多过程",
+    "变力做功"
+   ]
+  },
+  {
+   "id": "PSH-MECH-42",
+   "strand": "MECH",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修二 第8章",
+   "name": "机械能守恒定律与功能关系",
+   "name_en": "Conservation of mechanical energy",
+   "desc": "只有重力/弹力做功时机械能守恒；验证机械能守恒（DIS）；除重力外其他力做功等于机械能变化",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-41",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-35",
+     "strength": "有帮助"
+    },
+    {
+     "id": "PSH-MECH-37",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "先判断守恒条件，再选零势能面写“初=末”。功能关系：重力做功对应重力势能，合力做功对应动能，其他力做功对应机械能。常见错误：有摩擦仍用机械能守恒。",
+   "probe": "小球从光滑圆弧顶端滑下，求底端速度和对轨道的压力。",
+   "terms": [
+    "Ep=mgh",
+    "Ek1+Ep1=Ek2+Ep2",
+    "功能关系",
+    "零势能面"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-13",
+   "strand": "ELEC",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 静电场",
+   "name": "电荷守恒与库仑定律",
+   "name_en": "Coulomb's law",
+   "desc": "电荷守恒；点电荷；F=kq1q2/r²；静电力的叠加",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-02",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-28",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-STDF",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "完全相同的金属球接触后电荷先中和再平分。常见错误：三电荷平衡问题方向判断错（“两同夹异、两大夹小”）。",
+   "probe": "两相同金属球带 +3q 和 −q，接触后放回原处，求库仑力变为原来的几倍。",
+   "terms": [
+    "F=kq1q2/r²",
+    "k=9×10⁹",
+    "点电荷",
+    "电荷守恒"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-14",
+   "strand": "ELEC",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 静电场",
+   "name": "电场强度与电场线",
+   "name_en": "Electric field strength",
+   "desc": "E=F/q（定义式），点电荷 E=kQ/r²，匀强电场；电场线疏密与方向；场强叠加",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "E 由电场本身决定，与试探电荷无关。负电荷受力方向与 E 相反。常见错误：认为电场线就是电荷运动轨迹。",
+   "probe": "等量异种电荷连线中点和中垂线上场强如何分布。",
+   "terms": [
+    "E=F/q",
+    "E=kQ/r²",
+    "电场线",
+    "匀强电场",
+    "叠加"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-15",
+   "strand": "ELEC",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 静电场",
+   "name": "电势能、电势与电势差",
+   "name_en": "Electric potential and potential difference",
+   "desc": "W电=−ΔEp；φ=Ep/q；UAB=φA−φB=WAB/q；等势面；匀强电场 U=Ed",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-14",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-40",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-42",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "“沿电场线方向电势降低”。电场力做正功电势能减小（类比重力）。计算时 q、U 带符号代入。常见错误：认为场强大处电势一定高。",
+   "probe": "负电荷从 A 移到 B 电场力做负功，比较 A、B 电势。",
+   "terms": [
+    "φ=Ep/q",
+    "UAB=WAB/q",
+    "U=Ed",
+    "等势面",
+    "电势能"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-16",
+   "strand": "ELEC",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 静电场",
+   "name": "电容器",
+   "name_en": "Capacitors",
+   "desc": "C=Q/U；平行板 C=εS/(4πkd)；与电源相连 U 不变、断开 Q 不变的动态分析",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-15",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "先判断“U 不变还是 Q 不变”，再看 d、S 变化。常见错误：断开电源后仍认为 U 不变。",
+   "probe": "充电后断开电源，增大板间距离，问 E 如何变化。",
+   "terms": [
+    "C=Q/U",
+    "C=εS/4πkd",
+    "U不变",
+    "Q不变"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-17",
+   "strand": "ELEC",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 静电场",
+   "name": "带电粒子在电场中的运动",
+   "name_en": "Charged particles in electric fields",
+   "desc": "加速 qU=½mv²；偏转（类平抛）y=qUL²/(2mdv0²)；示波管",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-15",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-35",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-41",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "加速用动能定理，偏转用平抛分解。常见错误：电子等微观粒子题里还加上重力。",
+   "probe": "电子经 U1 加速后进入偏转电场 U2，求偏移量与哪些量有关。",
+   "terms": [
+    "qU=½mv²",
+    "类平抛",
+    "偏转量",
+    "示波管"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-18",
+   "strand": "ELEC",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 电路及其应用",
+   "name": "电阻定律与伏安特性",
+   "name_en": "Resistivity and I-U characteristics",
+   "desc": "R=ρL/S；电阻率与温度；线性与非线性元件；电表改装（串大分压、并小分流）",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-04",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-05",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-06",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "改装电压表串联大电阻、电流表并联小电阻。常见错误：导线拉长后只考虑长度变化忘了横截面积同时变小。",
+   "probe": "把导线均匀拉长到 2 倍，电阻变为原来几倍。",
+   "terms": [
+    "R=ρL/S",
+    "电阻率",
+    "伏安特性曲线",
+    "电表改装"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-19",
+   "strand": "ELEC",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 电路及其应用",
+   "name": "闭合电路欧姆定律",
+   "name_en": "Closed-circuit Ohm's law",
+   "desc": "电动势 E；I=E/(R+r)；路端电压 U=E−Ir；U-I 图像；电源输出功率",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-18",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把内阻 r 看作串联在电路里的一个电阻。U-I 图像纵截距是 E、斜率绝对值是 r。常见错误：认为外电阻越大输出功率越大（R=r 时最大）。",
+   "probe": "外电阻增大时，路端电压和电源总功率如何变化。",
+   "terms": [
+    "E",
+    "I=E/(R+r)",
+    "U=E−Ir",
+    "内阻",
+    "输出功率"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-20",
+   "strand": "ELEC",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 电路及其应用",
+   "name": "电功率、焦耳定律与非纯电阻电路",
+   "name_en": "Joule's law and non-ohmic circuits",
+   "desc": "Q=I²Rt；纯电阻 W=Q；电动机 UI=I²R+P机",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-11",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-19",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "电动机等非纯电阻只能用 UI 求总功率、I²R 求热功率。常见错误：电动机也用 U²/R。",
+   "probe": "电动机两端电压 10 V、电流 2 A、线圈电阻 1 Ω，求输出机械功率。",
+   "terms": [
+    "Q=I²Rt",
+    "非纯电阻",
+    "电动机",
+    "效率"
+   ]
+  },
+  {
+   "id": "PSH-ELEC-21",
+   "strand": "ELEC",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 实验",
+   "name": "测电源电动势和内阻与多用电表",
+   "name_en": "Measuring EMF and internal resistance; multimeter",
+   "desc": "伏安法测 E、r 并作 U-I 图像；多用电表测电阻（欧姆调零、换挡）",
+   "prereqs": [
+    {
+     "id": "PSH-ELEC-19",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-EXP-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "图像纵轴起点常不为零，求 r 要用 ΔU/ΔI 而不是 U/I。欧姆表换挡后要重新欧姆调零。常见错误：直接用纵轴截距之外的点算 r=U/I。",
+   "probe": "给 U-I 图像（纵轴从 1.0 V 开始），求 E 和 r。",
+   "terms": [
+    "U-I图像",
+    "电动势",
+    "内阻",
+    "欧姆调零",
+    "多用电表"
+   ]
+  },
+  {
+   "id": "PSH-MAG-05",
+   "strand": "MAG",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 电磁场与电磁波初步",
+   "name": "磁感应强度与磁通量",
+   "name_en": "Magnetic flux density and flux",
+   "desc": "B=F/(IL)（定义）；Φ=BS（S⊥B）；产生感应电流的条件：磁通量变化",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-02",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MAG-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "Φ=BS 中 S 是垂直于 B 的有效面积。常见错误：线圈翻转 180° 认为磁通量变化为零（应为 2BS）。",
+   "probe": "线圈平面与磁场成 30°，求磁通量。",
+   "terms": [
+    "B=F/IL",
+    "Φ=BS",
+    "特斯拉",
+    "韦伯",
+    "有效面积"
+   ]
+  },
+  {
+   "id": "PSH-MAG-06",
+   "strand": "MAG",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 电磁场与电磁波初步",
+   "name": "电磁波与电磁波谱",
+   "name_en": "Electromagnetic waves",
+   "desc": "麦克斯韦理论（变化电场磁场相互激发）；c=λf；无线电波→γ射线的顺序与应用；电磁振荡与传感器简介",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-05",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-SOUND-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "按波长从长到短记：无线电、红外、可见光、紫外、X、γ。常见错误：认为电磁波需要介质传播。",
+   "probe": "问手机信号、医院拍片、验钞各用哪种电磁波。",
+   "terms": [
+    "c=λf",
+    "电磁波谱",
+    "红外线",
+    "紫外线",
+    "X射线"
+   ]
+  },
+  {
+   "id": "PSH-MECH-43",
+   "strand": "MECH",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修三 能源与可持续发展",
+   "name": "能量守恒与能源",
+   "name_en": "Energy conservation and energy resources",
+   "desc": "能量守恒定律；能量转化的方向性与效率；常规能源与新能源",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-42",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-ENERGY",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "效率=有用能量/总能量。常见错误：认为能量守恒所以不存在能源危机（可利用的能量品质在下降）。",
+   "probe": "问为什么能量守恒还要节约能源。",
+   "terms": [
+    "能量守恒",
+    "效率",
+    "可再生能源",
+    "能量耗散"
+   ]
+  },
+  {
+   "id": "PSH-MECH-44",
+   "strand": "MECH",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选择性必修一 动量",
+   "name": "动量与动量定理",
+   "name_en": "Momentum and impulse",
+   "desc": "p=mv（矢量）；I=Ft；I合=Δp；缓冲问题",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-30",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-28",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "规定正方向，把速度带符号代入。常见错误：小球反弹时 Δp 用大小相减。",
+   "probe": "0.1 kg 小球以 10 m/s 撞墙以 8 m/s 弹回，求动量变化。",
+   "terms": [
+    "p=mv",
+    "I=Ft",
+    "Ft=Δp",
+    "缓冲"
+   ]
+  },
+  {
+   "id": "PSH-MECH-45",
+   "strand": "MECH",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选择性必修一 动量",
+   "name": "动量守恒定律与碰撞",
+   "name_en": "Conservation of momentum and collisions",
+   "desc": "守恒条件；弹性碰撞与完全非弹性碰撞；反冲与人船模型",
+   "prereqs": [
+    {
+     "id": "PSH-MECH-44",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-42",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "碰撞题“动量必守恒、动能可能损失”。完全非弹性碰撞后共速，动能损失最大。常见错误：系统受外力不为零时仍套动量守恒。",
+   "probe": "子弹打入木块共速，求共同速度和损失的动能。",
+   "terms": [
+    "m1v1+m2v2=m1v1'+m2v2'",
+    "弹性碰撞",
+    "完全非弹性碰撞",
+    "反冲"
+   ]
+  },
+  {
+   "id": "PSH-OPT-07",
+   "strand": "OPT",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选择性必修一 光",
+   "name": "折射率与全反射",
+   "name_en": "Refractive index and total internal reflection",
+   "desc": "n=sin i/sin r=c/v；临界角 sinC=1/n；光纤",
+   "prereqs": [
+    {
+     "id": "PSH-OPT-04",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-TRIG",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先判断是否从光密进入光疏、入射角是否大于临界角，再画光路。常见错误：从空气射入玻璃也说会全反射。",
+   "probe": "给 n=√2，求临界角并判断 50° 入射时是否全反射。",
+   "terms": [
+    "n=sin i/sin r",
+    "n=c/v",
+    "临界角",
+    "光纤"
+   ]
+  },
+  {
+   "id": "PSH-OPT-08",
+   "strand": "OPT",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选择性必修一 光",
+   "name": "光的干涉",
+   "name_en": "Interference of light",
+   "desc": "双缝干涉 Δx=Lλ/d；薄膜干涉；光的波动性",
+   "prereqs": [
+    {
+     "id": "PSH-SOUND-08",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-OPT-07",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "条纹间距公式的三个量逐个分析“变大还是变小”。常见错误：把单缝衍射图样（中央宽亮）当作双缝干涉（等间距）。",
+   "probe": "把红光换成紫光，问双缝干涉条纹间距如何变化。",
+   "terms": [
+    "双缝干涉",
+    "Δx=Lλ/d",
+    "薄膜干涉",
+    "相干光"
+   ]
+  },
+  {
+   "id": "PSH-OPT-09",
+   "strand": "OPT",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选择性必修一 光",
+   "name": "光的衍射与偏振",
+   "name_en": "Diffraction and polarisation of light",
+   "desc": "单缝衍射中央亮纹最宽；偏振说明光是横波；激光特点",
+   "prereqs": [
+    {
+     "id": "PSH-OPT-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "衍射看“中间宽两边窄”，干涉看“等间距”。偏振只有横波才有。常见错误：认为纵波也能偏振。",
+   "probe": "给两张条纹图，判断哪张是衍射。",
+   "terms": [
+    "单缝衍射",
+    "偏振",
+    "横波",
+    "激光"
+   ]
+  },
+  {
+   "id": "PSH-SOUND-03",
+   "strand": "SOUND",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选择性必修一 机械振动",
+   "name": "简谐运动",
+   "name_en": "Simple harmonic motion",
+   "desc": "回复力 F=-kx；位移、速度、加速度随时间变化；振动图像；周期与频率",
+   "prereqs": [
+    {
+     "id": "PSH-SOUND-02",
+     "strength": "有帮助"
+    },
+    {
+     "id": "PSH-MECH-26",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-30",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "抓住“回复力总指向平衡位置”，位移最大处速度为零、加速度最大。常见错误：把振动图像当成运动轨迹。",
+   "probe": "给 x-t 图像，问某时刻速度方向和加速度方向。",
+   "terms": [
+    "回复力",
+    "F=-kx",
+    "振幅",
+    "周期",
+    "x-t图像"
+   ]
+  },
+  {
+   "id": "PSH-SOUND-04",
+   "strand": "SOUND",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选择性必修一 机械振动",
+   "name": "单摆与用单摆测 g",
+   "name_en": "Simple pendulum",
+   "desc": "小角度单摆 T=2π√(L/g)，周期与摆球质量、振幅无关；单摆测重力加速度",
+   "prereqs": [
+    {
+     "id": "PSH-SOUND-03",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-EXP-05",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "摆长是悬点到球心的距离。测 30~50 次全振动求周期；用 T²-L 图像斜率求 g 可消除摆长误差。常见错误：把摆线长当摆长，或从最高点开始计时。",
+   "probe": "给 T²-L 图像（不过原点），问 g 是否受影响。",
+   "terms": [
+    "T=2π√(L/g)",
+    "摆长",
+    "全振动",
+    "T²-L 图像"
+   ]
+  },
+  {
+   "id": "PSH-SOUND-05",
+   "strand": "SOUND",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选择性必修一 机械振动",
+   "name": "受迫振动与共振",
+   "name_en": "Forced oscillation and resonance",
+   "desc": "受迫振动频率等于驱动力频率；驱动频率接近固有频率时振幅最大",
+   "prereqs": [
+    {
+     "id": "PSH-SOUND-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "记一句：受迫振动“跟着驱动力走”，共振是“频率对上了”。常见错误：认为受迫振动频率等于固有频率。",
+   "probe": "给共振曲线，问驱动频率从小到大时振幅如何变化。",
+   "terms": [
+    "固有频率",
+    "驱动力频率",
+    "共振曲线"
+   ]
+  },
+  {
+   "id": "PSH-SOUND-06",
+   "strand": "SOUND",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选择性必修一 机械波",
+   "name": "机械波的形成与传播",
+   "name_en": "Mechanical waves",
+   "desc": "横波与纵波；波传播的是振动形式和能量，质点不随波迁移；v=λf",
+   "prereqs": [
+    {
+     "id": "PSH-SOUND-03",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-SOUND-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "质点只在平衡位置附近振动。用“同侧法/上下坡法”判断质点振动方向。常见错误：认为波速由频率决定（其实由介质决定）。",
+   "probe": "给一列横波波形和传播方向，问某质点此刻向上还是向下。",
+   "terms": [
+    "横波",
+    "纵波",
+    "v=λf",
+    "波长",
+    "同侧法"
+   ]
+  },
+  {
+   "id": "PSH-SOUND-07",
+   "strand": "SOUND",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选择性必修一 机械波",
+   "name": "波动图像与振动图像",
+   "name_en": "Wave graph vs. oscillation graph",
+   "desc": "y-x 波形图与 y-t 振动图的区别和互推；波的多解问题",
+   "prereqs": [
+    {
+     "id": "PSH-SOUND-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先看横轴：x 是波形图（某时刻许多质点），t 是振动图（一个质点许多时刻）。常见错误：两图混看，或周期性多解只写一个答案。",
+   "probe": "给一张波形图和某质点的振动图，求波的传播方向和波速。",
+   "terms": [
+    "波形图",
+    "振动图",
+    "周期性",
+    "多解"
+   ]
+  },
+  {
+   "id": "PSH-SOUND-08",
+   "strand": "SOUND",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选择性必修一 机械波",
+   "name": "波的干涉、衍射与多普勒效应",
+   "name_en": "Interference, diffraction, Doppler effect",
+   "desc": "叠加原理；干涉加强/减弱条件（路程差）；明显衍射条件；多普勒效应",
+   "prereqs": [
+    {
+     "id": "PSH-SOUND-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "路程差为波长整数倍加强、为半波长奇数倍减弱（同相波源）。常见错误：认为加强点始终在波峰。",
+   "probe": "给两个同相波源的位置，判断某点是加强还是减弱。",
+   "terms": [
+    "叠加",
+    "路程差",
+    "衍射",
+    "多普勒效应"
+   ]
+  },
+  {
+   "id": "PSH-EXP-06",
+   "strand": "EXP",
+   "stage": "G12",
+   "term": "全",
+   "unit": "等级考实验",
+   "name": "实验设计与误差分析",
+   "name_en": "Experiment design and error analysis",
+   "desc": "等级考实验题：原理→器材→步骤→数据→误差来源（系统/偶然）与改进",
+   "prereqs": [
+    {
+     "id": "PSH-EXP-05",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-EXP-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "答题按“原理公式→要测哪些量→怎样测→误差从哪来”四句话组织。常见错误：误差分析只写“读数不准”，没有指明偏大还是偏小。",
+   "probe": "给“用单摆测重力加速度”数据偏大的情境，问可能原因。",
+   "terms": [
+    "系统误差",
+    "偶然误差",
+    "实验原理",
+    "改进方案"
+   ]
+  },
+  {
+   "id": "PSH-MAG-07",
+   "strand": "MAG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修二 磁场",
+   "name": "安培力",
+   "name_en": "Force on a current-carrying conductor",
+   "desc": "F=BIL（B⊥I）；左手定则；通电导线在斜面上的平衡",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-05",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-29",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MAG-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "左手：磁感线穿掌心、四指指电流、大拇指指受力。斜面题先画侧视图再受力分析。常见错误：用右手判断安培力。",
+   "probe": "斜面上通电导体棒静止，求所需磁感应强度最小值和方向。",
+   "terms": [
+    "F=BIL",
+    "左手定则",
+    "侧视图"
+   ]
+  },
+  {
+   "id": "PSH-MAG-08",
+   "strand": "MAG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修二 磁场",
+   "name": "洛伦兹力与带电粒子在磁场中的圆周运动",
+   "name_en": "Lorentz force and circular motion in B-field",
+   "desc": "f=qvB；r=mv/(qB)，T=2πm/(qB)；找圆心、求半径和时间",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-07",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-37",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "画轨迹三步：找圆心（两速度垂线交点）、算半径（几何关系）、求时间 t=θT/2π。洛伦兹力不做功。常见错误：负电荷用左手时四指方向没反过来。",
+   "probe": "粒子垂直射入有界磁场，求出射点和在磁场中的时间。",
+   "terms": [
+    "f=qvB",
+    "r=mv/qB",
+    "T=2πm/qB",
+    "找圆心",
+    "不做功"
+   ]
+  },
+  {
+   "id": "PSH-MAG-09",
+   "strand": "MAG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修二 磁场",
+   "name": "复合场与磁场应用",
+   "name_en": "Combined fields and applications",
+   "desc": "速度选择器 qE=qvB；质谱仪；回旋加速器；霍尔效应",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-08",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-17",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "速度选择器只选速度不选电荷电性。回旋加速器最大动能由 D 形盒半径决定，与电压无关。常见错误：认为加速电压越大粒子最终动能越大。",
+   "probe": "问回旋加速器提高粒子最大动能的方法。",
+   "terms": [
+    "速度选择器",
+    "v=E/B",
+    "质谱仪",
+    "回旋加速器",
+    "霍尔效应"
+   ]
+  },
+  {
+   "id": "PSH-MAG-10",
+   "strand": "MAG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修二 电磁感应",
+   "name": "楞次定律与右手定则",
+   "name_en": "Lenz's law",
+   "desc": "感应电流的磁场总阻碍引起它的磁通量变化；“增反减同、来拒去留”；右手定则",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-05",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MAG-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "四步：原磁场方向→磁通量增减→感应电流磁场方向→安培定则得电流方向。常见错误：“阻碍”理解成“相反”或“阻止”。",
+   "probe": "磁铁 N 极插入线圈，判断线圈中感应电流方向。",
+   "terms": [
+    "楞次定律",
+    "增反减同",
+    "来拒去留",
+    "右手定则"
+   ]
+  },
+  {
+   "id": "PSH-MAG-11",
+   "strand": "MAG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修二 电磁感应",
+   "name": "法拉第电磁感应定律",
+   "name_en": "Faraday's law",
+   "desc": "E=nΔΦ/Δt；导体切割 E=BLv；转动切割 E=½BL²ω",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-10",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-19",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "B 变化用 nSΔB/Δt，导体运动用 BLv。产生电动势的部分相当于电源，有内阻。常见错误：Φ-t 图中把 Φ 的大小当成电动势的大小（应看斜率）。",
+   "probe": "给 B-t 图像，求线圈中感应电动势和电流。",
+   "terms": [
+    "E=nΔΦ/Δt",
+    "E=BLv",
+    "E=½BL²ω",
+    "Φ-t图像斜率"
+   ]
+  },
+  {
+   "id": "PSH-MAG-12",
+   "strand": "MAG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修二 电磁感应",
+   "name": "电磁感应综合（导体棒与能量）",
+   "name_en": "Electromagnetic induction problems",
+   "desc": "导体棒在导轨上运动：电路+受力（安培力）+运动+能量；收尾速度；电荷量 q=ΔΦ/R总",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-11",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MAG-07",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-30",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-42",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "等级考压轴：按“电（E、I）→力（F安=B²L²v/R）→运动（a 变化）→能（焦耳热=克服安培力做功）”四条线分析。常见错误：变加速过程用匀变速公式。",
+   "probe": "导体棒从静止开始在恒力作用下运动，求最大速度和该过程产生的热量。",
+   "terms": [
+    "F安=B²L²v/R",
+    "收尾速度",
+    "q=ΔΦ/R",
+    "焦耳热",
+    "能量守恒"
+   ]
+  },
+  {
+   "id": "PSH-MAG-13",
+   "strand": "MAG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修二 电磁感应",
+   "name": "自感与涡流",
+   "name_en": "Self-induction and eddy currents",
+   "desc": "自感现象（通电/断电时灯泡亮灭）；涡流、电磁阻尼",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "自感线圈“阻碍电流变化”：通电时缓慢变亮，断电时电流沿原方向逐渐减小。常见错误：断电时认为灯泡一定闪亮（要比较原电流大小）。",
+   "probe": "断开开关时与线圈并联的灯会不会闪一下。",
+   "terms": [
+    "自感",
+    "自感电动势",
+    "涡流",
+    "电磁阻尼"
+   ]
+  },
+  {
+   "id": "PSH-MAG-14",
+   "strand": "MAG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修二 交变电流",
+   "name": "交变电流",
+   "name_en": "Alternating current",
+   "desc": "正弦交流电的产生；峰值与有效值 I=Im/√2；周期频率；中性面",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-11",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-36",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "电表读数、铭牌、计算热量用有效值；求电荷量用平均值。中性面磁通量最大但电动势为零。常见错误：用峰值计算功率。",
+   "probe": "给 e=311sin100πt V，求有效值和频率。",
+   "terms": [
+    "有效值",
+    "峰值",
+    "Em=NBSω",
+    "中性面",
+    "50 Hz"
+   ]
+  },
+  {
+   "id": "PSH-MAG-15",
+   "strand": "MAG",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修二 交变电流",
+   "name": "变压器与远距离输电",
+   "name_en": "Transformers and power transmission",
+   "desc": "U1/U2=n1/n2，I1/I2=n2/n1，P入=P出；高压输电减少损耗 P损=I²R线",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-14",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-20",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "输入功率由输出决定（“用多少给多少”）。输电损耗用线上的电流算，不用输电电压直接 U²/R。常见错误：用 U输²/R线 算损耗。",
+   "probe": "输电电压提高到 10 倍，线损变为原来的几分之一。",
+   "terms": [
+    "U1/U2=n1/n2",
+    "P入=P出",
+    "P损=I²R",
+    "高压输电"
+   ]
+  },
+  {
+   "id": "PSH-MOD-02",
+   "strand": "MOD",
+   "stage": "G12",
+   "term": "下",
+   "unit": "选择性必修三 原子结构与波粒二象性",
+   "name": "黑体辐射与光电效应",
+   "name_en": "Black-body radiation and photoelectric effect",
+   "desc": "能量子 ε=hν；光电效应规律（截止频率、瞬时性）；爱因斯坦方程 Ek=hν−W0；遏止电压",
+   "prereqs": [
+    {
+     "id": "PSH-MAG-06",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-ELEC-15",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-42",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "能否发生光电效应只看频率，光强只影响光电子数目。Ek-ν 图像斜率为 h、横截距为截止频率。常见错误：认为光强越大光电子最大初动能越大。",
+   "probe": "用不同频率光照射同一金属，给 Uc-ν 图像，求普朗克常量和逸出功。",
+   "terms": [
+    "ε=hν",
+    "Ek=hν−W0",
+    "截止频率",
+    "逸出功",
+    "遏止电压"
+   ]
+  },
+  {
+   "id": "PSH-MOD-03",
+   "strand": "MOD",
+   "stage": "G12",
+   "term": "下",
+   "unit": "选择性必修三",
+   "name": "波粒二象性与物质波",
+   "name_en": "Wave-particle duality",
+   "desc": "光的波动性与粒子性；康普顿效应；德布罗意波 λ=h/p",
+   "prereqs": [
+    {
+     "id": "PSH-MOD-02",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-OPT-08",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-44",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "大量光子显波动性、个别光子显粒子性。常见错误：认为只有光有波粒二象性（实物粒子也有）。",
+   "probe": "比较速度相同的电子和质子，谁的德布罗意波长长。",
+   "terms": [
+    "λ=h/p",
+    "康普顿效应",
+    "物质波",
+    "概率波"
+   ]
+  },
+  {
+   "id": "PSH-MOD-04",
+   "strand": "MOD",
+   "stage": "G12",
+   "term": "下",
+   "unit": "选择性必修三 原子结构",
+   "name": "原子结构与玻尔模型",
+   "name_en": "Atomic structure and Bohr model",
+   "desc": "α粒子散射实验与核式结构；氢原子能级；hν=Em−En；光谱",
+   "prereqs": [
+    {
+     "id": "PSH-MOD-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MOD-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "跃迁只吸收/放出等于能级差的光子，n 能级的一群原子可发出 C(n,2) 种光。常见错误：认为一个原子从 n=4 跃迁也能发出 6 种光（一个最多 3 种）。",
+   "probe": "一群处于 n=3 的氢原子，最多能发出几种频率的光、最大能量是多少。",
+   "terms": [
+    "α粒子散射",
+    "能级",
+    "hν=Em−En",
+    "基态",
+    "电离"
+   ]
+  },
+  {
+   "id": "PSH-MOD-05",
+   "strand": "MOD",
+   "stage": "G12",
+   "term": "下",
+   "unit": "选择性必修三 原子核",
+   "name": "天然放射与衰变、半衰期",
+   "name_en": "Radioactivity and half-life",
+   "desc": "α、β、γ 三种射线性质；衰变方程（质量数、电荷数守恒）；半衰期 m=m0(1/2)^(t/T)",
+   "prereqs": [
+    {
+     "id": "PSH-MOD-04",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MOD-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "写衰变方程先配质量数再配电荷数；求 α、β 衰变次数先由质量数算 α 次数。半衰期是统计规律，对少数原子核无意义。常见错误：认为加热或加压能改变半衰期。",
+   "probe": "铀238衰变为铅206，求经过几次 α 衰变和 β 衰变。",
+   "terms": [
+    "α衰变",
+    "β衰变",
+    "γ射线",
+    "半衰期",
+    "质量数守恒",
+    "电荷数守恒"
+   ]
+  },
+  {
+   "id": "PSH-MOD-06",
+   "strand": "MOD",
+   "stage": "G12",
+   "term": "下",
+   "unit": "选择性必修三 原子核",
+   "name": "核反应、核能与质能方程",
+   "name_en": "Nuclear reactions and nuclear energy",
+   "desc": "人工转变（质子、中子的发现）；结合能与比结合能；ΔE=Δmc²；裂变与聚变；核电站",
+   "prereqs": [
+    {
+     "id": "PSH-MOD-05",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-43",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "1 u 对应 931.5 MeV，可以直接换算核能。比结合能越大原子核越稳定。常见错误：认为质量亏损就是“质量消失变成能量”而忘记质量数守恒。",
+   "probe": "给反应前后核的质量，求释放的核能。",
+   "terms": [
+    "ΔE=Δmc²",
+    "比结合能",
+    "裂变",
+    "聚变",
+    "1 u=931.5 MeV"
+   ]
+  },
+  {
+   "id": "PSH-THERM-07",
+   "strand": "THERM",
+   "stage": "G12",
+   "term": "下",
+   "unit": "选择性必修三 分子动理论",
+   "name": "分子动理论与内能（高中）",
+   "name_en": "Molecular kinetic theory",
+   "desc": "阿伏伽德罗常数；油膜法估测分子大小；布朗运动；分子力与分子势能曲线；温度是分子平均动能的标志",
+   "prereqs": [
+    {
+     "id": "PSH-THERM-05",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-STDF",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "分子势能在 r=r0 时最小；温度只决定平均动能。油膜法 d=V/S。常见错误：把布朗运动说成分子运动（其实是颗粒运动，反映分子运动）。",
+   "probe": "给分子力 F-r 图像，问分子从远处靠近时分子势能如何变化。",
+   "terms": [
+    "NA=6.02×10²³",
+    "油膜法",
+    "布朗运动",
+    "分子势能",
+    "r0"
+   ]
+  },
+  {
+   "id": "PSH-THERM-08",
+   "strand": "THERM",
+   "stage": "G12",
+   "term": "下",
+   "unit": "选择性必修三 气体",
+   "name": "气体实验定律",
+   "name_en": "Gas laws",
+   "desc": "压强、体积、温度（热力学温度 T=t+273）；玻意耳定律、查理定律、盖-吕萨克定律；DIS 研究",
+   "prereqs": [
+    {
+     "id": "PSH-THERM-07",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-16",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-17",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先找“哪个量不变”，再选定律；封闭气体压强用液柱/活塞受力平衡求。常见错误：温度用摄氏度代入；液柱压强漏加大气压。",
+   "probe": "U 形管中封闭气体，求液柱移动后的气体长度。",
+   "terms": [
+    "pV=C",
+    "p/T=C",
+    "V/T=C",
+    "T=t+273",
+    "封闭气体压强"
+   ]
+  },
+  {
+   "id": "PSH-THERM-09",
+   "strand": "THERM",
+   "stage": "G12",
+   "term": "下",
+   "unit": "选择性必修三 气体",
+   "name": "理想气体状态方程与图像",
+   "name_en": "Ideal gas equation and graphs",
+   "desc": "pV/T=C；p-V、p-T、V-T 图像；变质量问题",
+   "prereqs": [
+    {
+     "id": "PSH-THERM-08",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-EXP-05",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "图像题先把图线上两点代入 pV/T 比较。p-T 图中过原点直线是等容线，斜率越大体积越小。常见错误：图像不过原点仍当作等容/等压。",
+   "probe": "给 p-V 图上两点，比较两状态温度高低。",
+   "terms": [
+    "pV/T=C",
+    "等温线",
+    "等容线",
+    "等压线"
+   ]
+  },
+  {
+   "id": "PSH-THERM-10",
+   "strand": "THERM",
+   "stage": "G12",
+   "term": "下",
+   "unit": "选择性必修三 热力学定律",
+   "name": "热力学第一定律",
+   "name_en": "First law of thermodynamics",
+   "desc": "ΔU=W+Q 的符号规定；理想气体内能只与温度有关；与气体图像综合",
+   "prereqs": [
+    {
+     "id": "PSH-THERM-09",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-THERM-05",
+     "strength": "必须"
+    },
+    {
+     "id": "PSH-MECH-43",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "符号：外界对气体做功 W>0、吸热 Q>0、内能增加 ΔU>0。气体膨胀对外做功 W<0。常见错误：符号弄反，或认为等温过程内能变化。",
+   "probe": "气体等温膨胀，问吸热还是放热。",
+   "terms": [
+    "ΔU=W+Q",
+    "符号规定",
+    "绝热",
+    "等温"
+   ]
+  },
+  {
+   "id": "PSH-THERM-11",
+   "strand": "THERM",
+   "stage": "G12",
+   "term": "下",
+   "unit": "选择性必修三 热力学定律",
+   "name": "热力学第二定律与熵",
+   "name_en": "Second law of thermodynamics",
+   "desc": "热传递的方向性；第二类永动机不可能；能量耗散",
+   "prereqs": [
+    {
+     "id": "PSH-THERM-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "记两种表述：热量不能自发从低温传到高温；不可能从单一热源吸热全部变功而不产生其他影响。常见错误：认为冰箱违反第二定律（它消耗了电能）。",
+   "probe": "问“效率 100% 的热机”违反哪条定律。",
+   "terms": [
+    "第二定律",
+    "不可逆",
+    "熵",
+    "第二类永动机"
+   ]
+  }
+ ]
+}

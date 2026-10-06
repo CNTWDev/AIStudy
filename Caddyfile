@@ -1,0 +1,5 @@
+# 把 study.example.com 换成你的域名（域名先解析到服务器 IP）。
+# 还没有域名时，可以改成 :80 先用 http://服务器IP 访问。
+study.example.com {
+	reverse_proxy app:8000
+}

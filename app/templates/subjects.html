@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>学科</h1>
+{% for r in rows %}
+{% set s = r.sum %}
+<div class="card">
+  <div class="row"><div class="grow"><h2 style="margin:0">{{ r.pack.subject_name }}</h2><div class="muted small">{{ r.pack.edition }} · 当前 {{ stage_label(r.e.stage) }}</div></div></div>
+  <div class="bar" style="margin:10px 0"><span style="width:{{ 100*s.mastered/s.total }}%;background:var(--ok)"></span><span style="width:{{ 100*s.learning/s.total }}%;background:var(--learn)"></span><span style="width:{{ 100*s.weak/s.total }}%;background:var(--warn)"></span></div>
+  <div class="muted small">已掌握 {{ s.mastered }} · 学习中 {{ s.learning }} · 薄弱 {{ s.weak }} · 未测 {{ s.unknown }}</div>
+  <div class="row" style="margin-top:10px">
+    <a class="btn" href="/map/{{ r.pack.id }}">知识地图</a>
+    <a class="btn ghost" href="/diagnose/{{ r.pack.id }}">{{ '再诊断一次' if r.diag else '摸底诊断' }}</a>
+  </div>
+</div>
+{% endfor %}
+<p class="muted small">新教材、新年级：请家长在「编辑孩子」里添加。</p>
+{% endblock %}

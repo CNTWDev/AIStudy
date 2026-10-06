@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="row"><h1 class="grow">复习</h1><a class="btn ghost sm" href="/words">生词本 / 错题本</a></div>
+<p class="muted small">按 1→2→4→7→15→30 天的间隔出现。记得就点「记得」，下次隔得更久；忘了会今天再来一次。</p>
+<div class="card flash" id="flash"><span class="loading">加载中</span></div>
+<script>
+let cards = [], i = 0;
+const KIND = {word: '生词', term: '术语', mistake: '错题', kp: '知识点', phrase: '短语'};
+async function load() { cards = (await api('/api/review/due')).cards; i = 0; show(); }
+function show() {
+  if (i >= cards.length) { $('#flash').innerHTML = '<div class="face">🎉 今天的复习完成了！</div><a class="btn" href="/today">回到今天</a>'; return; }
+  const c = cards[i], ex = c.extra || {};
+  $('#flash').innerHTML = `<div class="muted small">${KIND[c.kind] || c.kind}${c.kp_name ? ' · ' + esc(c.kp_name) : ''} · 还剩 ${cards.length - i} 张</div>` +
+    `<div class="face">${esc(c.front)}${ex.zh ? `<div class="muted small">${esc(ex.zh)}</div>` : ''}${ex.context ? `<div class="muted small">“${esc(ex.context)}”</div>` : ''}</div>` +
+    `<div id="back" style="display:none"><div class="back">${esc(c.back).replace(/\n/g, '<br>')}${ex.example ? `<div class="small">例：${esc(ex.example)}</div>` : ''}${ex.my_answer ? `<div class="small">我当时答：${esc(ex.my_answer)}</div>` : ''}</div>` +
+    `<div class="row" style="justify-content:center;margin-top:16px"><button class="btn warn" data-g="again">忘了</button><button class="btn ghost" data-g="hard">模糊</button><button class="btn" data-g="good">记得</button></div></div>` +
+    `<button class="btn" id="flip" style="margin-top:12px">${c.kind === 'mistake' ? '我想好了，看答案' : '翻面'}</button>`;
+  $('#flip').onclick = () => { $('#back').style.display = ''; $('#flip').remove(); };
+  $$('#flash [data-g]').forEach(b => b.onclick = async () => {
+    await api('/api/review/' + c.id, {grade: b.dataset.g});
+    if (b.dataset.g === 'again') cards.push(c);
+    i++; show();
+  });
+}
+load();
+</script>
+{% endblock %}

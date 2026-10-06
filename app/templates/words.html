@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/review" class="small">← 复习</a>
+<h1>我的本子</h1>
+<div class="row" style="margin-bottom:8px">
+{% for k, n in [('word','生词本'),('mistake','错题本'),('kp','知识点总结'),('term','术语'),('sentence','造句本')] %}
+<a class="btn sm {{ '' if kind == k else 'ghost' }}" href="/words?kind={{ k }}">{{ n }} {{ counts.get(k, 0) }}</a>
+{% endfor %}
+</div>
+{% if kind == 'sentence' %}
+{% for s in sents %}
+<div class="card"><div><b>{{ s.word }}</b>：{{ s.sentence }} {{ '✅' if s.ok else '✏️' }}</div>
+{% if s.fb.corrected %}<div class="small">改正：{{ s.fb.corrected }}</div>{% endif %}
+{% if s.fb.better %}<div class="small muted">示范：{{ s.fb.better }}</div>{% endif %}</div>
+{% else %}<p class="muted">还没有造句。阅读时查词后可以「用它造句」。</p>{% endfor %}
+{% else %}
+{% for c in cards %}
+<div class="card" style="padding:12px">
+  <div class="row"><b class="grow">{{ c.front }}</b><span class="pill">第 {{ c.box }} 轮 · {{ c.due[5:] }} 复习</span>
+    <button class="btn ghost sm" onclick="if(confirm('删除？'))api('/api/cards/{{ c.id }}/delete',{}).then(()=>this.closest('.card').remove())">删除</button></div>
+  <div class="small" style="white-space:pre-wrap">{{ c.back }}</div>
+  {% if c.extra.context %}<div class="small muted">原句：{{ c.extra.context }}</div>{% endif %}
+  {% if c.kind == 'word' %}<div class="row" style="margin-top:6px"><input type="text" placeholder="用 {{ c.front }} 造个句子" class="grow sent"><button class="btn sm mk" data-w="{{ c.front }}" data-m="{{ c.back.split('\n')[0] }}" data-l="{{ c.extra.lang or 'en' }}">让 AI 看看</button></div><div class="fbx"></div>{% endif %}
+</div>
+{% else %}<p class="muted">这里还是空的。</p>{% endfor %}
+{% endif %}
+<script>
+$$('.mk').forEach(b => b.onclick = async () => {
+  const card = b.closest('.card'), s = $('.sent', card).value.trim(); if (!s) return;
+  b.disabled = true; $('.fbx', card).innerHTML = '<span class="loading">AI 正在看</span>';
+  try { const f = await api('/api/sentence', {word: b.dataset.w, meaning: b.dataset.m, sentence: s, lang: b.dataset.l});
+    $('.fbx', card).innerHTML = `<div class="fb ${f.ok ? 'ok' : 'no'}">${esc(f.praise)}${f.issue ? '<br>⚠️ ' + esc(f.issue) : ''}${f.corrected ? '<br>改正：' + esc(f.corrected) : ''}${f.better ? '<br><span class="muted">示范：' + esc(f.better) + '</span>' : ''}</div>`;
+  } catch (e) { $('.fbx', card).innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+  b.disabled = false;
+});
+</script>
+{% endblock %}

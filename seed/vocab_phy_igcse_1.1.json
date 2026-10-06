@@ -1,0 +1,425 @@
+[
+ {
+  "id": "V-PHY11-01",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "ruler",
+  "back": "刻度尺",
+  "example": "Use a ruler to measure the length of the book.",
+  "kp": "PHY-IG-1.1-01"
+ },
+ {
+  "id": "V-PHY11-02",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "metre rule",
+  "back": "米尺",
+  "example": "The metre rule reads to the nearest millimetre.",
+  "kp": "PHY-IG-1.1-01"
+ },
+ {
+  "id": "V-PHY11-03",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "length",
+  "back": "长度",
+  "example": "The length of the pencil is 15.0 cm.",
+  "kp": "PHY-IG-1.1-01"
+ },
+ {
+  "id": "V-PHY11-04",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "width",
+  "back": "宽度",
+  "example": "Measure the width of the table.",
+  "kp": "PHY-IG-1.1-01"
+ },
+ {
+  "id": "V-PHY11-05",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "thickness",
+  "back": "厚度",
+  "example": "Find the thickness of one sheet of paper.",
+  "kp": "PHY-IG-1.1-05"
+ },
+ {
+  "id": "V-PHY11-06",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "diameter",
+  "back": "直径",
+  "example": "The diameter of the wire is 0.8 mm.",
+  "kp": "PHY-IG-1.1-05"
+ },
+ {
+  "id": "V-PHY11-07",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "measuring cylinder",
+  "back": "量筒",
+  "example": "Pour the water into a measuring cylinder.",
+  "kp": "PHY-IG-1.1-02"
+ },
+ {
+  "id": "V-PHY11-08",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "meniscus",
+  "back": "凹液面（弯月面）",
+  "example": "Read the bottom of the meniscus at eye level.",
+  "kp": "PHY-IG-1.1-02"
+ },
+ {
+  "id": "V-PHY11-09",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "volume",
+  "back": "体积",
+  "example": "The volume of the stone is 15 cm³.",
+  "kp": "PHY-IG-1.1-03"
+ },
+ {
+  "id": "V-PHY11-10",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "displacement method",
+  "back": "排水法",
+  "example": "Use the displacement method to find the volume of an irregular object.",
+  "kp": "PHY-IG-1.1-03"
+ },
+ {
+  "id": "V-PHY11-11",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "stopwatch",
+  "back": "秒表",
+  "example": "Start the stopwatch when the pendulum is released.",
+  "kp": "PHY-IG-1.1-04"
+ },
+ {
+  "id": "V-PHY11-12",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "digital timer",
+  "back": "数字计时器",
+  "example": "A digital timer can measure very short time intervals.",
+  "kp": "PHY-IG-1.1-04"
+ },
+ {
+  "id": "V-PHY11-13",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "time interval",
+  "back": "时间间隔",
+  "example": "Measure the time interval for 20 oscillations.",
+  "kp": "PHY-IG-1.1-04"
+ },
+ {
+  "id": "V-PHY11-14",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "oscillation",
+  "back": "（一次）摆动、振动",
+  "example": "One oscillation is a complete swing there and back.",
+  "kp": "PHY-IG-1.1-05"
+ },
+ {
+  "id": "V-PHY11-15",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "period",
+  "back": "周期",
+  "example": "The period is the time for one oscillation.",
+  "kp": "PHY-IG-1.1-05"
+ },
+ {
+  "id": "V-PHY11-16",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "reaction time",
+  "back": "反应时间",
+  "example": "Your reaction time affects stopwatch readings.",
+  "kp": "PHY-IG-1.1-04"
+ },
+ {
+  "id": "V-PHY11-17",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "multiples",
+  "back": "多个（累积）",
+  "example": "Measure multiples to find a small distance.",
+  "kp": "PHY-IG-1.1-05"
+ },
+ {
+  "id": "V-PHY11-18",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "average (mean)",
+  "back": "平均值",
+  "example": "Calculate the average of the five readings.",
+  "kp": "PHY-IG-1.1-10"
+ },
+ {
+  "id": "V-PHY11-19",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "vernier caliper",
+  "back": "游标卡尺",
+  "example": "A vernier caliper measures to 0.1 mm.",
+  "kp": "PHY-IG-1.1-06"
+ },
+ {
+  "id": "V-PHY11-20",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "micrometer screw gauge",
+  "back": "螺旋测微器",
+  "example": "A micrometer screw gauge measures to 0.01 mm.",
+  "kp": "PHY-IG-1.1-07"
+ },
+ {
+  "id": "V-PHY11-21",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "resolution",
+  "back": "分辨率（最小能读出的变化）",
+  "example": "The resolution of this ruler is 1 mm.",
+  "kp": "PHY-IG-1.1-06"
+ },
+ {
+  "id": "V-PHY11-22",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "reading",
+  "back": "读数",
+  "example": "Record each reading in the table.",
+  "kp": "PHY-IG-1.1-08"
+ },
+ {
+  "id": "V-PHY11-23",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "true value",
+  "back": "真实值",
+  "example": "The true value of the thickness is 40.00 mm.",
+  "kp": "PHY-IG-1.1-08"
+ },
+ {
+  "id": "V-PHY11-24",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "error",
+  "back": "误差",
+  "example": "Error is the difference between the measured value and the true value.",
+  "kp": "PHY-IG-1.1-08"
+ },
+ {
+  "id": "V-PHY11-25",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "random error",
+  "back": "随机误差",
+  "example": "Random errors make readings scatter above and below the true value.",
+  "kp": "PHY-IG-1.1-09"
+ },
+ {
+  "id": "V-PHY11-26",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "systematic error",
+  "back": "系统误差",
+  "example": "A systematic error shifts every reading by the same amount.",
+  "kp": "PHY-IG-1.1-09"
+ },
+ {
+  "id": "V-PHY11-27",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "zero error",
+  "back": "零点误差",
+  "example": "The thermometer has a zero error of +2 °C.",
+  "kp": "PHY-IG-1.1-09"
+ },
+ {
+  "id": "V-PHY11-28",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "parallax error",
+  "back": "视差",
+  "example": "Look straight at the scale to avoid parallax error.",
+  "kp": "PHY-IG-1.1-01"
+ },
+ {
+  "id": "V-PHY11-29",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "calibrate",
+  "back": "校准",
+  "example": "Calibrate the thermometer in ice water.",
+  "kp": "PHY-IG-1.1-10"
+ },
+ {
+  "id": "V-PHY11-30",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "accurate / accuracy",
+  "back": "准确的 / 准确度",
+  "example": "A measurement is accurate if it is close to the true value.",
+  "kp": "PHY-IG-1.1-11"
+ },
+ {
+  "id": "V-PHY11-31",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "precise / precision",
+  "back": "精密的 / 精密度",
+  "example": "Readings are precise if they are close to each other.",
+  "kp": "PHY-IG-1.1-11"
+ },
+ {
+  "id": "V-PHY11-32",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "uncertainty",
+  "back": "不确定度",
+  "example": "The length is 12.4 ± 0.1 cm; the uncertainty is 0.1 cm.",
+  "kp": "PHY-IG-1.1-12"
+ },
+ {
+  "id": "V-PHY11-33",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "scalar",
+  "back": "标量",
+  "example": "Speed is a scalar: it has size only.",
+  "kp": "PHY-IG-1.1-13"
+ },
+ {
+  "id": "V-PHY11-34",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "vector",
+  "back": "矢量",
+  "example": "Velocity is a vector: it has size and direction.",
+  "kp": "PHY-IG-1.1-13"
+ },
+ {
+  "id": "V-PHY11-35",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "magnitude",
+  "back": "大小（量值）",
+  "example": "The magnitude of the force is 5 N.",
+  "kp": "PHY-IG-1.1-13"
+ },
+ {
+  "id": "V-PHY11-36",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "direction",
+  "back": "方向",
+  "example": "A vector must have a direction.",
+  "kp": "PHY-IG-1.1-13"
+ },
+ {
+  "id": "V-PHY11-37",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "resultant",
+  "back": "合力 / 合矢量",
+  "example": "The resultant of 3 N and 4 N at right angles is 5 N.",
+  "kp": "PHY-IG-1.1-15"
+ },
+ {
+  "id": "V-PHY11-38",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "velocity",
+  "back": "速度（矢量）",
+  "example": "Velocity is speed in a given direction.",
+  "kp": "PHY-IG-1.1-14"
+ },
+ {
+  "id": "V-PHY11-39",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "weight",
+  "back": "重力（矢量）",
+  "example": "Weight is a force, so it is a vector.",
+  "kp": "PHY-IG-1.1-14"
+ },
+ {
+  "id": "V-PHY11-40",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "acceleration",
+  "back": "加速度",
+  "example": "Acceleration is a vector.",
+  "kp": "PHY-IG-1.1-14"
+ },
+ {
+  "id": "V-PHY11-41",
+  "kid": "jiejie",
+  "deck": "物理术语·测量",
+  "front": "momentum",
+  "back": "动量",
+  "example": "Momentum is a vector.",
+  "kp": "PHY-IG-1.1-14"
+ },
+ {
+  "id": "V-PHY11-42",
+  "kid": "jiejie",
+  "deck": "考试指令词",
+  "front": "state",
+  "back": "写出（直接给答案，不用解释）",
+  "example": "State the unit of volume.",
+  "kp": "ENG-PRE-CMD"
+ },
+ {
+  "id": "V-PHY11-43",
+  "kid": "jiejie",
+  "deck": "考试指令词",
+  "front": "describe",
+  "back": "描述（按步骤说清做法或现象）",
+  "example": "Describe how to measure the period of a pendulum.",
+  "kp": "ENG-PRE-CMD"
+ },
+ {
+  "id": "V-PHY11-44",
+  "kid": "jiejie",
+  "deck": "考试指令词",
+  "front": "explain",
+  "back": "解释（说出原因，要用 because）",
+  "example": "Explain why the student times 20 oscillations.",
+  "kp": "ENG-PRE-CMD"
+ },
+ {
+  "id": "V-PHY11-45",
+  "kid": "jiejie",
+  "deck": "考试指令词",
+  "front": "determine",
+  "back": "求出（通过测量或计算得到）",
+  "example": "Determine the thickness of one sheet.",
+  "kp": "ENG-PRE-CMD"
+ },
+ {
+  "id": "V-PHY11-46",
+  "kid": "jiejie",
+  "deck": "考试指令词",
+  "front": "calculate",
+  "back": "计算（写出算式和单位）",
+  "example": "Calculate the average thickness.",
+  "kp": "ENG-PRE-CMD"
+ },
+ {
+  "id": "V-PHY11-47",
+  "kid": "jiejie",
+  "deck": "考试指令词",
+  "front": "suggest",
+  "back": "提出（给一个合理的想法）",
+  "example": "Suggest one way to improve the experiment.",
+  "kp": "ENG-PRE-CMD"
+ }
+]

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/subjects" class="small">← 学科</a>
+<h1>{{ pack.subject_name }} 知识地图</h1>
+<p class="muted small">{{ pack.edition }} · 当前进度 {{ stage_label(stage) }}。<span class="pill st-mastered">已掌握</span> <span class="pill st-learning">学习中</span> <span class="pill st-weak">薄弱</span> <span class="pill st-unknown">未测</span></p>
+<div class="row" style="margin:8px 0"><input type="text" id="filter" placeholder="搜索知识点" class="grow"><label class="small" style="margin:0;font-weight:400"><input type="checkbox" id="onlyweak"> 只看薄弱</label></div>
+{% for g in groups %}
+<details {{ 'open' if g.current }} class="card stage">
+  <summary class="stage-h {{ 'cur' if g.current }}"><b>{{ stage_label(g.stage) }}</b>{% if g.current %} <span class="pill">当前</span>{% elif g.past %} <span class="muted small">往回复习</span>{% else %} <span class="muted small">向前预习</span>{% endif %}</summary>
+  {% for sname, kps in g.strands %}
+  <h3>{{ sname }}</h3>
+  {% for kp in kps %}{% set st = kp.m.status if kp.m else 'unknown' %}
+  <a class="kp {{ 'hot' if kp.hot }}" data-st="{{ st }}" data-name="{{ kp.name }} {{ kp.name_en or '' }}" href="/learn/{{ kp.id }}">
+    <span class="n">{{ kp.name }}{% if kp.name_en %} <span class="muted small">{{ kp.name_en }}</span>{% endif %}</span>
+    <span class="pill st-{{ st }}">{{ STATUS_LABEL[st] }}{% if kp.m and kp.m.attempts %} {{ (kp.m.score*100)|int }}%{% endif %}</span></a>
+  {% endfor %}{% endfor %}
+</details>
+{% endfor %}
+<script>
+function apply() {
+  const f = $('#filter').value.trim().toLowerCase(), w = $('#onlyweak').checked;
+  $$('.kp').forEach(a => { a.style.display = (!f || a.dataset.name.toLowerCase().includes(f)) && (!w || a.dataset.st === 'weak') ? '' : 'none'; });
+  if (f || w) $$('details.stage').forEach(d => d.open = true);
+}
+$('#filter').oninput = apply; $('#onlyweak').onchange = apply;
+</script>
+{% endblock %}

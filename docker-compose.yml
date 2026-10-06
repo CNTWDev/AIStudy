@@ -1,0 +1,43 @@
+# 用法见 docs/DEPLOY.md 第 7 节。推荐优先用 install.sh（不需要 Docker）。
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: aistudy
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aistudy-change-me}
+      POSTGRES_DB: aistudy
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aistudy"]
+      interval: 5s
+      retries: 20
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://aistudy:${POSTGRES_PASSWORD:-aistudy-change-me}@db:5432/aistudy
+    volumes:
+      - ./config/llm.toml:/app/config/llm.toml:ro
+      - ./data:/app/data
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000"
+  caddy:                          # 自动申请 HTTPS 证书的反向代理
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+    depends_on:
+      - app
+volumes:
+  pgdata:
+  caddy_data:

@@ -1,0 +1,2 @@
+{% extends "base.html" %}
+{% block body %}<div class="card"><h1>{{ title }}</h1><p>{{ text }}</p><a class="btn" href="{{ link or '/' }}">{{ '去登录' if link == '/login' else '返回' }}</a></div>{% endblock %}

@@ -1,0 +1,640 @@
+[
+ {
+  "type": "num",
+  "kp": [
+   "MATH-PRE-UNIT"
+  ],
+  "difficulty": 1,
+  "q": "Convert 25 mm to cm.",
+  "zh": "把 25 mm 换算成 cm。",
+  "answer": 2.5,
+  "unit": "cm",
+  "tol": 0.001,
+  "explain": "1 cm = 10 mm，所以 25 ÷ 10 = 2.5 cm。",
+  "id": "Q-PHY11-01",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "MATH-PRE-UNIT"
+  ],
+  "difficulty": 1,
+  "q": "Which is equal to 1 cm³?",
+  "zh": "哪个等于 1 cm³？",
+  "options": [
+   "1 L",
+   "1 mL",
+   "10 mL",
+   "1 m³"
+  ],
+  "answer": 1,
+  "explain": "1 cm³ = 1 mL，量筒上的 mL 刻度可以直接当 cm³ 用。",
+  "id": "Q-PHY11-02",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "num",
+  "kp": [
+   "MATH-PRE-DEC"
+  ],
+  "difficulty": 1,
+  "q": "A scale goes from 2.0 cm to 3.0 cm in 10 equal small divisions. The pointer is at the 4th small mark after 2.0 cm. What is the reading?",
+  "zh": "刻度从 2.0 cm 到 3.0 cm 分成 10 小格，指针在 2.0 cm 后第 4 小格。读数是多少？",
+  "answer": 2.4,
+  "unit": "cm",
+  "tol": 0.001,
+  "explain": "每小格 0.1 cm，2.0 + 4 × 0.1 = 2.4 cm。",
+  "id": "Q-PHY11-03",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "num",
+  "kp": [
+   "MATH-PRE-AVG"
+  ],
+  "difficulty": 1,
+  "q": "Find the average of 12, 14 and 16.",
+  "zh": "求 12、14、16 的平均数。",
+  "answer": 14,
+  "unit": "",
+  "tol": 0.001,
+  "explain": "(12 + 14 + 16) ÷ 3 = 14。",
+  "id": "Q-PHY11-04",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "num",
+  "kp": [
+   "MATH-PRE-PYTH"
+  ],
+  "difficulty": 1,
+  "q": "A right-angled triangle has two shorter sides of 6 cm and 8 cm. How long is the longest side?",
+  "zh": "直角三角形两条直角边是 6 cm 和 8 cm，斜边多长？",
+  "answer": 10,
+  "unit": "cm",
+  "tol": 0.001,
+  "explain": "√(6² + 8²) = √100 = 10 cm。",
+  "id": "Q-PHY11-05",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "ENG-PRE-CMD"
+  ],
+  "difficulty": 1,
+  "q": "A question says \"Explain why...\". What must your answer include?",
+  "zh": "题目说 Explain why…，答案必须包含什么？",
+  "options": [
+   "Only a number",
+   "A reason, often using 'because'",
+   "A drawing",
+   "The unit only"
+  ],
+  "answer": 1,
+  "explain": "explain 要说原因，最稳妥的写法是 ... because ...。",
+  "id": "Q-PHY11-06",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "PHY-IG-1.1-01"
+  ],
+  "difficulty": 1,
+  "q": "How should you look at a ruler to avoid parallax error?",
+  "zh": "怎样看刻度尺才能避免视差？",
+  "options": [
+   "From the left side",
+   "From directly above the mark, at right angles to the scale",
+   "From far away",
+   "With one eye closed, from below"
+  ],
+  "answer": 1,
+  "explain": "视线要垂直正对刻度。",
+  "id": "Q-PHY11-07",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "PHY-IG-1.1-01"
+  ],
+  "difficulty": 2,
+  "q": "A student measures a pencil starting from the 1.0 cm mark. The end of the pencil is at 15.6 cm. What is its length?",
+  "zh": "学生从 1.0 cm 刻度量起，铅笔末端在 15.6 cm。铅笔多长？",
+  "options": [
+   "15.6 cm",
+   "14.6 cm",
+   "16.6 cm",
+   "1.56 cm"
+  ],
+  "answer": 1,
+  "explain": "长度 = 末端读数 − 起点读数 = 15.6 − 1.0 = 14.6 cm。",
+  "id": "Q-PHY11-08",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "PHY-IG-1.1-02"
+  ],
+  "difficulty": 1,
+  "q": "When reading a measuring cylinder containing water, you should read:",
+  "zh": "读装水的量筒时，应该读：",
+  "options": [
+   "the top of the meniscus",
+   "the bottom of the meniscus, with your eye level with it",
+   "the highest mark on the cylinder",
+   "the side of the cylinder"
+  ],
+  "answer": 1,
+  "explain": "视线与液面平齐，读凹液面最低处。",
+  "id": "Q-PHY11-09",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "num",
+  "kp": [
+   "PHY-IG-1.1-03"
+  ],
+  "difficulty": 2,
+  "q": "A measuring cylinder contains 50 cm³ of water. A stone is lowered in and the level rises to 65 cm³. What is the volume of the stone?",
+  "zh": "量筒里有 50 cm³ 水，放入石块后液面升到 65 cm³。石块体积是多少？",
+  "answer": 15,
+  "unit": "cm³",
+  "tol": 0.001,
+  "explain": "65 − 50 = 15 cm³（排水法）。",
+  "id": "Q-PHY11-10",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "PHY-IG-1.1-04"
+  ],
+  "difficulty": 1,
+  "q": "Which is the main source of error when timing with a hand-held stopwatch?",
+  "zh": "用手按秒表计时，误差的主要来源是什么？",
+  "options": [
+   "The battery",
+   "Human reaction time",
+   "The colour of the stopwatch",
+   "The temperature"
+  ],
+  "answer": 1,
+  "explain": "按下和停止秒表都要靠人的反应，反应时间带来误差。",
+  "id": "Q-PHY11-11",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "num",
+  "kp": [
+   "PHY-IG-1.1-05"
+  ],
+  "difficulty": 2,
+  "q": "A stack of 50 sheets of paper is 5.0 mm thick. What is the thickness of one sheet?",
+  "zh": "50 张纸叠起来厚 5.0 mm，一张纸多厚？",
+  "answer": 0.1,
+  "unit": "mm",
+  "tol": 0.0001,
+  "explain": "5.0 ÷ 50 = 0.10 mm。",
+  "id": "Q-PHY11-12",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "num",
+  "kp": [
+   "PHY-IG-1.1-05"
+  ],
+  "difficulty": 2,
+  "q": "A thin wire is wound tightly around a pencil 20 times. The coil is 16 mm long. What is the diameter of the wire?",
+  "zh": "细铜丝在铅笔上紧密绕 20 圈，线圈总长 16 mm。铜丝直径是多少？",
+  "answer": 0.8,
+  "unit": "mm",
+  "tol": 0.0001,
+  "explain": "16 ÷ 20 = 0.8 mm。",
+  "id": "Q-PHY11-13",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "num",
+  "kp": [
+   "PHY-IG-1.1-05"
+  ],
+  "difficulty": 2,
+  "q": "A pendulum makes 20 oscillations in 32.0 s. What is its period?",
+  "zh": "单摆摆动 20 次用时 32.0 s，周期是多少？",
+  "answer": 1.6,
+  "unit": "s",
+  "tol": 0.0001,
+  "explain": "32.0 ÷ 20 = 1.6 s。",
+  "id": "Q-PHY11-14",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "short",
+  "kp": [
+   "PHY-IG-1.1-05",
+   "PHY-IG-1.1-04"
+  ],
+  "difficulty": 3,
+  "q": "Explain why a student times 20 oscillations instead of just one.",
+  "zh": "解释为什么学生要测 20 次摆动的时间，而不是 1 次。",
+  "model": "One oscillation takes a very short time, so the reaction time error is large compared with it. Timing 20 oscillations makes the time longer, so the reaction time error is smaller compared with the total; then divide by 20.",
+  "points": [
+   "一次时间太短，反应时间误差相对很大",
+   "测 20 次总时间长，误差占比小",
+   "最后除以 20"
+  ],
+  "explain": "",
+  "id": "Q-PHY11-15",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "short",
+  "kp": [
+   "PHY-IG-1.1-05",
+   "PHY-IG-1.1-01"
+  ],
+  "difficulty": 3,
+  "q": "Describe how to measure the thickness of one sheet of paper using a ruler.",
+  "zh": "描述怎样用刻度尺测一张纸的厚度。",
+  "model": "Stack 50 sheets of paper. Measure the thickness of the stack with a ruler. Divide the reading by 50 to get the thickness of one sheet.",
+  "points": [
+   "叠 50 张（多张）",
+   "用刻度尺量总厚度",
+   "除以张数"
+  ],
+  "explain": "",
+  "id": "Q-PHY11-16",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "PHY-IG-1.1-06"
+  ],
+  "difficulty": 2,
+  "q": "A vernier caliper has 10 divisions on the vernier scale and the main scale is in mm. What is its resolution?",
+  "zh": "游标卡尺的游标有 10 格，主尺单位是 mm。分辨率是多少？",
+  "options": [
+   "1 mm",
+   "0.1 mm",
+   "0.01 mm",
+   "10 mm"
+  ],
+  "answer": 1,
+  "explain": "1 mm ÷ 10 = 0.1 mm。",
+  "id": "Q-PHY11-17",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "num",
+  "kp": [
+   "PHY-IG-1.1-06"
+  ],
+  "difficulty": 3,
+  "q": "On a vernier caliper (resolution 0.1 mm), the main scale reads 23 mm and the 4th vernier mark lines up. What is the reading?",
+  "zh": "游标卡尺（分辨率 0.1 mm）主尺读数 23 mm，游标第 4 格对齐。读数是多少？",
+  "answer": 23.4,
+  "unit": "mm",
+  "tol": 0.0001,
+  "explain": "23 + 4 × 0.1 = 23.4 mm。",
+  "id": "Q-PHY11-18",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "num",
+  "kp": [
+   "PHY-IG-1.1-07"
+  ],
+  "difficulty": 3,
+  "q": "A micrometer screw gauge shows 5.5 mm on the sleeve and 0.28 mm on the thimble. What is the reading?",
+  "zh": "螺旋测微器套筒读数 5.5 mm，微分筒读数 0.28 mm。读数是多少？",
+  "answer": 5.78,
+  "unit": "mm",
+  "tol": 0.0001,
+  "explain": "5.5 + 0.28 = 5.78 mm。",
+  "id": "Q-PHY11-19",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "PHY-IG-1.1-08"
+  ],
+  "difficulty": 1,
+  "q": "_____ is the difference between the measured value and the true value.",
+  "zh": "测量值与真实值之差叫什么？",
+  "options": [
+   "Precision",
+   "Error",
+   "Uncertainty",
+   "Resolution"
+  ],
+  "answer": 1,
+  "explain": "error = measured value − true value。",
+  "id": "Q-PHY11-20",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "PHY-IG-1.1-11"
+  ],
+  "difficulty": 1,
+  "q": "_____ describes how close a set of repeated measurements are to one another.",
+  "zh": "描述多次测量结果彼此接近程度的是？",
+  "options": [
+   "Accuracy",
+   "Precision",
+   "Error",
+   "Resolution"
+  ],
+  "answer": 1,
+  "explain": "precision 精密度：读数彼此之间有多接近。",
+  "id": "Q-PHY11-21",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "PHY-IG-1.1-12"
+  ],
+  "difficulty": 1,
+  "q": "The _____ of a measurement is often written with a '±' sign, showing the range within which the true value lies.",
+  "zh": "常用 ± 表示、说明真实值所在范围的是？",
+  "options": [
+   "uncertainty",
+   "error",
+   "accuracy",
+   "average"
+  ],
+  "answer": 0,
+  "explain": "uncertainty 不确定度，例如 12.4 ± 0.1 cm。",
+  "id": "Q-PHY11-22",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "PHY-IG-1.1-09"
+  ],
+  "difficulty": 2,
+  "q": "In ice water (0 °C) a thermometer reads 2 °C. All its readings are about 2 °C too high. What type of error is this?",
+  "zh": "温度计在冰水（0 °C）中读 2 °C，所有读数都偏高约 2 °C。这是什么误差？",
+  "options": [
+   "Random error",
+   "Systematic (zero) error",
+   "Parallax error only",
+   "No error"
+  ],
+  "answer": 1,
+  "explain": "每次都偏同一方向、同样多，是系统误差；在 0 处就不准，叫零点误差。",
+  "id": "Q-PHY11-23",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "short",
+  "kp": [
+   "PHY-IG-1.1-10"
+  ],
+  "difficulty": 2,
+  "q": "The thermometer above reads 2 °C too high every time. How can this error be reduced?",
+  "zh": "上题的温度计每次都偏高 2 °C，怎样减小这个误差？",
+  "model": "Subtract 2 °C from every reading, or calibrate the thermometer. (Repeating and averaging does NOT remove a systematic error.)",
+  "points": [
+   "每个读数减 2 °C 或校准",
+   "多测求平均不能消除系统误差"
+  ],
+  "explain": "",
+  "id": "Q-PHY11-24",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "short",
+  "kp": [
+   "PHY-IG-1.1-10"
+  ],
+  "difficulty": 2,
+  "q": "State one way to reduce random error.",
+  "zh": "写出一种减小随机误差的方法。",
+  "model": "Repeat the measurement several times and calculate the average.",
+  "points": [
+   "重复测量",
+   "求平均"
+  ],
+  "explain": "",
+  "id": "Q-PHY11-25",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "short",
+  "kp": [
+   "PHY-IG-1.1-10",
+   "PHY-IG-1.1-05"
+  ],
+  "difficulty": 3,
+  "q": "Describe TWO methods to reduce error when measuring the diameter of a thin wire.",
+  "zh": "描述两种测细铜丝直径时减小误差的方法。",
+  "model": "1. Wind the wire tightly around a pencil many times (e.g. 20 turns), measure the total length and divide by the number of turns. 2. Measure the diameter at several different places along the wire and take the average.",
+  "points": [
+   "绕多圈测总长再除以圈数",
+   "在不同位置多测几次取平均"
+  ],
+  "explain": "",
+  "id": "Q-PHY11-26",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "num",
+  "kp": [
+   "PHY-IG-1.1-10",
+   "MATH-PRE-AVG"
+  ],
+  "difficulty": 2,
+  "q": "Five readings of a book's thickness are 40.31, 40.29, 40.30, 40.30 and 40.30 mm. Calculate the average.",
+  "zh": "书的厚度五次读数为 40.31、40.29、40.30、40.30、40.30 mm，求平均值。",
+  "answer": 40.3,
+  "unit": "mm",
+  "tol": 0.0001,
+  "explain": "总和 201.50 ÷ 5 = 40.30 mm。",
+  "id": "Q-PHY11-27",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "PHY-IG-1.1-11"
+  ],
+  "difficulty": 3,
+  "q": "The true thickness of the book is 40.00 mm, but the average of the five readings is 40.30 mm and the readings are all very close together. The readings are:",
+  "zh": "书的真实厚度是 40.00 mm，五次读数平均 40.30 mm 且彼此很接近。这些读数：",
+  "options": [
+   "accurate and precise",
+   "precise but not accurate",
+   "accurate but not precise",
+   "neither accurate nor precise"
+  ],
+  "answer": 1,
+  "explain": "读数彼此接近，所以精密；平均值偏离真实值 0.30 mm，所以不准确。",
+  "id": "Q-PHY11-28",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "short",
+  "kp": [
+   "PHY-IG-1.1-11"
+  ],
+  "difficulty": 3,
+  "q": "Explain the difference between accuracy and precision.",
+  "zh": "解释准确度和精密度的区别。",
+  "model": "Accuracy is how close a measurement (or the average) is to the true value. Precision is how close repeated measurements are to each other.",
+  "points": [
+   "accuracy 看离真实值多近",
+   "precision 看读数彼此多接近"
+  ],
+  "explain": "",
+  "id": "Q-PHY11-29",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "PHY-IG-1.1-13"
+  ],
+  "difficulty": 1,
+  "q": "Which statement about a vector quantity is correct?",
+  "zh": "关于矢量，哪句话正确？",
+  "options": [
+   "It has magnitude only",
+   "It has magnitude and direction",
+   "It has direction only",
+   "It is always positive"
+  ],
+  "answer": 1,
+  "explain": "矢量既有大小又有方向。",
+  "id": "Q-PHY11-30",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "PHY-IG-1.1-14"
+  ],
+  "difficulty": 2,
+  "q": "Which list contains only vector quantities?",
+  "zh": "哪一组全部是矢量？",
+  "options": [
+   "speed, mass, time",
+   "force, velocity, acceleration",
+   "energy, temperature, distance",
+   "mass, weight, speed"
+  ],
+  "answer": 1,
+  "explain": "force、velocity、acceleration 都有方向；speed、mass、time、energy、temperature、distance 是标量。",
+  "id": "Q-PHY11-31",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "mcq",
+  "kp": [
+   "PHY-IG-1.1-14"
+  ],
+  "difficulty": 2,
+  "q": "Which is a scalar quantity?",
+  "zh": "哪个是标量？",
+  "options": [
+   "weight",
+   "momentum",
+   "temperature",
+   "velocity"
+  ],
+  "answer": 2,
+  "explain": "temperature 只有大小。weight 是力，是矢量。",
+  "id": "Q-PHY11-32",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "num",
+  "kp": [
+   "PHY-IG-1.1-15"
+  ],
+  "difficulty": 2,
+  "q": "Two forces of 3 N (east) and 4 N (north) act on an object. Calculate the size of the resultant force.",
+  "zh": "3 N（向东）和 4 N（向北）两个力作用在物体上，求合力大小。",
+  "answer": 5,
+  "unit": "N",
+  "tol": 0.001,
+  "explain": "√(3² + 4²) = 5 N。",
+  "id": "Q-PHY11-33",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "num",
+  "kp": [
+   "PHY-IG-1.1-15"
+  ],
+  "difficulty": 3,
+  "q": "A boat moves at 12 m/s across a river while the river flows at 5 m/s at right angles to it. Calculate the size of the resultant velocity.",
+  "zh": "船以 12 m/s 横渡，水流 5 m/s 与之垂直。求合速度大小。",
+  "answer": 13,
+  "unit": "m/s",
+  "tol": 0.001,
+  "explain": "√(12² + 5²) = √169 = 13 m/s。",
+  "id": "Q-PHY11-34",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ },
+ {
+  "type": "num",
+  "kp": [
+   "PHY-IG-1.1-15"
+  ],
+  "difficulty": 3,
+  "q": "For the 3 N east and 4 N north forces, find the angle of the resultant measured from east (to the nearest degree).",
+  "zh": "对 3 N 向东、4 N 向北的两个力，求合力与正东方向的夹角（取整度）。",
+  "answer": 53,
+  "unit": "°",
+  "tol": 0.6,
+  "explain": "tan θ = 4/3，θ ≈ 53°（东偏北）。",
+  "id": "Q-PHY11-35",
+  "kid": "jiejie",
+  "source": "AI生成，已人工核对答案"
+ }
+]

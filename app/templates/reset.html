@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block body %}
+<div style="max-width:420px;margin:24px auto">
+  <h1>重设密码</h1>
+  {% if not target %}
+  <div class="card"><p>这个链接无效、已经用过或已过期。请联系管理员重新生成。</p><a class="btn" href="/login">去登录</a></div>
+  {% else %}
+  {% if error %}<div class="err">{{ error }}</div>{% endif %}
+  <form method="post" class="card">
+    <p>账号：<b>{{ target.email }}</b></p>
+    <label>新密码（至少 6 位）</label><input type="password" name="password" required minlength="6" autocomplete="new-password">
+    <label>再输一遍</label><input type="password" name="password2" required minlength="6" autocomplete="new-password">
+    <div style="margin-top:16px"><button class="btn" style="width:100%">保存新密码</button></div>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/reading" class="small">← 阅读</a>
+<h1>{{ r.title }}</h1>
+<p class="muted small">{{ '点一下不懂的单词就能查。' if r.lang == 'en' else '用手指长按/鼠标选中不懂的字词就能查；点一个句子可以问「这句什么意思」。' }} 已查 <span id="nlook">{{ looked|length }}</span> 个。</p>
+<div class="row" style="margin-bottom:8px"><input type="text" id="manual" class="grow" placeholder="也可以直接输入要查的词"><button class="btn sm" id="manualbtn">查</button></div>
+<div class="card reader" id="reader" lang="{{ 'en' if r.lang == 'en' else 'zh-CN' }}">{% for p in paras %}<p>{{ p }}</p>{% endfor %}</div>
+{% if questions %}
+<div class="card" id="qs"><h3 style="margin-top:0">读完了？做 {{ questions|length }} 道小题</h3>
+{% for q in questions %}{% set qi = loop.index0 %}<div class="rq" data-i="{{ qi }}" style="margin-bottom:12px"><div><b>{{ loop.index }}. {{ q.q }}</b></div>
+{% for o in q.options %}<button class="opt" data-o="{{ loop.index0 }}">{{ 'ABCD'[loop.index0] }}. {{ o }}</button>{% endfor %}<div class="fbq"></div></div>{% endfor %}
+</div>{% endif %}
+<div class="row"><button class="btn" id="finish">✅ 读完打卡</button><span class="muted small">计时：<span id="timer">0</span> 分钟</span></div>
+
+<div class="sheet" id="sheet"><button class="btn ghost sm close" onclick="closeSheet()">关闭</button><div id="sheetbody"></div></div>
+<button class="btn" id="selbtn" style="position:fixed;right:16px;bottom:90px;display:none;z-index:20">查「<span></span>」</button>
+<script>
+const RID = {{ r.id }}, LANG = {{ r.lang|tojson }};
+const t0 = Date.now(); setInterval(() => $('#timer').textContent = Math.round((Date.now() - t0) / 60000), 15000);
+const looked = new Set({{ looked|map(attribute='q')|list|tojson }}.map(s => s.toLowerCase()));
+// 把正文拆成可点的单词 / 句子
+$$('#reader p').forEach(p => {
+  const text = p.textContent;
+  if (LANG === 'en') {
+    p.innerHTML = text.split(/([A-Za-z][A-Za-z'’-]*)/).map((s, i) => i % 2 ? `<span class="w${looked.has(s.toLowerCase()) ? ' seen' : ''}">${esc(s)}</span>` : esc(s)).join('');
+  } else {
+    p.innerHTML = text.split(/(?<=[。！？；!?])/).map(s => `<span class="s">${esc(s)}</span>`).join('');
+  }
+});
+function sentenceOf(el) {
+  const para = el.closest('p').textContent;
+  if (LANG !== 'en') return el.closest('.s') ? el.closest('.s').textContent : para;
+  const sents = para.match(/[^.!?]+[.!?]*["”’]?\s*/g) || [para];
+  let pos = 0, before = 0; for (const n of el.closest('p').childNodes) { if (n === el) { before = pos; break; } pos += n.textContent.length; }
+  let acc = 0; for (const s of sents) { if (before < acc + s.length) return s.trim(); acc += s.length; } return para;
+}
+function openSheet(html) { $('#sheetbody').innerHTML = html; $('#sheet').classList.add('on'); }
+function closeSheet() { $('#sheet').classList.remove('on'); }
+async function lookup(q, ctx, el) {
+  openSheet(`<h2 style="margin-top:0">${esc(q)}</h2><span class="loading">正在查</span>`);
+  let r;
+  try { r = await api('/api/lookup', {q, context: ctx, lang: LANG, reading_id: RID}); }
+  catch (e) { openSheet(`<h2 style="margin-top:0">${esc(q)}</h2><div class="err">${esc(e.message)}</div>` + manualSave(q, ctx)); bindManual(q, ctx); return; }
+  if (el) el.classList.add('seen'); looked.add(q.toLowerCase()); $('#nlook').textContent = looked.size;
+  const head = LANG === 'en' ? `${esc(r.word || q)} <span class="muted small">${esc(r.phonetic || '')} ${esc(r.pos || '')}</span>` : `${esc(r.word || q)} <span class="muted small">${esc(r.pinyin || '')}</span>`;
+  openSheet(`<h2 style="margin-top:0">${head}</h2>
+    <p><b>${esc(r.meaning)}</b>${r.simple_en ? `<br><span class="muted small">${esc(r.simple_en)}</span>` : ''}</p>
+    ${r.other_meanings && r.other_meanings.length ? `<p class="small">其他意思：${r.other_meanings.map(esc).join('；')}</p>` : ''}
+    ${r.near && r.near.length ? `<p class="small">近义：${r.near.map(esc).join('、')}${r.opposite && r.opposite.length ? '　反义：' + r.opposite.map(esc).join('、') : ''}</p>` : ''}
+    ${r.example ? `<p class="small">例：${esc(r.example)}${r.example_zh ? `<br><span class="muted">${esc(r.example_zh)}</span>` : ''}</p>` : ''}
+    ${r.tip ? `<div class="hint">💡 ${esc(r.tip)}</div>` : ''}
+    <p class="small muted">原句：${esc(ctx)}</p>
+    <div class="row"><button class="btn" id="fav">⭐ 收藏到生词本</button><button class="btn ghost" id="expl">这句看不懂</button></div>
+    <div id="favmsg"></div>
+    <h3>✏️ 用它造个句子</h3><div class="row"><input type="text" id="mysent" class="grow" placeholder="${LANG === 'en' ? 'Write a sentence with ' + esc(r.word || q) : '用「' + esc(r.word || q) + '」写一句话'}"><button class="btn sm" id="chk">让 AI 看看</button></div><div id="sentfb"></div><div id="explbox"></div>`);
+  $('#fav').onclick = async () => {
+    await api('/api/cards', {kind: 'word', front: r.word || q, back: r.meaning + (r.phonetic ? '  ' + r.phonetic : '') + (r.pinyin ? '  ' + r.pinyin : ''), extra: {context: ctx, example: r.example, lang: LANG, reading_id: RID}});
+    $('#favmsg').innerHTML = '<p class="small" style="color:var(--ok)">已收藏，明天开始复习 ✓</p>'; $('#fav').disabled = true;
+  };
+  $('#expl').onclick = () => explain(ctx);
+  $('#chk').onclick = async () => {
+    const s = $('#mysent').value.trim(); if (!s) return;
+    $('#sentfb').innerHTML = '<span class="loading">AI 正在看</span>';
+    try { const f = await api('/api/sentence', {word: r.word || q, meaning: r.meaning, sentence: s, lang: LANG});
+      $('#sentfb').innerHTML = `<div class="fb ${f.ok ? 'ok' : 'no'}">${esc(f.praise)}${f.issue ? '<br>⚠️ ' + esc(f.issue) : ''}${f.corrected ? '<br>改正：' + esc(f.corrected) : ''}${f.better ? '<br><span class="muted">示范：' + esc(f.better) + '</span>' : ''}</div>`;
+    } catch (e) { $('#sentfb').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+  };
+}
+function manualSave(q, ctx) { return `<p class="small">AI 暂时不能用。你可以查纸质词典后自己写意思收藏：</p><input type="text" id="mmean" placeholder="意思"><div style="margin-top:8px"><button class="btn" id="msave">收藏</button></div>`; }
+function bindManual(q, ctx) { const b = $('#msave'); if (b) b.onclick = async () => { await api('/api/cards', {kind: 'word', front: q, back: $('#mmean').value, extra: {context: ctx, lang: LANG}}); b.textContent = '已收藏 ✓'; b.disabled = true; }; }
+async function explain(sentence) {
+  const box = $('#explbox') || (openSheet('<div id="explbox"></div>'), $('#explbox'));
+  box.innerHTML = '<span class="loading">AI 正在拆这句话</span>';
+  try { const e = await api('/api/explain', {sentence, lang: LANG});
+    box.innerHTML = `<div class="card" style="margin:8px 0"><p class="small muted">${esc(sentence)}</p><p><b>意思：</b>${esc(e.meaning)}</p><p><b>结构：</b>${esc(e.structure)}</p>${(e.points || []).map(p => `<p class="small">• <b>${esc(p.text)}</b>：${esc(p.note)}</p>`).join('')}</div>`;
+  } catch (er) { box.innerHTML = `<div class="err">${esc(er.message)}</div>`; }
+}
+$('#reader').addEventListener('click', e => {
+  if (LANG === 'en' && e.target.classList.contains('w')) { lookup(e.target.textContent, sentenceOf(e.target), e.target); return; }
+  if (LANG !== 'en' && e.target.classList.contains('s') && !String(getSelection()).trim()) {
+    const s = e.target.textContent; openSheet(`<p>${esc(s)}</p><div class="row"><button class="btn" id="ex2">这句什么意思？</button></div><p class="muted small">要查某个词：长按/拖动选中它。</p><div id="explbox"></div>`);
+    $('#ex2').onclick = () => explain(s);
+  }
+});
+document.addEventListener('selectionchange', () => {
+  const s = String(getSelection()).trim();
+  if (s && s.length <= 16 && $('#reader').contains(getSelection().anchorNode)) { $('#selbtn span').textContent = s; $('#selbtn').style.display = ''; }
+  else $('#selbtn').style.display = 'none';
+});
+$('#selbtn').onclick = () => { const sel = getSelection(); const s = String(sel).trim(); const el = sel.anchorNode.parentElement; lookup(s, el.closest('.s') ? el.closest('.s').textContent : el.closest('p').textContent); $('#selbtn').style.display = 'none'; };
+$('#manualbtn').onclick = () => { const q = $('#manual').value.trim(); if (q) lookup(q, ''); };
+const answers = {};
+$$('.rq .opt').forEach(b => b.onclick = () => { const q = b.closest('.rq'); $$('.opt', q).forEach(x => x.classList.remove('sel')); b.classList.add('sel'); answers[q.dataset.i] = b.dataset.o; });
+$('#finish').onclick = async () => {
+  const r = await api(`/api/reading/${RID}/finish`, {minutes: Math.max(1, Math.round((Date.now() - t0) / 60000)), answers});
+  r.results.forEach((x, i) => { const q = $(`.rq[data-i="${i}"]`); if (!q) return;
+    $$('.opt', q).forEach(o => { if (+o.dataset.o === +x.answer) o.classList.add('right'); else if (o.classList.contains('sel')) o.classList.add('wrong'); });
+    $('.fbq', q).innerHTML = `<div class="small muted">${esc(x.explain)}</div>`; });
+  $('#finish').textContent = '已打卡 ✓'; $('#finish').disabled = true;
+};
+</script>
+{% endblock %}

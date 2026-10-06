@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/subjects" class="small">← 学科</a>
+<h1>{{ pack.subject_name }} 诊断报告</h1>
+<p class="muted">共测 {{ rep.ok|length + rep.weak|length }} 个知识点：通过 {{ rep.ok|length }}，需要补 {{ rep.weak|length }}。</p>
+{% if rep.roots %}
+<div class="card"><h3 style="margin-top:0">🎯 最该先补的「断点」</h3>
+<p class="muted small">这些点做错了，而它们的前置都没问题——从这里补起，后面的会跟着顺。</p>
+{% for d in rep.roots %}{% set k = kp(d.kp) %}<a class="kp" href="/learn/{{ k.id }}"><span class="n">{{ k.name }} <span class="muted small">{{ stage_label(k.stage) }}</span></span><span class="pill st-weak">去补</span></a>{% endfor %}</div>
+{% endif %}
+{% if rep.weak %}
+<div class="card"><h3 style="margin-top:0">需要加强</h3>
+{% for d in rep.weak %}{% set k = kp(d.kp) %}<a class="kp" href="/learn/{{ k.id }}"><span class="n">{{ k.name }}{% if d.from %} <span class="muted small">← 由「{{ kp(d.from).name }}」追溯</span>{% endif %}</span><span class="pill st-weak">薄弱</span></a>
+<div class="small muted" style="margin:-2px 0 8px 10px">方法：{{ k.method }}</div>{% endfor %}</div>
+{% endif %}
+{% if rep.ok %}
+<div class="card"><h3 style="margin-top:0">已经会了 👍</h3>
+{% for d in rep.ok %}{% set k = kp(d.kp) %}<span class="pill st-mastered">{{ k.name }}</span> {% endfor %}</div>
+{% endif %}
+<p>今天的计划已按诊断结果更新。<a class="btn" href="/today">去看今日计划</a></p>
+{% endblock %}

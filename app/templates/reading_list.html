@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>阅读</h1>
+<p class="muted small">大量输入是提分的根本。读的时候<b>点一下不懂的词</b>就能查，觉得有用就收藏，收藏的词会自动进入复习，还可以用它造句。</p>
+<div class="card">
+  <h3 style="margin-top:0">✨ AI 给我写一篇（按我的水平）</h3>
+  <form method="post" action="/reading/new" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='正在写，约半分钟…'">
+    <input type="hidden" name="mode" value="ai">
+    <div class="row"><div class="grow"><label>语言</label><select name="lang"><option value="en" {{ 'selected' if lang=='en' }}>英文</option><option value="zh" {{ 'selected' if lang=='zh' }}>中文</option></select></div>
+    <div class="grow"><label>长度</label><select name="length"><option value="">标准</option><option value="很短，80-120 词（中文 300 字左右）">短一点</option><option value="长一些，300-400 词（中文 1000 字左右）">长一点</option></select></div></div>
+    <label>想读什么？（选填）</label><input type="text" name="topic" placeholder="例如：恐龙、足球、太空、友谊、电和磁…">
+    <p class="muted small">英文短文会自动用上你最近要复习的生词。</p>
+    <button class="btn">生成短文</button>
+  </form>
+</div>
+<details class="card"><summary><b>📋 读自己的书 / 课文：粘贴进来</b></summary>
+  <form method="post" action="/reading/new">
+    <input type="hidden" name="mode" value="paste">
+    <label>语言</label><select name="lang"><option value="en">英文</option><option value="zh">中文</option></select>
+    <label>标题</label><input type="text" name="title" placeholder="例如：Charlotte's Web 第 3 章">
+    <label>正文</label><textarea name="body" required placeholder="把要读的段落粘贴到这里"></textarea>
+    <div style="margin-top:8px"><button class="btn">开始读</button></div>
+  </form></details>
+<h2>我读过的</h2>
+{% for r in rows %}
+<a class="kp" href="/reading/{{ r.id }}"><span class="n">{{ r.title }} <span class="muted small">{{ '英文' if r.lang=='en' else '中文' }} · {{ r.created_at[:10] }}</span></span><span class="pill {{ 'st-mastered' if r.finished_at else 'st-unknown' }}">{{ '读完 ' ~ r.minutes ~ ' 分钟' if r.finished_at else '未读完' }}</span></a>
+{% else %}<p class="muted">还没有阅读记录。</p>{% endfor %}
+{% endblock %}

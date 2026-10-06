@@ -1,0 +1,4169 @@
+{
+ "pack": {
+  "id": "eng-shanghai",
+  "subject": "english",
+  "subject_name": "英语",
+  "edition": "上海牛津版（小学·初中）+ 上海高中英语新教材",
+  "region": "上海公办",
+  "stages": [
+   "G1",
+   "G2",
+   "G3",
+   "G4",
+   "G5",
+   "G6",
+   "G7",
+   "G8",
+   "G9",
+   "G10",
+   "G11",
+   "G12"
+  ],
+  "version": 1,
+  "generated": "2026-10-06",
+  "sources": [
+   "《英语（牛津上海版）》1A–5B，上海教育出版社（小学，试用本/修订版）",
+   "《英语（牛津上海版）》6A–9B，上海教育出版社（初中，五四学制）",
+   "《普通高中教科书·英语》必修第一至三册、选择性必修第一至四册，上海外语教育出版社（2020版）",
+   "《义务教育英语课程标准（2022年版）》，教育部",
+   "《普通高中英语课程标准（2017年版2020年修订）》，教育部",
+   "上海市初中学业水平考试英语学科考试说明/命题要求（上海市教育考试院）",
+   "上海市普通高校招生统一文化考试英语科考试说明（含英语听说测试），上海市教育考试院 https://www.shmeea.edu.cn"
+  ],
+  "notes": "覆盖上海公办学校1–12年级英语：小学1A–5B、初中6A–9B采用牛津上海版（5+4学制，六年级为预备年级），高中采用上外版新教材，对接上海中考（含听说测试、句型转换、首字母填空、回答问题、作文）与上海高考（语法填空、11选10词汇、完形、六选四、概要写作、汉译英、作文、英语听说测试）。“unit”仅为大致教材位置提示，教材各轮修订后模块与单元顺序可能调整，以学校实际进度为准；stage 为首次系统学习的年级。未摘录任何教材原文。小学阶段（尤其三年级）拆分较细，侧重自然拼读、核心句型和主题词汇。"
+ },
+ "strands": [
+  {
+   "id": "PHO",
+   "name": "语音"
+  },
+  {
+   "id": "VOC",
+   "name": "词汇"
+  },
+  {
+   "id": "GRA",
+   "name": "语法"
+  },
+  {
+   "id": "REA",
+   "name": "阅读"
+  },
+  {
+   "id": "WRI",
+   "name": "写作"
+  },
+  {
+   "id": "LIS",
+   "name": "听说"
+  }
+ ],
+ "kps": [
+  {
+   "id": "ESH-PHO-01",
+   "strand": "PHO",
+   "stage": "G1",
+   "term": "全",
+   "unit": "1A–1B 各模块 Letters",
+   "name": "26个字母认读与大小写",
+   "name_en": "The alphabet: letter names, upper & lower case",
+   "desc": "能按顺序唱、读26个字母，看到任意大写或小写字母都能说出名称并配对。",
+   "prereqs": [],
+   "hot": false,
+   "method": "先唱字母歌，再用磁贴字母玩“找朋友”（大写配小写），每天只攻4–5个。常见错误：b/d、p/q、m/n 混淆，可用手势“左手b右手d”帮助区分。",
+   "probe": "随机打乱给出8个小写字母（含b、d、p、q），请孩子说出名称并写出对应大写。",
+   "terms": [
+    "Aa–Zz",
+    "alphabet",
+    "capital letter",
+    "small letter",
+    "ABC song"
+   ]
+  },
+  {
+   "id": "ESH-LIS-01",
+   "strand": "LIS",
+   "stage": "G1",
+   "term": "上",
+   "unit": "1A Module 1",
+   "name": "问候与告别",
+   "name_en": "Greetings and goodbyes",
+   "desc": "能在真实场景中主动用 Hello/Hi、Good morning/afternoon、Goodbye 问候和告别，并正确回应。",
+   "prereqs": [],
+   "hot": false,
+   "method": "每天早上、放学固定用英语互相问候，家长先示范再角色互换。常见错误：下午也说 Good morning，可按时钟贴“早/午”提示卡。",
+   "probe": "出示下午3点的钟面和见到老师的图片，问孩子应该怎么打招呼。",
+   "terms": [
+    "Hello",
+    "Hi",
+    "Good morning",
+    "Good afternoon",
+    "Goodbye",
+    "See you"
+   ]
+  },
+  {
+   "id": "ESH-LIS-02",
+   "strand": "LIS",
+   "stage": "G1",
+   "term": "上",
+   "unit": "1A Module 1",
+   "name": "课堂指令（TPR）",
+   "name_en": "Classroom instructions",
+   "desc": "听到 Stand up、Sit down、Open/Close your book 等常用指令能立即做出正确动作。",
+   "prereqs": [],
+   "hot": false,
+   "method": "用“老师说”(Simon says) 游戏练习，听到指令马上做动作，不需要翻译成中文。常见错误：open 和 close 听反，可用打开/合上书的动作反复对比。",
+   "probe": "家长连续发出4个指令（如 Open your book. Show me your pencil.），观察孩子动作是否全部正确。",
+   "terms": [
+    "Stand up",
+    "Sit down",
+    "Open your book",
+    "Close your book",
+    "Listen",
+    "Look",
+    "Point to"
+   ]
+  },
+  {
+   "id": "ESH-GRA-01",
+   "strand": "GRA",
+   "stage": "G1",
+   "term": "上",
+   "unit": "1A Module 1 Unit 2",
+   "name": "自我介绍与介绍他人",
+   "name_en": "I'm... / This is...",
+   "desc": "能用 I'm ... 介绍自己，用 This is ... 介绍同伴或家人，并回应 Nice to meet you。",
+   "prereqs": [
+    {
+     "id": "ESH-LIS-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "拿家庭照片做“小主持人”，一张张介绍：This is my mum. 常见错误：介绍别人时说 I'm Tom 或 He is ... 不看对象，要强调“指着人用 This is”。",
+   "probe": "给一张两人合影，请孩子先介绍自己再介绍照片里的朋友。",
+   "terms": [
+    "I'm ...",
+    "This is ...",
+    "Nice to meet you",
+    "my friend",
+    "my mum",
+    "my dad"
+   ]
+  },
+  {
+   "id": "ESH-VOC-01",
+   "strand": "VOC",
+   "stage": "G1",
+   "term": "上",
+   "unit": "1A Module 2",
+   "name": "数字1–10",
+   "name_en": "Numbers 1–10",
+   "desc": "能听说读认1–10，能用数字回答数量问题，能听数字拍手。",
+   "prereqs": [],
+   "hot": false,
+   "method": "上下楼梯时用英语数台阶，玩“拍手数数”游戏。常见错误：three 发成 /sri:/，要把舌尖放在上下齿之间。",
+   "probe": "家长随机说5个数字，孩子举出对应手指数。",
+   "terms": [
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "seven",
+    "nine",
+    "ten"
+   ]
+  },
+  {
+   "id": "ESH-VOC-02",
+   "strand": "VOC",
+   "stage": "G1",
+   "term": "上",
+   "unit": "1A Module 2",
+   "name": "颜色词",
+   "name_en": "Colours",
+   "desc": "能认读常见颜色词并用 It's red. 描述物体颜色。",
+   "prereqs": [],
+   "hot": false,
+   "method": "家里“寻宝”：家长说 Find something blue! 孩子去找。常见错误：说成 It's a red，颜色词前不要加 a。",
+   "probe": "指着三样不同颜色的物品，问 What colour is it?，看孩子能否正确回答。",
+   "terms": [
+    "red",
+    "yellow",
+    "blue",
+    "green",
+    "black",
+    "white",
+    "orange",
+    "pink"
+   ]
+  },
+  {
+   "id": "ESH-VOC-03",
+   "strand": "VOC",
+   "stage": "G1",
+   "term": "上",
+   "unit": "1A Module 1 Unit 3",
+   "name": "五官与身体部位",
+   "name_en": "Face and body parts",
+   "desc": "能说出眼耳口鼻等五官和手脚等身体部位，听指令 Touch your nose 做动作。",
+   "prereqs": [
+    {
+     "id": "ESH-LIS-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "唱 Head, Shoulders, Knees and Toes 并边唱边摸。常见错误：单复数不分（an eye/two eyes），先只要求会说词，二年级再纠正复数。",
+   "probe": "说出 Touch your ear/mouth/hand，看孩子摸得对不对。",
+   "terms": [
+    "eye",
+    "ear",
+    "nose",
+    "mouth",
+    "face",
+    "hand",
+    "arm",
+    "leg"
+   ]
+  },
+  {
+   "id": "ESH-GRA-02",
+   "strand": "GRA",
+   "stage": "G1",
+   "term": "下",
+   "unit": "1B Module 1",
+   "name": "这是什么？",
+   "name_en": "What's this? It's a ...",
+   "desc": "能用 What's this? 提问并用 It's a/an ... 回答，认识常见物品与动物名称。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "做“神秘袋”游戏：袋里摸一样东西猜 What's this? It's a ball. 常见错误：漏掉 a，说成 It's ball。",
+   "probe": "出示一张苹果图，请孩子完整说出问答两句。",
+   "terms": [
+    "What's this?",
+    "It's a ...",
+    "It's an apple",
+    "ball",
+    "doll",
+    "kite",
+    "book"
+   ]
+  },
+  {
+   "id": "ESH-VOC-04",
+   "strand": "VOC",
+   "stage": "G1",
+   "term": "下",
+   "unit": "1B Module 2",
+   "name": "动物与食物基础词",
+   "name_en": "Animals and food (basic)",
+   "desc": "能说出10个以上常见动物和10个以上常见食物名称，能模仿动物叫声和动作。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "边看动物绘本边模仿动作说单词；吃饭时说出桌上的食物名。常见错误：中文式发音（如 dog 拖成 /dɔgə/），注意词尾辅音轻收。",
+   "probe": "出示6张动物/食物卡片快闪，孩子1秒内说出名称。",
+   "terms": [
+    "cat",
+    "dog",
+    "bird",
+    "fish",
+    "rice",
+    "egg",
+    "milk",
+    "cake"
+   ]
+  },
+  {
+   "id": "ESH-GRA-03",
+   "strand": "GRA",
+   "stage": "G1",
+   "term": "下",
+   "unit": "1B Module 2",
+   "name": "表达喜好 I like ...",
+   "name_en": "I like ... / Do you like ...?",
+   "desc": "能用 I like ... 表达喜好，听懂 Do you like ...? 并用 Yes, I do. / No, I don't. 回答。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "饭桌上互相问 Do you like eggs? 用拇指向上/向下配合回答。常见错误：回答 Yes, I like. 或 Yes, I am，要强调用 do 回答。",
+   "probe": "问孩子三个 Do you like ...? 问题，检查简略回答是否正确。",
+   "terms": [
+    "I like ...",
+    "Do you like ...?",
+    "Yes, I do.",
+    "No, I don't."
+   ]
+  },
+  {
+   "id": "ESH-LIS-03",
+   "strand": "LIS",
+   "stage": "G1",
+   "term": "全",
+   "unit": "1A–1B Learn the sound / Enjoy a song",
+   "name": "儿歌童谣与语音模仿",
+   "name_en": "Songs, rhymes and sound imitation",
+   "desc": "能跟唱并背诵课本中的儿歌童谣，节奏和发音基本准确，敢于大声开口。",
+   "prereqs": [],
+   "hot": false,
+   "method": "每周学一首儿歌，先听三遍再跟唱，最后边做动作边独立唱。常见错误：只记旋律不出声，要鼓励孩子录音回听。",
+   "probe": "请孩子不看书完整唱一首学过的英语儿歌，听节奏和关键词发音。",
+   "terms": [
+    "rhyme",
+    "chant",
+    "song",
+    "sing",
+    "say"
+   ]
+  },
+  {
+   "id": "ESH-PHO-02",
+   "strand": "PHO",
+   "stage": "G2",
+   "term": "全",
+   "unit": "2A–2B Learn the sound",
+   "name": "字母发音与短元音CVC拼读",
+   "name_en": "Letter sounds & short-vowel CVC words",
+   "desc": "掌握26个字母的常见发音，能拼读 cat、pen、big、hot、bus 等辅音-短元音-辅音单词。",
+   "prereqs": [
+    {
+     "id": "ESH-PHO-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "用字母卡“滑读”：c-a-t 慢慢连成 cat，再换首字母造新词（cat→hat→bat）。常见错误：把字母名称当发音读（c读成/si:/），要区分“名字”和“声音”。",
+   "probe": "给出5个没学过的CVC单词（如 jog、wet、fin），请孩子拼读出来。",
+   "terms": [
+    "cat",
+    "pen",
+    "big",
+    "hot",
+    "bus",
+    "short a",
+    "short e",
+    "short i"
+   ]
+  },
+  {
+   "id": "ESH-WRI-01",
+   "strand": "WRI",
+   "stage": "G2",
+   "term": "全",
+   "unit": "2A–2B Write",
+   "name": "四线三格书写规范",
+   "name_en": "Handwriting on four-line paper",
+   "desc": "能在四线三格中规范书写26个字母大小写和简单单词，词与词之间空一个字母宽。",
+   "prereqs": [
+    {
+     "id": "ESH-PHO-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "每天描红再仿写5个字母，注意“上格、中格、下格”位置（如 g、y 要伸到下格）。常见错误：大写字母只写在中格、f 和 t 高度写错。",
+   "probe": "听写一句短句 I like cats.，检查大写、空格、字母格位和句号。",
+   "terms": [
+    "four-line paper",
+    "capital letter",
+    "space",
+    "full stop"
+   ]
+  },
+  {
+   "id": "ESH-VOC-05",
+   "strand": "VOC",
+   "stage": "G2",
+   "term": "上",
+   "unit": "2A Module 2",
+   "name": "数字11–20与数数",
+   "name_en": "Numbers 11–20",
+   "desc": "能读写11–20并用于计数，能区分 -teen 和 -ty（如 thirteen/thirty）。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "跳绳时用英语计数到20；用数字卡玩“接龙”。常见错误：thirteen 与 thirty 混淆，读时注意 -teen 重读在后。",
+   "probe": "家长读 thirteen、thirty、fifteen、fifty，孩子写出阿拉伯数字。",
+   "terms": [
+    "eleven",
+    "twelve",
+    "thirteen",
+    "fifteen",
+    "twenty",
+    "How many?"
+   ]
+  },
+  {
+   "id": "ESH-GRA-04",
+   "strand": "GRA",
+   "stage": "G2",
+   "term": "上",
+   "unit": "2A Module 2",
+   "name": "How many 与名词复数 -s",
+   "name_en": "How many ...? & plural -s",
+   "desc": "能用 How many ... are there?/can you see? 提问，并用 '数字 + 名词复数' 回答。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "数家里的东西：How many chairs? Four chairs. 每次都强调尾巴加 s。常见错误：How many 后接单数（How many apple），以及数量大于1时忘加 -s。",
+   "probe": "看图说出图中有几只小鸟、几个苹果，检查复数形式。",
+   "terms": [
+    "How many ...?",
+    "two cats",
+    "three books",
+    "apples"
+   ]
+  },
+  {
+   "id": "ESH-GRA-05",
+   "strand": "GRA",
+   "stage": "G2",
+   "term": "上",
+   "unit": "2A Module 1",
+   "name": "be动词 am/is/are",
+   "name_en": "The verb be: am, is, are",
+   "desc": "能根据主语正确选用 am/is/are，说出 I am / He is / They are 等简单句。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "背口诀“我用am，你用are，is跟着他她它，复数全用are”，再做替换练习。常见错误：I is、They is，可让孩子当“小法官”判断对错句子。",
+   "probe": "填空：I ___ Tom. My sisters ___ tall. It ___ a dog.",
+   "terms": [
+    "am",
+    "is",
+    "are",
+    "I'm",
+    "you're",
+    "he's",
+    "they're"
+   ]
+  },
+  {
+   "id": "ESH-GRA-06",
+   "strand": "GRA",
+   "stage": "G2",
+   "term": "上",
+   "unit": "2A Module 2",
+   "name": "能力表达 can",
+   "name_en": "I can ... / Can you ...?",
+   "desc": "能用 I can ... / I can't ... 说出自己的能力，用 Can you ...? 提问并作答。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "做“我能行”海报：画出会做的事并写 I can swim. 常见错误：can 后面加 -s 或 to（I can to swim），强调 can 后直接接动词原形。",
+   "probe": "问 Can you ride a bike? Can you fly?，并请孩子说一句 I can't ...。",
+   "terms": [
+    "I can ...",
+    "I can't ...",
+    "Can you ...?",
+    "Yes, I can.",
+    "No, I can't.",
+    "swim",
+    "run",
+    "dance"
+   ]
+  },
+  {
+   "id": "ESH-GRA-07",
+   "strand": "GRA",
+   "stage": "G2",
+   "term": "下",
+   "unit": "2B Module 3",
+   "name": "方位介词 in/on/under",
+   "name_en": "Where is ...? in/on/under",
+   "desc": "能用 Where is ...? 询问位置，并用 It's in/on/under/behind/near the ... 回答。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把玩具小熊藏在不同位置，让孩子用英语说出位置再去找。常见错误：省略 the（It's on desk），以及 in/on 混用。",
+   "probe": "看一张房间图，回答三个 Where is ...? 问题。",
+   "terms": [
+    "Where is ...?",
+    "in",
+    "on",
+    "under",
+    "behind",
+    "near",
+    "next to"
+   ]
+  },
+  {
+   "id": "ESH-VOC-06",
+   "strand": "VOC",
+   "stage": "G2",
+   "term": "上",
+   "unit": "2A Module 1",
+   "name": "家庭成员称谓",
+   "name_en": "Family members",
+   "desc": "能说出 father/mother/brother/sister/grandpa/grandma 等称谓并用于介绍家人。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "画家庭树，每个人头像下写英文称谓。常见错误：把 brother/sister 混用，或忘记区分 grandpa 和 grandma。",
+   "probe": "看家庭树图回答 Who is he/she? 至少说对4个称谓。",
+   "terms": [
+    "father",
+    "mother",
+    "brother",
+    "sister",
+    "grandfather",
+    "grandmother",
+    "uncle",
+    "aunt"
+   ]
+  },
+  {
+   "id": "ESH-GRA-08",
+   "strand": "GRA",
+   "stage": "G2",
+   "term": "下",
+   "unit": "2B Module 2",
+   "name": "拥有表达 I have ...",
+   "name_en": "I have ... / Do you have ...?",
+   "desc": "能用 I have ... 说出自己拥有的东西，用 Do you have ...? 提问。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "收拾书包时边拿边说 I have a ruler. I have two pencils. 常见错误：中文“有”直译成 There is，或说 I has。",
+   "probe": "请孩子说出铅笔盒里三样东西：I have ...。",
+   "terms": [
+    "I have ...",
+    "Do you have ...?",
+    "Yes, I do.",
+    "a ruler",
+    "a rubber",
+    "a pencil"
+   ]
+  },
+  {
+   "id": "ESH-VOC-07",
+   "strand": "VOC",
+   "stage": "G2",
+   "term": "下",
+   "unit": "2B Module 3",
+   "name": "季节、天气与形状词",
+   "name_en": "Seasons, weather and shapes",
+   "desc": "能说出四季和常见天气（sunny/rainy/windy/cloudy），能认读圆形、方形、三角形等形状词。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "每天早上看窗外报天气：It's sunny today. 常见错误：sunny 写成 suny，rain 和 rainy 词性混用（It's rain）。",
+   "probe": "出示雨天图片问 How's the weather?，并请孩子说出这是哪个季节。",
+   "terms": [
+    "spring",
+    "summer",
+    "autumn",
+    "winter",
+    "sunny",
+    "rainy",
+    "windy",
+    "circle"
+   ]
+  },
+  {
+   "id": "ESH-REA-01",
+   "strand": "REA",
+   "stage": "G2",
+   "term": "全",
+   "unit": "2A–2B Look and read / Listen and enjoy",
+   "name": "图文配对与指读",
+   "name_en": "Picture-text matching and finger reading",
+   "desc": "能借助图片指读由学过单词组成的短句和小故事，并完成图文匹配。",
+   "prereqs": [
+    {
+     "id": "ESH-PHO-02",
+     "strength": "有帮助"
+    },
+    {
+     "id": "ESH-GRA-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "睡前和孩子共读分级绘本，孩子用手指点着每个词读。常见错误：只看图编故事不看字，要求读一句点一句。",
+   "probe": "给出4句话和4幅图，请孩子连线匹配并读出句子。",
+   "terms": [
+    "read",
+    "look",
+    "match",
+    "story",
+    "picture"
+   ]
+  },
+  {
+   "id": "ESH-PHO-03",
+   "strand": "PHO",
+   "stage": "G3",
+   "term": "上",
+   "unit": "3A Learn the sounds",
+   "name": "辅音连缀拼读",
+   "name_en": "Consonant blends (bl, cl, fl, gr, tr, st...)",
+   "desc": "能拼读并拼写含 bl/cl/fl/pl/br/cr/dr/gr/tr/st/sn/sw 等辅音连缀的单词，两个辅音音都要发出来。",
+   "prereqs": [
+    {
+     "id": "ESH-PHO-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把连缀做成“双胞胎卡”，先快速连读 bl-bl-bl，再接韵尾 -ack 组成 black；每天5个词听写。常见错误：在两个辅音间加元音（black 读成 /bəlæk/），要求一口气连读。",
+   "probe": "听写 frog、clap、stop、grass、swim，看连缀是否写全。",
+   "terms": [
+    "black",
+    "clap",
+    "flag",
+    "grass",
+    "tree",
+    "star",
+    "swim",
+    "snake"
+   ]
+  },
+  {
+   "id": "ESH-PHO-04",
+   "strand": "PHO",
+   "stage": "G3",
+   "term": "上",
+   "unit": "3A Learn the sounds",
+   "name": "字母组合 sh/ch/th/wh/ck/ng",
+   "name_en": "Consonant digraphs",
+   "desc": "知道 sh、ch、th、wh、ck、ng 两个字母只发一个音，能据此拼读和拼写单词。",
+   "prereqs": [
+    {
+     "id": "ESH-PHO-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做手势记音：sh 食指放嘴前“嘘”，ch 像小火车 ch-ch，th 舌头伸出来。常见错误：th 发成 /s/ 或 /z/，镜子前练习舌尖露出。",
+   "probe": "读出 ship、chin、thin、this、duck、sing，再听写其中三个。",
+   "terms": [
+    "ship",
+    "fish",
+    "chick",
+    "lunch",
+    "thin",
+    "this",
+    "duck",
+    "sing"
+   ]
+  },
+  {
+   "id": "ESH-PHO-05",
+   "strand": "PHO",
+   "stage": "G3",
+   "term": "下",
+   "unit": "3B Learn the sounds",
+   "name": "魔力e：长元音 a_e/i_e/o_e/u_e",
+   "name_en": "Magic e (split vowel digraphs)",
+   "desc": "理解词尾不发音的 e 让前面元音读字母本音，能区分 cap/cape、kit/kite 等词对。",
+   "prereqs": [
+    {
+     "id": "ESH-PHO-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "用“魔法棒e”卡片：孩子把e放到 cap 后面变成 cape，大声读出变化。常见错误：把词尾 e 也读出来，或写 cake 时漏掉 e。",
+   "probe": "读词对 hop/hope、cut/cute、pin/pine，并说出哪个是长元音。",
+   "terms": [
+    "cake",
+    "name",
+    "kite",
+    "bike",
+    "home",
+    "nose",
+    "cute",
+    "tube"
+   ]
+  },
+  {
+   "id": "ESH-LIS-04",
+   "strand": "LIS",
+   "stage": "G3",
+   "term": "上",
+   "unit": "3A Module 1 Unit 1–3",
+   "name": "个人信息问答",
+   "name_en": "How are you? / What's your name? / How old are you?",
+   "desc": "能就姓名、年龄、身体状况进行问答，回答完整自然，并会反问 And you?",
+   "prereqs": [
+    {
+     "id": "ESH-LIS-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "家长扮演“新同学”，孩子主动发起三问三答对话，录音回放。常见错误：How old are you? 回答 I'm nine years（漏 old）或 I'm nine old。",
+   "probe": "请孩子与家长进行一段6句的认识新朋友对话，检查三类问答是否正确。",
+   "terms": [
+    "How are you?",
+    "I'm fine, thank you.",
+    "What's your name?",
+    "My name is ...",
+    "How old are you?",
+    "I'm nine."
+   ]
+  },
+  {
+   "id": "ESH-GRA-09",
+   "strand": "GRA",
+   "stage": "G3",
+   "term": "上",
+   "unit": "3A Module 2 Unit 1",
+   "name": "人称代词主格与描述人物",
+   "name_en": "Subject pronouns & describing people",
+   "desc": "能用 I/you/he/she/it/we/they 作主语，并用 He's tall. She's thin. 等句子描述人物外貌。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "看全家福说“猜猜是谁”：He's tall. He has short hair. 让家人猜。常见错误：he/she 不分（受中文“ta”影响），可以给照片贴“男蓝女红”标签提示。",
+   "probe": "看两张人物图，各用两句话描述，检查 he/she 和 be 动词。",
+   "terms": [
+    "he",
+    "she",
+    "they",
+    "tall",
+    "short",
+    "fat",
+    "thin",
+    "He's ..."
+   ]
+  },
+  {
+   "id": "ESH-GRA-10",
+   "strand": "GRA",
+   "stage": "G3",
+   "term": "上",
+   "unit": "3A Module 2 Unit 2",
+   "name": "形容词性物主代词与名词所有格 's",
+   "name_en": "my/your/his/her & 's",
+   "desc": "能用 my/your/his/her/its/our/their 和 Tom's 表示所属关系，介绍家人和物品。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-09",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "整理家里物品时贴标签说：This is Dad's cup. That is my book. 常见错误：he 和 his 混用（This is he book），所有格漏 's。",
+   "probe": "改错：This is she bag. That is Peter pen. 请孩子改正并读出。",
+   "terms": [
+    "my",
+    "your",
+    "his",
+    "her",
+    "our",
+    "their",
+    "Tom's",
+    "Whose?"
+   ]
+  },
+  {
+   "id": "ESH-GRA-11",
+   "strand": "GRA",
+   "stage": "G3",
+   "term": "上",
+   "unit": "3A Module 1–2",
+   "name": "不定冠词 a/an 与可数名词",
+   "name_en": "a / an",
+   "desc": "能根据单词开头的发音（不是字母）选择 a 或 an，正确使用单数可数名词。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-PHO-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把元音音开头的词（apple、egg、orange、umbrella）做成红卡，提醒用 an。常见错误：按字母判断，如 an uniform、a hour，要强调“听发音”。",
+   "probe": "填空：___ egg、___ banana、___ orange、___ umbrella、___ bag。",
+   "terms": [
+    "a",
+    "an",
+    "an apple",
+    "an egg",
+    "an orange",
+    "a banana"
+   ]
+  },
+  {
+   "id": "ESH-GRA-12",
+   "strand": "GRA",
+   "stage": "G3",
+   "term": "上",
+   "unit": "3A Module 3",
+   "name": "名词复数规则 -s/-es/-ies",
+   "name_en": "Regular plurals",
+   "desc": "掌握加 -s、以 s/x/ch/sh 结尾加 -es、辅音+y变 -ies 的规则，能正确拼写复数。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-11",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把规则编成小儿歌并分类贴卡：boxes/watches/buses 一组，babies/cherries 一组。常见错误：toy 写成 toies（元音+y直接加 s），watch 写成 watchs。",
+   "probe": "写出下列复数：box、peach、baby、toy、bus、key。",
+   "terms": [
+    "boxes",
+    "buses",
+    "peaches",
+    "babies",
+    "toys",
+    "keys",
+    "-s",
+    "-es"
+   ]
+  },
+  {
+   "id": "ESH-LIS-05",
+   "strand": "LIS",
+   "stage": "G3",
+   "term": "上",
+   "unit": "3A Module 3 Unit 2",
+   "name": "购物用语 How much?",
+   "name_en": "Shopping: How much is it?",
+   "desc": "能在购物情景中用 Can I help you? / How much is it/are they? / It's ... yuan 完成买卖对话。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-12",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "家里摆“小商店”，用玩具钞票角色扮演买卖，孩子当店员和顾客各一次。常见错误：复数商品仍问 How much is it?，以及把 yuan 加 s。",
+   "probe": "给出价签图，请孩子用英语买两样东西（一件单数一件复数）。",
+   "terms": [
+    "Can I help you?",
+    "How much is it?",
+    "How much are they?",
+    "It's ... yuan",
+    "Here you are.",
+    "Thank you."
+   ]
+  },
+  {
+   "id": "ESH-GRA-13",
+   "strand": "GRA",
+   "stage": "G3",
+   "term": "上",
+   "unit": "3A Module 3 Unit 3",
+   "name": "祈使句与 Let's ...",
+   "name_en": "Imperatives and Let's ...",
+   "desc": "能用动词原形开头的祈使句发出指令或提醒，用 Don't ... 表示禁止，用 Let's ... 提出建议。",
+   "prereqs": [
+    {
+     "id": "ESH-LIS-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "做“交通安全小卫士”：说出 Stop! Don't run! Look left. 并配手势。常见错误：Don't 后加 -ing 或 to，Let's 后接 to do。",
+   "probe": "看公园标志图，说出三条规则，其中至少一条用 Don't。",
+   "terms": [
+    "Stop!",
+    "Don't ...",
+    "Look!",
+    "Let's ...",
+    "Let's go.",
+    "Be careful."
+   ]
+  },
+  {
+   "id": "ESH-GRA-14",
+   "strand": "GRA",
+   "stage": "G3",
+   "term": "下",
+   "unit": "3B Module 3 / 3A Module 3",
+   "name": "There is/There are 存在句",
+   "name_en": "There is / There are",
+   "desc": "能用 There is/are ... 描述某处有什么，并能对应单复数和 How many 提问。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-12",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "描述自己的房间：There is a bed. There are two windows. 常见错误：和 have 混用（There have ...），以及复数用 There is。",
+   "probe": "看街道图写3句 There is/are 句子，并回答 How many shops are there?",
+   "terms": [
+    "There is ...",
+    "There are ...",
+    "Is there ...?",
+    "Are there ...?",
+    "There isn't ..."
+   ]
+  },
+  {
+   "id": "ESH-VOC-08",
+   "strand": "VOC",
+   "stage": "G3",
+   "term": "下",
+   "unit": "3B Module 1",
+   "name": "五感与描述性形容词",
+   "name_en": "Senses and describing adjectives",
+   "desc": "能用 touch/smell/taste/hear/see 和 soft/hard/sweet/sour/loud 等形容词描述事物感受。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "蒙眼摸、闻、尝几样食物，用 It's soft. It smells nice. 说感受。常见错误：It is smell good（多加 is），感官动词后直接接形容词。",
+   "probe": "给一个柠檬，请孩子用三种感官各说一句话描述。",
+   "terms": [
+    "touch",
+    "smell",
+    "taste",
+    "hear",
+    "soft",
+    "hard",
+    "sweet",
+    "sour"
+   ]
+  },
+  {
+   "id": "ESH-LIS-06",
+   "strand": "LIS",
+   "stage": "G3",
+   "term": "下",
+   "unit": "3B Module 2",
+   "name": "礼貌请求 Would you like ...?",
+   "name_en": "Would you like ...? / I'd like ...",
+   "desc": "能用 Would you like ...? 礼貌询问、用 Yes, please. / No, thank you. 回应，用 I'd like ... 表达需求。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "在餐桌上用 Would you like some juice? 互相招待。常见错误：回答 Yes, I would like 或 Yes, I like，要与 Do you like 区分（一个问意愿，一个问喜好）。",
+   "probe": "情景判断：请朋友吃蛋糕怎么问？朋友不想要怎么答？",
+   "terms": [
+    "Would you like ...?",
+    "Yes, please.",
+    "No, thank you.",
+    "I'd like ...",
+    "some",
+    "juice"
+   ]
+  },
+  {
+   "id": "ESH-VOC-09",
+   "strand": "VOC",
+   "stage": "G3",
+   "term": "下",
+   "unit": "3B Module 2",
+   "name": "玩具、衣物与食物主题词汇",
+   "name_en": "Toys, clothes and food",
+   "desc": "按主题掌握玩具、衣服、食物各8–10个词，能用于“我最喜欢的东西”描述。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "按主题做思维导图，中间画衣柜，四周贴单词卡；穿衣服时说 I'm putting on my coat. 常见错误：trousers/shorts/glasses 永远复数，常误用 a trousers。",
+   "probe": "看衣柜图说出6件衣物名称，并判断 a skirt 和 a trousers 哪个对。",
+   "terms": [
+    "T-shirt",
+    "skirt",
+    "trousers",
+    "shoes",
+    "coat",
+    "doll",
+    "kite",
+    "noodles"
+   ]
+  },
+  {
+   "id": "ESH-REA-02",
+   "strand": "REA",
+   "stage": "G3",
+   "term": "全",
+   "unit": "3A–3B Read a story / Look and read",
+   "name": "短文与故事寻找信息",
+   "name_en": "Reading short texts for information",
+   "desc": "能独立朗读60–100词的小故事或对话，并找出 who/what/where 等关键信息回答问题。",
+   "prereqs": [
+    {
+     "id": "ESH-REA-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-14",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "读完一段后用三种颜色笔分别划出人物、地点、事情。常见错误：凭印象回答，不回原文找依据；要求孩子指出答案在第几句。",
+   "probe": "读一则80词小故事后回答3个 Wh- 问题和2个判断对错题。",
+   "terms": [
+    "Who",
+    "What",
+    "Where",
+    "True",
+    "False",
+    "story"
+   ]
+  },
+  {
+   "id": "ESH-WRI-02",
+   "strand": "WRI",
+   "stage": "G3",
+   "term": "下",
+   "unit": "3B Write",
+   "name": "仿写句子：大写、标点与句子完整",
+   "name_en": "Copying and writing sentences",
+   "desc": "能仿照范例写3–5个完整句子介绍自己或家人，句首大写、句末有标点、人名和 I 大写。",
+   "prereqs": [
+    {
+     "id": "ESH-WRI-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "用“填空式模板”：My name is ___. I am ___ years old. I like ___. 先填再独立写。常见错误：句中 i 小写、人名小写、漏句号。",
+   "probe": "请孩子写3句话介绍好朋友，检查大小写和标点。",
+   "terms": [
+    "My name is ...",
+    "I like ...",
+    "He is ...",
+    "capital letter",
+    "full stop",
+    "question mark"
+   ]
+  },
+  {
+   "id": "ESH-PHO-06",
+   "strand": "PHO",
+   "stage": "G4",
+   "term": "上",
+   "unit": "4A Learn the sounds",
+   "name": "元音字母组合 ee/ea/ai/ay/oa/ow/oo",
+   "name_en": "Vowel teams",
+   "desc": "掌握常见元音组合的发音（ee/ea发/i:/、ai/ay发/eɪ/、oa/ow发/əʊ/、oo长短音），能拼读拼写含这些组合的单词。",
+   "prereqs": [
+    {
+     "id": "ESH-PHO-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-PHO-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "口诀“两个元音走一起，第一个说话第二个不出声”，按组合分组做单词墙。常见错误：同音不同形拼错（rain/rane），可通过分类听写巩固。",
+   "probe": "听写 seat、train、boat、snow、moon、book，看组合是否选对。",
+   "terms": [
+    "sheep",
+    "sea",
+    "rain",
+    "play",
+    "boat",
+    "snow",
+    "moon",
+    "book"
+   ]
+  },
+  {
+   "id": "ESH-PHO-07",
+   "strand": "PHO",
+   "stage": "G4",
+   "term": "下",
+   "unit": "4B Learn the sounds",
+   "name": "r控元音 ar/or/er/ir/ur 与 ou/ow/oi/oy",
+   "name_en": "R-controlled vowels & diphthongs",
+   "desc": "能读准 ar/or/er/ir/ur 及 ou/ow/oi/oy，知道 er/ir/ur 发音相同，拼写需结合记忆。",
+   "prereqs": [
+    {
+     "id": "ESH-PHO-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "把 er/ir/ur 同音词放在一张“三胞胎”表上集中记忆（her/bird/nurse）。常见错误：car 读得过于卷舌或丢 r 音不稳定，按英式不卷舌即可。",
+   "probe": "读出 park、fork、girl、turn、house、cow、coin、boy。",
+   "terms": [
+    "car",
+    "fork",
+    "her",
+    "bird",
+    "nurse",
+    "house",
+    "cow",
+    "boy"
+   ]
+  },
+  {
+   "id": "ESH-GRA-15",
+   "strand": "GRA",
+   "stage": "G4",
+   "term": "上",
+   "unit": "4A Module 1–2",
+   "name": "一般现在时与第三人称单数",
+   "name_en": "Present simple & third-person -s",
+   "desc": "能用一般现在时描述习惯与事实，主语是第三人称单数时动词加 -s/-es，会用 does/doesn't 提问和否定。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-09",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做“家人的一天”海报：My dad gets up at 6. He goes to work by car. 每句圈出动词尾巴。常见错误：He like、Does he likes...?、He don't，用“does 出现，动词还原”口诀。",
+   "probe": "改错：She go to school by bus. Does he likes milk? Tom don't swim.",
+   "terms": [
+    "he likes",
+    "she goes",
+    "does",
+    "doesn't",
+    "Does he ...?",
+    "watches",
+    "has"
+   ]
+  },
+  {
+   "id": "ESH-GRA-16",
+   "strand": "GRA",
+   "stage": "G4",
+   "term": "上",
+   "unit": "4A Module 2",
+   "name": "现在进行时",
+   "name_en": "Present continuous",
+   "desc": "能用 be + doing 描述正在发生的动作，掌握 -ing 的变化规则（去e、双写）。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-15",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "玩“我在做什么”哑剧：孩子做动作，家长问 What are you doing? 常见错误：漏 be（I running）或拼错 runing/swiming/writeing。",
+   "probe": "看图写3句正在进行的句子，含 run、write、swim 三个动词。",
+   "terms": [
+    "What are you doing?",
+    "I'm reading.",
+    "She is running.",
+    "swimming",
+    "writing",
+    "now",
+    "Look!"
+   ]
+  },
+  {
+   "id": "ESH-VOC-10",
+   "strand": "VOC",
+   "stage": "G4",
+   "term": "上",
+   "unit": "4A Module 2 Unit 3",
+   "name": "职业与职业问答",
+   "name_en": "Jobs: What does he/she do?",
+   "desc": "能说出10个以上常见职业，用 What does your father do? He's a doctor. 进行问答，知道工作场所。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-15",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "采访家人和小区里的人，做“职业小卡片”：职业名+工作地点+做什么。常见错误：What does he do? 回答 He does doctor；职业名前漏 a。",
+   "probe": "回答 What does a nurse do? Where does a cook work?",
+   "terms": [
+    "doctor",
+    "nurse",
+    "teacher",
+    "cook",
+    "driver",
+    "police officer",
+    "What does ... do?"
+   ]
+  },
+  {
+   "id": "ESH-GRA-17",
+   "strand": "GRA",
+   "stage": "G4",
+   "term": "上",
+   "unit": "4A Module 1–3",
+   "name": "特殊疑问词 who/what/where/when/whose/how",
+   "name_en": "Wh- questions",
+   "desc": "能根据想得到的信息选用正确疑问词提问，并能对句子划线部分提问（初步）。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-15",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做“疑问词转盘”：转到 Where 就问一个关于地点的问题。常见错误：语序错（Where you live?），要记住“疑问词+助动词/be+主语”。",
+   "probe": "对划线部分提问：My bag is 【under the desk】. / 【Tom】 is my friend.",
+   "terms": [
+    "Who",
+    "What",
+    "Where",
+    "When",
+    "Whose",
+    "How",
+    "Which",
+    "Why"
+   ]
+  },
+  {
+   "id": "ESH-GRA-18",
+   "strand": "GRA",
+   "stage": "G4",
+   "term": "下",
+   "unit": "4A Module 1 / 4B",
+   "name": "名词性物主代词与宾格代词",
+   "name_en": "mine/yours & me/him/her",
+   "desc": "能用 Whose ... is this? It's mine/his. 表达所属，能正确使用宾格代词 me/him/her/us/them。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "整理失物招领盒：Whose ruler is this? It's hers. 常见错误：It's my.（漏 mine）、Give it to he.（宾格误用）。",
+   "probe": "选择：This book is (my/mine). Please help (I/me). Is it (her/hers) pen?",
+   "terms": [
+    "mine",
+    "yours",
+    "his",
+    "hers",
+    "ours",
+    "theirs",
+    "me",
+    "them"
+   ]
+  },
+  {
+   "id": "ESH-VOC-11",
+   "strand": "VOC",
+   "stage": "G4",
+   "term": "下",
+   "unit": "4B Module 3",
+   "name": "时间与星期",
+   "name_en": "Telling the time & days of the week",
+   "desc": "能用 What time is it? It's half past seven. 等表达时间，能说出星期并用 on Monday 等描述日程。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-15",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做一张“我的一周课程表”，每天睡前说明天几点做什么。常见错误：说 It's seven half；星期首字母小写；at/on 混用。",
+   "probe": "看钟面读出 7:30、8:15、9:45，并回答 What do you do on Saturdays?",
+   "terms": [
+    "What time is it?",
+    "o'clock",
+    "half past",
+    "quarter to",
+    "Monday",
+    "Saturday",
+    "on Monday",
+    "at seven"
+   ]
+  },
+  {
+   "id": "ESH-GRA-19",
+   "strand": "GRA",
+   "stage": "G4",
+   "term": "下",
+   "unit": "4B Module 3",
+   "name": "频度副词与日常作息",
+   "name_en": "Adverbs of frequency & daily routine",
+   "desc": "能用 always/usually/often/sometimes/never 描述做事频率，并放在正确位置。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-15",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-11",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "画“频率温度计”从100%到0%，把副词按高低排好，再说自己的习惯。常见错误：副词位置错（I go always ...），在 be 动词后、实义动词前。",
+   "probe": "用 never/sometimes/always 各写一句关于自己周末的句子。",
+   "terms": [
+    "always",
+    "usually",
+    "often",
+    "sometimes",
+    "never",
+    "How often?",
+    "get up",
+    "have breakfast"
+   ]
+  },
+  {
+   "id": "ESH-GRA-20",
+   "strand": "GRA",
+   "stage": "G4",
+   "term": "下",
+   "unit": "4B Module 2",
+   "name": "兴趣爱好 like doing",
+   "name_en": "Hobbies: like/love doing",
+   "desc": "能用 I like/love + doing 谈论爱好，用 What do you like doing? 询问他人。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-16",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做“家庭爱好调查表”，问每个人 What does Grandpa like doing? He likes reading. 常见错误：like do、He like playing，第三人称和 -ing 双重检查。",
+   "probe": "问孩子三个家人的爱好，请他用完整句回答。",
+   "terms": [
+    "like doing",
+    "love doing",
+    "What do you like doing?",
+    "reading",
+    "drawing",
+    "playing football",
+    "hobby"
+   ]
+  },
+  {
+   "id": "ESH-REA-03",
+   "strand": "REA",
+   "stage": "G4",
+   "term": "全",
+   "unit": "4A–4B Read a story",
+   "name": "阅读排序与主旨标题",
+   "name_en": "Sequencing and choosing a title",
+   "desc": "能读懂120词左右的故事或说明短文，按情节排序，选出最合适的标题。",
+   "prereqs": [
+    {
+     "id": "ESH-REA-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "读完故事后把剪开的句子条按顺序贴好，再给故事取个名字。常见错误：选标题只看第一句，要看全文都在讲什么。",
+   "probe": "给一则故事打乱的5个句子，请排序并从3个标题中选最佳。",
+   "terms": [
+    "first",
+    "then",
+    "next",
+    "finally",
+    "title",
+    "main idea"
+   ]
+  },
+  {
+   "id": "ESH-WRI-03",
+   "strand": "WRI",
+   "stage": "G4",
+   "term": "下",
+   "unit": "4B Write",
+   "name": "看图写话与段落仿写（5句左右）",
+   "name_en": "Writing a short paragraph from a model",
+   "desc": "能参照范文用5句左右写一段介绍家人、朋友或爱好的小短文，句子正确、意思连贯。",
+   "prereqs": [
+    {
+     "id": "ESH-WRI-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-15",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "用“三明治”结构：一句开头介绍、三句细节、一句结尾感受。常见错误：句子都以 I 开头显得单调，可尝试换 He/My dad/Every day 开头。",
+   "probe": "看一幅“妈妈的周末”图，写5句话。",
+   "terms": [
+    "My ... is ...",
+    "He/She likes ...",
+    "Every day ...",
+    "I love ...",
+    "because"
+   ]
+  },
+  {
+   "id": "ESH-LIS-07",
+   "strand": "LIS",
+   "stage": "G4",
+   "term": "下",
+   "unit": "4A Module 3 / 5A Module 3",
+   "name": "问路与指路",
+   "name_en": "Asking for and giving directions",
+   "desc": "能用 How do I get to ...? / Where is ...? 问路，用 Go along ... Turn left/right at ... It's next to ... 指路。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-07",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "用乐高或小区地图模拟问路，孩子当导游说路线。常见错误：左右说反；at the second crossing 等表达漏冠词。",
+   "probe": "看地图说出从学校到公园的路线（至少3步）。",
+   "terms": [
+    "Go along ...",
+    "Turn left",
+    "Turn right",
+    "Cross the road",
+    "next to",
+    "opposite",
+    "between"
+   ]
+  },
+  {
+   "id": "ESH-PHO-08",
+   "strand": "PHO",
+   "stage": "G5",
+   "term": "上",
+   "unit": "5A Learn the sounds",
+   "name": "音节划分与单词重音",
+   "name_en": "Syllables and word stress",
+   "desc": "能把多音节词拆分音节拼读和记拼写，知道单词有重音并能读出常见双音节词重音。",
+   "prereqs": [
+    {
+     "id": "ESH-PHO-07",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-PHO-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "拍手数音节：but-ter-fly 拍三下，重音那拍拍得最响。用音节拆分法记长词（hos-pi-tal）。常见错误：中文习惯每个音节一样重，听起来生硬。",
+   "probe": "说出 banana、computer、teacher 各有几个音节、重音在哪里。",
+   "terms": [
+    "syllable",
+    "stress",
+    "banana",
+    "computer",
+    "birthday",
+    "yesterday"
+   ]
+  },
+  {
+   "id": "ESH-VOC-12",
+   "strand": "VOC",
+   "stage": "G5",
+   "term": "上",
+   "unit": "5A Module 1",
+   "name": "序数词与日期、月份",
+   "name_en": "Ordinal numbers, months and dates",
+   "desc": "能用序数词和月份表达日期，掌握 When is your birthday? It's on 1st May. 及 in/on 的区别。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-11",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做全家生日日历，每人用英语说生日日期。常见错误：first/second/third 及 fifth/ninth/twelfth 拼写；in May 与 on 1st May 混用。",
+   "probe": "写出下列日期的英文：3月2日、9月12日、11月21日。",
+   "terms": [
+    "first",
+    "second",
+    "third",
+    "fifth",
+    "twelfth",
+    "twentieth",
+    "January",
+    "on 1st May"
+   ]
+  },
+  {
+   "id": "ESH-GRA-21",
+   "strand": "GRA",
+   "stage": "G5",
+   "term": "上",
+   "unit": "5A Module 2–3",
+   "name": "一般过去时：be 动词与规则动词",
+   "name_en": "Past simple: was/were and regular -ed",
+   "desc": "能用 was/were 和规则动词 -ed 形式讲述过去的事，会读 -ed 的三种发音，会用 did 提问和否定。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-15",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-12",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "每天晚饭时讲“今天三件事”，强调 yesterday/last week 等时间提示。常见错误：Did he played?、I was go，“did 出现动词还原，was 后不接动词原形”。",
+   "probe": "改写成过去时：I watch TV. They are at home. Does she visit her grandma?",
+   "terms": [
+    "was",
+    "were",
+    "played",
+    "watched",
+    "did",
+    "didn't",
+    "yesterday",
+    "last week"
+   ]
+  },
+  {
+   "id": "ESH-GRA-22",
+   "strand": "GRA",
+   "stage": "G5",
+   "term": "下",
+   "unit": "5B Module 1–2",
+   "name": "一般过去时：不规则动词",
+   "name_en": "Past simple: irregular verbs",
+   "desc": "能熟练使用50个以上常用不规则动词过去式（went/saw/ate/had/took 等）讲述经历。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-21",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "按变化规律分组记：ou-ght组(bought/brought/thought)、变元音组(sit-sat, swim-swam)。常见错误：goed、buyed，每天抽卡10个快答。",
+   "probe": "快速说出 go、see、buy、eat、take、teach 的过去式。",
+   "terms": [
+    "went",
+    "saw",
+    "ate",
+    "had",
+    "bought",
+    "took",
+    "made",
+    "came"
+   ]
+  },
+  {
+   "id": "ESH-GRA-23",
+   "strand": "GRA",
+   "stage": "G5",
+   "term": "上",
+   "unit": "5A Module 2",
+   "name": "一般将来时 be going to / will",
+   "name_en": "Future: be going to & will",
+   "desc": "能用 be going to 谈计划、用 will 预测或临时决定，会谈论 What do you want to be? 等未来理想。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-16",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "周日晚和孩子做“下周计划表”：I'm going to ... on Monday. 常见错误：be going to 漏 be，will 后接 -s/-ing。",
+   "probe": "用 be going to 说三件周末计划，用 will 预测明天天气。",
+   "terms": [
+    "be going to",
+    "will",
+    "won't",
+    "tomorrow",
+    "next week",
+    "I want to be ...",
+    "What are you going to do?"
+   ]
+  },
+  {
+   "id": "ESH-GRA-24",
+   "strand": "GRA",
+   "stage": "G5",
+   "term": "下",
+   "unit": "5B Module 2–3",
+   "name": "形容词比较级与最高级",
+   "name_en": "Comparatives and superlatives",
+   "desc": "掌握 -er/-est、more/most 和不规则变化（good-better-best），能用 than 和 the ...est in/of 进行比较。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-09",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-PHO-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "家人比身高、比年龄：Dad is taller than me. Grandpa is the oldest in my family. 常见错误：more taller、the most good、比较级漏 than。",
+   "probe": "填空：Tom is ___ (tall) than Ben. This is the ___ (good) film. Maths is ___ (interesting) than art.",
+   "terms": [
+    "taller",
+    "bigger",
+    "happier",
+    "more beautiful",
+    "than",
+    "the tallest",
+    "better",
+    "best"
+   ]
+  },
+  {
+   "id": "ESH-GRA-25",
+   "strand": "GRA",
+   "stage": "G5",
+   "term": "下",
+   "unit": "5B Module 3",
+   "name": "情态动词 should/must/mustn't/may",
+   "name_en": "Modals: should, must, mustn't, may",
+   "desc": "能用 must/mustn't 表达规则和禁止，用 should 给建议，用 May I ...? 礼貌请求许可。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-06",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "讨论“图书馆/马路/游泳池规则”，每条规则用 must 或 mustn't 说出来。常见错误：must to do；mustn't 与 needn't 意思混淆。",
+   "probe": "看标志图说规则：禁止吸烟、必须排队、应该多喝水。",
+   "terms": [
+    "must",
+    "mustn't",
+    "should",
+    "shouldn't",
+    "May I ...?",
+    "rule"
+   ]
+  },
+  {
+   "id": "ESH-GRA-26",
+   "strand": "GRA",
+   "stage": "G5",
+   "term": "上",
+   "unit": "5A Module 3",
+   "name": "可数/不可数名词与 some/any",
+   "name_en": "Countable/uncountable, some/any, much/many",
+   "desc": "能区分可数与不可数名词，正确使用 some/any、How much/How many、a bottle of 等量词短语。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-12",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-LIS-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "厨房分类游戏：把食物卡片分成“能数的”和“不能数的”两堆，再说 a glass of milk。常见错误：breads、some waters、How many milk。",
+   "probe": "选择：There is (some/any) juice. How (much/many) eggs? Would you like (some/any) tea?",
+   "terms": [
+    "some",
+    "any",
+    "How much",
+    "How many",
+    "a bottle of",
+    "a glass of",
+    "bread",
+    "water"
+   ]
+  },
+  {
+   "id": "ESH-REA-04",
+   "strand": "REA",
+   "stage": "G5",
+   "term": "全",
+   "unit": "5A–5B Read a story / Read and answer",
+   "name": "阅读：细节、判断与猜词义",
+   "name_en": "Reading for detail, T/F and guessing word meaning",
+   "desc": "能读懂150–200词短文，完成判断、选择、回答问题，能借助上下文猜测生词意思。",
+   "prereqs": [
+    {
+     "id": "ESH-REA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-21",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "读题后带着问题回原文划线定位，遇到生词先跳过看前后句猜意思。常见错误：判断题凭常识不看原文，或把原文没提到的当成 True。",
+   "probe": "读一篇180词短文，完成3道判断题和一道“文中划线词意思是什么”的猜词题。",
+   "terms": [
+    "True or False",
+    "Read and answer",
+    "guess the meaning",
+    "context",
+    "key words"
+   ]
+  },
+  {
+   "id": "ESH-WRI-04",
+   "strand": "WRI",
+   "stage": "G5",
+   "term": "下",
+   "unit": "5B Write",
+   "name": "记叙小短文（6–8句）：时间顺序",
+   "name_en": "Short recount with time-order words",
+   "desc": "能用一般过去时和 first/then/after that/finally 写6–8句描述一次经历（生日、出游），有开头结尾。",
+   "prereqs": [
+    {
+     "id": "ESH-WRI-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-22",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先画“故事四格漫画”，每格写两句，再连成短文。常见错误：时态前后不一致（过去事件中混入现在时）。",
+   "probe": "以 My last weekend 为题写7句话，检查时态和连接词。",
+   "terms": [
+    "first",
+    "then",
+    "after that",
+    "finally",
+    "last Sunday",
+    "I felt ...",
+    "It was ..."
+   ]
+  },
+  {
+   "id": "ESH-LIS-08",
+   "strand": "LIS",
+   "stage": "G5",
+   "term": "全",
+   "unit": "5A–5B Listen and say",
+   "name": "听力抓取关键信息与情景对话",
+   "name_en": "Listening for key information & role play",
+   "desc": "听一段对话或短文能记下数字、时间、地点、人物等关键信息，能按情景进行4–6轮对话。",
+   "prereqs": [
+    {
+     "id": "ESH-LIS-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-LIS-07",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-11",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "听前先看题预测要听什么（数字？地点？），听时只记关键词缩写。常见错误：想听懂每个词导致漏掉答案。",
+   "probe": "听一段约1分钟的电话对话，填写见面时间、地点和要带的东西。",
+   "terms": [
+    "What time ...?",
+    "Where ...?",
+    "Let's meet at ...",
+    "key words",
+    "note"
+   ]
+  },
+  {
+   "id": "ESH-PHO-09",
+   "strand": "PHO",
+   "stage": "G6",
+   "term": "上",
+   "unit": "6A 语音（国际音标）",
+   "name": "国际音标48个与查词典",
+   "name_en": "International Phonetic Alphabet (IPA)",
+   "desc": "能认读48个国际音标，借助音标读出生词，能识别同一字母组合的不同读音（中考语音辨析）。",
+   "prereqs": [
+    {
+     "id": "ESH-PHO-08",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-PHO-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把音标按“单元音-双元音-辅音”三张表贴墙，每天用音标查5个生词并读出。常见错误：/e/ 与 /æ/、/ɪ/ 与 /i:/ 不分，要用最小对立词（bed/bad, ship/sheep）练耳。",
+   "probe": "找出划线部分读音不同的一项：A. h【ea】d B. br【ea】d C. m【ea】t D. h【ea】vy。",
+   "terms": [
+    "/i:/",
+    "/ɪ/",
+    "/æ/",
+    "/e/",
+    "/ʃ/",
+    "/θ/",
+    "phonetic symbols",
+    "dictionary"
+   ]
+  },
+  {
+   "id": "ESH-GRA-27",
+   "strand": "GRA",
+   "stage": "G6",
+   "term": "上",
+   "unit": "6A Module 1–2",
+   "name": "冠词 a/an/the 与零冠词",
+   "name_en": "Articles: a/an/the/zero article",
+   "desc": "能区分泛指与特指，掌握 the 的常见用法（独一无二、乐器、序数词前）及零冠词（球类、三餐、by bus）。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-11",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "整理“the 必用/禁用清单”：play the piano vs play football，have breakfast，by bus。常见错误：the most 漏 the、play the football。",
+   "probe": "冠词填空：___ sun is big. He plays ___ violin after ___ lunch. It's ___ useful book.",
+   "terms": [
+    "the",
+    "a",
+    "an",
+    "play the piano",
+    "play football",
+    "by bus",
+    "at night",
+    "the first"
+   ]
+  },
+  {
+   "id": "ESH-GRA-28",
+   "strand": "GRA",
+   "stage": "G6",
+   "term": "上",
+   "unit": "6A Module 1",
+   "name": "名词：不规则复数与所有格",
+   "name_en": "Irregular plurals and possessives",
+   "desc": "掌握 man-men、child-children、sheep 等不规则复数和 's / s' / of 所有格，能正确使用。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-12",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做“不规则复数通缉令”海报；所有格口诀“单数加's，复数s后只加'”。常见错误：childrens、the teachers's office、两人共有与各自所有混淆。",
+   "probe": "写出复数并填所有格：foot、tooth、mouse；the ___ (student) books；Children___ Day。",
+   "terms": [
+    "men",
+    "women",
+    "children",
+    "feet",
+    "teeth",
+    "mice",
+    "Children's Day",
+    "teachers'"
+   ]
+  },
+  {
+   "id": "ESH-GRA-29",
+   "strand": "GRA",
+   "stage": "G6",
+   "term": "下",
+   "unit": "6A–6B",
+   "name": "代词体系与反身代词、不定代词",
+   "name_en": "Reflexive and indefinite pronouns",
+   "desc": "掌握主格、宾格、物主代词、反身代词全表，会用 something/anyone/nobody 等不定代词及 enjoy oneself 等搭配。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-18",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "填一张5列代词总表反复默写；不定代词记“形容词放后面”（something interesting）。常见错误：hisself、theirselves；interesting something。",
+   "probe": "填空：Help ___ (you) to some fish, kids. Is there ___ (new) in today's paper?",
+   "terms": [
+    "myself",
+    "yourselves",
+    "himself",
+    "something",
+    "anything",
+    "nobody",
+    "everyone",
+    "enjoy oneself"
+   ]
+  },
+  {
+   "id": "ESH-GRA-30",
+   "strand": "GRA",
+   "stage": "G6",
+   "term": "上",
+   "unit": "6A Module 2",
+   "name": "时间与地点介词 in/on/at 等",
+   "name_en": "Prepositions of time and place",
+   "desc": "能准确使用 in/on/at 表示时间（in 2025, on Monday morning, at noon）与地点，掌握常用介词短语。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-07",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-12",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "画“介词金字塔”：at 点、on 天、in 大段时间。常见错误：in Sunday morning（具体某天的上午用 on）、at weekend 与 at the weekend。",
+   "probe": "填空：___ the morning of May 1st；___ night；___ 2008；___ the corner of the street。",
+   "terms": [
+    "in",
+    "on",
+    "at",
+    "on Monday morning",
+    "at noon",
+    "in the end",
+    "across",
+    "through"
+   ]
+  },
+  {
+   "id": "ESH-GRA-31",
+   "strand": "GRA",
+   "stage": "G6",
+   "term": "上",
+   "unit": "6A Module 1–3",
+   "name": "四种基础时态辨析",
+   "name_en": "Comparing present simple/continuous, past simple, future",
+   "desc": "能根据时间状语和语境在一般现在、现在进行、一般过去、一般将来时之间准确选择并变形。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-15",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-16",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-22",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-23",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做“时间状语分类卡”（every day / now / yesterday / tomorrow），先找信号词再定时态。常见错误：语境无信号词时乱选，要看上下文动作是否已发生。",
+   "probe": "用括号内动词适当形式填空：Look! The boys ___ (play). He ___ (visit) Beijing last year.",
+   "terms": [
+    "every day",
+    "now",
+    "Look!",
+    "yesterday",
+    "ago",
+    "tomorrow",
+    "next",
+    "tense"
+   ]
+  },
+  {
+   "id": "ESH-GRA-32",
+   "strand": "GRA",
+   "stage": "G6",
+   "term": "下",
+   "unit": "6B Module 1–3",
+   "name": "特殊疑问句进阶 how long/often/far/soon",
+   "name_en": "How long/often/far/soon/many/much",
+   "desc": "能区分 how long/how often/how far/how soon/how much/how many 等，针对划线部分准确提问。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-17",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-19",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把每个疑问短语和它的“答案样子”配对：how often→twice a week, how far→2 km。常见错误：How long 与 How soon（in two days）混淆。",
+   "probe": "对划线部分提问：He goes swimming 【twice a week】. It's 【3 kilometres】 from here.",
+   "terms": [
+    "How long",
+    "How often",
+    "How far",
+    "How soon",
+    "How much",
+    "What time",
+    "Why"
+   ]
+  },
+  {
+   "id": "ESH-GRA-33",
+   "strand": "GRA",
+   "stage": "G6",
+   "term": "下",
+   "unit": "6B",
+   "name": "情态动词进阶 could/may/might/need",
+   "name_en": "Modals: could, may, might, need",
+   "desc": "能用 could/may/might 表示可能性和委婉请求，掌握 must 的否定回答 needn't/don't have to。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-25",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "列一张“情态动词态度表”：从100%到可能的 must/may/might。常见错误：Must I ...? No, you mustn't.（应为 needn't）。",
+   "probe": "选择：—Must I finish it today? —No, you ___. A. mustn't B. needn't C. can't",
+   "terms": [
+    "could",
+    "may",
+    "might",
+    "needn't",
+    "have to",
+    "Could you ...?",
+    "must"
+   ]
+  },
+  {
+   "id": "ESH-VOC-13",
+   "strand": "VOC",
+   "stage": "G6",
+   "term": "全",
+   "unit": "6A–6B",
+   "name": "构词法初步：常见前后缀",
+   "name_en": "Word formation: common prefixes and suffixes",
+   "desc": "掌握 -er/-or/-ist、-ful/-less、-ly、un-/dis-/re- 等构词规律，能完成简单的词形转换。",
+   "prereqs": [
+    {
+     "id": "ESH-PHO-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做“词族树”：help→helpful/helpless/helper，每周一棵。常见错误：careful 写成 carefull，-ful 只有一个 l。",
+   "probe": "用括号内词的适当形式填空：He is a famous ___ (art). Be ___ (care)!",
+   "terms": [
+    "-er",
+    "-or",
+    "-ist",
+    "-ful",
+    "-less",
+    "-ly",
+    "un-",
+    "dis-"
+   ]
+  },
+  {
+   "id": "ESH-REA-05",
+   "strand": "REA",
+   "stage": "G6",
+   "term": "全",
+   "unit": "6A–6B Reading",
+   "name": "阅读：主旨与细节题",
+   "name_en": "Main idea and detail questions",
+   "desc": "能读懂250词左右的记叙文和简单说明文，区分主旨句与支撑细节，完成选择与回答问题。",
+   "prereqs": [
+    {
+     "id": "ESH-REA-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "每段读完用一句中文概括，最后再串成全文大意。常见错误：把细节当主旨，选项过于具体时要警惕。",
+   "probe": "读一篇250词短文，选出主旨题和两道细节题答案并标出依据句。",
+   "terms": [
+    "main idea",
+    "topic sentence",
+    "detail",
+    "paragraph",
+    "according to the passage"
+   ]
+  },
+  {
+   "id": "ESH-WRI-05",
+   "strand": "WRI",
+   "stage": "G6",
+   "term": "下",
+   "unit": "6A–6B Writing",
+   "name": "主题段落写作（60词）",
+   "name_en": "Paragraph writing with a topic sentence",
+   "desc": "能围绕给定话题写不少于60词的短文，有主题句、3个支撑点和结尾句，语法基本正确。",
+   "prereqs": [
+    {
+     "id": "ESH-WRI-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-31",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "用“汉堡包”结构图：顶层主题句、中间三片论据、底层结尾。常见错误：开头直接写细节没有主题句，或中式英语如 I very like。",
+   "probe": "以 My favourite season 为题写60词短文。",
+   "terms": [
+    "topic sentence",
+    "First,",
+    "Besides,",
+    "What's more,",
+    "In a word,",
+    "I think ..."
+   ]
+  },
+  {
+   "id": "ESH-LIS-09",
+   "strand": "LIS",
+   "stage": "G6",
+   "term": "全",
+   "unit": "6A–6B Listening & Speaking",
+   "name": "听对话回答问题与看图说话",
+   "name_en": "Listening to dialogues & describing pictures",
+   "desc": "能听懂语速适中的对话和短文回答问题，能用5–6句话有条理地描述一幅图片。",
+   "prereqs": [
+    {
+     "id": "ESH-LIS-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "每天听5分钟课文录音做“影子跟读”，每周对一张图片说一分钟。常见错误：描述图片只罗列名词，应加上 There is/are + 正在做的动作。",
+   "probe": "听一段对话后回答两个问题，并就一张公园图片说出5句话。",
+   "terms": [
+    "In the picture",
+    "I can see",
+    "is doing",
+    "on the left",
+    "in the middle"
+   ]
+  },
+  {
+   "id": "ESH-GRA-34",
+   "strand": "GRA",
+   "stage": "G7",
+   "term": "下",
+   "unit": "7B",
+   "name": "现在完成时",
+   "name_en": "Present perfect",
+   "desc": "能用 have/has done 表示已完成并影响现在或持续到现在的动作，掌握 already/yet/ever/never/since/for 及与一般过去时的区别。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-22",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-31",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "画时间轴：一般过去时是“过去一个点”，现在完成时是“连到现在的箭头”。常见错误：I have bought it for 2 years（瞬间动词不能接段时间，要改为 have had）；与 last year 等过去时间连用。",
+   "probe": "改错：He has joined the club for three years. / I have seen the film yesterday.",
+   "terms": [
+    "have done",
+    "has been to",
+    "has gone to",
+    "already",
+    "yet",
+    "ever",
+    "since",
+    "for"
+   ]
+  },
+  {
+   "id": "ESH-GRA-35",
+   "strand": "GRA",
+   "stage": "G7",
+   "term": "下",
+   "unit": "7B",
+   "name": "过去进行时与 when/while",
+   "name_en": "Past continuous with when/while",
+   "desc": "能用 was/were doing 描述过去某时正在进行的动作，区分 when 和 while 引导的时间状语。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-16",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-22",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "讲“昨晚8点全家在干什么”：At 8 last night, Dad was cooking. 常见错误：while 后接短暂动词；两个动作谁用进行时分不清（长动作用进行时）。",
+   "probe": "用所给动词填空：I ___ (read) when the phone ___ (ring).",
+   "terms": [
+    "was doing",
+    "were doing",
+    "when",
+    "while",
+    "at this time yesterday"
+   ]
+  },
+  {
+   "id": "ESH-GRA-36",
+   "strand": "GRA",
+   "stage": "G7",
+   "term": "上",
+   "unit": "7A",
+   "name": "比较级进阶 as...as / the + 比较级",
+   "name_en": "Advanced comparison",
+   "desc": "能用 as...as / not as(so)...as、比较级+and+比较级、the+比较级 ..., the+比较级 以及 much/even 修饰比较级。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-24",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "写家人对比句并用三种结构改写同一意思。常见错误：very taller（应为 much taller）、as taller as。",
+   "probe": "同义句转换：Tom is shorter than Jim. = Tom is not ___ ___ ___ Jim.",
+   "terms": [
+    "as ... as",
+    "not so ... as",
+    "much taller",
+    "even",
+    "the more ..., the more ...",
+    "less"
+   ]
+  },
+  {
+   "id": "ESH-GRA-37",
+   "strand": "GRA",
+   "stage": "G7",
+   "term": "全",
+   "unit": "7A–7B",
+   "name": "动词不定式与动名词基础",
+   "name_en": "Infinitives and gerunds (basic)",
+   "desc": "掌握 want/decide/hope to do 和 enjoy/finish/mind doing 等固定搭配，区分 stop/remember/forget to do 与 doing。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-20",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-23",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做两列“只接 to do”与“只接 doing”的动词清单，每天读一遍造句。常见错误：enjoy to swim、finish to do；stop doing 与 stop to do 意思相反。",
+   "probe": "选择：Remember ___ the door when you leave. I'll never forget ___ the Great Wall.",
+   "terms": [
+    "want to do",
+    "decide to do",
+    "enjoy doing",
+    "finish doing",
+    "mind doing",
+    "stop to do",
+    "remember doing"
+   ]
+  },
+  {
+   "id": "ESH-GRA-38",
+   "strand": "GRA",
+   "stage": "G7",
+   "term": "上",
+   "unit": "7A",
+   "name": "并列连词与并列结构",
+   "name_en": "Coordinating conjunctions",
+   "desc": "能用 and/but/or/so 及 both...and、either...or、neither...nor、not only...but also 连接句子，知道就近原则。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-31",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把两句短句合成一句，练“and 顺接、but 转折、so 结果”。常见错误：because 和 so 同时用；Either you or he are（就近原则看 he）。",
+   "probe": "合并句子：Hurry up. You'll be late.（用 or）；判断 Neither Tom nor I ___ (be) right.",
+   "terms": [
+    "and",
+    "but",
+    "or",
+    "so",
+    "both ... and",
+    "either ... or",
+    "neither ... nor",
+    "not only ... but also"
+   ]
+  },
+  {
+   "id": "ESH-GRA-39",
+   "strand": "GRA",
+   "stage": "G7",
+   "term": "下",
+   "unit": "7B",
+   "name": "时间和条件状语从句（主将从现）",
+   "name_en": "Adverbial clauses of time & condition",
+   "desc": "能用 when/before/after/until/as soon as/if/unless 引导状语从句，掌握“主句将来时，从句一般现在时”。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-23",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-38",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "记口诀“主将从现”，并造 If it rains tomorrow, we will ... 等句子。常见错误：If it will rain；not ... until 用法错误。",
+   "probe": "填空：I'll call you as soon as I ___ (arrive). He didn't go to bed ___ his mum came back.",
+   "terms": [
+    "when",
+    "if",
+    "unless",
+    "until",
+    "not ... until",
+    "as soon as",
+    "before",
+    "after"
+   ]
+  },
+  {
+   "id": "ESH-GRA-40",
+   "strand": "GRA",
+   "stage": "G7",
+   "term": "上",
+   "unit": "7A",
+   "name": "感叹句 what/how",
+   "name_en": "Exclamatory sentences",
+   "desc": "能根据中心词是名词还是形容词/副词选用 What 或 How 构成感叹句。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-27",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-24",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "口诀“What 看名词，How 看形容词”，先划去主谓再判断。常见错误：What a fine weather（weather 不可数不能加 a）、What heavy rain 中误加 a。",
+   "probe": "选择：___ useful advice he gave us! ___ fast the boy runs!",
+   "terms": [
+    "What a ...!",
+    "What ...!",
+    "How ...!",
+    "What fun!",
+    "How beautiful!"
+   ]
+  },
+  {
+   "id": "ESH-VOC-14",
+   "strand": "VOC",
+   "stage": "G7",
+   "term": "全",
+   "unit": "7A–7B",
+   "name": "常用短语动词",
+   "name_en": "Common phrasal verbs",
+   "desc": "掌握 look after/look for/give up/put on/take off/turn on/get up 等常用动词短语，知道代词宾语放中间。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "按核心动词做“短语家族卡”（look 家族、take 家族），每张卡配一句生活例句。常见错误：put on it（应为 put it on）；look for 与 find 混用。",
+   "probe": "用短语填空：Please ___ the light. I'm ___ my keys. Don't ___ —try again!",
+   "terms": [
+    "look after",
+    "look for",
+    "give up",
+    "put on",
+    "take off",
+    "turn off",
+    "pick up",
+    "get on"
+   ]
+  },
+  {
+   "id": "ESH-REA-06",
+   "strand": "REA",
+   "stage": "G7",
+   "term": "全",
+   "unit": "7A–7B Reading",
+   "name": "阅读：推断与作者意图",
+   "name_en": "Inference and writer's purpose",
+   "desc": "能根据文中线索推断人物情感、隐含信息和作者写作目的，区分事实与观点。",
+   "prereqs": [
+    {
+     "id": "ESH-REA-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "每题追问“文中哪句话让你这么想？”，养成找证据的习惯。常见错误：用自己的常识代替文意，或选择过度推断的选项。",
+   "probe": "读一篇故事后回答：How did the girl feel at the end? Why did the writer write this passage?",
+   "terms": [
+    "infer",
+    "imply",
+    "feel",
+    "purpose",
+    "fact",
+    "opinion",
+    "probably"
+   ]
+  },
+  {
+   "id": "ESH-WRI-06",
+   "strand": "WRI",
+   "stage": "G7",
+   "term": "全",
+   "unit": "7A–7B Writing",
+   "name": "书信与电子邮件格式",
+   "name_en": "Letters and emails",
+   "desc": "能按格式写私人书信/邮件（称呼、正文、结束语、署名），完成邀请、感谢、介绍等交际任务。",
+   "prereqs": [
+    {
+     "id": "ESH-WRI-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "准备一张书信格式模板，每月给亲友或“笔友”写一封英文邮件。常见错误：Dear Tom 后用句号、结尾 Yours 写成 Your。",
+   "probe": "写一封70词邮件邀请外国朋友周末来家里做客，说明时间、地点和活动。",
+   "terms": [
+    "Dear ...,",
+    "How are you?",
+    "I'm writing to ...",
+    "Best wishes,",
+    "Yours,",
+    "Looking forward to ..."
+   ]
+  },
+  {
+   "id": "ESH-LIS-10",
+   "strand": "LIS",
+   "stage": "G7",
+   "term": "全",
+   "unit": "7A–7B Speaking",
+   "name": "交际用语：建议、观点、电话用语",
+   "name_en": "Functional language: suggestions, opinions, phone calls",
+   "desc": "能在情景中提建议、表达同意/反对、打电话，选出恰当的交际回应（中考情景交际题）。",
+   "prereqs": [
+    {
+     "id": "ESH-LIS-09",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-33",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "收集交际用语卡：Why not ...? / How about ...? / I agree. / Hold on, please. 情景表演。常见错误：电话中说 I am Tom（应为 This is Tom speaking）；回应 Thank you 时说 No thanks。",
+   "probe": "选择恰当回应：—Would you mind opening the window? —___",
+   "terms": [
+    "Why not ...?",
+    "How about ...?",
+    "I agree.",
+    "I'm afraid ...",
+    "This is ... speaking.",
+    "Hold on, please.",
+    "Not at all."
+   ]
+  },
+  {
+   "id": "ESH-GRA-41",
+   "strand": "GRA",
+   "stage": "G8",
+   "term": "上",
+   "unit": "8A",
+   "name": "被动语态",
+   "name_en": "Passive voice",
+   "desc": "能在一般现在、一般过去、一般将来、现在完成和含情态动词的句子中构成被动语态，并判断何时用被动。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-34",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-31",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-33",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先找“主语是动作发出者还是承受者”，再套“be + 过去分词”，be 负责时态。常见错误：漏 be（The bridge built in 1990）、不及物动词用被动（happen/take place 不能被动）。",
+   "probe": "改为被动语态：They will plant trees tomorrow. / You must hand in the homework on time.",
+   "terms": [
+    "be done",
+    "was built",
+    "will be held",
+    "has been finished",
+    "can be seen",
+    "by",
+    "take place"
+   ]
+  },
+  {
+   "id": "ESH-GRA-42",
+   "strand": "GRA",
+   "stage": "G8",
+   "term": "下",
+   "unit": "8B",
+   "name": "宾语从句",
+   "name_en": "Object clauses",
+   "desc": "能用 that/if/whether/疑问词引导宾语从句，掌握陈述语序和时态呼应（主过从过，客观真理除外）。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-32",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-31",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把“直接问句”改成“Could you tell me ...?”练陈述语序。常见错误：Can you tell me where is the station?；主句过去时从句仍用现在时。",
+   "probe": "合并：Do you know? When will the train leave? → Do you know ___?",
+   "terms": [
+    "that",
+    "if",
+    "whether",
+    "what",
+    "when",
+    "where",
+    "Could you tell me ...?",
+    "I wonder"
+   ]
+  },
+  {
+   "id": "ESH-GRA-43",
+   "strand": "GRA",
+   "stage": "G8",
+   "term": "上",
+   "unit": "8A",
+   "name": "反意疑问句",
+   "name_en": "Tag questions",
+   "desc": "能根据“前肯后否、前否后肯”构成反意疑问句，处理 never/few/little、let's 及 I think 等特殊情况，并正确回答。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-15",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-34",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做“反意疑问句镜子”练习：一句话照镜子，助动词和人称要对上。常见错误：He never comes late, doesn't he?；回答“不，他会来”时英语要说 Yes, he will。",
+   "probe": "填空：Let's go, ___? There's little milk, ___? You've finished it, ___?",
+   "terms": [
+    "isn't it?",
+    "doesn't he?",
+    "shall we?",
+    "will you?",
+    "is there?",
+    "never",
+    "little"
+   ]
+  },
+  {
+   "id": "ESH-GRA-44",
+   "strand": "GRA",
+   "stage": "G8",
+   "term": "下",
+   "unit": "8B",
+   "name": "过去完成时",
+   "name_en": "Past perfect",
+   "desc": "能用 had done 表示“过去的过去”，与 by the end of last year、before、when 等配合使用。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-34",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-35",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "画双时间轴：标出“过去点A”和更早发生的“点B”，B 用 had done。常见错误：不分先后全用过去时；by + 将来时间误用过去完成。",
+   "probe": "填空：When we got to the cinema, the film ___ (begin). By the end of last term, we ___ (learn) 1,500 words.",
+   "terms": [
+    "had done",
+    "by the end of last ...",
+    "before",
+    "when",
+    "already",
+    "by then"
+   ]
+  },
+  {
+   "id": "ESH-GRA-45",
+   "strand": "GRA",
+   "stage": "G8",
+   "term": "下",
+   "unit": "8B",
+   "name": "过去将来时",
+   "name_en": "Future in the past",
+   "desc": "能在宾语从句和间接引语中用 would do / was going to do 表示从过去看将来的动作。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-23",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-42",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "把 He said, \"I will come.\" 改成 He said he would come，体会“过去说的将来”。常见错误：主句过去时从句仍用 will。",
+   "probe": "改为间接引语：She said, \"I'm going to visit the museum.\"",
+   "terms": [
+    "would do",
+    "was going to",
+    "said that",
+    "told me that"
+   ]
+  },
+  {
+   "id": "ESH-GRA-46",
+   "strand": "GRA",
+   "stage": "G8",
+   "term": "全",
+   "unit": "8A–8B",
+   "name": "原因、结果、目的、让步状语从句",
+   "name_en": "Clauses of reason, result, purpose, concession",
+   "desc": "能用 because/since/so...that/such...that/so that/though/although 等引导状语从句，避免 because...so、though...but 连用。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-39",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-38",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把“so ... that 太……以至于”与“so that 为了”放在一张对比卡上；同义句互换（too...to ↔ so...that...not）。常见错误：Although ..., but ...；such 与 so 搭配名词/形容词混乱。",
+   "probe": "同义句转换：He is too young to go to school. = He is ___ young ___ he can't go to school.",
+   "terms": [
+    "because",
+    "since",
+    "so ... that",
+    "such ... that",
+    "so that",
+    "although",
+    "though",
+    "even if"
+   ]
+  },
+  {
+   "id": "ESH-GRA-47",
+   "strand": "GRA",
+   "stage": "G8",
+   "term": "下",
+   "unit": "8B",
+   "name": "不定式进阶：too...to/enough/疑问词+to do/it is ... for sb to do",
+   "name_en": "Infinitives (advanced)",
+   "desc": "能使用 too...to、adj+enough to、疑问词+不定式、It's + adj + for/of sb + to do，以及 make/let/have sb do 等省略 to 的情况。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-37",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "收集“省 to 的动词”：let/make/have + 感官动词 see/hear/watch，编成口诀。常见错误：make him to cry；enough 放在形容词前（enough old）。",
+   "probe": "改错：The box is enough light for me to carry. / Mum made me to clean the room.",
+   "terms": [
+    "too ... to",
+    "old enough to",
+    "how to do",
+    "what to do",
+    "It's ... for sb to do",
+    "It's kind of you to ...",
+    "let sb do",
+    "make sb do"
+   ]
+  },
+  {
+   "id": "ESH-VOC-15",
+   "strand": "VOC",
+   "stage": "G8",
+   "term": "全",
+   "unit": "8A–8B",
+   "name": "词形转换综合（中考题型）",
+   "name_en": "Word transformation (exam format)",
+   "desc": "能根据句子结构判断所需词性与形式（名词复数、形容词比较级、副词、动词时态、否定前缀等），完成中考词形转换题。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-13",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-36",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-41",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "做题三步走：①看空格前后定词性 ②看语义定肯定/否定 ③看语法定单复数/比较级/时态。常见错误：只改词性忘记复数或否定（如 dishonest、inventions）。",
+   "probe": "用所给词的适当形式填空：The ___ (science) have made great ___ (discover). He answered the question ___ (correct).",
+   "terms": [
+    "noun",
+    "adjective",
+    "adverb",
+    "-tion",
+    "-ness",
+    "-ment",
+    "dis-",
+    "im-"
+   ]
+  },
+  {
+   "id": "ESH-GRA-48",
+   "strand": "GRA",
+   "stage": "G8",
+   "term": "全",
+   "unit": "8A–8B",
+   "name": "句型转换（中考题型）",
+   "name_en": "Sentence transformation",
+   "desc": "能完成否定句、一般疑问句、划线提问、同义句、感叹句、被动语态、合并句等句型转换，每空一词且形式正确。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-32",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-40",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-41",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-42",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "建立错题本按转换类型分类，每类总结一个“公式”（如 spend/take/cost/pay 的互换）。常见错误：同义句只改一处忘记连动；划线提问忘助动词。",
+   "probe": "同义句：It took me two hours to finish it. = I ___ two hours ___ it.",
+   "terms": [
+    "spend ... doing",
+    "It takes sb ... to do",
+    "cost",
+    "pay for",
+    "same as",
+    "not ... any more",
+    "no longer"
+   ]
+  },
+  {
+   "id": "ESH-REA-07",
+   "strand": "REA",
+   "stage": "G8",
+   "term": "全",
+   "unit": "8A–8B Reading",
+   "name": "首字母填空与语篇填词",
+   "name_en": "First-letter cloze",
+   "desc": "能根据语篇上下文、首字母提示和语法要求填出正确单词的正确形式。",
+   "prereqs": [
+    {
+     "id": "ESH-REA-06",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-15",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先通读全文抓大意，再逐空判断“词性+形式”，最后整体回读检查。常见错误：意思对但形式错（漏复数、时态）、拼写错误。",
+   "probe": "完成一篇8空首字母填空短文，统计意义错与形式错各几处。",
+   "terms": [
+    "first letter",
+    "context",
+    "collocation",
+    "tense",
+    "plural"
+   ]
+  },
+  {
+   "id": "ESH-WRI-07",
+   "strand": "WRI",
+   "stage": "G8",
+   "term": "全",
+   "unit": "8A–8B Writing",
+   "name": "记叙文写作：情节与细节描写",
+   "name_en": "Narrative writing",
+   "desc": "能写80词以上的记叙文，有清晰开头-经过-结尾，用细节和感受描写让故事生动，段落分明。",
+   "prereqs": [
+    {
+     "id": "ESH-WRI-06",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-22",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-46",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "用“5W1H”列提纲，再加一句心理描写和一句收获感悟。常见错误：流水账没有重点；全篇只用简单句，可尝试加入 when/because/so that 从句。",
+   "probe": "以 An unforgettable experience 为题写90词左右短文。",
+   "terms": [
+    "One day",
+    "Suddenly",
+    "At that moment",
+    "I couldn't help ...",
+    "From then on",
+    "I learned that ..."
+   ]
+  },
+  {
+   "id": "ESH-LIS-11",
+   "strand": "LIS",
+   "stage": "G8",
+   "term": "全",
+   "unit": "8A–8B Listening",
+   "name": "长对话与短文听力：态度与推断",
+   "name_en": "Listening for attitude and inference",
+   "desc": "能听懂1–2分钟的长对话或短文，判断说话人态度、关系和场景，并完成信息记录。",
+   "prereqs": [
+    {
+     "id": "ESH-LIS-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "听前圈题干关键词，听时用符号速记（↑ 增加、× 否定）；关注 but/however 后的信息。常见错误：被首先听到的选项干扰，忽略说话人后面的转折。",
+   "probe": "听一段对话后判断两人关系、对话地点和女士的态度。",
+   "terms": [
+    "relationship",
+    "attitude",
+    "however",
+    "but",
+    "note-taking",
+    "place"
+   ]
+  },
+  {
+   "id": "ESH-GRA-49",
+   "strand": "GRA",
+   "stage": "G9",
+   "term": "上",
+   "unit": "9A",
+   "name": "定语从句（who/which/that/whose）",
+   "name_en": "Relative clauses (basic)",
+   "desc": "能用 who/whom/which/that/whose 引导限制性定语从句，判断先行词和关系代词在从句中的成分。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-42",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-29",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "两步法：①找先行词是人还是物 ②看从句缺主语还是宾语。只能用 that 的情况（all/the first/最高级）单独记。常见错误：从句中重复宾语（the book which I bought it）。",
+   "probe": "合并：I have a friend. His father is a pilot. → I have a friend ___ father is a pilot.",
+   "terms": [
+    "who",
+    "whom",
+    "which",
+    "that",
+    "whose",
+    "antecedent",
+    "the first ... that"
+   ]
+  },
+  {
+   "id": "ESH-GRA-50",
+   "strand": "GRA",
+   "stage": "G9",
+   "term": "全",
+   "unit": "9A–9B 中考复习",
+   "name": "八大时态综合运用",
+   "name_en": "All eight tenses in context",
+   "desc": "能在语篇中综合判断并使用一般现在/过去/将来/过去将来、现在/过去进行、现在/过去完成八种时态及其被动形式。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-34",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-44",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-35",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-41",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-45",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做一张“时态坐标表”（横轴过去/现在/将来，纵轴一般/进行/完成），每种时态贴一个例句。常见错误：语篇中前后时态不一致；完成时与过去时混用。",
+   "probe": "完成一篇10空用所给动词适当形式填空的短文，标出每空的时间依据。",
+   "terms": [
+    "tense",
+    "timeline",
+    "have done",
+    "had done",
+    "was doing",
+    "would do",
+    "is being done"
+   ]
+  },
+  {
+   "id": "ESH-GRA-51",
+   "strand": "GRA",
+   "stage": "G9",
+   "term": "下",
+   "unit": "9B",
+   "name": "主谓一致",
+   "name_en": "Subject-verb agreement",
+   "desc": "能处理 each/every、either/neither、the number of/a number of、就近原则、集体名词和 There be 等主谓一致问题。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-38",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-28",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "整理“陷阱主语清单”：Each of the students has ...；The number of ... is ...。常见错误：A number of students is ...；Mathematics are ...。",
+   "probe": "选择：The number of the students in our school ___ (be) 1,200. Each of us ___ (have) a dictionary.",
+   "terms": [
+    "each",
+    "every",
+    "the number of",
+    "a number of",
+    "either ... or",
+    "neither ... nor",
+    "news",
+    "maths"
+   ]
+  },
+  {
+   "id": "ESH-GRA-52",
+   "strand": "GRA",
+   "stage": "G9",
+   "term": "下",
+   "unit": "9B",
+   "name": "情态动词表推测 must/may/can't",
+   "name_en": "Modals of deduction",
+   "desc": "能用 must be / may be / can't be 对现在情况进行有把握程度不同的推测，并正确选择否定形式。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-33",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "看“侦探图片”推测：He must be a doctor. It can't be Tom—he's in Beijing. 常见错误：用 mustn't be 表示“一定不是”（应为 can't be）。",
+   "probe": "选择：—Whose bag is it? —It ___ be Lily's. Her name is on it.",
+   "terms": [
+    "must be",
+    "may be",
+    "might be",
+    "can't be",
+    "could be"
+   ]
+  },
+  {
+   "id": "ESH-GRA-53",
+   "strand": "GRA",
+   "stage": "G9",
+   "term": "下",
+   "unit": "9B",
+   "name": "it 作形式主语/宾语及句子基本结构",
+   "name_en": "It as dummy subject/object & five basic patterns",
+   "desc": "能识别主谓、主谓宾、主系表、主谓双宾、主谓宾补五种基本句型，能用 It is ... to do / find it adj to do 结构。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-47",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "给长句“画树”：先划出主谓，再找宾语、表语和补语。常见错误：I find difficult to learn（漏 it）；把系动词后的形容词改成副词（smell well）。",
+   "probe": "改错：I found that difficult to get up early. / The soup tastes well.",
+   "terms": [
+    "It is ... to do",
+    "find it ... to do",
+    "make it possible to",
+    "subject",
+    "predicate",
+    "object",
+    "complement"
+   ]
+  },
+  {
+   "id": "ESH-VOC-16",
+   "strand": "VOC",
+   "stage": "G9",
+   "term": "全",
+   "unit": "9A–9B 中考复习",
+   "name": "选词填空与语境词汇（中考题型）",
+   "name_en": "Choosing words in context",
+   "desc": "能在短文语境中从所给词中选出意义和形式都匹配的词，掌握中考核心词汇（约1600–2000词）及常用搭配。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-14",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-15",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先把备选词按词性分类，再逐空判断空格需要的词性；做完把多出的词再核对一遍。常见错误：只看意思不看词性和固定搭配。",
+   "probe": "完成一道“10选9”选词填空，并说明每个选择的词性依据。",
+   "terms": [
+    "collocation",
+    "part of speech",
+    "context",
+    "core vocabulary",
+    "fixed phrase"
+   ]
+  },
+  {
+   "id": "ESH-REA-08",
+   "strand": "REA",
+   "stage": "G9",
+   "term": "全",
+   "unit": "9A–9B 中考复习",
+   "name": "中考阅读综合：多文体与回答问题",
+   "name_en": "Exam reading: varied text types & short answers",
+   "desc": "能在规定时间内读懂应用文、记叙文、说明文、议论文，完成选择、首字母填空和用简短完整英语回答问题。",
+   "prereqs": [
+    {
+     "id": "ESH-REA-07",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-REA-06",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "按文体限时训练，“回答问题”题先定位原句，再改写人称和时态作答。常见错误：回答问题照抄整段、人称不转换或答非所问（问 why 不用 because）。",
+   "probe": "限时12分钟读一篇说明文并回答3个开放问题，检查语言是否完整准确。",
+   "terms": [
+    "skimming",
+    "scanning",
+    "Why ...?",
+    "because",
+    "according to",
+    "in your opinion"
+   ]
+  },
+  {
+   "id": "ESH-WRI-08",
+   "strand": "WRI",
+   "stage": "G9",
+   "term": "全",
+   "unit": "9A–9B 中考复习",
+   "name": "中考作文：审题、结构与语言（不少于60词）",
+   "name_en": "Exam composition",
+   "desc": "能在15–20分钟内完成话题作文，审题准确、要点齐全、结构清楚，使用多样句式且少语法错误。",
+   "prereqs": [
+    {
+     "id": "ESH-WRI-07",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-50",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-49",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "审题划出“人称、时态、要点”，列三段提纲后再写；准备10个可迁移的高级句式（定语从句、not only...but also、It is ... that ...）。常见错误：跑题或漏要点、为凑字数重复。",
+   "probe": "以 A person who helped me 为题限时20分钟写作，按要点、语言、结构评分。",
+   "terms": [
+    "outline",
+    "topic",
+    "structure",
+    "linking words",
+    "Not only ... but also",
+    "It is ... that ...",
+    "conclusion"
+   ]
+  },
+  {
+   "id": "ESH-LIS-12",
+   "strand": "LIS",
+   "stage": "G9",
+   "term": "全",
+   "unit": "9A–9B 中考复习",
+   "name": "中考听力与听说测试",
+   "name_en": "Exam listening and speaking test",
+   "desc": "能完成中考听力各题型（辨图、对话应答、短文判断、信息填空），能进行朗读、情景问答和话题简述。",
+   "prereqs": [
+    {
+     "id": "ESH-LIS-11",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-PHO-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "每天一套听力限时训练，错题回听精听并跟读原文；口语用录音自评语音、流利度。常见错误：信息填空拼写错、单复数遗漏；朗读时吞音、停顿位置不当。",
+   "probe": "完成一套中考听力模拟题，并朗读一段80词短文录音自评。",
+   "terms": [
+    "picture",
+    "response",
+    "true or false",
+    "fill in",
+    "read aloud",
+    "quick response"
+   ]
+  },
+  {
+   "id": "ESH-PHO-10",
+   "strand": "PHO",
+   "stage": "G9",
+   "term": "上",
+   "unit": "9A",
+   "name": "句子重音、连读与语调",
+   "name_en": "Sentence stress, linking and intonation",
+   "desc": "能在朗读中体现实词重读、虚词弱读、连读和失爆，一般疑问句用升调、特殊疑问句用降调。",
+   "prereqs": [
+    {
+     "id": "ESH-PHO-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "用“影子跟读法”模仿课文录音，在课文上用符号标出重读和升降调。常见错误：每个词都重读、问句全用升调。",
+   "probe": "朗读 What do you want to do? / Is it an apple? 并标出语调和连读处。",
+   "terms": [
+    "stress",
+    "weak form",
+    "linking",
+    "intonation",
+    "rising",
+    "falling",
+    "pause"
+   ]
+  },
+  {
+   "id": "ESH-GRA-54",
+   "strand": "GRA",
+   "stage": "G9",
+   "term": "下",
+   "unit": "9B",
+   "name": "名词性从句与间接引语初步",
+   "name_en": "Reported speech (statements, questions, commands)",
+   "desc": "能把陈述句、疑问句、祈使句改为间接引语，正确变化人称、时态、时间和地点状语。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-42",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-45",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做转换表：now→then, today→that day, here→there，祈使句变 tell/ask sb (not) to do。常见错误：疑问句变间接引语后仍用疑问语序。",
+   "probe": "改为间接引语：He asked me, \"Where do you live?\" / The teacher said to us, \"Don't talk in class.\"",
+   "terms": [
+    "said that",
+    "asked if",
+    "asked where",
+    "told sb to do",
+    "that day",
+    "the next day"
+   ]
+  },
+  {
+   "id": "ESH-GRA-55",
+   "strand": "GRA",
+   "stage": "G10",
+   "term": "全",
+   "unit": "必修第一册–第二册",
+   "name": "非谓语动词：作定语、状语、宾补",
+   "name_en": "Non-finite verbs as attributes, adverbials and complements",
+   "desc": "能根据逻辑主语和时间关系选择 to do / doing / done / having done，作定语、状语、宾语补足语，判断主动与被动。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-47",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-41",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-53",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "三步判断：①句中已有谓语吗 ②与逻辑主语是主动还是被动 ③动作先后还是将来。常见错误：Seen from the hill 与 Seeing 混淆；悬垂分词（逻辑主语不一致）。",
+   "probe": "语法填空：___ (see) from the top, the city looks beautiful. The building ___ (build) now is our new library.",
+   "terms": [
+    "to do",
+    "doing",
+    "done",
+    "having done",
+    "being done",
+    "with + n. + doing",
+    "logical subject"
+   ]
+  },
+  {
+   "id": "ESH-GRA-56",
+   "strand": "GRA",
+   "stage": "G10",
+   "term": "上",
+   "unit": "必修第一册",
+   "name": "定语从句进阶：关系副词、介词+which/whom、非限制性",
+   "name_en": "Relative clauses (advanced)",
+   "desc": "能使用 where/when/why、介词+which/whom、非限制性定语从句（which 指代整句、as 引导），判断关系词在从句中的成分。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-49",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先补全从句看“缺什么”：缺主宾用 which/that，缺状语用 where/when 或介词+which。常见错误：The house where I bought（缺宾语却用 where）；非限制性从句用 that。",
+   "probe": "填空：This is the factory ___ we visited last year. / He failed the exam, ___ surprised us all.",
+   "terms": [
+    "where",
+    "when",
+    "why",
+    "in which",
+    "of whom",
+    "which",
+    "as",
+    "non-restrictive"
+   ]
+  },
+  {
+   "id": "ESH-GRA-57",
+   "strand": "GRA",
+   "stage": "G10",
+   "term": "下",
+   "unit": "必修第二册",
+   "name": "名词性从句（主语/宾语/表语/同位语从句）",
+   "name_en": "Noun clauses",
+   "desc": "能区分 that/whether/what/whatever 等在名词性从句中的用法，识别同位语从句与定语从句的区别。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-54",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-49",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "判断法：从句缺成分用 what，不缺成分且有“是否”用 whether，不缺成分且意思完整用 that。常见错误：What 与 That 混用；同位语从句的 that 被当成定语从句的关系代词。",
+   "probe": "语法填空：___ he said at the meeting surprised everyone. The news ___ our team won is true.",
+   "terms": [
+    "that",
+    "whether",
+    "what",
+    "whatever",
+    "whoever",
+    "the fact that",
+    "It is said that"
+   ]
+  },
+  {
+   "id": "ESH-GRA-58",
+   "strand": "GRA",
+   "stage": "G10",
+   "term": "全",
+   "unit": "高考题型训练",
+   "name": "语法填空解题策略（有提示词/无提示词）",
+   "name_en": "Grammar gap-filling strategy",
+   "desc": "能在上海高考语法填空中，根据空格结构判断填谓语、非谓语、词形、连词、代词、介词或冠词，并准确拼写。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-50",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-55",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-56",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "有提示词先看“句子是否缺谓语”，无提示词先看“是否缺连接/缺成分”。每次做完按错因归类（时态/非谓语/从句/词形）。常见错误：只看空前后两词不看整句结构。",
+   "probe": "完成一篇10空语法填空（含4个无提示词空），统计每类错因。",
+   "terms": [
+    "predicate",
+    "non-finite",
+    "conjunction",
+    "pronoun",
+    "preposition",
+    "article",
+    "clause"
+   ]
+  },
+  {
+   "id": "ESH-VOC-17",
+   "strand": "VOC",
+   "stage": "G10",
+   "term": "全",
+   "unit": "必修第一册–第二册",
+   "name": "高中词汇与词块：构词法、搭配、选词填空",
+   "name_en": "High-school vocabulary, chunks and the 11-for-10 word bank",
+   "desc": "能通过构词法和词块积累课标词汇（约3000词），在上海高考词汇题（11选10）中依据词性、语义和搭配准确选词。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-16",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-15",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "每课整理“词块卡”（如 make a contribution to），用词根词缀成族记忆；做选词题前先给11个词标词性。常见错误：只背中文意思不记搭配和词性。",
+   "probe": "完成一道11选10词汇填空，并说明两处干扰项被排除的原因。",
+   "terms": [
+    "root",
+    "prefix",
+    "suffix",
+    "collocation",
+    "chunk",
+    "contribute to",
+    "account for",
+    "part of speech"
+   ]
+  },
+  {
+   "id": "ESH-REA-09",
+   "strand": "REA",
+   "stage": "G10",
+   "term": "全",
+   "unit": "必修第一册–第二册 Reading",
+   "name": "篇章结构与主旨大意",
+   "name_en": "Text structure and gist",
+   "desc": "能识别记叙、说明、议论等文本的组织结构（总分、时间顺序、问题-解决、对比），概括段落及全文主旨。",
+   "prereqs": [
+    {
+     "id": "ESH-REA-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "每篇课文画“结构图”（每段一个关键词+段落关系箭头）。常见错误：把第一段的引子当主旨，忽略 however 之后的转折主题。",
+   "probe": "读一篇400词说明文，画出段落结构并选出最佳标题。",
+   "terms": [
+    "structure",
+    "general-specific",
+    "cause and effect",
+    "problem-solution",
+    "contrast",
+    "gist",
+    "title"
+   ]
+  },
+  {
+   "id": "ESH-REA-10",
+   "strand": "REA",
+   "stage": "G10",
+   "term": "全",
+   "unit": "高考题型训练",
+   "name": "完形填空",
+   "name_en": "Cloze test",
+   "desc": "能在300词左右的语篇中依据上下文逻辑、复现、搭配和情感线索完成15空选词。",
+   "prereqs": [
+    {
+     "id": "ESH-REA-09",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-17",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先读首尾句把握主线，做题时寻找“原词复现、同义复现、转折对比”线索。常见错误：只看空格所在句；对抽象名词和副词选项不敏感。",
+   "probe": "完成一篇15空完形填空，并为每题写出所依据的线索词。",
+   "terms": [
+    "context",
+    "logic",
+    "recurrence",
+    "synonym",
+    "contrast",
+    "collocation"
+   ]
+  },
+  {
+   "id": "ESH-WRI-09",
+   "strand": "WRI",
+   "stage": "G10",
+   "term": "全",
+   "unit": "必修第一册–第二册 Writing",
+   "name": "应用文写作：通知、邀请、建议信、申请信",
+   "name_en": "Practical writing",
+   "desc": "能按目的与读者写通知、邀请信、建议信、申请信等应用文，格式规范、要点完整、语气得体。",
+   "prereqs": [
+    {
+     "id": "ESH-WRI-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "为每种应用文准备“开头-主体-结尾”三句模板，再用不同话题替换练习。常见错误：语气不当（对校长用过于随便的口吻）、要点遗漏。",
+   "probe": "给校报写一封120词建议信，提出改善食堂的三条建议。",
+   "terms": [
+    "I'm writing to ...",
+    "I'd like to suggest ...",
+    "It would be ... if ...",
+    "I would appreciate it if ...",
+    "Notice",
+    "Yours sincerely"
+   ]
+  },
+  {
+   "id": "ESH-LIS-13",
+   "strand": "LIS",
+   "stage": "G10",
+   "term": "全",
+   "unit": "高考题型训练",
+   "name": "高考听力：短对话、长对话与短文",
+   "name_en": "Gaokao listening",
+   "desc": "能完成上海高考听力短对话推断、长对话与短文理解题，掌握预读题、速记和同义转述识别。",
+   "prereqs": [
+    {
+     "id": "ESH-LIS-12",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "听前30秒扫读选项划差异词；听到的原词往往是干扰项，答案常为同义转述。常见错误：听到原词就选；忽略语气词和说话人语调表达的态度。",
+   "probe": "完成10道短对话推断题，统计“原词干扰”造成的错误数。",
+   "terms": [
+    "inference",
+    "paraphrase",
+    "prediction",
+    "attitude",
+    "implication"
+   ]
+  },
+  {
+   "id": "ESH-GRA-59",
+   "strand": "GRA",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修第三册 / 选择性必修第一册",
+   "name": "虚拟语气",
+   "name_en": "Subjunctive mood",
+   "desc": "能使用与现在、过去、将来事实相反的条件句、错综时间虚拟、wish/would rather/as if/it's time that、insist/suggest 等后的虚拟语气。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-46",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-44",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "列一张三行表格（现在/过去/将来）分别写 if 从句和主句形式，造与自己生活相关的句子。常见错误：混用时间（If I had studied, I would pass the exam now 判断错误）；suggest 表“表明”时误用虚拟。",
+   "probe": "填空：If I ___ (know) your number yesterday, I would have called you. I wish I ___ (be) taller.",
+   "terms": [
+    "If I were ...",
+    "would have done",
+    "wish",
+    "as if",
+    "would rather",
+    "It's time that",
+    "suggest (should) do"
+   ]
+  },
+  {
+   "id": "ESH-GRA-60",
+   "strand": "GRA",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选择性必修第一册",
+   "name": "倒装句与强调句",
+   "name_en": "Inversion and emphasis",
+   "desc": "能使用 Only/Never/Hardly...when/Not until 等引起的部分倒装、so/neither 倒装、表地点副词的全部倒装，以及 It is/was ... that/who 强调句。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-51",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-46",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做“否定词开头→助动词提前”对照练习；强调句检验法：去掉 It is ... that 句子仍完整。常见错误：Not until ... 倒装放在主句还是从句；强调句与主语从句混淆。",
+   "probe": "改写：I didn't realize the mistake until he told me. → Not until ___。",
+   "terms": [
+    "Only then did ...",
+    "Never have I ...",
+    "Hardly ... when",
+    "Not until",
+    "So do I.",
+    "It is ... that ...",
+    "Here comes ..."
+   ]
+  },
+  {
+   "id": "ESH-GRA-61",
+   "strand": "GRA",
+   "stage": "G11",
+   "term": "上",
+   "unit": "必修第三册",
+   "name": "情态动词 + have done",
+   "name_en": "Modals with perfect infinitive",
+   "desc": "能用 must/can't/may have done 对过去推测，用 should/needn't/could have done 表达对过去的责备、遗憾或未实现的可能。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-52",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-34",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "看“侦探故事”对过去推测，并用 should have done 说一件后悔的事。常见错误：对过去推测用 must be；needn't have done 与 didn't need to do 意思区别不清。",
+   "probe": "选择：The ground is wet. It ___ last night. A. must rain B. must have rained C. can have rained",
+   "terms": [
+    "must have done",
+    "can't have done",
+    "may have done",
+    "should have done",
+    "needn't have done",
+    "could have done"
+   ]
+  },
+  {
+   "id": "ESH-GRA-62",
+   "strand": "GRA",
+   "stage": "G11",
+   "term": "下",
+   "unit": "选择性必修第一册",
+   "name": "状语从句省略与特殊句式",
+   "name_en": "Ellipsis in clauses",
+   "desc": "能识别并使用 when/if/though + doing/done/adj 等状语从句省略结构，以及 if necessary/if possible 等固定省略。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-55",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-46",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "把完整从句逐步“删减”到省略形式，体会主语一致、含 be 动词才能省略。常见错误：主从句主语不一致时仍省略。",
+   "probe": "将 When he was asked about the plan, he said nothing. 改为省略结构。",
+   "terms": [
+    "when asked",
+    "if necessary",
+    "though tired",
+    "while doing",
+    "unless invited"
+   ]
+  },
+  {
+   "id": "ESH-VOC-18",
+   "strand": "VOC",
+   "stage": "G11",
+   "term": "全",
+   "unit": "选择性必修第一册–第二册",
+   "name": "熟词僻义与同义转述",
+   "name_en": "Polysemy and paraphrasing",
+   "desc": "能识别熟词在语境中的新义（如 address 处理、novel 新颖的），能用同义词或句式对原文意思进行转述。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-17",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "建“熟词生义本”，每词附原文例句；阅读时练习用自己的话改写长句。常见错误：用最常见义硬套导致误读题目和选项。",
+   "probe": "解释句中划线词：We must address the problem at once. / It's a novel idea.",
+   "terms": [
+    "address",
+    "novel",
+    "figure",
+    "fine",
+    "paraphrase",
+    "synonym",
+    "in other words"
+   ]
+  },
+  {
+   "id": "ESH-REA-11",
+   "strand": "REA",
+   "stage": "G11",
+   "term": "全",
+   "unit": "高考题型训练",
+   "name": "六选四：语篇衔接与段落还原",
+   "name_en": "Gapped text (6-for-4 sentences)",
+   "desc": "能利用代词指代、连接词、词汇复现和段落主题，在语篇中还原恰当的句子（上海高考六选四题型）。",
+   "prereqs": [
+    {
+     "id": "ESH-REA-09",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-REA-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先读每个选项划出代词和连接词，再到空格前后找对应；先做最确定的空。常见错误：只看空格后一句；忽略选项与段首主题句的关系。",
+   "probe": "完成一道六选四练习，并标出每个答案的衔接线索。",
+   "terms": [
+    "cohesion",
+    "reference",
+    "this",
+    "however",
+    "for example",
+    "topic sentence"
+   ]
+  },
+  {
+   "id": "ESH-WRI-10",
+   "strand": "WRI",
+   "stage": "G11",
+   "term": "全",
+   "unit": "高考题型训练",
+   "name": "汉译英（按提示词翻译）",
+   "name_en": "Chinese-English translation",
+   "desc": "能用括号中提示词和合适句式翻译句子，结构正确、用词准确，并恰当使用从句、非谓语等高级结构。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-55",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-57",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-59",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "先划出中文句子主干确定英语主谓，再处理修饰成分；每天2句并对照多种译法。常见错误：逐字直译（中式英语）、提示词形式没变化、时态错误。",
+   "probe": "用所给词翻译：要是你早点出发，就不会错过那班火车了。（catch）",
+   "terms": [
+    "key word",
+    "sentence structure",
+    "subject",
+    "predicate",
+    "Chinglish",
+    "tense"
+   ]
+  },
+  {
+   "id": "ESH-WRI-11",
+   "strand": "WRI",
+   "stage": "G11",
+   "term": "全",
+   "unit": "高考题型训练",
+   "name": "概要写作（60词以内）",
+   "name_en": "Summary writing",
+   "desc": "能概括一篇350词左右文章的要点，用自己的语言在60词以内完整表达主旨和关键信息，不加个人观点。",
+   "prereqs": [
+    {
+     "id": "ESH-REA-09",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-VOC-18",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "找出每段主旨句→合并为3–4个要点→同义改写+连接词串联。常见错误：大段照抄原文、加入例子细节或个人评价、超字数。",
+   "probe": "阅读一篇350词议论文，写一段不超过60词的概要，对照评分标准自评要点覆盖。",
+   "terms": [
+    "main points",
+    "paraphrase",
+    "in your own words",
+    "cohesive devices",
+    "word limit",
+    "objective"
+   ]
+  },
+  {
+   "id": "ESH-LIS-14",
+   "strand": "LIS",
+   "stage": "G11",
+   "term": "全",
+   "unit": "上海高考英语听说测试",
+   "name": "高考英语听说测试（人机对话）",
+   "name_en": "Computer-based listening & speaking test",
+   "desc": "能完成朗读句子与短文、情景提问与应答、看图说话/话题表达等人机口语任务，语音清晰、表达连贯。",
+   "prereqs": [
+    {
+     "id": "ESH-LIS-13",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-PHO-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "每周录音完成一套听说模拟，回听时关注重音、连读和停顿；看图说话用“总体-细节-感受”三句结构。常见错误：提问时语序错误；超时或冷场。",
+   "probe": "根据情景用两个问句向对方提问，并就一张图片说60秒。",
+   "terms": [
+    "read aloud",
+    "situational questions",
+    "quick response",
+    "picture description",
+    "fluency"
+   ]
+  },
+  {
+   "id": "ESH-GRA-63",
+   "strand": "GRA",
+   "stage": "G12",
+   "term": "上",
+   "unit": "选择性必修第三册",
+   "name": "独立主格与复杂非谓语结构",
+   "name_en": "Absolute constructions",
+   "desc": "能识别并运用名词/代词 + doing/done/to do/形容词/介词短语构成的独立主格及 with 复合结构。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-55",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-62",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "对比“逻辑主语一致用分词，不一致用独立主格”，把 because/when 从句改写为独立主格。常见错误：独立主格中加连词（The work done, so we left）；with 复合结构主被动判断错。",
+   "probe": "改写：Because the weather was fine, we went for a picnic. → The weather ___ fine, we went for a picnic.",
+   "terms": [
+    "The work done, ...",
+    "Weather permitting",
+    "with + n. + done",
+    "There being ...",
+    "absolute"
+   ]
+  },
+  {
+   "id": "ESH-GRA-64",
+   "strand": "GRA",
+   "stage": "G12",
+   "term": "全",
+   "unit": "选择性必修第三册–第四册",
+   "name": "长难句分析",
+   "name_en": "Analysing long and complex sentences",
+   "desc": "能拆分多层从句、插入语、并列结构和倒装的长难句，找出主干并理解修饰关系，服务于阅读和翻译。",
+   "prereqs": [
+    {
+     "id": "ESH-GRA-57",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-56",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-60",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-63",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "用“括号法”：从句用［］、非谓语用（），先读主干再逐层还原。每天分析1个阅读中的长句。常见错误：把从句的谓语当成主句谓语；忽略插入语导致断句错。",
+   "probe": "分析一个40词长句的主干和各从句功能，并译成通顺中文。",
+   "terms": [
+    "main clause",
+    "subordinate clause",
+    "parenthesis",
+    "modifier",
+    "trunk",
+    "parallel structure"
+   ]
+  },
+  {
+   "id": "ESH-REA-12",
+   "strand": "REA",
+   "stage": "G12",
+   "term": "全",
+   "unit": "高考复习",
+   "name": "高考阅读：推断、态度与语篇功能",
+   "name_en": "Gaokao reading: inference, tone and function",
+   "desc": "能在限时内完成上海高考各类阅读题，准确解答推断题、作者态度/语气题、句子与段落作用题和词义猜测题。",
+   "prereqs": [
+    {
+     "id": "ESH-REA-11",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-64",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "每类题总结错因：推断题“不超出原文一步”，态度题关注形容词和副词，功能题看上下段关系。常见错误：选项过于绝对仍选、把文中事实当推断答案。",
+   "probe": "限时35分钟完成一套高考阅读，统计各题型正确率。",
+   "terms": [
+    "infer",
+    "tone",
+    "attitude",
+    "objective",
+    "critical",
+    "function of the paragraph",
+    "the underlined word"
+   ]
+  },
+  {
+   "id": "ESH-WRI-12",
+   "strand": "WRI",
+   "stage": "G12",
+   "term": "全",
+   "unit": "高考复习",
+   "name": "高考作文（120–150词）：论证与表达",
+   "name_en": "Gaokao guided writing",
+   "desc": "能就给定情境和话题写120–150词作文，立场明确、论证有据、结构完整，句式多样且语言准确得体。",
+   "prereqs": [
+    {
+     "id": "ESH-WRI-09",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-WRI-11",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-WRI-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "建“话题素材库”（科技、教育、环保、文化），每个话题准备论点+例证；写后按“内容-语言-结构”三维自改。常见错误：只罗列观点不展开、模板化语句过多、关键词拼写错。",
+   "probe": "就“学生是否应使用 AI 学习工具”写一篇140词左右的议论性书信，限时30分钟。",
+   "terms": [
+    "thesis",
+    "argument",
+    "evidence",
+    "counterargument",
+    "In conclusion",
+    "Admittedly",
+    "Therefore"
+   ]
+  },
+  {
+   "id": "ESH-VOC-19",
+   "strand": "VOC",
+   "stage": "G12",
+   "term": "全",
+   "unit": "高考复习",
+   "name": "高考核心词汇与高级表达",
+   "name_en": "Core vocabulary and advanced expression",
+   "desc": "熟练掌握上海高考考纲词汇及高频词组，能在写作中运用准确、多样的词汇替换基础表达。",
+   "prereqs": [
+    {
+     "id": "ESH-VOC-18",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "按话题整理“升级词表”（important→vital/crucial；think→hold the view that），每次写作至少用3个。常见错误：堆砌生僻词导致搭配错误，重在准确而非华丽。",
+   "probe": "把一段用基础词写成的80词短文改写升级，并保证搭配正确。",
+   "terms": [
+    "vital",
+    "crucial",
+    "beneficial",
+    "contribute to",
+    "be committed to",
+    "hold the view that"
+   ]
+  },
+  {
+   "id": "ESH-REA-13",
+   "strand": "REA",
+   "stage": "G12",
+   "term": "全",
+   "unit": "选择性必修第三册–第四册 / 课外整本书阅读",
+   "name": "文学阅读与整本书阅读",
+   "name_en": "Literary and extensive reading",
+   "desc": "能阅读英文小说、诗歌片段和整本简写读物，分析人物、主题和修辞，形成阅读习惯和跨文化理解。",
+   "prereqs": [
+    {
+     "id": "ESH-REA-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "每学期读完1–2本分级读物或简写名著，写读书卡（人物、主题、金句）。常见错误：查每个生词导致读不下去，应以理解情节为先。",
+   "probe": "读一篇短篇小说后回答：主人公性格如何变化？作者用了哪种修辞表达主题？",
+   "terms": [
+    "character",
+    "theme",
+    "plot",
+    "setting",
+    "metaphor",
+    "simile",
+    "extensive reading"
+   ]
+  },
+  {
+   "id": "ESH-WRI-13",
+   "strand": "WRI",
+   "stage": "G12",
+   "term": "全",
+   "unit": "高考复习",
+   "name": "写作衔接与句式多样化",
+   "name_en": "Cohesion and sentence variety",
+   "desc": "能恰当使用连接词、指代、替换和平行结构使文章连贯，能综合运用从句、非谓语、倒装和强调丰富句式。",
+   "prereqs": [
+    {
+     "id": "ESH-WRI-12",
+     "strength": "有帮助"
+    },
+    {
+     "id": "ESH-GRA-60",
+     "strength": "必须"
+    },
+    {
+     "id": "ESH-GRA-63",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把自己的作文中的简单句两两合并，并用不同连接方式（从句、分词、独立主格）重写。常见错误：连接词堆砌（first, second, third 到底）；逗号连接两个完整句（run-on sentence）。",
+   "probe": "将五个简单句合并改写为两个复合句，并保证逻辑清楚。",
+   "terms": [
+    "moreover",
+    "nevertheless",
+    "consequently",
+    "not only ... but also",
+    "run-on sentence",
+    "parallelism"
+   ]
+  },
+  {
+   "id": "ESH-LIS-15",
+   "strand": "LIS",
+   "stage": "G12",
+   "term": "全",
+   "unit": "选择性必修第四册",
+   "name": "思辨表达与跨文化交际",
+   "name_en": "Critical speaking and intercultural communication",
+   "desc": "能就社会和文化话题进行演讲、讨论或辩论，提出有依据的观点并回应不同意见，体现跨文化意识。",
+   "prereqs": [
+    {
+     "id": "ESH-LIS-14",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "每周选一个热点话题做2分钟演讲录音，使用“观点-理由-例子-总结”结构。常见错误：只陈述观点不给理由；回应他人时语气生硬。",
+   "probe": "就“传统节日是否应该现代化”发表1分钟观点并回应一个反方问题。",
+   "terms": [
+    "In my view",
+    "From my perspective",
+    "I see your point, but ...",
+    "cultural differences",
+    "debate",
+    "presentation"
+   ]
+  }
+ ]
+}

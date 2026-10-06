@@ -1,0 +1,2821 @@
+{
+ "pack": {
+  "id": "phy-cambridge",
+  "subject": "physics",
+  "subject_name": "物理",
+  "edition": "Cambridge Lower Secondary Science → IGCSE Physics 0625",
+  "region": "国际学校",
+  "stages": [
+   "G6",
+   "G7",
+   "G8",
+   "G9",
+   "IGCSE"
+  ],
+  "version": 1,
+  "generated": "2026-10-06",
+  "sources": [
+   "https://www.cambridgeinternational.org/Images/764332-2029-syllabus.pdf",
+   "https://www.cambridgeinternational.org/Images/697209-2026-2028-syllabus.pdf",
+   "/mnt/project-files/aistudy/data/phy_igcse_1.1_knowledge_points.json"
+  ],
+  "notes": "知识图谱：从数学与初中科学基础（Cambridge Lower Secondary Stage 7-9 对应 G6-G9）到 IGCSE Physics 0625 全部六大板块。2026-2028 与 2029 大纲主题编号相同（2029 版注明无影响教学的重大变化）。1.1 与 MATH-PRE-UNIT/DEC/AVG/PYTH、ENG-PRE-CMD 沿用旧文件的 id、name、desc、level、prereqs、hot，保证旧诊断结果可对应；1.1-06~12 为学校补充（school）内容。较小的子主题合并为一个知识点，syllabus 字段用 / 列出覆盖的多个小节（如 1.7.2/1.7.4）；supp 表示该点主要属于 Supplement（Extended）内容，core 点中也可能附带少量 supplement 细节。prereqs 中 strength 取 必须 / 有帮助。"
+ },
+ "strands": [
+  {
+   "id": "BASE",
+   "name": "数学与科学基础"
+  },
+  {
+   "id": "S1",
+   "name": "运动、力和能量"
+  },
+  {
+   "id": "S2",
+   "name": "热学"
+  },
+  {
+   "id": "S3",
+   "name": "波"
+  },
+  {
+   "id": "S4",
+   "name": "电和磁"
+  },
+  {
+   "id": "S5",
+   "name": "核物理"
+  },
+  {
+   "id": "S6",
+   "name": "天体物理"
+  }
+ ],
+ "kps": [
+  {
+   "id": "MATH-PRE-UNIT",
+   "strand": "BASE",
+   "stage": "G6",
+   "syllabus": "",
+   "level": "pre",
+   "name": "长度与体积单位换算",
+   "name_en": "Converting units of length and volume",
+   "desc": "mm、cm、m 互换；1 mL = 1 cm³",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "millimetre",
+    "centimetre",
+    "metre",
+    "cubic centimetre",
+    "millilitre",
+    "convert"
+   ],
+   "method": "画一条“km–m–cm–mm”换算梯子（×1000、×100、×10），面积/体积要把倍数平方/立方：1 m³ = 10⁶ cm³。每题先写单位再算，常见错误是体积换算只乘 100。",
+   "probe": "给出 cm³ 与 m³、mL 与 cm³ 的换算，看她是否会把长度倍数立方。"
+  },
+  {
+   "id": "MATH-PRE-DEC",
+   "strand": "BASE",
+   "stage": "G6",
+   "syllabus": "",
+   "level": "pre",
+   "name": "小数与读刻度",
+   "name_en": "Decimals and reading scales",
+   "desc": "能读出两刻度之间的小数值",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "scale",
+    "division",
+    "reading",
+    "decimal",
+    "interval"
+   ],
+   "method": "读刻度前先算“每小格 = 两个标数之差 ÷ 格数”，再数格子。练习不同起点、每格 0.2、0.5 的刻度，常见错误是默认每格为 1。",
+   "probe": "给一个每小格 0.2 单位的刻度图，请她读出指针位置。"
+  },
+  {
+   "id": "MATH-PRE-AVG",
+   "strand": "BASE",
+   "stage": "G6",
+   "syllabus": "",
+   "level": "pre",
+   "name": "求平均数",
+   "name_en": "Calculating the mean (average)",
+   "desc": "几个数相加再除以个数",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "mean",
+    "average",
+    "sum",
+    "repeat",
+    "anomalous"
+   ],
+   "method": "求平均前先剔除明显的异常值（anomalous result），再相加除以个数，保留与原数据相同的小数位。",
+   "probe": "给 4 次重复读数（含一个异常值），问合适的平均值。"
+  },
+  {
+   "id": "MATH-PRE-PYTH",
+   "strand": "BASE",
+   "stage": "G8",
+   "syllabus": "",
+   "level": "pre",
+   "name": "勾股定理",
+   "name_en": "Pythagoras' theorem",
+   "desc": "直角三角形斜边² = 两直角边平方和",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "hypotenuse",
+    "right angle",
+    "square",
+    "square root"
+   ],
+   "method": "记住 c² = a² + b²，c 是对着直角的最长边；算完开平方，并检查结果比两条直角边都大。",
+   "probe": "已知两条直角边求斜边，或已知斜边和一边求另一边。"
+  },
+  {
+   "id": "ENG-PRE-CMD",
+   "strand": "BASE",
+   "stage": "G7",
+   "syllabus": "",
+   "level": "pre",
+   "name": "考试指令词",
+   "name_en": "Exam command words",
+   "desc": "state、describe、explain、determine、calculate、suggest 各要求写什么",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "state",
+    "describe",
+    "explain",
+    "calculate",
+    "determine",
+    "suggest",
+    "define"
+   ],
+   "method": "制作指令词卡：state = 只写答案；describe = 说出是什么/怎样变化；explain = 写出原因（because…）；calculate = 写公式、代数、带单位的答案；suggest = 运用知识推测。每次做题先圈出指令词。",
+   "probe": "给同一个现象配 state / explain 两问，看她能否写出不同深度的答案。"
+  },
+  {
+   "id": "MATH-PRE-SI",
+   "strand": "BASE",
+   "stage": "G7",
+   "syllabus": "",
+   "level": "pre",
+   "name": "国际单位与词头",
+   "name_en": "SI units and prefixes",
+   "desc": "七个常用基本单位（m、kg、s、A、K）和词头 n、μ、m、c、k、M、G 的含义",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-UNIT",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "SI unit",
+    "prefix",
+    "kilo",
+    "mega",
+    "milli",
+    "micro",
+    "nano",
+    "giga"
+   ],
+   "method": "背一张词头表：G 10⁹、M 10⁶、k 10³、c 10⁻²、m 10⁻³、μ 10⁻⁶、n 10⁻⁹。代入公式前一律换成基本单位（g→kg、km→m、mA→A、min→s）。常见错误：把 m（milli）和 M（mega）混淆，或 g 不换成 kg。",
+   "probe": "给 2.5 kV、350 mA、4 min 让她换成基本单位后再代入公式。"
+  },
+  {
+   "id": "MATH-PRE-STDF",
+   "strand": "BASE",
+   "stage": "G8",
+   "syllabus": "",
+   "level": "pre",
+   "name": "科学记数法与有效数字",
+   "name_en": "Standard form and significant figures",
+   "desc": "用 a×10ⁿ 表示很大/很小的数；按题目要求保留有效数字",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-DEC",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "standard form",
+    "significant figures",
+    "decimal places",
+    "power of ten",
+    "round"
+   ],
+   "method": "练习计算器的 ×10ˣ（EXP）键输入 3.0×10⁸；答案一般保留 2–3 位有效数字，不要比题中数据更多。常见错误：把 10⁻³ 输成 10³，或中途四舍五入导致结果偏差。",
+   "probe": "计算 3.0×10⁸ ÷ 6.0×10¹⁴ 并保留 2 位有效数字。"
+  },
+  {
+   "id": "MATH-PRE-REARR",
+   "strand": "BASE",
+   "stage": "G8",
+   "syllabus": "",
+   "level": "pre",
+   "name": "公式变形",
+   "name_en": "Rearranging equations",
+   "desc": "把 v = s/t、F = ma 等公式变形求任一个量",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "subject",
+    "rearrange",
+    "equation",
+    "formula",
+    "substitute"
+   ],
+   "method": "用“三角形法”只适合三量乘除式；更通用的方法是两边同乘同除，一步一行写清楚。做题顺序：写公式 → 变形 → 代数 → 带单位答案。常见错误：E = ½mv² 求 v 时忘记开方。",
+   "probe": "给 Ek = ½mv² 和 p = F/A，要求求 v 和 A。"
+  },
+  {
+   "id": "MATH-PRE-GRAPH",
+   "strand": "BASE",
+   "stage": "G8",
+   "syllabus": "",
+   "level": "pre",
+   "name": "画图读图、斜率与面积",
+   "name_en": "Plotting and reading graphs; gradient and area",
+   "desc": "会选刻度描点、画最佳拟合线，会算直线斜率和图线下面积",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-DEC",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "axis",
+    "scale",
+    "plot",
+    "line of best fit",
+    "gradient",
+    "intercept",
+    "area under the graph"
+   ],
+   "method": "斜率 = Δy/Δx，用大三角形（占直线一半以上）读两点；面积按矩形 + 三角形分块算。描点画小 ×，最佳拟合线是一条平滑线而不是连点。常见错误：读坐标不看单位或刻度。",
+   "probe": "给一条直线图，让她用大三角形求斜率并写出单位。"
+  },
+  {
+   "id": "MATH-PRE-RATIO",
+   "strand": "BASE",
+   "stage": "G7",
+   "syllabus": "",
+   "level": "pre",
+   "name": "比例与正反比",
+   "name_en": "Ratio and proportion",
+   "desc": "判断正比、反比；会用比例关系做计算",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "ratio",
+    "proportional",
+    "directly proportional",
+    "inversely proportional",
+    "constant"
+   ],
+   "method": "正比：y/x 为常数，图像是过原点直线；反比：xy 为常数。看到“doubles”就想一想另一个量如何变化。常见错误：把“增大”误当成“成正比”（必须过原点）。",
+   "probe": "给一组数据，判断是正比、反比还是都不是，并说明理由。"
+  },
+  {
+   "id": "MATH-PRE-TRIG",
+   "strand": "BASE",
+   "stage": "G9",
+   "syllabus": "",
+   "level": "pre",
+   "name": "三角函数基础",
+   "name_en": "Basic trigonometry (sin, cos, tan)",
+   "desc": "直角三角形中的 sin、cos、tan，以及用计算器求角度",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-PYTH",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "sine",
+    "cosine",
+    "tangent",
+    "inverse",
+    "angle",
+    "degree"
+   ],
+   "method": "记 SOH-CAH-TOA；用计算器前检查是 DEG 模式；求角度用 sin⁻¹、tan⁻¹。物理里主要用于矢量方向（tan）和折射定律（sin）。",
+   "probe": "已知直角三角形两边求夹角，或求 sin 30° 的值。"
+  },
+  {
+   "id": "SCI-PRE-PART",
+   "strand": "BASE",
+   "stage": "G7",
+   "syllabus": "",
+   "level": "pre",
+   "name": "粒子模型",
+   "name_en": "Particle model of solids, liquids and gases",
+   "desc": "固液气中粒子的排列、间距和运动方式",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "particle",
+    "solid",
+    "liquid",
+    "gas",
+    "arrangement",
+    "vibrate",
+    "melting",
+    "boiling"
+   ],
+   "method": "画三格图：固体规则紧密只振动；液体紧密无规则可滑动；气体间距大、随机快速运动。用“arrangement / separation / motion”三个词描述。常见错误：说固体粒子“不动”。",
+   "probe": "让她画并用英文描述三态粒子的排列与运动。"
+  },
+  {
+   "id": "SCI-PRE-ENERGY",
+   "strand": "BASE",
+   "stage": "G7",
+   "syllabus": "",
+   "level": "pre",
+   "name": "能量储存与转移",
+   "name_en": "Energy stores and transfers",
+   "desc": "动能、重力势能、化学能、弹性势能、热能等储存方式，能量守恒",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "energy store",
+    "kinetic",
+    "gravitational potential",
+    "chemical",
+    "elastic",
+    "thermal",
+    "transfer",
+    "conservation"
+   ],
+   "method": "背英文名称：kinetic、gravitational potential、chemical、elastic (strain)、nuclear、electrostatic、internal (thermal)。用“A store → B store”写能量流程图。常见错误：把 light/sound 当成储存（它们是传递方式）。",
+   "probe": "描述一个过山车或电池灯的能量从哪个储存转到哪个储存。"
+  },
+  {
+   "id": "SCI-PRE-CIRC",
+   "strand": "BASE",
+   "stage": "G8",
+   "syllabus": "",
+   "level": "pre",
+   "name": "简单电路",
+   "name_en": "Simple circuits",
+   "desc": "电路符号、串并联、电流表和电压表的基本接法",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "circuit",
+    "cell",
+    "bulb",
+    "switch",
+    "series",
+    "parallel",
+    "ammeter",
+    "voltmeter"
+   ],
+   "method": "画符号卡；记住电流表串联、电压表并联。串联只有一条回路，并联有分支。常见错误：电压表串在电路里。",
+   "probe": "给一个简单电路图，问电流表和电压表应如何连接。"
+  },
+  {
+   "id": "SCI-PRE-FORCE",
+   "strand": "BASE",
+   "stage": "G7",
+   "syllabus": "",
+   "level": "pre",
+   "name": "力的基础",
+   "name_en": "Forces basics",
+   "desc": "力的种类、单位牛顿、力的示意图、平衡力",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "force",
+    "newton",
+    "weight",
+    "friction",
+    "air resistance",
+    "balanced",
+    "unbalanced",
+    "free-body diagram"
+   ],
+   "method": "用箭头画受力图（长度表示大小），标出 weight、normal contact force、friction、drag。平衡力 → 静止或匀速；不平衡 → 速度改变。常见错误：认为运动必须有向前的合力。",
+   "probe": "画出匀速下落的跳伞者的受力图并判断是否平衡。"
+  },
+  {
+   "id": "SCI-PRE-LIGHT",
+   "strand": "BASE",
+   "stage": "G8",
+   "syllabus": "",
+   "level": "pre",
+   "name": "光的直线传播与反射",
+   "name_en": "Light travels in straight lines; reflection",
+   "desc": "光沿直线传播，平面镜反射，入射角等于反射角",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "ray",
+    "reflection",
+    "mirror",
+    "normal",
+    "angle of incidence",
+    "angle of reflection"
+   ],
+   "method": "角度都从法线（normal，与镜面垂直的虚线）量起，不是从镜面量。画光线要用直尺并加箭头。",
+   "probe": "给一条斜射到平面镜的光线，让她画法线并标出入射角、反射角。"
+  },
+  {
+   "id": "PHY-IG-1.1-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "core",
+   "name": "用刻度尺测长度",
+   "name_en": "Measuring length with a ruler",
+   "desc": "从零刻度量起，读到最近的 mm，视线垂直刻度避免视差",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-UNIT",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-DEC",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "ruler",
+    "length",
+    "millimetre",
+    "parallax",
+    "zero mark"
+   ],
+   "method": "量时物体从 0 刻度对齐，读到最近 1 mm，记录写成如 12.0 cm；眼睛正对刻度避免 parallax error。",
+   "probe": "给一张尺子测物体的图（物体不从 0 开始），请她读出长度。"
+  },
+  {
+   "id": "PHY-IG-1.1-02",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "core",
+   "name": "用量筒测液体体积",
+   "name_en": "Measuring volume with a measuring cylinder",
+   "desc": "视线与液面平齐，读凹液面最低处；单位 cm³",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-UNIT",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-DEC",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "measuring cylinder",
+    "volume",
+    "meniscus",
+    "eye level",
+    "cm³"
+   ],
+   "method": "读凹液面最低点（bottom of the meniscus），视线与液面平齐，单位 cm³ 或 ml（相等）。",
+   "probe": "给量筒图（每格 2 cm³），让她读体积。"
+  },
+  {
+   "id": "PHY-IG-1.1-03",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "core",
+   "name": "排水法测不规则物体体积",
+   "name_en": "Volume of an irregular object by displacement",
+   "desc": "放入物体后的读数减去原来的读数",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.1-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "displacement",
+    "irregular",
+    "volume",
+    "measuring cylinder",
+    "difference"
+   ],
+   "method": "体积 = 放入后读数 − 放入前读数；物体须完全浸没，不要溅出水。",
+   "probe": "给前后两次读数图，算物体体积。"
+  },
+  {
+   "id": "PHY-IG-1.1-04",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "core",
+   "name": "测时间间隔",
+   "name_en": "Measuring time intervals",
+   "desc": "秒表、数字计时器；人的反应时间会带来误差",
+   "prereqs": [],
+   "hot": false,
+   "terms": [
+    "stopwatch",
+    "timer",
+    "time interval",
+    "reaction time",
+    "period"
+   ],
+   "method": "人工计时有约 0.2 s 的反应时间，计时越长相对误差越小；短时间要用光门/数字计时器或测多次。",
+   "probe": "问为什么用秒表测单摆一次摆动的时间不准确，以及如何改进。"
+  },
+  {
+   "id": "PHY-IG-1.1-05",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "core",
+   "name": "累积法测微小量",
+   "name_en": "Measuring a multiple to find a small quantity",
+   "desc": "测 n 个的总量再除以 n：纸张厚度、细铜丝直径、单摆周期",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.1-04",
+     "strength": "有帮助"
+    },
+    {
+     "id": "MATH-PRE-AVG",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "multiple",
+    "oscillation",
+    "period",
+    "thickness",
+    "diameter",
+    "average"
+   ],
+   "method": "“测 n 个再除以 n”：测 20 次摆动求周期、测 100 张纸求厚度。答题要说“measure the total … then divide by …”。",
+   "probe": "给 20 次摆动总时间，求周期并解释为何不只测一次。"
+  },
+  {
+   "id": "PHY-IG-1.1-06",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "school",
+   "name": "游标卡尺读数与分辨率",
+   "name_en": "Reading a vernier caliper",
+   "desc": "主尺读数加游标对齐格数乘以分辨率；10 格游标分辨率 0.1 mm",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-DEC",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "vernier caliper",
+    "main scale",
+    "vernier scale",
+    "resolution",
+    "jaws"
+   ],
+   "method": "读数 = 主尺读数（游标 0 线左侧）+ 对齐格数 × 0.1 mm。先确认零点误差。",
+   "probe": "给一张游标卡尺图让她读数。"
+  },
+  {
+   "id": "PHY-IG-1.1-07",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "school",
+   "name": "螺旋测微器读数",
+   "name_en": "Reading a micrometer screw gauge",
+   "desc": "套筒读数加微分筒读数，分辨率 0.01 mm",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.1-06",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "micrometer",
+    "sleeve",
+    "thimble",
+    "ratchet",
+    "resolution"
+   ],
+   "method": "读数 = 套筒可见刻度（含半毫米）+ 微分筒对齐格数 × 0.01 mm；用 ratchet 拧紧防止压太紧。",
+   "probe": "给一张螺旋测微器图让她读数。"
+  },
+  {
+   "id": "PHY-IG-1.1-08",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "school",
+   "name": "误差的定义",
+   "name_en": "Definition of error",
+   "desc": "error = 测量值 − 真实值",
+   "prereqs": [
+    {
+     "id": "ENG-PRE-CMD",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "error",
+    "measured value",
+    "true value",
+    "reading"
+   ],
+   "method": "背定义：error = measured value − true value；error 不是“mistake”。",
+   "probe": "给真实值与测量值，求误差并指出正负意义。"
+  },
+  {
+   "id": "PHY-IG-1.1-09",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "school",
+   "name": "随机误差与系统误差",
+   "name_en": "Random and systematic errors",
+   "desc": "随机误差忽大忽小；系统误差每次偏同一方向同样多，零点误差是一种系统误差",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.1-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "random error",
+    "systematic error",
+    "zero error",
+    "scatter",
+    "consistent"
+   ],
+   "method": "随机误差：读数在真实值两边散开，多测求平均可减小；系统误差：每次偏同一方向同样多（如 zero error），平均不能消除。做对比表并各背两个例子。常见错误：把两者对调。",
+   "probe": "描述一组读数现象（都偏大 0.2 / 忽大忽小），让她判断误差类型并给出改进方法。"
+  },
+  {
+   "id": "PHY-IG-1.1-10",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "school",
+   "name": "减小误差的方法",
+   "name_en": "Reducing errors",
+   "desc": "随机误差：多测几次求平均；系统误差：校准仪器或从每个读数中减去零点误差",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.1-09",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-AVG",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "repeat",
+    "average",
+    "calibrate",
+    "zero error",
+    "correct"
+   ],
+   "method": "随机误差 → repeat and calculate the mean；系统误差 → calibrate the instrument / subtract the zero error。答题必须对应误差类型。",
+   "probe": "给一个零点误差为 +0.3 mm 的情境，问如何得到正确读数。"
+  },
+  {
+   "id": "PHY-IG-1.1-11",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "school",
+   "name": "准确度与精密度",
+   "name_en": "Accuracy and precision",
+   "desc": "accuracy 看平均值离真实值多近；precision 看多次读数彼此多接近",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.1-08",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-AVG",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "accuracy",
+    "precision",
+    "true value",
+    "close together",
+    "spread"
+   ],
+   "method": "用靶子图记：accurate = 平均值靠近靶心（真实值）；precise = 弹孔彼此靠近（读数一致）。四种组合各画一个。常见错误：认为 precise 就一定 accurate。",
+   "probe": "给四组数据（真实值已知），让她分别判断是否 accurate、是否 precise。"
+  },
+  {
+   "id": "PHY-IG-1.1-12",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "school",
+   "name": "不确定度",
+   "name_en": "Uncertainty",
+   "desc": "用 ± 表示真实值可能所在的范围，通常取仪器分辨率",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.1-06",
+     "strength": "有帮助"
+    },
+    {
+     "id": "PHY-IG-1.1-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "uncertainty",
+    "±",
+    "resolution",
+    "range",
+    "reading"
+   ],
+   "method": "结果写成 值 ± 不确定度，通常取仪器最小分度（或其一半），单位与小数位要对齐，如 12.4 ± 0.1 cm。",
+   "probe": "给一个读数和仪器分辨率，让她写出带不确定度的结果。"
+  },
+  {
+   "id": "PHY-IG-1.1-13",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "supp",
+   "name": "标量与矢量",
+   "name_en": "Scalars and vectors",
+   "desc": "标量只有大小；矢量有大小和方向",
+   "prereqs": [],
+   "hot": true,
+   "terms": [
+    "scalar",
+    "vector",
+    "magnitude",
+    "direction"
+   ],
+   "method": "背定义：scalar has magnitude only；vector has magnitude and direction。",
+   "probe": "问 speed 与 velocity 的区别，并说明哪个是矢量。"
+  },
+  {
+   "id": "PHY-IG-1.1-14",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "supp",
+   "name": "常见标量和矢量",
+   "name_en": "Common scalar and vector quantities",
+   "desc": "标量：distance、speed、time、mass、energy、temperature；矢量：force、weight、velocity、acceleration、momentum、电场强度、重力场强度",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.1-13",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "distance",
+    "displacement",
+    "speed",
+    "velocity",
+    "mass",
+    "weight",
+    "acceleration",
+    "momentum"
+   ],
+   "method": "做两列词表反复默写；成对记忆：distance/displacement、speed/velocity、mass/weight（前标量后矢量）。",
+   "probe": "给 8 个物理量，让她分成标量和矢量两组。"
+  },
+  {
+   "id": "PHY-IG-1.1-15",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.1",
+   "level": "supp",
+   "name": "两个垂直矢量的合成",
+   "name_en": "Resultant of two perpendicular vectors",
+   "desc": "用勾股定理算大小，用 tan 或作图求方向；只考力和速度",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.1-13",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-PYTH",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "resultant",
+    "perpendicular",
+    "Pythagoras",
+    "scale drawing",
+    "direction"
+   ],
+   "method": "大小用勾股定理，方向用 tan θ = 对边/邻边，并说明角是相对哪个方向的；也可按比例作图。",
+   "probe": "两个互相垂直的力 3 N 和 4 N，求合力大小和方向。"
+  },
+  {
+   "id": "PHY-IG-1.2-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.2",
+   "level": "core",
+   "name": "速度与平均速度",
+   "name_en": "Speed and average speed",
+   "desc": "v = s/t；平均速度 = 总路程 ÷ 总时间；速度是有方向的 speed",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-SI",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.1-14",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "speed",
+    "average speed",
+    "velocity",
+    "distance",
+    "time",
+    "m/s"
+   ],
+   "method": "背 speed = distance ÷ time 和 average speed = total distance ÷ total time；单位换成 m 和 s，km/h ÷ 3.6 = m/s。常见错误：平均速度用两段速度直接求平均。",
+   "probe": "两段不同速度的行程，求全程平均速度。"
+  },
+  {
+   "id": "PHY-IG-1.2-02",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.2",
+   "level": "core",
+   "name": "路程-时间图",
+   "name_en": "Distance–time graphs",
+   "desc": "水平线 = 静止；直线斜率 = 速度；曲线变陡 = 加速",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "distance-time graph",
+    "gradient",
+    "at rest",
+    "constant speed",
+    "accelerating"
+   ],
+   "method": "口诀：d-t 图看斜率 = speed；水平线 = at rest。用大三角形求斜率。常见错误：把 d-t 图和 v-t 图的形状含义混用。",
+   "probe": "给一张分段 d-t 图，问每段运动状态并求某段速度。"
+  },
+  {
+   "id": "PHY-IG-1.2-03",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.2",
+   "level": "core",
+   "name": "速度-时间图与加速度",
+   "name_en": "Speed–time graphs and acceleration",
+   "desc": "v-t 图斜率 = 加速度；水平线 = 匀速；a = Δv/Δt",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.2-02",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "speed-time graph",
+    "acceleration",
+    "constant acceleration",
+    "m/s²",
+    "gradient",
+    "change in velocity"
+   ],
+   "method": "背 acceleration = change in velocity ÷ time taken，单位 m/s²。v-t 图：水平 = constant speed，斜向上直线 = constant acceleration。常见错误：看到 v-t 水平线就说“静止”。",
+   "probe": "给一张 v-t 图，问哪段匀速、哪段加速，并求加速度。"
+  },
+  {
+   "id": "PHY-IG-1.2-04",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.2",
+   "level": "supp",
+   "name": "v-t 图面积、减速、自由落体与终极速度",
+   "name_en": "Area under v–t graph, deceleration, free fall and terminal velocity",
+   "desc": "v-t 图下面积 = 路程；负加速度 = 减速；g ≈ 9.8 m/s²；阻力增大到等于重力时达到终极速度",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.2-03",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-FORCE",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "area under the graph",
+    "deceleration",
+    "free fall",
+    "acceleration of free fall",
+    "terminal velocity",
+    "air resistance",
+    "drag"
+   ],
+   "method": "面积分块（矩形 + 三角形）算路程；跳伞题按“开始只有重力 → 速度增大阻力增大 → 合力减小加速度减小 → 阻力 = 重力，terminal velocity”四步写。常见错误：说到达终极速度时“没有力”。",
+   "probe": "给跳伞者的 v-t 图，让她解释各段形状并求某段路程。"
+  },
+  {
+   "id": "PHY-IG-1.3-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.3",
+   "level": "core",
+   "name": "质量、重量与重力场强度",
+   "name_en": "Mass, weight and gravitational field strength",
+   "desc": "质量是物体所含物质的量（kg）；重量是重力（N）；W = mg，g = 9.8 N/kg",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-FORCE",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.1-14",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "mass",
+    "weight",
+    "gravitational field strength",
+    "newton",
+    "kilogram",
+    "N/kg",
+    "balance"
+   ],
+   "method": "背 W = mg；mass 不随地点变，weight 随 g 变（月球 g 约 1.6 N/kg）。天平测质量、弹簧秤测重量。常见错误：说“体重 50 kg”这种日常说法在物理题中当成 weight。",
+   "probe": "宇航员从地球到月球，问质量和重量如何变化并计算月球上的重量。"
+  },
+  {
+   "id": "PHY-IG-1.4-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.4",
+   "level": "core",
+   "name": "密度的计算与测量",
+   "name_en": "Density: calculation, measurement and floating",
+   "desc": "ρ = m/V；用天平和量筒/排水法测密度；密度小于液体的物体漂浮",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.1-03",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-UNIT",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "density",
+    "mass",
+    "volume",
+    "kg/m³",
+    "g/cm³",
+    "float",
+    "sink"
+   ],
+   "method": "背 density = mass ÷ volume，1 g/cm³ = 1000 kg/m³。实验步骤按“测质量 → 测体积（规则物体量边长 / 不规则用排水）→ 计算”写。常见错误：单位换算把 g/cm³ 和 kg/m³ 搞反。",
+   "probe": "给不规则石块的天平读数和量筒前后读数，求密度并判断能否在水中漂浮。"
+  },
+  {
+   "id": "PHY-IG-1.5.1-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.5.1",
+   "level": "supp",
+   "name": "形变、弹簧与胡克定律",
+   "name_en": "Load–extension graphs and Hooke's law",
+   "desc": "力可以改变物体形状；伸长量 = 现长 − 原长；比例极限内 F = kx",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-FORCE",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-RATIO",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "load",
+    "extension",
+    "spring constant",
+    "limit of proportionality",
+    "Hooke's law",
+    "elastic"
+   ],
+   "method": "extension = stretched length − original length（不是总长度！）。背 F = kx，k 单位 N/m；图上直线终点是 limit of proportionality。",
+   "probe": "给弹簧长度数据表，让她算伸长量、画图并求 k。"
+  },
+  {
+   "id": "PHY-IG-1.5.1-02",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.5.1",
+   "level": "core",
+   "name": "合力、牛顿第一定律与摩擦",
+   "name_en": "Resultant force, Newton's first law and friction",
+   "desc": "同一直线上力的合成；合力为零时静止或匀速；摩擦和阻力阻碍运动并产生热",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-FORCE",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.1-13",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "resultant force",
+    "balanced",
+    "Newton's first law",
+    "friction",
+    "drag",
+    "air resistance",
+    "constant velocity"
+   ],
+   "method": "合力：同向相加、反向相减并写方向。背“If the resultant force is zero, the object stays at rest or moves at constant velocity.” 常见错误：以为匀速运动需要向前的净力。",
+   "probe": "汽车匀速行驶时推力 2000 N，问阻力多大及原因。"
+  },
+  {
+   "id": "PHY-IG-1.5.1-03",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.5.1",
+   "level": "supp",
+   "name": "F = ma 与圆周运动",
+   "name_en": "Newton's second law and circular motion",
+   "desc": "F = ma；圆周运动中力垂直于速度，速度大小不变方向改变",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.5.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.2-03",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "Newton's second law",
+    "resultant force",
+    "acceleration",
+    "mass",
+    "circular motion",
+    "centripetal",
+    "perpendicular"
+   ],
+   "method": "F 必须用 resultant force（先算合力再除以质量）。圆周运动：force perpendicular to velocity，速度一定时半径越小/质量越大需要的力越大。常见错误：直接用推力而不是合力代入。",
+   "probe": "已知推力和摩擦力及质量，求加速度。"
+  },
+  {
+   "id": "PHY-IG-1.5.2-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.5.2",
+   "level": "core",
+   "name": "力矩与力矩平衡",
+   "name_en": "Moments and the principle of moments",
+   "desc": "力矩 = 力 × 到支点的垂直距离；平衡时顺时针力矩 = 逆时针力矩，且合力为零",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-FORCE",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "moment",
+    "pivot",
+    "perpendicular distance",
+    "clockwise",
+    "anticlockwise",
+    "equilibrium",
+    "principle of moments"
+   ],
+   "method": "背 moment = force × perpendicular distance from the pivot（N m）。解题：标支点 → 分顺/逆时针 → 列等式。平衡两条件：no resultant force AND no resultant moment。常见错误：距离从物体端点而非支点量。",
+   "probe": "跷跷板两边挂不同重物，求平衡位置或未知力。"
+  },
+  {
+   "id": "PHY-IG-1.5.3-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.5.3",
+   "level": "core",
+   "name": "重心与稳定性",
+   "name_en": "Centre of gravity and stability",
+   "desc": "重心是重量看似作用的点；悬挂法找薄板重心；重心低、底面宽更稳定",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.5.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "centre of gravity",
+    "stability",
+    "plumb line",
+    "base",
+    "topple"
+   ],
+   "method": "实验：从两点悬挂薄板，用 plumb line 画竖线，交点即重心。稳定性：low centre of gravity + wide base；重心垂线落出底面就会翻倒。",
+   "probe": "解释为什么赛车做得又低又宽。"
+  },
+  {
+   "id": "PHY-IG-1.6-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.6",
+   "level": "supp",
+   "name": "动量与冲量",
+   "name_en": "Momentum and impulse",
+   "desc": "p = mv；冲量 = FΔt = Δ(mv)；F = Δp/Δt",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.5.1-03",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.1-14",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "momentum",
+    "impulse",
+    "kg m/s",
+    "change in momentum",
+    "rate of change",
+    "collision"
+   ],
+   "method": "背 p = mv、impulse = FΔt = Δ(mv)。安全题模板：气囊/缓冲区 increase the time of collision → 动量变化相同 → force is smaller。注意速度方向（反弹时 Δv 要相加）。",
+   "probe": "网球以 20 m/s 撞墙后以 15 m/s 弹回，求动量变化。"
+  },
+  {
+   "id": "PHY-IG-1.6-02",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.6",
+   "level": "supp",
+   "name": "动量守恒",
+   "name_en": "Conservation of momentum",
+   "desc": "碰撞和爆炸中总动量守恒（无外力时）",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.6-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "conservation of momentum",
+    "total momentum",
+    "collision",
+    "explosion",
+    "before",
+    "after"
+   ],
+   "method": "列“碰前总动量 = 碰后总动量”，先规定正方向，反向速度取负。爆炸前总动量常为零。",
+   "probe": "两车相撞后粘在一起，求共同速度。"
+  },
+  {
+   "id": "PHY-IG-1.7.1-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.7.1",
+   "level": "core",
+   "name": "能量储存、转移与守恒",
+   "name_en": "Energy stores, transfers and conservation",
+   "desc": "能量有多种储存形式，通过力、电流、加热、波来转移，总量守恒",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-ENERGY",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "energy store",
+    "transfer",
+    "mechanically",
+    "electrically",
+    "by heating",
+    "by waves",
+    "conservation of energy",
+    "Sankey diagram"
+   ],
+   "method": "背四种转移方式：mechanical work、electrical work、heating、waves（electromagnetic, sound）。Sankey 图箭头宽度表示能量多少，输入 = 有用输出 + 浪费。",
+   "probe": "描述电动机提升重物的能量转移，并画/读 Sankey 图。"
+  },
+  {
+   "id": "PHY-IG-1.7.1-02",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.7.1",
+   "level": "supp",
+   "name": "动能与重力势能",
+   "name_en": "Kinetic and gravitational potential energy",
+   "desc": "Ek = ½mv²；ΔEp = mgΔh；下落时势能转化为动能",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.7.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "kinetic energy",
+    "gravitational potential energy",
+    "height",
+    "joule",
+    "Ek = ½mv²",
+    "conservation"
+   ],
+   "method": "背 Ek = ½mv²、ΔEp = mgΔh；“从高处落下最大速度”题列 mgh = ½mv² 求 v（记得开方）。常见错误：v² 忘平方或忘开方，质量用 g。",
+   "probe": "球从 5 m 高处落下（忽略空气阻力），求落地速度。"
+  },
+  {
+   "id": "PHY-IG-1.7.2-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.7.2/1.7.4",
+   "level": "core",
+   "name": "功与功率",
+   "name_en": "Work done and power",
+   "desc": "W = Fd = ΔE；P = W/t = ΔE/t",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.7.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-SI",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "work done",
+    "force",
+    "distance",
+    "joule",
+    "power",
+    "watt",
+    "energy transferred",
+    "rate"
+   ],
+   "method": "背 work done = force × distance moved in the direction of the force；power = work done ÷ time（W = J/s）。常见错误：kW 不换成 W、min 不换成 s。",
+   "probe": "起重机 20 s 将 500 N 的重物升高 8 m，求做功和功率。"
+  },
+  {
+   "id": "PHY-IG-1.7.3-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.7.3",
+   "level": "core",
+   "name": "能源",
+   "name_en": "Energy resources",
+   "desc": "化石燃料、核能、风能、水能、潮汐、地热、太阳能、生物燃料的原理与优缺点；太阳是大多数能源的来源",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.7.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "renewable",
+    "non-renewable",
+    "fossil fuels",
+    "nuclear fuel",
+    "wind",
+    "hydroelectric",
+    "geothermal",
+    "solar"
+   ],
+   "method": "做一张表：资源 / 能量来源 / renewable? / 可靠性 / 污染 / 成本。记住 nuclear fusion in the Sun 是大多数能源的根本来源（地热、潮汐、核能除外）。",
+   "probe": "比较风能和天然气发电各两个优缺点。"
+  },
+  {
+   "id": "PHY-IG-1.7.3-02",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.7.3",
+   "level": "core",
+   "name": "效率",
+   "name_en": "Efficiency",
+   "desc": "效率 = 有用输出 ÷ 总输入 × 100%（能量或功率）",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.7.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-RATIO",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "efficiency",
+    "useful energy output",
+    "total energy input",
+    "wasted",
+    "percentage"
+   ],
+   "method": "背 efficiency = useful output ÷ total input × 100%；结果不可能 > 100%。Sankey 图可直接读数据。常见错误：分子分母颠倒。",
+   "probe": "灯泡输入 60 J 输出光能 12 J，求效率和浪费的能量。"
+  },
+  {
+   "id": "PHY-IG-1.8-01",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.8",
+   "level": "core",
+   "name": "压强 p = F/A",
+   "name_en": "Pressure = force / area",
+   "desc": "压强是单位面积上的压力，单位 Pa；面积越小压强越大",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-UNIT",
+     "strength": "必须"
+    },
+    {
+     "id": "SCI-PRE-FORCE",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "pressure",
+    "force",
+    "area",
+    "pascal",
+    "N/m²",
+    "perpendicular"
+   ],
+   "method": "背 pressure = force ÷ area，1 Pa = 1 N/m²；cm² → m² 要 ÷10⁴。解释题：刀刃/钉尖 small area → large pressure；雪鞋 large area → small pressure。",
+   "probe": "大象和高跟鞋谁对地面压强大，给数据计算并解释。"
+  },
+  {
+   "id": "PHY-IG-1.8-02",
+   "strand": "S1",
+   "stage": "IGCSE",
+   "syllabus": "1.8",
+   "level": "supp",
+   "name": "液体压强 Δp = ρgΔh",
+   "name_en": "Pressure in liquids",
+   "desc": "液体压强随深度和密度增大；Δp = ρgΔh",
+   "prereqs": [
+    {
+     "id": "PHY-IG-1.8-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "liquid pressure",
+    "depth",
+    "density",
+    "Δp = ρgΔh",
+    "dam"
+   ],
+   "method": "背 Δp = ρgΔh，深度用 m、密度用 kg/m³。解释大坝底部更厚：pressure increases with depth。常见错误：用 g/cm³ 直接代入。",
+   "probe": "求水下 15 m 处由水产生的压强（ρ = 1000 kg/m³）。"
+  },
+  {
+   "id": "PHY-IG-2.1.2-01",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "syllabus": "2.1.1/2.1.2",
+   "level": "core",
+   "name": "三态与粒子模型",
+   "name_en": "States of matter and the particle model",
+   "desc": "三态的性质与粒子排列、运动；温度越高粒子运动越快；绝对零度 −273 °C",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-PART",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "solid",
+    "liquid",
+    "gas",
+    "melting",
+    "boiling",
+    "condensation",
+    "solidification",
+    "absolute zero"
+   ],
+   "method": "用英文写出三态对比（arrangement / separation / motion / forces between particles）。背状态变化名称：melting、boiling、condensation、solidification、evaporation。",
+   "probe": "比较液体与气体中粒子的排列和运动。"
+  },
+  {
+   "id": "PHY-IG-2.1.2-02",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "syllabus": "2.1.2",
+   "level": "core",
+   "name": "气体压强的粒子解释与布朗运动",
+   "name_en": "Gas pressure and Brownian motion",
+   "desc": "气体分子撞击器壁产生压强；布朗运动是小颗粒被看不见的快速分子随机撞击",
+   "prereqs": [
+    {
+     "id": "PHY-IG-2.1.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.8-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "Brownian motion",
+    "random",
+    "collisions",
+    "gas pressure",
+    "molecules",
+    "smoke particles"
+   ],
+   "method": "背模板：molecules collide with the walls → exert a force → pressure = force/area。布朗运动：smoke particles move randomly because they are hit by fast-moving (invisible) air molecules。常见错误：说看见的是“空气分子”在动。",
+   "probe": "解释显微镜下烟雾颗粒的随机运动说明了什么。"
+  },
+  {
+   "id": "PHY-IG-2.1.3-01",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "syllabus": "2.1.3",
+   "level": "core",
+   "name": "气体定律与开氏温度",
+   "name_en": "Gas pressure, volume, temperature and the kelvin scale",
+   "desc": "定体积时温度升高压强增大；定温度时 pV = 常数（补充）；T(K) = θ(°C) + 273",
+   "prereqs": [
+    {
+     "id": "PHY-IG-2.1.2-02",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-RATIO",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "kelvin",
+    "absolute zero",
+    "pressure",
+    "volume",
+    "temperature",
+    "pV = constant",
+    "constant temperature"
+   ],
+   "method": "背 T(K) = θ(°C) + 273；p₁V₁ = p₂V₂ 只在温度不变时用。解释用粒子：温度升高 → 粒子更快 → 撞击更频繁更用力 → 压强增大。",
+   "probe": "气体在温度不变时体积从 2.0 L 压缩到 0.5 L，求新压强并用粒子解释。"
+  },
+  {
+   "id": "PHY-IG-2.2.1-01",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "syllabus": "2.2.1",
+   "level": "core",
+   "name": "热膨胀",
+   "name_en": "Thermal expansion",
+   "desc": "固液气受热膨胀，气体最大、固体最小；铁轨缝隙、温度计等应用",
+   "prereqs": [
+    {
+     "id": "PHY-IG-2.1.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "thermal expansion",
+    "expand",
+    "contract",
+    "gap",
+    "thermometer",
+    "bimetallic strip"
+   ],
+   "method": "顺序记 gas > liquid > solid；粒子解释：粒子振动/运动更剧烈、间距变大（粒子本身不变大！）。",
+   "probe": "解释为什么桥梁和铁轨之间留缝隙。"
+  },
+  {
+   "id": "PHY-IG-2.2.2-01",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "syllabus": "2.2.2",
+   "level": "supp",
+   "name": "比热容",
+   "name_en": "Specific heat capacity",
+   "desc": "c = ΔE/(mΔθ)；内能增大温度升高；用电加热器测比热容",
+   "prereqs": [
+    {
+     "id": "PHY-IG-2.1.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.7.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "specific heat capacity",
+    "internal energy",
+    "temperature rise",
+    "J/(kg °C)",
+    "heater",
+    "insulation"
+   ],
+   "method": "背 ΔE = mcΔθ，c 的定义：energy needed to raise the temperature of 1 kg by 1 °C。实验：E = P × t（或 IVt），包上保温层减少热损失；结果偏大常因热量散失。",
+   "probe": "用 50 W 加热器加热 1 kg 铝块 5 min 升温 15 °C，求 c 并说出误差原因。"
+  },
+  {
+   "id": "PHY-IG-2.2.3-01",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "syllabus": "2.2.3",
+   "level": "core",
+   "name": "熔化、沸腾与蒸发",
+   "name_en": "Melting, boiling and evaporation",
+   "desc": "熔化/沸腾时吸热但温度不变；蒸发发生在表面，使液体冷却；影响蒸发的因素",
+   "prereqs": [
+    {
+     "id": "PHY-IG-2.1.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "melting point",
+    "boiling point",
+    "evaporation",
+    "condensation",
+    "cooling",
+    "surface area",
+    "latent heat"
+   ],
+   "method": "加热曲线中“平台段”= 状态变化，温度不变。蒸发冷却：more energetic molecules escape → average kinetic energy of the remaining ones decreases → temperature falls。沸腾 vs 蒸发对比表：温度、位置、气泡。",
+   "probe": "解释出汗为何能降温，以及风为何使衣服干得更快。"
+  },
+  {
+   "id": "PHY-IG-2.3.1-01",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "syllabus": "2.3.1",
+   "level": "core",
+   "name": "热传导",
+   "name_en": "Conduction",
+   "desc": "固体中通过粒子振动（和金属中自由电子）传热；金属是良导体，气体液体是不良导体",
+   "prereqs": [
+    {
+     "id": "PHY-IG-2.1.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "conduction",
+    "conductor",
+    "insulator",
+    "lattice vibrations",
+    "free electrons"
+   ],
+   "method": "背两条机制：atoms vibrate and pass energy to neighbours；metals also have free (delocalised) electrons that move and carry energy。实验：不同金属棒涂蜡比较融化先后。",
+   "probe": "为什么金属摸起来比同温度的木头冷？"
+  },
+  {
+   "id": "PHY-IG-2.3.2-01",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "syllabus": "2.3.2",
+   "level": "core",
+   "name": "热对流",
+   "name_en": "Convection",
+   "desc": "液体或气体受热膨胀密度变小上升，冷的下沉，形成对流",
+   "prereqs": [
+    {
+     "id": "PHY-IG-2.3.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.4-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "convection",
+    "convection current",
+    "density",
+    "rise",
+    "sink",
+    "fluid"
+   ],
+   "method": "背链条：heated → expands → less dense → rises；cooler, denser fluid sinks → convection current。对流不能发生在固体中。",
+   "probe": "解释为什么暖气片装在房间下方、空调装在上方。"
+  },
+  {
+   "id": "PHY-IG-2.3.3-01",
+   "strand": "S2",
+   "stage": "IGCSE",
+   "syllabus": "2.3.3/2.3.4",
+   "level": "core",
+   "name": "热辐射及热传递综合应用",
+   "name_en": "Thermal radiation and applications of heat transfer",
+   "desc": "一切物体发出红外辐射，不需要介质；黑色粗糙表面吸收和发射都好；保温瓶、地球温度等综合应用",
+   "prereqs": [
+    {
+     "id": "PHY-IG-2.3.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-2.3.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "infrared radiation",
+    "emitter",
+    "absorber",
+    "reflector",
+    "dull black",
+    "shiny white",
+    "vacuum flask"
+   ],
+   "method": "记 dull black = good absorber AND good emitter；shiny white/silver = good reflector, poor emitter。保温瓶题逐一说明：vacuum 阻止传导和对流、镀银表面减少辐射、盖子阻止对流和蒸发。",
+   "probe": "解释保温瓶每个结构减少哪种热传递。"
+  },
+  {
+   "id": "PHY-IG-3.1-01",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "syllabus": "3.1",
+   "level": "core",
+   "name": "波的基本术语与波速公式",
+   "name_en": "Wave features and v = fλ",
+   "desc": "振幅、波长、频率、波峰、波谷、波前；波传递能量不传递物质；v = fλ",
+   "prereqs": [
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-STDF",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-SI",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "amplitude",
+    "wavelength",
+    "frequency",
+    "crest",
+    "trough",
+    "wavefront",
+    "hertz",
+    "wave speed"
+   ],
+   "method": "在一张波形图上标出 amplitude（平衡位置到波峰，不是峰到谷）和 wavelength。背 v = fλ，kHz/MHz 要换成 Hz。常见错误：振幅量成峰到谷的距离。",
+   "probe": "给波形图（标刻度）求振幅、波长，再给频率求波速。"
+  },
+  {
+   "id": "PHY-IG-3.1-02",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "syllabus": "3.1",
+   "level": "core",
+   "name": "横波与纵波",
+   "name_en": "Transverse and longitudinal waves",
+   "desc": "横波振动方向垂直于传播方向（电磁波、水波）；纵波平行（声波），有疏部和密部",
+   "prereqs": [
+    {
+     "id": "PHY-IG-3.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "transverse",
+    "longitudinal",
+    "perpendicular",
+    "parallel",
+    "compression",
+    "rarefaction",
+    "vibration"
+   ],
+   "method": "背定义里要说清“vibration relative to direction of energy transfer / wave travel”。例子：transverse = light, water waves, S-waves；longitudinal = sound, P-waves。",
+   "probe": "用弹簧（slinky）演示两种波，让她说出区别并各举一例。"
+  },
+  {
+   "id": "PHY-IG-3.1-03",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "syllabus": "3.1",
+   "level": "core",
+   "name": "波的反射、折射与衍射",
+   "name_en": "Reflection, refraction and diffraction of waves",
+   "desc": "水波槽中波遇障碍反射；进入浅水速度变小、波长变短发生折射；通过缝隙衍射，缝宽接近波长时最明显",
+   "prereqs": [
+    {
+     "id": "PHY-IG-3.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "reflection",
+    "refraction",
+    "diffraction",
+    "ripple tank",
+    "gap",
+    "wavelength",
+    "shallow water"
+   ],
+   "method": "折射时频率不变，速度和波长改变。衍射：gap size similar to wavelength → most diffraction；衍射前后波长不变。画图时波前间距保持相同。",
+   "probe": "给水波通过宽缝和窄缝的图，问哪个衍射更明显并画出波前。"
+  },
+  {
+   "id": "PHY-IG-3.2.1-01",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "syllabus": "3.2.1",
+   "level": "core",
+   "name": "平面镜反射",
+   "name_en": "Reflection of light in a plane mirror",
+   "desc": "入射角 = 反射角；平面镜成正立、等大、虚像，像距 = 物距",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-LIGHT",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-3.1-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "angle of incidence",
+    "angle of reflection",
+    "normal",
+    "virtual image",
+    "plane mirror",
+    "laterally inverted"
+   ],
+   "method": "角度从 normal 量起。平面镜成像四特征：same size、upright、virtual、same distance behind the mirror。作图时虚像光线用虚线反向延长。",
+   "probe": "作图找出平面镜中物体的像位置。"
+  },
+  {
+   "id": "PHY-IG-3.2.2-01",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "syllabus": "3.2.2",
+   "level": "supp",
+   "name": "光的折射与折射率",
+   "name_en": "Refraction of light and refractive index",
+   "desc": "光进入玻璃变慢，向法线偏折；n = sin i / sin r = c/v",
+   "prereqs": [
+    {
+     "id": "PHY-IG-3.2.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-3.1-03",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-TRIG",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "refraction",
+    "refractive index",
+    "angle of incidence",
+    "angle of refraction",
+    "normal",
+    "speed of light",
+    "Snell's law"
+   ],
+   "method": "记 slower → bends towards the normal；faster → away from the normal。背 n = sin i / sin r（i 在空气中）。计算器用 DEG 模式，sin⁻¹ 求角度。常见错误：i 和 r 放反，或用角度直接相除。",
+   "probe": "光以 40° 入射到 n = 1.5 的玻璃，求折射角。"
+  },
+  {
+   "id": "PHY-IG-3.2.2-02",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "syllabus": "3.2.2",
+   "level": "core",
+   "name": "临界角、全反射与光纤",
+   "name_en": "Critical angle, total internal reflection and optical fibres",
+   "desc": "光从密介质射向疏介质，入射角大于临界角时发生全反射；n = 1/sin c；光纤通信、内窥镜",
+   "prereqs": [
+    {
+     "id": "PHY-IG-3.2.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "critical angle",
+    "total internal reflection",
+    "optical fibre",
+    "denser medium",
+    "endoscope"
+   ],
+   "method": "两个条件都要写：light travels from a denser to a less dense medium AND angle of incidence > critical angle。背 n = 1/sin c。",
+   "probe": "给玻璃中光线入射角 30°/42°/50°（临界角 42°），让她画出三种情况。"
+  },
+  {
+   "id": "PHY-IG-3.2.3-01",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "syllabus": "3.2.3",
+   "level": "core",
+   "name": "薄透镜与成像",
+   "name_en": "Thin lenses and ray diagrams",
+   "desc": "会聚/发散透镜；焦点、焦距、主光轴；画光路图并描述像的性质；放大镜、近视远视矫正（补充）",
+   "prereqs": [
+    {
+     "id": "PHY-IG-3.2.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "converging lens",
+    "diverging lens",
+    "principal focus",
+    "focal length",
+    "principal axis",
+    "real image",
+    "virtual image",
+    "magnified"
+   ],
+   "method": "背两条作图光线：平行于主轴的光线 → 过焦点；过光心的光线 → 不偏折。描述像用三组词：enlarged/same size/diminished，upright/inverted，real/virtual。物在焦点内 → 虚像（放大镜）。",
+   "probe": "给物距和焦距（比例作图），让她画光路图并描述像。"
+  },
+  {
+   "id": "PHY-IG-3.3-01",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "syllabus": "3.2.4/3.3",
+   "level": "core",
+   "name": "色散与电磁波谱",
+   "name_en": "Dispersion and the electromagnetic spectrum",
+   "desc": "白光经棱镜色散为七色；电磁波谱顺序、在真空中速度相同（3.0×10⁸ m/s）、各波段用途与危害",
+   "prereqs": [
+    {
+     "id": "PHY-IG-3.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-3.2.2-01",
+     "strength": "有帮助"
+    },
+    {
+     "id": "MATH-PRE-STDF",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "dispersion",
+    "spectrum",
+    "radio waves",
+    "microwaves",
+    "infrared",
+    "ultraviolet",
+    "X-rays",
+    "gamma rays"
+   ],
+   "method": "口诀记顺序（长波到短波）：Radio–Micro–IR–Visible–UV–X–Gamma，频率反向增大；七色 ROYGBIV，紫光偏折最多。做“用途/危害”表：microwave 加热内部组织、UV 皮肤癌、X/γ 细胞突变。",
+   "probe": "给打乱的电磁波名称，让她按频率排序并写出一种用途和一种危害。"
+  },
+  {
+   "id": "PHY-IG-3.3-02",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "syllabus": "3.3",
+   "level": "supp",
+   "name": "通信与数字信号",
+   "name_en": "Communication and digital signals",
+   "desc": "卫星、手机、光纤通信选用的波段；数字信号与模拟信号的区别与优点",
+   "prereqs": [
+    {
+     "id": "PHY-IG-3.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-3.2.2-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "analogue",
+    "digital",
+    "signal",
+    "noise",
+    "regenerate",
+    "geostationary",
+    "Bluetooth",
+    "optical fibre"
+   ],
+   "method": "数字信号优点背两条：noise can be removed / signal regenerated；faster data transfer, more information。Microwaves 穿透墙壁且用于卫星；手机/Wi-Fi 用 microwaves。",
+   "probe": "比较模拟与数字信号，并解释数字信号为何更不容易失真。"
+  },
+  {
+   "id": "PHY-IG-3.4-01",
+   "strand": "S3",
+   "stage": "IGCSE",
+   "syllabus": "3.4",
+   "level": "core",
+   "name": "声音",
+   "name_en": "Sound",
+   "desc": "声由振动产生，是纵波，需要介质；人耳范围 20 Hz–20 kHz；振幅定响度、频率定音调；回声；在空气中约 330–350 m/s；超声波（>20 kHz）用于探伤、医学成像、声呐（补充）",
+   "prereqs": [
+    {
+     "id": "PHY-IG-3.1-02",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "vibration",
+    "compression",
+    "rarefaction",
+    "pitch",
+    "loudness",
+    "echo",
+    "ultrasound",
+    "sonar"
+   ],
+   "method": "背 louder = larger amplitude；higher pitch = higher frequency。回声测速：distance = speed × time ÷ 2（来回！）。声速：solid > liquid > gas（补充）。超声 ultrasound = frequency above 20 000 Hz，声呐测深同样用 d = vt/2。常见错误：回声题忘除以 2。",
+   "probe": "人对墙拍手 0.6 s 后听到回声，墙距 100 m，求声速。"
+  },
+  {
+   "id": "PHY-IG-4.1-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "syllabus": "4.1",
+   "level": "core",
+   "name": "磁现象与磁场",
+   "name_en": "Magnets and magnetic fields",
+   "desc": "同极相斥异极相吸；感应磁化；软铁（临时磁体）与钢（永磁体）；磁感线从 N 到 S，越密越强",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-FORCE",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "magnetic pole",
+    "attract",
+    "repel",
+    "induced magnetism",
+    "soft iron",
+    "steel",
+    "magnetic field",
+    "field lines"
+   ],
+   "method": "背 soft iron = temporary magnet（易磁化易退磁，用于电磁铁）；steel = permanent magnet。画条形磁铁磁感线：N 出 S 入、不相交、两极密。只有排斥才能证明是磁铁。",
+   "probe": "画条形磁铁周围的磁场并说明如何用指南针确定方向。"
+  },
+  {
+   "id": "PHY-IG-4.2.2-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "syllabus": "4.2.1/4.2.2/4.2.3",
+   "level": "core",
+   "name": "电荷、电流与电压",
+   "name_en": "Charge, current, e.m.f. and potential difference",
+   "desc": "摩擦起电是电子转移；电流是电荷流动 I = Q/t；电动势与电势差是单位电荷做的功（V = W/Q）",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-CIRC",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-REARR",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "charge",
+    "coulomb",
+    "electron",
+    "current",
+    "ampere",
+    "e.m.f.",
+    "potential difference",
+    "volt"
+   ],
+   "method": "背 I = Q/t（A = C/s）、V = W/Q（V = J/C）。摩擦起电只有 electrons 转移（正电荷不动）。conventional current 从 + 到 −，电子流向相反。常见错误：说“正电荷从布转移到棒”。",
+   "probe": "用毛皮摩擦塑料棒后棒带负电，解释原因；并算 2 min 内流过 0.5 A 的电荷量。"
+  },
+  {
+   "id": "PHY-IG-4.2.4-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "syllabus": "4.2.4",
+   "level": "core",
+   "name": "电阻与 I-V 特性",
+   "name_en": "Resistance and I–V characteristics",
+   "desc": "R = V/I；电阻与长度成正比、与横截面积成反比；定值电阻、灯丝、二极管的 I-V 图",
+   "prereqs": [
+    {
+     "id": "PHY-IG-4.2.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-RATIO",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "resistance",
+    "ohm",
+    "current-voltage graph",
+    "filament lamp",
+    "diode",
+    "length",
+    "cross-sectional area"
+   ],
+   "method": "背 R = V/I。三条 I-V 曲线要会画会解释：电阻 = 直线过原点；灯丝 = 变弯（温度升高电阻增大）；二极管只在一个方向导通。粗导线电阻小、长导线电阻大。",
+   "probe": "给灯丝 I-V 图，问电压增大时电阻如何变化及原因。"
+  },
+  {
+   "id": "PHY-IG-4.2.5-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "syllabus": "4.2.5",
+   "level": "core",
+   "name": "电功率与电能、千瓦时",
+   "name_en": "Electrical power, energy and the kilowatt-hour",
+   "desc": "P = IV；E = IVt；1 kWh 是 1 kW 用 1 h 的能量，电费 = 度数 × 单价",
+   "prereqs": [
+    {
+     "id": "PHY-IG-4.2.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.7.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-SI",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "power",
+    "energy",
+    "kilowatt-hour",
+    "watt",
+    "joule",
+    "cost"
+   ],
+   "method": "背 P = IV、E = IVt（t 用 s 得 J）；算电费用 kW × h。1 kWh = 3.6×10⁶ J。常见错误：算 kWh 时用 W 和 s。",
+   "probe": "2 kW 电热水壶每天用 15 min，每度 0.6 元，求一周电费。"
+  },
+  {
+   "id": "PHY-IG-4.3.1-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "syllabus": "4.3.1",
+   "level": "core",
+   "name": "电路符号与元件",
+   "name_en": "Circuit symbols and components",
+   "desc": "电池、开关、电阻、变阻器、热敏电阻、光敏电阻、灯、保险丝、继电器、二极管/LED 等的符号和作用",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-CIRC",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "thermistor",
+    "light-dependent resistor",
+    "variable resistor",
+    "fuse",
+    "relay",
+    "diode",
+    "LED"
+   ],
+   "method": "做符号闪卡（正面符号，背面英文名 + 作用）。背：NTC thermistor – resistance decreases as temperature increases；LDR – resistance decreases as light intensity increases。",
+   "probe": "给一个含 LDR 的电路，问光变强时电流表读数如何变化。"
+  },
+  {
+   "id": "PHY-IG-4.3.2-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "syllabus": "4.3.2",
+   "level": "core",
+   "name": "串联与并联电路",
+   "name_en": "Series and parallel circuits",
+   "desc": "串联电流处处相等、电压相加、电阻相加；并联各支路电压相等、电流相加、总电阻小于最小支路电阻",
+   "prereqs": [
+    {
+     "id": "PHY-IG-4.2.4-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-4.3.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "series",
+    "parallel",
+    "total resistance",
+    "junction",
+    "branch",
+    "potential difference",
+    "combined"
+   ],
+   "method": "做两列对比表（current / p.d. / resistance）。补充：并联 1/R = 1/R₁ + 1/R₂。家庭用并联：each lamp can be switched independently, still works if one breaks。常见错误：并联总电阻也直接相加。",
+   "probe": "3 Ω 和 6 Ω 并联接 6 V，求总电阻和干路电流。"
+  },
+  {
+   "id": "PHY-IG-4.3.3-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "syllabus": "4.3.3",
+   "level": "supp",
+   "name": "分压器",
+   "name_en": "Potential dividers",
+   "desc": "两个串联电阻按电阻比分电压 V₁/V₂ = R₁/R₂；与热敏/光敏电阻组成传感电路",
+   "prereqs": [
+    {
+     "id": "PHY-IG-4.3.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-4.3.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-RATIO",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "potential divider",
+    "output voltage",
+    "ratio",
+    "sensor",
+    "thermistor",
+    "LDR"
+   ],
+   "method": "记“电阻大的分到电压多”。传感题三步：条件变化 → 传感器电阻变化 → 它两端电压按比例变化。",
+   "probe": "热敏电阻与定值电阻串联，温度升高时热敏电阻两端电压如何变化？"
+  },
+  {
+   "id": "PHY-IG-4.4-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "syllabus": "4.4",
+   "level": "core",
+   "name": "安全用电",
+   "name_en": "Electrical safety",
+   "desc": "绝缘损坏、过载、潮湿的危险；火线、零线、地线；保险丝和断路器的作用与选择；双重绝缘",
+   "prereqs": [
+    {
+     "id": "PHY-IG-4.2.5-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-4.3.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "live wire",
+    "neutral wire",
+    "earth wire",
+    "fuse",
+    "circuit breaker",
+    "double insulation",
+    "overloading",
+    "fuse rating"
+   ],
+   "method": "开关和保险丝必须接在 live wire 上。选保险丝：先算正常电流 I = P/V，选略大于它的规格（3 A、5 A、13 A）。地线作用：外壳漏电时大电流流过地线使保险丝熔断。",
+   "probe": "2.3 kW、230 V 的电器应选 3 A、5 A 还是 13 A 的保险丝？说明理由。"
+  },
+  {
+   "id": "PHY-IG-4.5.1-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "syllabus": "4.5.1/4.5.2",
+   "level": "core",
+   "name": "电磁感应与交流发电机",
+   "name_en": "Electromagnetic induction and the a.c. generator",
+   "desc": "导体切割磁感线或磁场变化产生感应电动势；增大速度、磁场强度、匝数可增大；楞次定律（补充）；交流发电机的滑环与电刷",
+   "prereqs": [
+    {
+     "id": "PHY-IG-4.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-4.2.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "electromagnetic induction",
+    "induced e.m.f.",
+    "Lenz's law",
+    "coil",
+    "slip rings",
+    "brushes",
+    "alternating current"
+   ],
+   "method": "背增大感应电动势三法：move faster、stronger magnet、more turns。楞次定律：induced current opposes the change that produces it。发电机图上指出 slip rings 和 brushes，并能读 e.m.f.-时间图（线圈平行磁场时最大）。",
+   "probe": "磁铁插入线圈时电流计偏转，问拔出、静止、更快插入各会怎样。"
+  },
+  {
+   "id": "PHY-IG-4.5.3-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "syllabus": "4.5.3",
+   "level": "core",
+   "name": "电流的磁效应与电磁铁",
+   "name_en": "Magnetic effect of a current",
+   "desc": "直导线磁场为同心圆，螺线管磁场像条形磁铁；电磁铁、继电器、扬声器",
+   "prereqs": [
+    {
+     "id": "PHY-IG-4.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-4.2.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "solenoid",
+    "electromagnet",
+    "right-hand grip rule",
+    "relay",
+    "loudspeaker",
+    "field pattern"
+   ],
+   "method": "用右手螺旋定则（right-hand grip rule）判断方向。增强电磁铁：more turns、larger current、soft-iron core。",
+   "probe": "画出通电螺线管的磁场并标出 N 极。"
+  },
+  {
+   "id": "PHY-IG-4.5.4-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "syllabus": "4.5.4/4.5.5",
+   "level": "core",
+   "name": "电动机效应与直流电动机",
+   "name_en": "The motor effect and the d.c. motor",
+   "desc": "磁场中通电导线受力；左手定则判断方向；直流电动机中换向器每半圈改变电流方向",
+   "prereqs": [
+    {
+     "id": "PHY-IG-4.5.3-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "motor effect",
+    "Fleming's left-hand rule",
+    "force",
+    "split-ring commutator",
+    "brushes",
+    "d.c. motor"
+   ],
+   "method": "左手定则：First finger = Field，seCond finger = Current，thuMb = Motion。增大转速：more turns、larger current、stronger field。split-ring commutator reverses the current every half turn。常见错误：左右手定则混用。",
+   "probe": "给磁场和电流方向，用左手定则判断导线受力方向。"
+  },
+  {
+   "id": "PHY-IG-4.5.6-01",
+   "strand": "S4",
+   "stage": "IGCSE",
+   "syllabus": "4.5.6",
+   "level": "core",
+   "name": "变压器与远距离输电",
+   "name_en": "The transformer and power transmission",
+   "desc": "Vp/Vs = Np/Ns；升压/降压变压器；高压输电减小电流和热损失 P = I²R（补充）",
+   "prereqs": [
+    {
+     "id": "PHY-IG-4.5.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-4.2.5-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-RATIO",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "transformer",
+    "primary coil",
+    "secondary coil",
+    "step-up",
+    "step-down",
+    "turns ratio",
+    "soft-iron core",
+    "power loss"
+   ],
+   "method": "背 Vp/Vs = Np/Ns，理想变压器 VpIp = VsIs。原理：交流 → 铁芯中变化的磁场 → 次级线圈感应电压（所以只能用 a.c.）。高压输电：higher voltage → lower current → less I²R heating loss。",
+   "probe": "原线圈 2000 匝接 230 V，要输出 11.5 V，次级要多少匝？是升压还是降压？"
+  },
+  {
+   "id": "PHY-IG-5.1.1-01",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "syllabus": "5.1.1",
+   "level": "core",
+   "name": "原子结构与 α 粒子散射",
+   "name_en": "The atom and alpha-particle scattering",
+   "desc": "原子由带正电的原子核和绕核运动的电子组成；离子；α 散射实验说明原子大部分是空的、核小而重且带正电",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-PART",
+     "strength": "有帮助"
+    },
+    {
+     "id": "PHY-IG-4.2.2-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "atom",
+    "nucleus",
+    "electron",
+    "ion",
+    "alpha-particle scattering",
+    "gold foil"
+   ],
+   "method": "α 散射三个观察对应三个结论：大多数直穿 → mostly empty space；少数偏转 → nucleus is positive；极少数反弹 → mass concentrated in a tiny nucleus。",
+   "probe": "描述 α 散射实验的结果并说明各自的结论。"
+  },
+  {
+   "id": "PHY-IG-5.1.2-01",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "syllabus": "5.1.2",
+   "level": "core",
+   "name": "原子核、核素符号与同位素",
+   "name_en": "The nucleus, nuclide notation and isotopes",
+   "desc": "质子、中子、电子的相对电荷；质子数 Z、核子数 A；中子数 = A − Z；同位素",
+   "prereqs": [
+    {
+     "id": "PHY-IG-5.1.1-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "proton",
+    "neutron",
+    "proton number",
+    "nucleon number",
+    "isotope",
+    "nuclide notation"
+   ],
+   "method": "核素符号上 A（nucleon number）下 Z（proton number）。isotopes = same number of protons, different number of neutrons。常见错误：把核子数当中子数。",
+   "probe": "给 ¹⁴₆C，求质子数、中子数、电子数，并写出它的一种同位素。"
+  },
+  {
+   "id": "PHY-IG-5.1.2-02",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "syllabus": "5.1.2",
+   "level": "supp",
+   "name": "核裂变与核聚变",
+   "name_en": "Nuclear fission and fusion",
+   "desc": "重核分裂成较轻核并放能（核电站）；轻核结合成重核放能（太阳）",
+   "prereqs": [
+    {
+     "id": "PHY-IG-5.1.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "fission",
+    "fusion",
+    "chain reaction",
+    "neutron",
+    "energy released",
+    "uranium"
+   ],
+   "method": "fission = splitting a large nucleus（中子撞击 U-235）；fusion = joining two small nuclei（hydrogen → helium，在恒星中）。两者都会损失质量放出能量。",
+   "probe": "比较裂变和聚变：哪种用于核电站、哪种发生在太阳中。"
+  },
+  {
+   "id": "PHY-IG-5.2.1-01",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "syllabus": "5.2.1",
+   "level": "core",
+   "name": "本底辐射与探测",
+   "name_en": "Background radiation and detection",
+   "desc": "本底辐射来源（氡气、岩石、建筑、食物、宇宙射线）；盖革计数器测计数率；修正计数率 = 读数 − 本底",
+   "prereqs": [
+    {
+     "id": "PHY-IG-5.1.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "background radiation",
+    "radon",
+    "cosmic rays",
+    "Geiger-Müller tube",
+    "count rate",
+    "counts per minute",
+    "corrected count rate"
+   ],
+   "method": "列出 4 个来源（radon gas、rocks and buildings、food and drink、cosmic rays）。所有数据都先减本底再分析。",
+   "probe": "测得 150 counts/min，本底 20 counts/min，求修正计数率。"
+  },
+  {
+   "id": "PHY-IG-5.2.2-01",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "syllabus": "5.2.2/5.2.5",
+   "level": "core",
+   "name": "α、β、γ 辐射的性质与安全防护",
+   "name_en": "Alpha, beta and gamma radiation and safety",
+   "desc": "三种射线的本质、电离能力、穿透能力；在电场磁场中偏转（补充）；电离辐射的危害与防护",
+   "prereqs": [
+    {
+     "id": "PHY-IG-5.1.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-5.2.1-01",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "alpha particle",
+    "beta particle",
+    "gamma ray",
+    "ionising",
+    "penetrating",
+    "paper",
+    "aluminium",
+    "lead"
+   ],
+   "method": "做三行表：α = helium nucleus，强电离，被 paper 挡住；β = fast electron，中等，被 few mm aluminium 挡住；γ = EM wave，弱电离，需要 thick lead。防护三法：reduce time、increase distance、use shielding。常见错误：说 γ 电离最强。",
+   "probe": "用纸、铝片、铅板测计数率的数据表，判断源放出哪几种射线。"
+  },
+  {
+   "id": "PHY-IG-5.2.3-01",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "syllabus": "5.2.3",
+   "level": "supp",
+   "name": "放射性衰变与衰变方程",
+   "name_en": "Radioactive decay and decay equations",
+   "desc": "衰变是自发、随机的；α 衰变 A−4、Z−2；β 衰变中子变质子，Z+1；γ 不改变 A、Z",
+   "prereqs": [
+    {
+     "id": "PHY-IG-5.2.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-5.1.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "radioactive decay",
+    "random",
+    "spontaneous",
+    "decay equation",
+    "daughter nucleus",
+    "neutron → proton + electron"
+   ],
+   "method": "写方程时上下两行分别配平（A 守恒、Z 守恒）。α 用 ⁴₂He，β 用 ⁰₋₁e。",
+   "probe": "写出 ²³⁸₉₂U 发生 α 衰变的方程。"
+  },
+  {
+   "id": "PHY-IG-5.2.4-01",
+   "strand": "S5",
+   "stage": "IGCSE",
+   "syllabus": "5.2.4",
+   "level": "core",
+   "name": "半衰期",
+   "name_en": "Half-life",
+   "desc": "半衰期是一半原子核衰变所需时间；从表格或曲线求半衰期；同位素的选择（补充）",
+   "prereqs": [
+    {
+     "id": "PHY-IG-5.2.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-GRAPH",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "half-life",
+    "count rate",
+    "decay curve",
+    "activity",
+    "isotope",
+    "undecayed"
+   ],
+   "method": "从曲线读：任选一点，找到计数率降为一半的时间差，取两次平均。计算：每过一个半衰期 ÷2，画小表格逐行减半。补充：先减本底再求半衰期。选同位素：根据射线类型 + 半衰期长短（医用示踪剂要短半衰期、γ 射线）。",
+   "probe": "某样品 24 天后剩 1/8，求半衰期。"
+  },
+  {
+   "id": "PHY-IG-6.1.1-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "syllabus": "6.1.1",
+   "level": "core",
+   "name": "地球自转、公转与月相",
+   "name_en": "The Earth, seasons and the Moon",
+   "desc": "地球自转约 24 h 造成昼夜；公转约 365 天加地轴倾斜造成季节；月球绕地球约 1 个月，月相变化",
+   "prereqs": [
+    {
+     "id": "SCI-PRE-LIGHT",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "rotation",
+    "axis",
+    "orbit",
+    "tilt",
+    "seasons",
+    "phases of the Moon"
+   ],
+   "method": "背三组：Earth spins on its axis once every ~24 h → day and night；orbits the Sun every ~365 days + tilted axis → seasons；Moon orbits Earth every ~1 month → phases (reflected sunlight)。常见错误：认为季节是地日距离变化造成的。",
+   "probe": "解释为什么北半球夏天白天更长、更热。"
+  },
+  {
+   "id": "PHY-IG-6.1.2-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "syllabus": "6.1.2",
+   "level": "core",
+   "name": "太阳系与引力",
+   "name_en": "The Solar System and gravity",
+   "desc": "八大行星顺序；内行星岩质小、外行星气态大（吸积模型）；太阳引力使行星绕行，离太阳越远引力和轨道速度越小；v = 2πr/T、光传播时间（补充）",
+   "prereqs": [
+    {
+     "id": "PHY-IG-6.1.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-1.2-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "planet",
+    "orbit",
+    "asteroid",
+    "comet",
+    "dwarf planet",
+    "gravitational force",
+    "orbital speed",
+    "accretion"
+   ],
+   "method": "行星顺序口诀：My Very Easy Method Just Speeds Up Naming（Mercury→Neptune）。背 orbital speed v = 2πr/T、time = distance ÷ speed of light。会从行星数据表找规律（距离与周期、温度）。",
+   "probe": "给行星数据表，问离太阳距离与公转周期的关系，并计算地球轨道速度。"
+  },
+  {
+   "id": "PHY-IG-6.2.1-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "syllabus": "6.2.1/6.2.2",
+   "level": "core",
+   "name": "太阳与恒星的一生",
+   "name_en": "The Sun as a star and the life cycle of stars",
+   "desc": "太阳是中等大小恒星，主要由氢和氦组成，靠核聚变发光；光年；恒星演化（补充）",
+   "prereqs": [
+    {
+     "id": "PHY-IG-6.1.2-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-5.1.2-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "terms": [
+    "star",
+    "nuclear fusion",
+    "light-year",
+    "galaxy",
+    "protostar",
+    "red giant",
+    "white dwarf",
+    "supernova"
+   ],
+   "method": "light-year 是距离不是时间（9.5×10¹⁵ m）。恒星演化画流程图：nebula → protostar → stable star → red giant（小）/ red supergiant（大）→ white dwarf + planetary nebula / supernova → neutron star 或 black hole。稳定原因：gravity inwards balanced by pressure from fusion outwards。",
+   "probe": "解释恒星为何能长期稳定，并说出大质量恒星的最终结局。"
+  },
+  {
+   "id": "PHY-IG-6.2.3-01",
+   "strand": "S6",
+   "stage": "IGCSE",
+   "syllabus": "6.2.3",
+   "level": "core",
+   "name": "宇宙、红移与大爆炸",
+   "name_en": "The Universe, redshift and the Big Bang",
+   "desc": "银河系是数十亿星系之一；遥远星系光谱红移说明宇宙在膨胀；宇宙微波背景辐射；H₀ = v/d，宇宙年龄约 1/H₀（补充）",
+   "prereqs": [
+    {
+     "id": "PHY-IG-6.2.1-01",
+     "strength": "必须"
+    },
+    {
+     "id": "PHY-IG-3.3-01",
+     "strength": "必须"
+    },
+    {
+     "id": "MATH-PRE-STDF",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "terms": [
+    "redshift",
+    "Big Bang",
+    "expanding universe",
+    "Milky Way",
+    "cosmic microwave background radiation",
+    "Hubble constant"
+   ],
+   "method": "背 redshift = observed wavelength is longer than emitted wavelength because the source moves away。两大证据：redshift（越远越红移越大）和 CMBR。补充：H₀ = v/d，1/H₀ 估算宇宙年龄。",
+   "probe": "解释星系红移如何支持大爆炸理论；给 H₀ 估算宇宙年龄。"
+  }
+ ]
+}

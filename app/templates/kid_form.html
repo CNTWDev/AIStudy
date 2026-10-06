@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>{{ '编辑' if k else '添加' }}孩子</h1>
+<form method="post" action="/parent/kids/save" class="card">
+  {% if k %}<input type="hidden" name="id" value="{{ k.id }}">{% endif %}
+  <label>名字</label><input type="text" name="name" value="{{ k.name if k else '' }}" required placeholder="例如：姐姐">
+  <label>登录邮箱</label><input type="email" name="email" value="{{ k.email if k else '' }}" required>
+  <label>{{ '新密码（不改就留空）' if k else '密码（至少 6 位）' }}</label><input type="text" name="password" {{ '' if k else 'required minlength=6' }} autocomplete="off">
+  {% if k %}<label style="display:flex;gap:8px;align-items:center;font-weight:normal"><input type="checkbox" name="disabled" value="1" style="width:auto" {{ 'checked' if k.status == 'disabled' }}> 暂停这个账号（孩子暂时不能登录，学习记录保留）</label>{% endif %}
+  <div class="row">
+    <div class="grow"><label>年级</label><select name="grade">{% for g in GRADES %}<option value="{{ g }}" {{ 'selected' if k and k.grade == g }}>{{ stage_label(g) }}</option>{% endfor %}</select></div>
+    <div class="grow"><label>每天学习分钟</label><input type="number" name="daily_minutes" min="15" max="240" value="{{ k.daily_minutes if k else 60 }}"></div>
+  </div>
+  <label>学校（选填）</label><input type="text" name="school" value="{{ k.school if k else '' }}">
+  <h2>学科与教材</h2>
+  <p class="muted small">每个学科勾选一套教材，并选「当前学习进度」所在学段。系统会向前预习、向后回溯补漏。</p>
+  {% for subj, packs in packs_by_subject.items() %}
+  <h3>{{ subj }}</h3>
+  {% for p in packs %}
+  <div class="card" style="margin:6px 0;padding:10px 12px">
+    <label style="margin:0;font-weight:400" class="row"><input type="checkbox" name="pack_{{ p.id }}" {{ 'checked' if p.id in enrolled }}>
+      <span class="grow"><b>{{ p.edition }}</b> <span class="muted small">{{ p.region }} · {{ stage_label(p.stages[0]) }}–{{ stage_label(p.stages[-1]) }} · {{ p.kp_ids|length }} 个知识点</span></span></label>
+    <div class="row small" style="margin-top:6px"><span class="muted">当前进度</span>
+      <select name="stage_{{ p.id }}" style="width:auto;min-height:34px;padding:4px 8px">{% for s in p.stages %}
+        <option value="{{ s }}" {{ 'selected' if enrolled.get(p.id) == s or (not enrolled.get(p.id) and k and s == catalog.default_stage(p.id, k.grade)) }}>{{ stage_label(s) }}</option>{% endfor %}</select></div>
+  </div>
+  {% endfor %}
+  {% endfor %}
+  <div style="margin-top:16px"><button class="btn">保存</button> <a class="btn ghost" href="/parent">取消</a></div>
+</form>
+{% endblock %}

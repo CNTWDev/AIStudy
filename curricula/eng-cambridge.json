@@ -1,0 +1,1520 @@
+{
+ "pack": {
+  "id": "eng-cambridge",
+  "subject": "english",
+  "subject_name": "英语",
+  "edition": "Cambridge 国际课程（Lower Secondary → IGCSE ESL/First Language）",
+  "region": "国际学校",
+  "stages": [
+   "G3",
+   "G4",
+   "G5",
+   "G6",
+   "G7",
+   "G8",
+   "G9",
+   "IGCSE"
+  ],
+  "version": 1,
+  "generated": "2026-10-06",
+  "sources": [
+   "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-as-a-second-language-0510/",
+   "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-as-a-second-language-speaking-endorsement-0511/",
+   "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-first-language-0500/",
+   "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-lower-secondary-english-as-a-second-language-0876/"
+  ],
+  "notes": "覆盖小学三年级至 IGCSE 的英语知识图谱，用于诊断与回溯。IGCSE 部分按 English as a Second Language (0510/0511) 技能设计：阅读（细节、匹配、推断、态度）、笔记整理、概要写作、非正式邮件、文章/报告/评论、听力填空与多选、口语。若实际课程为 First Language English (0500)，还需补充：作者语言效果分析（writer's effect / language analysis）、定向写作（directed writing，基于材料的议论文/书信）、叙事与描写创作（composition），以及更高要求的概要；这些可在本图谱 REA-10、REA-13、WRI-10、WRI-12 基础上扩展。stage 为通常最早学习的年级，非严格对应。"
+ },
+ "strands": [
+  {
+   "id": "VOC",
+   "name": "词汇"
+  },
+  {
+   "id": "GRA",
+   "name": "语法"
+  },
+  {
+   "id": "REA",
+   "name": "阅读理解"
+  },
+  {
+   "id": "WRI",
+   "name": "写作表达"
+  },
+  {
+   "id": "LIS",
+   "name": "听说"
+  }
+ ],
+ "kps": [
+  {
+   "id": "ENG-VOC-01",
+   "strand": "VOC",
+   "stage": "G3",
+   "name": "自然拼读：字母与发音",
+   "name_en": "Phonics: letter sounds and blends",
+   "desc": "能把字母、字母组合（sh/ch/th/ee/oa等）与发音对应，拼读和拼写简单单词。",
+   "prereqs": [],
+   "hot": false,
+   "method": "每天10分钟跟读自然拼读表（按字母组合分组，如 ee/ea/ai/ay），边读边写。遇到新单词先按发音拆音节再拼，不要逐字母死记。",
+   "probe": "听写一组按发音规则可拼出的生词（如 sheep, train, chop），看能否凭发音写对。"
+  },
+  {
+   "id": "ENG-VOC-02",
+   "strand": "VOC",
+   "stage": "G3",
+   "name": "高频常见词",
+   "name_en": "High-frequency sight words",
+   "desc": "认读并正确拼写最常用的 300 个左右功能词与基础词（the, because, people, could 等）。",
+   "prereqs": [],
+   "hot": false,
+   "method": "把高频词做成卡片，每天快速闪认 20 个，认不出的放回待复习堆。重点练不规则拼写词（said, does, friend），每个默写三遍并造一个短句。",
+   "probe": "快速默写 10 个易错高频词（because, friend, which, though 等），看拼写是否稳定。"
+  },
+  {
+   "id": "ENG-VOC-03",
+   "strand": "VOC",
+   "stage": "G4",
+   "name": "拼写规律与易混词",
+   "name_en": "Spelling patterns and homophones",
+   "desc": "掌握不发音字母、双写辅音、magic-e、ie/ei 等拼写规律，并区分 there/their/they're、your/you're、to/too/two 等同音词。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "建立“错词本”，按规律归类（双写、静音字母、同音词），每周复习一次。同音词每组造一个对比句，如 They're putting their bags over there。",
+   "probe": "给出含同音词空格的句子让学生选词填写，并听写 5 个含静音字母或双写规律的词。"
+  },
+  {
+   "id": "ENG-VOC-04",
+   "strand": "VOC",
+   "stage": "G4",
+   "name": "词形变化拼写（复数、-ing、-ed、-er/-est）",
+   "name_en": "Inflection spelling rules",
+   "desc": "掌握名词复数、动词 -ing/-ed、形容词比较级加词尾时的拼写变化（去e、双写、y变i）。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "把三条核心规则（去不发音e、短元音双写末尾辅音、辅音+y变i）写在卡片上，每天给 10 个词做变形练习。写作后专门检查所有 -ed/-ing 词的拼写。",
+   "probe": "给 stop, make, carry, box, big 等词，要求写出复数/-ing/-ed/比较级形式。"
+  },
+  {
+   "id": "ENG-VOC-05",
+   "strand": "VOC",
+   "stage": "G5",
+   "name": "词族与词性转换",
+   "name_en": "Word families and word classes",
+   "desc": "知道同一词根的名词、动词、形容词、副词形式（act/action/active/actively），并能根据句子位置选对词性。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "每学一个新词就查出它的词族，做成四列表格（名/动/形/副）。做填空时先判断空格需要什么词性（冠词后多为名词、be 后多为形容词），再选形式。",
+   "probe": "句子填空：给出词根（如 decide），要求根据句子位置填 decision / decisive / decisively。"
+  },
+  {
+   "id": "ENG-VOC-06",
+   "strand": "VOC",
+   "stage": "G6",
+   "name": "常用前缀",
+   "name_en": "Common prefixes",
+   "desc": "掌握 un-, dis-, im-/in-, re-, mis-, pre-, over- 等前缀的含义，用于构词和猜词。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "每个前缀收集 5 个例词贴在桌前，例如 dis-: disagree, dislike, disappear。阅读遇到生词时先遮住前缀看词根，再加回前缀推测词义。",
+   "probe": "给出含前缀的生词（如 misunderstand, unbelievable），让学生解释意思或写出反义词。"
+  },
+  {
+   "id": "ENG-VOC-07",
+   "strand": "VOC",
+   "stage": "G6",
+   "name": "常用后缀",
+   "name_en": "Common suffixes",
+   "desc": "掌握 -tion, -ment, -ness, -ful, -less, -able, -ly, -ise/-ize 等后缀及其决定的词性。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "把后缀按词性分类记忆（-tion/-ment/-ness 是名词，-ful/-less/-able 是形容词，-ly 多为副词）。每周做一次“给词根加后缀”填空，注意拼写变化如 happy→happiness。",
+   "probe": "给出词根和句子语境，要求用正确后缀变形（care → careless / carefully）。"
+  },
+  {
+   "id": "ENG-VOC-08",
+   "strand": "VOC",
+   "stage": "G7",
+   "name": "同义替换与反义词",
+   "name_en": "Synonyms, antonyms and paraphrase",
+   "desc": "能识别和使用同义词、近义表达及反义词，理解题目与原文之间的同义改写。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做阅读题后，把题干和原文中对应的同义表达成对抄下来（e.g. purchase = buy）。背单词时同时记一个同义词和一个反义词，避免只记中文意思。",
+   "probe": "给一句原文和四个改写句，找出意思相同的那一句（考同义替换识别）。"
+  },
+  {
+   "id": "ENG-VOC-09",
+   "strand": "VOC",
+   "stage": "G7",
+   "name": "固定搭配",
+   "name_en": "Collocations",
+   "desc": "掌握常见动词+名词（make a mistake, do homework）、形容词+介词（interested in）、名词+介词等固定搭配。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-05",
+     "strength": "有帮助"
+    },
+    {
+     "id": "ENG-GRA-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "以“词块”为单位记，不单记单词：例如记 take part in, pay attention to 整块。中式搭配（如 learn knowledge, open the light）列入错题本并写出正确说法。",
+   "probe": "选择题：make/do/take/have 与名词搭配，以及形容词后接介词（good at / afraid of）。"
+  },
+  {
+   "id": "ENG-VOC-10",
+   "strand": "VOC",
+   "stage": "G7",
+   "name": "常用短语动词",
+   "name_en": "Phrasal verbs",
+   "desc": "理解并使用常见短语动词（look after, give up, find out, turn down 等）及其非字面含义。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-09",
+     "strength": "有帮助"
+    },
+    {
+     "id": "ENG-GRA-07",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "按核心动词分组（look/get/take/give + 不同小品词），每组画一张小图或写一个生活例句。阅读中遇到动词后跟 up/out/off 时，先查是否为短语动词再理解句意。",
+   "probe": "给含短语动词的句子，要求选出同义的单个动词（find out = discover）。"
+  },
+  {
+   "id": "ENG-VOC-11",
+   "strand": "VOC",
+   "stage": "G8",
+   "name": "话题词汇（IGCSE 常考主题）",
+   "name_en": "Topic vocabulary for common themes",
+   "desc": "掌握学校、家庭、环境、科技、健康、旅行、工作、娱乐等常考话题的核心词汇。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-09",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "每周一个话题，做一张思维导图（名词、动词、形容词、常用搭配各 8-10 个）。用这组词写一段 80 词小短文或口头说 1 分钟，用到才算掌握。",
+   "probe": "给一个话题（如环境），让学生在限定时间内写出 10 个相关词并用其中 3 个造句。"
+  },
+  {
+   "id": "ENG-VOC-12",
+   "strand": "VOC",
+   "stage": "G8",
+   "name": "正式与非正式语域词汇",
+   "name_en": "Formal vs informal register",
+   "desc": "区分正式与非正式用词（get/obtain, kids/children, a lot of/numerous），并能按写作对象选用。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-08",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-10",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "做一张“非正式→正式”对照表（ask→enquire, buy→purchase, sorry→I apologise），每天加 3 对。写正式邮件前先列出要用的正式表达，写完后删除缩写和口语词。",
+   "probe": "给一段非正式句子，要求改写成正式语气（去缩写、换正式词）。"
+  },
+  {
+   "id": "ENG-VOC-13",
+   "strand": "VOC",
+   "stage": "G8",
+   "name": "题目指令词与学术词汇",
+   "name_en": "Command words and academic vocabulary",
+   "desc": "理解 identify, explain, describe, suggest, summarise, compare, give reasons 等题目指令词及常见学术词。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-08",
+     "strength": "有帮助"
+    },
+    {
+     "id": "ENG-VOC-07",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "把常见指令词做成卡片：正面英文，背面写“要答什么、答多长”。每次做题先圈出指令词，答完对照卡片检查是否答对了要求。",
+   "probe": "给几道题目，让学生说明每题的指令词要求做什么（如 explain 需要给原因而非只列事实）。"
+  },
+  {
+   "id": "ENG-GRA-01",
+   "strand": "GRA",
+   "stage": "G3",
+   "name": "名词单复数与 a/an",
+   "name_en": "Nouns: singular/plural and a/an",
+   "desc": "掌握可数名词单复数形式（含 child→children 等不规则）以及 a/an 的使用。",
+   "prereqs": [],
+   "hot": false,
+   "method": "把不规则复数（man/men, child/children, foot/feet, mouse/mice）做成一张小表贴在书桌前。用 a/an 时听首音而不是看首字母（an hour, a university）。",
+   "probe": "选择/填空：给 an hour, a uniform, three child__ 等，考 a/an 与不规则复数。"
+  },
+  {
+   "id": "ENG-GRA-02",
+   "strand": "GRA",
+   "stage": "G3",
+   "name": "be 动词与人称代词主格",
+   "name_en": "Verb 'be' and subject pronouns",
+   "desc": "掌握 am/is/are 与 I/you/he/she/it/we/they 的搭配，以及否定和疑问形式。",
+   "prereqs": [],
+   "hot": false,
+   "method": "口头快速替换练习：把 I am happy 依次换成 she/they/we 说出。写句子时先找主语，再选 am/is/are。",
+   "probe": "填空 She ___ / They ___ 以及把肯定句改成否定和一般疑问句。"
+  },
+  {
+   "id": "ENG-GRA-03",
+   "strand": "GRA",
+   "stage": "G3",
+   "name": "一般现在时",
+   "name_en": "Present simple",
+   "desc": "用一般现在时表达习惯和事实，第三人称单数加 -s/-es，否定和疑问用 do/does。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "每天用一般现在时写 5 句关于自己或家人日常的话，专门检查 he/she/it 后的动词是否加 -s。牢记 does 之后动词用原形（Does she like…? 而不是 Does she likes）。",
+   "probe": "改错题：找出 He go to school / Does she likes… 等第三人称单数和 do/does 错误。"
+  },
+  {
+   "id": "ENG-GRA-04",
+   "strand": "GRA",
+   "stage": "G4",
+   "name": "现在进行时",
+   "name_en": "Present continuous",
+   "desc": "用 be + doing 表达正在发生的动作，并区分它与一般现在时。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "对照记信号词：now, at the moment, Look! 用进行时；every day, usually 用一般现在时。看图说话：描述图中人物正在做什么。",
+   "probe": "二选一填空，区分 usually plays 与 is playing now，并含 like/know 等状态动词不用进行时的陷阱。"
+  },
+  {
+   "id": "ENG-GRA-05",
+   "strand": "GRA",
+   "stage": "G4",
+   "name": "可数与不可数名词及数量词",
+   "name_en": "Countable/uncountable nouns and quantifiers",
+   "desc": "区分可数与不可数名词（information, advice, homework 不可数），正确使用 much/many/a few/a little/some/any。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "把中国学生常错的不可数名词（advice, information, furniture, homework, news, equipment）列成清单，背到能脱口而出。每写 much/many 时先问“这个名词能数吗”。",
+   "probe": "改错/选择：many informations, a few advice, How much people 等。"
+  },
+  {
+   "id": "ENG-GRA-06",
+   "strand": "GRA",
+   "stage": "G4",
+   "name": "冠词 a/an/the/零冠词",
+   "name_en": "Articles",
+   "desc": "掌握不定冠词、定冠词和零冠词的基本用法（首次提及、特指、独一无二、泛指复数）。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "记三条主规则：第一次提到用 a，再次提到用 the；独一无二的用 the（the sun）；泛指复数或不可数名词不用冠词（I like dogs）。写完后专门用笔圈出所有单数可数名词，检查前面是否有冠词。",
+   "probe": "短文填冠词：在一段小故事中填 a/an/the/不填，覆盖首次/再次提及和泛指。"
+  },
+  {
+   "id": "ENG-GRA-07",
+   "strand": "GRA",
+   "stage": "G4",
+   "name": "时间与地点介词",
+   "name_en": "Prepositions of time and place",
+   "desc": "掌握 in/on/at 表时间与地点，以及 under, between, next to, opposite 等方位介词。",
+   "prereqs": [],
+   "hot": false,
+   "method": "时间介词画“漏斗图”：at 精确时刻、on 具体某天、in 月/年/季节。地点介词用房间实物练习，边摆放物品边说句子。",
+   "probe": "填空：___ Monday, ___ 7 o'clock, ___ 2025, ___ the weekend，以及看图选方位介词。"
+  },
+  {
+   "id": "ENG-GRA-08",
+   "strand": "GRA",
+   "stage": "G4",
+   "name": "形容词与副词",
+   "name_en": "Adjectives and adverbs",
+   "desc": "区分形容词与副词的用法和位置，掌握 -ly 构成副词及 good/well、fast/hard 等特殊形式。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "记口诀：形容词修饰名词或跟在 be/look/feel 后，副词修饰动词。造对比句练习：She is a careful driver / She drives carefully。",
+   "probe": "选择：She sings beautiful/beautifully; He looks happy/happily，考形副区分。"
+  },
+  {
+   "id": "ENG-GRA-09",
+   "strand": "GRA",
+   "stage": "G5",
+   "name": "一般过去时（规则动词）",
+   "name_en": "Past simple (regular verbs)",
+   "desc": "用一般过去时描述过去的动作，规则动词加 -ed，否定和疑问用 did + 动词原形。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "每晚用一般过去时写 3-5 句日记（I watched…, I didn't…）。注意 did/didn't 之后用原形（didn't play，不是 didn't played）。",
+   "probe": "把一段现在时短文改成过去时，并包含否定句和疑问句。"
+  },
+  {
+   "id": "ENG-GRA-10",
+   "strand": "GRA",
+   "stage": "G5",
+   "name": "一般过去时（不规则动词）与过去分词",
+   "name_en": "Past simple irregular verbs and past participles",
+   "desc": "掌握常用不规则动词的过去式和过去分词（go-went-gone, write-wrote-written）。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-09",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "把不规则动词按变化模式分组背（AAA: put-put-put；ABB: buy-bought-bought；ABC: write-wrote-written），每天 10 个，周末自测。用每个动词写一个过去式句子。",
+   "probe": "默写 15 个常用不规则动词的三种形式，并在句中选用正确过去式。"
+  },
+  {
+   "id": "ENG-GRA-11",
+   "strand": "GRA",
+   "stage": "G5",
+   "name": "比较级与最高级",
+   "name_en": "Comparatives and superlatives",
+   "desc": "掌握形容词/副词比较级和最高级（-er/-est, more/most, good-better-best），及 as…as、than 结构。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-08",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "按音节规则分类：单音节加 -er/-est，多音节用 more/most，不规则单独背（good/bad/far）。用家人或城市互相比较造句（Shanghai is bigger than…）。",
+   "probe": "填空含 more better 等双重比较错误，以及 the most / than / as…as 的选择。"
+  },
+  {
+   "id": "ENG-GRA-12",
+   "strand": "GRA",
+   "stage": "G5",
+   "name": "代词：宾格、物主、反身",
+   "name_en": "Pronouns: object, possessive, reflexive",
+   "desc": "正确使用 me/him/them、my/mine、myself 等代词，并确保代词与所指名词一致。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "画一张五列代词表（主格/宾格/形容词性物主/名词性物主/反身）并每天默写一次。写作时检查 he/she/it/they 是否与前文名词数和性别一致。",
+   "probe": "选择填空：Between you and ___ (I/me)；This book is ___ (her/hers)。"
+  },
+  {
+   "id": "ENG-GRA-13",
+   "strand": "GRA",
+   "stage": "G5",
+   "name": "疑问句构成",
+   "name_en": "Question forms",
+   "desc": "会用助动词构成一般疑问句和特殊疑问句（What/Where/How often/How long…），注意语序。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-09",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用“疑问词 + 助动词 + 主语 + 动词”公式造句，每天针对一段短文提 5 个问题。特别练主语疑问句（Who called you? 不加 did）。",
+   "probe": "给答句，让学生针对划线部分提问（如 She goes to school by bus → How does she go…）。"
+  },
+  {
+   "id": "ENG-GRA-14",
+   "strand": "GRA",
+   "stage": "G5",
+   "name": "基础连词",
+   "name_en": "Basic conjunctions",
+   "desc": "用 and, but, or, so, because 连接分句，理解它们表达的逻辑关系。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "把两个简单句用不同连词合并，读出来体会意思变化。避免中式 Because…, so… 和 Although…, but… 同时使用。",
+   "probe": "把两句合并成一句并选正确连词，含 because/so 同用的改错。"
+  },
+  {
+   "id": "ENG-GRA-15",
+   "strand": "GRA",
+   "stage": "G6",
+   "name": "将来时表达",
+   "name_en": "Future forms",
+   "desc": "区分 will（临时决定/预测）、be going to（计划/有迹象）、现在进行时表将来（已安排）。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "每个形式记一个典型场景句：I'll help you（临时）/ I'm going to study medicine（计划）/ I'm meeting Tom at 6（安排）。每周写下周计划，三种形式各用两次。",
+   "probe": "情景选择题：根据语境选 will / be going to / be doing。"
+  },
+  {
+   "id": "ENG-GRA-16",
+   "strand": "GRA",
+   "stage": "G6",
+   "name": "情态动词",
+   "name_en": "Modal verbs",
+   "desc": "掌握 can, could, must, have to, should, may, might 表能力、义务、建议、可能性，后接动词原形。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "按功能整理：能力 can/could，义务 must/have to，建议 should，可能 may/might。注意情态动词后不加 to、不加 -s（She can swim）。写邮件时练习用 should/could 给建议。",
+   "probe": "选择：考 must 与 have to 的区别、mustn't 与 don't have to 的区别以及后接原形。"
+  },
+  {
+   "id": "ENG-GRA-17",
+   "strand": "GRA",
+   "stage": "G6",
+   "name": "过去进行时",
+   "name_en": "Past continuous",
+   "desc": "用 was/were + doing 表示过去某时正在进行的动作，常与一般过去时搭配（when/while）。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "记“长动作用进行时，短动作打断用一般过去时”：I was reading when the phone rang。写故事开头时练习用过去进行时描写背景。",
+   "probe": "填空：While I ___ (walk) home, it ___ (start) to rain。"
+  },
+  {
+   "id": "ENG-GRA-18",
+   "strand": "GRA",
+   "stage": "G7",
+   "name": "动名词与不定式",
+   "name_en": "Gerunds and infinitives",
+   "desc": "掌握常见动词后接 doing 还是 to do（enjoy doing, want to do, stop doing/to do）。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-16",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "分两张清单背：后接 -ing（enjoy, finish, avoid, mind, suggest）和后接 to do（want, decide, hope, plan, refuse）。介词后一律用 -ing（interested in learning）。",
+   "probe": "选择 enjoy to swim / swimming，looking forward to see/seeing 等。"
+  },
+  {
+   "id": "ENG-GRA-19",
+   "strand": "GRA",
+   "stage": "G7",
+   "name": "现在完成时",
+   "name_en": "Present perfect",
+   "desc": "用 have/has + 过去分词表达经历、持续到现在的状态和对现在有影响的动作，搭配 ever/never/already/yet/for/since。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "记信号词并分成两组：经历类（ever/never/before）、持续类（for + 时间段 / since + 时间点）。每天写 3 句关于自己经历的句子：I have never been to…",
+   "probe": "填空 for/since 和 have/has + 过去分词，含 I have lived here since 3 years 等改错。"
+  },
+  {
+   "id": "ENG-GRA-20",
+   "strand": "GRA",
+   "stage": "G7",
+   "name": "现在完成时与一般过去时对比",
+   "name_en": "Present perfect vs past simple",
+   "desc": "区分有具体过去时间（yesterday, in 2020, ago）用一般过去时，与现在相关或无具体时间用现在完成时。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-19",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "看到 yesterday/ago/last/in+年份 就用一般过去时，这是最常见失分点。把两种时态写成成对句子比较：I have lost my key（现在还没找到）/ I lost my key yesterday。",
+   "probe": "二选一填空短文：混合 ago, since, yet, last week 等信号词，判断时态。"
+  },
+  {
+   "id": "ENG-GRA-21",
+   "strand": "GRA",
+   "stage": "G7",
+   "name": "主谓一致",
+   "name_en": "Subject-verb agreement",
+   "desc": "在长主语、不可数名词、each/every/everyone、there is/are、定语从句等情况下保持主谓一致。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-05",
+     "strength": "有帮助"
+    },
+    {
+     "id": "ENG-GRA-12",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "写完每句话找出真正的主语（划掉介词短语：The number of students... 的主语是 number）。记住 everyone/each/the news 用单数。",
+   "probe": "改错：The list of items are…; Everyone have…; There is many people…"
+  },
+  {
+   "id": "ENG-GRA-22",
+   "strand": "GRA",
+   "stage": "G7",
+   "name": "零条件句与第一条件句",
+   "name_en": "Zero and first conditionals",
+   "desc": "掌握 If + 一般现在时, 一般现在时（普遍事实）以及 If + 一般现在时, will + 动词原形（真实可能）。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-15",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "记“主将从现”：if 从句用一般现在时，主句用 will。用因果链造句：If it rains, we will stay home. If we stay home, we will…",
+   "probe": "改错：If it will rain tomorrow, we will…；补全条件句。"
+  },
+  {
+   "id": "ENG-GRA-23",
+   "strand": "GRA",
+   "stage": "G8",
+   "name": "第二条件句",
+   "name_en": "Second conditional",
+   "desc": "用 If + 一般过去时, would + 动词原形 表达与现在事实相反或不太可能的假设（If I were you…）。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-22",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-10",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "每天想一个“假如”问题并回答（If I had a million yuan, I would…）。记住提建议常用 If I were you, I would…",
+   "probe": "比较 first 与 second conditional 选择，并完成 If I ___ (be) you…"
+  },
+  {
+   "id": "ENG-GRA-24",
+   "strand": "GRA",
+   "stage": "G8",
+   "name": "被动语态",
+   "name_en": "Passive voice",
+   "desc": "掌握一般现在时、一般过去时、现在完成时及情态动词的被动语态（be + 过去分词），并知道何时使用。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-10",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-19",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "先找宾语，把它提前做主语，再按原句时态写 be，最后接过去分词。读科普文章或报告时划出被动句，体会它用于“不重要/不知道是谁做的”场景。",
+   "probe": "把主动句改成被动句（含不同时态），以及选择 is made / made / is making。"
+  },
+  {
+   "id": "ENG-GRA-25",
+   "strand": "GRA",
+   "stage": "G8",
+   "name": "定语从句",
+   "name_en": "Relative clauses",
+   "desc": "用 who, which, that, whose, where 连接定语从句，修饰名词。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-12",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-14",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "用合并句子练习：The girl is my friend + She lives next door → The girl who lives next door is my friend。注意从句中不要重复代词（the book which I bought it 是错的）。",
+   "probe": "合并两句为定语从句，并选择 who/which/whose/where。"
+  },
+  {
+   "id": "ENG-GRA-26",
+   "strand": "GRA",
+   "stage": "G8",
+   "name": "间接引语",
+   "name_en": "Reported speech",
+   "desc": "把直接引语转换为间接引语（时态后退、人称和时间状语变化），包括陈述句和疑问句。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-13",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-10",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-20",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "背转换表：am/is→was, will→would, can→could, today→that day, tomorrow→the next day。转换疑问句时语序改为陈述语序（She asked where I lived）。",
+   "probe": "把 \"Where do you live?\" she asked me 转为间接引语，考时态后退与语序。"
+  },
+  {
+   "id": "ENG-GRA-27",
+   "strand": "GRA",
+   "stage": "G9",
+   "name": "过去完成时",
+   "name_en": "Past perfect",
+   "desc": "用 had + 过去分词表达“过去的过去”，用于叙事和间接引语。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-19",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-17",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "画时间轴标出两个过去动作，较早的那个用 had done。写故事时用 By the time…, I had already… 句型练习。",
+   "probe": "填空：When I arrived at the station, the train ___ (leave)。"
+  },
+  {
+   "id": "ENG-REA-01",
+   "strand": "REA",
+   "stage": "G3",
+   "name": "句子与短文朗读理解",
+   "name_en": "Decoding and reading simple texts",
+   "desc": "能读懂简单句和短小图文，理解基本意思。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-01",
+     "strength": "有帮助"
+    },
+    {
+     "id": "ENG-VOC-02",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "每天朗读 5 分钟分级读物（如 Oxford Reading Tree 低级别），用手指着读。读完用中文或英文说一句故事大意。",
+   "probe": "读一段 50 词左右的图文短文，判断句子对错。"
+  },
+  {
+   "id": "ENG-REA-02",
+   "strand": "REA",
+   "stage": "G4",
+   "name": "细节信息定位",
+   "name_en": "Locating explicit details",
+   "desc": "能根据 who/what/when/where 问题在文中找到明确陈述的信息。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "做题时先划出问题中的关键词（人名、数字、地点），回到原文找同词或同义词，再读该句前后各一句确认。答案不要凭印象，必须能在原文指出出处。",
+   "probe": "给 150 词短文和 4 个细节问题，看学生能否准确定位并回答。"
+  },
+  {
+   "id": "ENG-REA-03",
+   "strand": "REA",
+   "stage": "G5",
+   "name": "段落主旨",
+   "name_en": "Main idea of a paragraph",
+   "desc": "能找出段落的主题句或概括段落大意。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "读每一段后用不超过 8 个英文单词写段落大意并写在页边。注意主题句通常在首句或尾句，例子和数字一般是支撑细节不是主旨。",
+   "probe": "给一段文字和三个可能的概括，选出最准确的主旨（干扰项为细节或过度概括）。"
+  },
+  {
+   "id": "ENG-REA-04",
+   "strand": "REA",
+   "stage": "G6",
+   "name": "寻读（扫读找信息）",
+   "name_en": "Scanning for specific information",
+   "desc": "能快速在长文中查找数字、名字、日期等特定信息而不逐字阅读。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "计时练习：给自己 30 秒在一篇文章里找到指定的日期或数字。先想好要找的“形状”（大写字母、数字、%），眼睛只扫这些。",
+   "probe": "限时 1 分钟回答 4 个只需定位数字/名称的问题。"
+  },
+  {
+   "id": "ENG-REA-05",
+   "strand": "REA",
+   "stage": "G6",
+   "name": "略读抓大意",
+   "name_en": "Skimming for gist",
+   "desc": "通过标题、首尾段和各段首句快速把握全文主旨与结构，能为段落匹配标题。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "拿到文章先花 1 分钟只读标题、首段、每段第一句和末段，然后合上文章说出文章讲什么。练习段落标题匹配题。",
+   "probe": "限时 2 分钟略读后，为 4 个段落匹配小标题。"
+  },
+  {
+   "id": "ENG-REA-06",
+   "strand": "REA",
+   "stage": "G7",
+   "name": "上下文猜词",
+   "name_en": "Vocabulary in context",
+   "desc": "根据上下文、构词法和同义复现推测生词含义，理解多义词在文中的意思。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "遇到生词先不查字典：看前后句是否有解释、举例或对比词（but, however），再看词根词缀，写下猜测意思后再查证。每篇阅读至少练 3 个。",
+   "probe": "给文中一个生词，要求从选项中选出最接近的意思或写出同义词。"
+  },
+  {
+   "id": "ENG-REA-07",
+   "strand": "REA",
+   "stage": "G7",
+   "name": "指代关系",
+   "name_en": "Reference words",
+   "desc": "理解 it, they, this, that, which, such 等指代词在文中指代的内容。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-12",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "阅读时看到 this/it/they 就向前找它指的名词，并用箭头连起来。答题时把找到的名词代入原句检验是否通顺。",
+   "probe": "问：文中第 3 段的 'this' 指的是什么？"
+  },
+  {
+   "id": "ENG-REA-08",
+   "strand": "REA",
+   "stage": "G7",
+   "name": "推断隐含意思",
+   "name_en": "Inference",
+   "desc": "能根据文本线索推断人物感受、原因和未明说的信息。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-02",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-06",
+     "strength": "有帮助"
+    },
+    {
+     "id": "ENG-REA-07",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "答推断题时写出“线索词 → 结论”两步，例如 she slammed the door → angry。避免把文中没有依据的常识当答案。",
+   "probe": "问“为什么作者说……”或“人物此时可能有什么感受”，要求引用文中依据。"
+  },
+  {
+   "id": "ENG-REA-09",
+   "strand": "REA",
+   "stage": "G8",
+   "name": "区分事实与观点",
+   "name_en": "Fact vs opinion",
+   "desc": "区分可以证实的事实和作者或人物的观点，识别观点标志词（I believe, should, best）。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "给文章中的句子打 F/O 标签，观点句圈出评价性词语（amazing, terrible, should）。看到数字、日期、研究结果多为事实。",
+   "probe": "给 5 个句子判断是事实还是观点，并说出判断依据。"
+  },
+  {
+   "id": "ENG-REA-10",
+   "strand": "REA",
+   "stage": "G8",
+   "name": "作者目的与态度",
+   "name_en": "Writer's purpose and attitude",
+   "desc": "判断作者写作目的（告知、说服、娱乐、建议）及对话题的态度（支持、批评、怀疑）。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-08",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-09",
+     "strength": "有帮助"
+    },
+    {
+     "id": "ENG-VOC-12",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "积累描述态度的形容词（critical, supportive, doubtful, enthusiastic）。读完文章问自己：作者想让读者做什么或想什么？找出 2 个带感情色彩的词作为依据。",
+   "probe": "问作者对某事的态度，选项为几个态度形容词，需从文中语气词找证据。"
+  },
+  {
+   "id": "ENG-REA-11",
+   "strand": "REA",
+   "stage": "G8",
+   "name": "多文本匹配",
+   "name_en": "Multiple matching across texts",
+   "desc": "在几篇短文或多个人的观点中，把陈述与对应的人/段落匹配（ESL 阅读常见题型）。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-08",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "先读题目陈述并划出关键概念，再逐篇略读找同义表达，不要找原词重复。每匹配一个就在原文中标出对应句子，防止张冠李戴。",
+   "probe": "给 4 个人的短段落和 6 个陈述，要求匹配说话人，陈述均为同义改写。"
+  },
+  {
+   "id": "ENG-REA-12",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "name": "笔记整理（Note-making）",
+   "name_en": "Note-making",
+   "desc": "按标题从文章中提取相关要点，以简洁笔记形式写出（IGCSE ESL 阅读常考题型）。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-04",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "做题前先读清每个小标题，再按标题在原文中划出相关信息。笔记用简短短语（3-6 词）而不是整句，每点只写一个信息，不重复。",
+   "probe": "给一篇 400 词文章和两个小标题，要求在每个标题下写出 3-4 条要点。"
+  },
+  {
+   "id": "ENG-REA-13",
+   "strand": "REA",
+   "stage": "IGCSE",
+   "name": "概要写作（Summary）",
+   "name_en": "Summary writing",
+   "desc": "根据要求从文章中选取相关要点，用自己的话写成连贯的短文（约 80-100 词）。",
+   "prereqs": [
+    {
+     "id": "ENG-REA-12",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-08",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-WRI-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "三步法：先列要点（可借用 note-making），再用同义词改写，最后用连接词串成一段。严格控制字数，不加个人观点和例子。写完数一数要点数量是否足够。",
+   "probe": "给一篇文章，要求按特定方面写约 80 词概要，检查要点覆盖、改写程度和连贯性。"
+  },
+  {
+   "id": "ENG-WRI-01",
+   "strand": "WRI",
+   "stage": "G3",
+   "name": "简单句与首字母大写、句号",
+   "name_en": "Simple sentences and basic capitalisation",
+   "desc": "能写出主语+谓语（+宾语）的完整简单句，句首大写、句末有句号，I 和专有名词大写。",
+   "prereqs": [],
+   "hot": false,
+   "method": "每天写 5 个关于自己的完整句子，读一遍检查“有没有主语、有没有动词、开头大写、结尾句号”。",
+   "probe": "看图写 3 个句子，检查句子完整性和大写/句号。"
+  },
+  {
+   "id": "ENG-WRI-02",
+   "strand": "WRI",
+   "stage": "G4",
+   "name": "标点：逗号、问号、感叹号、撇号",
+   "name_en": "Punctuation: commas, question marks, apostrophes",
+   "desc": "正确使用逗号（列举、从句后）、问号、感叹号、所有格与缩写撇号、引号。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "重点区分 it's（it is）与 its（它的）、所有格 the boy's / the boys'。写完后朗读，在自然停顿处检查逗号。",
+   "probe": "改正一段标点错误的短文（缺问号、it's/its 混用、列举缺逗号）。"
+  },
+  {
+   "id": "ENG-WRI-03",
+   "strand": "WRI",
+   "stage": "G4",
+   "name": "扩展句子",
+   "name_en": "Expanding sentences",
+   "desc": "用形容词、副词、时间地点短语和介词短语把简单句扩写得更具体。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-01",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用 who/what/where/when/how 五问法扩写：I played → Last Saturday I happily played football with my cousins in the park。每天扩写 3 句。",
+   "probe": "给一个简单句，要求用至少 3 种信息扩写。"
+  },
+  {
+   "id": "ENG-WRI-04",
+   "strand": "WRI",
+   "stage": "G5",
+   "name": "并列句",
+   "name_en": "Compound sentences",
+   "desc": "用 and, but, or, so 连接两个简单句，避免全是短句。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-14",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "写完一段后找出相邻的两个短句尝试合并。注意 so 和 because 不同时用，并列连词前常加逗号。",
+   "probe": "把 4 对短句合并成并列句。"
+  },
+  {
+   "id": "ENG-WRI-05",
+   "strand": "WRI",
+   "stage": "G5",
+   "name": "段落写作（主题句+支撑句）",
+   "name_en": "Paragraph structure",
+   "desc": "写出含主题句、2-3 个支撑句（理由/例子）和结尾句的段落。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-WRI-04",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用“汉堡包”结构：主题句（面包）+ 理由和例子（馅）+ 总结句（面包）。每周写 3 段，每段 60-80 词，写完检查每句是否都围绕主题句。",
+   "probe": "给一个话题，写一段 60 词左右的段落，看是否有清晰主题句和相关支撑。"
+  },
+  {
+   "id": "ENG-WRI-06",
+   "strand": "WRI",
+   "stage": "G6",
+   "name": "复合句（状语从句）",
+   "name_en": "Complex sentences",
+   "desc": "用 when, because, although, if, while, before, after 构成主从复合句。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-14",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "每次写作至少用 3 个不同的从属连词。从句放句首时后面加逗号（Although it was late, we…）。",
+   "probe": "给两个分句，要求用 although/because/when 合并并写对逗号位置。"
+  },
+  {
+   "id": "ENG-WRI-07",
+   "strand": "WRI",
+   "stage": "G6",
+   "name": "避免破句与粘连句",
+   "name_en": "Avoiding fragments and run-ons",
+   "desc": "识别并改正缺主语/谓语的句子碎片，以及只用逗号连接两个完整句的粘连句。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-06",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-WRI-02",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "写完后逐句检查：每个句子是否只有一个“主句”，两个完整句之间是否有句号或连词。中国学生常见“逗号一逗到底”，遇到新主语就考虑断句。",
+   "probe": "改错：给 4 个含 run-on 或 fragment 的句子，要求改为正确句子。"
+  },
+  {
+   "id": "ENG-WRI-08",
+   "strand": "WRI",
+   "stage": "G7",
+   "name": "连接词与篇章衔接",
+   "name_en": "Linking adverbials and cohesion",
+   "desc": "使用 however, therefore, moreover, in addition, as a result, for example, finally 等连接段落和观点，使文章连贯。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-14",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "按功能整理连接词表：递进、转折、因果、举例、总结，每类记 3 个。注意 however 是副词不能直接连两个句子，要用句号或分号。",
+   "probe": "在一段缺连接词的短文中选择合适连接词，并改正 However 误用。"
+  },
+  {
+   "id": "ENG-WRI-09",
+   "strand": "WRI",
+   "stage": "G6",
+   "name": "非正式邮件/书信",
+   "name_en": "Informal email/letter",
+   "desc": "写给朋友或家人的非正式邮件：恰当的开头结尾、友好语气、覆盖所有要点（IGCSE ESL 写作常考）。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-03",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "背一套开头（Hi Tom, Thanks for your email…）和结尾（Can't wait to hear from you. Best wishes,）。动笔前把题目的 3 个要点编号，每个要点写一段。可以用缩写和口语，但仍需语法正确。",
+   "probe": "给一个 ESL 风格的邮件任务（3 个要点），检查要点覆盖、语气和段落。"
+  },
+  {
+   "id": "ENG-WRI-10",
+   "strand": "WRI",
+   "stage": "G7",
+   "name": "记叙与描写",
+   "name_en": "Narrative and descriptive writing",
+   "desc": "用正确的过去时态写故事，含开头、发展、高潮、结尾，并使用感官细节描写。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-10",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-17",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用“五个方框”提纲：背景—问题—事件升级—解决—感受。描写时加入看、听、闻、触的细节，并检查全文时态是否保持在过去时。",
+   "probe": "写一个 150 词故事开头，检查时态一致性和细节描写。"
+  },
+  {
+   "id": "ENG-WRI-11",
+   "strand": "WRI",
+   "stage": "G8",
+   "name": "正式邮件/书信",
+   "name_en": "Formal email/letter",
+   "desc": "写给校长、公司或报社的正式书信（投诉、申请、建议），使用正式语域、清楚的目的和礼貌结尾。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-09",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-12",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-16",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "记正式模板：Dear Sir or Madam, / I am writing to… / I would be grateful if… / Yours faithfully。写完检查删除所有缩写（don't→do not）和口语词。",
+   "probe": "给一个投诉或申请任务，检查格式、语域和是否说明目的。"
+  },
+  {
+   "id": "ENG-WRI-12",
+   "strand": "WRI",
+   "stage": "G8",
+   "name": "文章（Article）",
+   "name_en": "Article writing",
+   "desc": "为校刊或杂志写文章：吸引人的标题和开头、直接与读者对话、分段阐述观点（IGCSE ESL 常考）。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-08",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-WRI-05",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "开头用问题或惊人事实吸引读者（Have you ever wondered…?），中间每段一个观点+例子，结尾给建议或呼吁。写前列出 3 个观点再动笔。",
+   "probe": "给一个校刊文章任务，检查标题、开头吸引力、段落观点和读者意识。"
+  },
+  {
+   "id": "ENG-WRI-13",
+   "strand": "WRI",
+   "stage": "G8",
+   "name": "报告与评论（Report/Review）",
+   "name_en": "Report and review writing",
+   "desc": "写结构清晰的报告（可用小标题、客观语气、建议）或评论（描述+评价+推荐）。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-08",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-12",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "报告用固定结构：Introduction（目的）— Findings（分小标题）— Recommendations。语气客观，多用被动和 It is recommended that…。评论则描述后给出明确评价和推荐对象。",
+   "probe": "给一个学校活动报告任务，检查结构、客观语气和建议部分。"
+  },
+  {
+   "id": "ENG-WRI-14",
+   "strand": "WRI",
+   "stage": "G9",
+   "name": "审题与写作规划",
+   "name_en": "Task analysis and planning",
+   "desc": "读清写作任务的读者、目的、文体、语气和全部要点，控制字数，写前列提纲。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-05",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-13",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用“PAF+要点”审题：Purpose 目的、Audience 读者、Form 文体，再把要点编号。动笔前花 3-5 分钟写提纲，写完对照要点逐一打勾，并估算字数。",
+   "probe": "给一个写作题，要求只写出读者、目的、文体、语气和要点清单，不写全文。"
+  },
+  {
+   "id": "ENG-WRI-15",
+   "strand": "WRI",
+   "stage": "G9",
+   "name": "检查与自我修改",
+   "name_en": "Proofreading and self-editing",
+   "desc": "按清单检查时态、主谓一致、冠词、拼写、标点和句子完整性，自行改正错误。",
+   "prereqs": [
+    {
+     "id": "ENG-WRI-07",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-21",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "建立个人错误清单（自己最常犯的 5 类错误），每次写完逐条检查一遍。把作文读出声来，读不顺的地方往往有错。",
+   "probe": "给一段含 8 处常见错误的短文，要求找出并改正。"
+  },
+  {
+   "id": "ENG-LIS-01",
+   "strand": "LIS",
+   "stage": "G3",
+   "name": "基础听力：数字、字母、时间",
+   "name_en": "Basic listening: numbers, spelling, times",
+   "desc": "听懂数字、字母拼读、时间、日期和课堂常用指令。",
+   "prereqs": [],
+   "hot": false,
+   "method": "每天听写 10 个数字或电话号码、5 个拼读的名字。特别练易混的 13/30、15/50 等。",
+   "probe": "听录音写下数字、时间和拼读出来的名字。"
+  },
+  {
+   "id": "ENG-LIS-02",
+   "strand": "LIS",
+   "stage": "G4",
+   "name": "发音与单词重音",
+   "name_en": "Pronunciation and word stress",
+   "desc": "发准常见难音（/θ/、/v/、/r/-/l/、词尾辅音）和单词重音，说话能让人听懂。",
+   "prereqs": [
+    {
+     "id": "ENG-VOC-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "跟读录音并录下自己的声音对比，每次专练 1 个难音。新学单词时用查字典标出重音位置，跟读 3 遍。",
+   "probe": "朗读一组单词和短句，检查难音、词尾辅音和重音位置。"
+  },
+  {
+   "id": "ENG-LIS-03",
+   "strand": "LIS",
+   "stage": "G5",
+   "name": "听取具体信息",
+   "name_en": "Listening for specific information",
+   "desc": "在对话或独白中听出具体信息（人名、日期、价格、地点、原因）。",
+   "prereqs": [
+    {
+     "id": "ENG-LIS-01",
+     "strength": "必须"
+    }
+   ],
+   "hot": false,
+   "method": "听前先读题，划出要找的信息类型（时间？价格？），预测答案。每天听 5 分钟慢速英语，听后复述 3 个细节。",
+   "probe": "听一段 1 分钟对话，回答 4 个细节问题。"
+  },
+  {
+   "id": "ENG-LIS-04",
+   "strand": "LIS",
+   "stage": "G6",
+   "name": "口语：描述与表达观点",
+   "name_en": "Speaking: describing and giving opinions",
+   "desc": "能描述人物、地点、经历，并用 I think… because… 表达观点和理由。",
+   "prereqs": [
+    {
+     "id": "ENG-GRA-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-GRA-14",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "每天用 1 分钟说一个话题（我的学校、周末），用手机录音，回听找出卡顿和错误。观点句一定配一个理由和一个例子。",
+   "probe": "给一个熟悉话题，要求连续说 1 分钟，观察是否能给出观点、理由和例子。"
+  },
+  {
+   "id": "ENG-LIS-05",
+   "strand": "LIS",
+   "stage": "G8",
+   "name": "听力填空与笔记补全",
+   "name_en": "Gap-fill note completion",
+   "desc": "边听边补全笔记或表格，答案需准确拼写（IGCSE ESL 听力常见题型）。",
+   "prereqs": [
+    {
+     "id": "ENG-LIS-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-VOC-03",
+     "strength": "必须"
+    }
+   ],
+   "hot": true,
+   "method": "听前读空格前后的词，预测词性和内容（名词？数字？）。听时只写关键词，最后检查拼写和单复数。复盘时对照原文找出漏听的连读和同义表达。",
+   "probe": "听一段讲座片段，完成 6 个笔记空格，考核信息准确与拼写。"
+  },
+  {
+   "id": "ENG-LIS-06",
+   "strand": "LIS",
+   "stage": "G8",
+   "name": "听主旨、态度与干扰项",
+   "name_en": "Gist, attitude and distractors",
+   "desc": "理解说话人主旨与态度，识别听力中的干扰信息（先说后改、否定转折）。",
+   "prereqs": [
+    {
+     "id": "ENG-LIS-03",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-REA-08",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": true,
+   "method": "注意 but, actually, no wait, I thought…but 之后才是真正答案。做多选题时听到某个选项的原词不要立刻选，要等整句听完。",
+   "probe": "听一段讨论，选择说话人的观点，选项中含原词重现的干扰项。"
+  },
+  {
+   "id": "ENG-LIS-07",
+   "strand": "LIS",
+   "stage": "IGCSE",
+   "name": "口语考试：拓展对话",
+   "name_en": "Speaking exam: extended conversation",
+   "desc": "在 IGCSE 口语考试中围绕话题进行拓展回答，展开观点、举例、回应追问。",
+   "prereqs": [
+    {
+     "id": "ENG-LIS-04",
+     "strength": "必须"
+    },
+    {
+     "id": "ENG-WRI-08",
+     "strength": "有帮助"
+    },
+    {
+     "id": "ENG-VOC-11",
+     "strength": "有帮助"
+    }
+   ],
+   "hot": false,
+   "method": "用 AREA 法回答：Answer 回答—Reason 理由—Example 例子—Alternative/Add 补充。准备 10 个常考话题，每题录音练 2 分钟。",
+   "probe": "模拟问答 3 个话题问题，评估回答长度、展开程度和词汇语法准确性。"
+  }
+ ]
+}
