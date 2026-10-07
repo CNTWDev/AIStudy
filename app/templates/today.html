@@ -105,8 +105,8 @@
   {% if readonly %}{% if rec.mood or t.reflection %}<p>心情：{{ rec.mood }} {% if t.reflection %}「{{ t.reflection }}」{% endif %}</p>{% endif %}{% else %}
   <label style="margin-top:16px">今天心情怎么样？点一下就算打卡</label>
   <div class="moods">{% for m, n in [('😄','超开心'),('🙂','还不错'),('😐','一般'),('😣','有点难'),('😴','好累')] %}<button data-m="{{ m }}" class="{{ 'sel' if rec.mood == m }}" title="{{ n }}" aria-label="{{ n }}">{{ m }}</button>{% endfor %}</div>
-  <details class="note" {{ 'open' if t.reflection }}><summary class="small muted">想说点什么？（可以不写）</summary>
-    <div class="ig" style="margin-top:8px"><input type="text" id="refl" value="{{ t.reflection }}" placeholder="比如：今天的电路题终于弄懂了" maxlength="200"><button class="btn sm" id="savenote">保存</button></div></details>
+  <label for="refl" style="margin-top:14px">想说点什么？<span class="muted small" style="font-weight:400">（选填）</span></label>
+  <div class="ig"><input type="text" id="refl" value="{{ t.reflection }}" placeholder="比如：今天的电路题终于弄懂了" maxlength="200"><button class="btn sm" id="savenote">保存</button></div>
   <p class="small" id="checked" style="margin:10px 0 0" {{ '' if t.checked_in else 'hidden' }}>✅ 今天已经打卡啦</p>
   {% endif %}
 </div>
