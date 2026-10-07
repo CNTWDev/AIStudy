@@ -1,0 +1,33 @@
+/* ===== 星星守卫（defense） ===== */
+.pl-defense .pl-stage{background:#ffd3b0}
+/* 手机竖屏：画面矮一点，答题面板留在屏幕里 */
+@media (max-width:640px) and (orientation:portrait){.pl-defense .pl-stage{height:clamp(220px,64vw,380px)}}
+.df-hud{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;width:100%}
+.df-l,.df-r{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.df-r{justify-content:flex-end}
+.df-c{flex:1;display:flex;justify-content:center;min-width:0}
+.df-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.92);color:#2b2340;border:3px solid #2b2340;box-shadow:0 3px 0 #2b2340;border-radius:99px;padding:2px 11px;font-weight:900;font-size:17px;line-height:1.35;white-space:nowrap}
+.df-chip b{font-size:20px}.df-chip small{font-size:13px;opacity:.6}
+.df-time b{font-size:17px;font-variant-numeric:tabular-nums}
+.df-time.low{background:#ffe3ea;color:#d6204e;animation:dfpulse .8s infinite}
+.df-castle i{display:block;width:84px;height:13px;border-radius:99px;background:#ffe3ea;border:2px solid #2b2340;overflow:hidden}
+.df-castle i b{display:block;height:100%;background:linear-gradient(180deg,#ff8fab,#ff4d6d);transition:width .3s cubic-bezier(.2,.9,.3,1.3)}
+.df-castle em{font-style:normal;font-size:18px;min-width:20px;text-align:center}
+.df-castle.low i b{background:#ff3d3d}.df-castle.low{animation:dfpulse .7s infinite}
+.df-combo{background:#fff3c4}.df-combo.hot{background:#ffd23f;color:#5a2d00}
+.bump{animation:dfbump .35s cubic-bezier(.2,.9,.3,1.5)}
+.df-boss{display:flex;align-items:center;gap:6px;background:rgba(43,35,64,.85);border:3px solid #2b2340;border-radius:99px;padding:3px 12px 3px 8px;width:min(260px,100%);animation:dfbump .4s}
+.df-boss[hidden]{display:none}
+.df-boss span{font-size:22px;line-height:1}
+.df-boss i{flex:1;height:14px;border-radius:99px;background:#5b4b9a;overflow:hidden;border:2px solid #fff}
+.df-boss i b{display:block;height:100%;background:linear-gradient(90deg,#ff4d6d,#ff9f1c);transition:width .35s ease-out}
+@keyframes dfbump{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes dfpulse{50%{transform:scale(1.07)}}
+@media (max-width:640px),(max-height:540px){
+  .pl-defense .pl-hud{padding:6px 7px}
+  .df-chip{font-size:14px;padding:1px 8px;border-width:2.5px;box-shadow:0 2px 0 #2b2340}
+  .df-chip b{font-size:16px}.df-time b{font-size:14px}
+  .df-castle i{width:54px;height:11px}.df-castle em{font-size:15px}
+  .df-hud{flex-wrap:wrap}.df-c{order:3;flex-basis:100%}
+  .df-boss{width:min(220px,80%);padding:2px 10px 2px 6px}.df-boss span{font-size:18px}
+}
