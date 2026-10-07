@@ -18,7 +18,11 @@
    ▼
 FastAPI 应用（app/main.py）
    ├─ catalog.py   教材目录：加载 curricula/*.json，提供知识图谱查询（前置、后续、祖先）
-   ├─ engine.py    学习引擎：掌握度、诊断回溯、每日计划、间隔复习、错题本、统计
+   ├─ engine.py    学习引擎：诊断回溯、间隔复习、错题本、统计
+   ├─ evidence.py  学习证据：事件表 → 当前学习方式的模型 → 掌握状态；换方式时按事件重放（见 5.0）
+   ├─ methods/     学习方法：掌握模型（mastery.py）、记忆模型（memory.py）、学习方式配置（profiles.toml）
+   ├─ plan.py      每日计划：任务来源 + 按学习方式的策略排
+   ├─ itemtypes.py 题型注册表：判分、显示、证据题型、蒙对概率、AI 题整理、前端控件
    ├─ llm/         AI 抽象层（见第 6 节）
    │   ├─ base.py       Provider 接口、ChatRequest、LLMError
    │   ├─ providers.py  anthropic（Claude）/ openai_compat（DeepSeek、通义…）/ mock
@@ -31,6 +35,7 @@ FastAPI 应用（app/main.py）
    └─ cli.py       命令行：migrate / check / backup / create-admin / reset-password / invite …
 数据：curricula/（教材知识图谱） seed/（人工核对过的题库、术语卡） PostgreSQL（全部账号和学习记录）
 配置：.env（服务器、数据库、账号策略） config/llm.toml（AI 提供方、模型、密钥、按任务路由）
+      config/methods.toml（可选：覆盖 / 新增学习方式，默认配置在 app/methods/profiles.toml）
 运维：install.sh（一键安装/升级：环境检测 → 装依赖 → 拉代码 → 建库 → 备份 → 迁移 → systemd → Caddy HTTPS → 健康检查）
 ```
 
@@ -79,10 +84,14 @@ FastAPI 应用（app/main.py）
 
 ### 4.1 学段（`curricula/_meta/stages.json`）
 
-每个学段有 `id`、`system`（cn / cambridge / alevel / ib / us）、`label` 和 `year`。`year` 是「相当于中国几年级」，例如 IGCSE = 9.5，MYP3 = 8，DP1 = 11。
+每个学段有 `id`、`system`（cn / cambridge / alevel / ib / us / uni）、`label` 和 `year`。`year` 是「相当于中国几年级」，例如 IGCSE = 9.5，MYP3 = 8，DP1 = 11，大一 U1 = 13。
 
 - 不同学制的知识点靠 `year` 比先后，诊断回溯和跨教材推断都用它。
-- 加学制或年级只改这个文件。孩子的「年级」从 `grades` 里选。
+- 学制（`systems`）带 `international` 和 `lang`：这个学制的课默认用什么语言授课和出题。代码不再按教材 id 猜。
+- 没有统一学制的课程（少儿编程、某个技术栈、兴趣课）用 `course` 学制，级别在教材包里自己定义（见 4.2 的 `levels`）。
+- 加学制或年级只改这个文件。孩子的「年级」从 `grades` 里选，`default_grade` 是新建孩子时的默认值。
+
+学科表 `curricula/_meta/subjects.json`：学科 id、名字、图标、颜色、领域（language / math / science / humanities / social / computing），语言类学科还有 `lang`（它教的是哪种语言）。加学科只改这个文件，页面上的图标、语言课的判断都从这里来。
 
 ### 4.2 教材包（`curricula/<pack_id>.json`）
 
@@ -108,6 +117,11 @@ FastAPI 应用（app/main.py）
   - 诊断、计划、地图、进度、统计都只看所选方向的知识点：`catalog.ids_for(pack, track)`、`engine.my_ids(user, pack)`。
 - **prereqs**：「必须」用于诊断回溯和补漏，「有帮助」只做展示。前置的学段不能晚于本点，否则自动降为「有帮助」。
 - **school_types / system**：「编辑孩子」时把适合这类学校的教材排在前面。其它教材仍然可选，用于转学或提前学。
+- **kind**：`textbook`（审定教材，如统编、沪教）/ `syllabus`（考试局大纲，如剑桥 IGCSE）/ `course`（没有统一教材的课程：少儿 Python、大学线性代数、某个技术栈）。不写时按学制推断：cn → textbook，国际学制 → syllabus，其它 → course。
+- **teach_lang / item_lang**：授课语言、出题语言。不写时：语言课的题目用它教的语言（语文课讲解也用中文）；其他学科按学制（国际学制英文，否则中文）。题库按 `item_lang` 分语言，AI 出题和讲解的说明也按它生成。
+- **levels**：`course` 没有年级时自己定义级别，例如 `[{"id": "PY-L1", "label": "入门", "year": 3}]`。级别挂到学段轴上，和年级比先后，知识点的 `stage` 引用它。大学课程直接用 U1–U4。
+- **prompt_note**：给 AI 出题、讲解时的额外说明，比如「代码用 Python 3，不用第三方库」。不用为某门课改代码。
+- 编程类题目用现有题型加 `code` 字段（一段代码，页面按代码块显示）：读代码写输出用填空，选哪段代码对用选择。
 - **加一套教材**：往 `curricula/` 放一个 JSON 文件，跑 `python -m app.cli check-curricula` 通过即可。CI 也会跑这一步。
 - 题库 `seed/items_*.json`、术语卡 `seed/vocab_*.json` 按知识点 id 挂靠。
 
@@ -147,9 +161,27 @@ FastAPI 应用（app/main.py）
 
 ## 5. 学习引擎
 
+### 5.0 学习方式（教学理念）和扩展点
+
+学习方法会不断研究、引入，所以「方法」和「记录」分开：
+
+- **学习事件表 `events` 是唯一的原始记录**：做题、复习卡片、单词摸底、推断、自评、导入，每条证据一行（`target` = kp / word / card）。
+- **一种学习方式 = 掌握模型 + 记忆模型 + 每日计划策略 + 参数**，写在 `app/methods/profiles.toml`。现在有三种：
+  - 均衡（默认）：检索练习 + 间隔复习 + 交错练习 + 掌握学习。
+  - 先学牢再往前：掌握学习，标准更严（90%、3 天），先补前置，不预习。
+  - 考前冲刺：高频考点和薄弱点优先，复习更勤（保持率 90%），不预习、不摸底。
+  家长在孩子资料页给每个孩子选，管理员在后台设全站默认。
+- **掌握状态是算出来的**：`mastery.model` 记着算它的模型指纹（模型 + 版本 + 参数）。换方式、调参数、升级算法后指纹变了，就按事件重放（启动时自动做，换方式时立即做），新方法马上用上全部历史，旧记录一条不丢。
+- **扩展的地方都只有一处**：
+  - 调参数、加一种学习方式：写 `config/methods.toml`（同名覆盖，新名新增），不改代码。
+  - 换一种算法：在 `app/methods/` 写一个实现同样接口的类（掌握模型：`step / judge / missing / needs_work / now_p`；记忆模型：`recall / interval / review`），登记到 `app/methods/__init__.py` 的注册表，在配置里用 `model = "名字"` 引用。
+  - 加一类每日任务：在 `app/plan.py` 写一个来源函数，登记到 `SOURCES`，在学习方式的 `plan` 里排上。
+  - 加一种题型：在 `app/itemtypes.py` 写一个子类（判分、显示、证据题型、蒙对概率、AI 题整理、前端控件）。
+- 单元测试 `tests/test_units.py` 覆盖模型、配置、题型、教材元数据，改算法时先跑它。
+
 ### 5.1 掌握度
 
-每个孩子 × 每个知识点一条记录：真懂的概率、记忆稳定性、做题数、正确数、证据、状态（未测 / 薄弱 / 学习中 / 已掌握）。代码在 `app/evidence.py`，实时更新和按历史重算都走同一个纯函数 `step`。
+每个孩子 × 每个知识点一条记录：真懂的概率、记忆稳定性、做题数、正确数、证据、状态（未测 / 薄弱 / 学习中 / 已掌握）、模型指纹。下面是默认学习方式「均衡」的掌握模型（`app/methods/mastery.py` 的 BKT）；实时更新和按事件重放都走同一个纯函数 `step`。
 
 - **真懂的概率**用贝叶斯知识追踪（BKT）估算：按题目的蒙对概率（四选一 25%，填空 / 计算约 5%）和粗心概率（10%）更新，所以选择题答对只加一点，粗心错一次也不会掉到底。题库里大家几乎都对的题，答对算的证据弱一些；大家都错的题，做错算的证据弱一些。点「还不会」是很可靠的证据。
 - **遗忘模型**用 FSRS 的记忆公式：记忆稳定性 S（天），隔 t 天还记得的概率 R = (1 + t/9S)^-1。隔得久、R 低时答对，S 涨得多；当天反复答对几乎不涨。现在真懂的概率 = 上次的估计 × R。
@@ -167,7 +199,7 @@ FastAPI 应用（app/main.py）
 
 ### 5.3 每日任务清单
 
-每天第一次打开时生成（可点「重新安排」；已经做完的任务即使新计划里没有了也保留打勾）。分两部分：
+每天第一次打开时生成（可点「重新安排」；已经做完的任务即使新计划里没有了也保留打勾）。代码在 `app/plan.py`：每类任务一个来源函数，排哪些、什么顺序、每类几个由学习方式的 `plan` 决定（`fixed` / `flex` / `limits` / `prefer_hot`，`"weak+backfill"` 表示交替）。下面是默认「均衡」的排法，分两部分：
 
 **固定项**（每天都有，不截断——坚持比做对更重要）
 
@@ -220,7 +252,7 @@ FastAPI 应用（app/main.py）
 
 ### 5.5 间隔复习
 
-卡片类型：生词、术语、错题（做错自动加入）、知识点总结。按上面的遗忘模型排期：下一次复习排在「记得的概率」降到 85% 的那天；「忘了」当天再来，稳定性回落。单词摸底四选一认出来的词，三天后会换成「看中文写英文」复查，写不出来就不算认识。
+卡片类型：生词、术语、错题（做错自动加入）、知识点总结。按学习方式的记忆模型排期（默认：下一次复习排在「记得的概率」降到 85% 的那天，「考前冲刺」是 90%）；「忘了」当天再来，稳定性回落。单词摸底四选一认出来的词，三天后会换成「看中文写英文」复查，写不出来就不算认识。
 
 ### 5.6 阅读
 
@@ -295,13 +327,13 @@ FastAPI 应用（app/main.py）
   - 孩子和家长可以标记「这道题有问题」（`flags`）。标记的人自己不再看到这道题；家长标记一次，或两个不同的孩子标记，就暂停使用，管理员在后台「题库」页恢复或下架。后台也能看各教材的覆盖情况、正确率最低的题，并导出整个题库（不含作答记录和试卷原题）。
   - 试卷导入的原题只给这个孩子自己用。题目要求「答案正确且唯一」，人工核对过的题标为 seed。
 - 每个孩子每天调用上限 `daily_limit_per_kid`。
-- 面向国际学校的学科：题干英文 + 中文翻译，讲解用中文并标出英文术语。
+- 题目和讲解用什么语言、要注意什么，按教材包的 `teach_lang` / `item_lang` / `prompt_note` 生成（国际学校的学科：题干英文 + 中文翻译，讲解用中文并标出英文术语）。出题格式里的题型来自题型注册表。
 - Claude 默认启用服务端 fallback（`server_fallback = true`），模型过载时自动切换备用模型。
 - `install.sh check --llm` 会真实调用一次，确认密钥和网络都通。
 
 ## 7. 数据表
 
-`users`（家长/孩子）· `enrollments`（孩子选的教材包和当前学段）· `mastery`（掌握度）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
+`users`（家长/孩子；`settings.method` 是学习方式）· `enrollments`（孩子选的教材包和当前学段）· `events`（学习事件：所有学习证据，掌握度按它重放）· `mastery`（掌握度，带模型指纹）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
 
 ## 8. 后续路线
 

@@ -33,12 +33,9 @@ def item_hash(it: dict) -> str:
 
 
 def kp_lang(kp_id: str) -> str:
-    """题目语言：国际学校的学科和英语课是英文题，其余是中文题。"""
+    """题目语言：教材包声明的出题语言（见 catalog.Pack.item_lang）。"""
     pid = catalog.kp_pack.get(kp_id)
-    if not pid:
-        return ""
-    p = catalog.packs[pid]
-    return "en" if p.international or p.subject == "english" else "zh"
+    return catalog.packs[pid].item_lang if pid else ""
 
 
 def gen_meta(task: str, **extra) -> dict:

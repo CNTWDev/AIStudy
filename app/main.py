@@ -9,10 +9,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import auth, bank, config, db, engine, evidence, explore, insights, llm, papers, records, sitecfg, webpage
+from . import auth, bank, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, webpage
 from .auth import LoginRequired
 from .catalog import GRADES, catalog, stage_label, stage_rank
 from .content import content
+from .methods import methods
 
 
 @asynccontextmanager
@@ -22,7 +23,8 @@ async def lifespan(app):
     content.load()
     engine.load_seed_items(config.SEED_DIR)
     bank.sync()
-    evidence.rebuild()
+    methods.load()
+    evidence.ensure_current()  # 学习方式 / 参数 / 算法变了的孩子：按学习记录重算掌握状态
     yield
     db.close()
 
@@ -32,7 +34,7 @@ app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY, max_age=60 *
                    same_site="lax", https_only=config.HTTPS_ONLY)
 app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), name="static")
 templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
-templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL,
+templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
                              stage_rank=stage_rank)
 
@@ -447,7 +449,11 @@ async def admin_settings(request: Request):
         raise HTTPException(400, "注册方式不对")
     if vals.get("parent_invite_limit") and not vals["parent_invite_limit"].isdigit():
         raise HTTPException(400, "邀请码上限要填数字")
+    if vals.get("method_profile") and vals["method_profile"] not in {m.id for m in methods.choices()}:
+        raise HTTPException(400, "学习方式不对")
     sitecfg.set_many(vals)
+    if "method_profile" in vals:
+        evidence.ensure_current()  # 跟着全站默认的孩子：按新方式重算
     auth.log_event("site_settings", user_id=a["id"], email=a["email"], detail=",".join(f"{k}={v}" for k, v in vals.items()),
                    request=request)
     return _admin_back("system", msg="站点设置已保存，立即生效")
@@ -705,6 +711,23 @@ async def kid_account(request: Request, kid_id: int):
     return _kid_form(request, auth.get_user(k["id"]), **res)
 
 
+def set_method(kid_id: int, method: str) -> bool:
+    """给孩子换学习方式：存进 users.settings，并按已有的学习记录重算掌握状态。"""
+    if method not in {m.id for m in methods.choices()}:
+        return False
+    before = evidence.profile(kid_id).key
+    u = db.one("SELECT settings FROM users WHERE id=?", kid_id)
+    st = db.jload(u["settings"], {}) if u else {}
+    if st.get("method") == method or (not st.get("method") and method == methods.site_default()):
+        return False  # 没改；用全站默认的孩子不固定下来，管理员改默认时跟着变
+    st["method"] = method
+    db.run("UPDATE users SET settings=? WHERE id=?", db.jdump(st), kid_id)
+    if evidence.profile(kid_id).key != before:
+        evidence.replay(kid_id)
+    engine.today_plan(kid_id, rebuild=True)
+    return True
+
+
 @app.post("/parent/kids/save")
 async def kid_save(request: Request):
     p = auth.require_parent(request)
@@ -712,7 +735,7 @@ async def kid_save(request: Request):
     kid_id = form.get("id")
     email = (form.get("email") or "").strip().lower()
     name = (form.get("name") or "").strip()
-    grade = form.get("grade") or "G3"
+    grade = form.get("grade") or catalog.default_grade
     minutes = int(form.get("daily_minutes") or 60)
     pw = form.get("password") or ""
     if not name:
@@ -747,6 +770,7 @@ async def kid_save(request: Request):
                                       school=form.get("school") or "", daily_minutes=minutes)
         except ValueError as e:
             raise HTTPException(400, str(e))
+    set_method(kid_id, form.get("method") or "")
     old = {e["pack_id"]: e["stage"] for e in enrollments(kid_id)}
     chosen = _kid_form_packs(form, grade, old, grade != old_grade)
     db.run("UPDATE enrollments SET active=0 WHERE user_id=?", kid_id)
@@ -1043,7 +1067,7 @@ def learn(request: Request, kp_id: str, task: str = "practice"):
     post = [{**s, "m": m.get(s["id"])} for s in catalog.successors(kp_id)]
     pack = catalog.packs[kp["pack"]]
     vocab = db.q("SELECT front, back FROM cards WHERE user_id=? AND kp_id=? AND kind='term'", k["id"], kp_id)
-    return render(request, "learn.html", kp=kp, pack=pack, pre=pre, post=post, me=m.get(kp_id), task=task, ev=evidence.explain(m.get(kp_id)),
+    return render(request, "learn.html", kp=kp, pack=pack, pre=pre, post=post, me=m.get(kp_id), task=task, ev=evidence.explain(k['id'], m.get(kp_id)),
                   strand=catalog.strand_name(pack.id, kp["strand"]), vocab=vocab, bridges=engine.bridges(k["id"], kp_id, m))
 
 
@@ -1060,8 +1084,7 @@ def api_teach(request: Request, kp_id: str):
 
 
 def _public_item(it: dict) -> dict:
-    hide = {"answer", "explain", "model", "points", "tol", "source"}
-    return {k: v for k, v in it.items() if k not in hide}
+    return {k: v for k, v in itemtypes.public(it).items() if k not in ("tol", "source")}
 
 
 @app.get("/api/practice/{kp_id}")
@@ -1098,7 +1121,7 @@ def api_answer(request: Request, body: dict = Body(...)):
             explore.after_probe(k["id"], kp_id, False, int(pr.get("depth") or 0), pr.get("from") or "")
         return {"correct": False, "dont_know": True, "answer": _answer_display(it), "explain": it.get("explain", ""),
                 "hint": it.get("hint", "")}
-    if it["type"] == "short":
+    if itemtypes.of(it).self_rated:
         if "self" not in body:  # 先给参考答案，孩子对照后自评
             return {"reveal": True, "answer": it.get("model", ""), "points": it.get("points", []), "explain": it.get("explain", "")}
         correct = body["self"] == "ok"

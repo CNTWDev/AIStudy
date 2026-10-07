@@ -14,6 +14,13 @@
 4. 学校模板（curricula/_meta/presets.json）：「上海公办初中」「国际学校剑桥路线」这类常见组合，
    家长选了学校类型就把各科教材和方向预填好，仍然可以逐科改。
 
+另有学科表（curricula/_meta/subjects.json）：学科的名字、图标、领域、语言类学科教哪种语言。
+
+教材包不一定是「国家审定教材」：kind = textbook（审定教材）/ syllabus（考试局大纲，如剑桥）/
+course（没有统一教材的课程：少儿编程、大学课程、某个技术栈）。course 没有统一学制时，
+包里自己定义 levels（入门 / 进阶……，各对应大约几年级），会挂到学段轴上。
+授课语言（teach_lang）和出题语言（item_lang）由包声明，没写就按学制和学科推断；代码里不再猜。
+
 孩子自己的选择（年级、学校类型、每科选哪套教材、哪个方向、学到哪）存在数据库里，不进这些文件。
 """
 import json
@@ -30,7 +37,10 @@ STAGE_LABEL = {
     "G10": "高一", "G11": "高二", "G12": "高三", "IGCSE": "IGCSE", "A-Level": "A-Level",
 }
 GRADES = [f"G{i}" for i in range(1, 13)]
-LANG_SUBJECTS = {"english": "en", "chinese": "zh"}
+SYSTEMS: dict[str, dict] = {}   # 学制 id -> {name, international, lang}
+SUBJECTS: dict[str, dict] = {"english": {"id": "english", "name": "英语", "lang": "en"},
+                             "chinese": {"id": "chinese", "name": "语文", "lang": "zh"}}  # 加载 subjects.json 后覆盖
+PACK_KINDS = {"textbook": "审定教材", "syllabus": "考试大纲", "course": "自定课程"}
 LINK_TYPES = {"uses": "要用到", "language": "另一种语言的说法", "context": "相关背景"}
 
 
@@ -56,15 +66,25 @@ class Pack:
     tracks: list = field(default_factory=list)       # [{id, name, desc?}]
     default_track: str = ""
     school_types: list = field(default_factory=list)  # public / private / international；空 = 不限
-    system: str = ""                                  # cn / cambridge / ib / alevel / us
+    system: str = ""                                  # 学制 id，见 _meta/stages.json 的 systems
+    kind: str = ""                                    # textbook / syllabus / course，见 PACK_KINDS
+    teach_lang: str = ""                              # 授课 / 讲解语言（zh / en …）
+    item_lang: str = ""                               # 题目语言
+    prompt_note: str = ""                             # 给 AI 出题 / 讲解时的额外说明（比如「代码用 Python 3」）
+    levels: list = field(default_factory=list)        # course 自己的级别 [{id, label, year}]
 
     @property
     def lang(self) -> str:
-        return LANG_SUBJECTS.get(self.subject, "")
+        """语言类学科教的是哪种语言（英语课 → en，语文 → zh）；其他学科为空。"""
+        return SUBJECTS.get(self.subject, {}).get("lang", "")
 
     @property
     def international(self) -> bool:
-        return self.system in ("cambridge", "ib", "alevel", "us") or "cambridge" in self.id or "igcse" in self.id
+        return bool(SYSTEMS.get(self.system, {}).get("international"))
+
+    @property
+    def domain(self) -> str:
+        return SUBJECTS.get(self.subject, {}).get("domain", "")
 
     def track(self, track: str | None) -> str:
         """有效方向：选了合法的就用它，否则用默认方向；没有方向的教材返回空。"""
@@ -92,6 +112,7 @@ class Catalog:
         self.stages: list[dict] = []
         self.presets: list[dict] = []
         self.errors: list[str] = []           # 加载时发现的问题（check 命令会列出来）
+        self.default_grade = "G3"             # 新建孩子时的默认年级（_meta/stages.json 的 default_grade）
 
     # ---- 加载 ----
     def load(self, directory=None):
@@ -101,13 +122,7 @@ class Catalog:
         for path in sorted(directory.glob("*.json")):
             d = json.loads(path.read_text(encoding="utf-8"))
             meta = d["pack"]
-            pack = Pack(
-                id=meta["id"], subject=meta["subject"], subject_name=meta.get("subject_name", meta["subject"]),
-                edition=meta.get("edition", ""), region=meta.get("region", ""),
-                stages=sorted(meta.get("stages") or [], key=stage_rank), notes=meta.get("notes", ""),
-                strands=d.get("strands", []), tracks=meta.get("tracks", []), default_track=meta.get("default_track", ""),
-                school_types=meta.get("school_types", []), system=meta.get("system", ""),
-            )
+            pack = self._pack(meta, d)
             track_ids = {t["id"] for t in pack.tracks}
             for kp in d["kps"]:
                 kp = dict(kp)
@@ -144,16 +159,51 @@ class Catalog:
                     self.errors.append(f"学校模板 {pr['id']}：{subj} 用的教材 {pid} 不存在")
         return self
 
+    def _pack(self, meta: dict, d: dict) -> Pack:
+        global_subj = SUBJECTS.get(meta["subject"], {})
+        if meta["subject"] not in SUBJECTS:
+            self.errors.append(f"{meta['id']}: 学科 {meta['subject']} 没有在 _meta/subjects.json 里定义")
+        system = meta.get("system", "")
+        if system and system not in SYSTEMS:
+            self.errors.append(f"{meta['id']}: 学制 {system} 没有在 _meta/stages.json 里定义")
+        sysd = SYSTEMS.get(system, {})
+        kind = meta.get("kind") or ("syllabus" if sysd.get("international") else "textbook" if system == "cn" else "course")
+        if kind not in PACK_KINDS:
+            self.errors.append(f"{meta['id']}: kind {kind} 不认识（可选 {list(PACK_KINDS)}）")
+        # 语言：包里写了就用。没写：语言课的题目用它教的语言（语文课讲解也用中文）；其他学科按学制（国际学制英文）
+        subj_lang = global_subj.get("lang", "")
+        teach = meta.get("teach_lang") or ("zh" if subj_lang == "zh" else sysd.get("lang") or "zh")
+        item = meta.get("item_lang") or subj_lang or teach
+        levels = meta.get("levels") or []
+        for lv in levels:  # 自定课程的级别挂到学段轴上，和年级比先后
+            STAGE_RANK[lv["id"]] = float(lv.get("year", 99))
+            STAGE_LABEL[lv["id"]] = lv.get("label", lv["id"])
+        return Pack(
+            id=meta["id"], subject=meta["subject"], subject_name=meta.get("subject_name") or global_subj.get("name", meta["subject"]),
+            edition=meta.get("edition", ""), region=meta.get("region", ""),
+            stages=sorted(meta.get("stages") or [lv["id"] for lv in levels], key=stage_rank), notes=meta.get("notes", ""),
+            strands=d.get("strands", []), tracks=meta.get("tracks", []), default_track=meta.get("default_track", ""),
+            school_types=meta.get("school_types", []), system=system, kind=kind, teach_lang=teach, item_lang=item,
+            prompt_note=meta.get("prompt_note", ""), levels=levels,
+        )
+
     def _load_meta(self, meta_dir):
         f = meta_dir / "stages.json"
         if f.exists():
             d = json.loads(f.read_text(encoding="utf-8"))
             self.systems, self.stages = d.get("systems", []), d.get("stages", [])
+            SYSTEMS.clear()
+            SYSTEMS.update({x["id"]: x for x in self.systems})
             for s in self.stages:
                 STAGE_RANK[s["id"]] = float(s["year"])
                 STAGE_LABEL[s["id"]] = s.get("label", s["id"])
             if d.get("grades"):
                 GRADES[:] = d["grades"]
+            self.default_grade = d.get("default_grade") or GRADES[0]
+        f = meta_dir / "subjects.json"
+        if f.exists():
+            SUBJECTS.clear()
+            SUBJECTS.update({x["id"]: x for x in json.loads(f.read_text(encoding="utf-8")).get("subjects", [])})
         f = meta_dir / "presets.json"
         self.presets = json.loads(f.read_text(encoding="utf-8")).get("presets", []) if f.exists() else []
 
@@ -280,6 +330,10 @@ class Catalog:
             for lst in out.values():
                 lst.sort(key=lambda p: bool(p.school_types) and school_type not in p.school_types)
         return out
+
+    @staticmethod
+    def subject(subject_id: str) -> dict:
+        return SUBJECTS.get(subject_id) or {"id": subject_id, "name": subject_id, "icon": "📘", "tone": "brand"}
 
     def preset(self, preset_id: str) -> dict | None:
         return next((p for p in self.presets if p["id"] == preset_id), None)

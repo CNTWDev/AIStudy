@@ -307,3 +307,5 @@ input[type=file]::file-selector-button{font:inherit;font-weight:600;border:0;bor
 details:not(.card)>summary{cursor:pointer}
 .flagrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}.flagrow .linkbtn{font-size:12.5px;color:var(--muted)}
 .evline{display:flex;flex-wrap:wrap;gap:6px 14px;background:var(--line-2);border-radius:12px;padding:8px 12px;margin:0 0 12px}
+/* 题目里的代码（编程课：读代码、填代码） */
+.q pre.code{margin:8px 0;padding:10px 12px;border-radius:10px;background:var(--line-2);font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto;white-space:pre}

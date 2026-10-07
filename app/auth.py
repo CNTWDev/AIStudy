@@ -95,13 +95,16 @@ def by_email(email: str):
 
 
 def create_user(email: str, password: str, name: str, role: str = "parent", *, parent_id=None, is_admin=False,
-                grade="G3", school="", daily_minutes=60, status="active", invited_by=None, invite_code=None,
+                grade="", school="", daily_minutes=60, status="active", invited_by=None, invite_code=None,
                 apply_note="") -> int:
     email = validate_email(email)
     validate_pw(password)
     if by_email(email):
         raise ValueError("这个邮箱已注册")
     now = db.now()
+    if not grade:
+        from .catalog import catalog
+        grade = catalog.default_grade
     return db.insert(
         "INSERT INTO users(email,pw_hash,name,role,parent_id,is_admin,grade,school,daily_minutes,status,invited_by,"
         "invite_code,apply_note,approved_at,pw_changed_at,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",

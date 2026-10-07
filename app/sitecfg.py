@@ -9,6 +9,7 @@ DEFAULTS = {
     "assistant_icon": lambda: config.ASSISTANT_ICON,
     "registration": lambda: config.REGISTRATION,
     "parent_invite_limit": lambda: str(config.PARENT_INVITE_LIMIT),
+    "method_profile": lambda: "",  # 全站默认学习方式（空 = 用 app/methods/profiles.toml 的 default）
 }
 REG_MODES = {"approval": "审批制：有邀请码直接开通，没有的提交申请等管理员审批",
              "invite": "邀请制：必须有邀请码", "open": "开放注册", "closed": "关闭注册：只能由管理员创建"}

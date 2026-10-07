@@ -4,12 +4,14 @@
   "generated": "2026-10-06",
   "pos_note": "n. 名词 v. 动词 adj. 形容词 adv. 副词 prep. 介词 conj. 连词 pron. 代词 det. 限定词 num. 数词 interj. 感叹词 phr. 短语",
   "notes": [
+   "每个词表用 subject（选了这个学科的孩子都用）或 packs（只给选了这些教材的孩子）说明给谁用；stage 是适用学段。",
    "不同列表之间允许少量重复（同一个词在高年级以新的意思/用法再出现，如 compare、describe）。"
   ]
  },
  "lists": [
   {
    "id": "en-core-g1-2",
+   "subject": "english",
    "title": "小学1-2年级核心词",
    "stage": "G1-G2",
    "source_note": "高频核心词（参考上海牛津版及常见低年级词表整理，不对应具体课本单元）",
@@ -849,6 +851,7 @@
   },
   {
    "id": "en-core-g3",
+   "subject": "english",
    "title": "小学3年级核心词",
    "stage": "G3",
    "source_note": "按上海牛津版三年级常见话题整理（家庭、身体、动物、食物、文具、颜色、100以内数字、天气、玩具、动作、衣物、星期），不对应具体课本单元",
@@ -1943,6 +1946,7 @@
   },
   {
    "id": "en-core-g4-5",
+   "subject": "english",
    "title": "小学4-5年级核心词",
    "stage": "G4-G5",
    "source_note": "按上海牛津版四五年级常见话题（职业、地点、月份、交通、情绪、自然、爱好、健康、环保、时间）及高频动词形容词整理",
@@ -3302,6 +3306,7 @@
   },
   {
    "id": "en-core-g6-7",
+   "subject": "english",
    "title": "初中预备-初一核心词（含 KS3 通用学术词）",
    "stage": "G6-G7",
    "source_note": "社会、文化、科学、自然、品格、学习方法等话题高频词，含 Cambridge Lower Secondary/KS3 常用学术词",
@@ -4806,6 +4811,7 @@
   },
   {
    "id": "en-core-g8-igcse",
+   "subject": "english",
    "title": "初二 / IGCSE 预备：学术词与考试指令词",
    "stage": "G8",
    "source_note": "IGCSE 各科试卷常见指令词（command words）、学术通用词、阅读写作术语、图表描述用语",
@@ -6265,6 +6271,7 @@
   },
   {
    "id": "igcse-physics-terms",
+   "packs": ["phy-cambridge"],
    "title": "IGCSE 物理术语（英中对照）",
    "stage": "G8-G10",
    "source_note": "按 Cambridge IGCSE Physics 考纲主题顺序整理（测量与运动、力、能量、热、波、电磁、原子核、太空）；中文用国内初高中物理通用译名",

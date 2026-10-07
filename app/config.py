@@ -30,6 +30,7 @@ DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{DATA_DIR / 'aistudy.d
 DB_POOL_SIZE = int(os.environ.get("DB_POOL_SIZE", "10"))
 CURRICULA_DIR = Path(os.environ.get("CURRICULA_DIR", BASE_DIR / "curricula"))
 SEED_DIR = Path(os.environ.get("SEED_DIR", BASE_DIR / "seed"))
+METHODS_FILE = Path(os.environ.get("METHODS_FILE", BASE_DIR / "config" / "methods.toml"))  # 可选：覆盖 / 新增学习方式
 LLM_CONFIG_FILE = Path(os.environ.get("LLM_CONFIG_FILE", BASE_DIR / "config" / "llm.toml"))
 TIMEZONE = os.environ.get("TZ_NAME", "Asia/Shanghai")
 HTTPS_ONLY = os.environ.get("HTTPS_ONLY", "0") == "1"
