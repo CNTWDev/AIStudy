@@ -1,5 +1,8 @@
 """游戏乐园：按每个孩子自己的水平出题的游戏（第一款：火柴人大战，单机打电脑）。
 
+第一原则：PK 比的不是知识，也不是谁做同样难的题，而是当下学习的专注和投入。
+每个孩子拿到的题难度不同、答对的概率相同；在这个前提下谁更投入，谁赢的机会更大、学习效果也更好。
+
 公平的做法（详见 docs/DESIGN.md 5.12）：
 - 每个孩子在每个知识点上有一个能力值 θ，每个（题族, 级别）有一个难度 b，答对概率 p = 1 / (1 + e^-(θ − b))。
 - 出题时选让 p 最接近目标（火柴人 75%）的级别：学得快的孩子拿到难题，学得慢的拿到适合他的题，
@@ -348,18 +351,37 @@ def end(kid: dict, match_id, result: str, stats: dict | None = None) -> dict:
     secs = _close(m["id"], m["started_at"], result, clean, GAMES[m["game"]]["max_seconds"])
     st = m["state"]
     answered, right = st.get("answered", 0), st.get("right", 0)
+    f = focus(m["id"])
     tips = []
+    if f["index"] is not None:
+        if f["index"] >= 110:
+            tips.append(f"专注指数 {f['index']}：比预期多答对了 {f['extra']} 道，这局很投入！")
+        elif f["index"] >= 90:
+            tips.append(f"专注指数 {f['index']}：发挥稳定，和平时的你一样。")
+        else:
+            tips.append(f"专注指数 {f['index']}：比预期少答对了 {-f['extra']} 道，下局看清题目再答。")
+    if f["guesses"] >= 2:
+        tips.append(f"有 {f['guesses']} 道题 3 秒内就答错了，像是在猜。认真答，冷冻会少很多。")
     if clean.get("zero_energy_s", 0) >= 20:
         tips.append(f"有 {clean['zero_energy_s']} 秒能量是 0，能量快没时早点去答题。")
-    if answered and right / answered < 0.6:
-        tips.append("这局答错的多一些，慢一点看清题目再答，冷冻时间就少了。")
-    if answered >= 4 and right / answered >= 0.8:
-        tips.append("答题又快又准，专注力很棒！")
     if not answered:
-        tips.append("这局没答题。经验值是从答题来的，试试边打边答。")
+        tips.append("这局没答题。能量是从答题来的，试试边打边答。")
     return {"result": result, "seconds": secs, "answered": answered, "right": right,
             "accuracy": round(right / answered * 100) if answered else 0, "xp": st.get("xp", 0),
-            "xp_total": xp_total(kid["id"]), "seconds_left": remaining_seconds(kid), "tips": tips}
+            "focus": f["index"], "xp_total": xp_total(kid["id"]), "seconds_left": remaining_seconds(kid), "tips": tips}
+
+
+def focus(match_id: int) -> dict:
+    """专注指数 = 实际答对题数 ÷ 预期答对题数 × 100。
+    每道题都按孩子自己的水平出，预期答对的概率大家一样，所以比的不是会多少，而是这一局有多投入：
+    100 是正常发挥，高于 100 是比平时的自己更专注。答题少于 3 道不算（太少，看不出来）。"""
+    rows = db.q("SELECT correct, p_pred, ms FROM arena_answers WHERE match_id=?", match_id)
+    exp = sum(r["p_pred"] or 0 for r in rows)
+    right = sum(r["correct"] for r in rows)
+    guesses = sum(1 for r in rows if not r["correct"] and (r["ms"] or 0) < FAST_MS)
+    ok = len(rows) >= 3 and exp >= 1
+    return {"index": round(100 * right / exp) if ok else None, "extra": round(right - exp) if ok else 0,
+            "answered": len(rows), "guesses": guesses}
 
 
 def hub(kid: dict) -> dict:

@@ -128,6 +128,7 @@ def test_match_flow():
 
         end = c.post(f"/api/arena/{mid}/end", json={"result": "win", "stats": {"zero_energy_s": 25}}).json()
         assert end["answered"] == 2 and end["right"] == 1 and end["accuracy"] == 50
+        assert end["focus"] is None  # 不到 3 道题，不算专注指数
         assert any("能量是 0" in t for t in end["tips"])
         assert c.post(f"/api/arena/{mid}/end", json={"result": "win"}).status_code == 409
         c.get("/logout")
@@ -147,3 +148,14 @@ def test_match_flow():
         c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
         page = c.get("/admin?tab=arena").text
         assert "游戏公平看板" in page and "实际答对率" in page
+
+
+def test_focus_index():
+    """专注指数 = 实际答对 ÷ 预期答对：预期一样时，答对多的（更投入的）分数高；3 秒内答错算猜。"""
+    uid = db.one("SELECT id FROM users WHERE role='kid' ORDER BY id LIMIT 1")["id"]
+    mid = db.insert("INSERT INTO arena_matches(user_id, game, started_at) VALUES(?,?,?)", uid, "stickman", db.now())
+    for ok, ms in ((1, 6000), (1, 5000), (1, 7000), (1, 4000), (0, 1200), (0, 900)):
+        db.run("INSERT INTO arena_answers(user_id,match_id,kp_id,family,level,p_pred,correct,ms,created_at) VALUES(?,?,?,?,?,?,?,?,?)",
+               uid, mid, "MSH-NUM-10", "mult", 3, 0.5, ok, ms, db.now())
+    f = arena.focus(mid)
+    assert f["index"] == 133 and f["extra"] == 1 and f["guesses"] == 2

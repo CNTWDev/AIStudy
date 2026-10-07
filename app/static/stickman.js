@@ -288,10 +288,10 @@
     try {
       r = await api(`/api/arena/${match.match_id}/end`, {result, stats: {zero_energy_s: Math.round(zeroTime), specials,
         weapons: bought, hp_left: Math.round(P.hp), ai_hp_left: Math.round(A.hp)}});
-    } catch (e) { r = {result, answered: 0, right: 0, accuracy: 0, xp: 0, tips: [e.message], seconds_left: 0}; }
+    } catch (e) { r = {result, answered: 0, right: 0, accuracy: 0, focus: null, xp: 0, tips: [e.message], seconds_left: 0}; }
     const title = {win: '🏆 你赢了！', lose: '💪 差一点！再来一局', draw: '🤝 平局'}[result];
     $q('.sm-end .sm-sum').innerHTML = `<h2>${title}</h2>
-      <div class="statline"><div><b>${r.answered}</b><span>答题</span></div><div><b>${r.accuracy}%</b><span>答对率</span></div><div><b>+${r.xp}</b><span>经验值</span></div></div>
+      <div class="statline"><div><b>${r.focus ?? '—'}</b><span>专注指数</span></div><div><b>${r.right}/${r.answered}</b><span>答对 / 答题</span></div><div><b>+${r.xp}</b><span>经验值</span></div></div>
       ${r.tips.length ? `<ul class="small">${r.tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
       <p class="muted small">今天还能玩 ${Math.floor((r.seconds_left || 0) / 60)} 分钟。</p>`;
     $q('.sm-again').hidden = (r.seconds_left || 0) < 30;
