@@ -1,0 +1,26 @@
+/* 闪电赛跑：顶部进度条（我 / 影子 / 终点旗）、计时、连对；答题面板常驻在画面下方 */
+.pl-race.has-dock .pl-stage{height:clamp(240px,46vh,500px)}
+@media (max-width:640px) and (orientation:portrait){.pl-race.has-dock .pl-stage{height:clamp(210px,36vh,400px)}}
+@media (orientation:landscape) and (max-height:540px){.pl-race.has-dock .pl-stage{height:calc(100vh - 64px)}}
+.rc-hud{display:flex;gap:10px;align-items:flex-start;width:100%}
+.rc-bar{flex:1;min-width:0;background:rgba(255,255,255,.88);border:3px solid var(--pl-ink);box-shadow:0 3px 0 var(--pl-ink);border-radius:18px;padding:7px 30px 4px 18px}
+.rc-track{position:relative;height:14px;border-radius:99px;background:repeating-linear-gradient(90deg,#ffe3d4 0 12px,#ffd0b8 12px 24px);border:2px solid var(--pl-ink)}
+.rc-fill{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,#ffd23f,#ff9f1c);width:0}
+.rc-dot{position:absolute;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:3px solid var(--pl-ink);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;line-height:1;transition:left .12s linear}
+.rc-me{background:var(--pl-pink);z-index:2;box-shadow:0 2px 0 var(--pl-ink)}
+.rc-g{background:rgba(140,195,255,.75);border-style:dashed;border-color:#4d6fb3;color:#2a4a8a;z-index:1}
+.rc-flag{position:absolute;right:-26px;top:50%;transform:translateY(-58%);font-size:22px;line-height:1}
+.rc-m{font-size:12px;font-weight:800;color:#6b5f80;margin-top:5px;text-align:center;line-height:1}.rc-m b{color:var(--pl-ink);font-size:14px}
+.rc-chips{display:flex;flex-direction:column;gap:6px;flex:none}
+.rc-chip{background:#fff;border:3px solid var(--pl-ink);box-shadow:0 3px 0 var(--pl-ink);border-radius:14px;padding:2px 10px;font-size:18px;font-weight:900;color:var(--pl-ink);text-align:center;min-width:84px;line-height:1.35}
+.rc-time.warn{background:#ff5d5d;color:#fff;animation:plpulse .8s infinite}
+.rc-combo{color:#b9a9cc}.rc-combo.hot{background:#fff1c9;color:#ff6a00}
+.rc-combo.bump{animation:rcbump .35s cubic-bezier(.2,.9,.3,1.5)}
+@keyframes rcbump{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+.rc-sub{display:block;font-size:14px;font-weight:700;color:var(--muted);margin-top:2px}
+@media (max-width:520px){
+  .rc-hud{gap:6px}.rc-bar{padding:5px 26px 3px 14px;border-radius:14px}
+  .rc-dot{width:24px;height:24px;margin:-12px 0 0 -12px;font-size:12px}
+  .rc-chip{font-size:15px;min-width:66px;padding:1px 6px;border-radius:12px}
+  .rc-flag{font-size:18px;right:-22px}
+}

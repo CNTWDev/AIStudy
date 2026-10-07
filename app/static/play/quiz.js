@@ -37,8 +37,11 @@ class ArenaQuiz {
     document.removeEventListener('keydown', this._key, true);
     this.o.onClose && this.o.onClose();
   }
+  /* 一局结束：不再拿新题（常驻模式的 close() 不关面板，所以单独停）。 */
+  stop() { this.stopped = true; clearInterval(this.timer); this.close(); }
   destroy() { clearInterval(this.timer); document.removeEventListener('keydown', this._key, true); this.el.remove(); }
   async load() {
+    if (this.stopped) return;
     this.body.innerHTML = '<div class="aq-wait"><span></span><span></span><span></span></div>';
     try {
       const r = await fetch(`/api/arena/${this.o.matchId}/q`);

@@ -73,7 +73,7 @@
       if (sh.over) return;
       sh.over = true;
       Play.music.stop();
-      if (sh.quiz) { sh.quiz.close(); if (game.dock) sh.quiz.el.classList.add('wait'); }
+      if (sh.quiz) { sh.quiz.stop(); if (game.dock) sh.quiz.el.classList.add('wait'); }
       root.classList.remove('playing');
       Play.sfx.play(result === 'win' ? 'win' : result === 'lose' ? 'lose' : 'pop');
       let r;
