@@ -1,20 +1,61 @@
 {% extends "base.html" %}
 {% block title %}乐园 · {{ SITE }}{% endblock %}
 {% block body %}
-<h1>🎮 乐园</h1>
-<p class="lead">边玩边答题。题目按你自己的水平出，大家答对的机会一样，谁赢看专注和操作。</p>
-<div class="card"><div class="statline" style="margin:0">
-  <div><b>{{ a.xp_total }}</b><span>累计经验值</span></div>
-  <div><b>{{ (a.seconds_left / 60)|round(0, 'floor')|int }}<small> 分钟</small></b><span>今天还能玩</span></div>
-  <div><b>{{ a.week_answered }}<small> 道</small></b><span>这周答题</span></div>
-</div></div>
+<link rel="stylesheet" href="/static/play/play.css">
+{% set S = a.status %}
+<div class="ah-hero">
+  <canvas id="ah-me" data-avatar="{{ a.avatar }}" title="换个角色" role="button" tabindex="0"></canvas>
+  <div class="grow">
+    <h1>🎮 乐园</h1>
+    <div class="lv"><span>Lv.{{ a.level.level }}</span><i><b style="width:{{ a.level.pct }}%"></b></i><small>再答对 {{ a.level.to_next }} 题升级</small></div>
+    <div class="ah-time">
+      {% if S.base %}<span>⏱ 今天还能玩 {{ (S.left / 60)|round(0, 'floor')|int }} 分钟</span>{% endif %}
+      {% if S.bonus_all %}<span>✅ 任务全做完 +{{ S.bonus_all }}</span>{% endif %}
+      {% if S.bonus_lit %}<span>🌟 点亮 {{ S.lit }} 个 +{{ S.bonus_lit }}</span>{% endif %}
+      {% if a.week.focus %}<span title="这一周实际答对 ÷ 预期答对。100 是正常发挥，越高越投入">💎 本周专注指数 {{ a.week.focus }}</span>{% endif %}
+      <span>🏅 贴纸 {{ a.wall|selectattr('got')|list|length }}/{{ a.wall|length }}</span>
+    </div>
+  </div>
+</div>
+{% if a.locked %}
+<div class="ah-lock">🔒 <span>{{ a.locked }}</span>{% if S.need %}<a class="btn sm" href="/today">去做任务</a>{% endif %}</div>
+{% elif S.can_bonus_all %}
+<p class="small muted" style="margin:-4px 0 12px">💡 把今天的任务全部做完，还能多玩 10 分钟；每点亮一个知识点再多 2 分钟。</p>
+{% endif %}
+
+<div class="ah-games">
 {% for id, g in a.games.items() %}
-<a class="card link arena-game" href="/arena/{{ id }}">
-  <span class="arena-ico">{{ g.icon }}</span>
-  <span class="grow"><b>{{ g.name }}</b><span class="muted small">{{ g.desc }}</span></span>
-  <span class="btn">开始</span>
+<a class="ah-game{{ ' locked' if a.locked }}" href="/arena/{{ id }}">
+  <canvas data-preview="{{ id }}"></canvas>
+  <div class="t"><span class="tag" style="background:{{ g.color }}">{{ g.tag }}</span><b>{{ g.icon }} {{ g.name }}</b><p>{{ g.desc }}</p></div>
 </a>
 {% endfor %}
-{% if a.minutes == 0 %}<div class="hint">家长设置了暂时不玩游戏。</div>
-{% elif a.seconds_left <= 0 %}<div class="hint">今天的游戏时间用完了，明天再来！</div>{% endif %}
+</div>
+
+<div class="ah-sec"><h2>🧸 我的角色</h2><span class="small muted">点一下换上；灰色的达成贴纸条件就解锁</span></div>
+<div class="ah-avatars">
+{% for v in a.avatars %}
+<button type="button" class="ah-av{{ ' on' if v.id == a.avatar }}{{ ' lock' if not v.open }}" data-av="{{ v.id }}" {% if not v.open %}title="得到「{{ v.need_name }}」贴纸解锁：{{ v.need_how }}"{% endif %}>
+  <canvas data-avatar="{{ v.id }}"></canvas><span>{{ v.name }}</span>{% if not v.open %}<small>🔒 {{ v.need_name }}</small>{% endif %}
+</button>
+{% endfor %}
+</div>
+
+<div class="ah-sec"><h2>🏅 贴纸墙</h2><span class="small muted">只奖励真的做到的事：答对、坚持、点亮知识点</span></div>
+<div class="ah-wall">
+{% for s in a.wall %}<div class="ah-st{{ ' got' if s.got }}" title="{{ s.how }}"><span class="i">{{ s.icon }}</span><b>{{ s.name }}</b><small>{{ s.at if s.got else s.how }}</small></div>{% endfor %}
+</div>
+
+<details class="card" style="margin-top:18px">
+  <summary><b>⚖️ 为什么说乐园是公平的？</b></summary>
+  <div class="ah-why">
+    <p>每道题都是按<b>你自己的水平</b>出的：系统知道你在每个知识点上大概会多少，会挑一道你有七八成把握答对的题。学得快的同学拿到的题更难，刚开始学的同学拿到的题更合适，所以大家答对的机会差不多，<b>比的是专注和投入</b>，不是谁本来会得多。</p>
+    <p>💎 <b>专注指数</b> = 实际答对的题数 ÷ 按你的水平预期能答对的题数 × 100。100 是正常发挥，超过 100 说明这局比平时的自己更投入。3 秒内就答错，像是在猜，会冷冻更久。</p>
+    <p>答错只冷冻几秒，不扣分；乱点会冷冻得更久。游戏里答的题也会记进学习记录，帮你发现哪里还不熟。这周在乐园答了 {{ a.week.answered }} 道题，对了 {{ a.week.right }} 道。</p>
+  </div>
+</details>
+{% if a.new_stickers %}<script>window.NEW_STICKERS = {{ a.new_stickers|tojson }};</script>{% endif %}
+<script src="/static/play/engine.js"></script>
+<script src="/static/play/art.js"></script>
+<script src="/static/play/hub.js"></script>
 {% endblock %}

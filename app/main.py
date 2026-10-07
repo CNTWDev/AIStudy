@@ -36,8 +36,8 @@ app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), 
 templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
-                             stage_rank=stage_rank, game_minutes=arena.game_minutes,
-                             GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES)
+                             stage_rank=stage_rank, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock,
+                             GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES)
 
 
 def device_label(ua: str | None) -> str:
@@ -777,6 +777,8 @@ async def kid_save(request: Request):
     set_method(kid_id, form.get("method") or "")
     if form.get("game_minutes") is not None:
         arena.set_game_minutes(kid_id, form.get("game_minutes"))
+    if form.get("game_unlock"):
+        arena.set_game_unlock(kid_id, form.get("game_unlock"))
     old = {e["pack_id"]: e["stage"] for e in enrollments(kid_id)}
     chosen = _kid_form_packs(form, grade, old, grade != old_grade)
     db.run("UPDATE enrollments SET active=0 WHERE user_id=?", kid_id)
@@ -880,7 +882,9 @@ def today(request: Request):
     me = auth.current_user(request)
     m = engine.get_mastery(k["id"])
     rec = engine.day_record(k["id"], t["day"])
-    return render(request, "today.html", manual_done=engine.MANUAL_DONE, t=t, streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
+    play = arena.status(k)
+    return render(request, "today.html", manual_done=engine.MANUAL_DONE, t=t, play=play, play_locked=arena.locked_reason(play),
+                  due=len(engine.due_cards(k["id"], 99)), streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
                   stars=engine.total_stars(k["id"]), rec=rec, auto=engine.day_summary(rec),
                   cov=explore.coverage(k["id"], m), lit=explore.lit_today(k["id"]), ahead=explore.ahead(k["id"], m),
                   vocab=explore.word_stats(k["id"]), weekly=records.weekly(k["id"]), mine=records.summary(k["id"]),
@@ -1174,7 +1178,7 @@ def api_context(request: Request, kp_id: str):
 
 # ================================================================== 热身：穿插以前学过的知识点和旧单词（摸底）
 
-# ================================================================== 游戏乐园（app/arena.py）
+# ================================================================== 游戏乐园（app/arena/）
 
 @app.exception_handler(arena.ArenaError)
 async def _arena_error(request: Request, exc: arena.ArenaError):
@@ -1192,12 +1196,19 @@ def arena_game(request: Request, game: str):
     k = kid_or_redirect(request)
     if game not in arena.GAMES:
         raise HTTPException(404)
-    return render(request, f"arena_{game}.html", g=arena.GAMES[game], game=game, a=arena.hub(k))
+    return render(request, "arena_game.html", g=arena.GAMES[game], game=game, a=arena.hub(k))
 
 
 @app.post("/api/arena/start")
 def arena_start(request: Request, body: dict = Body(...)):
-    return arena.start(kid_or_redirect(request), str(body.get("game") or ""))
+    return arena.start(kid_or_redirect(request), str(body.get("game") or ""), str(body.get("src") or "mix"))
+
+
+@app.post("/api/arena/avatar")
+def arena_avatar(request: Request, body: dict = Body(...)):
+    if not arena.set_avatar(kid_or_redirect(request)["id"], str(body.get("avatar") or "")):
+        raise HTTPException(400, "这个角色还没解锁")
+    return {"ok": True}
 
 
 @app.get("/api/arena/{match_id}/q")

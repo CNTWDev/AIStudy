@@ -13,7 +13,8 @@
     <div class="grow"><label>每天学习分钟</label><input type="number" name="daily_minutes" min="15" max="240" value="{{ k.daily_minutes if k else 60 }}"></div>
   </div>
   <label>每天最多玩游戏</label><select name="game_minutes">{% set gm = game_minutes(k) if k else 20 %}{% for m in GAME_MINUTE_CHOICES %}<option value="{{ m }}" {{ 'selected' if m == gm }}>{{ '不玩' if m == 0 else m ~ ' 分钟' }}</option>{% endfor %}</select>
-  <p class="muted small" style="margin:4px 0 0">「乐园」里的游戏边玩边答题，题目按孩子自己的水平出；答题计入学习记录，游戏时间不计入每天的学习分钟。</p>
+  <label>什么时候可以玩</label><select name="game_unlock">{% set gu = game_unlock(k) if k else 'half' %}{% for v, n in UNLOCK_CHOICES.items() %}<option value="{{ v }}" {{ 'selected' if v == gu }}>{{ n }}</option>{% endfor %}</select>
+  <p class="muted small" style="margin:4px 0 0">「乐园」里的游戏边玩边答题，题目按孩子自己的水平出，答题计入学习记录（游戏时间不计入每天的学习分钟）。今天的任务全部做完再奖励 10 分钟，每点亮一个知识点再奖励 2 分钟（最多 6 分钟）。今天没有任务时随时能玩。</p>
   <label>学校（选填）</label><input type="text" name="school" value="{{ k.school if k else '' }}">
   <label>学校类型</label>
   <select name="preset" id="preset">

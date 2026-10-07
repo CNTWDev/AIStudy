@@ -1,10 +1,11 @@
-"""游戏乐园：快题答案正确、按水平出题确实公平、一局完整走通。"""
+"""游戏乐园：快题答案正确、按水平出题确实公平、一局完整走通、解锁规则、贴纸和角色、多种题源。"""
 import random
 import statistics
 
 from fastapi.testclient import TestClient
 
 from app import arena, db, itemtypes, quickgen
+from app.arena import awards, sources
 from app.catalog import catalog
 from app.main import app
 
@@ -94,10 +95,21 @@ def test_match_flow():
         c.get("/logout")
 
         c.post("/login", data={"email": "gk@x.com", "password": "secret1"})
-        assert "乐园" in c.get("/today").text
-        assert "火柴人大战" in c.get("/arena").text
-        assert c.get("/arena/stickman").status_code == 200
-        mid = c.post("/api/arena/start", json={"game": "stickman"}).json()["match_id"]
+        assert "乐园" in c.get("/today").text   # 生成今天的任务
+        hub = c.get("/arena").text
+        assert "火柴人大战" in hub and "闪电赛跑" in hub and "星星守卫" in hub and "贴纸墙" in hub
+        for g in arena.GAMES:
+            assert c.get(f"/arena/{g}").status_code == 200
+        assert c.get("/arena/nope").status_code == 404
+        # 默认「做完今天一半的任务后才能玩」
+        r = c.post("/api/arena/start", json={"game": "stickman"})
+        assert r.status_code == 403 and "任务" in r.json()["error"]
+        st = arena.status(dict(kid))
+        assert st["need"] == (st["total"] + 1) // 2 and not st["unlocked"]
+        arena.set_game_unlock(kid["id"], "free")
+        start = c.post("/api/arena/start", json={"game": "stickman", "src": "math"}).json()
+        mid = start["match_id"]
+        assert start["src"] == "math" and start["avatar"] == "mint"
 
         q = c.get(f"/api/arena/{mid}/q").json()["item"]
         assert "answer" not in q and q["q"]
@@ -120,7 +132,7 @@ def test_match_flow():
         q = c.get(f"/api/arena/{mid}/q").json()["item"]
         it = _pending(mid)
         r = c.post(f"/api/arena/{mid}/a", json={"item_id": q["id"], "answer": str(_right_answer(it))}).json()
-        assert r["correct"] and r["xp"] >= 70 and r["xp_total"] == r["xp"]
+        assert r["correct"] and r["xp"] >= 70
         assert db.one("SELECT COUNT(*) AS n FROM attempts WHERE user_id=? AND mode='game'", kid["id"])["n"] == 2
         assert db.one("SELECT COUNT(*) AS n FROM arena_ability WHERE user_id=?", kid["id"])["n"] >= 1
         # 旧题不能再交
@@ -128,7 +140,15 @@ def test_match_flow():
 
         end = c.post(f"/api/arena/{mid}/end", json={"result": "win", "stats": {"zero_energy_s": 25}}).json()
         assert end["answered"] == 2 and end["right"] == 1 and end["accuracy"] == 50
+        assert end["focus"] is None  # 不到 3 道题，不算专注指数
         assert any("能量是 0" in t for t in end["tips"])
+        # 第一次赢电脑：得到「你好乐园」「第一场胜利」，解锁棒球帽角色
+        keys = {x["key"] for x in end["stickers"]}
+        assert {"hello", "first_win"} <= keys and end["level"]["level"] >= 1
+        assert c.post("/api/arena/avatar", json={"avatar": "ninja"}).status_code == 400   # 还没解锁
+        assert c.post("/api/arena/avatar", json={"avatar": "cap"}).json()["ok"]
+        assert awards.avatar(dict(db.one("SELECT * FROM users WHERE id=?", kid["id"]))) == "cap"
+        assert "第一场胜利" in c.get("/arena").text
         assert c.post(f"/api/arena/{mid}/end", json={"result": "win"}).status_code == 409
         c.get("/logout")
 
@@ -147,3 +167,80 @@ def test_match_flow():
         c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
         page = c.get("/admin?tab=arena").text
         assert "游戏公平看板" in page and "实际答对率" in page
+
+
+def test_unlock_rules_and_bonus(monkeypatch):
+    from app.arena import rules
+    kid = {"id": 999001, "game_minutes": 20, "game_unlock": "half"}
+    monkeypatch.setattr(rules, "game_unlock", lambda k: k["game_unlock"])
+    monkeypatch.setattr(rules, "game_minutes", lambda k: k["game_minutes"])
+    monkeypatch.setattr(rules, "seconds_today", lambda kid_id, m=None: 0)
+    monkeypatch.setattr(rules.explore, "lit_today", lambda kid_id: [1, 2, 3, 4, 5])
+    for (done, total, rule), (need, minutes) in {
+            (0, 0, "half"): (0, 20 + 6),          # 今天没有任务：直接能玩
+            (1, 5, "half"): (2, 26), (3, 5, "half"): (0, 26),
+            (4, 5, "all"): (1, 26), (5, 5, "all"): (0, 36),   # 全做完 +10
+            (0, 5, "free"): (0, 26)}.items():
+        monkeypatch.setattr(rules, "_tasks_today", lambda kid_id, d=done, t=total: (d, t))
+        st = rules.status(dict(kid, game_unlock=rule))
+        assert (st["need"], st["minutes"]) == (need, minutes), (done, total, rule, st)
+        assert bool(rules.locked_reason(st)) == bool(need)
+    st = rules.status(dict(kid, game_minutes=0))
+    assert "家长" in rules.locked_reason(st)
+
+
+def test_levels_and_avatars_are_deterministic():
+    assert [awards.level_of(n)["level"] for n in (0, 9, 10, 29, 30, 60)] == [1, 1, 2, 2, 3, 4]
+    assert {a for a, (_, need) in awards.AVATARS.items() if not need} == {"mint", "sunny", "berry", "sky"}
+    for a, (_, need) in awards.AVATARS.items():
+        assert not need or need in awards.STICKERS, a
+
+
+def test_word_and_bank_sources():
+    """英语单词题：四个选项、答案在选项里、判分对；能开一局「认单词」并答题、记进生词本。"""
+    with TestClient(app) as c:
+        c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+        c.post("/admin/users/create", data={"email": "wp@x.com", "password": "secret1", "name": "单词妈妈", "role": "parent"})
+        c.get("/logout")
+        c.post("/login", data={"email": "wp@x.com", "password": "secret1"})
+        subj = catalog.packs["eng-cambridge"].subject
+        c.post("/parent/kids/save", data={"name": "小单词", "email": "wk@x.com", "password": "secret1", "grade": "G8",
+                                          "daily_minutes": "60", f"subj_{subj}": "eng-cambridge", "game_minutes": "20",
+                                          "game_unlock": "free"})
+        kid = dict(db.one("SELECT * FROM users WHERE email='wk@x.com'"))
+        assert arena.game_unlock(kid) == "free"
+        ids = [x["id"] for x in arena.question_sources(kid)]
+        assert "words" in ids and "math" in ids
+        src, ctx, rng = sources.SOURCES["words"], sources.Ctx(kid), random.Random(5)
+        for _ in range(30):
+            it = src.pick(kid, ctx, 0.8, rng)
+            assert it["type"] == "mcq" and len(set(it["options"])) == 4 and 0 <= it["answer"] < 4
+            assert itemtypes.check(it, str(it["answer"])) and not itemtypes.check(it, str((it["answer"] + 1) % 4))
+            assert it["dim"].startswith(("vocab:", "terms:")) and 0 < it["p"] < 1
+            pub = sources.public(it)
+            assert "answer" not in pub and pub["q"]
+        c.get("/logout")
+
+        c.post("/login", data={"email": "wk@x.com", "password": "secret1"})
+        mid = c.post("/api/arena/start", json={"game": "race", "src": "words"}).json()["match_id"]
+        q = c.get(f"/api/arena/{mid}/q").json()["item"]
+        it = _pending(mid)
+        assert it["src"] == "words" and len(q["options"]) == 4
+        wrong = str((it["answer"] + 1) % 4)
+        assert c.post(f"/api/arena/{mid}/a", json={"item_id": q["id"], "answer": wrong}).json()["correct"] is False
+        assert db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=?", kid["id"])["n"] >= 1   # 答错的词进生词本
+        end = c.post(f"/api/arena/{mid}/end", json={"result": "lose", "stats": {"finish_s": 80}}).json()
+        assert end["answered"] == 1
+        assert c.post("/api/arena/start", json={"game": "defense", "src": "nope"}).status_code in (200, 400)
+
+
+def test_focus_index():
+    """专注指数 = 实际答对 ÷ 预期答对：预期一样时，答对多的（更投入的）分数高；3 秒内答错算猜。"""
+    from app.arena import matches
+    uid = db.one("SELECT id FROM users WHERE role='kid' ORDER BY id LIMIT 1")["id"]
+    mid = db.insert("INSERT INTO arena_matches(user_id, game, started_at) VALUES(?,?,?)", uid, "stickman", db.now())
+    for ok, ms in ((1, 6000), (1, 5000), (1, 7000), (1, 4000), (0, 1200), (0, 900)):
+        db.run("INSERT INTO arena_answers(user_id,match_id,kp_id,family,level,p_pred,correct,ms,created_at) VALUES(?,?,?,?,?,?,?,?,?)",
+               uid, mid, "MSH-NUM-10", "mult", 3, 0.5, ok, ms, db.now())
+    f = matches.focus(mid)
+    assert f["index"] == 133 and f["extra"] == 1 and f["guesses"] == 2

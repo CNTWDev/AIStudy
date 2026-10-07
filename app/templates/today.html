@@ -24,6 +24,16 @@
   {% elif total and done == total and not t.checked_in and not readonly %}<a class="btn lg go" href="#daylog">写一句一日记录</a>{% endif %}
 </div>
 
+{% if not readonly %}
+<div class="quick">
+  <a href="/review"><span class="qi">🔁</span><span><b>复习</b><small>{% if due %}有 {{ due }} 张卡到期{% else %}今天的卡都复习完了{% endif %}</small></span></a>
+  <a href="/words"><span class="qi">🔤</span><span><b>单词本</b><small>查过的词都在这</small></span></a>
+  {% if play.base %}<a href="/arena" class="qplay {{ 'lock' if play_locked }}"><span class="qi">🎮</span><span style="flex:1;min-width:0"><b>乐园</b>
+    <small>{% if play.need %}再完成 {{ play.need }} 项任务就能玩{% elif play.left > 0 %}今天还能玩 {{ (play.left / 60)|int }} 分钟{% if play.can_bonus_all %} · 全做完再 +10{% endif %}{% else %}今天玩够啦，明天见{% endif %}</small>
+    {% if play.need %}<span class="pbar"><i style="width:{{ (100 * play.done / (play.done + play.need))|round }}%"></i></span>{% endif %}</span></a>{% endif %}
+</div>
+{% endif %}
+
 {% if weekly %}
 <details class="card wkcard" {{ 'open' if weekly.monday }}>
   <summary><b>📈 上周进步卡</b> <span class="muted small">{{ weekly.from[5:] }} ~ {{ weekly.to[5:] }} · 只和自己比</span></summary>

@@ -1,0 +1,32 @@
+/* 火柴人大战：血条、能量条、操作按钮、装备店 */
+.pl-stickman .pl-hud{justify-content:space-between}
+.sm-card{display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.88);border:3px solid var(--pl-ink);border-radius:18px;padding:5px 10px 6px;width:min(40%,300px);box-shadow:0 3px 0 var(--pl-ink);color:var(--pl-ink)}
+.sm-card.ai{text-align:right}.sm-card .grow{flex:1;min-width:0}
+.sm-face{width:40px;height:40px;flex:none;border-radius:50%;background:#fff3e6;border:2.5px solid var(--pl-ink)}
+.sm-name{font-weight:900;font-size:14px;line-height:1.1}
+.sm-hp{position:relative;height:14px;border-radius:99px;background:#ffd9d9;border:2.5px solid var(--pl-ink);overflow:hidden;margin:3px 0}
+.sm-hp i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#7be495,#2fbf71);transition:width .1s}
+.sm-card.ai .sm-hp i{left:auto;right:0;background:linear-gradient(180deg,#ff9a9a,#ff5d5d)}
+.sm-hp b{position:absolute;inset:0;font-size:10px;line-height:9px;text-align:center;color:var(--pl-ink)}
+.sm-en{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:900}.sm-card.ai .sm-en{justify-content:flex-end}
+.sm-enbar{flex:1;height:8px;border-radius:99px;background:#eee6ff;overflow:hidden;border:2px solid var(--pl-ink)}.sm-enbar i{display:block;height:100%;background:linear-gradient(90deg,#ffd23f,#ff9f1c)}
+.sm-en.low{color:#ff3d3d;animation:smblink .6s infinite}@keyframes smblink{50%{opacity:.45}}
+.sm-sp{font-size:12px;height:14px;line-height:14px}
+.sm-time{font-weight:900;font-size:26px;color:#fff;-webkit-text-stroke:5px var(--pl-ink);paint-order:stroke;margin-top:4px}
+.sm-time.low{color:#ff5d5d;animation:smblink .6s infinite}
+.pl-stickman .pl-ctrl{flex-direction:column;align-items:stretch;gap:8px}
+.sm-shop{display:flex;gap:6px;justify-content:center}
+.sm-buy{flex:1;max-width:120px;display:flex;flex-direction:column;align-items:center;border:2.5px solid var(--pl-ink);box-shadow:0 3px 0 var(--pl-ink);background:var(--card);color:var(--ink);border-radius:14px;padding:3px 4px;font:inherit;cursor:pointer;line-height:1.15}
+.sm-buy span{font-size:20px}.sm-buy b{font-size:12px}.sm-buy small{font-size:11px;color:#c77700;font-weight:800}
+.sm-buy:disabled{opacity:.4}.sm-buy.have{background:var(--pl-sun);opacity:1}
+.sm-pads{display:flex;justify-content:space-between;align-items:center;gap:8px}
+@media (max-width:520px){.sm-card{padding:4px 6px;gap:5px}.sm-face{width:30px;height:30px}.sm-time{font-size:20px}.sm-name{font-size:12px}.sm-hp{height:12px}
+  .pl-stickman .pl-btn.big{min-width:56px;min-height:56px;font-size:16px}.pl-stickman .pl-btn.quiz{font-size:16px;padding:4px 10px}}
+@media (pointer:fine) and (min-width:900px){.sm-pads .pl-pad .pl-btn{min-width:56px;min-height:56px}}
+@media (orientation:landscape) and (max-height:540px){
+  .pl-stickman .pl-stage{height:calc(100vh - 128px)}
+  .pl-stickman .pl-ctrl{flex-direction:row;flex-wrap:nowrap;align-items:center}.sm-pads{flex:1;min-width:0}
+  .sm-shop{order:2;flex:none;gap:4px}.sm-buy{width:50px;padding:2px}.sm-buy b{display:none}.sm-buy span{font-size:18px}
+  .pl-stickman .pl-btn{min-width:50px;min-height:50px;font-size:15px}.pl-stickman .pl-btn.big{min-width:56px;min-height:56px}
+  .pl-stickman .pl-btn.quiz{font-size:16px;padding:4px 12px}
+}
