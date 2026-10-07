@@ -11,27 +11,34 @@ TUTOR = (
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"items": 1, "teach": 2, "context": 1, "passage": 1}
+PROMPT_VERSION = {"items": 2, "teach": 2, "context": 1, "passage": 1}
 
 
 def _audience(grade: str, pack) -> str:
     from ..catalog import stage_label
     s = f"学生年级：{stage_label(grade)}。学科：{pack.subject_name}（{pack.edition}）。"
-    if pack.international:
+    if pack.teach_lang == "en" and pack.item_lang == "en":
         s += "学生在国际学校，这一科用英文授课和考试，但英文基础较弱：题干用英文，同时给中文翻译，讲解用中文并标出关键英文术语。"
-    elif pack.subject == "english":
+    elif pack.item_lang == "en":
         s += "题目用英文，题目要求和讲解用中文。"
-    else:
+    elif pack.item_lang == "zh":
         s += "全部用中文。"
+    else:
+        s += f"题目用 {pack.item_lang}，讲解用 {pack.teach_lang}。"
+    if pack.prompt_note:
+        s += pack.prompt_note
     return s
 
 
-ITEM_SCHEMA = (
-    '{"items":[{"type":"mcq|num|fill|short","difficulty":1-3,"q":"题干","zh":"中文翻译(可选)",'
-    '"options":["仅mcq，4个选项"],"answer":"mcq为正确选项下标(整数)；num为数值；fill为可接受答案字符串列表；short省略",'
-    '"unit":"num题单位(可选)","tol":"num题允许误差(可选)","model":"short题参考答案","points":["short题得分要点"],'
-    '"hint":"一句提示，不直接给答案","explain":"中文讲解，2-3句"}]}'
-)
+def _item_schema() -> str:
+    """出题格式：题型和答案格式来自题型注册表（app/itemtypes.py），加题型不用改这里。"""
+    from .. import itemtypes
+    return (
+        '{"items":[{"type":"' + "|".join(itemtypes.TYPES) + '","difficulty":1-3,"q":"题干","zh":"中文翻译(可选)",'
+        '"code":"题目里的一段代码(可选，编程类题目才用)","options":["仅选择题"],"answer":"见下","unit":"单位(可选)",'
+        '"tol":"允许误差(可选)","model":"参考答案","points":["得分要点"],'
+        '"hint":"一句提示，不直接给答案","explain":"中文讲解，2-3句"}]}\n各题型：' + itemtypes.schema_text()
+    )
 
 
 def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=None) -> list[dict]:
@@ -44,11 +51,14 @@ def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=
         f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n"
         f"诊断思路参考：{kp.get('probe','')}\n关键词：{', '.join(kp.get('terms', []))}\n\n"
         f"{purpose_txt}\n优先用 mcq/num/fill（能自动判分），short 最多 1 道。不要照搬教材原文。"
-        f"答案必须正确且唯一，请自己检查一遍。\n输出格式：{ITEM_SCHEMA}"
+        f"答案必须正确且唯一，请自己检查一遍。\n输出格式：{_item_schema()}"
     )
     data = ask_json("items", TUTOR + "你也是严谨的出题人。", user, user_id=user_id, effort="medium", cache=False)
     items = data.get("items", []) if isinstance(data, dict) else data
-    return [i for i in items if isinstance(i, dict) and i.get("q") and i.get("type") in ("mcq", "num", "fill", "short")]
+    from .. import itemtypes
+    return [{**itemtypes.normalize(i), "difficulty": i.get("difficulty", 2), **({"kp_ids": i["kp_ids"]} if i.get("kp_ids") else {})}
+            for i in items
+            if isinstance(i, dict) and i.get("q") and i.get("type") in itemtypes.TYPES]
 
 
 def teach(kp: dict, pack, grade: str, user_id=None, known: list[str] | None = None) -> dict:

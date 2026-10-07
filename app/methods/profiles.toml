@@ -1,0 +1,50 @@
+# 学习方式（教学理念）：每种方式 = 掌握模型 + 记忆模型 + 每日计划策略 + 各自的参数。
+# 家长可以给每个孩子选一种（孩子资料页「学习方式」），管理员可以设全站默认。
+# 换方式后，这个孩子的掌握状态会按新方式从学习记录（events 表）重新算一遍。
+#
+# 要改参数或加一种方式：在 config/methods.toml 里写同名 [profiles.xxx] 覆盖或新增（不用改这个文件）。
+# 要换一种算法（不只是调参数）：在 app/methods/ 里写一个新类，实现同样的接口，注册到 app/methods/__init__.py，
+# 然后在这里用 model = "新名字" 引用。
+#
+# plan（每日计划）：
+#   fixed  每天都有的任务，按顺序（坚持比做对更重要，不受时间预算限制）
+#   flex   学知识点的任务，按顺序排，超出每天可用时间就截掉；"a+b" 表示两类交替穿插（交错练习）
+#   limits 每类最多几个（weak 是每个学科最多几个）
+#   prefer_hot  高频考点排前面
+# 可用的任务类型见 app/plan.py 的 SOURCES。
+
+default = "balanced"
+
+[profiles.balanced]
+name = "均衡"
+desc = "检索练习 + 间隔复习 + 交错练习 + 掌握学习：跟上学校进度，补弱和补前置交替，学有余力再预习。"
+basis = "Roediger & Karpicke 2006（检索练习）；Cepeda 等 2006（间隔效应）；Rohrer 2012（交错练习）；Bloom 1968（掌握学习）"
+mastery = { model = "bkt" }
+memory = { model = "fsrs", target_r = 0.85 }
+[profiles.balanced.plan]
+fixed = ["progress", "warmup", "words", "mistakes", "reading"]
+flex = ["sync", "top", "paper", "diagnose", "weak+backfill", "check", "preview", "review"]
+limits = { sync = 2, top = 1, paper = 1, diagnose = 1, weak = 3, check = 2, preview = 1 }
+
+[profiles.mastery]
+name = "先学牢再往前"
+desc = "掌握学习：掌握标准更严（真懂的概率 90%、3 个不同的日子答对），先补前置再攻克，不预习新内容。适合基础不牢、经常“学了后面忘前面”的孩子。"
+basis = "Bloom 1968 / Guskey 2007（掌握学习）；Kulik 等 1990（掌握学习的元分析）"
+mastery = { model = "bkt", master_p = 0.9, min_days = 3 }
+memory = { model = "fsrs", target_r = 0.9 }
+[profiles.mastery.plan]
+fixed = ["progress", "warmup", "words", "mistakes", "reading"]
+flex = ["sync", "top", "paper", "diagnose", "backfill", "weak", "check", "review"]
+limits = { sync = 2, top = 1, paper = 1, diagnose = 1, weak = 3, check = 3, preview = 0 }
+
+[profiles.exam]
+name = "考前冲刺"
+desc = "考前两三周用：高频考点和薄弱点优先，复习间隔缩短（记得的概率保持在 90% 以上），不安排预习和摸底。考完记得换回来。"
+basis = "Agarwal 等 2021（检索练习对考试成绩的综述）；Cepeda 等 2008（离考试越近，最优间隔越短）"
+mastery = { model = "bkt" }
+memory = { model = "fsrs", target_r = 0.9 }
+[profiles.exam.plan]
+fixed = ["progress", "words", "mistakes", "reading"]
+flex = ["top", "paper", "weak+backfill", "check", "review"]
+limits = { top = 1, paper = 1, weak = 4, check = 3, preview = 0 }
+prefer_hot = true

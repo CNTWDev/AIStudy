@@ -1,25 +1,47 @@
 {
- "_doc": "所有学制的学段放在同一根「学年」轴上：year = 相当于中国几年级（一年级 = 1）。不同学制的学段靠 year 比先后、做跨教材推断。孩子的「年级」用 grades 里的值（中国学年）；国际学校的孩子也按学年选（如 Year 9 / Grade 8 选「初二」）。加学制或学段：在 systems / stages 里加一行即可，教材包的 stage 字段引用这里的 id。",
+ "_doc": "所有学制的学段放在同一根「学年」轴上：year = 相当于中国几年级（一年级 = 1）。不同学制的学段靠 year 比先后、做跨教材推断。孩子的「年级」用 grades 里的值（中国学年）；国际学校的孩子也按学年选（如 Year 9 / Grade 8 选「初二」）。加学制或学段：在 systems / stages 里加一行即可，教材包的 stage 字段引用这里的 id。 systems 的 international / lang：这个学制的课默认用什么语言授课和出题（教材包可以自己覆盖）。没有统一学制的课程（少儿编程、技术栈、兴趣课）用 course 学制，在教材包里自己定义 levels（见 docs/DESIGN.md §4.2）。default_grade：新建孩子时默认的年级。",
  "systems": [
   {
    "id": "cn",
-   "name": "中国（上海五·四学制）"
+   "name": "中国（上海五·四学制）",
+   "international": false,
+   "lang": "zh"
   },
   {
    "id": "cambridge",
-   "name": "剑桥国际（Primary / Lower Secondary / IGCSE）"
+   "name": "剑桥国际（Primary / Lower Secondary / IGCSE）",
+   "international": true,
+   "lang": "en"
   },
   {
    "id": "alevel",
-   "name": "A-Level"
+   "name": "A-Level",
+   "international": true,
+   "lang": "en"
   },
   {
    "id": "ib",
-   "name": "IB（PYP / MYP / DP）"
+   "name": "IB（PYP / MYP / DP）",
+   "international": true,
+   "lang": "en"
   },
   {
    "id": "us",
-   "name": "美式（AP）"
+   "name": "美式（AP）",
+   "international": true,
+   "lang": "en"
+  },
+  {
+   "id": "uni",
+   "name": "大学（本科）",
+   "international": false,
+   "lang": "zh"
+  },
+  {
+   "id": "course",
+   "name": "自定课程（没有统一学制：少儿编程、技术栈、兴趣课……）",
+   "international": false,
+   "lang": "zh"
   }
  ],
  "grades": [
@@ -34,7 +56,11 @@
   "G9",
   "G10",
   "G11",
-  "G12"
+  "G12",
+  "U1",
+  "U2",
+  "U3",
+  "U4"
  ],
  "stages": [
   {
@@ -199,6 +225,35 @@
    "label": "AP",
    "year": 11.5,
    "age": 16
+  },
+  {
+   "id": "U1",
+   "system": "uni",
+   "label": "大一",
+   "year": 13,
+   "age": 18
+  },
+  {
+   "id": "U2",
+   "system": "uni",
+   "label": "大二",
+   "year": 14,
+   "age": 19
+  },
+  {
+   "id": "U3",
+   "system": "uni",
+   "label": "大三",
+   "year": 15,
+   "age": 20
+  },
+  {
+   "id": "U4",
+   "system": "uni",
+   "label": "大四",
+   "year": 16,
+   "age": 21
   }
- ]
+ ],
+ "default_grade": "G3"
 }

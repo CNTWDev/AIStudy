@@ -10,7 +10,7 @@ for_kid（孩子能不能看到）、action（backfill / weak / check / words / 
 from collections import Counter, defaultdict
 from datetime import timedelta
 
-from . import db, engine
+from . import db, engine, evidence
 from .catalog import catalog
 
 WINDOW_DAYS = 14
@@ -33,7 +33,7 @@ def detect(user_id: int) -> list[dict]:
                user_id, since)
 
     # 1. 共同的薄弱前置：好几个没掌握的知识点都要用到同一个前置，它多半是「根」
-    shaky = {k for k, v in m.items() if v["status"] == "weak" or (v["status"] == "learning" and v["score"] < 0.6)}
+    shaky = evidence.needs_work(user_id, m)
     shaky |= {a["kp_id"] for a in att if not a["correct"] and a["mode"] != "exam"}
     shaky = {k for k in shaky if catalog.kp(k)}
     roots: dict[str, list[str]] = defaultdict(list)
@@ -108,9 +108,8 @@ def detect(user_id: int) -> list[dict]:
         out.append({"kind": "lookup_repeat", "key": ",".join(sorted(added))[:200], "kp_id": None, "severity": 1, "action": "words",
                     "for_kid": 1, "title": f"查了好几次的词已经放进单词本", "detail": "、".join(added[:6])})
 
-    # 7. 学会过，但按遗忘模型估算，现在记得的概率已经掉到 85% 以下：该复查了
-    from . import evidence
-    for v in [v for v in evidence.due_checks(m, limit=6) if catalog.kp(v["kp_id"])][:2]:
+    # 7. 学会过，但按遗忘模型估算，现在记得的概率已经掉到目标保持率（默认 85%）以下：该复查了
+    for v in [v for v in evidence.due_checks(user_id, m, limit=6) if catalog.kp(v["kp_id"])][:2]:
         days = int(evidence.days_since(v["last_ev"]))
         out.append({"kind": "decay", "key": v["kp_id"], "kp_id": v["kp_id"], "severity": 1, "action": "check", "for_kid": 1,
                     "title": f"「{_name(v['kp_id'])}」该复查了",

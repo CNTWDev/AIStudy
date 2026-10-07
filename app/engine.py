@@ -1,10 +1,8 @@
 """学习引擎：掌握度、间隔复习、诊断（向后回溯）、每日计划（补弱/回溯/复习/预习/阅读）。"""
 import json
-import random
-import uuid
 from datetime import date, timedelta
 
-from . import bank, db, evidence, llm
+from . import bank, db, evidence, itemtypes, llm
 from .catalog import catalog, stage_rank
 
 # ------------------------------------------------------------------ 掌握度
@@ -17,20 +15,14 @@ def get_mastery(user_id: int) -> dict[str, dict]:
 
 
 def update_mastery(user_id: int, kp_id: str, correct: bool, weight=1.0, source="practice", item=None, fmt=None,
-                   dont_know=False) -> str:
-    """一次作答证据进来，重新估算真懂的概率和状态（见 app/evidence.py：BKT + 遗忘模型 + 交叉验证）。"""
-    return evidence.update(user_id, kp_id, correct, item=item, mode=source, fmt=fmt, weight=weight, dont_know=dont_know)
+                   dont_know=False, kind="answer") -> str:
+    """一次作答证据进来：记进学习事件表，按这个孩子的学习方式重新估算掌握状态（见 app/evidence.py）。"""
+    return evidence.record(user_id, kp_id, correct, item=item, mode=source, fmt=fmt, weight=weight, dont_know=dont_know, kind=kind)
 
 
 def set_mastery(user_id: int, kp_id: str, score: float, status: str, source: str):
-    """没有作答的推断（同一概念、前置、自评、导入）：只给一个概率，不算交叉验证的证据，所以不会直接变成「掌握」。"""
-    status = "learning" if status == "mastered" else status
-    db.run(
-        "INSERT INTO mastery(user_id,kp_id,score,attempts,correct,status,source,updated_at,last_ev,evidence) "
-        "VALUES(?,?,?,0,0,?,?,?,?,?) "
-        "ON CONFLICT(user_id,kp_id) DO UPDATE SET score=excluded.score, status=excluded.status, "
-        "source=excluded.source, updated_at=excluded.updated_at",
-        user_id, kp_id, score, status, source, db.now(), db.now(), '{"days":[],"items":[],"fmts":[],"wrong":[],"dk":0}')
+    """没有作答的推断（同一概念、前置、自评、导入）：只给一个概率，不会直接变成「掌握」。status 由模型按概率定。"""
+    return evidence.infer(user_id, kp_id, score, source)
 
 
 # ------------------------------------------------------------------ 间隔复习卡片
@@ -50,24 +42,26 @@ def add_card(user_id: int, kind: str, front: str, back: str, extra=None, kp_id=N
 
 
 def review_card(user_id: int, card_id: int, grade: str):
-    """grade: again(忘了) / hard(模糊) / good(记得)。下次复习按遗忘模型排在「记得的概率」降到 85% 的那天。"""
+    """grade: again(忘了) / hard(模糊) / good(记得)。下次复习按这个孩子学习方式的记忆模型排期
+    （默认：记得的概率降到 85% 的那天）。"""
     c = db.one("SELECT * FROM cards WHERE id=? AND user_id=?", card_id, user_id)
     if not c:
         return None
-    s0, d0 = c["stability"] or 0, c["difficulty"] or 5
-    r = evidence.recall(evidence.days_since(c["last_review"]), s0) if c["last_review"] else 1.0
-    s, d = evidence.next_state(s0, d0, r, grade) if s0 else evidence.init_state(grade)
+    mem = evidence.profile(user_id).memory
+    days = evidence.days_since(c["last_review"]) if c["last_review"] else 0
+    s, d = mem.review(c["stability"] or 0, c["difficulty"] or 5, days, grade)
     lapses = c["lapses"] + (1 if grade == "again" else 0)
     if grade == "again":
         box, due = 0, db.today()  # 今天再来一次
     else:
         box = c["box"] + 1 if grade == "good" else max(c["box"], 1)
-        due = db.today() + timedelta(days=evidence.interval(s))
+        due = db.today() + timedelta(days=mem.interval(s))
     db.run("UPDATE cards SET box=?, due=?, lapses=?, reviews=reviews+1, last_review=?, stability=?, difficulty=? WHERE id=?",
            box, due.isoformat(), lapses, db.now(), round(s, 3), round(d, 3), card_id)
+    evidence.log(user_id, "card", card_id, "review", correct=grade != "again", fmt="recall", data={"grade": grade, "kind": c["kind"]})
     if c["kp_id"]:
         update_mastery(user_id, c["kp_id"], grade != "again", weight={"again": 0.6, "hard": 0.3, "good": 0.6}[grade],
-                       source="review", fmt="recall")
+                       source="review", fmt="recall", kind="review")
     return {"box": box, "due": due.isoformat()}
 
 
@@ -106,7 +100,7 @@ _item_row_to_dict = bank.row_to_item
 save_items = bank.save_items
 
 
-def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="G3") -> list[dict]:
+def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="") -> list[dict]:
     """取题：先用题库里的（这个知识点的，加上别的教材里同一概念的），优先没做过的、难度从低到高；
     不够且配置了 AI 时现场出题，存进题库，以后别的孩子也能用。"""
     rows = bank.candidates(user_id, kp_id)
@@ -115,11 +109,12 @@ def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="G3") -> 
     # 交叉验证：优先没用过的题型（已经用选择题答对过，就先给填空 / 计算）
     m = db.one("SELECT evidence FROM mastery WHERE user_id=? AND kp_id=?", user_id, kp_id)
     seen_fmts = set(db.jload(m["evidence"], {}).get("fmts", [])) if m and m["evidence"] else set()
-    pool = sorted(fresh, key=lambda r: (r["other"] or 0, evidence.FMT.get(r["type"]) in seen_fmts, r["difficulty"])) + redo
+    pool = sorted(fresh, key=lambda r: (r["other"] or 0, itemtypes.fmt(r["type"]) in seen_fmts, r["difficulty"])) + redo
     if purpose == "diagnose":
         pool = sorted(rows, key=lambda r: (r["done"] > 0, r["other"] or 0, abs(r["difficulty"] - 2)))
     picked = [{**bank.row_to_item(r), "kp_id": kp_id} for r in pool[:n]]  # 共用的题，这次记在正在学的知识点上
     if len(picked) < n and llm.enabled():
+        grade = grade or catalog.default_grade
         kp = catalog.kp(kp_id)
         pack = catalog.packs[catalog.kp_pack[kp_id]]
         try:
@@ -134,43 +129,11 @@ def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="G3") -> 
 
 
 def check_answer(item: dict, answer) -> bool | None:
-    t = item["type"]
-    if t == "short":
-        return None  # 自评
-    if answer is None or str(answer).strip() == "":
-        return False
-    if t == "mcq":
-        try:
-            return int(answer) == int(item["answer"])
-        except (TypeError, ValueError):
-            return False
-    if t == "num":
-        try:
-            val = float(str(answer).replace(",", "").split()[0])
-            target = float(item["answer"])
-        except (TypeError, ValueError, IndexError):
-            return False
-        tol = float(item.get("tol") or 0) or max(abs(target) * 0.01, 1e-9)
-        return abs(val - target) <= tol + 1e-12
-    if t == "fill":
-        accepted = item["answer"] if isinstance(item["answer"], list) else [item["answer"]]
-        norm = lambda s: "".join(str(s).lower().split()).strip("。.!！")
-        return norm(answer) in {norm(a) for a in accepted}
-    return False
+    return itemtypes.check(item, answer)
 
 
 def answer_display(it: dict) -> str:
-    a = it.get("answer")
-    if it["type"] == "mcq":
-        try:
-            return f"{'ABCD'[int(a)]}. {it['options'][int(a)]}"
-        except (TypeError, ValueError, IndexError, KeyError):
-            return str(a)
-    if it["type"] == "short":
-        return it.get("model", "")
-    if isinstance(a, list):
-        return " / ".join(map(str, a))
-    return f"{a} {it.get('unit', '')}".strip()
+    return itemtypes.display(it)
 
 
 def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, correct: bool, answer="", dont_know=False,
@@ -191,17 +154,7 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
         infer_equivalents(user_id, kp_id)
     if item and not correct and mode in ("practice", "diagnose", "probe", "paper", "exam"):
         # 错题自动进错题本（以卡片形式参与间隔复习）
-        ans = item.get("answer")
-        if item["type"] == "mcq":
-            try:
-                ans = item["options"][int(ans)]
-            except (TypeError, ValueError, IndexError, KeyError):
-                pass
-        elif item["type"] == "short":
-            ans = item.get("model", "")
-        elif isinstance(ans, list):
-            ans = " / ".join(map(str, ans))
-        back = f"{ans}{(' ' + item.get('unit', '')) if item.get('unit') else ''}\n{item.get('explain', '')}"
+        back = f"{itemtypes.display(item)}\n{item.get('explain', '')}"
         add_card(user_id, "mistake", item["q"], back.strip(), {"item_id": item["id"], "zh": item.get("zh", ""),
                  "my_answer": "（还不会）" if dont_know else str(answer)}, kp_id)
     if touch:
@@ -256,7 +209,7 @@ def cross_topics(user_id: int, lang: str, limit: int = 3) -> list[dict]:
         if not kp or k in seen:
             continue
         p = catalog.packs[kp["pack"]]
-        if p.subject in ("english", "chinese") or (lang == "zh" and p.subject == "math"):
+        if p.lang or (lang == "zh" and p.domain == "math"):  # 语言课本身不算「别的学科」
             continue
         seen.add(k)
         en = kp.get("name_en") or ""
@@ -572,176 +525,9 @@ def log_reading(user_id: int, track_id: int | None, *, to_pos=0, minutes=0, summ
 # ------------------------------------------------------------------ 每日任务
 
 def build_plan(user_id: int) -> list[dict]:
-    """一天的任务，按固定顺序从上到下做：（进度提醒）→ 单词 → 错题 → 英语阅读 → 中文阅读 →
-    跟上学校 → 试卷订正 → 诊断 → 补弱 / 补前置 → 回顾小检查 → 预习 → 知识点回顾。
-    单词、错题、阅读每天都有（坚持比做对更重要）；学知识点的任务按每天可用时间截断。"""
-    user = db.one("SELECT * FROM users WHERE id=?", user_id)
-    budget = user["daily_minutes"] or 60
-    mastery = get_mastery(user_id)
-    enrolls = db.q("SELECT * FROM enrollments WHERE user_id=? AND active=1", user_id)
-    active_tracks = tracks(user_id)
-    fixed: list[dict] = []
-
-    new_words = add_daily_words(user_id)
-    n_words = len(due_cards(user_id, 300, "words"))
-    if n_words:
-        title = f"单词：复习 {n_words} 个" + (f"（含新词 {new_words} 个）" if new_words else "")
-        fixed.append({"type": "words", "title": title, "why": "记得点「记得」，忘了就点「忘了」，明天再来",
-                      "minutes": min(15, 3 + n_words // 4), "url": "/review?group=words"})
-    n_mis = len(due_cards(user_id, 300, "mistakes"))
-    if n_mis:
-        fixed.append({"type": "mistakes", "title": f"错题回顾 {min(n_mis, 8)} 道", "why": "先想再翻答案，想不起来也没关系",
-                      "minutes": min(10, 2 + min(n_mis, 8)), "url": "/review?group=mistakes"})
-
-    langs = {catalog.packs[e["pack_id"]].lang for e in enrolls if e["pack_id"] in catalog.packs} - {""}
-    for kind, lang, label in (("read_en", "en", "英语阅读"), ("read_zh", "zh", "名著接着读")):
-        tr = [t for t in active_tracks if t["kind"] == kind]
-        if tr:
-            t = tr[0]
-            seg = track_today(t)
-            fixed.append({"type": kind, "track": t["id"], "title": f"{label}：《{t['title']}》{seg['label']}",
-                          "why": f"读 {t['daily_minutes']} 分钟，读完用一句话说说讲了什么",
-                          "minutes": t["daily_minutes"], "url": f"/track/{t['id']}"})
-        elif lang in langs:
-            fixed.append({"type": kind, "lang": lang, "title": f"{'英文' if lang == 'en' else '中文'}阅读 15 分钟",
-                          "why": "读一篇短文，不懂的词点一下就查，收藏后自动进单词复习", "minutes": 15,
-                          "url": f"/reading?lang={lang}"})
-
-    # 热身：几道小题，混着以前学过的知识点和旧单词——不知不觉中把过去摸清（见 explore.py）
-    from . import explore
-    has_probe = bool(explore.candidates(user_id, mastery)[:1])
-    has_words = bool(explore.word_lists(user_id))
-    if has_probe or has_words:
-        n = (3 if has_probe else 0) + (2 if has_words else 0)
-        fixed.insert(0, {"type": "warmup", "title": f"热身 {n} 题", "why": "先动动脑：混着以前学过的内容，答完系统更懂你",
-                         "minutes": 4, "url": "/warmup"})
-
-    weak_all, back_all, pre_all, diag_needed, sync_all, check_all = [], [], [], [], [], []
-    taught = taught_set(user_id)
-    stale_packs = []
-    day_seed = db.today().toordinal()
-    for e in enrolls:
-        pack_id, stage = e["pack_id"], e["stage"]
-        if pack_id not in catalog.packs:
-            continue
-        pv = progress_view(user_id, e)
-        if pv["stale"]:
-            stale_packs.append(catalog.packs[pack_id].subject_name)
-        # 跟上学校：正在学的知识点没掌握，就练它；进度之后的下一个可以预习
-        if e["progress_kp"] and catalog.kp(e["progress_kp"]):
-            cur = catalog.kp(e["progress_kp"])
-            if mastery.get(cur["id"], {}).get("status") != "mastered":
-                sync_all.append({"type": "sync", "kp": cur["id"], "title": f"跟上学校：{cur['name']}",
-                                 "why": "学校正在学这个，趁热练一练", "minutes": 12, "pack": pack_id})
-            nxt = next_after(pack_id, cur["id"], mastery, taught, e["track"])
-            if nxt:
-                pre_all.append({"type": "preview", "kp": nxt["id"], "title": f"预习：{nxt['name']}",
-                                "why": "学校马上要学，先看一眼", "minutes": 8, "pack": pack_id})
-        # 往回巩固：学校学过、但系统里还没检测过的知识点，每天轮一个做个小检查
-        unchecked = [k for k in pv["learned"] if mastery.get(k, {}).get("status") in (None, "unknown")
-                     and stage_rank(catalog.kps[k]["stage"]) >= stage_rank(stage) - 2]
-        if unchecked:
-            k = catalog.kps[unchecked[day_seed % len(unchecked)]]
-            check_all.append({"type": "check", "kp": k["id"], "title": f"回顾小检查：{k['name']}",
-                              "why": f"{'学校学过' if k['id'] in taught else '以前学过'}，看看还记得吗（会就很快过）",
-                              "minutes": 6, "pack": pack_id})
-        diag = db.one("SELECT id FROM diag_sessions WHERE user_id=? AND pack_id=? AND status='done'", user_id, pack_id)
-        if not diag:
-            diag_needed.append(pack_id)
-        kp_ids = set(catalog.ids_for(pack_id, e["track"]))
-        weak = [mastery[k] for k in kp_ids if k in mastery and
-                (mastery[k]["status"] == "weak" or mastery[k]["status"] == "learning" and mastery[k]["score"] < 0.6)]
-        weak.sort(key=lambda m: m["score"])
-        for w in weak[:3]:
-            kp = catalog.kp(w["kp_id"])
-            gap = [p for p, _ in catalog.ancestors(w["kp_id"], depth=3)
-                   if mastery.get(p["id"], {}).get("status") in (None, "weak", "unknown")]
-            if gap:
-                g = gap[0]
-                back_all.append({"type": "backfill", "kp": g["id"], "for": w["kp_id"],
-                                 "title": f"补前置：{g['name']}", "why": f"「{kp['name']}」要用到它", "minutes": 10, "pack": pack_id})
-            else:
-                weak_all.append({"type": "weak", "kp": w["kp_id"], "title": f"攻克：{kp['name']}",
-                                 "why": f"掌握度 {int(w['score'] * 100)}%，{'刚学' if w['status'] == 'learning' else '薄弱'}",
-                                 "minutes": 12, "pack": pack_id})
-        fr = frontier(user_id, pack_id, stage, mastery)[:2] if diag and not e["progress_kp"] else []  # 诊断前不安排预习
-        for k in fr:
-            pre_all.append({"type": "preview", "kp": k["id"], "title": f"预习：{k['name']}",
-                            "why": "前置已具备" + ("，高频考点" if k.get("hot") else ""), "minutes": 8, "pack": pack_id})
-
-    # 自动发现的问题（根源前置、反复还不会、常问、做对但慢、久未复习……）排在同类任务最前面
-    from . import insights
-    auto = insights.plan_tasks(insights.refresh(user_id))
-    auto_kps = {t["kp"] for lst in auto.values() for t in lst}
-    back_all = auto["backfill"] + [t for t in back_all if t["kp"] not in auto_kps]
-    weak_all = auto["weak"] + [t for t in weak_all if t["kp"] not in auto_kps]
-    check_all = auto["check"] + [t for t in check_all if t["kp"] not in auto_kps]
-    # 交叉验证：昨天以前答对过、还差「隔天再对 / 换一种题型」的，今天换一道题确认（最多 2 个）
-    mine = {k for e in enrolls if e["pack_id"] in catalog.packs for k in catalog.ids_for(e["pack_id"], e["track"])}
-    confirm = [m for k, m in mastery.items() if k in mine and m["status"] == "learning" and (m["score"] or 0) >= 0.6
-               and m.get("last_ev") and evidence.days_since(m["last_ev"]) >= 0.5 and m["attempts"]]
-    confirm.sort(key=lambda m: -(m["score"] or 0))
-    planned = {t["kp"] for t in check_all}
-    for m in confirm[:2]:
-        if m["kp_id"] not in planned and catalog.kp(m["kp_id"]):
-            need = "、".join(evidence.missing(m)[:2])
-            check_all.insert(0, {"type": "check", "kp": m["kp_id"], "title": f"确认一下：{catalog.kps[m['kp_id']]['name']}",
-                                 "why": f"上次答对了，{need}才算真的掌握", "minutes": 5,
-                                 "pack": catalog.kp_pack[m["kp_id"]]})
-            planned.add(m["kp_id"])
-
-    flex: list[dict] = []
-    # 顺序：跟上学校 → 摸底诊断 → 补弱 / 补前置（交替）→ 回顾小检查 → 预习
-    for t in sync_all[:2]:
-        t["url"] = f"/learn/{t['kp']}?task=sync"
-        flex.append(t)
-    # 系统自动发现的最重要的一条，紧跟在「跟上学校」后面（不会因为时间不够被截掉）
-    top = (auto["backfill"] + auto["weak"])[:1]
-    for t in top:
-        t["url"] = f"/learn/{t['kp']}?task={t['type']}"
-        t["keep"] = True
-        flex.append(t)
-    back_all = [t for t in back_all if t not in top]
-    weak_all = [t for t in weak_all if t not in top]
-    # 导入了还没订正完的试卷
-    for p in db.q("SELECT id, title FROM papers WHERE user_id=? AND status='ready' ORDER BY id LIMIT 1", user_id):
-        flex.append({"type": "paper", "title": f"试卷订正：{p['title']}", "why": "把卷子上的题在线再做一遍，做完看诊断",
-                     "minutes": 20, "url": f"/papers/{p['id']}"})
-    for p in diag_needed[:1]:
-        pk = catalog.packs[p]
-        flex.append({"type": "diagnose", "pack": p, "title": f"{pk.subject_name}摸底诊断（约 10 分钟）",
-                     "why": "先找到真正的薄弱点，计划才准", "minutes": 12, "url": f"/diagnose/{p}"})
-
-    def interleave(*lists):
-        out, i = [], 0
-        while any(i < len(l) for l in lists):
-            for l in lists:
-                if i < len(l):
-                    out.append(l[i])
-            i += 1
-        return out
-
-    for t in interleave(weak_all, back_all) + check_all[:2] + pre_all[:1]:
-        t["url"] = f"/learn/{t['kp']}?task={t['type']}"
-        flex.append(t)
-    n_other = len(due_cards(user_id, 100, "other"))
-    if n_other:
-        flex.append({"type": "review", "title": f"知识点回顾 {n_other} 张", "why": "间隔复习学过的知识点",
-                     "minutes": min(10, 2 + n_other), "url": "/review?group=other"})
-
-    if stale_packs:
-        fixed.insert(0, {"type": "progress", "title": "更新一下学校进度（1 分钟）",
-                         "why": f"{'、'.join(stale_packs[:3])}：告诉系统学校学到哪了，计划才跟得上", "minutes": 2, "url": "/progress"})
-    out, used, n_flex = [], 0, 0
-    for is_flex, t in [(False, t) for t in fixed] + [(True, t) for t in flex]:
-        if is_flex and n_flex and not t.get("keep") and used + t["minutes"] > budget:
-            continue
-        n_flex += is_flex
-        t["id"] = f"t{len(out)}"
-        t["done"] = False
-        out.append(t)
-        used += t["minutes"]
-    return out
+    """一天的任务清单：来源和排法见 app/plan.py，排法由孩子的学习方式决定。"""
+    from . import plan
+    return plan.build_plan(user_id)
 
 
 def today_plan(user_id: int, rebuild=False) -> dict:

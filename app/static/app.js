@@ -15,18 +15,21 @@ function $$(s, el) { return [...(el || document).querySelectorAll(s)]; }
 function renderItem(box, item, opts) {
   opts = opts || {};
   const L = 'ABCDEFG';
+  // 输入控件由服务端题型注册表给出（app/itemtypes.py 的 widget）：choice 选项 / self 自评 / text 输入框
+  const W = item.widget || (item.type === 'mcq' ? 'choice' : item.type === 'short' ? 'self' : 'text');
   let html = `<div class="q"><div style="font-weight:600">${esc(item.q)}</div>` +
+    (item.code ? `<pre class="code">${esc(item.code)}</pre>` : '') +
     (item.zh ? `<div class="muted small">${esc(item.zh)}</div>` : '');
-  if (item.type === 'mcq') {
+  if (W === 'choice') {
     html += item.options.map((o, i) => `<button class="opt" data-i="${i}">${L[i]}. ${esc(o)}</button>`).join('');
-  } else if (item.type === 'short') {
+  } else if (W === 'self') {
     html += `<textarea class="ans" placeholder="先自己写一写（写关键词也行）"></textarea>`;
   } else {
     html += `<div class="row" style="margin-top:8px"><input type="text" class="ans grow" placeholder="你的答案" autocomplete="off">` +
       (item.unit ? `<span class="muted">${esc(item.unit)}</span>` : '') + `</div>`;
   }
   html += `<div class="qacts">` +
-    `<button class="btn submit">${item.type === 'short' ? '看参考答案' : '提交'}</button>` +
+    `<button class="btn submit">${W === 'self' ? '看参考答案' : '提交'}</button>` +
     (item.hint ? `<button class="btn soft hintbtn">💡 提示</button>` : '') +
     (opts.dontKnow ? `<button class="linkbtn dkbtn">🤔 这道题还不会</button>` : '') + `</div>` +
     `<div class="hintbox"></div><div class="fbbox"></div></div>`;
@@ -53,8 +56,8 @@ function renderItem(box, item, opts) {
   if (ans && ans.tagName === 'INPUT') ans.addEventListener('keydown', e => { if (e.key === 'Enter') $('.submit', box).click(); });
   $('.submit', box).onclick = async () => {
     const btn = $('.submit', box);
-    const answer = item.type === 'mcq' ? chosen : (ans ? ans.value : '');
-    if (item.type === 'mcq' && chosen === null) { alert('先选一个答案'); return; }
+    const answer = W === 'choice' ? chosen : (ans ? ans.value : '');
+    if (W === 'choice' && chosen === null) { alert('先选一个答案'); return; }
     btn.disabled = true;
     try {
       const res = await opts.submit(answer, undefined, Date.now() - t0);
@@ -67,7 +70,7 @@ function renderItem(box, item, opts) {
         $('.selfok', box).onclick = () => go('ok'); $('.selfno', box).onclick = () => go('no');
         return;
       }
-      if (item.type === 'mcq') $$('.opt', box).forEach(b => { if (b.dataset.i === chosen) b.classList.add(res.correct ? 'right' : 'wrong'); b.disabled = true; });
+      if (W === 'choice') $$('.opt', box).forEach(b => { if (b.dataset.i === chosen) b.classList.add(res.correct ? 'right' : 'wrong'); b.disabled = true; });
       $('.fbbox', box).innerHTML = feedback(res);
       btn.remove(); if (dk) dk.remove();
       if (res.correct) cheer(box);

@@ -12,7 +12,7 @@
 import random
 from datetime import timedelta
 
-from . import db, engine
+from . import db, engine, evidence
 from .catalog import catalog, stage_rank
 
 MAX_DEPTH = 3
@@ -189,21 +189,16 @@ def _list_hi(stage: str) -> int:
 
 
 def word_lists(user_id: int) -> list[dict]:
-    """这个孩子要摸底的词表：英语学到当前年级（含）为止的核心词；学 IGCSE 物理的再加物理术语。"""
+    """这个孩子要摸底的词表：词表声明给哪个学科（subject）或哪几套教材（packs）用，学到当前年级（含）为止。
+    比如英语核心词给所有学英语的孩子，IGCSE 物理术语只给选了剑桥物理的孩子。"""
     from .content import content
     user = db.one("SELECT grade FROM users WHERE id=?", user_id)
-    packs = {e["pack_id"] for e in _enrolls(user_id)}
-    if not any(catalog.packs[p].subject == "english" for p in packs):
-        return []
-    g = stage_rank(user["grade"] or "G3")
-    out = []
-    for wl in content.word_lists.values():
-        lo = stage_rank(wl["stage"].split("-")[0])
-        if wl["id"].startswith("en-core") and lo <= g:
-            out.append(wl)
-        elif "physics" in wl["id"] and "phy-cambridge" in packs and lo <= g:
-            out.append(wl)
-    return out
+    packs = {e["pack_id"] for e in _enrolls(user_id) if e["pack_id"] in catalog.packs}
+    subjects = {catalog.packs[p].subject for p in packs}
+    g = stage_rank(user["grade"] or catalog.default_grade)
+    return [wl for wl in content.word_lists.values()
+            if (wl.get("subject") in subjects or packs & set(wl.get("packs") or []))
+            and stage_rank(wl["stage"].split("-")[0]) <= g]
 
 
 def word_stats(user_id: int) -> dict:
@@ -292,6 +287,8 @@ def answer_word(user_id: int, word: str, list_id: str, choice, dont_know=False, 
     now = db.now()
     db.run("INSERT INTO probes(user_id,kind,kp_id,ref,reason,status,result,created_at,done_at) VALUES(?,'word',?,?,?,'done',?,?,?)",
            user_id, list_id, word, "recheck" if recheck else wl["title"], 1 if ok else 0, now, now)
+    evidence.log(user_id, "word", f"{list_id}:{word}", "answer", correct=ok, mode="probe", fmt="recall" if recheck else "choice",
+                 dont_know=dont_know)
     added = False
     if not ok:  # 不认识的词：明天开始进单词复习
         added = bool(engine.add_card(user_id, "word", w["w"], w["zh"], {"pos": w.get("pos", ""), "list": list_id, "probe": 1}))

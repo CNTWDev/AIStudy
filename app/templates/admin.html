@@ -234,7 +234,9 @@
     <div class="grow"><label>注册方式</label><select name="registration">{% for k, v in reg_modes.items() %}<option value="{{ k }}" {{ 'selected' if k == reg_mode }}>{{ v }}</option>{% endfor %}</select></div>
     <div><label>每个家长最多同时有几个邀请码</label><input type="number" name="parent_invite_limit" min="0" value="{{ site.parent_invite_limit }}" style="width:90px"></div>
   </div>
-  <p class="muted small">邀请码只用于注册家长账号；孩子账号由家长在家长页添加。保存后立即生效。</p>
+  <label>默认学习方式（家长没给孩子单独选时用这个）</label>
+  <select name="method_profile">{% for m in methods.choices() %}<option value="{{ m.id }}" {{ 'selected' if m.id == methods.site_default() }}>{{ m.name }}：{{ m.desc }}</option>{% endfor %}</select>
+  <p class="muted small">邀请码只用于注册家长账号；孩子账号由家长在家长页添加。保存后立即生效。学习方式的参数在 app/methods/profiles.toml，可以用 config/methods.toml 覆盖或新增。</p>
   <button class="btn">保存</button>
 </form>
 <div class="card">

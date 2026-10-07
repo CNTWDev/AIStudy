@@ -19,6 +19,10 @@
     {% for pr in presets %}<option value="{{ pr.id }}" data-packs='{{ pr.packs|tojson }}' {{ 'selected' if k and k.preset == pr.id }}>{{ pr.name }}</option>{% endfor %}
   </select>
   <p class="muted small" style="margin:4px 0 0">选了学校类型会把下面每门课的教材和方向自动选好，你仍然可以逐科改（比如英语用剑桥教材）。</p>
+  {% set cur_method = methods.for_user(k.id).id if k else methods.site_default() %}
+  <label>学习方式</label>
+  <select name="method" id="method">{% for m in methods.choices() %}<option value="{{ m.id }}" data-desc="{{ m.desc }}" {{ 'selected' if m.id == cur_method }}>{{ m.name }}</option>{% endfor %}</select>
+  <p class="muted small" id="method-desc" style="margin:4px 0 0"></p>
   <h2>学科与教材</h2>
   <p class="muted small">每门课选孩子学校用的教材版本就行，学段按上面的年级自动对应。之后在「学校进度」里点到学校正在教的那一课，系统据此往前补漏、往后预习。</p>
   {% for subj, packs in packs_by_subject.items() %}
@@ -36,6 +40,9 @@
   <div style="margin-top:16px"><button class="btn">保存</button> <a class="btn ghost" href="/parent">取消</a></div>
 </form>
 <script>
+// 学习方式说明：换了以后，系统会按孩子已有的学习记录重新判断掌握情况
+const _md = () => { const o = $('#method').selectedOptions[0]; $('#method-desc').textContent = o ? o.dataset.desc + '（换了以后会按已有的学习记录重新判断掌握情况。）' : ''; };
+$('#method').onchange = _md; _md();
 // 选学校类型 → 预填每门课的教材和方向（这个年级还没开、或已经学完的科目不预选，家长仍可手动选）
 $('#preset').onchange = () => {
   const o = $('#preset').selectedOptions[0]; if (!o || !o.dataset.packs) return;

@@ -3,25 +3,9 @@
 默认用临时 SQLite。要在 PostgreSQL 上跑：
   TEST_DATABASE_URL=postgresql://用户:密码@127.0.0.1/空数据库 python -m pytest -q
 """
-import os
-import tempfile
+from fastapi.testclient import TestClient
 
-os.environ["DATA_DIR"] = tempfile.mkdtemp()
-os.environ["DATABASE_URL"] = os.environ.get("TEST_DATABASE_URL") or f"sqlite:///{os.environ['DATA_DIR']}/test.db"
-os.environ["LLM_CONFIG_FILE"] = os.path.join(os.environ["DATA_DIR"], "no-llm.toml")
-os.environ["LLM_PROVIDER"] = "mock"
-os.environ["SECRET_KEY"] = "test"
-os.environ["REGISTRATION"] = "invite"
-
-if os.environ.get("TEST_DATABASE_URL"):  # 测试库每次清空重建
-    import psycopg
-    with psycopg.connect(os.environ["TEST_DATABASE_URL"], autocommit=True) as _c:
-        _c.execute("DROP SCHEMA public CASCADE")
-        _c.execute("CREATE SCHEMA public")
-
-from fastapi.testclient import TestClient  # noqa: E402
-
-from app.main import app  # noqa: E402
+from app.main import app
 
 
 def test_full_flow():
@@ -812,7 +796,7 @@ def test_evidence_model():
     # 同一天再答对两道不同题型：概率很高，但没有隔天的证据，还不算掌握
     engine.update_mastery(kid, kp, True, item=fill(1))
     assert engine.update_mastery(kid, kp, True, item=fill(2)) == "learning" and row()["score"] >= 0.85
-    assert "隔天再答对一次" in evidence.missing(dict(row()))
+    assert "隔天再答对一次" in evidence.missing(kid, dict(row()))
     # 当天反复答对，记忆稳定性几乎不涨（间隔效应）
     s_same_day = row()["stability"]
     assert s_same_day < 4
@@ -821,7 +805,7 @@ def test_evidence_model():
     ev["days"] = [(db.today() - timedelta(days=2)).isoformat()]
     two_days_ago = (db.today() - timedelta(days=2)).isoformat() + "T08:00:00"
     db.run("UPDATE mastery SET last_ev=?, evidence=? WHERE user_id=? AND kp_id=?", two_days_ago, db.jdump(ev), kid, kp)
-    assert evidence.recall(2, s_same_day) < 1
+    assert evidence.profile(kid).memory.recall(2, s_same_day) < 1
     assert engine.update_mastery(kid, kp, True, item=fill(3)) == "mastered"
     assert row()["stability"] > s_same_day * 1.5
     # 掌握后粗心错一次：概率下降，但不会直接变「薄弱」
@@ -833,7 +817,7 @@ def test_evidence_model():
     assert engine.update_mastery(kid, kp2, False, item=fill(6)) == "weak"
     # 遗忘模型：学会过、隔了很久的，排进复查
     db.run("UPDATE mastery SET last_ev=? WHERE user_id=? AND kp_id=?", "2020-01-01T08:00:00", kid, kp)
-    assert any(m["kp_id"] == kp for m in evidence.due_checks(engine.get_mastery(kid), limit=50))
+    assert any(m["kp_id"] == kp for m in evidence.due_checks(kid, engine.get_mastery(kid), limit=50))
     # 复习卡片：按稳定性排期，记得的越久间隔越长
     cid = engine.add_card(kid, "word", "evidence-test", "测试")
     r1 = engine.review_card(kid, cid, "good")
@@ -855,3 +839,34 @@ def test_evidence_model():
     assert not res["correct"] and res["answer"] == rc[0]["word"]["w"]
     known1 = next(x for x in explore.word_stats(kid)["lists"] if x["id"] == rc[0]["word"]["list"])["known"]
     assert known1 < known0 or rc[0]["word"]["list"] != lst["id"]
+
+
+def test_event_log_and_methods():
+    """学习事件表是唯一的原始记录：掌握状态能按事件重放；换学习方式会按新方式重算，计划也跟着变。"""
+    from app import db, engine, evidence, plan
+    from app.methods import methods
+    from app.main import set_method
+    kid = db.one("SELECT id FROM users WHERE email='a@x.com'")["id"]
+    n_ev = db.one("SELECT COUNT(*) AS n FROM events WHERE user_id=?", kid)["n"]
+    assert n_ev > 0
+    kinds = {r["target"] for r in db.q("SELECT DISTINCT target FROM events WHERE user_id=?", kid)}
+    assert {"kp", "card", "word"} <= kinds  # 做题、复习卡片、单词摸底都在事件表里
+    # 重放：和实时更新算出来的一样（同一个方式）
+    before = {k: (m["status"], round(m["score"], 3)) for k, m in engine.get_mastery(kid).items()}
+    db.run("UPDATE mastery SET model='' WHERE user_id=?", kid)
+    assert evidence.ensure_current() >= 1
+    after = {k: (m["status"], round(m["score"], 3)) for k, m in engine.get_mastery(kid).items()}
+    kp2 = "PHY-IG-2.1-02"
+    assert after[kp2] == before[kp2]
+    assert all(m["model"] == evidence.profile(kid).key for m in engine.get_mastery(kid).values())
+    # 推断（没有作答）不会直接变成「掌握」
+    assert engine.set_mastery(kid, "PHY-IG-2.1-03", 0.95, "mastered", "import") == "learning"
+    # 换成「先学牢再往前」：掌握标准更严，按全部记录重算；计划里不再有预习
+    assert methods.get("mastery").mastery.master_p > methods.get("balanced").mastery.master_p
+    old_key = evidence.profile(kid).key
+    assert set_method(kid, "mastery")
+    assert evidence.profile(kid).id == "mastery" and evidence.profile(kid).key != old_key
+    assert all(m["model"] == evidence.profile(kid).key for m in engine.get_mastery(kid).values())
+    assert not [t for t in plan.build_plan(kid) if t["type"] == "preview"]
+    assert set_method(kid, "balanced")
+    assert not set_method(kid, "no-such-method")

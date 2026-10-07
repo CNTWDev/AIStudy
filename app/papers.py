@@ -7,7 +7,7 @@
 import base64
 import uuid
 
-from . import bank, config, db, engine, llm
+from . import bank, config, db, engine, itemtypes, llm
 from .catalog import catalog, stage_rank
 
 MAX_IMAGES = 8
@@ -23,45 +23,8 @@ def candidates(pack_id: str, stage: str) -> list[dict]:
     return [catalog.kps[k] for k in pack.kp_ids if r - 2 <= stage_rank(catalog.kps[k]["stage"]) <= r + 1]
 
 
-def _num(v):
-    try:
-        return float(str(v).strip().rstrip("分"))
-    except (TypeError, ValueError):
-        return None
-
-
-def _normalize(q: dict) -> dict:
-    """AI 给的题目整理成 items 表的格式；答案格式不对的退化成自评题。"""
-    t = q["type"]
-    it = {k: q.get(k) for k in ("q", "zh", "options", "answer", "unit", "tol", "model", "points", "explain", "hint") if q.get(k) not in (None, "", [])}
-    if t == "mcq":
-        try:
-            a = int(q.get("answer"))
-            if not (isinstance(q.get("options"), list) and 0 <= a < len(q["options"])):
-                raise ValueError
-            it["answer"] = a
-        except (TypeError, ValueError):
-            t = "short"
-    elif t == "num":
-        if _num(q.get("answer")) is None:
-            t = "short"
-    elif t == "fill":
-        a = q.get("answer")
-        if isinstance(a, str) and a.strip():
-            it["answer"] = [a.strip()]
-        elif not (isinstance(a, list) and a):
-            t = "short"
-    if t == "short":
-        if not it.get("model"):
-            ans = q.get("answer")
-            if q["type"] == "mcq" and isinstance(q.get("options"), list):
-                ans = "；".join(q["options"]) + f"（参考：{ans}）" if ans not in (None, "") else ""
-            it["model"] = str(ans or "（AI 没有给出参考答案，请对照老师的讲评）")
-        it.pop("answer", None)
-        if not isinstance(it.get("points"), list):
-            it.pop("points", None)
-    it["type"] = t
-    return it
+_normalize = itemtypes.normalize
+_num = itemtypes._num
 
 
 def create(user_id: int, pack_id: str, *, title="", exam_date="", images=None, text="", created_by=None) -> int:

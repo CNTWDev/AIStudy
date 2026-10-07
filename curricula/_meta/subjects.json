@@ -1,0 +1,98 @@
+{
+ "_doc": "学科：名字、图标、颜色、所属领域，以及语言类学科教的是哪种语言（lang）。教材包的 subject 引用这里的 id；加学科只改这个文件。domain：language 语言 / math 数学 / science 科学 / humanities 人文 / social 社会 / computing 计算机。",
+ "subjects": [
+  {
+   "id": "chinese",
+   "name": "语文",
+   "icon": "📖",
+   "tone": "coral",
+   "domain": "language",
+   "lang": "zh"
+  },
+  {
+   "id": "english",
+   "name": "英语",
+   "icon": "🔤",
+   "tone": "sky",
+   "domain": "language",
+   "lang": "en"
+  },
+  {
+   "id": "math",
+   "name": "数学",
+   "icon": "📐",
+   "tone": "violet",
+   "domain": "math"
+  },
+  {
+   "id": "physics",
+   "name": "物理",
+   "icon": "⚡",
+   "tone": "brand",
+   "domain": "science"
+  },
+  {
+   "id": "chemistry",
+   "name": "化学",
+   "icon": "⚗️",
+   "tone": "learn",
+   "domain": "science"
+  },
+  {
+   "id": "biology",
+   "name": "生物",
+   "icon": "🌱",
+   "tone": "ok",
+   "domain": "science"
+  },
+  {
+   "id": "science",
+   "name": "科学",
+   "icon": "🔬",
+   "tone": "brand",
+   "domain": "science"
+  },
+  {
+   "id": "history",
+   "name": "历史",
+   "icon": "🏛️",
+   "tone": "warn",
+   "domain": "humanities"
+  },
+  {
+   "id": "geography",
+   "name": "地理",
+   "icon": "🌏",
+   "tone": "sky",
+   "domain": "social"
+  },
+  {
+   "id": "politics",
+   "name": "道德与法治",
+   "icon": "⚖️",
+   "tone": "coral",
+   "domain": "social"
+  },
+  {
+   "id": "economics",
+   "name": "经济",
+   "icon": "💹",
+   "tone": "warn",
+   "domain": "social"
+  },
+  {
+   "id": "it",
+   "name": "信息科技",
+   "icon": "💻",
+   "tone": "violet",
+   "domain": "computing"
+  },
+  {
+   "id": "programming",
+   "name": "编程",
+   "icon": "⌨️",
+   "tone": "violet",
+   "domain": "computing"
+  }
+ ]
+}
