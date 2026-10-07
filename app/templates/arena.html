@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}乐园 · {{ SITE }}{% endblock %}
+{% block body %}
+<h1>🎮 乐园</h1>
+<p class="lead">边玩边答题。题目按你自己的水平出，大家答对的机会一样，谁赢看专注和操作。</p>
+<div class="card"><div class="statline" style="margin:0">
+  <div><b>{{ a.xp_total }}</b><span>累计经验值</span></div>
+  <div><b>{{ (a.seconds_left / 60)|round(0, 'floor')|int }}<small> 分钟</small></b><span>今天还能玩</span></div>
+  <div><b>{{ a.week_answered }}<small> 道</small></b><span>这周答题</span></div>
+</div></div>
+{% for id, g in a.games.items() %}
+<a class="card link arena-game" href="/arena/{{ id }}">
+  <span class="arena-ico">{{ g.icon }}</span>
+  <span class="grow"><b>{{ g.name }}</b><span class="muted small">{{ g.desc }}</span></span>
+  <span class="btn">开始</span>
+</a>
+{% endfor %}
+{% if a.minutes == 0 %}<div class="hint">家长设置了暂时不玩游戏。</div>
+{% elif a.seconds_left <= 0 %}<div class="hint">今天的游戏时间用完了，明天再来！</div>{% endif %}
+{% endblock %}

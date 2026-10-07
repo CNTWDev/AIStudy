@@ -309,3 +309,7 @@ details:not(.card)>summary{cursor:pointer}
 .evline{display:flex;flex-wrap:wrap;gap:6px 14px;background:var(--line-2);border-radius:12px;padding:8px 12px;margin:0 0 12px}
 /* 题目里的代码（编程课：读代码、填代码） */
 .q pre.code{margin:8px 0;padding:10px 12px;border-radius:10px;background:var(--line-2);font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto;white-space:pre}
+/* 乐园 */
+a.card.arena-game{display:flex;align-items:center;gap:14px}.arena-game .grow{display:flex;flex-direction:column;gap:2px;min-width:0}
+.statline b small{font-size:13px;font-weight:600;color:var(--muted)}
+.arena-ico{width:56px;height:56px;border-radius:16px;background:var(--sun-2);display:flex;align-items:center;justify-content:center;font-size:30px;flex:none}

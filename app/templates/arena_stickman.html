@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ g.name }} · {{ SITE }}{% endblock %}
+{% block body %}
+<link rel="stylesheet" href="/static/arena.css">
+<div class="row sm-top"><a href="/arena" class="btn ghost sm">← 乐园</a><h1 class="grow">{{ g.icon }} {{ g.name }}</h1></div>
+<div id="sm">
+  <div class="sm-stage">
+    <div class="sm-hud">
+      <div class="sm-side"><div class="sm-name">我</div><div class="sm-bar hp me"><i></i></div><div class="sm-en"><span>⚡ <b class="sm-pe">300</b></span><div class="sm-bar en"><i></i></div><span class="sm-psp"></span></div></div>
+      <div class="sm-time">3:00</div>
+      <div class="sm-side ai"><div class="sm-name">电脑</div><div class="sm-bar hp ai"><i></i></div><div class="sm-en"><span>⚡ <b class="sm-ae">300</b></span></div></div>
+    </div>
+    <canvas width="960" height="460" aria-label="火柴人对战场地"></canvas>
+    <div class="sm-say" aria-live="polite"></div>
+    <div class="sm-start sm-over">
+      <div class="sm-panel">
+        <h2>{{ g.icon }} {{ g.name }}</h2>
+        <ul class="small">
+          <li>走路、跳、出拳都会消耗 <b>⚡能量</b>。能量快没了就点左下角 <b>答题</b>。</li>
+          <li>答对一题约 <b>+100 能量</b>，连对 3 题攒一次 <b>必杀</b>。答错冷冻 5 秒。</li>
+          <li>答题时你会进入充能姿势，受到的伤害减半。</li>
+          <li>用能量换 <b>木棍、护盾、剑、激光</b>。</li>
+          <li>题目按你自己的水平出，电脑也要答题，答对率和你一样。</li>
+        </ul>
+        <p class="muted small">电脑键盘：A / D 走，W 跳，J 出拳，L 必杀，Q 答题，1–4 买装备。</p>
+        <p class="hint small sm-rotate">把手机横过来玩，场地更大。</p>
+        {% if a.seconds_left > 0 %}<button type="button" class="btn lg block sm-go">开始（今天还能玩 {{ (a.seconds_left / 60)|round(0, 'floor')|int }} 分钟）</button>
+        {% else %}<p class="hint">{{ '家长设置了暂时不玩游戏。' if a.minutes == 0 else '今天的游戏时间用完了，明天再来！' }}</p><button type="button" class="btn lg block sm-go" hidden></button>{% endif %}
+      </div>
+    </div>
+    <div class="sm-end sm-over" hidden>
+      <div class="sm-panel"><div class="sm-sum"></div>
+        <div class="row"><button type="button" class="btn lg grow sm-again">再来一局</button><a class="btn ghost lg grow" href="/arena">回乐园</a></div></div>
+    </div>
+  </div>
+  <div class="sm-shop">{% for key, label, price in [('stick', '🪵 木棍', 200), ('shield', '🛡️ 护盾', 300), ('sword', '🗡️ 剑', 500), ('laser', '🔫 激光', 1000)] %}<button type="button" data-buy="{{ key }}" data-price="{{ price }}"><span>{{ label }}</span><small>{{ price }}</small></button>{% endfor %}</div>
+  <div class="sm-ctrl">
+    <button type="button" class="sm-quiz">✍️ 答题</button>
+    <div class="sm-pad sm-move"><button type="button" class="sm-left" aria-label="向左">◀</button><button type="button" class="sm-right" aria-label="向右">▶</button></div>
+    <div class="sm-pad sm-act"><button type="button" class="sm-jump">跳</button><button type="button" class="sm-hit">打</button><button type="button" class="sm-sp" disabled>必杀</button></div>
+  </div>
+</div>
+<script src="/static/arena.js"></script>
+<script src="/static/stickman.js"></script>
+{% endblock %}
