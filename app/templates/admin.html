@@ -213,6 +213,28 @@
 </div>
 {% endif %}
 
+{% elif tab == 'arena' %}
+{% set F = fair %}
+<div class="card">
+  <div class="card-h"><span class="ico">⚖️</span><h3>游戏公平看板（近 {{ F.days }} 天）</h3></div>
+  <p class="muted small">按孩子在学的教材里已掌握的比例分组（和游戏无关的学业水平）。出题目标是每个孩子都有约 <b>{{ F.target }}%</b> 的答对率（火柴人；闪电赛跑 {{ F.games.race }}%，星星守卫 {{ F.games.defense }}%，四选一的题再高一点）：各组「实际答对率」都接近目标、接近「预测答对率」，说明不同水平的孩子拿到的是同样有挑战、同样答得上的题。差得多的组，要看题目难度是不是估偏了。</p>
+  <table>
+    <tr class="small muted"><td>水平</td><td>孩子</td><td>答题</td><td>预测答对率</td><td>实际答对率</td><td>每分钟经验值</td><td>局数</td><td>打赢电脑</td></tr>
+    {% for r in F.rows %}
+    <tr class="small"><td>{{ r.band }}</td><td>{{ r.kids }}</td><td>{{ r.answers }}</td><td>{{ r.pred ~ '%' if r.pred is not none else '—' }}</td>
+      <td>{% if r.acc is not none %}<b>{{ r.acc }}%</b>{% else %}—{% endif %}</td><td>{{ r.xp_per_min if r.xp_per_min is not none else '—' }}</td>
+      <td>{{ r.matches }}</td><td>{{ r.win_rate ~ '%' if r.win_rate is not none else '—' }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+<div class="card">
+  <div class="card-h"><span class="ico">🎯</span><h3>题目难度校准</h3></div>
+  <p class="muted small">每个题族、每个级别的难度由所有孩子的作答在线校准（数值越大越难，0 表示中等）。作答次数少的还是先验值。</p>
+  {% if F.calib %}<table><tr class="small muted"><td>题族</td><td>级别</td><td>难度</td><td>作答</td></tr>
+    {% for c in F.calib %}<tr class="small"><td>{{ c.name }}</td><td>{{ c.level }}</td><td>{{ '%.2f'|format(c.b) }}</td><td>{{ c.n }}</td></tr>{% endfor %}</table>
+  {% else %}<p class="muted small">还没有孩子玩过。</p>{% endif %}
+</div>
+
 {% elif tab == 'log' %}
 <div class="card">
   <table>

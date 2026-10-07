@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import auth, bank, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, webpage
+from . import arena, auth, bank, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, webpage
 from .auth import LoginRequired
 from .catalog import GRADES, catalog, stage_label, stage_rank
 from .content import content
@@ -36,7 +36,8 @@ app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), 
 templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
-                             stage_rank=stage_rank)
+                             stage_rank=stage_rank, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock,
+                             GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES)
 
 
 def device_label(ua: str | None) -> str:
@@ -313,11 +314,12 @@ def kid_brief(k) -> dict:
             "cov": explore.coverage(k["id"], m), "vocab": explore.word_stats(k["id"]),
             "weak": [catalog.kp(w["kp_id"]) for w in weak[:5]], "weak_n": len(weak),
             "due": len(engine.due_cards(k["id"], 500)), "weekly": records.weekly(k["id"]),
-            "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='word'", k["id"])["n"]}
+            "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='word'", k["id"])["n"],
+            "arena": arena.parent_summary(k)}
 
 
 ADMIN_TABS = [("overview", "概览"), ("stats", "数据统计"), ("families", "家庭与孩子"), ("invites", "邀请码"),
-              ("tree", "邀请关系"), ("bank", "题库"), ("log", "安全日志"), ("system", "站点设置")]
+              ("tree", "邀请关系"), ("bank", "题库"), ("arena", "游戏公平"), ("log", "安全日志"), ("system", "站点设置")]
 
 
 @app.get("/admin", response_class=HTMLResponse)
@@ -382,6 +384,8 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
         ctx["daily"], ctx["totals"], ctx["kid_rows"] = _site_stats(users)
     elif tab == "bank":
         ctx["bank"] = bank.overview()
+    elif tab == "arena":
+        ctx["fair"] = arena.fairness()
     elif tab == "log":
         ctx["events"] = db.q("SELECT * FROM auth_events ORDER BY id DESC LIMIT 300")
     elif tab == "system":
@@ -771,6 +775,10 @@ async def kid_save(request: Request):
         except ValueError as e:
             raise HTTPException(400, str(e))
     set_method(kid_id, form.get("method") or "")
+    if form.get("game_minutes") is not None:
+        arena.set_game_minutes(kid_id, form.get("game_minutes"))
+    if form.get("game_unlock"):
+        arena.set_game_unlock(kid_id, form.get("game_unlock"))
     old = {e["pack_id"]: e["stage"] for e in enrollments(kid_id)}
     chosen = _kid_form_packs(form, grade, old, grade != old_grade)
     db.run("UPDATE enrollments SET active=0 WHERE user_id=?", kid_id)
@@ -874,7 +882,9 @@ def today(request: Request):
     me = auth.current_user(request)
     m = engine.get_mastery(k["id"])
     rec = engine.day_record(k["id"], t["day"])
-    return render(request, "today.html", manual_done=engine.MANUAL_DONE, t=t, streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
+    play = arena.status(k)
+    return render(request, "today.html", manual_done=engine.MANUAL_DONE, t=t, play=play, play_locked=arena.locked_reason(play),
+                  due=len(engine.due_cards(k["id"], 99)), streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
                   stars=engine.total_stars(k["id"]), rec=rec, auto=engine.day_summary(rec),
                   cov=explore.coverage(k["id"], m), lit=explore.lit_today(k["id"]), ahead=explore.ahead(k["id"], m),
                   vocab=explore.word_stats(k["id"]), weekly=records.weekly(k["id"]), mine=records.summary(k["id"]),
@@ -1167,6 +1177,55 @@ def api_context(request: Request, kp_id: str):
 
 
 # ================================================================== 热身：穿插以前学过的知识点和旧单词（摸底）
+
+# ================================================================== 游戏乐园（app/arena/）
+
+@app.exception_handler(arena.ArenaError)
+async def _arena_error(request: Request, exc: arena.ArenaError):
+    return JSONResponse({"error": str(exc), **exc.extra}, status_code=exc.status)
+
+
+@app.get("/arena", response_class=HTMLResponse)
+def arena_home(request: Request):
+    k = kid_or_redirect(request)
+    return render(request, "arena.html", a=arena.hub(k))
+
+
+@app.get("/arena/{game}", response_class=HTMLResponse)
+def arena_game(request: Request, game: str):
+    k = kid_or_redirect(request)
+    if game not in arena.GAMES:
+        raise HTTPException(404)
+    return render(request, "arena_game.html", g=arena.GAMES[game], game=game, a=arena.hub(k))
+
+
+@app.post("/api/arena/start")
+def arena_start(request: Request, body: dict = Body(...)):
+    return arena.start(kid_or_redirect(request), str(body.get("game") or ""), str(body.get("src") or "mix"))
+
+
+@app.post("/api/arena/avatar")
+def arena_avatar(request: Request, body: dict = Body(...)):
+    if not arena.set_avatar(kid_or_redirect(request)["id"], str(body.get("avatar") or "")):
+        raise HTTPException(400, "这个角色还没解锁")
+    return {"ok": True}
+
+
+@app.get("/api/arena/{match_id}/q")
+def arena_question(request: Request, match_id: int):
+    return arena.question(kid_or_redirect(request), match_id)
+
+
+@app.post("/api/arena/{match_id}/a")
+def arena_answer(request: Request, match_id: int, body: dict = Body(...)):
+    return arena.answer(kid_or_redirect(request), match_id, str(body.get("item_id") or ""), body.get("answer"),
+                        dont_know=bool(body.get("dont_know")))
+
+
+@app.post("/api/arena/{match_id}/end")
+def arena_end(request: Request, match_id: int, body: dict = Body(...)):
+    return arena.end(kid_or_redirect(request), match_id, str(body.get("result") or ""), body.get("stats") or {})
+
 
 @app.get("/warmup", response_class=HTMLResponse)
 def warmup_page(request: Request):

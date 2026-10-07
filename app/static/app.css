@@ -29,6 +29,22 @@ box-shadow:var(--shadow-lg);display:flex;justify-content:space-between;padding:6
 nav.tabs a{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:12px;color:var(--muted);padding:6px 4px;border-radius:16px;transition:background .2s,color .2s}
 nav.tabs a .i{font-size:22px;line-height:1.15;transition:transform .2s}nav.tabs a:hover{background:var(--line-2)}
 nav.tabs a.on{color:var(--brand);font-weight:700;background:var(--brand-2)}nav.tabs a.on .i{transform:translateY(-1px) scale(1.08)}
+/* 中间凸起的「乐园」：学习之后的奖励，一眼能找到 */
+nav.tabs a.play{position:relative;overflow:visible;color:#6d4fd8;font-weight:700}
+nav.tabs a.play .i{width:52px;height:52px;margin:-26px 0 1px;display:grid;place-items:center;font-size:27px;border-radius:50%;
+background:linear-gradient(145deg,#ffd76a,#ff8fb1 55%,#9b7bff);box-shadow:0 6px 16px rgba(109,79,216,.35),0 0 0 4px var(--card)}
+nav.tabs a.play:hover{background:transparent}nav.tabs a.play:hover .i{transform:translateY(-2px) rotate(-6deg)}
+nav.tabs a.play.on{background:transparent}nav.tabs a.play.on .i{transform:translateY(-3px) scale(1.06)}
+/* 今天页：复习、单词本、乐园的快捷入口 */
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 14px}
+.quick a{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:18px;background:var(--card);border:1px solid var(--line);color:var(--ink);box-shadow:var(--shadow);min-width:0}
+.quick a .qi{font-size:26px;line-height:1}.quick a b{display:block;font-size:15px}.quick a small{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quick a.qplay{background:linear-gradient(135deg,#fff3c4,#ffe0ec 60%,#e9e0ff);border-color:#e6d6ff}
+.quick a.qplay.lock{filter:saturate(.55)}.quick a.qplay .pbar{display:block;height:5px;border-radius:9px;background:rgba(0,0,0,.08);margin-top:4px;overflow:hidden}
+.quick a.qplay .pbar i{display:block;height:100%;background:#9b7bff;border-radius:9px}
+@media (max-width:560px){.quick{grid-template-columns:1fr 1fr}.quick a.qplay{grid-column:1/-1}}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .quick a.qplay{background:linear-gradient(135deg,#3a3320,#3a2430 60%,#2c2547);border-color:#4a3d6b}}
+:root[data-theme=dark] .quick a.qplay{background:linear-gradient(135deg,#3a3320,#3a2430 60%,#2c2547);border-color:#4a3d6b}
 /* 文字 */
 h1{font-size:26px;line-height:1.3;margin:14px 0 6px;font-weight:800;letter-spacing:.3px}h2{font-size:20px;margin:28px 0 10px;font-weight:750}h3{font-size:17px;margin:16px 0 8px;font-weight:700}
 .muted{color:var(--muted)}.small{font-size:14px}.tiny{font-size:12px}.faint{color:var(--faint)}
@@ -309,3 +325,7 @@ details:not(.card)>summary{cursor:pointer}
 .evline{display:flex;flex-wrap:wrap;gap:6px 14px;background:var(--line-2);border-radius:12px;padding:8px 12px;margin:0 0 12px}
 /* 题目里的代码（编程课：读代码、填代码） */
 .q pre.code{margin:8px 0;padding:10px 12px;border-radius:10px;background:var(--line-2);font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto;white-space:pre}
+/* 乐园 */
+a.card.arena-game{display:flex;align-items:center;gap:14px}.arena-game .grow{display:flex;flex-direction:column;gap:2px;min-width:0}
+.statline b small{font-size:13px;font-weight:600;color:var(--muted)}
+.arena-ico{width:56px;height:56px;border-radius:16px;background:var(--sun-2);display:flex;align-items:center;justify-content:center;font-size:30px;flex:none}

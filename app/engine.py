@@ -137,8 +137,9 @@ def answer_display(it: dict) -> str:
 
 
 def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, correct: bool, answer="", dont_know=False,
-                   touch=True, ms=None):
-    """dont_know=True：孩子点了「这道题还不会」。算一次没答对，但掌握度只轻微下调，并把讲解放进错题本。"""
+                   touch=True, ms=None, weight=1.0):
+    """dont_know=True：孩子点了「这道题还不会」。算一次没答对，但掌握度只轻微下调，并把讲解放进错题本。
+    weight：这条证据的分量（游戏里限时作答记 0.5，见 app/arena/sources.py）。"""
     try:
         ms = int(ms) if ms and 500 <= int(ms) <= 30 * 60000 else None  # 做题用时（毫秒），太短/太长的不算
     except (TypeError, ValueError):
@@ -146,10 +147,10 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
     db.run("INSERT INTO attempts(user_id,item_id,kp_id,mode,correct,answer,dont_know,ms,created_at) VALUES(?,?,?,?,?,?,?,?,?)",
            user_id, item["id"] if item else None, kp_id, mode, 1 if correct else 0, str(answer)[:500],
            1 if dont_know else 0, ms, db.now())
-    if item and item.get("id"):
-        bank.record(item["id"], correct, dont_know, ms)
+    if item and item.get("id"):  # 游戏里限时作答，用时不算进题目的平均用时
+        bank.record(item["id"], correct, dont_know, None if mode == "game" else ms)
     # 诊断、摸底答对也只是一条证据：概率升高，要隔天换题再对才算掌握
-    status = update_mastery(user_id, kp_id, correct, source=mode, item=item, dont_know=dont_know)
+    status = update_mastery(user_id, kp_id, correct, weight=weight, source=mode, item=item, dont_know=dont_know)
     if correct and status in ("mastered", "learning"):  # 别的教材里同一概念、还没测过的：推断为「学习中」
         infer_equivalents(user_id, kp_id)
     if item and not correct and mode in ("practice", "diagnose", "probe", "paper", "exam"):
