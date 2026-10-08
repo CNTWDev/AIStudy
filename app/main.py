@@ -40,7 +40,8 @@ templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
                              stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock,
-                             GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES)
+                             GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES,
+                             trend_words=records.trend_words)
 templates.env.globals.update(MASCOTS=brand.MASCOTS, mascot_of=brand.mascot_of, mascot_chosen=brand.has_chosen, mascot_svg=brand.mascot_svg,
                              wordmark_svg=brand.wordmark_svg)
 # 样式和脚本的地址带上文件修改时间，升级后浏览器不会继续用缓存里的旧版本
@@ -342,7 +343,7 @@ def kid_brief(k) -> dict:
             "weak": [catalog.kp(w["kp_id"]) for w in weak[:5]], "weak_n": len(weak),
             "due": len(engine.due_cards(k["id"], 500)), "weekly": records.weekly(k["id"]),
             "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='word'", k["id"])["n"],
-            "arena": arena.parent_summary(k)}
+            "arena": arena.parent_summary(k), "trend": records.accuracy_trend(k["id"], 14)}
 
 
 ADMIN_TABS = [("overview", "概览"), ("stats", "数据统计"), ("families", "家庭与孩子"), ("invites", "邀请码"),
@@ -1985,7 +1986,7 @@ def _records_ctx(k):
                          "AND m.role='user' WHERE t.user_id=? ORDER BY m.id DESC LIMIT 20", k["id"]),
             "papers": [{**dict(p), "rep": db.jload(p["report"], {})} for p in
                        db.q("SELECT * FROM papers WHERE user_id=? ORDER BY id DESC LIMIT 20", k["id"])],
-            "tot": tot, "mistakes": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='mistake'", k["id"])["n"],
+            "tot": tot, "trend": records.accuracy_trend(k["id"]), "mistakes": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='mistake'", k["id"])["n"],
             "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='word'", k["id"])["n"]}
 
 

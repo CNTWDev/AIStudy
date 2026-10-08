@@ -1,0 +1,34 @@
+{# 每天的做题正确率曲线：tr 来自 records.accuracy_trend()。点 = 那一天，粗线 = 近 7 天合起来的平均。
+   坐标是百分比：图随宽度铺开，手机上字不会缩小。 #}
+{% macro plot(s, tr, link=True, mini=False) %}
+<div class="tplot {{ 'mini' if mini }}">
+  {% if not mini %}{% for g in s.grid %}<div class="gl {{ 'g80' if g.v == 80 }}" style="top:{{ g.y }}%"><span>{{ g.v }}%</span></div>{% endfor %}
+  {% else %}{% for g in s.grid if g.v == 80 %}<div class="gl g80" style="top:{{ g.y }}%"></div>{% endfor %}{% endif %}
+  <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">{% for a in s.avg %}<polyline points="{{ a }}" vector-effect="non-scaling-stroke"/>{% endfor %}</svg>
+  {% for p in s.pts %}{% set tip = p.day[5:] ~ '：做了 ' ~ p.n ~ ' 题，对 ' ~ p.ok ~ ' 题，正确率 ' ~ p.acc ~ '%' ~ ('（题少，参考就好）' if p.few else '') %}
+  <{{ 'a href="/day/' ~ p.day ~ '"' if link else 'span' }} class="pt {{ 'few' if p.few }}" style="left:{{ p.x }}%;top:{{ p.y }}%" title="{{ tip }}" aria-label="{{ tip }}"></{{ 'a' if link else 'span' }}>{% endfor %}
+  {% if not mini %}{% for lb in tr.labels %}<span class="xl" style="left:{{ lb.x }}%">{{ lb.text }}</span>{% endfor %}{% endif %}
+</div>
+{% endmacro %}
+
+{% macro accuracy(tr, link=True) %}
+{% set multi = tr.series|length > 1 %}
+<div class="card trend" id="acc-trend">
+  <div class="card-h"><span class="ico">📈</span><h3>每天的正确率 <span class="muted small" style="font-weight:400">近 {{ tr.days }} 天 · 只跟自己比</span></h3></div>
+  {% if multi %}<div class="seg" role="radiogroup" aria-label="选学科" style="margin-bottom:8px">
+    {% for s in tr.series %}<label><input type="radio" name="acc-subj" value="{{ s.key }}" {{ 'checked' if loop.first }} onchange="accTrend(this.value)"><span>{{ s.name }}</span></label>{% endfor %}
+  </div>{% endif %}
+  {% for s in tr.series %}
+  <div class="trend-pane" data-key="{{ s.key }}" {{ 'hidden' if not loop.first }}>
+    <p class="small" style="margin:2px 0 10px">{{ trend_words(s) }}</p>
+    {{ plot(s, tr, link) }}
+  </div>
+  {% endfor %}
+  <div class="legend trend-leg"><span><i class="pt-i"></i>每天</span><span><i class="pt-i few"></i>那天不到 {{ tr.min }} 题</span><span><i class="avg-i"></i>近 7 天平均</span><span><i class="g80-i"></i>80%</span></div>
+  <p class="tiny faint" style="margin:6px 0 0">学新内容的日子正确率低一点很正常；看粗线的走向比看某一天更有用。乐园和冲刺里的限时题不算在内。</p>
+</div>
+{% if multi %}<script>function accTrend(k){document.querySelectorAll('#acc-trend .trend-pane').forEach(function(p){p.hidden=p.dataset.key!==k})}</script>{% endif %}
+{% endmacro %}
+
+{# 家长页用的小曲线：只画每天的点和近 7 天平均线 #}
+{% macro spark(tr) %}{{ plot(tr.series[0], tr, False, True) }}{% endmacro %}

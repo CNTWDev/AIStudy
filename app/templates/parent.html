@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_trend.html" as trend_ui %}
 {% block body %}
 <div class="row"><h1 class="grow">家长页</h1><a class="btn ghost" href="/invite">邀请亲友</a> <a class="btn" href="/parent/kids/new">＋ 添加孩子</a></div>
 {% if not llm_enabled() %}<div class="hint">提示：服务器还没有配置 AI 密钥。诊断、练习（现成题库）、复习、记录都能用；查词、讲解、AI 出题和 AI 短文需要配置后才能用（见 docs/DEPLOY.md）。</div>{% endif %}
@@ -31,6 +32,7 @@
     {% if k.vocab.estimate %} · 英语核心词约 {{ k.vocab.estimate }} 个{% endif %}
     <br><span class="muted">系统每天在热身和练习里穿插几道以前的题，慢慢摸清，不用专门考试。</span></p>{% endif %}
   {% if k.arena.week_answered or k.arena.week_minutes %}<p class="small" style="margin:6px 0">🎮 乐园本周：玩了 {{ k.arena.week_minutes }} 分钟，答题 {{ k.arena.week_answered }} 道（对 {{ k.arena.week_right }} 道）{% if k.arena.week_focus %}，专注指数 {{ k.arena.week_focus }}{% endif %} · 乐园 Lv.{{ k.arena.level }}，贴纸 {{ k.arena.stickers }} 张 · 每天 {{ '不玩' if k.arena.minutes == 0 else k.arena.minutes ~ ' 分钟' }}，{{ k.arena.rule }}</p>{% endif %}
+  {% if k.trend %}<div class="trend-mini"><p class="small" style="margin:6px 0 4px">📊 {{ trend_words(k.trend.series[0]) }} · <a href="/parent/kids/{{ k.u.id }}#acc-trend">看每天的曲线 →</a></p>{{ trend_ui.spark(k.trend) }}</div>{% endif %}
   {% if k.weekly %}<p class="small" style="margin:6px 0">📈 上周进步（{{ k.weekly.from[5:] }}~{{ k.weekly.to[5:] }}）：{{ k.weekly.lines|join('；') }}</p>{% endif %}
   {% if k.insights %}<div style="margin-top:8px"><b class="small">🔍 系统发现</b>
     {% for f in k.insights %}<div class="finding sev{{ f.severity }}"><b class="small">{{ f.title }}</b>{% if not f.for_kid %} <span class="pill">只给家长看</span>{% endif %}<div class="small muted">{{ f.detail }}</div></div>{% endfor %}</div>{% endif %}
