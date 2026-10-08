@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 
-def test_full_flow():
+def test_full_flow(monkeypatch):
     with TestClient(app) as c:
         assert c.get("/healthz").json()["kps"] > 500
         r = c.get("/login")
@@ -72,7 +72,8 @@ def test_full_flow():
         # 复习卡片（错题 + 术语）
         due = c.get("/api/review/due").json()["cards"]
         # 卡片明天才到期，这里直接把它们设为今天
-        from app import db
+        from app import db, engine, streak
+        monkeypatch.setattr(streak, "RULE_FROM", "2000-01-01")   # 不依赖新规则的生效日期
         db.run("UPDATE cards SET due=?", db.today().isoformat())
         due = c.get("/api/review/due").json()["cards"]
         assert due
@@ -95,7 +96,15 @@ def test_full_flow():
         # 学习时长自动计时：心跳累计秒数（一次最多 75 秒），不再手填
         assert c.post("/api/beat", json={"s": 40}).json()["minutes"] == 1
         assert c.post("/api/beat", json={"s": 9999}).json()["minutes"] == 2
-        assert c.post("/api/checkin", json={"reflection": "学会了量筒读数", "minutes": 40}).json()["streak"] == 1
+        # 连续天数按保底算：只打卡、开着页面不算，做完第 1 节才算
+        assert c.post("/api/checkin", json={"reflection": "学会了量筒读数", "minutes": 40}).json()["streak"] == 0
+        kid_id = db.one("SELECT id FROM users WHERE email='a@x.com'")["id"]
+        first = streak.sections(engine.today_plan(kid_id)["plan"])[0]
+        for i in first["tasks"]:
+            engine.mark_task(kid_id, engine.today_plan(kid_id)["plan"][i]["id"])
+        assert engine.streak(kid_id) == 1
+        for i in first["tasks"]:   # 还原，后面的测试要用今天的清单
+            engine.mark_task(kid_id, engine.today_plan(kid_id)["plan"][i]["id"], done=False)
         assert db.one("SELECT minutes FROM days WHERE user_id=(SELECT id FROM users WHERE email='a@x.com')")["minutes"] == 2
         assert "今天学到的" in c.get("/today").text
         assert "学会了量筒读数" in c.get("/records").text

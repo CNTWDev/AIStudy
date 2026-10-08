@@ -3,10 +3,13 @@ import json
 from datetime import date, timedelta
 
 from . import bank, db, evidence, itemtypes, llm
+from . import streak as _streak
 from .catalog import catalog, stage_rank
 
 # ------------------------------------------------------------------ 掌握度
 
+# 游戏和冲刺里的快题：答得快慢受玩法影响，不进题目的用时统计，也不参与「做得慢」的发现
+QUICK_MODES = ("game", "sprint")
 STATUS_LABEL = {"unknown": "未测", "weak": "薄弱", "learning": "学习中", "mastered": "已掌握"}
 
 
@@ -148,7 +151,7 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
            user_id, item["id"] if item else None, kp_id, mode, 1 if correct else 0, str(answer)[:500],
            1 if dont_know else 0, ms, db.now())
     if item and item.get("id"):  # 游戏里限时作答，用时不算进题目的平均用时
-        bank.record(item["id"], correct, dont_know, None if mode == "game" else ms)
+        bank.record(item["id"], correct, dont_know, None if mode in QUICK_MODES else ms)
     # 诊断、摸底答对也只是一条证据：概率升高，要隔天换题再对才算掌握
     status = update_mastery(user_id, kp_id, correct, weight=weight, source=mode, item=item, dont_know=dont_know)
     if correct and status in ("mastered", "learning"):  # 别的教材里同一概念、还没测过的：推断为「学习中」
@@ -649,22 +652,17 @@ def badges(n: int) -> dict:
 
 
 def total_stars(user_id: int) -> int:
-    """⭐ = 完成的任务数（只看做没做，不看对错）。"""
+    """⭐ = 完成的任务数（只看做没做，不看对错）+ 冲刺分换的星（每天每 10 分一颗，见 app/sprint.py）。"""
+    from . import sprint
     n = 0
     for r in db.q("SELECT plan FROM days WHERE user_id=?", user_id):
         n += sum(1 for t in db.jload(r["plan"], []) if t.get("done"))
-    return n
+    return n + sum(sprint.stars_by_day(user_id).values())
 
 
 def streak(user_id: int) -> int:
-    days = {r["day"] for r in db.q("SELECT day FROM days WHERE user_id=? AND (checked_in=1 OR minutes>0)", user_id)}
-    d, n = db.today(), 0
-    if d.isoformat() not in days:
-        d -= timedelta(days=1)
-    while d.isoformat() in days:
-        n += 1
-        d -= timedelta(days=1)
-    return n
+    """连续天数：每天做完保底（第 1 节）算一天，补签卡能补上漏掉的日子。规则在 app/streak.py。"""
+    return _streak.streak(user_id)
 
 
 def pack_summary(user_id: int, pack_id: str, mastery=None) -> dict:
@@ -685,6 +683,7 @@ def calendar(user_id: int, weeks=8, full_weeks=False) -> list[dict]:
     else:
         start = today - timedelta(days=weeks * 7 - 1)
     rows = {r["day"]: r for r in db.q("SELECT * FROM days WHERE user_id=? AND day>=?", user_id, start.isoformat())}
+    frozen = _streak.frozen_days(user_id, start.isoformat())
     out = []
     for i in range(weeks * 7):
         dt = start + timedelta(days=i)
@@ -696,7 +695,7 @@ def calendar(user_id: int, weeks=8, full_weeks=False) -> list[dict]:
         checked = bool(r and r["checked_in"])
         out.append({"day": d, "wd": "一二三四五六日"[dt.weekday()], "wi": dt.weekday(), "dn": dt.day, "month": dt.month,
                     "minutes": m, "checked": checked, "done": done, "total": len(plan),
-                    "future": dt > today, "today": dt == today,
+                    "future": dt > today, "today": dt == today, "frozen": d in frozen,
                     "level": 4 if m >= 60 else 3 if m >= 40 else 2 if m >= 20 else 1 if (m > 0 or checked or done) else 0})
     return out
 

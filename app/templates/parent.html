@@ -17,7 +17,7 @@
     <a class="btn ghost sm" href="/parent/kids/{{ k.u.id }}/edit">资料与密码</a>
   </div>
   {% set done = k.today.plan|selectattr('done')|list|length %}
-  <p>今天：完成 <b>{{ done }}/{{ k.today.plan|length }}</b> 项，学习约 <b>{{ k.today.minutes }}</b> 分钟 · 连续 <b>{{ k.streak }}</b> 天 · 本周 {{ k.week_min }} 分钟 · 待复习 {{ k.due }} 张</p>
+  <p>今天：完成 <b>{{ done }}/{{ k.today.plan|length }}</b> 项，学习约 <b>{{ k.today.minutes }}</b> 分钟 · 连续 <b>{{ k.streak }}</b> 天{% if k.cards %}（补签卡 {{ k.cards }} 张）{% endif %} · 本周 {{ k.week_min }} 分钟{% if k.sprint_week %}，冲刺 {{ k.sprint_week }} 分{% endif %} · 待复习 {{ k.due }} 张</p>
   {% for p in k.packs %}
   {% set s = p.sum %}
   <div style="margin:10px 0">

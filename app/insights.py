@@ -65,7 +65,7 @@ def detect(user_id: int) -> list[dict]:
                         "title": f"「{_name(r['kp_id'])}」问了 {r['n']} 次", "detail": "说明这里还有点糊涂，安排一次专门的练习"})
 
     # 4. 做对了但很慢：会，但还不熟练
-    oks = [a for a in att if a["correct"] and a["ms"] and a["mode"] != "game"]  # 游戏里限时作答，不看快慢
+    oks = [a for a in att if a["correct"] and a["ms"] and a["mode"] not in engine.QUICK_MODES]  # 游戏、冲刺里的快题不看快慢
     if len(oks) >= 5:
         med = sorted(a["ms"] for a in oks)[len(oks) // 2]
         by_kp = defaultdict(list)
