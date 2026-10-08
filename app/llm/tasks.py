@@ -24,7 +24,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"items": 2, "teach": 2, "context": 1, "passage": 1}
+PROMPT_VERSION = {"items": 2, "teach": 2, "context": 1, "passage": 1, "variant": 1, "verify": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -73,6 +73,37 @@ def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=
     return [{**itemtypes.normalize(i), "difficulty": i.get("difficulty", 2), **({"kp_ids": i["kp_ids"]} if i.get("kp_ids") else {})}
             for i in items
             if isinstance(i, dict) and i.get("q") and i.get("type") in itemtypes.TYPES]
+
+
+def solve_item(item: dict, pack, grade: str) -> dict:
+    """校对答案：不给参考答案，让 AI 自己独立做一遍（可以在 config/llm.toml 的 [tasks.verify] 指定另一个模型）。"""
+    from .. import itemtypes
+    t = itemtypes.of(item)
+    fmt = {"mcq": "answer 为你选的选项下标（从 0 开始的整数）", "num": "answer 为数值（不带单位）",
+           "fill": "answer 为要填的内容（字符串）"}.get(item["type"], "answer 为你的答案")
+    opts = "".join(f"\n{i}. {o}" for i, o in enumerate(item.get("options") or [])) if item["type"] == "mcq" else ""
+    code = f"\n代码：\n{item['code']}" if item.get("code") else ""
+    user = (f"{_audience(grade, pack)}\n请认真独立地做下面这道{t.label}，一步步想清楚再给答案。\n题目：{item['q']}{code}{opts}\n\n"
+            "如果题目本身有错、条件不够、或者不止一个正确答案，ok 填 false，并在 problem 里一句话说明。\n"
+            f'输出格式：{{"answer": ..., "ok": true, "problem": "", "why": "一句话思路"}}，其中 {fmt}。')
+    data = ask_json("verify", "你是严谨的出题审校老师。", user, effort="medium", max_tokens=1500, cache=False)
+    return data if isinstance(data, dict) else {}
+
+
+def make_variant(item: dict, kp: dict, pack, grade: str) -> dict | None:
+    """把家里拍的卷子上的一道题改编成一道新题：考同一个知识点、难度相当，但换掉数字、情境和说法，不照抄原题。"""
+    from .. import itemtypes
+    user = (f"{_audience(grade, pack)}\n知识点：{kp['name']}\n下面是一道学校卷子上的原题（{itemtypes.of(item).label}）：\n{item['q']}\n"
+            + ("".join(f"{'ABCDEFGH'[i]}. {o}  " for i, o in enumerate(item.get("options") or [])) + "\n" if item.get("options") else "")
+            + "\n请改编成一道新题：考同一个知识点、同样的思路和难度，但换掉数字、人名、情境和措辞，不要照抄原题的句子。"
+            "能自动判分的尽量用 mcq/num/fill。答案必须正确且唯一，请自己再做一遍检查。\n"
+            f"输出格式：{_item_schema()}（只出 1 道）")
+    data = ask_json("variant", _tutor(grade) + "你也是严谨的出题人。", user, effort="medium", cache=False)
+    items = data.get("items", []) if isinstance(data, dict) else data
+    for i in items or []:
+        if isinstance(i, dict) and i.get("q") and i.get("type") in itemtypes.TYPES:
+            return {**itemtypes.normalize(i), "difficulty": i.get("difficulty", 2)}
+    return None
 
 
 def teach(kp: dict, pack, grade: str, user_id=None, known: list[str] | None = None) -> dict:

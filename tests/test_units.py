@@ -165,3 +165,12 @@ def test_adult_learner_prompts_and_fund_pack():
     kps = [catalog.kps[k] for k in pack.kp_ids]
     assert len(kps) > 100 and {k["req"] for k in kps} == {"掌握", "理解", "了解"}
     assert all(k["hot"] == (k["req"] == "掌握") for k in kps)
+
+
+def test_bankflow_helpers():
+    from app import bankflow
+    a = bankflow.skeleton({"q": "小明有 3 个苹果，又买了 5 个，一共几个？"})
+    b = bankflow.skeleton({"q": "小明有 12 个苹果，又买了 7 个，一共几个?"})
+    c = bankflow.skeleton({"q": "长方形的面积怎么算？"})
+    assert a == b and bankflow.similar(a, c) < bankflow.SIM
+    assert [bankflow.level_of(x) for x in (-3, -1, 0, 1, 3)] == [1, 2, 3, 4, 5]

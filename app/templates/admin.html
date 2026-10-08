@@ -178,6 +178,27 @@
 <p class="muted small" style="margin-bottom:0">AI 现场生成的题目、讲解、背景和短文都会存进来，以后先用库里的，不够才再生成。题目来源：{% for k, v in B.by_source.items() %}{{ {'ai': 'AI 出题', 'seed': '内置', 'paper': '试卷导入', 'bank': '卷库'}.get(k, k) }} {{ v }}{{ '，' if not loop.last }}{% endfor %}。
   <a href="/admin/bank/export.json">导出整个题库（JSON）</a>，不含孩子的作答记录、试卷原题和卷库的题。</p></div>
 
+{% set F2 = flow %}
+<div class="card">
+  <div class="card-h"><span class="ico">⚙️</span><h3>题库流水线</h3></div>
+  <p class="muted small">后台每 15 分钟自动跑一小批，不用人管：家里拍的卷子（家长同意分享的）由 AI 改编成新题，校对通过才进公共题库；
+  AI 不看答案独立做一遍来校对，对不上的暂停使用、出现在下面「被标记有问题」里；换了数字的同一道题归成一组，不当新题出；
+  做的人够多以后按真实作答校准难度（1 很容易 … 5 很难），只用来给每个人配合适的题。每天最多调用 AI {{ F2.ai_limit }} 次（今天 {{ F2.ai_today }} 次）。</p>
+  <div class="statline" style="margin:0">
+    <div><b>{{ F2.verified }}</b><span>道已校对</span></div>
+    <div><b>{{ F2.todo }}</b><span>道待校对</span></div>
+    <div><b>{{ F2.held }}</b><span>道校对没过</span></div>
+    <div><b>{{ F2.variants }}</b><span>道卷子改编题</span></div>
+    <div><b>{{ F2.pending }}</b><span>道改编待校对</span></div>
+    <div><b>{{ F2.groups }}</b><span>个同型组</span></div>
+    <div><b>{{ F2.calibrated }}</b><span>道按作答定了难度</span></div>
+  </div>
+  {% if F2.levels %}<p class="small">难度分布：{% for lv in [1, 2, 3, 4, 5] %}{{ lv }} 级 {{ F2.levels.get(lv, 0) }}{{ '，' if not loop.last }}{% endfor %}</p>{% endif %}
+  <form method="post" action="/admin/bank/maintain" class="row small" style="margin-top:6px">
+    <button class="btn sm soft">现在跑一轮</button>
+    <span class="muted">{% if F2.last_run %}上次 {{ F2.last_run[:16]|replace('T', ' ') }}{% else %}还没跑过{% endif %}</span></form>
+</div>
+
 {% if B.review or B.review_contents %}
 <div class="card">
   <div class="card-h"><span class="ico">🚩</span><h3>被标记有问题，暂停使用（{{ B.review|length + B.review_contents|length }}）</h3></div>

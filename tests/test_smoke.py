@@ -1030,3 +1030,92 @@ def test_bank_papers_admin_import_and_mock():
         assert rows[0]["item_id"] not in {r["id"] for r in bank.candidates(kid["id"], kp)}
         assert "已下架" in c.get("/admin?tab=papers").text
         c.get("/logout")
+
+
+def test_bank_pipeline(monkeypatch):
+    """题库流水线：家里的卷子改编入库（先待校对）、AI 独立校对答案、同型题分组、按作答校准难度、出题小帮手贴纸；
+    多个进程只跑一份。"""
+    from app import bank, bankflow, db, engine
+    from app.arena import awards
+    from app.catalog import catalog
+    with TestClient(app) as c:
+        mom = db.one("SELECT * FROM users WHERE email='mom@x.com'")
+        c.post("/login", data={"email": "mom@x.com", "password": "secret1"})
+        assert 'name="shared"' in c.get("/papers").text
+        r = c.post("/api/papers", data={"pack_id": "fund-law", "title": "单元测验", "text": "第一题……" * 5})
+        pid = r.json()["id"]
+        assert db.one("SELECT shared FROM papers WHERE id=?", pid)["shared"] == 1  # 默认同意分享
+        r = c.post("/api/papers", data={"pack_id": "fund-law", "title": "不分享", "text": "第一题……" * 5, "share_choice": "1"})
+        assert db.one("SELECT shared FROM papers WHERE id=?", r.json()["id"])["shared"] == 0
+        c.get("/logout")
+
+        # 改编入库 + 校对：AI 独立做出来和参考答案一样 → 进公共题库（别的测试里的卷子先设成不分享）
+        db.run("UPDATE papers SET shared=0 WHERE user_id<>?", mom["id"])
+        monkeypatch.setattr(bankflow.llm, "solve_item", lambda it, pack, grade: {"answer": it.get("answer"), "ok": True})
+        res = bankflow.run_once(force=True)
+        assert res["variants"]["made"] == 1, res  # 两道题改编出来一样的，只存一份
+        v = db.one("SELECT * FROM items WHERE source='variant'")
+        assert v["status"] == "active" and v["verified"] == 1 and v["contributor_id"] == mom["id"] and v["variant_of"]
+        src = db.one("SELECT p.shared FROM items i JOIN paper_items pi ON pi.item_id=i.id JOIN papers p ON p.id=pi.paper_id "
+                     "WHERE i.id=?", v["variant_of"])
+        assert src["shared"] == 1
+        assert bankflow.run_once(force=True)["variants"]["tried"] == 0  # 改编过的不再改编
+
+        # 校对没过：暂停使用，进管理后台「被标记有问题」并写明原因
+        kp = catalog.ids_for("fund-law")[0]
+        bad = bank.save_items(kp, [{"type": "num", "q": "基金份额 100 份，每份净值 1.5 元，资产净值多少元？", "answer": 150}])[0]
+        monkeypatch.setattr(bankflow.llm, "solve_item", lambda it, pack, grade: {"answer": 15, "ok": True})
+        bankflow.verify_batch()
+        row = db.one("SELECT * FROM items WHERE id=?", bad["id"])
+        assert row["status"] == "review" and row["verified"] == -1 and "对不上" in row["verify_note"]
+        weird = bank.save_items(kp, [{"type": "fill", "q": "基金的____", "answer": ["x"]}])[0]
+        monkeypatch.setattr(bankflow.llm, "solve_item", lambda it, pack, grade: {"answer": "", "ok": False, "problem": "条件不够"})
+        bankflow.verify_batch()
+        assert "条件不够" in db.one("SELECT verify_note FROM items WHERE id=?", weird["id"])["verify_note"]
+
+        # 同型题：换了数字的同一道题归一组；一次不出同组两道，做过一道后另一道不算新题
+        a, b2, other = bank.save_items(kp, [
+            {"type": "num", "q": "某基金持有 300 万元股票，占净值 30%，基金净值多少万元？", "answer": 1000},
+            {"type": "num", "q": "某基金持有 450 万元股票，占净值 15%，基金净值多少万元？", "answer": 3000},
+            {"type": "mcq", "q": "下列哪项属于基金托管人的职责？", "options": ["选股", "保管基金资产", "销售", "投研"], "answer": 1}])
+        na = db.one("SELECT near_key FROM items WHERE id=?", a["id"])["near_key"]
+        assert na == db.one("SELECT near_key FROM items WHERE id=?", b2["id"])["near_key"]
+        assert na != db.one("SELECT near_key FROM items WHERE id=?", other["id"])["near_key"]
+        db.run("UPDATE items SET verified=1 WHERE kp_id=?", kp)
+        got = [x["id"] for x in engine.items_for(mom["id"], kp, n=20)]
+        assert not (a["id"] in got and b2["id"] in got)
+        engine.record_attempt(mom["id"], a, kp, "practice", False, "1")
+        got = [x["id"] for x in engine.items_for(mom["id"], kp, n=20)]
+        done = {r["item_id"] for r in db.q("SELECT item_id FROM attempts WHERE user_id=?", mom["id"])}
+        fresh = [x for x in got if x not in done and x != b2["id"]]
+        assert b2["id"] in got and a["id"] not in got  # 做错的组：先出换了数字的那道，不是原题
+        assert got.index(b2["id"]) == len(fresh)  # 排在真正没见过的题后面、重做的题前面
+
+        # 难度校准：要看是谁做的
+        users = [db.insert("INSERT INTO users(email,name,role,grade,created_at,pw_hash) VALUES(?,?,?,?,?,?)",
+                           f"cal{i}@x.com", f"cal{i}", "kid", "ADULT", db.now(), "x") for i in range(4)]
+        for u in users:
+            for _ in range(3):
+                db.run("INSERT INTO attempts(user_id,item_id,kp_id,mode,correct,answer,dont_know,created_at) VALUES(?,?,?,?,?,?,?,?)",
+                       u, other["id"], kp, "practice", 0, "0", 0, db.now())
+                db.run("INSERT INTO attempts(user_id,item_id,kp_id,mode,correct,answer,dont_know,created_at) VALUES(?,?,?,?,?,?,?,?)",
+                       u, v["id"], kp, "practice", 1, "2", 0, db.now())
+        assert bankflow.calibrate() >= 2
+        lv_hard = db.one("SELECT level FROM items WHERE id=?", other["id"])["level"]
+        lv_easy = db.one("SELECT level FROM items WHERE id=?", v["id"])["level"]
+        assert lv_hard > lv_easy and 1 <= lv_easy and lv_hard <= 5
+        # 别的同学练了 12 次改编题 → 出题小帮手
+        assert bankflow.contributed(mom["id"]) == {"items": 1, "uses": 12}
+        assert "helper" in awards.learning_keys(mom["id"])
+        c.post("/login", data={"email": "mom@x.com", "password": "secret1"})
+        assert "改编出 1 道新题" in c.get("/papers").text
+        c.get("/logout")
+
+        # 多个进程只跑一份；管理后台能看到、能手动跑
+        db.run("UPDATE jobs SET locked_until=? WHERE name='bank'", "9999")
+        assert bankflow.run_once()["skipped"]
+        db.run("UPDATE jobs SET locked_until='' WHERE name='bank'")
+        c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+        page = c.get("/admin?tab=bank").text
+        assert "题库流水线" in page and "AI 校对" in page
+        assert "跑完了" in c.post("/admin/bank/maintain").text

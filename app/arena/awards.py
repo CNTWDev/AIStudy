@@ -32,6 +32,8 @@ STICKERS = {
     "lit3": ("🌟", "点亮 3 个", "真正掌握 3 个知识点"),
     "lit10": ("✨", "点亮 10 个", "真正掌握 10 个知识点"),
     "lit30": ("🌌", "点亮 30 个", "真正掌握 30 个知识点"),
+    "redo": ("📝", "认真订正", "把一份试卷的每道题都在线重做完"),
+    "helper": ("🤝", "出题小帮手", "分享的卷子改编成新题，帮别的同学练习了 10 次"),
 }
 
 AVATARS = {
@@ -93,6 +95,15 @@ def learning_keys(kid_id: int) -> list[str]:
     keys += [k for k, n in (("days7", 7), ("days30", 30)) if st >= n]
     lit = (db.one("SELECT COUNT(*) AS n FROM mastery WHERE user_id=? AND status='mastered'", kid_id) or {}).get("n") or 0
     keys += [k for k, n in (("lit3", 3), ("lit10", 10), ("lit30", 30)) if lit >= n]
+    # 奖励认真做完，不奖励上传张数（张数会招来重复、拍不清的卷子）
+    for r in db.q("SELECT report FROM papers WHERE user_id=? AND status='done'", kid_id):
+        rep = db.jload(r["report"], {}) or {}
+        if rep.get("total") and rep.get("answered", 0) >= rep["total"]:
+            keys.append("redo")
+            break
+    from .. import bankflow
+    if bankflow.contributed(kid_id)["uses"] >= 10:
+        keys.append("helper")
     return keys
 
 

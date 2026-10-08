@@ -9,6 +9,7 @@
   python -m app.cli unlock 邮箱                       解除密码输错导致的锁定
   python -m app.cli invite [次数] [天数] [备注]        生成注册邀请码
   python -m app.cli mark-weak 孩子邮箱 知识点ID ...    导入已知薄弱点（如以前的试卷分析）
+  python -m app.cli bank-maintain                    手动跑一轮题库流水线（改编入库、校对答案、校准难度；平时后台自动跑）
   python -m app.cli backup [目标目录]                 备份数据库（PostgreSQL 用 pg_dump）
 """
 import os
@@ -156,6 +157,10 @@ def main(argv) -> int:
         code = auth.create_invite(admin["id"] if admin else None, args[2] if len(args) > 2 else "命令行生成",
                                   int(args[0]) if args else 1, int(args[1]) if len(args) > 1 else 14)
         print("邀请码：", code)
+    elif cmd == "bank-maintain":
+        from . import bankflow
+        catalog.load()
+        print(bankflow.run_once(force=True))
     elif cmd == "mark-weak":
         catalog.load()
         u = auth.by_email(args[0])

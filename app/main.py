@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import arena, auth, bank, bankpapers, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, webpage
+from . import arena, auth, bank, bankflow, bankpapers, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, webpage
 from .auth import LoginRequired
 from .catalog import GRADES, catalog, is_adult, stage_label, stage_rank
 from .content import content
@@ -25,6 +25,7 @@ async def lifespan(app):
     bank.sync()
     methods.load()
     evidence.ensure_current()  # 学习方式 / 参数 / 算法变了的孩子：按学习记录重算掌握状态
+    bankflow.start_background()  # 题库流水线：改编入库、校对答案、校准难度
     yield
     db.close()
 
@@ -389,6 +390,7 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
         ctx["daily"], ctx["totals"], ctx["kid_rows"] = _site_stats(users)
     elif tab == "bank":
         ctx["bank"] = bank.overview()
+        ctx["flow"] = bankflow.stats()
     elif tab == "papers":
         ctx.update(bps=bankpapers.listing(), bp_kinds=bankpapers.KINDS, bp_status=bankpapers.STATUS, bp_label=bankpapers.label,
                    bp_packs=sorted(catalog.packs.values(), key=lambda p: (p.subject_name, p.edition)),
@@ -608,6 +610,19 @@ def admin_bank_status(request: Request, target: str, tid: str, status: str = For
         raise HTTPException(400)
     bank.set_status(target, int(tid) if target == "content" else tid, status)
     return _admin_back("bank", "已恢复使用" if status == "active" else "已下架")
+
+
+@app.post("/admin/bank/maintain")
+async def admin_bank_maintain(request: Request):
+    """手动跑一轮题库流水线（平时后台每 15 分钟自动跑）。"""
+    auth.require_admin(request)
+    from starlette.concurrency import run_in_threadpool
+    res = await run_in_threadpool(bankflow.run_once, True)
+    if res.get("skipped"):
+        return _admin_back("bank", "另一个进程正在跑，稍后再看")
+    v, p = res.get("verify") or {}, res.get("variants") or {}
+    return _admin_back("bank", f"跑完了：改编新题 {p.get('made', 0)} 道，校对 {v.get('checked', 0)} 道（拦下 {v.get('held', 0)} 道），"
+                               f"校准难度 {res.get('calibrated', 0)} 道")
 
 
 @app.get("/admin/bank/export.json")
@@ -1342,7 +1357,7 @@ def papers_page(request: Request, pack: str = ""):
     lst = db.q("SELECT p.*, (SELECT COUNT(*) FROM paper_items i WHERE i.paper_id=p.id) AS n FROM papers p "
                "WHERE p.user_id=? ORDER BY p.id DESC", k["id"])
     return render(request, "papers.html", es=[(e, catalog.packs[e["pack_id"]]) for e in es], papers=lst, pack=pack,
-                  max_images=papers.MAX_IMAGES, llm_on=llm.enabled())
+                  max_images=papers.MAX_IMAGES, llm_on=llm.enabled(), helped=bankflow.contributed(k["id"]))
 
 
 async def _read_photos(f) -> list:
@@ -1378,7 +1393,8 @@ async def papers_create(request: Request):
         raise HTTPException(400, "请拍照上传，或者粘贴题目文字")
     from starlette.concurrency import run_in_threadpool
     pid = await run_in_threadpool(papers.create, k["id"], pack_id, title=(f.get("title") or "").strip(),
-                                  exam_date=f.get("exam_date") or "", images=images, text=text, created_by=u["id"])
+                                  exam_date=f.get("exam_date") or "", images=images, text=text, created_by=u["id"],
+                                  shared="share_choice" not in f or bool(f.get("shared")))
     engine.today_plan(k["id"], rebuild=True)
     return {"ok": True, "id": pid}
 

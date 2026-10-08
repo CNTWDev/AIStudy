@@ -21,11 +21,15 @@
     <div id="thumbs" class="row" style="flex-wrap:wrap;margin-top:6px"></div>
     <details style="margin-top:10px"><summary class="small">没有照片？粘贴题目文字</summary>
       <textarea name="text" style="min-height:120px" placeholder="把题目复制粘贴到这里（电子版作业、网上的练习都可以）"></textarea></details>
+    <input type="hidden" name="share_choice" value="1">
+    <label class="small" style="font-weight:400;margin-top:10px"><input type="checkbox" name="shared" value="1" checked>
+      题目由 AI 改编成新题，帮助别的同学练习（原卷照片、孩子的作答都不公开）</label>
     <button class="btn" id="go" style="margin-top:12px" {{ 'disabled' if not llm_on }}>上传并解析</button>
     <div id="msg" class="small" style="margin-top:8px"></div>
   </form>
 </div>
 
+{% if helped['items'] %}<div class="hint">🤝 导入的卷子已经改编出 {{ helped['items'] }} 道新题{% if helped.uses %}，别的同学练了 {{ helped.uses }} 次{% endif %}。谢谢分享！</div>{% endif %}
 {% if papers %}
 <h3>导入过的试卷</h3>
 {% for p in papers %}

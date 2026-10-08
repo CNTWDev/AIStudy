@@ -123,6 +123,9 @@ class MockProvider(Provider):
 
 
 MOCK = {
+    "verify": {"answer": 1, "ok": True, "problem": "", "why": "示例"},
+    "variant": {"items": [{"type": "mcq", "difficulty": 2, "q": "示例改编题：1 km = ? m", "options": ["10", "100", "1000", "10000"],
+                           "answer": 2, "hint": "千米和米", "explain": "1 千米 = 1000 米。"}]},
     "ask": {"reply": "我们一步一步来：你先说说，这道题在问什么？", "reveals_answer": False},
     "paper": {"title": "示例测验", "subject_guess": "", "notes": "示例数据",
               "questions": [

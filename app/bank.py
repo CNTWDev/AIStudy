@@ -57,8 +57,10 @@ def link(item_id: str, kp_id: str, role="main"):
                item_id, kp_id, role)
 
 
-def save_items(kp_id: str, items: list[dict], source="ai", purpose="", grade="", meta=None) -> list[dict]:
-    """存题。内容和库里已有的题一样就不重复存，直接把那道题也挂到这个知识点上。"""
+def save_items(kp_id: str, items: list[dict], source="ai", purpose="", grade="", meta=None, status="active") -> list[dict]:
+    """存题。内容和库里已有的题一样就不重复存，直接把那道题也挂到这个知识点上；
+    换了数字、改了几个字的同一道题归到同一个同型组（见 app/bankflow.py）。"""
+    from . import bankflow
     out, lang, now = [], kp_lang(kp_id), db.now()
     for it in items:
         h = item_hash(it)
@@ -75,10 +77,11 @@ def save_items(kp_id: str, items: list[dict], source="ai", purpose="", grade="",
         except (TypeError, ValueError):
             diff = 2
         also = [k for k in (it.get("kp_ids") or []) if k != kp_id and catalog.kp(k)]
-        db.run("INSERT INTO items(id,kp_id,kp_ids,type,difficulty,data,source,created_at,lang,grade,purpose,gen_meta,qhash,updated_at) "
-               "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", iid, kp_id, db.jdump([kp_id] + also), it["type"], diff, db.jdump(data),
-               source, now, lang, grade, purpose, db.jdump(meta or {}), h, now)
+        db.run("INSERT INTO items(id,kp_id,kp_ids,type,difficulty,data,source,created_at,lang,grade,purpose,gen_meta,qhash,updated_at,status) "
+               "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", iid, kp_id, db.jdump([kp_id] + also), it["type"], diff, db.jdump(data),
+               source, now, lang, grade, purpose, db.jdump(meta or {}), h, now, status)
         link(iid, kp_id)
+        bankflow.assign_near(iid, it, kp_id)
         for k in also:
             link(iid, k, "also")
         out.append(row_to_item(db.one("SELECT * FROM items WHERE id=?", iid)))
@@ -94,13 +97,15 @@ def candidates(user_id: int, kp_id: str) -> list:
     return db.q(
         "SELECT i.*, (SELECT COUNT(*) FROM attempts a WHERE a.item_id=i.id AND a.user_id=?) AS done, "
         "(SELECT COUNT(*) FROM attempts a WHERE a.item_id=i.id AND a.user_id=? AND a.correct=1) AS ok, "
+        # 同型组里做过几次（换了数字的同一道题算做过）
+        "(SELECT COUNT(*) FROM attempts a JOIN items j ON j.id=a.item_id WHERE a.user_id=? AND j.near_key=i.near_key) AS gdone, "
         "(SELECT MIN(CASE WHEN x.kp_id=? THEN 0 ELSE 1 END) FROM item_kps x WHERE x.item_id=i.id AND x.kp_id IN (" + marks + ")) AS other "
         "FROM items i WHERE i.status='active' "
         "AND i.id IN (SELECT item_id FROM item_kps WHERE kp_id IN (" + marks + ")) "
         "AND i.id NOT IN (SELECT target_id FROM flags WHERE user_id=? AND target='item') "
         # 试卷原题来自某个孩子的卷子，只给这个孩子自己用
         "AND (i.source<>'paper' OR i.id IN (SELECT pi.item_id FROM paper_items pi JOIN papers p ON p.id=pi.paper_id WHERE p.user_id=?))",
-        user_id, user_id, kp_id, *kps, *kps, user_id, user_id)
+        user_id, user_id, user_id, kp_id, *kps, *kps, user_id, user_id)
 
 
 def flagged_by(user_id: int) -> set:
@@ -231,6 +236,8 @@ def sync():
         body = {"title": r["title"], "body": r["body"], "questions": db.jload(r["questions"], [])}
         cid = save_content("passage", body, "", r["lang"], r["grade"] or "", title=r["title"], created_by=r["user_id"])
         db.run("UPDATE readings SET content_id=? WHERE id=?", cid, r["id"])
+    from . import bankflow
+    bankflow.sync_near()
 
 
 # ------------------------------------------------------------------ 管理后台
@@ -256,7 +263,8 @@ def overview() -> dict:
     hard = db.q("SELECT * FROM items WHERE status='active' AND n_attempts>=5 ORDER BY 1.0*n_correct/n_attempts, n_attempts DESC LIMIT 10")
     return {"items": tot["n"], "attempts": tot["a"], "acc": round(100 * tot["c"] / tot["a"]) if tot["a"] else None,
             "by_source": by_source, "by_kind": by_kind, "packs": packs,
-            "review": [{**row_to_item(r), "n_flags": r["n_flags"], "why": reasons.get(("item", r["id"]), [])} for r in review],
+            "review": [{**row_to_item(r), "n_flags": r["n_flags"],
+                        "why": reasons.get(("item", r["id"]), []) + ([r["verify_note"]] if r["verify_note"] else [])} for r in review],
             "review_contents": [{**dict(r), "why": reasons.get(("content", str(r["id"])), [])} for r in review_c],
             "hard": [{**row_to_item(r), "n": r["n_attempts"], "acc": round(100 * r["n_correct"] / r["n_attempts"])} for r in hard]}
 

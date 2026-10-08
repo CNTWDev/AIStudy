@@ -65,6 +65,7 @@ def create(admin_id: int, pack_id: str, *, kind="real", stage="", title="", exam
             (d / name).write_bytes(b)
             names.append(name)
         db.run("UPDATE bank_papers SET images=? WHERE id=?", db.jdump(names), bp)
+    _group(bp)
     return bp
 
 
@@ -77,6 +78,12 @@ def _insert_item(t, it: dict, kp, now, bp_id) -> str:
     if kp:
         t.run("INSERT INTO item_kps(item_id, kp_id, role) VALUES(?,?,'main')", iid, kp)
     return iid
+
+
+def _group(bp_id: int):
+    from . import bankflow
+    for r in db.q("SELECT i.id, i.kp_id FROM bank_paper_items x JOIN items i ON i.id=x.item_id WHERE x.bank_paper_id=?", bp_id):
+        bankflow.assign_near(r["id"], kp_id=r["kp_id"])
 
 
 def rows(bp_id: int) -> list[dict]:
@@ -142,6 +149,9 @@ def update_item(bp_id: int, bpi_id: int, f: dict) -> str:
             t.run("INSERT INTO item_kps(item_id, kp_id, role) VALUES(?,?,'main')", r["item_id"], kp)
         t.run("UPDATE bank_paper_items SET label=?, points=? WHERE id=?", (f.get("label") or r["label"])[:20],
               itemtypes._num(f.get("points")), bpi_id)
+        t.run("UPDATE items SET verified=0, verify_note='' WHERE id=?", r["item_id"])  # 改过的题重新校对
+    from . import bankflow
+    bankflow.assign_near(r["item_id"], kp_id=kp or "")
     return it["type"]
 
 
