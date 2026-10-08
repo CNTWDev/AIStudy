@@ -28,7 +28,8 @@
 {% for id, g in a.games.items() %}
 <a class="ah-game{{ ' locked' if a.locked }}" href="/arena/{{ id }}">
   <canvas data-preview="{{ id }}"></canvas>
-  <div class="t"><span class="tag" style="background:{{ g.color }}">{{ g.tag }}</span><b>{{ g.icon }} {{ g.name }}</b><p>{{ g.desc }}</p></div>
+  <div class="t"><span class="tag" style="background:{{ g.color }}">{{ g.tag }}</span><b>{{ g.icon }} {{ g.name }}</b><p>{{ g.desc }}</p>
+    {% set sg = a.stages.get(id) %}{% if sg %}<p class="ah-stage">🗺️ 打到第 {{ sg.upto }} 关 · ⭐ {{ sg.stars }}/{{ sg.max_stars }}</p>{% endif %}</div>
 </a>
 {% endfor %}
 </div>

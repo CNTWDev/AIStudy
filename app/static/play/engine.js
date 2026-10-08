@@ -246,6 +246,7 @@
       sunset: {sky: ['#ffb38a', '#ffe3c2'], hill: ['#f6a6b2', '#d98aa0'], ground: '#8fcf7a', soil: '#b9875c', cloud: '#fff4ea'},
       night: {sky: ['#2b2d6e', '#5b4b9a'], hill: ['#3b3f8f', '#2f3275'], ground: '#4a5bb0', soil: '#33307a', cloud: '#8f8fd6', stars: true},
       candy: {sky: ['#ffd6f0', '#e8f0ff'], hill: ['#c7b8ff', '#a99bf5'], ground: '#ffcfe3', soil: '#e9a7c6', cloud: '#fff'},
+      lava: {sky: ['#4a1830', '#ff8a4d'], hill: ['#7a2b3b', '#4f1d2c'], ground: '#6b3a2e', soil: '#3a1f1a', cloud: '#ffb38a', stars: true},
     },
     clouds: null,
     sky(ctx, W, H, theme) {

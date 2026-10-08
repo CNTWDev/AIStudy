@@ -30,3 +30,9 @@
   .pl-stickman .pl-btn{min-width:50px;min-height:50px;font-size:15px}.pl-stickman .pl-btn.big{min-width:56px;min-height:56px}
   .pl-stickman .pl-btn.quiz{font-size:16px;padding:4px 12px}
 }
+/* 闯关：关卡号、锁住的装备 */
+.sm-mid{display:flex;flex-direction:column;align-items:center}
+.sm-stage{font-weight:900;font-size:13px;color:#fff;-webkit-text-stroke:3px var(--pl-ink);paint-order:stroke;white-space:nowrap}
+.sm-buy em{display:none;font-style:normal;font-size:11px;font-weight:800;color:var(--muted)}
+.sm-buy.lock small{display:none}.sm-buy.lock em{display:block}.sm-buy.lock span{filter:grayscale(1)}
+@media (max-width:420px){.sm-pads{gap:4px}.sm-pads .pl-pad{gap:4px}.pl-stickman .pl-btn.big{min-width:50px;min-height:54px;font-size:15px}.pl-stickman .pl-btn.quiz{padding:4px 8px}.sm-shop{gap:4px}}
