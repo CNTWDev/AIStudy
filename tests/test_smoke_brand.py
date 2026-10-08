@@ -47,3 +47,16 @@ def test_kid_picks_mascot():
         c.post("/login", data={"email": "bp@x.com", "password": "secret1"})
         assert 'data-tone="adult"' in c.get("/parent").text
         assert "我的图标" in c.get("/settings").text
+
+
+def test_old_saved_site_name_falls_back_to_beejoy():
+    """改名前后台保存过站点设置的网站，库里存着「AIStudy」，升级后要自动显示 beejoy。"""
+    from app import sitecfg
+    with TestClient(app):
+        sitecfg.set_many({"site_name": "AIStudy"})
+        assert sitecfg.get("site_name") == "beejoy"
+        sitecfg.set_many({"site_name": "AI Study"})
+        assert sitecfg.get("site_name") == "beejoy"
+        sitecfg.set_many({"site_name": "我家学习本"})  # 自己起的名字照常生效
+        assert sitecfg.get("site_name") == "我家学习本"
+        sitecfg.set_many({"site_name": ""})

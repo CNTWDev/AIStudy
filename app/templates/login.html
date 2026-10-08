@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
 <div style="max-width:440px;margin:24px auto">
-  {% if SITE == 'beejoy' %}<div class="brandhero">{{ mascot_svg('hive', 72) }}{{ wordmark_svg(34) }}<p>每天勤快一点，开心一点</p></div>{% endif %}
+  {% if SITE|lower == 'beejoy' %}<div class="brandhero">{{ mascot_svg('hive', 72) }}{{ wordmark_svg(34) }}<p>每天勤快一点，开心一点</p></div>{% endif %}
   {% if mode == 'first' %}
   <h1>第一次使用：创建网站管理员账号</h1>
   <p class="muted">这是系统里的第一个账号，不需要邀请码，用来管理整个网站（站点设置、数据统计、审批和邀请）。进入管理后台后，再给自己创建一个家长账号，用家长账号添加孩子。</p>
