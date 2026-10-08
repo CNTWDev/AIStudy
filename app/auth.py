@@ -306,6 +306,12 @@ def require_admin(request: Request):
     return u
 
 
+def is_self_learner(u) -> bool:
+    """自学者：自己注册、自己选课的学习账号（多半是备考的成人）。和孩子账号一样能学习，只是没有家长，
+    课程、每天时长、考试日期都由自己在「我的课程」里设。孩子账号一定有家长（parent_id）。"""
+    return bool(u) and u["role"] == "kid" and not u["parent_id"]
+
+
 def kid_of(parent, kid_id: int):
     k = db.one("SELECT * FROM users WHERE id=? AND parent_id=?", kid_id, parent["id"])
     if not k:

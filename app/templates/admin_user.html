@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
 <p class="small"><a href="/admin?tab=families">← 家庭与账号</a></p>
-<h1>{{ u.name }} <span class="pill">{{ {'admin': '管理员', 'parent': '家长', 'kid': '孩子'}[u.role] }}</span>
+<h1>{{ u.name }} <span class="pill">{{ '自学者' if is_self_learner(u) else {'admin': '管理员', 'parent': '家长', 'kid': '孩子'}[u.role] }}</span>
   {% if u.status == 'disabled' %}<span class="pill st-weak">已停用</span>{% elif u.status == 'pending' %}<span class="pill st-learning">待审批</span>{% elif u.status == 'rejected' %}<span class="pill st-weak">未通过</span>{% endif %}</h1>
 {% if msg %}<div class="hint">{{ msg }}{% if link %}<br><input type="text" readonly value="{{ link }}" onclick="this.select()" style="margin-top:6px">{% endif %}</div>{% endif %}
 <p class="muted small">注册 {{ u.created_at[:10] }}{% if inviter %} · 由 {{ inviter.name }}（{{ inviter.email }}）邀请{% endif %}
@@ -14,7 +14,7 @@
     <div class="grow"><label>登录邮箱</label><input type="email" name="email" value="{{ u.email }}" required></div>
   </div>
   <div style="margin-top:12px"><button class="btn">保存</button>
-    {% if u.role == 'kid' %}<span class="muted small">年级、教材等学习安排由家长在家长页修改。</span>{% endif %}</div>
+    {% if u.role == 'kid' %}<span class="muted small">年级、教材等学习安排由{{ '本人在「我的课程」里' if is_self_learner(u) else '家长在家长页' }}修改。</span>{% endif %}</div>
 </form>
 
 {% include "_account_security.html" %}

@@ -17,6 +17,24 @@
 {% endif %}
 <a class="btn ghost sm" href="/admin/users/{{ u.id }}">账号管理</a>
 {%- endmacro %}
+{% macro kid_table(kids, first='孩子') %}
+  <table style="margin-top:8px">
+    <tr><th>{{ first }}</th><th>年级 / 教材</th><th>今天</th><th>坚持</th><th>本周</th><th>待复习 / 生词</th><th>薄弱点</th><th>系统发现</th><th></th></tr>
+    {% for k in kids %}
+    <tr>
+      <td><b><a href="/admin/users/{{ k.u.id }}">{{ k.u.name }}</a></b> {{ status_pill(k.u) }}<div class="muted small">{{ k.u.email }}</div></td>
+      <td class="small">{{ stage_label(k.u.grade) }}<br><span class="muted">{% for p in k.packs %}{{ p.pack.subject_name }}{{ '、' if not loop.last }}{% else %}未选教材{% endfor %}</span></td>
+      <td class="small">{{ k.today_done }}/{{ k.today.plan|length }} 项<br><span class="muted">{{ k.today.minutes }} 分钟</span></td>
+      <td class="small">连续 {{ k.streak }} 天</td>
+      <td class="small">{{ k.week_days }} 天 · {{ k.week_min }} 分钟</td>
+      <td class="small">{{ k.due }} / {{ k.words }}</td>
+      <td class="small">{{ k.weak_n }}{% if k.weak %}<br><span class="muted">{{ k.weak[0].name }}</span>{% endif %}</td>
+      <td class="small">{% for i in k.insights[:2] %}<div>🔍 {{ i.title }}</div>{% else %}<span class="muted">—</span>{% endfor %}</td>
+      <td class="small"><a href="/admin/kids/{{ k.u.id }}">报告</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endmacro %}
 {% block body %}
 <h1>管理后台</h1>
 <nav class="subnav">{% for key, label in tabs %}<a href="/admin?tab={{ key }}" class="{{ 'on' if tab == key }}">{{ label }}{% if key == 'overview' and stats.pending %} <span class="badge">{{ stats.pending }}</span>{% endif %}</a>{% endfor %}</nav>
@@ -26,6 +44,7 @@
 <div class="stats">
   <div class="stat"><b>{{ stats.families }}</b><span>家庭</span></div>
   <div class="stat"><b>{{ stats.kids }}</b><span>孩子</span></div>
+  {% if stats.selfs %}<div class="stat"><b>{{ stats.selfs }}</b><span>自学者</span></div>{% endif %}
   <div class="stat"><b>{{ stats.active_kids }}</b><span>近 7 天在学</span></div>
   <div class="stat"><b>{{ stats.pending }}</b><span>待审批</span></div>
   <div class="stat"><b>{{ stats.invites_open }}</b><span>可用邀请码</span></div>
@@ -89,25 +108,16 @@
       {% if f.p.id != me.id and f.p.status == 'active' %}<form method="post" action="/admin/users/{{ f.p.id }}/admin" style="display:inline"><input type="hidden" name="on" value="{{ '' if f.p.is_admin else '1' }}"><button class="btn ghost sm">{{ '取消管理员' if f.p.is_admin else '设为管理员' }}</button></form>{% endif %}</div>
   </div>
   {% if f.kids %}
-  <table style="margin-top:8px">
-    <tr><th>孩子</th><th>年级 / 教材</th><th>今天</th><th>坚持</th><th>本周</th><th>待复习 / 生词</th><th>薄弱点</th><th>系统发现</th><th></th></tr>
-    {% for k in f.kids %}
-    <tr>
-      <td><b><a href="/admin/users/{{ k.u.id }}">{{ k.u.name }}</a></b> {{ status_pill(k.u) }}<div class="muted small">{{ k.u.email }}</div></td>
-      <td class="small">{{ stage_label(k.u.grade) }}<br><span class="muted">{% for p in k.packs %}{{ p.pack.subject_name }}{{ '、' if not loop.last }}{% else %}未选教材{% endfor %}</span></td>
-      <td class="small">{{ k.today_done }}/{{ k.today.plan|length }} 项<br><span class="muted">{{ k.today.minutes }} 分钟</span></td>
-      <td class="small">连续 {{ k.streak }} 天</td>
-      <td class="small">{{ k.week_days }} 天 · {{ k.week_min }} 分钟</td>
-      <td class="small">{{ k.due }} / {{ k.words }}</td>
-      <td class="small">{{ k.weak_n }}{% if k.weak %}<br><span class="muted">{{ k.weak[0].name }}</span>{% endif %}</td>
-      <td class="small">{% for i in k.insights[:2] %}<div>🔍 {{ i.title }}</div>{% else %}<span class="muted">—</span>{% endfor %}</td>
-      <td class="small"><a href="/admin/kids/{{ k.u.id }}">报告</a></td>
-    </tr>
-    {% endfor %}
-  </table>
+  {{ kid_table(f.kids) }}
   {% else %}<p class="muted small">还没有添加孩子。</p>{% endif %}
 </div>
 {% else %}<div class="card muted">没有找到。</div>{% endfor %}
+{% if selfs %}
+<div class="card">
+  <h3 style="margin:0">自学者 <span class="muted small">自己注册、自己选课的学习账号，没有家长</span></h3>
+  {{ kid_table(selfs, '自学者') }}
+</div>
+{% endif %}
 <form class="card" method="post" action="/admin/users/create">
   <h3>直接创建账号</h3>
   <p class="muted small">家长账号：添加孩子、查看和安排孩子的学习。管理员账号：只管理网站，不带孩子。</p>

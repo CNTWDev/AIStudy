@@ -873,21 +873,50 @@ def test_event_log_and_methods():
 
 
 def test_adult_exam_course():
-    """成人学习者备考基金从业：没有乐园、不先摸底；设了考试日期后按剩余天数排新考点，最后两周冲刺高频考点。"""
+    """自学者（成人备考基金从业）：自己注册、自己选课和定考试日期；没有乐园、不先摸底；
+    按剩余天数排新考点，最后两周冲刺高频考点。家长给家人开的成人账号也能在表单里直接填考试日期。"""
     from datetime import timedelta
 
     from app import db, engine
     from app.catalog import catalog
     with TestClient(app) as c:
         c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+        r = c.post("/admin/invites/create", data={"note": "自学", "max_uses": "1", "days": "7"})
+        code = r.text.split("新邀请码：")[1][:14]
+        c.get("/logout")
+
+        # 注册时选「自己学」：没有家长，默认成人，先去「我的课程」选课
+        r = c.post("/register", data={"email": "mom@x.com", "password": "secret1", "name": "妈妈", "invite": code, "who": "self"})
+        assert r.url.path == "/me/courses" and "我的课程" in r.text and 'name="email"' not in r.text and "game_minutes" not in r.text
+        mom = db.one("SELECT * FROM users WHERE email='mom@x.com'")
+        assert mom["role"] == "kid" and mom["parent_id"] is None and mom["grade"] == "ADULT"
+        assert c.get("/today").url.path == "/me/courses"  # 还没选课
+        assert c.get("/parent").status_code == 403
+        assert c.post("/me/courses", data={"name": "妈妈", "grade": "ADULT", "subj_fund_law": "fund-law",
+                                           "exam_fund-law": "2026-02-30"}).status_code == 400
+        r = c.post("/me/courses", data={"name": "妈妈", "grade": "ADULT", "daily_minutes": "45", "subj_fund_law": "fund-law",
+                                        "exam_fund-law": ""})
+        assert r.url.path == "/today"
+        assert db.one("SELECT stage FROM enrollments WHERE user_id=?", mom["id"])["stage"] == "FUND-1"
+        assert c.post("/settings/profile", data={"name": "妈妈", "email": "mom@x.com"}).url.path == "/settings"
+        assert "我的课程" in c.get("/settings").text
+        c.get("/logout")
+
+        # 管理后台：自学者单独列出
+        c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+        page = c.get("/admin?tab=families").text
+        assert "自学者" in page and "mom@x.com" in page
+        assert c.get("/admin?tab=tree").status_code == 200 and "自学者" in c.get(f"/admin/users/{mom['id']}").text
+        # 家长给家人开的成人账号：考证课的考试日期直接在表单里填
         c.post("/admin/users/create", data={"email": "fp@x.com", "password": "secret1", "name": "家长", "role": "parent"})
         c.get("/logout")
         c.post("/login", data={"email": "fp@x.com", "password": "secret1"})
-        r = c.post("/parent/kids/save", data={"name": "妈妈", "email": "mom@x.com", "password": "secret1", "grade": "ADULT",
-                                          "daily_minutes": "60", "subj_fund_law": "fund-law"})
-        assert r.url.path == "/parent"
-        mom = db.one("SELECT * FROM users WHERE email='mom@x.com'")
-        assert db.one("SELECT stage FROM enrollments WHERE user_id=?", mom["id"])["stage"] == "FUND-1"
+        assert 'name="exam_fund-law"' in c.get("/parent/kids/new").text
+        day = (db.today() + timedelta(days=90)).isoformat()
+        c.post("/parent/kids/save", data={"name": "爸爸", "email": "dad@x.com", "password": "secret1", "grade": "ADULT",
+                                          "subj_fund_law": "fund-law", "exam_fund-law": day})
+        dad = db.one("SELECT id FROM users WHERE email='dad@x.com'")["id"]
+        assert db.one("SELECT exam_date FROM enrollments WHERE user_id=?", dad)["exam_date"] == day
         c.get("/logout")
 
         c.post("/login", data={"email": "mom@x.com", "password": "secret1"})

@@ -6,7 +6,7 @@
 {% if err %}<div class="err">{{ err }}</div>{% endif %}
 <form class="card" method="post" action="/settings/profile">
   <h3>基本信息</h3>
-  {% if user.role == 'kid' %}
+  {% if user.role == 'kid' and not is_self_learner(user) %}
   <p>{{ user.name }} · {{ user.email }}</p><p class="muted small">名字和邮箱由家长修改。</p>
   {% else %}
   <label>称呼</label><input type="text" name="name" value="{{ user.name }}" required>

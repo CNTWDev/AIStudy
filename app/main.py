@@ -36,7 +36,7 @@ app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), 
 templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
-                             stage_rank=stage_rank, is_adult=is_adult, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock,
+                             stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock,
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES)
 
 
@@ -151,7 +151,7 @@ def login(request: Request, email: str = Form(...), password: str = Form(...)):
 
 @app.post("/register")
 def register(request: Request, email: str = Form(...), password: str = Form(...), name: str = Form(...),
-             invite: str = Form(""), note: str = Form("")):
+             invite: str = Form(""), note: str = Form(""), who: str = Form("parent")):
     mode = _reg_mode()
     if mode == "closed":
         raise HTTPException(403, "注册已关闭，请联系管理员创建账号")
@@ -170,9 +170,11 @@ def register(request: Request, email: str = Form(...), password: str = Form(...)
         elif mode == "invite":
             raise ValueError("需要邀请码才能注册（向管理员或已经在用的家长索取）")
         status = "pending" if (mode == "approval" and not inv) else "active"
-        # 第一个账号是网站管理员（不带孩子）；之后注册的都是家长
-        uid = auth.create_user(email, password, name, "admin" if mode == "first" else "parent", is_admin=(mode == "first"),
-                               status=status,
+        # 第一个账号是网站管理员（不带孩子）；之后注册的是家长，或者自己学的自学者（没有家长的学习账号，默认成人）
+        self_learn = who == "self" and mode != "first"
+        role = "admin" if mode == "first" else "kid" if self_learn else "parent"
+        uid = auth.create_user(email, password, name, role, is_admin=(mode == "first"), status=status,
+                               grade="ADULT" if self_learn else "",
                                invited_by=inv["created_by"] if inv else None, invite_code=inv["code"] if inv else None,
                                apply_note=note)
     except ValueError as e:
@@ -183,7 +185,7 @@ def register(request: Request, email: str = Form(...), password: str = Form(...)
         return render(request, "message.html", title="申请已提交",
                       text="管理员审批通过后，就可以用这个邮箱和密码登录了。", link="/login")
     auth.login(request, auth.get_user(uid))
-    return RedirectResponse("/admin" if mode == "first" else "/parent", 303)
+    return RedirectResponse("/admin" if mode == "first" else "/me/courses" if self_learn else "/parent", 303)
 
 
 @app.get("/logout")
@@ -259,7 +261,7 @@ def _back(msg="", err=""):
 @app.post("/settings/profile")
 def settings_profile(request: Request, name: str = Form(...), email: str = Form(...)):
     u = auth.require_user(request)
-    if u["role"] == "kid":
+    if u["role"] == "kid" and not auth.is_self_learner(u):
         return _back(err="孩子账号的名字和邮箱由家长修改")
     try:
         email = auth.validate_email(email)
@@ -333,7 +335,8 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
     week_ago = (db.today() - timedelta(days=7)).isoformat()
     ctx["stats"] = {
         "families": sum(1 for u in users if u["role"] == "parent" and u["status"] == "active"),
-        "kids": sum(1 for u in users if u["role"] == "kid"),
+        "kids": sum(1 for u in users if u["role"] == "kid" and u["parent_id"]),
+        "selfs": sum(1 for u in users if auth.is_self_learner(u)),
         "pending": len(ctx["pending"]),
         "active_kids": db.one("SELECT COUNT(DISTINCT user_id) AS n FROM days WHERE day>=? AND (minutes>0 OR checked_in=1)",
                               week_ago)["n"],
@@ -353,6 +356,8 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
             fams.append({"p": p, "kids": kids,
                          "invited": [u for u in users if u["invited_by"] == p["id"]]})
         ctx["families"] = fams
+        ctx["selfs"] = [kid_brief(u) for u in users if auth.is_self_learner(u)
+                        and (not q or q.lower() in (u["email"] + u["name"]).lower())]
     elif tab == "invites":
         invites = db.q("SELECT v.*, u.name AS creator_name, u.email AS creator_email FROM invites v "
                        "LEFT JOIN users u ON u.id=v.created_by ORDER BY v.created_at DESC LIMIT 200")
@@ -362,7 +367,7 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
                 used_by.setdefault(u["invite_code"], []).append(u)
         ctx["invites"], ctx["used_by"] = invites, used_by
     elif tab == "tree":
-        parents = [u for u in users if u["role"] in ("parent", "admin")]  # 管理员也是邀请树的起点
+        parents = [u for u in users if u["role"] in ("parent", "admin") or auth.is_self_learner(u)]  # 管理员也是邀请树的起点
         children = {}
         for u in parents:
             children.setdefault(u["invited_by"] if u["invited_by"] in by_id else None, []).append(u)
@@ -689,7 +694,8 @@ def _kid_form_packs(form, grade: str, old: dict, grade_changed: bool) -> list[tu
 @app.get("/parent/kids/new", response_class=HTMLResponse)
 def kid_new_page(request: Request):
     auth.require_parent(request)
-    return render(request, "kid_form.html", k=None, enrolled={}, tracks={}, presets=catalog.presets, packs_by_subject=catalog.by_subject())
+    return render(request, "kid_form.html", k=None, enrolled={}, tracks={}, exams={}, presets=catalog.presets,
+                  packs_by_subject=catalog.by_subject())
 
 
 @app.get("/parent/kids/{kid_id}/edit", response_class=HTMLResponse)
@@ -699,12 +705,17 @@ def kid_edit_page(request: Request, kid_id: int):
     return _kid_form(request, k)
 
 
-def _kid_form(request: Request, k, **extra):
+def _kid_form(request: Request, k, self_mode=False, **extra):
+    """家长编辑孩子，和自学者编辑「我的课程」共用一张表单（self_mode：不显示邮箱密码、游戏、学校这些家长管的项）。"""
     es = enrollments(k["id"])
     enrolled = {e["pack_id"]: e["stage"] for e in es}
+    acct = {} if self_mode else account_ctx(k, f"/parent/kids/{k['id']}/account", force=False)
+    by_subject = catalog.by_subject(k["school_type"] or "")
+    if is_adult(k["grade"]):  # 成人：职业资格考试的课排前面
+        by_subject = dict(sorted(by_subject.items(), key=lambda kv: not any(p.system == "cert" for p in kv[1])))
     return render(request, "kid_form.html", k=k, enrolled=enrolled, tracks={e["pack_id"]: e["track"] for e in es},
-                  presets=catalog.presets, packs_by_subject=catalog.by_subject(k["school_type"] or ""),
-                  **account_ctx(k, f"/parent/kids/{k['id']}/account", force=False), **extra)
+                  exams={e["pack_id"]: e["exam_date"] for e in es}, self_mode=self_mode,
+                  presets=catalog.presets, packs_by_subject=by_subject, **acct, **extra)
 
 
 @app.post("/parent/kids/{kid_id}/account")
@@ -744,6 +755,7 @@ async def kid_save(request: Request):
     pw = form.get("password") or ""
     if not name:
         raise HTTPException(400, "请填写孩子的名字")
+    _check_exam_dates(form)
     try:
         email = auth.validate_email(email)
         if pw:
@@ -774,10 +786,25 @@ async def kid_save(request: Request):
                                       school=form.get("school") or "", daily_minutes=minutes)
         except ValueError as e:
             raise HTTPException(400, str(e))
+    _save_learning(kid_id, form, grade, old_grade)
+    return RedirectResponse("/parent", 303)
+
+
+def _check_exam_dates(form) -> None:
+    for key in form.keys():
+        if key.startswith("exam_") and (form.get(key) or "").strip():
+            try:
+                date.fromisoformat(form.get(key).strip())
+            except ValueError:
+                raise HTTPException(400, "考试日期格式不对")
+
+
+def _save_learning(kid_id: int, form, grade: str, old_grade, games: bool = True) -> None:
+    """保存学习安排：学习方式、游戏、每门课的教材 / 方向 / 考试日期、学校模板。家长编辑孩子和自学者「我的课程」共用。"""
     set_method(kid_id, form.get("method") or "")
-    if form.get("game_minutes") is not None:
+    if games and form.get("game_minutes") is not None:
         arena.set_game_minutes(kid_id, form.get("game_minutes"))
-    if form.get("game_unlock"):
+    if games and form.get("game_unlock"):
         arena.set_game_unlock(kid_id, form.get("game_unlock"))
     old = {e["pack_id"]: e["stage"] for e in enrollments(kid_id)}
     chosen = _kid_form_packs(form, grade, old, grade != old_grade)
@@ -786,12 +813,43 @@ async def kid_save(request: Request):
         db.run("INSERT INTO enrollments(user_id,pack_id,stage,active,track) VALUES(?,?,?,1,?) "
                "ON CONFLICT(user_id,pack_id) DO UPDATE SET stage=excluded.stage, active=1, track=excluded.track",
                kid_id, pid, stage, track)
+        if f"exam_{pid}" in form:  # 考试日期：学习者（或家长）自己定，系统按剩下的天数排计划
+            engine.set_exam_date(kid_id, pid, form.get(f"exam_{pid}"))
         engine.seed_vocab(kid_id, pid, config.SEED_DIR)
-    preset = catalog.preset(form.get("preset") or "")
-    db.run("UPDATE users SET preset=?, school_type=? WHERE id=?", preset["id"] if preset else "",
-           preset["school_type"] if preset else "", kid_id)
+    if games:  # 学校模板只在家长的表单里
+        preset = catalog.preset(form.get("preset") or "")
+        db.run("UPDATE users SET preset=?, school_type=? WHERE id=?", preset["id"] if preset else "",
+               preset["school_type"] if preset else "", kid_id)
     engine.today_plan(kid_id, rebuild=True)
-    return RedirectResponse("/parent", 303)
+
+
+# ================================================================== 自学者：我的课程
+
+def require_self_learner(request: Request):
+    u = auth.require_user(request)
+    if not auth.is_self_learner(u):
+        raise HTTPException(403, "孩子的课程由家长在家长页安排" if u["role"] == "kid" else "「我的课程」是自学账号用的")
+    return u
+
+
+@app.get("/me/courses", response_class=HTMLResponse)
+def my_courses(request: Request):
+    return _kid_form(request, require_self_learner(request), self_mode=True)
+
+
+@app.post("/me/courses")
+async def my_courses_save(request: Request):
+    u = require_self_learner(request)
+    form = await request.form()
+    _check_exam_dates(form)
+    grade = form.get("grade") or u["grade"]
+    if grade not in GRADES:
+        raise HTTPException(400, "年级不对")
+    minutes = max(15, min(240, int(form.get("daily_minutes") or u["daily_minutes"] or 60)))
+    db.run("UPDATE users SET name=?, grade=?, daily_minutes=? WHERE id=?",
+           (form.get("name") or "").strip()[:40] or u["name"], grade, minutes, u["id"])
+    _save_learning(u["id"], form, grade, u["grade"], games=False)
+    return RedirectResponse("/today", 303)
 
 
 # ================================================================== 家长：阅读与单词安排
@@ -874,6 +932,8 @@ def parent_as(request: Request, kid_id: int, next: str = "/today"):
 def today(request: Request):
     k = kid_or_redirect(request, manage=True)
     if not enrollments(k["id"]):
+        if auth.is_self_learner(k):
+            return RedirectResponse("/me/courses", 303)
         return render(request, "message.html", title="还没有选择学科",
                       text="请家长在「家长页 → 编辑孩子」里勾选要学的教材。")
     t = engine.today_plan(k["id"])
