@@ -338,7 +338,7 @@ def user_by_token(request: Request):
     row = db.one("SELECT * FROM api_tokens WHERE token_hash=?", _sha(token))
     u = get_user(row["user_id"]) if row else None
     if not u or u["status"] != "active":
-        raise HTTPException(401, "连接码无效或已被收回，请在 AIStudy「我的账号」里重新生成")
+        raise HTTPException(401, "连接码无效或已被收回，请在 beejoy「我的账号」里重新生成")
     if not row["last_used"] or row["last_used"][:13] != db.now()[:13]:
         db.run("UPDATE api_tokens SET last_used=? WHERE token_hash=?", db.now(), row["token_hash"])
     return u

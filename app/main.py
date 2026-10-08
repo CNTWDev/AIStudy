@@ -1,4 +1,4 @@
-"""AIStudy Web 应用入口。启动：uvicorn app.main:app"""
+"""beejoy（AIStudy）Web 应用入口。启动：uvicorn app.main:app"""
 import re
 from contextlib import asynccontextmanager
 from datetime import date, timedelta
@@ -14,6 +14,8 @@ from .auth import LoginRequired
 from .catalog import GRADES, catalog, stage_label, stage_rank
 from .content import content
 from .methods import methods
+from . import brand
+from . import catalog as catalog_mod
 
 
 @asynccontextmanager
@@ -29,7 +31,7 @@ async def lifespan(app):
     db.close()
 
 
-app = FastAPI(title="AIStudy", lifespan=lifespan)
+app = FastAPI(title="beejoy", lifespan=lifespan)
 app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY, max_age=60 * 60 * 24 * 60,
                    same_site="lax", https_only=config.HTTPS_ONLY)
 app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), name="static")
@@ -38,6 +40,8 @@ templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LA
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
                              stage_rank=stage_rank, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock,
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES)
+templates.env.globals.update(MASCOTS=brand.MASCOTS, mascot_of=brand.mascot_of, mascot_chosen=brand.has_chosen, mascot_svg=brand.mascot_svg,
+                             wordmark_svg=brand.wordmark_svg)
 
 
 def device_label(ua: str | None) -> str:
@@ -74,6 +78,14 @@ async def _llm_error(request: Request, exc):
     return JSONResponse({"error": str(exc)}, status_code=503)
 
 
+def ui_tone(learner) -> str:
+    """界面口吻：上中小学的孩子是 kid（圆体、小伙伴会动）；成人学习者、家长、管理员是 adult（同一套颜色，少一点童趣）。"""
+    if not learner or learner["role"] != "kid":
+        return "adult"
+    is_adult = getattr(catalog_mod, "is_adult", None)  # 成人学习者（年级「成人」/大学）
+    return "adult" if is_adult and is_adult(learner["grade"]) else "kid"
+
+
 def render(request: Request, name: str, status_code: int = 200, **ctx):
     user = auth.current_user(request)
     if user and user["must_change_pw"] and name not in ("settings.html", "message.html"):
@@ -86,7 +98,7 @@ def render(request: Request, name: str, status_code: int = 200, **ctx):
     # readonly：家长在看孩子的页面——只能查看和管理，不能替孩子做题
     base = {"user": user, "kid": kid, "readonly": bool(user and user["role"] != "kid"),
             "SITE": sitecfg.get("site_name"), "ASSISTANT": sitecfg.get("assistant_name"),
-            "ASSISTANT_ICON": sitecfg.get("assistant_icon")}
+            "ASSISTANT_ICON": sitecfg.get("assistant_icon"), "tone": ui_tone(kid or user)}
     return templates.TemplateResponse(request, name, {**base, **ctx}, status_code=status_code)
 
 
@@ -254,6 +266,14 @@ def account_ctx(acct, url: str, force: bool, reset_link: bool = False) -> dict:
 def _back(msg="", err=""):
     from urllib.parse import urlencode
     return RedirectResponse("/settings?" + urlencode({"msg": msg, "err": err}), 303)
+
+
+@app.post("/settings/mascot")
+def settings_mascot(request: Request, mascot: str = Form(...)):
+    u = auth.require_user(request)
+    if not brand.set_mascot(u["id"], mascot):
+        return _back(err="没有这个形象")
+    return _back(msg=f"换好了，以后陪你学习的是「{brand.MASCOTS[mascot][0]}」")
 
 
 @app.post("/settings/profile")

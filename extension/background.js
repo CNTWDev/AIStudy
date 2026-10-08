@@ -1,4 +1,4 @@
-// AIStudy 划词查词：后台负责调用 AIStudy 服务器（带连接码），以及右键菜单
+// beejoy 划词查词：后台负责调用 beejoy 服务器（带连接码），以及右键菜单
 importScripts("config.js");
 
 async function settings() {
@@ -9,7 +9,7 @@ async function settings() {
 
 async function call(path, body) {
   const s = await settings();
-  if (!s.server || !s.token) throw new Error("还没有设置：点浏览器右上角的 AIStudy 图标 → 设置，填网站地址和连接码");
+  if (!s.server || !s.token) throw new Error("还没有设置：点浏览器右上角的 beejoy 图标 → 设置，填网站地址和连接码");
   const r = await fetch(s.server + path, {
     method: body ? "POST" : "GET",
     headers: Object.assign({"Authorization": "Bearer " + s.token}, body ? {"Content-Type": "application/json"} : {}),
@@ -34,7 +34,7 @@ chrome.runtime.onMessage.addListener((msg, sender, reply) => {
 });
 
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.create({id: "aistudy-lookup", title: "用 AIStudy 查「%s」", contexts: ["selection"]});
+  chrome.contextMenus.create({id: "aistudy-lookup", title: "用 beejoy 查「%s」", contexts: ["selection"]});
   chrome.storage.sync.get({token: ""}).then(s => { if (!s.token) chrome.runtime.openOptionsPage(); });
 });
 

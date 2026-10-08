@@ -358,6 +358,18 @@ FastAPI 应用（app/main.py）
 
 **公平看板**（管理后台「游戏公平」）：按孩子已掌握的比例分 4 组，对比各组的预测答对率、实际答对率、每分钟能量、打赢电脑的比例；下面列出每个（题族, 级别）校准后的难度。
 
+### 5.13 品牌与界面（beejoy）
+
+- 名字 beejoy（bee + joy），域名 beejoy.ai。站点名默认「beejoy」（管理后台「站点设置」可改；改成别的名字时顶栏显示文字，不显示字标）。
+- 颜色在 `app/static/app.css` 顶部：主色蜂蜜黄。`--brand` 是实心填充（按钮、进度、选中），按钮上的字用 `--on-brand`（深棕）；
+  正文里的品牌色文字（链接、选中标签）用 `--brand-ink`，因为黄色字在浅底上看不清。深色模式整套重定义。
+- 图形在 `app/static/brand/`：五个小伙伴形象（`hive` 蜂巢宝宝、`buzzy` 小蜜蜂、`letter` 字母 b、`flyer` 飞飞、`drop` 蜜糖滴）、字标 `wordmark.svg`（Fredoka 字体转成路径，不用加载字体）、
+  手机图标 `icon-*.png` 和 `site.webmanifest`。`app/brand.py` 把它们内联进页面（`mascot_svg`、`wordmark_svg`）。数字和英文用自带的 Fredoka 子集（`app/static/fonts/`，OFL 授权）。
+- 每个人可以在「我的账号」里选一个形象（`users.settings.mascot`，默认蜂巢宝宝）：顶栏标志、浏览器标签图标、今天页卡片上的小伙伴、右下角提问按钮都换成它
+  （提问按钮只在 `ASSISTANT_ICON` 还是默认 🙋 时换）。没选过的孩子在今天页会看到「选一个你最喜欢的小伙伴」。
+- 界面口吻 `main.ui_tone`：中小学的孩子是 `kid`（标题和数字用圆体、小伙伴会动）；成人学习者（`catalog.is_adult`）、家长、管理员是 `adult`：
+  同一套颜色、组件和交互，只收掉动来动去的小伙伴、圆角略小，写在 `body[data-tone]` 上，CSS 按它区分。
+
 ## 7. 数据表
 
 `users`（家长/孩子；`settings.method` 是学习方式）· `enrollments`（孩子选的教材包和当前学段）· `events`（学习事件：所有学习证据，掌握度按它重放）· `mastery`（掌握度，带模型指纹）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· 乐园：`arena_ability` / `arena_calib` / `arena_matches` / `arena_answers` / `arena_ledger` / `arena_awards`（贴纸）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。

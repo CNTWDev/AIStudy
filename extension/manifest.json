@@ -1,12 +1,43 @@
 {
   "manifest_version": 3,
-  "name": "AIStudy 划词查词",
+  "name": "beejoy 划词查词",
   "version": "1.0.0",
-  "description": "在任意网页选中不认识的英文单词或中文词语，一键用 AI 查意思、听发音，并加入 AIStudy 单词本定期复习。",
-  "permissions": ["storage", "contextMenus"],
-  "host_permissions": ["<all_urls>"],
-  "background": {"service_worker": "background.js"},
-  "content_scripts": [{"matches": ["<all_urls>"], "js": ["content.js"], "run_at": "document_idle", "all_frames": false}],
+  "description": "在任意网页选中不认识的英文单词或中文词语，一键用 AI 查意思、听发音，并加入 beejoy 单词本定期复习。",
+  "permissions": [
+    "storage",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
   "options_page": "options.html",
-  "action": {"default_popup": "popup.html", "default_title": "AIStudy"}
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "beejoy",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
 }
