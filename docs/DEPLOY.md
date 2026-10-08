@@ -129,7 +129,7 @@ sudo /opt/aistudy/install.sh domain --domain beejoy.ai,www.beejoy.ai   # 多个�
 
 - **服务器在中国大陆**：新域名必须在这家云厂商完成 ICP 备案，否则 80/443 的访问会被云厂商拦截。不是所有域名后缀都能备案（以工信部公布的列表为准）；不能备案的域名，只能换香港 / 海外服务器。
 - **域名开了 CDN / 代理**（Cloudflare 的橙色云朵、阿里云 ESA / CDN 等）：检查它的 WAF / 防火墙规则，或先关掉代理（DNS only）直连试试。
-- **解析没指到这台服务器**：`dig +short beejoy.ai` 应该等于服务器公网 IP；域名注册商的「URL 转发 / 停放页」也会拦请求。
+- **解析没指到这台服务器，或者不止一个 IP**：`dig +short beejoy.ai @8.8.8.8` 应该**只有**服务器公网 IP 一行。多出来的 IP 多半是注册商的停放页 / 转发服务器（例如 GoDaddy 的 `15.197.148.33`、`3.33.130.190`，它们返回的就是 `Request forbidden by administrative rules`），浏览器会随机连到它们。在注册商的 DNS 里删掉这些记录，并关掉域名转发。
 
 ## 6. 日常运维
 
