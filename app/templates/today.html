@@ -37,6 +37,11 @@
     {% if x.phase == 'learn' %}每天学 {{ x.per_day }} 个，离考试两周时学完{% else %}考前冲刺：每天过一遍还没掌握的高频考点{% endif %}</div>
 </a>
 {% endfor %}
+{% if progress_ask and not readonly %}
+<div class="note-bar" id="progask">📚 <b>这周学校学了啥？</b> {{ progress_ask[:3]|join('、') }}{{ ' 等' if progress_ask|length > 3 }}：点一下学到第几章，预习和复习能对得更准。
+  <a class="btn sm" href="/progress">去选章节（1 分钟）</a> <button type="button" class="linkbtn" id="progskip">这周跳过</button></div>
+<script>document.getElementById('progskip').onclick = async () => { try { await api('/api/progress/snooze', {}); } catch (e) {} document.getElementById('progask').remove(); };</script>
+{% endif %}
 {% if settled.used %}<div class="note-bar ice">🧊 {{ '昨天' if settled.used|length == 1 else '前几天' }}没达到保底，自动用了 {{ settled.used|length }} 张补签卡，连续 {{ streak }} 天保住了！今天做完第 1 节就能接着往上涨。</div>{% endif %}
 {% if settled.earned %}<div class="note-bar ice">🧊 连续 {{ streak }} 天！得到 1 张补签卡。哪天状态不好没做完保底，它会帮你保住连续天数。</div>{% endif %}
 {% if t.minutes >= 90 and not readonly %}<div class="note-bar rest">👀 今天已经学了 {{ t.minutes }} 分钟，很棒！记得站起来走走、看看远处，让眼睛休息一下。</div>{% endif %}

@@ -86,7 +86,7 @@ def detect(user_id: int) -> list[dict]:
     for c in hard:
         if c["kind"] in ("mistake", "kp") and c["kp_id"] and catalog.kp(c["kp_id"]):
             out.append({"kind": "forget_kp", "key": c["kp_id"], "kp_id": c["kp_id"], "severity": 2, "action": "weak", "for_kid": 1,
-                        "title": f"「{_name(c['kp_id'])}」复习时总忘", "detail": "错题回顾忘了好几次，重新学一遍再复习"})
+                        "title": f"「{_name(c['kp_id'])}」复习时总忘", "detail": "错题重做错了好几次，重新学一遍再复习"})
             break
 
     # 6. 同一个词查了好几次还没收藏：自动加进单词本

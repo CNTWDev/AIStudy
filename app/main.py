@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import arena, auth, bank, bankflow, bankpapers, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, sprint, streak, webpage
+from . import arena, auth, bank, bankflow, bankpapers, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, recall, records, sitecfg, sprint, streak, webpage
 from .auth import LoginRequired
 from .catalog import GRADES, catalog, is_adult, stage_label, stage_rank
 from .content import content
@@ -991,7 +991,7 @@ def today(request: Request):
     day = streak.today_state(k, t["plan"], t["minutes"], sprint.points_today(k["id"]))
     return render(request, "today.html", manual_done=engine.MANUAL_DONE, t=t, play=play, day=day, settled=settled, exams=exams,
                   goals=streak.GOALS, sprint_best=sprint.best_day(k["id"]), play_locked=arena.locked_reason(play),
-                  due=len(engine.due_cards(k["id"], 99)), streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
+                  due=len(engine.due_cards(k["id"], 99)), progress_ask=engine.progress_prompt(k), streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
                   stars=engine.total_stars(k["id"]), rec=rec, auto=engine.day_summary(rec),
                   cov=explore.coverage(k["id"], m), lit=explore.lit_today(k["id"]), ahead=explore.ahead(k["id"], m),
                   vocab=explore.word_stats(k["id"]), weekly=records.weekly(k["id"]), mine=records.summary(k["id"]),
@@ -1168,12 +1168,23 @@ async def progress_save(request: Request, pack_id: str):
         # 只换学段：先保存学段，再回到页面勾选新学段学过的内容
         engine.set_progress(k["id"], pack_id, None, None, stage)
         msg = f"已切换到 {stage_label(stage)}，请勾选这个学段学校已经学过的内容"
+    elif "chapter" in f or "done_ch" in f:  # 按章报（孩子记得的是学到第几章）
+        engine.set_progress_chapters(k["id"], pack_id, f.get("chapter") or None, f.getlist("done_ch"), stage)
+        msg = "进度已更新，今天的任务已按新进度重新安排"
     else:
         engine.set_progress(k["id"], pack_id, f.get("current") or None, f.getlist("taught"), stage)
         msg = "进度已更新，今天的任务已按新进度重新安排"
     engine.mark_task_by(k["id"], type="progress")
     engine.today_plan(k["id"], rebuild=True)
     return RedirectResponse("/progress?" + urlencode({"pack": pack_id, "msg": msg}) + f"#p-{pack_id}", 303)
+
+
+@app.post("/api/progress/snooze")
+def progress_snooze(request: Request):
+    """「这周学校学了啥？」点了这周跳过：一周内不再提示。"""
+    k = kid_or_redirect(request, manage=True)
+    engine.snooze_progress(k["id"])
+    return {"ok": True}
 
 
 @app.get("/learn/{kp_id}", response_class=HTMLResponse)
@@ -1713,18 +1724,35 @@ def review_due(request: Request, group: str = ""):
         d = dict(c)
         d["extra"] = db.jload(c["extra"], {})
         d["kp_name"] = (catalog.kp(c["kp_id"]) or {}).get("name", "") if c["kp_id"] else ""
+        d["quiz"] = recall.quiz(k["id"], c)  # 复习要作答，系统判对错（见 app/recall.py）
         cards.append(d)
     return {"cards": cards}
 
 
+def _review_tasks_done(kid_id: int):
+    for group, task in (("words", "words"), ("mistakes", "mistakes"), ("other", "review")):
+        if not engine.due_cards(kid_id, 1, group):
+            engine.mark_task_by(kid_id, type=task)
+
+
 @app.post("/api/review/{card_id}")
 def review_card(request: Request, card_id: int, body: dict = Body(...)):
+    """自评（出不了题的卡才用）。"""
     k = kid_or_redirect(request)
     r = engine.review_card(k["id"], card_id, body.get("grade", "good"))
-    for group, task in (("words", "words"), ("mistakes", "mistakes"), ("other", "review")):
-        if not engine.due_cards(k["id"], 1, group):
-            engine.mark_task_by(k["id"], type=task)
+    _review_tasks_done(k["id"])
     return r or {}
+
+
+@app.post("/api/review/{card_id}/answer")
+def review_answer(request: Request, card_id: int, body: dict = Body(...)):
+    k = kid_or_redirect(request)
+    r = recall.answer(k["id"], card_id, body)
+    if r.get("error"):
+        raise HTTPException(400, r["error"])
+    if not r.get("reveal"):
+        _review_tasks_done(k["id"])
+    return r
 
 
 @app.get("/words", response_class=HTMLResponse)
