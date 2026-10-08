@@ -18,6 +18,8 @@ DEFAULT_UNLOCK = "half"
 BONUS_ALL_DONE = 10       # 今天的任务全部做完：多玩 10 分钟
 BONUS_PER_LIT = 2         # 今天每点亮一个知识点：多玩 2 分钟
 BONUS_LIT_MAX = 6
+BONUS_SPRINT_PER = 20     # 冲刺每 20 分多玩 1 分钟
+BONUS_SPRINT_MAX = 10
 
 FREEZE_SECONDS = (5, 8, 12)
 FAST_MS = 3000
@@ -91,6 +93,11 @@ def _tasks_today(kid_id: int) -> tuple[int, int]:
     return sum(1 for t in plan if t.get("done")), len(plan)
 
 
+def sprint_points(kid_id: int) -> int:
+    from .. import sprint   # sprint 用到乐园的出题，这里晚一点导入，避免循环
+    return sprint.points_today(kid_id)
+
+
 def status(kid: dict, max_seconds: dict | None = None) -> dict:
     """今天的游戏状态：基础时长 + 学习奖励、用了多少、还剩多少、是否解锁（还差几项任务）。"""
     base = game_minutes(kid)
@@ -105,10 +112,11 @@ def status(kid: dict, max_seconds: dict | None = None) -> dict:
     lit = len(explore.lit_today(kid["id"])) if base else 0
     bonus_all = BONUS_ALL_DONE if base and total and done >= total else 0
     bonus_lit = min(BONUS_LIT_MAX, lit * BONUS_PER_LIT) if base else 0
-    minutes = base + bonus_all + bonus_lit
+    bonus_sprint = min(BONUS_SPRINT_MAX, sprint_points(kid["id"]) // BONUS_SPRINT_PER) if base else 0
+    minutes = base + bonus_all + bonus_lit + bonus_sprint
     used = seconds_today(kid["id"], max_seconds)
     left = max(0, minutes * 60 - used)
-    return {"base": base, "bonus_all": bonus_all, "bonus_lit": bonus_lit, "lit": lit, "minutes": minutes,
+    return {"base": base, "bonus_all": bonus_all, "bonus_lit": bonus_lit, "bonus_sprint": bonus_sprint, "lit": lit, "minutes": minutes,
             "used": used, "left": left, "rule": rule, "rule_name": UNLOCK_CHOICES[rule], "need": need,
             "done": done, "total": total, "unlocked": base > 0 and need == 0,
             "can_bonus_all": bool(base and total and done < total)}

@@ -11,6 +11,7 @@
     <div class="ah-time">
       {% if S.base %}<span>⏱ 今天还能玩 {{ (S.left / 60)|round(0, 'floor')|int }} 分钟</span>{% endif %}
       {% if S.bonus_all %}<span>✅ 任务全做完 +{{ S.bonus_all }}</span>{% endif %}
+      {% if S.bonus_sprint %}<span>⚡ 冲刺 +{{ S.bonus_sprint }}</span>{% endif %}
       {% if S.bonus_lit %}<span>🌟 点亮 {{ S.lit }} 个 +{{ S.bonus_lit }}</span>{% endif %}
       {% if a.week.focus %}<span title="这一周实际答对 ÷ 预期答对。100 是正常发挥，越高越投入">💎 本周专注指数 {{ a.week.focus }}</span>{% endif %}
       <span>🏅 贴纸 {{ a.wall|selectattr('got')|list|length }}/{{ a.wall|length }}</span>

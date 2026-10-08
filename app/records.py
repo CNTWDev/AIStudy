@@ -5,7 +5,7 @@
 """
 from datetime import timedelta
 
-from . import db
+from . import db, sprint
 
 KINDS = {"warmup": "热身", "words": "单词复习", "mistakes": "错题回顾", "review": "知识点回顾",
          "practice": "知识点练习", "read": "阅读"}
@@ -85,6 +85,7 @@ def _week(user_id: int, start, end) -> dict:
             "sec": round(sum(timed) / len(timed) / 1000, 1) if len(timed) >= 3 else None,
             "lit": db.one("SELECT COUNT(*) AS n FROM lights WHERE user_id=? AND day>=? AND day<?", user_id,
                           start.isoformat(), end.isoformat())["n"],
+            "sprint": sprint.week(user_id, start.isoformat(), end.isoformat()),
             "days": db.one("SELECT COUNT(*) AS n FROM days WHERE user_id=? AND day>=? AND day<? AND (minutes>0 OR checked_in=1)",
                            user_id, start.isoformat(), end.isoformat())["n"]}
 
@@ -108,6 +109,8 @@ def weekly(user_id: int) -> dict | None:
         lines.append(f"破了 {w1['pbs']} 次个人纪录")
     if w1["focus"]:
         lines.append(f"专注学习 {w1['focus']} 分钟" + (f"（比再上周多 {w1['focus'] - w0['focus']} 分钟）" if w1["focus"] > w0["focus"] else ""))
+    if w1["sprint"]:
+        lines.append(f"冲刺了 {w1['sprint']} 分" + (f"（比再上周多 {w1['sprint'] - w0['sprint']} 分）" if w1["sprint"] > w0["sprint"] else ""))
     lines.append(f"学习了 {w1['days']} 天，做题 {w1['attempts']} 道")
     return {"from": last_mon.isoformat(), "to": (this_mon - timedelta(days=1)).isoformat(), "lines": lines,
             "this": w1, "prev": w0, "monday": today.weekday() == 0}

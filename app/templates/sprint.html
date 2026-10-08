@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}冲刺 · {{ SITE }}{% endblock %}
+{% block body %}
+<link rel="stylesheet" href="/static/play/play.css">
+<div id="sp" class="sp" data-info='{{ {"open": open, "today": today_points, "best": best, "tier_at": tier_at, "goal_name": goal.goal_name, "goal_need": goal.goal_need or 0}|tojson }}'>
+  <div class="sp-top">
+    <a class="btn ghost sm" href="/today">‹ 今天</a>
+    <b class="grow">⚡ 冲刺</b>
+    <span class="sp-pts" title="今天的冲刺分">今天 <b id="sp-today">{{ today_points }}</b> 分 · ⭐ <b id="sp-stars">{{ today_points // 10 }}</b></span>
+  </div>
+
+  {% if not open %}
+  <div class="card sp-intro">
+    <div class="sp-big">🔒</div>
+    <h2>先做完今天的任务</h2>
+    <p class="muted">还差 <b>{{ left }}</b> 项。做完今天全部任务，就能来这里冲刺：题目不限量，连对倍数越来越高。</p>
+    <a class="btn lg" href="/today">回到今天的任务 →</a>
+  </div>
+  {% else %}
+  <div class="card sp-intro" id="sp-start">
+    <div class="sp-big">⚡</div>
+    <h2>今天的任务做完了，还想继续？</h2>
+    <ul class="sp-rules">
+      <li>题目不限量，都按你的水平出，答对七八成正好。</li>
+      <li>连对 <b>{{ tier_at[1] }}</b> 题升到 <b class="x2">×2</b>，再连对 <b>{{ tier_at[2] - tier_at[1] }}</b> 题升到 <b class="x3">×3</b>。每答对一题得「当前倍数」分。</li>
+      <li>答错只降一档，不会清零；<b>3 秒内答错</b>像在猜，会回到 ×1。不会就点「这题不会」，不降档。</li>
+      <li>每 10 分换 1 颗 ⭐，每 20 分乐园多玩 1 分钟（今天最多多 10 分钟）。</li>
+    </ul>
+    {% if best %}<p class="small muted">你的个人纪录：一天冲了 <b>{{ best }}</b> 分。</p>{% endif %}
+    <button type="button" class="btn lg block" id="sp-go">开始冲刺！</button>
+  </div>
+
+  <div class="sp-run" id="sp-run" hidden>
+    <div class="card sp-hud">
+      <div class="sp-tier t1" id="sp-tier"><span>×</span><b>1</b></div>
+      <div class="grow">
+        <div class="sp-heat"><i id="sp-heat"></i><span class="m m2" style="left:{{ 100 * tier_at[1] / tier_at[2] }}%">×2</span><span class="m m3">×3</span></div>
+        <div class="small muted" id="sp-next">再连对 {{ tier_at[1] }} 题升到 ×2</div>
+      </div>
+      <div class="sp-run-pts"><b id="sp-pts">0</b><span>这次</span></div>
+    </div>
+    <div id="sp-dock"></div>
+    <div class="sp-foot"><span class="small muted" id="sp-goal"></span><button type="button" class="btn ghost" id="sp-stop">结束冲刺</button></div>
+  </div>
+
+  <div class="card sp-intro" id="sp-end" hidden></div>
+  {% endif %}
+</div>
+<script src="/static/play/engine.js"></script>
+<script src="/static/play/quiz.js"></script>
+<script src="/static/play/sprint.js"></script>
+{% endblock %}

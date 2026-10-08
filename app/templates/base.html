@@ -37,7 +37,7 @@
 {% if kid %}
 {% set p = request.url.path %}
 <nav class="tabs">
-  <a href="/today" class="{{ 'on' if p.startswith('/today') or p.startswith('/review') or p.startswith('/words') or p.startswith('/warmup') }}"><span class="i">☀️</span>今天</a>
+  <a href="/today" class="{{ 'on' if p.startswith('/today') or p.startswith('/sprint') or p.startswith('/review') or p.startswith('/words') or p.startswith('/warmup') }}"><span class="i">☀️</span>今天</a>
   <a href="/subjects" class="{{ 'on' if p.startswith('/subjects') or p.startswith('/papers') or p.startswith('/progress') or p.startswith('/map') or p.startswith('/learn') or p.startswith('/diagnose') }}"><span class="i">🗺️</span>学科</a>
   {% if not readonly %}<a href="/arena" class="play {{ 'on' if p.startswith('/arena') }}"><span class="i">🎮</span>乐园</a>
   <a href="/reading" class="{{ 'on' if p.startswith('/reading') }}"><span class="i">📖</span>阅读</a>{% endif %}

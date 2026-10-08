@@ -99,10 +99,10 @@ class Source:
     def pick(self, kid: dict, ctx: Ctx, target: float, rng: random.Random) -> dict:
         raise NotImplementedError
 
-    def record(self, kid: dict, it: dict, correct: bool, ans, dont_know: bool, ms: int):
+    def record(self, kid: dict, it: dict, correct: bool, ans, dont_know: bool, ms: int, mode="game", weight=GAME_WEIGHT):
         if it.get("kp_id"):
-            engine.record_attempt(kid["id"], it, it["kp_id"], "game", correct, "" if dont_know else ans,
-                                  dont_know=dont_know, touch=False, ms=ms, weight=GAME_WEIGHT)
+            engine.record_attempt(kid["id"], it, it["kp_id"], mode, correct, "" if dont_know else ans,
+                                  dont_know=dont_know, touch=False, ms=ms, weight=weight)
 
 
 # ------------------------------------------------------------------ 数学口算（现场生成）
@@ -240,14 +240,14 @@ class WordSource(Source):
                   explain=f"{w['w']}：{w['zh']}")
         return it
 
-    def record(self, kid, it, correct, ans, dont_know, ms):
-        evidence.log(kid["id"], "word", f"{it['list']}:{it['word']}", "answer", correct=correct, mode="game",
-                     fmt="choice", weight=GAME_WEIGHT)
+    def record(self, kid, it, correct, ans, dont_know, ms, mode="game", weight=GAME_WEIGHT):
+        evidence.log(kid["id"], "word", f"{it['list']}:{it['word']}", "answer", correct=correct, mode=mode,
+                     fmt="choice", weight=weight)
         if it.get("kp_id"):   # 术语卡挂了知识点：也算这个知识点的一条证据
-            super().record(kid, it, correct, ans, dont_know, ms)
+            super().record(kid, it, correct, ans, dont_know, ms, mode, weight)
         if not correct:       # 不认识的词放进复习
             engine.add_card(kid["id"], "word" if it["family"] == "words" else "term", it["word"], it["zh"],
-                            {"list": it["list"], "from": "game"}, it.get("kp_id") or None)
+                            {"list": it["list"], "from": mode}, it.get("kp_id") or None)
 
 
 # ------------------------------------------------------------------ 题库里的短选择题（任何学科）
@@ -350,8 +350,8 @@ def pick(kid: dict, src: str, target: float, rng: random.Random) -> dict:
     return it
 
 
-def record(kid: dict, it: dict, correct: bool, ans, dont_know: bool, ms: int):
-    SOURCES.get(it.get("src") or "math", SOURCES["math"]).record(kid, it, correct, ans, dont_know, ms)
+def record(kid: dict, it: dict, correct: bool, ans, dont_know: bool, ms: int, mode="game", weight=GAME_WEIGHT):
+    SOURCES.get(it.get("src") or "math", SOURCES["math"]).record(kid, it, correct, ans, dont_know, ms, mode, weight)
 
 
 def public(it: dict) -> dict:
