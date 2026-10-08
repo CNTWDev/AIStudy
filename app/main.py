@@ -43,6 +43,9 @@ templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LA
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES)
 templates.env.globals.update(MASCOTS=brand.MASCOTS, mascot_of=brand.mascot_of, mascot_chosen=brand.has_chosen, mascot_svg=brand.mascot_svg,
                              wordmark_svg=brand.wordmark_svg)
+# 样式和脚本的地址带上文件修改时间，升级后浏览器不会继续用缓存里的旧版本
+_STATIC = config.BASE_DIR / "app" / "static"
+templates.env.globals["ASSET_V"] = str(int(max((_STATIC / f).stat().st_mtime for f in ("app.css", "app.js"))))
 
 
 def device_label(ua: str | None) -> str:

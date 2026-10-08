@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{% block title %}{{ SITE }}{% endblock %}</title>
 {% set mascot = mascot_of(user) %}
-<link rel="stylesheet" href="/static/app.css">
+<link rel="stylesheet" href="/static/app.css?v={{ ASSET_V }}">
 <link rel="icon" type="image/svg+xml" href="/static/brand/{{ mascot }}.svg">
 <link rel="apple-touch-icon" href="/static/brand/icon-180.png">
 <link rel="manifest" href="/static/brand/site.webmanifest">
 <meta name="theme-color" content="#FBF7EC" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16130F" media="(prefers-color-scheme: dark)">
-<script src="/static/app.js"></script>
+<script src="/static/app.js?v={{ ASSET_V }}"></script>
 </head>
 <body data-tone="{{ tone }}"{% if user and user.role == 'kid' %} data-kid="1"{% endif %}>
 {% if user and user.role == 'parent' and kid %}

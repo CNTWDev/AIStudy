@@ -33,7 +33,7 @@
       <div><label>考试日期{% if v.pack.system != 'cert' %}（选填）{% endif %}</label><input type="date" name="exam_date" value="{{ v.exam_date or '' }}"></div>
       <div><label>{{ '学段' if adult else '年级 / 学段' }}</label>
         <select name="stage">{% for st in v.pack.stages %}<option value="{{ st }}" {{ 'selected' if st == v.stage }}>{{ stage_label(st) }}</option>{% endfor %}</select></div>
-      <div class="grow"><label>{{ '现在正在学' if adult else '现在学校正在学' }}</label>
+      <div class="grow grow-w"><label>{{ '现在正在学' if adult else '现在学校正在学' }}</label>
         <select name="current" class="cur">
           <option value="">{{ '（不确定）' if adult else '（不确定 / 放假中）' }}</option>
           {% for sname, kps in v.strands %}<optgroup label="{{ sname }}">

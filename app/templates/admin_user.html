@@ -37,17 +37,19 @@
 {% if kids %}
 <div class="card">
   <h3>孩子</h3>
-  <table>{% for k in kids %}
-    <tr><td><a href="/admin/users/{{ k.id }}">{{ k.name }}</a></td><td class="small muted">{{ k.email }}</td><td class="small">{{ stage_label(k.grade) }}</td>
-      <td class="small">最近登录 {{ (k.last_login_at or '—')[:10] }}</td><td class="small"><a href="/admin/kids/{{ k.id }}">报告</a></td></tr>
-  {% endfor %}</table>
+  <div class="tw"><table>{% for k in kids %}
+    <tr><td class="nw"><a href="/admin/users/{{ k.id }}">{{ k.name }}</a></td><td class="small muted nw">{{ k.email }}</td><td class="small nw">{{ stage_label(k.grade) }}</td>
+      <td class="small nw">最近登录 {{ (k.last_login_at or '—')[:10] }}</td><td class="small nw"><a href="/admin/kids/{{ k.id }}">报告</a></td></tr>
+  {% endfor %}</table></div>
 </div>
 {% endif %}
 
 <div class="card">
   <h3>最近的账号记录</h3>
-  <table>{% for e in events %}
-    <tr class="small"><td>{{ e.created_at[:16]|replace('T',' ') }}</td><td>{{ e.event }}</td><td class="muted">{{ e.ip }}</td><td class="muted">{{ e.detail }}</td></tr>
-  {% else %}<tr><td class="muted small">还没有记录</td></tr>{% endfor %}</table>
+  <div class="tw"><table class="log">
+    <tr><th>时间</th><th>事件</th><th>IP</th><th>详情</th></tr>
+  {% for e in events %}
+    <tr class="small"><td class="nw">{{ e.created_at[:16]|replace('T',' ') }}</td><td class="nw">{{ e.event }}</td><td class="muted nw">{{ e.ip }}</td><td class="muted tx">{{ e.detail }}</td></tr>
+  {% else %}<tr><td colspan="4" class="muted small">还没有记录</td></tr>{% endfor %}</table></div>
 </div>
 {% endblock %}
