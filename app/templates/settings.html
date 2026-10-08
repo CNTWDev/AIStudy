@@ -4,6 +4,20 @@
 {% if user.must_change_pw %}<div class="err">你现在用的是临时密码。请先在下面改一个自己的新密码（「旧密码」填刚拿到的临时密码），改完就能正常使用了。</div>{% endif %}
 {% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
 {% if err %}<div class="err">{{ err }}</div>{% endif %}
+{% if user.role != 'admin' %}
+<form class="card" method="post" action="/settings/mascot" id="mascot">
+  <h3>{{ '选一个陪你学习的小伙伴' if tone == 'kid' else '我的图标' }}</h3>
+  <p class="muted small" style="margin:-4px 0 0">{{ '选好以后，网站左上角和浏览器标签上都是它。随时可以换。' if tone == 'kid' else '显示在网站左上角和浏览器标签上，随时可以换。' }}</p>
+  {% set cur = mascot_of(user) %}
+  <div class="mascots">
+  {% for id, (name, desc) in MASCOTS.items() %}
+    <label><input type="radio" name="mascot" value="{{ id }}" {{ 'checked' if id == cur }} onchange="this.form.submit()">
+      <span class="m">{{ mascot_svg(id, 64) }}<b>{{ name }}</b><small>{{ desc }}</small></span></label>
+  {% endfor %}
+  </div>
+  <noscript><div style="margin-top:12px"><button class="btn">保存</button></div></noscript>
+</form>
+{% endif %}
 <form class="card" method="post" action="/settings/profile">
   <h3>基本信息</h3>
   {% if user.role == 'kid' %}
