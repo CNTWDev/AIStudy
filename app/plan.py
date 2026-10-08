@@ -6,7 +6,9 @@
   fixed 每天都有（坚持比做对更重要，不受时间预算限制），flex 按顺序排、超出每天可用时间就截掉，
   "a+b" 表示两类交替穿插（交错练习），limits 是每类的上限。
 """
-from . import db, engine, evidence, explore, insights
+from datetime import timedelta
+
+from . import bankpapers, db, engine, evidence, explore, insights
 from .catalog import catalog, stage_rank
 
 
@@ -188,6 +190,14 @@ def src_exam(c: Ctx) -> list[dict]:
             left = [k for k in catalog.ids_for(pack_id, e["track"])
                     if catalog.kps[k].get("hot") and c.mastery.get(k, {}).get("status") != "mastered"]
             left.sort(key=lambda k: c.mastery.get(k, {}).get("score") or 0)
+            # 冲刺期每周一套整卷模拟考（卷库里有发布的卷子、手上没有没做完的模拟考时）
+            last = bankpapers.last_mock_day(c.user_id, pack_id)
+            if (not last or last <= (db.today() - timedelta(days=7)).isoformat()) and bankpapers.for_learner(c.user_id, [e]) \
+                    and not db.one("SELECT 1 AS ok FROM papers WHERE user_id=? AND pack_id=? AND bank_paper_id IS NOT NULL "
+                                   "AND status='ready'", c.user_id, pack_id):
+                out.append({"type": "paper", "pack": pack_id, "title": f"{catalog.packs[pack_id].subject_name}整卷模拟考",
+                            "why": f"离考试还有 {ex['days_left']} 天，找一段完整的时间按考试的节奏做一套", "minutes": 40,
+                            "url": f"/mocks?pack={pack_id}"})
             for i, k in enumerate(left[:c.limit("exam", 3)]):
                 out.append({"type": "exam", "kp": k, "title": f"考前过一遍：{catalog.kps[k]['name']}", "pack": pack_id,
                             "why": f"离考试还有 {ex['days_left']} 天，高频考点还没掌握", "minutes": 8,
@@ -205,9 +215,10 @@ def src_top(c: Ctx) -> list[dict]:
 
 
 def src_paper(c: Ctx) -> list[dict]:
-    return [{"type": "paper", "title": f"试卷订正：{p['title']}", "why": "把卷子上的题在线再做一遍，做完看诊断",
-             "minutes": 20, "url": f"/papers/{p['id']}"}
-            for p in db.q("SELECT id, title FROM papers WHERE user_id=? AND status='ready' ORDER BY id", c.user_id)]
+    return [{"type": "paper", "url": f"/papers/{p['id']}",
+             **({"title": f"模拟考：{p['title']}", "why": "接着把这套卷子做完，做完看诊断", "minutes": 30} if p["bank_paper_id"] else
+                {"title": f"试卷订正：{p['title']}", "why": "把卷子上的题在线再做一遍，做完看诊断", "minutes": 20})}
+            for p in db.q("SELECT id, title, bank_paper_id FROM papers WHERE user_id=? AND status='ready' ORDER BY id", c.user_id)]
 
 
 def src_diagnose(c: Ctx) -> list[dict]:

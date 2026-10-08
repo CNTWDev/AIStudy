@@ -175,8 +175,8 @@
   <div><b>{{ B.by_kind.get('context', 0) }}</b><span>份背景和用处</span></div>
   <div><b>{{ B.by_kind.get('passage', 0) }}</b><span>篇阅读短文</span></div>
 </div>
-<p class="muted small" style="margin-bottom:0">AI 现场生成的题目、讲解、背景和短文都会存进来，以后先用库里的，不够才再生成。题目来源：{% for k, v in B.by_source.items() %}{{ {'ai': 'AI 出题', 'seed': '内置', 'paper': '试卷导入'}.get(k, k) }} {{ v }}{{ '，' if not loop.last }}{% endfor %}。
-  <a href="/admin/bank/export.json">导出整个题库（JSON）</a>，不含孩子的作答记录和试卷原题。</p></div>
+<p class="muted small" style="margin-bottom:0">AI 现场生成的题目、讲解、背景和短文都会存进来，以后先用库里的，不够才再生成。题目来源：{% for k, v in B.by_source.items() %}{{ {'ai': 'AI 出题', 'seed': '内置', 'paper': '试卷导入', 'bank': '卷库'}.get(k, k) }} {{ v }}{{ '，' if not loop.last }}{% endfor %}。
+  <a href="/admin/bank/export.json">导出整个题库（JSON）</a>，不含孩子的作答记录、试卷原题和卷库的题。</p></div>
 
 {% if B.review or B.review_contents %}
 <div class="card">
@@ -222,6 +222,77 @@
   {% endfor %}
 </div>
 {% endif %}
+
+{% elif tab == 'papers' %}
+<div class="card">
+  <div class="card-h"><span class="ico">📥</span><h3>导入一份卷子</h3></div>
+  <p class="muted small">真题、名校卷、名师卷、考后回忆版：拍照或粘贴文字，AI 拆题、对上知识点、给出答案和讲解，存成<b>草稿</b>。
+  你逐题核对后点「发布」，题目才进公共题库：练习时比 AI 出的题优先，学习者也能把整套卷子当模拟考做。卷子只存在服务器上，不进代码仓库，也不随题库导出。</p>
+  {% if not llm_on %}<div class="hint">服务器还没有配置 AI，暂时不能解析卷子。</div>{% endif %}
+  <form id="bpf">
+    <div class="row">
+      <div class="grow"><label>课程</label><select name="pack_id" id="bppack">{% for p in bp_packs %}<option value="{{ p.id }}" data-stages="{{ p.stages|join(',') }}">{{ p.subject_name }} · {{ p.edition }}</option>{% endfor %}</select></div>
+      <div><label>学段</label><select name="stage" id="bpstage"></select></div>
+      <div><label>类型</label><select name="kind">{% for k, v in bp_kinds.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select></div>
+    </div>
+    <div class="row">
+      <div class="grow"><label>名称（可不填，AI 会从卷子上读）</label><input type="text" name="title" placeholder="例如：2024 年海淀区六年级数学期末"></div>
+      <div><label>年份</label><input type="text" name="year" placeholder="2024" style="width:80px"></div>
+      <div><label>限时（分钟）</label><input type="number" name="minutes" min="0" style="width:90px"></div>
+    </div>
+    <div class="row">
+      <div class="grow"><label>考试</label><input type="text" name="exam" placeholder="期末 / 中考 / 基金从业 3 月"></div>
+      <div class="grow"><label>地区</label><input type="text" name="region" placeholder="北京海淀"></div>
+      <div class="grow"><label>学校 / 老师 / 出处</label><input type="text" name="org" placeholder="人大附中"></div>
+    </div>
+    <label>拍照（每页一张，最多 {{ max_images }} 张）</label>
+    <input type="file" id="bpphotos" accept="image/*" multiple>
+    <div id="bpthumbs" class="row" style="flex-wrap:wrap;margin-top:6px"></div>
+    <details style="margin-top:10px"><summary class="small">没有照片？粘贴题目文字</summary>
+      <textarea name="text" style="min-height:120px"></textarea></details>
+    <button class="btn" id="bpgo" style="margin-top:12px" {{ 'disabled' if not llm_on }}>上传并解析</button>
+    <div id="bpmsg" class="small" style="margin-top:8px"></div>
+  </form>
+</div>
+<div class="card">
+  <div class="card-h"><span class="ico">🗂️</span><h3>卷库（{{ bps|length }}）</h3></div>
+  {% for b in bps %}
+  <a class="kp row" href="/admin/bank-papers/{{ b.id }}" style="display:flex;text-decoration:none;color:inherit">
+    <div class="grow"><b>{{ b.title }}</b>
+      <div class="muted small">{{ catalog.packs[b.pack_id].subject_name if b.pack_id in catalog.packs else b.pack_id }}{% if b.stage %} · {{ stage_label(b.stage) }}{% endif %} · {{ bp_label(b) }} · {{ b.n }} 题{% if b.used %} · 做过 {{ b.used }} 次{% endif %}</div></div>
+    <span class="pill {{ {'published': 'st-mastered', 'draft': 'st-learning'}.get(b.status, 'st-weak') }}">{{ bp_status[b.status] }}</span>
+  </a>
+  {% else %}<p class="muted small">还没有导入过卷子。</p>{% endfor %}
+</div>
+<script>
+const bpfiles = [];
+const fillStages = () => { const o = $('#bppack').selectedOptions[0]; $('#bpstage').innerHTML = (o ? o.dataset.stages.split(',') : []).map(s => `<option>${esc(s)}</option>`).join(''); };
+$('#bppack').onchange = fillStages; fillStages();
+$('#bpphotos').onchange = e => {
+  for (const f of e.target.files) {
+    if (bpfiles.length >= {{ max_images }}) { toast('最多 {{ max_images }} 张'); break; }
+    bpfiles.push(f);
+    const im = document.createElement('img'); im.src = URL.createObjectURL(f);
+    im.style.cssText = 'height:80px;border-radius:8px;margin:2px;border:1px solid var(--line)';
+    $('#bpthumbs').appendChild(im);
+  }
+  e.target.value = '';
+};
+$('#bpf').onsubmit = async e => {
+  e.preventDefault();
+  const fd = new FormData($('#bpf'));
+  bpfiles.forEach((b, i) => fd.append('photos', b, `page${i + 1}.jpg`));
+  if (!bpfiles.length && (fd.get('text') || '').trim().length < 10) { toast('先上传照片，或者粘贴题目文字'); return; }
+  $('#bpgo').disabled = true;
+  $('#bpmsg').textContent = '🤖 AI 正在拆题、对知识点、做答案……一般要一两分钟，请不要关闭页面。';
+  try {
+    const r = await fetch('/admin/bank-papers', {method: 'POST', body: fd});
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || d.detail || ('出错了 ' + r.status));
+    location.href = '/admin/bank-papers/' + d.id;
+  } catch (err) { $('#bpmsg').innerHTML = `<span class="err">${esc(err.message)}</span>`; $('#bpgo').disabled = false; }
+};
+</script>
 
 {% elif tab == 'arena' %}
 {% set F = fair %}

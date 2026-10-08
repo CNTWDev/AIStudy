@@ -946,3 +946,87 @@ def test_adult_exam_course():
         assert exam and all(t["title"].startswith("考前过一遍") and catalog.kps[t["kp"]]["hot"] for t in exam)
         e = db.one("SELECT * FROM enrollments WHERE user_id=? AND pack_id='fund-law'", mom["id"])
         assert engine.exam_view(mom["id"], e)["phase"] == "sprint"
+
+
+def test_bank_papers_admin_import_and_mock():
+    """公共卷库：只有管理员能导入；草稿不出给学习者；逐题核对后发布，练习时真题优先并标出来源；
+    学习者做整卷模拟考（复用试卷流程），卷库的题不随题库导出。"""
+    from app import bank, bankpapers, db, engine
+    with TestClient(app) as c:
+        kid = db.one("SELECT * FROM users WHERE email='mom@x.com'")
+        e = db.one("SELECT * FROM enrollments WHERE user_id=? AND pack_id='fund-law'", kid["id"])
+        c.post("/login", data={"email": "mom@x.com", "password": "secret1"})
+        assert c.post("/admin/bank-papers", data={"pack_id": "fund-law", "text": "x" * 20}).status_code == 403
+        assert c.post("/mocks/1/start").status_code == 404
+        c.get("/logout")
+
+        c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+        assert "导入一份卷子" in c.get("/admin?tab=papers").text
+        assert c.post("/admin/bank-papers", data={"pack_id": "fund-law"}).status_code == 400
+        jpg = b"\xff\xd8\xff\xe0" + b"0" * 100
+        r = c.post("/admin/bank-papers", data={"pack_id": "fund-law", "stage": e["stage"], "kind": "school", "title": "期末卷",
+                                               "year": "2024", "region": "上海徐汇", "org": "某某小学", "exam": "期末", "minutes": "60"},
+                   files=[("photos", ("p1.jpg", jpg, "image/jpeg"))])
+        assert r.status_code == 200, r.text
+        bp = r.json()["id"]
+        rows = bankpapers.rows(bp)
+        assert len(rows) == 3 and all(r["item"]["source"] == "bank" for r in rows)
+        assert db.one("SELECT status FROM items WHERE id=?", rows[0]["item_id"])["status"] == "draft"
+        assert c.get(f"/admin/bank-papers/{bp}/img/1.jpg").content == jpg
+        page = c.get(f"/admin/bank-papers/{bp}").text
+        assert "待核对" in page and "2024 上海徐汇 某某小学 期末 · 名校卷" in page
+        kp = rows[0]["item"]["kp_id"]
+        assert kp
+        # 草稿：练习里不出现
+        assert all(r["id"] not in {x["item_id"] for x in rows} for r in bank.candidates(kid["id"], kp))
+
+        # 逐题核对：改答案（选择题写字母）、删掉认错的题；答案不合格会退成简答题并提示
+        c.post(f"/admin/bank-papers/{bp}/items/{rows[0]['id']}", data={
+            "label": "1", "points": "3", "type": "mcq", "q": "1 m = ? cm", "options": "10\n100\n1000\n0.1",
+            "answer": "b", "explain": "1 米是 100 厘米", "kp_id": kp})
+        it = bank.row_to_item(db.one("SELECT * FROM items WHERE id=?", rows[0]["item_id"]))
+        assert it["answer"] == 1 and it["q"] == "1 m = ? cm" and it["type"] == "mcq"
+        r = c.post(f"/admin/bank-papers/{bp}/items/{rows[1]['id']}", data={"type": "mcq", "q": "2+3", "options": "4\n5", "answer": "Z"})
+        assert "简答题" in r.text
+        c.post(f"/admin/bank-papers/{bp}/items/{rows[2]['id']}", data={"delete": "1"})
+        assert len(bankpapers.rows(bp)) == 2 and not db.one("SELECT 1 AS ok FROM items WHERE id=?", rows[2]["item_id"])
+
+        # 发布：进公共题库，带来源标签；下架 / 删除的规则
+        assert "已发布" in c.post(f"/admin/bank-papers/{bp}/status", data={"action": "publish"}).text
+        it = bank.row_to_item(db.one("SELECT * FROM items WHERE id=?", rows[0]["item_id"]))
+        assert it["src"] == "2024 上海徐汇 某某小学 期末 · 名校卷"
+        assert "不能删" in c.post(f"/admin/bank-papers/{bp}/status", data={"action": "delete"}).text
+        assert all(x["source"] != "bank" for x in bank.export()["items"])
+        c.get("/logout")
+
+        # 学习者：练习时卷库的题优先；整卷模拟考
+        c.post("/login", data={"email": "mom@x.com", "password": "secret1"})
+        got = engine.items_for(kid["id"], kp, n=1)
+        assert got[0]["id"] == rows[0]["item_id"] and got[0]["src"]
+        plan = c.post("/api/plan/rebuild").json()["plan"]  # 离考试一周：冲刺期排一套整卷模拟考
+        assert any(t["title"] == "基金法律法规整卷模拟考" and t["url"] == "/mocks?pack=fund-law" for t in plan), plan
+        page = c.get("/mocks").text
+        assert "期末卷" in page and "名校卷" in page
+        r = c.post(f"/mocks/{bp}/start")
+        assert r.url.path.startswith("/papers/")
+        pid = int(r.url.path.split("/")[2])
+        assert c.post(f"/mocks/{bp}/start").url.path == f"/papers/{pid}"  # 没做完的接着做
+        page = c.get(f"/papers/{pid}").text
+        assert "模拟考" in page and "mclock" in page and 'class="kpsel"' not in page
+        plan = c.post("/api/plan/rebuild").json()["plan"]
+        assert any(t["title"].startswith("模拟考：") for t in plan), plan
+        prs = db.q("SELECT * FROM paper_items WHERE paper_id=? ORDER BY seq", pid)
+        assert c.post(f"/api/papers/{pid}/kp", json={"pi": prs[0]["id"], "kp_id": kp}).status_code == 400
+        assert c.post(f"/api/papers/{pid}/answer", json={"pi": prs[0]["id"], "answer": "1"}).json()["correct"]
+        c.post(f"/api/papers/{pid}/answer", json={"pi": prs[1]["id"], "dont_know": True})
+        assert c.post(f"/api/papers/{pid}/finish").json()["ok"]
+        assert "再做一次" in c.get("/mocks").text
+        assert db.one("SELECT n_attempts FROM items WHERE id=?", rows[0]["item_id"])["n_attempts"] >= 1
+        c.get("/logout")
+
+        # 下架后练习里不再出现
+        c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+        c.post(f"/admin/bank-papers/{bp}/status", data={"action": "retire"})
+        assert rows[0]["item_id"] not in {r["id"] for r in bank.candidates(kid["id"], kp)}
+        assert "已下架" in c.get("/admin?tab=papers").text
+        c.get("/logout")

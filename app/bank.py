@@ -265,8 +265,8 @@ def export() -> dict:
     """整个题库导出成 JSON（不含任何孩子的作答记录，只有题目本身和汇总统计）。"""
     items = []
     for r in db.q("SELECT * FROM items ORDER BY created_at"):
-        if r["source"] == "paper":
-            continue  # 试卷原题来自孩子的卷子，不导出
+        if r["source"] in ("paper", "bank"):
+            continue  # 试卷原题来自孩子的卷子；卷库的题来自真题、名校卷，有版权，都不导出
         items.append({**row_to_item(r), "lang": r["lang"], "grade": r["grade"], "purpose": r["purpose"], "status": r["status"],
                       "gen": db.jload(r["gen_meta"], {}), "stats": {"attempts": r["n_attempts"], "correct": r["n_correct"],
                       "dont_know": r["n_dont_know"], "avg_ms": round(r["total_ms"] / r["n_timed"]) if r["n_timed"] else None},

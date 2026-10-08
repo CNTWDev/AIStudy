@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import arena, auth, bank, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, webpage
+from . import arena, auth, bank, bankpapers, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, webpage
 from .auth import LoginRequired
 from .catalog import GRADES, catalog, is_adult, stage_label, stage_rank
 from .content import content
@@ -321,7 +321,7 @@ def kid_brief(k) -> dict:
 
 
 ADMIN_TABS = [("overview", "概览"), ("stats", "数据统计"), ("families", "家庭与孩子"), ("invites", "邀请码"),
-              ("tree", "邀请关系"), ("bank", "题库"), ("arena", "游戏公平"), ("log", "安全日志"), ("system", "站点设置")]
+              ("tree", "邀请关系"), ("bank", "题库"), ("papers", "卷库"), ("arena", "游戏公平"), ("log", "安全日志"), ("system", "站点设置")]
 
 
 @app.get("/admin", response_class=HTMLResponse)
@@ -389,6 +389,10 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
         ctx["daily"], ctx["totals"], ctx["kid_rows"] = _site_stats(users)
     elif tab == "bank":
         ctx["bank"] = bank.overview()
+    elif tab == "papers":
+        ctx.update(bps=bankpapers.listing(), bp_kinds=bankpapers.KINDS, bp_status=bankpapers.STATUS, bp_label=bankpapers.label,
+                   bp_packs=sorted(catalog.packs.values(), key=lambda p: (p.subject_name, p.edition)),
+                   max_images=papers.MAX_IMAGES, llm_on=llm.enabled())
     elif tab == "arena":
         ctx["fair"] = arena.fairness()
     elif tab == "log":
@@ -1341,14 +1345,8 @@ def papers_page(request: Request, pack: str = ""):
                   max_images=papers.MAX_IMAGES, llm_on=llm.enabled())
 
 
-@app.post("/api/papers")
-async def papers_create(request: Request):
-    k = kid_or_redirect(request, manage=True)
-    u = auth.current_user(request)
-    f = await request.form()
-    pack_id = f.get("pack_id") or ""
-    if pack_id not in {e["pack_id"] for e in enrollments(k["id"])}:
-        raise HTTPException(400, "请选择学科")
+async def _read_photos(f) -> list:
+    """上传的试卷照片 → [(media_type, bytes)]，顺便检查格式、大小、张数。"""
     images = []
     for up in f.getlist("photos"):
         if not hasattr(up, "read"):
@@ -1363,6 +1361,18 @@ async def papers_create(request: Request):
         images.append((up.content_type, data))
     if len(images) > papers.MAX_IMAGES:
         raise HTTPException(400, f"一次最多 {papers.MAX_IMAGES} 张照片")
+    return images
+
+
+@app.post("/api/papers")
+async def papers_create(request: Request):
+    k = kid_or_redirect(request, manage=True)
+    u = auth.current_user(request)
+    f = await request.form()
+    pack_id = f.get("pack_id") or ""
+    if pack_id not in {e["pack_id"] for e in enrollments(k["id"])}:
+        raise HTTPException(400, "请选择学科")
+    images = await _read_photos(f)
     text = (f.get("text") or "").strip()
     if not images and len(text) < 10:
         raise HTTPException(400, "请拍照上传，或者粘贴题目文字")
@@ -1380,7 +1390,8 @@ def paper_page(request: Request, paper_id: int):
     rs = papers.rows(paper_id)
     pack = catalog.packs.get(p["pack_id"])
     stage = engine.enrollment_stage(k["id"], p["pack_id"]) or k["grade"]
-    return render(request, "paper.html", p=p, rows=rs, pack=pack, images=db.jload(p["images"], []),
+    bp = bankpapers.get(p["bank_paper_id"]) if p["bank_paper_id"] else None
+    return render(request, "paper.html", p=p, rows=rs, pack=pack, images=db.jload(p["images"], []), bp_minutes=bp["minutes"] if bp else 0,
                   cands=papers.candidates(p["pack_id"], stage) if pack else [],
                   qs=[{"id": r["id"], "item_id": r["item_id"], "type": r["item"]["type"], "q": r["item"]["q"], "zh": r["item"].get("zh", ""),
                        "options": r["item"].get("options", []), "unit": r["item"].get("unit", ""),
@@ -1409,6 +1420,8 @@ def paper_set_kp(request: Request, paper_id: int, body: dict = Body(...)):
     """家长 / 孩子觉得 AI 对应的知识点不对，手动改。"""
     k = kid_or_redirect(request, manage=True)
     p = _paper_or_404(k, paper_id)
+    if p["bank_paper_id"]:
+        raise HTTPException(400, "模拟考的题来自公共卷库，知识点由管理员核对")
     kp_id = body.get("kp_id") or None
     if kp_id and kp_id not in catalog.packs[p["pack_id"]].kp_ids:
         raise HTTPException(400, "知识点不在这门课里")
@@ -1458,7 +1471,7 @@ def paper_delete(request: Request, paper_id: int):
 def _ask_item(k, item_id: str):
     """孩子能看到的题：公共题库的题，或自己试卷里的题。"""
     row = db.one("SELECT * FROM items WHERE id=?", item_id) if item_id else None
-    if not row:
+    if not row or row["status"] == "draft":
         return None
     if row["source"] == "paper" and not db.one(
             "SELECT 1 AS ok FROM paper_items i JOIN papers p ON p.id=i.paper_id WHERE i.item_id=? AND p.user_id=?", item_id, k["id"]):
@@ -1965,3 +1978,123 @@ def healthz():
     ok, _ = llm.check()
     return {"ok": True, "db": db.DIALECT, "packs": len(catalog.packs), "kps": len(catalog.kps),
             "llm": llm.settings().default if ok else "off"}
+
+
+# ================================================================== 公共卷库：管理员导入真题 / 名校卷 / 名师卷，学习者做整卷模拟考
+
+def _bp_or_404(bp_id: int):
+    bp = bankpapers.get(bp_id)
+    if not bp:
+        raise HTTPException(404, "没有这份卷子")
+    return bp
+
+
+def _bp_back(bp_id: int, msg="", anchor=""):
+    from urllib.parse import urlencode
+    return RedirectResponse(f"/admin/bank-papers/{bp_id}?" + urlencode({"msg": msg}) + (f"#{anchor}" if anchor else ""), 303)
+
+
+@app.post("/admin/bank-papers")
+async def admin_bp_create(request: Request):
+    a = auth.require_admin(request)
+    f = await request.form()
+    pack_id = f.get("pack_id") or ""
+    if pack_id not in catalog.packs:
+        raise HTTPException(400, "请选择课程")
+    images = await _read_photos(f)
+    text = (f.get("text") or "").strip()
+    if not images and len(text) < 10:
+        raise HTTPException(400, "请上传卷子照片，或者粘贴题目文字")
+    from starlette.concurrency import run_in_threadpool
+    try:
+        bp = await run_in_threadpool(bankpapers.create, a["id"], pack_id, kind=f.get("kind") or "real", stage=f.get("stage") or "",
+                                     title=(f.get("title") or "").strip(), exam=(f.get("exam") or "").strip(),
+                                     year=(f.get("year") or "").strip(), region=(f.get("region") or "").strip(),
+                                     org=(f.get("org") or "").strip(),
+                                     minutes=int(f.get("minutes")) if str(f.get("minutes") or "").isdigit() else 0,
+                                     images=images, text=text)
+    except llm.LLMError as e:
+        raise HTTPException(400, str(e))
+    return {"ok": True, "id": bp}
+
+
+@app.get("/admin/bank-papers/{bp_id}", response_class=HTMLResponse)
+def admin_bp_page(request: Request, bp_id: int, msg: str = ""):
+    auth.require_admin(request)
+    bp = _bp_or_404(bp_id)
+    pack = catalog.packs.get(bp["pack_id"])
+    return render(request, "admin_bank_paper.html", bp=bp, pack=pack, rows=bankpapers.rows(bp_id), msg=msg,
+                  label=bankpapers.label(bp), kinds=bankpapers.KINDS, status=bankpapers.STATUS, types=itemtypes.TYPES,
+                  images=db.jload(bp["images"], []), kps=[catalog.kps[k] for k in pack.kp_ids] if pack else [],
+                  used=db.one("SELECT COUNT(*) AS n FROM papers WHERE bank_paper_id=?", bp_id)["n"])
+
+
+@app.get("/admin/bank-papers/{bp_id}/img/{name}")
+def admin_bp_image(request: Request, bp_id: int, name: str):
+    from fastapi.responses import FileResponse
+    auth.require_admin(request)
+    if name not in db.jload(_bp_or_404(bp_id)["images"], []):
+        raise HTTPException(404)
+    return FileResponse(bankpapers.DIR / str(bp_id) / name)
+
+
+@app.post("/admin/bank-papers/{bp_id}/meta")
+async def admin_bp_meta(request: Request, bp_id: int):
+    auth.require_admin(request)
+    _bp_or_404(bp_id)
+    bankpapers.update_meta(bp_id, dict(await request.form()))
+    return _bp_back(bp_id, "已保存")
+
+
+@app.post("/admin/bank-papers/{bp_id}/items/{bpi_id}")
+async def admin_bp_item(request: Request, bp_id: int, bpi_id: int):
+    auth.require_admin(request)
+    _bp_or_404(bp_id)
+    f = dict(await request.form())
+    if f.get("delete"):
+        bankpapers.remove_item(bp_id, bpi_id)
+        return _bp_back(bp_id, "已删掉这道题")
+    try:
+        typ = bankpapers.update_item(bp_id, bpi_id, f)
+    except KeyError:
+        raise HTTPException(404)
+    msg = "已保存" if typ == (f.get("type") or typ) else f"答案格式不对，这题改成了{itemtypes.TYPES[typ].label}，请再看一眼"
+    return _bp_back(bp_id, msg, f"bpi-{bpi_id}")
+
+
+@app.post("/admin/bank-papers/{bp_id}/status")
+def admin_bp_status(request: Request, bp_id: int, action: str = Form(...)):
+    auth.require_admin(request)
+    _bp_or_404(bp_id)
+    if action == "publish":
+        try:
+            n = bankpapers.publish(bp_id)
+        except ValueError as e:
+            return _bp_back(bp_id, str(e))
+        return _bp_back(bp_id, f"已发布：{n} 道题进了公共题库，学习者可以做整卷模拟考")
+    if action == "retire":
+        bankpapers.retire(bp_id)
+        return _bp_back(bp_id, "已下架")
+    if action == "delete":
+        if not bankpapers.delete(bp_id):
+            return _bp_back(bp_id, "发布过或有人做过的卷子不能删，可以下架")
+        return _admin_back("papers", "已删除")
+    raise HTTPException(400)
+
+
+@app.get("/mocks", response_class=HTMLResponse)
+def mocks_page(request: Request, pack: str = ""):
+    k = kid_or_redirect(request, manage=True)
+    es = enrollments(k["id"])
+    lst = bankpapers.for_learner(k["id"], [e for e in es if not pack or e["pack_id"] == pack])
+    return render(request, "mocks.html", mocks=lst, pack=pack, packs=[catalog.packs[e["pack_id"]] for e in es])
+
+
+@app.post("/mocks/{bp_id}/start")
+def mock_start(request: Request, bp_id: int):
+    k = kid_or_redirect(request)
+    if not any(m["bp"]["id"] == bp_id for m in bankpapers.for_learner(k["id"], enrollments(k["id"]))):
+        raise HTTPException(404, "没有这套卷子")
+    pid = bankpapers.start_mock(k["id"], bp_id)
+    engine.today_plan(k["id"], rebuild=True)
+    return RedirectResponse(f"/papers/{pid}", 303)

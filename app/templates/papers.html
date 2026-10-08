@@ -32,6 +32,7 @@
 <a class="card row" href="/papers/{{ p.id }}{{ '/report' if p.status == 'done' }}" style="display:flex;text-decoration:none;color:inherit">
   <div class="grow"><b>{{ p.title }}</b>
     <div class="muted small">{{ catalog.packs[p.pack_id].subject_name if p.pack_id in catalog.packs else p.pack_id }} · {{ p.exam_date or p.created_at[:10] }} · {{ p.n }} 题</div></div>
+  {% if p.bank_paper_id %}<span class="pill">模拟考</span>{% endif %}
   <span class="pill {{ 'st-mastered' if p.status == 'done' else 'st-learning' }}">{{ '已诊断' if p.status == 'done' else '待订正' }}</span>
 </a>
 {% endfor %}

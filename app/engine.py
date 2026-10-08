@@ -101,7 +101,7 @@ save_items = bank.save_items
 
 
 def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="") -> list[dict]:
-    """取题：先用题库里的（这个知识点的，加上别的教材里同一概念的），优先没做过的、难度从低到高；
+    """取题：先用题库里的（这个知识点的，加上别的教材里同一概念的），优先没做过的、卷库真题优先、难度从低到高；
     不够且配置了 AI 时现场出题，存进题库，以后别的孩子也能用。"""
     rows = bank.candidates(user_id, kp_id)
     fresh = [r for r in rows if r["done"] == 0]
@@ -109,7 +109,9 @@ def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="") -> li
     # 交叉验证：优先没用过的题型（已经用选择题答对过，就先给填空 / 计算）
     m = db.one("SELECT evidence FROM mastery WHERE user_id=? AND kp_id=?", user_id, kp_id)
     seen_fmts = set(db.jload(m["evidence"], {}).get("fmts", [])) if m and m["evidence"] else set()
-    pool = sorted(fresh, key=lambda r: (r["other"] or 0, itemtypes.fmt(r["type"]) in seen_fmts, r["difficulty"])) + redo
+    # 卷库里管理员核对过的真题 / 名校卷 / 名师卷，比 AI 出的题优先
+    pool = sorted(fresh, key=lambda r: (r["other"] or 0, r["source"] != "bank", itemtypes.fmt(r["type"]) in seen_fmts,
+                                        r["difficulty"])) + redo
     if purpose == "diagnose":
         pool = sorted(rows, key=lambda r: (r["done"] > 0, r["other"] or 0, abs(r["difficulty"] - 2)))
     picked = [{**bank.row_to_item(r), "kp_id": kp_id} for r in pool[:n]]  # 共用的题，这次记在正在学的知识点上
