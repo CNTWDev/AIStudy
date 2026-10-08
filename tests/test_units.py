@@ -174,3 +174,16 @@ def test_bankflow_helpers():
     c = bankflow.skeleton({"q": "长方形的面积怎么算？"})
     assert a == b and bankflow.similar(a, c) < bankflow.SIM
     assert [bankflow.level_of(x) for x in (-3, -1, 0, 1, 3)] == [1, 2, 3, 4, 5]
+
+
+def test_tables_scroll_instead_of_squeezing():
+    """每张表都套在 .tw 里（窄屏横向滑动），不再把表格本身改成 display:block（列会被挤成一两个字宽）。"""
+    import pathlib
+    import re
+    root = pathlib.Path(__file__).resolve().parent.parent / "app"
+    for f in sorted((root / "templates").glob("*.html")):
+        html = f.read_text(encoding="utf-8")
+        for m in re.finditer(r"<table", html):
+            assert re.search(r'<div class="tw[^"]*"[^>]*>\s*$', html[:m.start()]), f"{f.name}: <table> 没有套 <div class=\"tw\">"
+    css = (root / "static" / "app.css").read_text(encoding="utf-8")
+    assert "table{display:block" not in css.replace(" ", "")

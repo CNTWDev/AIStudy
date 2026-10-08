@@ -93,7 +93,7 @@
   <h3 style="margin-top:0">参考：每日计划示例</h3>
   {% for pl in content.plans %}
   <details><summary><b>{{ pl.for or pl.id }}</b>{% if pl.weekday_minutes %} · 平时每天 {{ pl.weekday_minutes }} 分钟{% endif %}</summary>
-    <table>{% for x in pl.tasks %}<tr class="small"><td><b>{{ x.title }}</b></td><td>{{ x.minutes }} 分钟</td><td>{{ x.what }}{% if x.example %}<br><span class="muted">例：{{ x.example }}</span>{% endif %}</td></tr>{% endfor %}</table>
+    <div class="tw"><table>{% for x in pl.tasks %}<tr class="small"><td class="nw"><b>{{ x.title }}</b></td><td class="nw">{{ x.minutes }} 分钟</td><td class="tx">{{ x.what }}{% if x.example %}<br><span class="muted">例：{{ x.example }}</span>{% endif %}</td></tr>{% endfor %}</table></div>
     {% if pl.week_example %}<p class="small"><b>一周示例</b></p>{% for d in pl.week_example %}<p class="small">{{ d.day }}：{{ d['items']|join('；') }}</p>{% endfor %}{% endif %}
     {% for n in pl.notes or [] %}<p class="small muted">· {{ n }}</p>{% endfor %}
   </details>

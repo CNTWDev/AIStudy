@@ -12,13 +12,13 @@
 </div>
 <div class="card">
   <h3>我生成的邀请码</h3>
-  <table>
+  <div class="tw"><table>
     <tr><th>邀请码</th><th>备注</th><th>状态</th></tr>
     {% for i in invites %}
-    <tr><td><code>{{ i.code }}</code></td><td class="small">{{ i.note }}</td>
-      <td class="small">{% if i.used >= i.max_uses %}已使用{% elif i.expires_at and i.expires_at < now %}已过期{% else %}可用，{{ i.expires_at[:10] }} 前{% endif %}</td></tr>
+    <tr><td class="nw"><code>{{ i.code }}</code></td><td class="small tx">{{ i.note }}</td>
+      <td class="small nw">{% if i.used >= i.max_uses %}已使用{% elif i.expires_at and i.expires_at < now %}已过期{% else %}可用，{{ i.expires_at[:10] }} 前{% endif %}</td></tr>
     {% else %}<tr><td colspan="3" class="muted small">还没有</td></tr>{% endfor %}
-  </table>
+  </table></div>
 </div>
 <div class="card">
   <h3>通过我加入的家庭</h3>

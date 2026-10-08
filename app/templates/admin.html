@@ -18,22 +18,22 @@
 <a class="btn ghost sm" href="/admin/users/{{ u.id }}">账号管理</a>
 {%- endmacro %}
 {% macro kid_table(kids, first='孩子') %}
-  <table style="margin-top:8px">
+  <div class="tw" style="margin-top:8px"><table>
     <tr><th>{{ first }}</th><th>年级 / 教材</th><th>今天</th><th>坚持</th><th>本周</th><th>待复习 / 生词</th><th>薄弱点</th><th>系统发现</th><th></th></tr>
     {% for k in kids %}
     <tr>
-      <td><b><a href="/admin/users/{{ k.u.id }}">{{ k.u.name }}</a></b> {{ status_pill(k.u) }}<div class="muted small">{{ k.u.email }}</div></td>
+      <td class="nw"><b><a href="/admin/users/{{ k.u.id }}">{{ k.u.name }}</a></b> {{ status_pill(k.u) }}<div class="muted small">{{ k.u.email }}</div></td>
       <td class="small">{{ stage_label(k.u.grade) }}<br><span class="muted">{% for p in k.packs %}{{ p.pack.subject_name }}{{ '、' if not loop.last }}{% else %}未选教材{% endfor %}</span></td>
-      <td class="small">{{ k.today_done }}/{{ k.today.plan|length }} 项<br><span class="muted">{{ k.today.minutes }} 分钟</span></td>
-      <td class="small">连续 {{ k.streak }} 天</td>
-      <td class="small">{{ k.week_days }} 天 · {{ k.week_min }} 分钟</td>
-      <td class="small">{{ k.due }} / {{ k.words }}</td>
-      <td class="small">{{ k.weak_n }}{% if k.weak %}<br><span class="muted">{{ k.weak[0].name }}</span>{% endif %}</td>
-      <td class="small">{% for i in k.insights[:2] %}<div>🔍 {{ i.title }}</div>{% else %}<span class="muted">—</span>{% endfor %}</td>
-      <td class="small"><a href="/admin/kids/{{ k.u.id }}">报告</a></td>
+      <td class="small nw">{{ k.today_done }}/{{ k.today.plan|length }} 项<br><span class="muted">{{ k.today.minutes }} 分钟</span></td>
+      <td class="small nw">连续 {{ k.streak }} 天</td>
+      <td class="small nw">{{ k.week_days }} 天<br><span class="muted">{{ k.week_min }} 分钟</span></td>
+      <td class="small nw">{{ k.due }} / {{ k.words }}</td>
+      <td class="small tx">{{ k.weak_n }}{% if k.weak %}<br><span class="muted">{{ k.weak[0].name }}</span>{% endif %}</td>
+      <td class="small tx">{% for i in k.insights[:2] %}<div>🔍 {{ i.title }}</div>{% else %}<span class="muted">—</span>{% endfor %}</td>
+      <td class="small nw"><a href="/admin/kids/{{ k.u.id }}">报告</a></td>
     </tr>
     {% endfor %}
-  </table>
+  </table></div>
 {% endmacro %}
 {% block body %}
 <h1>管理后台</h1>
@@ -61,11 +61,11 @@
 </div>
 <div class="card">
   <h3>最近加入的家庭</h3>
-  <table>{% for u in recent %}
-    <tr><td><b>{{ u.name }}</b> <span class="muted small">{{ u.email }}</span> {{ status_pill(u) }}</td>
-      <td class="small">{{ '由 ' ~ u.inviter_name ~ ' 邀请' if u.inviter_name else ('申请注册' if u.apply_note or u.status in ('pending','rejected') else '—') }}</td>
-      <td class="small muted">{{ u.created_at[:10] }}</td></tr>
-  {% endfor %}</table>
+  <div class="tw"><table>{% for u in recent %}
+    <tr><td class="tx"><b>{{ u.name }}</b> <span class="muted small">{{ u.email }}</span> {{ status_pill(u) }}</td>
+      <td class="small nw">{{ '由 ' ~ u.inviter_name ~ ' 邀请' if u.inviter_name else ('申请注册' if u.apply_note or u.status in ('pending','rejected') else '—') }}</td>
+      <td class="small muted nw">{{ u.created_at[:10] }}</td></tr>
+  {% endfor %}</table></div>
 </div>
 
 {% elif tab == 'stats' %}
@@ -83,16 +83,16 @@
   <h3 style="margin-top:0">近 14 天</h3>
   {% set mx = [daily|map(attribute='minutes')|max, 1]|max %}
   <div class="mini-bars" style="height:80px">{% for d in daily %}<div style="height:{{ 100 * d.minutes / mx }}%" title="{{ d.day }}：{{ d.minutes }} 分钟"></div>{% endfor %}</div>
-  <table class="small"><tr><th>日期</th><th>在学孩子</th><th>学习分钟</th><th>做题</th><th>提问</th><th>AI 调用</th></tr>
-  {% for d in daily|reverse %}<tr><td>{{ d.day[5:] }}</td><td>{{ d.kids }}</td><td>{{ d.minutes }}</td><td>{{ d.attempts }}</td><td>{{ d.asks }}</td><td>{{ d.ai }}</td></tr>{% endfor %}</table>
+  <div class="tw"><table class="small nums"><tr><th>日期</th><th>在学孩子</th><th>学习分钟</th><th>做题</th><th>提问</th><th>AI 调用</th></tr>
+  {% for d in daily|reverse %}<tr><td>{{ d.day[5:] }}</td><td>{{ d.kids }}</td><td>{{ d.minutes }}</td><td>{{ d.attempts }}</td><td>{{ d.asks }}</td><td>{{ d.ai }}</td></tr>{% endfor %}</table></div>
 </div>
 <div class="card">
   <h3 style="margin-top:0">每个孩子（近 7 天）</h3>
-  <table class="small"><tr><th>孩子</th><th>家长</th><th>学习天数</th><th>分钟</th><th>做题 / 正确率</th><th>还不会</th><th>提问</th><th>连续</th><th>系统发现</th><th></th></tr>
-  {% for r in kid_rows %}<tr><td><b>{{ r.u.name }}</b> {{ stage_label(r.u.grade) }}</td><td>{{ r.parent.name if r.parent }}</td><td>{{ r.days }}</td><td>{{ r.minutes }}</td>
-    <td>{{ r.attempts }}{% if r.acc is not none %} / {{ r.acc }}%{% endif %}</td><td>{{ r.dk }}</td><td>{{ r.asks }}</td><td>{{ r.streak }} 天</td><td>{{ r.insights }}</td>
-    <td><a href="/admin/kids/{{ r.u.id }}">报告</a></td></tr>
-  {% else %}<tr><td colspan="10" class="muted">还没有孩子账号</td></tr>{% endfor %}</table>
+  <div class="tw"><table class="small nums"><tr><th>孩子</th><th>家长</th><th>学习天数</th><th>分钟</th><th>做题 / 正确率</th><th>还不会</th><th>提问</th><th>连续</th><th>系统发现</th><th></th></tr>
+  {% for r in kid_rows %}<tr><td class="nw"><b>{{ r.u.name }}</b> <span class="muted">{{ stage_label(r.u.grade) }}</span></td><td class="nw">{{ r.parent.name if r.parent }}</td><td>{{ r.days }}</td><td>{{ r.minutes }}</td>
+    <td>{{ r.attempts }}{% if r.acc is not none %} / {{ r.acc }}%{% endif %}</td><td>{{ r.dk }}</td><td>{{ r.asks }}</td><td class="nw">{{ r.streak }} 天</td><td>{{ r.insights }}</td>
+    <td class="nw"><a href="/admin/kids/{{ r.u.id }}">报告</a></td></tr>
+  {% else %}<tr><td colspan="10" class="muted">还没有孩子账号</td></tr>{% endfor %}</table></div>
 </div>
 
 {% elif tab == 'families' %}
@@ -101,7 +101,7 @@
 {% for f in families %}
 <div class="card">
   <div class="row">
-    <div class="grow"><h3 style="margin:0"><a href="/admin/users/{{ f.p.id }}">{{ f.p.name }}</a> {{ status_pill(f.p) }}</h3>
+    <div class="grow grow-w"><h3 style="margin:0"><a href="/admin/users/{{ f.p.id }}">{{ f.p.name }}</a> {{ status_pill(f.p) }}</h3>
       <div class="muted small">{{ f.p.email }} · 注册 {{ f.p.created_at[:10] }} · 最近活动 {{ (f.p.last_active_at or f.p.last_login_at or '—')[:10] }}
         {% if f.p.inviter_name %} · 由 {{ f.p.inviter_name }} 邀请{% endif %}{% if f.invited %} · 邀请了 {{ f.invited|length }} 个家庭{% endif %}</div></div>
     <div class="small">{{ user_actions(f.p, 'families') }}
@@ -139,20 +139,20 @@
 </form>
 <div class="card">
   <p class="muted small">管理员生成的邀请码可以多次使用、不限数量；家长在「邀请亲友」里也能生成（每人最多同时 3 个、一次有效）。用邀请码注册的账号直接开通。</p>
-  <table>
+  <div class="tw"><table>
     <tr><th>邀请码</th><th>生成人</th><th>备注</th><th>使用</th><th>状态</th><th></th></tr>
     {% for i in invites %}
     {% set dead = i.used >= i.max_uses or (i.expires_at and i.expires_at < now) %}
     <tr>
-      <td><code>{{ i.code }}</code></td>
-      <td class="small">{{ i.creator_name or '命令行' }}</td>
-      <td class="small">{{ i.note }}</td>
-      <td class="small">{{ i.used }}/{{ i.max_uses }}{% for u in used_by.get(i.code, []) %}<br>→ {{ u.name }} <span class="muted">{{ u.email }}</span>{% endfor %}</td>
-      <td class="small">{% if i.used >= i.max_uses %}已用完{% elif i.expires_at and i.expires_at < now %}已过期{% else %}可用至 {{ (i.expires_at or '')[:10] }}{% endif %}</td>
+      <td class="nw"><code>{{ i.code }}</code></td>
+      <td class="small nw">{{ i.creator_name or '命令行' }}</td>
+      <td class="small tx">{{ i.note }}</td>
+      <td class="small nw">{{ i.used }}/{{ i.max_uses }}{% for u in used_by.get(i.code, []) %}<br>→ {{ u.name }} <span class="muted">{{ u.email }}</span>{% endfor %}</td>
+      <td class="small nw">{% if i.used >= i.max_uses %}已用完{% elif i.expires_at and i.expires_at < now %}已过期{% else %}可用至 {{ (i.expires_at or '')[:10] }}{% endif %}</td>
       <td>{% if not dead %}<form method="post" action="/admin/invites/{{ i.code }}/delete"><button class="btn ghost sm">作废</button></form>{% endif %}</td>
     </tr>
     {% else %}<tr><td colspan="6" class="muted small">还没有邀请码</td></tr>{% endfor %}
-  </table>
+  </table></div>
 </div>
 
 {% elif tab == 'tree' %}
@@ -224,12 +224,12 @@
 <div class="card">
   <div class="card-h"><span class="ico">📚</span><h3>各教材的题目覆盖</h3></div>
   <p class="muted small">「有题」：至少有 1 道题的知识点；「够用」：至少 3 道。</p>
-  <table>
-    <tr class="small muted"><td>教材</td><td>知识点</td><td>有题</td><td>够用</td><td>题目</td></tr>
+  <div class="tw"><table class="nums">
+    <tr><th>教材</th><th>知识点</th><th>有题</th><th>够用</th><th>题目</th></tr>
     {% for p in B.packs %}
-    <tr class="small"><td>{{ p.name }}</td><td>{{ p.kps }}</td><td>{{ p.covered }}（{{ (100 * p.covered / p.kps)|round|int if p.kps else 0 }}%）</td><td>{{ p.enough }}</td><td>{{ p['items'] }}</td></tr>
+    <tr class="small"><td class="tx">{{ p.name }}</td><td>{{ p.kps }}</td><td class="nw">{{ p.covered }}（{{ (100 * p.covered / p.kps)|round|int if p.kps else 0 }}%）</td><td>{{ p.enough }}</td><td>{{ p['items'] }}</td></tr>
     {% endfor %}
-  </table>
+  </table></div>
 </div>
 
 {% if B.hard %}
@@ -320,30 +320,31 @@ $('#bpf').onsubmit = async e => {
 <div class="card">
   <div class="card-h"><span class="ico">⚖️</span><h3>游戏公平看板（近 {{ F.days }} 天）</h3></div>
   <p class="muted small">按孩子在学的教材里已掌握的比例分组（和游戏无关的学业水平）。出题目标是每个孩子都有约 <b>{{ F.target }}%</b> 的答对率（火柴人；闪电赛跑 {{ F.games.race }}%，星星守卫 {{ F.games.defense }}%，四选一的题再高一点）：各组「实际答对率」都接近目标、接近「预测答对率」，说明不同水平的孩子拿到的是同样有挑战、同样答得上的题。差得多的组，要看题目难度是不是估偏了。</p>
-  <table>
-    <tr class="small muted"><td>水平</td><td>孩子</td><td>答题</td><td>预测答对率</td><td>实际答对率</td><td>每分钟经验值</td><td>局数</td><td>打赢电脑</td></tr>
+  <div class="tw"><table class="nums">
+    <tr><th>水平</th><th>孩子</th><th>答题</th><th>预测答对率</th><th>实际答对率</th><th>每分钟经验值</th><th>局数</th><th>打赢电脑</th></tr>
     {% for r in F.rows %}
-    <tr class="small"><td>{{ r.band }}</td><td>{{ r.kids }}</td><td>{{ r.answers }}</td><td>{{ r.pred ~ '%' if r.pred is not none else '—' }}</td>
+    <tr class="small"><td class="nw">{{ r.band }}</td><td>{{ r.kids }}</td><td>{{ r.answers }}</td><td>{{ r.pred ~ '%' if r.pred is not none else '—' }}</td>
       <td>{% if r.acc is not none %}<b>{{ r.acc }}%</b>{% else %}—{% endif %}</td><td>{{ r.xp_per_min if r.xp_per_min is not none else '—' }}</td>
       <td>{{ r.matches }}</td><td>{{ r.win_rate ~ '%' if r.win_rate is not none else '—' }}</td></tr>
     {% endfor %}
-  </table>
+  </table></div>
 </div>
 <div class="card">
   <div class="card-h"><span class="ico">🎯</span><h3>题目难度校准</h3></div>
   <p class="muted small">每个题族、每个级别的难度由所有孩子的作答在线校准（数值越大越难，0 表示中等）。作答次数少的还是先验值。</p>
-  {% if F.calib %}<table><tr class="small muted"><td>题族</td><td>级别</td><td>难度</td><td>作答</td></tr>
-    {% for c in F.calib %}<tr class="small"><td>{{ c.name }}</td><td>{{ c.level }}</td><td>{{ '%.2f'|format(c.b) }}</td><td>{{ c.n }}</td></tr>{% endfor %}</table>
+  {% if F.calib %}<div class="tw"><table class="nums"><tr><th>题族</th><th>级别</th><th>难度</th><th>作答</th></tr>
+    {% for c in F.calib %}<tr class="small"><td>{{ c.name }}</td><td>{{ c.level }}</td><td>{{ '%.2f'|format(c.b) }}</td><td>{{ c.n }}</td></tr>{% endfor %}</table></div>
   {% else %}<p class="muted small">还没有孩子玩过。</p>{% endif %}
 </div>
 
 {% elif tab == 'log' %}
 <div class="card">
-  <table>
+  <div class="tw"><table class="log">
+    <tr><th>时间</th><th>事件</th><th>账号</th><th>IP</th><th>详情</th></tr>
     {% for e in events %}
-    <tr class="small"><td>{{ e.created_at[:16]|replace('T',' ') }}</td><td>{{ e.event }}</td><td>{{ e.email }}</td><td class="muted">{{ e.ip }}</td><td class="muted">{{ e.detail }}</td></tr>
-    {% endfor %}
-  </table>
+    <tr class="small"><td class="nw">{{ e.created_at[:16]|replace('T',' ') }}</td><td class="nw">{{ e.event }}</td><td class="nw">{{ e.email }}</td><td class="muted nw">{{ e.ip }}</td><td class="muted tx">{{ e.detail }}</td></tr>
+    {% else %}<tr><td colspan="5" class="muted small">还没有记录</td></tr>{% endfor %}
+  </table></div>
 </div>
 
 {% elif tab == 'system' %}
@@ -369,13 +370,13 @@ $('#bpf').onsubmit = async e => {
   <p class="muted small">在「家庭与孩子」页底部可以创建新的管理员账号。</p>
 </div>
 <div class="card">
-  <table>
+  <div class="tw"><table class="kv">
     <tr><td>代码版本</td><td><code>{{ version }}</code>（升级：<code>sudo /opt/aistudy/install.sh upgrade</code>）</td></tr>
     <tr><td>数据库</td><td>{{ db_dialect }}</td></tr>
     <tr><td>AI</td><td>{% if llm_status[0] %}<b>可用</b> · {{ llm_status[1] }}{% else %}<b>未就绪</b> · {{ llm_status[1] }}{% endif %}
       <div class="muted small">在服务器 config/llm.toml 修改后重启；<code>install.sh check --llm</code> 可实际测试</div></td></tr>
     <tr><td>数据库迁移</td><td class="small">{% for m in migrations %}{{ m.name }}：{{ '已执行' if m.applied_at else '待执行' }}<br>{% endfor %}</td></tr>
-  </table>
+  </table></div>
 </div>
 {% endif %}
 {% endblock %}

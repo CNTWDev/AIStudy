@@ -7,7 +7,7 @@
 {% for k in kids %}
 <div class="card">
   <div class="row">
-    <div class="grow"><h2 style="margin:0">{{ k.u.name }} <span class="pill">{{ stage_label(k.u.grade) }}</span>{% if k.u.status == 'disabled' %} <span class="pill st-weak">已暂停</span>{% endif %}</h2>
+    <div class="grow grow-w"><h2 style="margin:0">{{ k.u.name }} <span class="pill">{{ stage_label(k.u.grade) }}</span>{% if k.u.status == 'disabled' %} <span class="pill st-weak">已暂停</span>{% endif %}</h2>
       <div class="muted small">{{ k.u.email }}{% if k.u.school %} · {{ k.u.school }}{% endif %} · 每天 {{ k.u.daily_minutes }} 分钟</div></div>
     <a class="btn sm" href="/parent/as/{{ k.u.id }}">看今天的清单</a>
     <a class="btn ghost sm" href="/parent/kids/{{ k.u.id }}/plan">阅读与单词</a>
