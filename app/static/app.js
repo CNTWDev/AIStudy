@@ -123,7 +123,7 @@ function cheer(el) {
   }
 }
 function confetti() {
-  const colors = ['#2f6f5e', '#e0a100', '#d9534f', '#3b82f6', '#a855f7', '#10b981'];
+  const colors = ['#f6b400', '#ffd25c', '#ff9bae', '#7aa7ff', '#a893ff', '#d6eeff'];
   for (let i = 0; i < 80; i++) {
     const p = document.createElement('i'); p.className = 'confetti';
     p.style.left = Math.random() * 100 + 'vw'; p.style.background = colors[i % colors.length];

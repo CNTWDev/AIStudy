@@ -4,7 +4,7 @@ import threading
 from . import config, db
 
 DEFAULTS = {
-    "site_name": lambda: "AIStudy",
+    "site_name": lambda: "beejoy",
     "assistant_name": lambda: config.ASSISTANT_NAME,
     "assistant_icon": lambda: config.ASSISTANT_ICON,
     "registration": lambda: config.REGISTRATION,

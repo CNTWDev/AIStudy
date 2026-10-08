@@ -9,6 +9,7 @@
 {% set td = (week|selectattr('today')|first) %}
 {% set me = kid or user %}
 <div class="card hero">
+  {% if not readonly %}<a class="buddy {{ 'yay' if total and done == total }}" href="/settings#mascot" title="换一个小伙伴">{{ mascot_svg(mascot_of(user), 46) }}</a>{% endif %}
   <div class="ring {{ 'full' if total and done == total }}" style="--p:{{ (100 * done / total)|round if total else 0 }}"><div><b>{{ done }}/{{ total }}</b><span>今天的任务</span></div></div>
   <div>
     <div class="hi">{{ t.day[5:7]|int }} 月 {{ t.day[8:]|int }} 日 · 星期{{ td.wd if td else '' }}</div>
@@ -22,6 +23,7 @@
       {% if badges.next %}<span class="muted">再坚持 {{ badges.to_next }} 天得 {{ badges.next[1] }}</span>{% endif %}
       {% for b in badges.got %}<span title="{{ b[2] }}">{{ b[1] }}</span>{% endfor %}
     </div>
+    {% if not readonly and not mascot_chosen(user) %}<a class="pick" href="/settings#mascot">{{ mascot_svg('buzzy', 22) }}选一个你最喜欢的小伙伴 →</a>{% endif %}
   </div>
   {% if nx and not readonly %}<a class="btn lg go" href="{{ nx.url }}">开始第 {{ t.plan.index(nx) + 1 }} 项 →</a>
   {% elif total and done == total and not t.checked_in and not readonly %}<a class="btn lg go" href="#daylog">写一句一日记录</a>{% endif %}

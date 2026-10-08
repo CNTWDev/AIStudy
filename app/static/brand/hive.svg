@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><style>@media (prefers-color-scheme:dark){svg{filter:drop-shadow(0 0 1px #f3ecdd) drop-shadow(0 0 1px #f3ecdd)}}</style><ellipse cx="15" cy="12" rx="8" ry="5.5" transform="rotate(35 15 12)" fill="#D6EEFF" stroke="#2B2118" stroke-width="2.5"/>
+<ellipse cx="49" cy="12" rx="8" ry="5.5" transform="rotate(-35 49 12)" fill="#D6EEFF" stroke="#2B2118" stroke-width="2.5"/>
+<path d="M32 7 L54 19.5 V44.5 L32 57 L10 44.5 V19.5 Z" fill="#F6B400" stroke="#F6B400" stroke-width="6" stroke-linejoin="round"/>
+<circle cx="18.5" cy="39" r="3" fill="#FF9BAE" opacity=".85"/><circle cx="45.5" cy="39" r="3" fill="#FF9BAE" opacity=".85"/>
+<circle cx="24.5" cy="31" r="3.6" fill="#2B2118"/><circle cx="39.5" cy="31" r="3.6" fill="#2B2118"/>
+<path d="M23 39 Q32 47.5 41 39" fill="none" stroke="#2B2118" stroke-width="4" stroke-linecap="round"/></svg>
