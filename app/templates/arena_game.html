@@ -3,7 +3,7 @@
 {% block body %}
 <link rel="stylesheet" href="/static/play/play.css">
 <link rel="stylesheet" href="/static/play/{{ game }}.css">
-{% set info = {'game': game, 'sources': a.sources, 'avatar': a.avatar, 'left': a.status.left, 'locked': a.locked, 'ghost': a.ghost, 'level': a.level.level} %}
+{% set info = {'game': game, 'sources': a.sources, 'avatar': a.avatar, 'left': a.status.left, 'locked': a.locked, 'ghost': a.ghost, 'level': a.level.level, 'stages': a.stages.get(game)} %}
 <div id="pl" class="pl pl-{{ game }}" data-info='{{ info|tojson }}'>
   <div class="pl-top">
     <a href="/arena" class="pl-back" aria-label="回乐园">‹</a>
@@ -20,6 +20,7 @@
       <div class="pl-panel">
         <canvas class="pl-me" width="96" height="120" data-avatar="{{ a.avatar }}"></canvas>
         <div class="pl-title">{{ g.icon }} {{ g.name }}</div>
+        <div class="pl-map" hidden></div>
         <div class="pl-srcs"></div>
         <button type="button" class="btn lg block pl-go">开始！<small>（今天还能玩 {{ (a.status.left / 60)|round(0, 'floor')|int }} 分钟）</small></button>
         <p class="pl-locked"></p>
@@ -29,7 +30,7 @@
     </div>
     <div class="pl-over pl-end" hidden>
       <div class="pl-panel"><div class="pl-sum"></div>
-        <div class="pl-row"><button type="button" class="btn lg pl-again">再来一局</button><a class="btn ghost lg" href="/arena">回乐园</a></div></div>
+        <div class="pl-row"><button type="button" class="btn lg pl-next" hidden>下一关 →</button><button type="button" class="btn lg pl-again">再来一局</button><a class="btn ghost lg" href="/arena">回乐园</a></div></div>
     </div>
   </div>
   <div class="pl-ctrl"></div>

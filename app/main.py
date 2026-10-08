@@ -1322,7 +1322,7 @@ def arena_game(request: Request, game: str):
 
 @app.post("/api/arena/start")
 def arena_start(request: Request, body: dict = Body(...)):
-    return arena.start(kid_or_redirect(request), str(body.get("game") or ""), str(body.get("src") or "mix"))
+    return arena.start(kid_or_redirect(request), str(body.get("game") or ""), str(body.get("src") or "mix"), body.get("stage"))
 
 
 @app.post("/api/arena/avatar")

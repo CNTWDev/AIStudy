@@ -9,11 +9,11 @@ import time
 from datetime import timedelta
 
 from .. import db
-from . import awards, fair, rules, sources
+from . import awards, fair, levels, rules, sources
 
 GAMES = {
     "stickman": {"name": "火柴人大战", "icon": "🥋", "target": 0.75, "max_seconds": 600, "color": "#2f6f5e",
-                 "tag": "对战", "desc": "走、跳、出拳都耗能量，答题补能量、换武器、放必杀，打赢电脑！"},
+                 "tag": "对战", "desc": "30 关闯关！能量只靠答题补，打败每个世界的大怪兽，解锁新装备。"},
     "race": {"name": "闪电赛跑", "icon": "⚡", "target": 0.8, "max_seconds": 300, "color": "#2f6fdc",
              "tag": "竞速", "desc": "答对一题冲刺一段，和「上次的我」赛跑，看谁先到终点。"},
     "defense": {"name": "星星守卫", "icon": "🏰", "target": 0.72, "max_seconds": 600, "color": "#6d4fd8",
@@ -63,21 +63,22 @@ def ghost(kid_id: int) -> dict | None:
     return None
 
 
-def start(kid: dict, game: str, src: str = "mix") -> dict:
+def start(kid: dict, game: str, src: str = "mix", stage=None) -> dict:
     if game not in GAMES:
         raise ArenaError("没有这个游戏", 404)
     st = status(kid)
     why = rules.locked_reason(st)
     if why:
         raise ArenaError(why, 403)
+    stg = levels.check_start(kid["id"], game, stage) if game in levels.LEVELED else None
     for m in db.q("SELECT id, game, started_at FROM arena_matches WHERE user_id=? AND ended_at IS NULL", kid["id"]):
         _close(m["id"], m["started_at"], "quit", {}, GAMES.get(m["game"], {}).get("max_seconds", 600))
     avail = {s["id"] for s in sources.available(kid)}
     src = src if src in avail else "mix"
     mid = db.insert("INSERT INTO arena_matches(user_id, game, mode, started_at, data) VALUES(?,?,?,?,?)",
-                    kid["id"], game, "solo", db.now(), db.jdump({"streak": 0, "fast_wrongs": 0, "src": src}))
+                    kid["id"], game, "solo", db.now(), db.jdump({"streak": 0, "fast_wrongs": 0, "src": src, "stage": stg and stg["n"]}))
     return {"match_id": mid, "seconds_left": st["left"], "src": src, "avatar": awards.avatar(kid),
-            "ghost": ghost(kid["id"]) if game == "race" else None, "target": GAMES[game]["target"]}
+            "ghost": ghost(kid["id"]) if game == "race" else None, "target": GAMES[game]["target"], "stage": stg}
 
 
 def question(kid: dict, match_id, rng: random.Random | None = None) -> dict:
@@ -196,12 +197,17 @@ def end(kid: dict, match_id, result: str, stats: dict | None = None) -> dict:
     # 这局在哪些内容上进步了：按能力维度汇总答对几题
     topics = [{"topic": t, "n": n, "right": r} for n, r, t in (st.get("dims") or {}).values() if t]
     topics.sort(key=lambda x: -x["n"])
+    stage = None
+    if m["game"] in levels.LEVELED and st.get("stage"):
+        stage = levels.finish(kid["id"], m["game"], st["stage"], result, f["index"], clean.get("hp_left"))
     st_now = status(kid)
     new = awards.after_match(kid["id"], m["game"], result, st, clean, st_now, f)
+    if stage:
+        new += awards.give(kid["id"], levels.sticker_keys(m["game"], stage))
     return {"result": result, "seconds": secs, "answered": answered, "right": right,
             "accuracy": round(right / answered * 100) if answered else 0, "xp": st.get("xp", 0), "focus": f["index"],
             "best_streak": st.get("best_streak", 0), "seconds_left": st_now["left"], "tips": tips,
-            "topics": topics[:4], "stickers": new, "level": awards.level(kid["id"])}
+            "topics": topics[:4], "stickers": new, "level": awards.level(kid["id"]), "stage": stage}
 
 
 def focus(match_id: int) -> dict:
@@ -233,7 +239,7 @@ def hub(kid: dict) -> dict:
     return {"games": GAMES, "status": st, "locked": rules.locked_reason(st), "level": awards.level(kid["id"]),
             "avatar": awards.avatar(kid), "avatars": awards.avatars(kid["id"]), "wall": awards.wall(kid["id"]),
             "new_stickers": new, "sources": sources.available(kid), "week": _week(kid["id"]),
-            "ghost": ghost(kid["id"])}
+            "ghost": ghost(kid["id"]), "stages": {g: levels.progress(kid["id"], g) for g in levels.LEVELED}}
 
 
 def parent_summary(kid: dict) -> dict:
