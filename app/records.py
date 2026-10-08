@@ -1,13 +1,13 @@
 """跟自己比：个人最好（PB）、「上周的我」、最长专注、每周进步卡。
 
 原则：只跟自己比，不做排行榜；正确率不到 80% 的一组不算纪录（免得为了快乱答）；
-速度只比「每道答对的题平均用时」，而且只在单词复习、错题回顾这类已经学过的内容和热身上比。
+速度只比「每道答对的题平均用时」，而且只在单词复习、错题重做这类已经学过的内容和热身上比。
 """
 from datetime import timedelta
 
 from . import db, sprint
 
-KINDS = {"warmup": "热身", "words": "单词复习", "mistakes": "错题回顾", "review": "知识点回顾",
+KINDS = {"warmup": "热身", "words": "单词复习", "mistakes": "错题重做", "review": "知识点回顾",
          "practice": "知识点练习", "read": "阅读"}
 SPEED_KINDS = {"warmup", "words", "mistakes", "review"}
 MIN_ACC = 0.8

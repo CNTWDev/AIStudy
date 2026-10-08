@@ -24,6 +24,7 @@ course（没有统一教材的课程：少儿编程、大学课程、某个技�
 孩子自己的选择（年级、学校类型、每科选哪套教材、哪个方向、学到哪）存在数据库里，不进这些文件。
 """
 import json
+import re
 from dataclasses import dataclass, field
 
 from . import config
@@ -79,6 +80,7 @@ class Pack:
     item_lang: str = ""                               # 题目语言
     prompt_note: str = ""                             # 给 AI 出题 / 讲解时的额外说明（比如「代码用 Python 3」）
     levels: list = field(default_factory=list)        # course 自己的级别 [{id, label, year}]
+    chapters: bool = True                             # 能不能按章报进度；按能力分的（剑桥英语等）写 "progress": "none"
 
     @property
     def lang(self) -> str:
@@ -103,6 +105,27 @@ class Pack:
     def track_name(self, track: str | None) -> str:
         t = self.track(track)
         return next((x["name"] for x in self.tracks if x["id"] == t), "")
+
+
+_MAJOR = re.compile(r"^(\d+)\.\d+")
+_CN_NUM = {c: i for i, c in enumerate("零一二三四五六七八九十", 0)}
+
+
+def _chapter_num(name: str) -> float:
+    """章名里的序号（第3章、第三单元、Module 2、专题1、1. …），用来排先后；没有序号的排在后面。"""
+    m = re.search(r"第\s*([0-9]+|[一二三四五六七八九十]+)\s*[章单元节课]", name) or \
+        re.search(r"(?:Module|Unit|Chapter|专题|主题)\s*([0-9]+)", name) or re.match(r"([0-9]+)[.\s]", name)
+    if not m:
+        return 999
+    v = m[1]
+    if v.isdigit():
+        return int(v)
+    if v.startswith("十"):  # 十、十一 …
+        return 10 + _CN_NUM.get(v[1:], 0) if len(v) > 1 else 10
+    if "十" in v:           # 二十、二十一 …
+        a, _, b = v.partition("十")
+        return _CN_NUM.get(a, 0) * 10 + _CN_NUM.get(b, 0)
+    return _CN_NUM.get(v, 999)
 
 
 class Catalog:
@@ -191,7 +214,7 @@ class Catalog:
             stages=sorted(meta.get("stages") or [lv["id"] for lv in levels], key=stage_rank), notes=meta.get("notes", ""),
             strands=d.get("strands", []), tracks=meta.get("tracks", []), default_track=meta.get("default_track", ""),
             school_types=meta.get("school_types", []), system=system, kind=kind, teach_lang=teach, item_lang=item,
-            prompt_note=meta.get("prompt_note", ""), levels=levels,
+            prompt_note=meta.get("prompt_note", ""), levels=levels, chapters=meta.get("progress") != "none",
         )
 
     def _load_meta(self, meta_dir):
@@ -313,6 +336,42 @@ class Catalog:
             out.append({"kp": self.kps[other], "type": ln["type"], "note": ln.get("note", ""),
                         "dir": "out" if ln["from"] == kp_id else "in"})
         return out
+
+    def chapters(self, pack_id: str, stage: str, track: str | None = None) -> list[dict]:
+        """某学段的「章」：孩子报进度用（孩子记得的是学到第几章，不是知识点名字）。
+        知识点标了 unit 的按 unit 分；整个学段都没标的按板块（strand）分。上册在前、下册在后，其余按教材里的顺序。"""
+        pack = self.packs.get(pack_id)
+        if not pack or not pack.chapters:
+            return []
+        kps = [self.kps[k] for k in self.ids_for(pack_id, track) if self.kps[k]["stage"] == stage]
+        by_unit = len({k.get("unit") for k in kps if k.get("unit")}) > 1
+        coarse = by_unit and len({k.get("unit") for k in kps}) > 15  # 大纲分得很细（1.1、1.2…）：归到大题
+        out: dict[str, dict] = {}
+        for i, kp in enumerate(kps):
+            unit, strand = kp.get("unit") or "", self.strand_name(pack_id, kp.get("strand", ""))
+            major = _MAJOR.match(unit)
+            if by_unit and unit and coarse and " / " in unit:
+                key = name = unit.split(" / ")[0]
+            elif by_unit and unit and coarse and major:
+                key, name = "n:" + major[1], f"{major[1]}. {strand}"
+            elif by_unit and unit:
+                key = name = unit
+            else:
+                key, name = "s:" + kp.get("strand", ""), ("其他 · " if by_unit else "") + strand
+            ch = out.setdefault(key, {"key": key, "name": name, "kps": [], "first": i, "terms": []})
+            ch["kps"].append(kp["id"])
+            ch["terms"].append(kp.get("term"))
+        term_rank = {"上": 0, "下": 2}
+        for ch in out.values():
+            terms = [t for t in ch.pop("terms") if t in term_rank]
+            ch["rank"] = term_rank[max(sorted(set(terms)), key=terms.count)] if terms else 1  # 一样多时算上册
+            ch["num"] = _chapter_num(ch["name"])
+        chs = sorted(out.values(), key=lambda c: (c["rank"], c["first"]))
+        # 章名里的序号不重复时按序号排（教材数据里的先后不一定是上课顺序）；有重复（第1节、第1节…）就保持原顺序
+        nums = [(c["rank"], c["num"]) for c in chs if c["num"] < 999]
+        if len(nums) == len(set(nums)):
+            chs.sort(key=lambda c: (c["rank"], c["num"], c["first"]))
+        return chs
 
     def strand_name(self, pack_id: str, strand_id: str) -> str:
         for s in self.packs[pack_id].strands:

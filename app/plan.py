@@ -61,9 +61,10 @@ def _scan_packs(c: Ctx) -> dict:
         cert = catalog.packs[pack_id].system == "cert"  # 职业资格考试：按考试日期走，不跟学校进度
         if pv["stale"] and not cert:
             out["stale"].append(catalog.packs[pack_id].subject_name)
-        # 跟上学校：正在学的知识点没掌握，就练它；进度之后的下一个可以预习
-        if e["progress_kp"] and catalog.kp(e["progress_kp"]):
-            cur = catalog.kp(e["progress_kp"])
+        # 跟上学校：正在学的知识点没掌握，就练它；进度之后的下一个可以预习。掌握了就自动换下一个（见 advance_progress）
+        progress_kp = engine.advance_progress(c.user_id, e, c.mastery, c.taught) if not cert else e["progress_kp"]
+        if progress_kp and catalog.kp(progress_kp):
+            cur = catalog.kp(progress_kp)
             if c.mastery.get(cur["id"], {}).get("status") != "mastered":
                 out["sync"].append({"type": "sync", "kp": cur["id"], "title": f"跟上学校：{cur['name']}",
                                     "why": "学校正在学这个，趁热练一练", "minutes": 12, "pack": pack_id})
@@ -101,7 +102,7 @@ def _scan_packs(c: Ctx) -> dict:
                 out["weak"].append({"type": "weak", "kp": w["kp_id"], "title": f"攻克：{kp['name']}",
                                     "why": f"掌握度 {int(w['score'] * 100)}%，{'刚学' if w['status'] == 'learning' else '薄弱'}",
                                     "minutes": 12, "pack": pack_id})
-        if diag and not e["progress_kp"] and not e["exam_date"]:  # 诊断前不安排预习；有考试日期的由 src_exam 安排新内容
+        if diag and not progress_kp and not e["exam_date"]:  # 诊断前不安排预习；有考试日期的由 src_exam 安排新内容
             for k in engine.frontier(c.user_id, pack_id, stage, c.mastery)[:2]:
                 out["preview"].append({"type": "preview", "kp": k["id"], "title": f"预习：{k['name']}",
                                        "why": "前置已具备" + ("，高频考点" if k.get("hot") else ""), "minutes": 8, "pack": pack_id})
@@ -111,9 +112,9 @@ def _scan_packs(c: Ctx) -> dict:
 # ------------------------------------------------------------------ 任务来源
 
 def src_progress(c: Ctx) -> list[dict]:
-    stale = c.per_pack["stale"]
-    return [{"type": "progress", "title": "更新一下学校进度（1 分钟）",
-             "why": f"{'、'.join(stale[:3])}：告诉系统学校学到哪了，计划才跟得上", "minutes": 2, "url": "/progress"}] if stale else []
+    """学校进度不再是每天的任务：今天页上方一周最多提示一次「这周学校学了啥？」，可以跳过（见 engine.progress_prompt）。
+    保留这个来源名，是为了自定义学习方式（config/methods.toml）里写了 progress 的也不出错。"""
+    return []
 
 
 def src_exam_date(c: Ctx) -> list[dict]:
@@ -142,12 +143,12 @@ def src_words(c: Ctx) -> list[dict]:
     if not n:
         return []
     return [{"type": "words", "title": f"单词：复习 {n} 个" + (f"（含新词 {new_words} 个）" if new_words else ""),
-             "why": "记得点「记得」，忘了就点「忘了」，明天再来", "minutes": min(15, 3 + n // 4), "url": "/review?group=words"}]
+             "why": "看意思选单词、写单词，系统来判；答错的过一会儿再来", "minutes": min(15, 3 + n // 4), "url": "/review?group=words"}]
 
 
 def src_mistakes(c: Ctx) -> list[dict]:
     n = len(engine.due_cards(c.user_id, 300, "mistakes"))
-    return [{"type": "mistakes", "title": f"错题回顾 {min(n, 8)} 道", "why": "先想再翻答案，想不起来也没关系",
+    return [{"type": "mistakes", "title": f"错题重做 {min(n, 8)} 道", "why": "原题再做一遍，隔天做对两次换一道新题，做对就过关",
              "minutes": min(10, 2 + min(n, 8)), "url": "/review?group=mistakes"}] if n else []
 
 

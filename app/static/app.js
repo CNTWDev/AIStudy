@@ -106,7 +106,7 @@ function feedback(res) {
   if (res.correct === undefined) return '';
   return `<div class="fb ${res.correct ? 'ok' : 'no'} pop">${res.correct ? PRAISE[Math.floor(Math.random() * PRAISE.length)] : '差一点！正确答案是 <b>' + esc(res.answer) + '</b>'}` +
     (res.explain ? `<div class="small" style="margin-top:6px">${esc(res.explain)}</div>` : '') +
-    (res.correct ? '' : `<div class="small muted">已放进错题本，过几天会再出现。做错也算练过，继续！</div>`) + `</div>`;
+    (res.correct || res.redo ? '' : `<div class="small muted">已放进错题本，过几天会再出现。做错也算练过，继续！</div>`) + `</div>`;
 }
 
 /* ---------- 即时反馈：小动画 ---------- */

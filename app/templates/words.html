@@ -16,7 +16,7 @@
 {% else %}
 {% for c in cards %}
 <div class="card" style="padding:12px">
-  <div class="row"><b class="grow">{{ c.front }}</b><span class="pill">第 {{ c.box }} 轮 · {{ c.due[5:] }} 复习</span>
+  <div class="row"><b class="grow">{{ c.front }}</b>{% if c.extra.passed %}<span class="pill">🏅 {{ c.extra.passed[5:] }} 过关</span>{% else %}<span class="pill">第 {{ c.box }} 轮 · {{ c.due[5:] }} 复习</span>{% endif %}
     {% if not readonly %}<button class="linkbtn" title="从本子里删掉" onclick="if(confirm('删除？'))api('/api/cards/{{ c.id }}/delete',{}).then(()=>this.closest('.card').remove())">删除</button>{% endif %}</div>
   <div class="small" style="white-space:pre-wrap">{{ c.back }}</div>
   {% if c.extra.context %}<div class="small muted">原句：{{ c.extra.context }}</div>{% endif %}
