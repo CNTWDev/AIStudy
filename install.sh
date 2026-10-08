@@ -410,6 +410,18 @@ EOF
 setup_caddy() {
   [[ -n "$DOMAIN" ]] || return 0
   step "配置 HTTPS（Caddy，自动申请和续期证书）"
+  # 80/443 已被 nginx / Apache 等占用时，Caddy 起不来；不要假装成功，提示改那边的配置
+  local other
+  other="$(ss -ltnp 2>/dev/null | grep -E '[:.](80|443)[[:space:]]' | grep -oE '\(\("[^"]+"' | tr -d '("' | grep -vx caddy | sort -u | tr '\n' ' ' || true)"
+  if [[ -n "$other" ]]; then
+    warn "80/443 端口已被 ${other}占用，跳过 Caddy"
+    warn "请在 ${other}里把 ${DOMAIN//,/ } 反向代理到 127.0.0.1:$PORT，并为它申请证书。nginx 示例："
+    echo "      server_name ${DOMAIN//,/ };"
+    echo "      location / { proxy_pass http://127.0.0.1:$PORT; proxy_set_header Host \$host;"
+    echo "                   proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Proto \$scheme; }"
+    echo "      证书：certbot --nginx -d ${DOMAIN//,/ -d }"
+    return 0
+  fi
   if ! command -v caddy >/dev/null; then
     case "$PKG" in
       apt)
