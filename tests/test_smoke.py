@@ -79,6 +79,57 @@ def test_full_flow(monkeypatch):
         assert due
         assert "box" in c.post(f"/api/review/{due[0]['id']}", json={"grade": "good"}).json()
 
+        # 错题重做：原题原样（带选项），系统判对错；隔天连续做对 2 次 → 换变式题，做对才过关
+        from app import bank, recall
+        kid_a = db.one("SELECT id FROM users WHERE email='a@x.com'")["id"]
+        it = next(i for i in engine.items_for(kid_a, "MATH-PRE-UNIT", n=5) if i["type"] in ("mcq", "fill", "num"))
+        right = lambda x: {"mcq": x.get("answer"), "fill": (x.get("answer") or [""])[0] if isinstance(x.get("answer"), list) else x.get("answer"),
+                           "num": x.get("answer")}[x["type"]]
+        db.run("DELETE FROM cards WHERE kind='mistake'")
+        cid = engine.add_card(kid_a, "mistake", it["q"], "答案", {"item_id": it["id"], "my_answer": "1"}, "MATH-PRE-UNIT",
+                              due=db.today())
+        card = next(x for x in c.get("/api/review/due?group=mistakes").json()["cards"] if x["id"] == cid)
+        assert card["quiz"]["mode"] == "item" and "answer" not in card["quiz"]["item"] and card["quiz"]["last"] == "1"
+        if it["type"] == "mcq":
+            assert card["quiz"]["item"]["options"]
+        res = c.post(f"/api/review/{cid}/answer", json={"item_id": it["id"], "answer": "zzz-wrong"}).json()
+        assert res["correct"] is False and res["next"] == "tomorrow"
+        assert db.one("SELECT due FROM cards WHERE id=?", cid)["due"] > db.today().isoformat()  # 错了明天再做
+        assert c.post(f"/api/review/{cid}/answer", json={"item_id": "nope", "answer": "1"}).status_code == 400
+        db.run("UPDATE cards SET due=? WHERE id=?", db.today().isoformat(), cid)
+        res = c.post(f"/api/review/{cid}/answer", json={"item_id": it["id"], "answer": right(it)}).json()
+        assert res["correct"] and res["streak"] == 1
+        res = c.post(f"/api/review/{cid}/answer", json={"item_id": it["id"], "answer": right(it)}).json()
+        assert res["streak"] == 1  # 同一天做对两次只算一次
+        ex = db.jload(db.one("SELECT extra FROM cards WHERE id=?", cid)["extra"])
+        db.run("UPDATE cards SET extra=? WHERE id=?", db.jdump({**ex, "streak_day": "2000-01-01"}), cid)
+        res = c.post(f"/api/review/{cid}/answer", json={"item_id": it["id"], "answer": right(it)}).json()
+        assert res.get("variant_next") or res.get("passed"), res
+        if res.get("variant_next"):
+            db.run("UPDATE cards SET due=? WHERE id=?", db.today().isoformat(), cid)
+            q = recall.quiz(kid_a, db.one("SELECT * FROM cards WHERE id=?", cid))
+            assert q["variant"] and q["item"]["id"] != it["id"]
+            v = bank.row_to_item(db.one("SELECT * FROM items WHERE id=?", q["item"]["id"]))
+            body = {"item_id": v["id"], "self": "ok"} if v["type"] == "short" else {"item_id": v["id"], "answer": right(v)}
+            res = c.post(f"/api/review/{cid}/answer", json=body).json()
+            assert res["passed"], res
+        assert db.one("SELECT due FROM cards WHERE id=?", cid)["due"] == recall.PASSED_DUE  # 过关：不再出现
+
+        # 单词复习：看意思选单词（四选一），系统判对错
+        db.run("DELETE FROM cards WHERE user_id=? AND kind='word'", kid_a)
+        for w, m in (("apple", "苹果"), ("river", "河流"), ("cloud", "云"), ("stone", "石头")):
+            engine.add_card(kid_a, "word", w, m, due=db.today())
+        words = c.get("/api/review/due?group=words").json()["cards"]
+        wc = next(x for x in words if x["front"] == "apple")
+        assert wc["quiz"]["mode"] == "choice" and "apple" in wc["quiz"]["options"] and wc["quiz"]["q"] == "苹果"
+        assert c.post(f"/api/review/{wc['id']}/answer", json={"answer": "river"}).json()["correct"] is False
+        assert c.post(f"/api/review/{wc['id']}/answer", json={"answer": "Apple "}).json()["correct"] is True
+        db.run("UPDATE cards SET box=3, due=? WHERE id=?", db.today().isoformat(), wc["id"])  # 熟了 → 拼写
+        q = recall.quiz(kid_a, db.one("SELECT * FROM cards WHERE id=?", wc["id"]))
+        assert q["mode"] == "spell" and "apple" not in q["q"]
+        unknown = engine.add_card(kid_a, "word", "zephyr", "（意思还没查到，复习时想一想，或问一问）", due=db.today())
+        assert recall.quiz(kid_a, db.one("SELECT * FROM cards WHERE id=?", unknown))["mode"] == "self"  # 出不了题才自评
+
         # 阅读：AI 生成 → 查词 → 收藏 → 造句 → 读完
         r = c.post("/reading/new", data={"mode": "ai", "lang": "en", "topic": "plants"})
         assert r.status_code == 200 and "A Small Seed" in r.text
@@ -258,7 +309,8 @@ def test_daily_tasks_progress_and_tools():
         c.post("/login", data={"email": "b@x.com", "password": "secret1"})
         plan = c.post("/api/plan/rebuild").json()["plan"]
         types = [t["type"] for t in plan]
-        assert types[0] == "progress"  # 还没设置学校进度 → 第一项提醒
+        assert "progress" not in types  # 学校进度不再是每天的任务
+        assert "这周学校学了啥" in c.get("/today").text  # 改成今天页上方的提示，可以跳过
         assert {"words", "read_zh", "read_en"} <= set(types), types
         assert "第 1 回" in c.get("/today").text or "第1回" in c.get("/today").text
         assert len(c.get("/api/review/due?group=words").json()["cards"]) >= 5
@@ -269,8 +321,20 @@ def test_daily_tasks_progress_and_tools():
         assert c.post("/api/plan/task", json={"id": read_t["id"], "done": True}).json()["ok"]
         assert "在书上读完了" in c.get("/today").text
 
-        # 更新学校进度：数学正在学两位数乘两位数，前面的乘法学过了
-        assert "学校学到哪了" in c.get("/progress").text
+        # 更新学校进度（按章）：口算学过了，正在学乘法 → 正在学的知识点 = 乘法这一章里第一个
+        assert "学到哪一章了" in c.get("/progress").text
+        r = c.post("/progress/math-shanghai", data={"stage": "G3", "chapter": "乘法", "done_ch": ["口算与估算"]})
+        assert "进度已更新" in r.text
+        e = db.one("SELECT * FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)
+        assert e["progress_kp"] == "MSH-NUM-17"
+        assert {x["kp_id"] for x in db.q("SELECT kp_id FROM kp_taught WHERE user_id=?", kid_b)} == {"MSH-NUM-16", "MSH-NUM-17"}
+        # 正在学的知识点掌握了 → 自动换成这一章的下一个
+        db.run("INSERT INTO mastery(user_id,kp_id,score,status) VALUES(?,?,?,?) ON CONFLICT(user_id,kp_id) DO UPDATE SET "
+               "status='mastered'", kid_b, "MSH-NUM-17", 0.95, "mastered")
+        c.post("/api/plan/rebuild")
+        assert db.one("SELECT progress_kp FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["progress_kp"] == "MSH-NUM-20"
+        db.run("DELETE FROM mastery WHERE user_id=? AND kp_id='MSH-NUM-17'", kid_b)
+        # 旧的按知识点报进度（老页面 / 接口）也还能用
         r = c.post("/progress/math-shanghai", data={"stage": "G3", "current": "MSH-NUM-20",
                                                    "taught": ["MSH-NUM-16", "MSH-NUM-17"]})
         assert "进度已更新" in r.text
@@ -279,8 +343,8 @@ def test_daily_tasks_progress_and_tools():
         taught = {x["kp_id"] for x in db.q("SELECT kp_id FROM kp_taught WHERE user_id=?", kid_b)}
         assert taught == {"MSH-NUM-16", "MSH-NUM-17", "MSH-NUM-20"}
         plan = c.post("/api/plan/rebuild").json()["plan"]
-        prog = [t for t in plan if t["type"] == "progress"]
-        assert prog and prog[0]["done"]  # 做完的进度任务保留并打勾
+        assert c.post("/api/progress/snooze").json()["ok"]  # 这周跳过：一周内不再提示
+        assert "这周学校学了啥" not in c.get("/today").text
         assert any(t["type"] == "sync" and "两位数乘两位数" in t["title"] for t in plan), plan
         # 再次只改学段：清空正在学，保留勾选
         c.post("/progress/math-shanghai", data={"stage": "G4"})

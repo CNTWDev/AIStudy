@@ -46,26 +46,35 @@ def add_card(user_id: int, kind: str, front: str, back: str, extra=None, kp_id=N
 
 def review_card(user_id: int, card_id: int, grade: str):
     """grade: again(忘了) / hard(模糊) / good(记得)。下次复习按这个孩子学习方式的记忆模型排期
-    （默认：记得的概率降到 85% 的那天）。"""
+    （默认：记得的概率降到 85% 的那天）。只用于没法出题考的卡（意思还没查到的词等）；
+    能出题的卡由 app/recall.py 出题、判对错，再调 schedule_card。"""
     c = db.one("SELECT * FROM cards WHERE id=? AND user_id=?", card_id, user_id)
     if not c:
         return None
+    r = schedule_card(user_id, c, grade)
+    if c["kp_id"]:
+        update_mastery(user_id, c["kp_id"], grade != "again", weight={"again": 0.6, "hard": 0.3, "good": 0.6}[grade],
+                       source="review", fmt="recall", kind="review")
+    return r
+
+
+def schedule_card(user_id: int, c, grade: str, due=None, extra=None, fmt="recall") -> dict:
+    """按记忆模型排下次复习；due 给了就用它（比如错题重做错了，明天再做）。extra 给了就一起存。"""
     mem = evidence.profile(user_id).memory
     days = evidence.days_since(c["last_review"]) if c["last_review"] else 0
     s, d = mem.review(c["stability"] or 0, c["difficulty"] or 5, days, grade)
     lapses = c["lapses"] + (1 if grade == "again" else 0)
     if grade == "again":
-        box, due = 0, db.today()  # 今天再来一次
+        box, due = 0, due or db.today()  # 默认今天再来一次
     else:
         box = c["box"] + 1 if grade == "good" else max(c["box"], 1)
-        due = db.today() + timedelta(days=mem.interval(s))
-    db.run("UPDATE cards SET box=?, due=?, lapses=?, reviews=reviews+1, last_review=?, stability=?, difficulty=? WHERE id=?",
-           box, due.isoformat(), lapses, db.now(), round(s, 3), round(d, 3), card_id)
-    evidence.log(user_id, "card", card_id, "review", correct=grade != "again", fmt="recall", data={"grade": grade, "kind": c["kind"]})
-    if c["kp_id"]:
-        update_mastery(user_id, c["kp_id"], grade != "again", weight={"again": 0.6, "hard": 0.3, "good": 0.6}[grade],
-                       source="review", fmt="recall", kind="review")
-    return {"box": box, "due": due.isoformat()}
+        due = due or db.today() + timedelta(days=mem.interval(s))
+    due = due if isinstance(due, str) else due.isoformat()
+    db.run("UPDATE cards SET box=?, due=?, lapses=?, reviews=reviews+1, last_review=?, stability=?, difficulty=?, extra=? WHERE id=?",
+           box, due, lapses, db.now(), round(s, 3), round(d, 3),
+           db.jdump(extra) if extra is not None else c["extra"], c["id"])
+    evidence.log(user_id, "card", c["id"], "review", correct=grade != "again", fmt=fmt, data={"grade": grade, "kind": c["kind"]})
+    return {"box": box, "due": due}
 
 
 CARD_GROUPS = {"words": ("word", "phrase", "term"), "mistakes": ("mistake",), "other": ("kp",)}
@@ -407,7 +416,7 @@ def frontier(user_id: int, pack_id: str, stage: str, mastery: dict) -> list[dict
 
 # ------------------------------------------------------------------ 课程进度（学校学到哪了）
 
-PROGRESS_STALE_DAYS = 14
+PROGRESS_STALE_DAYS = 7   # 最多一周问一次「这周学校学了啥」（不是每天的任务，可以跳过）
 
 
 def taught_set(user_id: int) -> set[str]:
@@ -436,6 +445,74 @@ def set_progress(user_id: int, pack_id: str, current_kp: str | None, taught: lis
                           user_id, k, now)
 
 
+def set_progress_chapters(user_id: int, pack_id: str, current: str | None, done: list[str], stage: str | None = None) -> None:
+    """按章报进度：current = 正在学的那一章，done = 学过的章。正在学的知识点 = 这一章里第一个还没掌握的。"""
+    e = db.one("SELECT stage, track FROM enrollments WHERE user_id=? AND pack_id=?", user_id, pack_id)
+    chs = catalog.chapters(pack_id, stage or e["stage"], e["track"])
+    done_set = set(done or [])
+    taught = [k for ch in chs if ch["key"] in done_set for k in ch["kps"]]
+    cur_ch = next((ch for ch in chs if ch["key"] == current), None)
+    cur_kp = None
+    if cur_ch:
+        m = get_mastery(user_id)
+        cur_kp = next((k for k in cur_ch["kps"] if m.get(k, {}).get("status") != "mastered"), cur_ch["kps"][0])
+    set_progress(user_id, pack_id, cur_kp, taught, stage)
+
+
+def mark_taught(user_id: int, kp_ids) -> None:
+    """学校教过了（比如考试卷里考到了）。"""
+    now = db.now()
+    for k in set(kp_ids):
+        if catalog.kp(k):
+            db.run("INSERT INTO kp_taught(user_id,kp_id,marked_at) VALUES(?,?,?) ON CONFLICT(user_id,kp_id) DO NOTHING", user_id, k, now)
+
+
+def advance_progress(user_id: int, e, mastery: dict, taught: set) -> str | None:
+    """进度自动往前走，不用孩子天天报：
+    - 正在学的知识点掌握了 → 换成这一章里下一个还没掌握的；
+    - 后面的章里已经有学校教过的内容（比如导入的考试卷考到了）→ 正在学的章往后挪到那一章。"""
+    cur = e["progress_kp"]
+    chs = catalog.chapters(e["pack_id"], e["stage"], e["track"])
+    if not cur or not chs:
+        return cur
+    ci = next((i for i, ch in enumerate(chs) if cur in ch["kps"]), None)
+    if ci is None:
+        return cur
+    li = max((i for i, ch in enumerate(chs) if taught & set(ch["kps"])), default=ci)
+    new = cur
+    if li > ci:
+        mark_taught(user_id, [k for ch in chs[:li] for k in ch["kps"]])
+        new = next((k for k in chs[li]["kps"] if mastery.get(k, {}).get("status") != "mastered"), chs[li]["kps"][0])
+    elif mastery.get(cur, {}).get("status") == "mastered":
+        new = next((k for k in chs[ci]["kps"] if mastery.get(k, {}).get("status") != "mastered"), cur)
+    if new != cur:
+        mark_taught(user_id, [new])
+        db.run("UPDATE enrollments SET progress_kp=? WHERE user_id=? AND pack_id=?", new, user_id, e["pack_id"])
+    return new
+
+
+def progress_prompt(user: dict) -> list[str]:
+    """今天页上方的小提示「这周学校学了啥？」：哪些课一周没更新了。不是任务，点「这周跳过」就一周不再问。"""
+    snooze = (db.jload(user.get("settings"), {}) or {}).get("progress_snooze", "")
+    if snooze and snooze > (db.today() - timedelta(days=PROGRESS_STALE_DAYS)).isoformat():
+        return []
+    out = []
+    for e in db.q("SELECT * FROM enrollments WHERE user_id=?", user["id"]):
+        pack = catalog.packs.get(e["pack_id"])
+        if not pack or not pack.chapters or pack.system == "cert" or not catalog.chapters(pack.id, e["stage"], e["track"]):
+            continue
+        if not e["progress_at"] or e["progress_at"] < (db.today() - timedelta(days=PROGRESS_STALE_DAYS)).isoformat():
+            out.append(pack.subject_name)
+    return out
+
+
+def snooze_progress(user_id: int) -> None:
+    u = db.one("SELECT settings FROM users WHERE id=?", user_id)
+    st = db.jload(u["settings"], {}) if u else {}
+    st["progress_snooze"] = db.today().isoformat()
+    db.run("UPDATE users SET settings=? WHERE id=?", db.jdump(st), user_id)
+
+
 def progress_view(user_id: int, e) -> dict:
     """一个教材包的进度概况：学过的（以前学段 + 本学段勾选的）、正在学的、接下来的。"""
     pack = catalog.packs[e["pack_id"]]
@@ -447,7 +524,14 @@ def progress_view(user_id: int, e) -> dict:
     return {"pack": pack, "stage": cur, "current": catalog.kp(e["progress_kp"]) if e["progress_kp"] else None,
             "learned": learned, "taught_here": [k for k in ids if catalog.kps[k]["stage"] == cur and k in taught],
             "stage_kps": [catalog.kps[k] for k in ids if catalog.kps[k]["stage"] == cur], "track": pack.track_name(e["track"]),
-            "updated": e["progress_at"], "stale": stale}
+            "updated": e["progress_at"], "stale": stale, "chapters": _chapter_rows(e, taught)}
+
+
+def _chapter_rows(e, taught: set) -> list[dict]:
+    rows = []
+    for ch in catalog.chapters(e["pack_id"], e["stage"], e["track"]):
+        rows.append({**ch, "current": e["progress_kp"] in ch["kps"], "done": all(k in taught for k in ch["kps"])})
+    return rows
 
 
 def next_after(pack_id: str, kp_id: str, mastery: dict, taught: set, track: str | None = None) -> dict | None:

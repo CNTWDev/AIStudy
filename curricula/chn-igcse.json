@@ -1,6 +1,7 @@
 {
  "pack": {
   "id": "chn-igcse",
+  "progress": "none",
   "subject": "chinese",
   "subject_name": "语文",
   "edition": "剑桥 IGCSE 中文 0509 / 0523 / 0547",

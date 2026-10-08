@@ -353,6 +353,11 @@ label:not(.seg *):has(>input[type=checkbox]),label:not(.seg *):has(>input[type=r
 .kpchk{border:1.5px solid var(--line);border-radius:10px;padding:6px 10px!important;margin:4px 6px 4px 0!important;background:var(--card);transition:border-color .15s,background .15s}
 .kpchk:hover{border-color:var(--brand-3)}.kpchk:has(input:checked){border-color:var(--brand);background:var(--brand-2)}
 .kpset{border:1px solid var(--line);border-radius:14px;padding:8px 12px 12px;margin:10px 0}.kpset legend{font-weight:650;color:var(--muted);font-size:13px;padding:0 6px}
+.chlist{display:flex;flex-direction:column;gap:6px;margin:6px 0}
+.chrow{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--card)}
+.chrow label{display:inline-flex;align-items:center;gap:6px;font-weight:400;cursor:pointer;margin:0}.chrow .grow{min-width:0}
+.chrow:has(input[name=done_ch]:checked){background:var(--brand-2)}.chrow.cur{border-color:var(--brand)}
+label.chrow{border-style:dashed}
 .badge.warn{background:var(--warn)}
 .qacts{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}.qacts .submit{min-width:120px}.qacts .dkbtn{margin-left:auto}
 @media (max-width:480px){.qacts .submit{flex:1}}

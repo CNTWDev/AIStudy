@@ -1,29 +1,111 @@
 {% extends "base.html" %}
 {% block body %}
-<div class="row"><h1 class="grow">{{ {"words":"单词复习","mistakes":"错题回顾","other":"知识点回顾"}.get(group, "复习") }}</h1><a class="btn ghost sm" href="/words">生词本 / 错题本</a></div>
-<p class="muted small">按 1→2→4→7→15→30 天的间隔出现。记得就点「记得」，下次隔得更久；忘了会今天再来一次。</p>
+<div class="row"><h1 class="grow">{{ {"words":"单词复习","mistakes":"错题重做","other":"知识点回顾"}.get(group, "复习") }}</h1><a class="btn ghost sm" href="/words">生词本 / 错题本</a></div>
+<p class="muted small">{% if group == 'mistakes' %}错题原样再做一遍，系统来判。隔天连续做对 2 次，会换一道同类的新题，也做对了就过关、移出错题本。
+{% else %}每张都要作答，系统来判。答对了下次隔得更久；答错了过一会儿再来一次。{% endif %}</p>
 <div class="card flash" id="flash"><span class="loading">加载中</span></div>
 <script>
-let cards = [], i = 0;
+let cards = [], i = 0, known = 0;
 const KIND = {word: '生词', term: '术语', mistake: '错题', kp: '知识点', phrase: '短语'};
 const GROUP = {{ group|tojson }}, TASK = {words: 'words', mistakes: 'mistakes', other: 'review'}[GROUP];
-let known = 0;
 const RUNKIND = {words: 'words', mistakes: 'mistakes'}[GROUP] || 'review';
 async function load() { cards = (await api('/api/review/due' + (GROUP ? '?group=' + GROUP : ''))).cards; i = 0; if (cards.length) Run.start(RUNKIND, {total: cards.length, mount: $('#flash')}); show(); }
+const post = (c, body) => api('/api/review/' + c.id + '/answer', body);
+function head(c, extra) {
+  return `<div class="muted small">${KIND[c.kind] || c.kind}${c.kp_name ? ' · ' + esc(c.kp_name) : ''}${extra || ''} · 还剩 ${cards.length - i} 张</div>`;
+}
+function nextBtn(box, res, c) {
+  Run.hit(!!res.correct);
+  if (res.correct) { known++; cheer(box); }
+  else if (c.kind !== 'mistake' && c.kind !== 'kp') cards.push(c);  // 生词答错：这一轮最后再来一次
+  const b = document.createElement('button'); b.className = 'btn'; b.style.marginTop = '12px'; b.textContent = '下一张 →';
+  b.onclick = () => { i++; show(); };
+  box.appendChild(b); b.focus();
+}
 function show() {
+  const box = $('#flash');
   if (i >= cards.length) {
-    $('#flash').innerHTML = `<div class="face pop">🎉 ${cards.length ? '完成了！记得 ' + known + ' 张' : '现在没有要复习的'}</div><button class="btn" id="back2">回到今天 +1 ⭐</button>`;
+    box.innerHTML = `<div class="face pop">🎉 ${cards.length ? '完成了！答对 ' + known + ' 张' : '现在没有要复习的'}</div><button class="btn" id="back2">回到今天 +1 ⭐</button>`;
     if (cards.length) { confetti(); Run.finish(); }
     $('#back2').onclick = () => TASK ? finishTask(TASK) : (location.href = '/today');
     return;
   }
-  const c = cards[i], ex = c.extra || {};
+  const c = cards[i], q = c.quiz || {mode: 'self'};
   Run.total = cards.length;
-  $('#flash').innerHTML = `<div class="muted small">${KIND[c.kind] || c.kind}${c.kp_name ? ' · ' + esc(c.kp_name) : ''} · 还剩 ${cards.length - i} 张</div>` +
+  if (q.mode === 'item') return showItem(box, c, q);
+  if (q.mode === 'choice' || q.mode === 'spell') return showWord(box, c, q);
+  showSelf(box, c);
+}
+
+/* 错题重做 / 知识点题：原题原样（选项齐全），系统判对错 */
+function showItem(box, c, q) {
+  const tag = c.kind === 'mistake' ? (q.variant ? ' · 换一道同类题，做对就过关' : (q.streak ? ` · 已隔天做对 ${q.streak} 次` : '')) : '';
+  box.innerHTML = head(c, tag) + '<div class="qbox" style="text-align:left"></div>';
+  const qb = $('.qbox', box), it = q.item;
+  renderItem(qb, it, {
+    submit: (answer, self, ms) => post(c, {item_id: it.id, answer, self, ms}),
+    dontKnow: () => post(c, {item_id: it.id, dont_know: true}),
+    onDone: res => {
+      if (res.reveal) return;
+      const opts = $$('.opt', qb);
+      if (res.answer_index != null && opts[res.answer_index]) opts[res.answer_index].classList.add('right');
+      // 上次做错时选的那个：标出来，看清自己当时错在哪
+      if (q.last != null && q.last !== '' && /^\d+$/.test(String(q.last)) && opts[+q.last]) opts[+q.last].insertAdjacentHTML('beforeend', ' <span class="badge warn">上次选的</span>');
+      else if (q.last && !opts.length) $('.fbbox', qb).insertAdjacentHTML('beforeend', `<div class="small muted">上次答的：${esc(q.last)}</div>`);
+      let note = '';
+      if (res.passed) note = '🏅 过关！这道题已经移出错题本。';
+      else if (res.variant_next) note = '👍 隔天连续做对了！下次换一道同类的新题，做对就过关。';
+      else if (res.correct && res.need > 0) note = `再隔天做对 ${res.need} 次就能过关。`;
+      else if (c.kind === 'mistake' && !res.correct) note = '没关系，看懂上面的讲解，明天再做一次。';
+      if (note) $('.fbbox', qb).insertAdjacentHTML('beforeend', `<div class="small" style="margin-top:6px">${note}</div>`);
+      if (res.passed) confetti();
+      nextBtn(box, res, c);
+    }
+  });
+}
+
+/* 单词：看意思选单词（四选一），熟了以后看意思写单词 */
+function showWord(box, c, q) {
+  const speak = /^[A-Za-z]/.test(c.front) ? `<button class="btn ghost sm" id="say">🔊</button>` : '';
+  let html = head(c) + `<div class="face" style="min-height:120px">${esc(q.q)}${q.hint ? `<div class="muted small">${esc(q.hint)}</div>` : ''}</div>`;
+  if (q.mode === 'choice') {
+    html += `<div style="text-align:left">${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
+  } else {
+    html += `<div class="muted small">${esc(q.shape)} · 写出这个${c.kind === 'term' ? '术语' : '单词'}</div>` +
+      `<div class="row" style="margin-top:8px"><input type="text" class="ans grow" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="写在这里">${speak}<button class="btn" id="go">提交</button></div>`;
+  }
+  html += `<div class="row" style="justify-content:center;margin-top:8px"><button class="linkbtn" id="dk">🤔 想不起来</button></div><div class="fbbox"></div>`;
+  box.innerHTML = html;
+  if ($('#say', box)) $('#say', box).onclick = () => say(q.say || c.front);
+  const done = async (answer, el) => {
+    $$('.opt,#go,#dk', box).forEach(b => b.disabled = true);
+    const res = await post(c, {answer, mode: q.mode, dont_know: answer === null});
+    if (q.mode === 'choice') $$('.opt', box).forEach(b => { if (b.dataset.v === res.answer) b.classList.add('right'); else if (b === el) b.classList.add('wrong'); });
+    $('.fbbox', box).innerHTML = `<div class="fb ${res.correct ? 'ok' : 'no'} pop">${res.correct ? '✅ 对了！' : '正确答案是 <b>' + esc(res.answer) + '</b>'}` +
+      (!res.correct && answer ? `<div class="small muted">${q.mode === 'choice' ? '你选的' : '你写的'}：${esc(answer)}</div>` : '') +
+      (res.example ? `<div class="small">例：${esc(res.example)}</div>` : '') +
+      (/^[A-Za-z]/.test(res.answer) ? ` <button class="btn ghost sm" onclick="say(${esc(JSON.stringify(res.answer))})">🔊</button>` : '') + `</div>`;
+    if (/^[A-Za-z]/.test(res.answer)) say(res.answer);
+    nextBtn(box, res, c);
+  };
+  $$('.opt', box).forEach(b => b.onclick = () => done(b.dataset.v, b));
+  const inp = $('.ans', box);
+  if (inp) {
+    inp.focus();
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter' && inp.value.trim()) done(inp.value.trim()); });
+    $('#go', box).onclick = () => inp.value.trim() ? done(inp.value.trim()) : inp.focus();
+  }
+  $('#dk', box).onclick = () => done(null);
+}
+
+/* 出不了题的卡（意思还没查到的词等）：才用翻面自评 */
+function showSelf(box, c) {
+  const ex = c.extra || {};
+  box.innerHTML = head(c) +
     `<div class="face">${esc(c.front)}${ex.zh ? `<div class="muted small">${esc(ex.zh)}</div>` : ''}${ex.context ? `<div class="muted small">“${esc(ex.context)}”</div>` : ''}</div>` +
     `<div id="back" style="display:none"><div class="back">${esc(c.back).replace(/\n/g, '<br>')}${ex.example ? `<div class="small">例：${esc(ex.example)}</div>` : ''}${ex.my_answer ? `<div class="small">我当时答：${esc(ex.my_answer)}</div>` : ''}</div>` +
     `<div class="row" style="justify-content:center;margin-top:16px">${c.kind === 'word' || c.kind === 'phrase' ? `<button class="btn ghost" onclick="say(${esc(JSON.stringify(c.front))})">🔊</button>` : ''}<button class="btn warn" data-g="again">忘了</button><button class="btn ghost" data-g="hard">模糊</button><button class="btn" data-g="good">记得</button></div></div>` +
-    `<button class="btn" id="flip" style="margin-top:12px">${c.kind === 'mistake' ? '我想好了，看答案' : '翻面'}</button>`;
+    `<button class="btn" id="flip" style="margin-top:12px">先想一想，再翻面</button>`;
   $('#flip').onclick = () => { $('#back').style.display = ''; $('#flip').remove(); };
   $$('#flash [data-g]').forEach(b => b.onclick = async () => {
     await api('/api/review/' + c.id, {grade: b.dataset.g});

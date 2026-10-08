@@ -75,7 +75,8 @@ def create(user_id: int, pack_id: str, *, title="", exam_date="", images=None, t
             (d / name).write_bytes(b)
             names.append(name)
         db.run("UPDATE papers SET images=? WHERE id=?", db.jdump(names), pid)
-    # 原卷批改结果：判错 / 扣分的题进错题本，并计入掌握度
+    # 原卷批改结果：判错 / 扣分的题进错题本，并计入掌握度；卷子上考到的知识点 = 学校已经教过（进度自动往前走）
+    engine.mark_taught(user_id, [pi["kp_id"] for pi in rows(pid) if pi["kp_id"]])
     for pi in rows(pid):
         if pi["orig"] in ("right", "wrong", "partial") and pi["kp_id"]:
             engine.record_attempt(user_id, pi["item"], pi["kp_id"], "exam", pi["orig"] == "right",
