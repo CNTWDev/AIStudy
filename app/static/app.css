@@ -410,3 +410,24 @@ transition:border-color .15s,background .15s,transform .12s;height:100%}
 .hero .buddy{filter:none}.hero .buddy .mascot{filter:drop-shadow(0 0 .6px #f3ecdd) drop-shadow(0 0 .6px #f3ecdd) drop-shadow(0 4px 6px rgba(0,0,0,.4))}}
 #askbtn .mascot{width:26px;height:26px;filter:none}@media (max-width:480px){#askbtn .mascot{width:36px;height:36px}}
 #askbtn{background:var(--card);color:var(--ink);border:2.5px solid var(--brand);box-shadow:0 6px 18px rgba(43,33,24,.18)}#askbtn:hover .mascot{transform:rotate(-8deg) scale(1.08)}#askbtn .mascot{transition:transform .2s}
+/* 每天的正确率曲线（记录页、家长页）：坐标是百分比，图随宽度铺开 */
+.tplot{position:relative;height:200px;margin:4px 6px 30px 40px}
+.tplot.mini{height:56px;max-width:360px;margin:0 6px 8px}
+.tplot svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.tplot polyline{fill:none;stroke:var(--brand-ink);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.tplot.mini polyline{stroke-width:2}
+.tplot .gl{position:absolute;left:0;right:0;border-top:1px solid var(--line)}
+.tplot .gl.g80{border-top:1px dashed color-mix(in srgb,var(--ok) 60%,transparent)}
+.tplot .gl span{position:absolute;right:100%;margin-right:6px;transform:translateY(-50%);font-size:11px;color:var(--faint);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tplot .xl{position:absolute;top:100%;margin-top:8px;transform:translateX(-50%);font-size:11px;color:var(--faint);white-space:nowrap;font-variant-numeric:tabular-nums}
+.tplot .xl:last-child{transform:translateX(-85%)}
+.tplot .pt{position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 2px var(--card)}
+.tplot.mini .pt{width:7px;height:7px;margin:-3.5px 0 0 -3.5px}
+.tplot .pt.few{background:var(--card);box-shadow:inset 0 0 0 1.5px var(--brand-ink)}
+.tplot a.pt::after{content:"";position:absolute;inset:-8px;border-radius:50%}
+.tplot a.pt:hover,.tplot a.pt:focus-visible{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--brand-ink);outline:none}
+.trend-leg{gap:14px}.trend-leg span{display:inline-flex;align-items:center;gap:5px}
+.trend-leg .pt-i{width:10px;height:10px;border-radius:50%;background:var(--brand)}
+.trend-leg .pt-i.few{background:var(--card);border:1.5px solid var(--brand-ink)}
+.trend-leg .avg-i{width:18px;height:0;border-radius:0;border-top:2.5px solid var(--brand-ink)}
+.trend-leg .g80-i{width:18px;height:0;border-radius:0;border-top:1px dashed var(--ok)}
