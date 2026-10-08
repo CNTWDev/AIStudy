@@ -720,6 +720,49 @@ def test_self_records():
         assert "上周进步" in c.get("/parent").text
 
 
+def test_accuracy_trend():
+    """每天的正确率曲线：按天算、分学科、近 7 天和再前 7 天比；限时题和原卷不算；孩子和家长都看得到。"""
+    from datetime import datetime, timedelta
+
+    from app import db, records
+    from app.catalog import catalog
+    kid = db.one("SELECT id FROM users WHERE email='b2@x.com'")["id"]
+    db.run("DELETE FROM attempts WHERE user_id=?", kid)
+    kp_eng = next(k for k in catalog.packs["eng-shanghai"].kp_ids)
+    kp_math = next(k for k in catalog.packs["math-shanghai"].kp_ids)
+    today = db.today()
+
+    def add(back, kp, n, ok, mode="practice"):
+        at = datetime.combine(today - timedelta(days=back), datetime.min.time()).replace(hour=19).isoformat()
+        for i in range(n):
+            db.run("INSERT INTO attempts(user_id,item_id,kp_id,mode,correct,answer,created_at) VALUES(?,?,?,?,?,?,?)",
+                   kid, None, kp, mode, 1 if i < ok else 0, "", at)
+    add(10, kp_eng, 10, 6)       # 再前 7 天：60%
+    add(2, kp_eng, 10, 9)        # 最近 7 天：英语 9/10
+    add(1, kp_math, 10, 7)       # 数学 7/10
+    add(0, kp_eng, 3, 3)         # 今天只做了 3 题：空心点
+    add(0, kp_eng, 20, 0, "game")    # 乐园里的限时题不算
+    add(0, kp_eng, 20, 0, "exam")    # 原卷上的对错不算
+    tr = records.accuracy_trend(kid)
+    al = tr["series"][0]
+    assert al["key"] == "all" and al["n"] == 33 and [p["acc"] for p in al["pts"]] == [60, 90, 70, 100]
+    assert al["pts"][-1]["few"] and not al["pts"][0]["few"]
+    assert al["now"] == {"n": 23, "acc": 83} and al["prev"] == {"n": 10, "acc": 60}
+    assert {s["name"] for s in tr["series"]} >= {"全部"} and len(tr["series"]) == 3   # 英语、数学各一条
+    assert "高了 23 个百分点" in records.trend_words(al)
+    assert records.accuracy_trend(999999) is None
+    with TestClient(app) as c:
+        c.post("/login", data={"email": "b2@x.com", "password": "kidpass1"})
+        page = c.get("/records").text
+        assert "每天的正确率" in page and 'href="/day/' in page and "acc-subj" in page
+        c.get("/logout")
+        c.post("/login", data={"email": "p2@x.com", "password": "secret1"})
+        assert "最近 7 天正确率 83%" in c.get("/parent").text
+        page = c.get(f"/parent/kids/{kid}").text
+        assert "每天的正确率" in page and 'href="/day/' not in page.split("acc-trend")[1].split("</svg>")[0]
+        c.get("/logout")
+
+
 def test_curricula_layers_tracks_and_bridges():
     """教材分层：学段配置、教材方向、学校模板、跨教材关联（同一概念互认、跨学科背景、阅读话题）。"""
     from app import db, engine

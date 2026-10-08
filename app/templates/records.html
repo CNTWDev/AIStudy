@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% import "_ui.html" as ui %}
+{% import "_trend.html" as trend_ui %}
 {% block body %}
 {% if report_for %}<a href="/parent" class="back">← 家长页</a>{% endif %}
 <div class="ph"><h1>{{ k.name }} 的学习记录</h1></div>
@@ -9,6 +10,7 @@
   <div><b>{{ tot.n or 0 }}</b><span>做题 · 正确率 {{ ((tot.ok or 0) * 100 / tot.n)|int if tot.n else 0 }}%</span></div>
   <div><b>{{ words }} / {{ mistakes }}</b><span>生词 / 错题</span></div>
 </div>
+{% if trend %}{{ trend_ui.accuracy(trend, link=not report_for) }}{% endif %}
 <div class="card">
   <div class="card-h"><span class="ico">📅</span><h3>每天学习 <span class="muted small" style="font-weight:400">近 12 周</span></h3></div>
   {{ ui.heat(cal) }}

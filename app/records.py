@@ -138,3 +138,105 @@ def summary(user_id: int) -> dict:
             rows.append({"kind": kind, "label": label, "text": " · ".join(bits)})
     focus = db.one("SELECT MAX(ms_active) AS m FROM runs WHERE user_id=?", user_id)["m"] or 0
     return {"rows": rows, "focus": _mmss(int(focus)) if focus >= 60_000 else ""}
+
+
+# ------------------------------------------------------------------ 每天的正确率：画成曲线，看自己是在变好还是变差
+
+# 不算进正确率的作答：原卷上老师批的对错（不是那天做的）、诊断里的自评、乐园和冲刺里的限时题（难度跟着孩子自动调，正确率本来就稳在七成多）
+TREND_SKIP = ("exam", "diagnose-self", "game", "sprint")
+TREND_MIN = 5          # 一天少于 5 题：点画成空心，提醒「题少，参考价值小」
+
+
+def _acc(n: int, ok: int) -> int | None:
+    return round(100 * ok / n) if n else None
+
+
+def _series(days: list[str], by_day: dict[str, list[int]]) -> dict:
+    """一条序列：每天的点 + 近 7 天合起来的平均线（按题数加权，7 天不到 5 题不画）。
+    坐标是图里的百分比（左→右、上→下），手机和电脑上都按宽度铺开；纵轴从「最低那天往下一点」起，不从 0 起，免得线挤在上半截。"""
+    daily, rolling = [], []
+    for i, d in enumerate(days):
+        n, ok = by_day.get(d, (0, 0))
+        daily.append((i, d, n, ok))
+        win = [by_day.get(dd, (0, 0)) for dd in days[max(0, i - 6):i + 1]]
+        wn, wok = sum(a for a, _ in win), sum(b for _, b in win)
+        rolling.append(100 * wok / wn if wn >= TREND_MIN else None)
+    seen = [_acc(n, ok) for _, _, n, ok in daily if n] + [r for r in rolling if r is not None]
+    lo = max(0, min(50, (int(min(seen, default=50)) - 5) // 10 * 10))
+    span = max(1, len(days) - 1)
+    x = lambda i: round(100 * i / span, 2)
+    y = lambda a: round(100 * (100 - a) / (100 - lo), 2)
+    pts = [{"day": d, "n": n, "ok": ok, "acc": _acc(n, ok), "x": x(i), "y": y(_acc(n, ok)), "few": n < TREND_MIN}
+           for i, d, n, ok in daily if n]
+    avg, seg = [], []
+    for i, r in enumerate(rolling):
+        if r is not None:
+            seg.append(f"{x(i)},{y(r)}")
+        elif seg:
+            avg.append(" ".join(seg))
+            seg = []
+    if seg:
+        avg.append(" ".join(seg))
+    grid = [{"v": v, "y": y(v)} for v in sorted({lo, 80, 100} | ({50} if lo < 50 else set()))]
+    n = sum(p["n"] for p in pts)
+    return {"pts": pts, "avg": avg, "grid": grid, "n": n, "acc": _acc(n, sum(p["ok"] for p in pts))}
+
+
+def accuracy_trend(user_id: int, days: int = 30) -> dict | None:
+    """最近 days 天每天的做题正确率（全部 + 分学科），和「最近 7 天 vs 再前 7 天」的对比。一题都没做过返回 None。"""
+    from .catalog import catalog
+    today = db.today()
+    span = [(today - timedelta(days=days - 1 - i)).isoformat() for i in range(days)]
+    start = (today - timedelta(days=max(days, 14) - 1)).isoformat()
+    marks = ",".join("?" * len(TREND_SKIP))
+    rows = db.q(f"SELECT kp_id, correct, created_at FROM attempts WHERE user_id=? AND created_at>=? AND mode NOT IN ({marks})",
+                user_id, start, *TREND_SKIP)
+    if not rows:
+        return None
+    by: dict[str, dict[str, list[int]]] = {"all": {}}
+    names = {}
+    for r in rows:
+        d = r["created_at"][:10]
+        kp = catalog.kp(r["kp_id"])
+        pack = catalog.packs.get(kp["pack"]) if kp else None
+        keys = ["all"] + ([pack.subject] if pack else [])
+        if pack:
+            names[pack.subject] = pack.subject_name
+        for key in keys:
+            c = by.setdefault(key, {}).setdefault(d, [0, 0])
+            c[0] += 1
+            c[1] += 1 if r["correct"] else 0
+
+    def week(key, back):
+        cells = [by[key].get((today - timedelta(days=back + i)).isoformat(), (0, 0)) for i in range(7)]
+        n = sum(a for a, _ in cells)
+        return {"n": n, "acc": _acc(n, sum(b for _, b in cells))}
+
+    series = []
+    for key in ["all"] + sorted(names, key=lambda s: names[s]):
+        s = _series(span, by[key])
+        if key != "all" and s["n"] < 10:   # 题太少的学科不单独画
+            continue
+        series.append({"key": key, "name": "全部" if key == "all" else names[key], **s,
+                       "now": week(key, 0), "prev": week(key, 7)})
+    if len(series) == 2:   # 只有一门课：「全部」就是它，不用切换
+        series = series[:1]
+    labels = [{"x": round(100 * i / max(1, days - 1), 2), "text": d[5:].replace("-", "/")}
+              for i, d in enumerate(span) if (days - 1 - i) % 7 == 0]
+    return {"days": days, "series": series, "labels": labels, "min": TREND_MIN}
+
+
+def trend_words(s: dict) -> str:
+    """一句话：最近 7 天和再前 7 天比。只说事实，不批评。"""
+    now, prev = s["now"], s["prev"]
+    if not now["n"]:
+        return f"最近 7 天还没做题；再前 7 天正确率 {prev['acc']}%（{prev['n']} 题）" if prev["n"] else "最近 7 天还没做题"
+    head = f"最近 7 天正确率 {now['acc']}%（{now['n']} 题）"
+    if not prev["n"]:
+        return head
+    diff = now["acc"] - prev["acc"]
+    if abs(diff) <= 2:
+        return f"{head}，和再前 7 天（{prev['acc']}%）差不多，很稳"
+    if diff > 0:
+        return f"{head}，比再前 7 天（{prev['acc']}%）高了 {diff} 个百分点 👍"
+    return f"{head}，比再前 7 天（{prev['acc']}%）低了 {-diff} 个百分点"
