@@ -97,14 +97,18 @@ def test_full_flow(monkeypatch):
         assert c.post("/api/beat", json={"s": 40}).json()["minutes"] == 1
         assert c.post("/api/beat", json={"s": 9999}).json()["minutes"] == 2
         # 连续天数按保底算：只打卡、开着页面不算，做完第 1 节才算
-        assert c.post("/api/checkin", json={"reflection": "学会了量筒读数", "minutes": 40}).json()["streak"] == 0
+        # （上面做过的练习、阅读可能已自动勾掉第 1 节的部分任务，先统一设为没做，最后再还原）
         kid_id = db.one("SELECT id FROM users WHERE email='a@x.com'")["id"]
-        first = streak.sections(engine.today_plan(kid_id)["plan"])[0]
-        for i in first["tasks"]:
-            engine.mark_task(kid_id, engine.today_plan(kid_id)["plan"][i]["id"])
+        plan = engine.today_plan(kid_id)["plan"]
+        first = [plan[i] for i in streak.sections(plan)[0]["tasks"]]
+        for t in first:
+            engine.mark_task(kid_id, t["id"], done=False)
+        assert c.post("/api/checkin", json={"reflection": "学会了量筒读数", "minutes": 40}).json()["streak"] == 0
+        for t in first:
+            engine.mark_task(kid_id, t["id"])
         assert engine.streak(kid_id) == 1
-        for i in first["tasks"]:   # 还原，后面的测试要用今天的清单
-            engine.mark_task(kid_id, engine.today_plan(kid_id)["plan"][i]["id"], done=False)
+        for t in first:   # 还原，后面的测试要用今天的清单
+            engine.mark_task(kid_id, t["id"], done=bool(t.get("done")))
         assert db.one("SELECT minutes FROM days WHERE user_id=(SELECT id FROM users WHERE email='a@x.com')")["minutes"] == 2
         assert "今天学到的" in c.get("/today").text
         assert "学会了量筒读数" in c.get("/records").text
