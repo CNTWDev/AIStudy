@@ -1,4 +1,4 @@
-"""AIStudy Web 应用入口。启动：uvicorn app.main:app"""
+"""beejoy（AIStudy）Web 应用入口。启动：uvicorn app.main:app"""
 import re
 from contextlib import asynccontextmanager
 from datetime import date, timedelta
@@ -9,11 +9,13 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import arena, auth, bank, bankflow, bankpapers, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, webpage
+from . import arena, auth, bank, bankflow, bankpapers, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, sprint, streak, webpage
 from .auth import LoginRequired
 from .catalog import GRADES, catalog, is_adult, stage_label, stage_rank
 from .content import content
 from .methods import methods
+from . import brand
+from . import catalog as catalog_mod
 
 
 @asynccontextmanager
@@ -30,7 +32,7 @@ async def lifespan(app):
     db.close()
 
 
-app = FastAPI(title="AIStudy", lifespan=lifespan)
+app = FastAPI(title="beejoy", lifespan=lifespan)
 app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY, max_age=60 * 60 * 24 * 60,
                    same_site="lax", https_only=config.HTTPS_ONLY)
 app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), name="static")
@@ -39,6 +41,8 @@ templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LA
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
                              stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock,
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES)
+templates.env.globals.update(MASCOTS=brand.MASCOTS, mascot_of=brand.mascot_of, mascot_chosen=brand.has_chosen, mascot_svg=brand.mascot_svg,
+                             wordmark_svg=brand.wordmark_svg)
 
 
 def device_label(ua: str | None) -> str:
@@ -75,6 +79,14 @@ async def _llm_error(request: Request, exc):
     return JSONResponse({"error": str(exc)}, status_code=503)
 
 
+def ui_tone(learner) -> str:
+    """界面口吻：上中小学的孩子是 kid（圆体、小伙伴会动）；成人学习者、家长、管理员是 adult（同一套颜色，少一点童趣）。"""
+    if not learner or learner["role"] != "kid":
+        return "adult"
+    is_adult = getattr(catalog_mod, "is_adult", None)  # 成人学习者（年级「成人」/大学）
+    return "adult" if is_adult and is_adult(learner["grade"]) else "kid"
+
+
 def render(request: Request, name: str, status_code: int = 200, **ctx):
     user = auth.current_user(request)
     if user and user["must_change_pw"] and name not in ("settings.html", "message.html"):
@@ -87,7 +99,7 @@ def render(request: Request, name: str, status_code: int = 200, **ctx):
     # readonly：家长在看孩子的页面——只能查看和管理，不能替孩子做题
     base = {"user": user, "kid": kid, "readonly": bool(user and user["role"] != "kid"),
             "SITE": sitecfg.get("site_name"), "ASSISTANT": sitecfg.get("assistant_name"),
-            "ASSISTANT_ICON": sitecfg.get("assistant_icon")}
+            "ASSISTANT_ICON": sitecfg.get("assistant_icon"), "tone": ui_tone(kid or user)}
     return templates.TemplateResponse(request, name, {**base, **ctx}, status_code=status_code)
 
 
@@ -259,6 +271,14 @@ def _back(msg="", err=""):
     return RedirectResponse("/settings?" + urlencode({"msg": msg, "err": err}), 303)
 
 
+@app.post("/settings/mascot")
+def settings_mascot(request: Request, mascot: str = Form(...)):
+    u = auth.require_user(request)
+    if not brand.set_mascot(u["id"], mascot):
+        return _back(err="没有这个形象")
+    return _back(msg=f"换好了，以后陪你学习的是「{brand.MASCOTS[mascot][0]}」")
+
+
 @app.post("/settings/profile")
 def settings_profile(request: Request, name: str = Form(...), email: str = Form(...)):
     u = auth.require_user(request)
@@ -310,7 +330,8 @@ def kid_brief(k) -> dict:
     cal = engine.calendar(k["id"], weeks=1)
     today = engine.today_plan(k["id"]) if packs else {"plan": [], "minutes": 0}
     weak = sorted([v for v in m.values() if v["status"] == "weak" and catalog.kp(v["kp_id"])], key=lambda v: v["score"])
-    return {"u": k, "packs": packs, "streak": engine.streak(k["id"]), "week": cal,
+    return {"u": k, "packs": packs, "streak": engine.streak(k["id"]), "cards": streak.cards(k["id"]), "week": cal,
+            "sprint_week": sprint.week(k["id"], cal[0]["day"], (db.today() + timedelta(days=1)).isoformat()),
             "week_min": sum(d["minutes"] for d in cal), "week_days": sum(1 for d in cal if d["minutes"] or d["checked"]),
             "today": today, "today_done": sum(1 for t in today["plan"] if t.get("done")),
             "insights": insights.open_insights(k["id"], limit=6),
@@ -956,14 +977,17 @@ def today(request: Request):
         return render(request, "message.html", title="还没有选择学科",
                       text="请家长在「家长页 → 编辑孩子」里勾选要学的教材。")
     t = engine.today_plan(k["id"])
+    me = auth.current_user(request)
+    settled = streak.settle(k["id"]) if me["role"] == "kid" else {"used": [], "earned": 0}   # 家长查看不结算
     st = engine.streak(k["id"])
     cal = engine.calendar(k["id"], 4, full_weeks=True)
-    me = auth.current_user(request)
     m = engine.get_mastery(k["id"])
     rec = engine.day_record(k["id"], t["day"])
     play = arena.status(k)
     exams = [x for x in (engine.exam_view(k["id"], e, m) for e in enrollments(k["id"])) if x and x["days_left"] >= 0]
-    return render(request, "today.html", manual_done=engine.MANUAL_DONE, t=t, play=play, exams=exams, play_locked=arena.locked_reason(play),
+    day = streak.today_state(k, t["plan"], t["minutes"], sprint.points_today(k["id"]))
+    return render(request, "today.html", manual_done=engine.MANUAL_DONE, t=t, play=play, day=day, settled=settled, exams=exams,
+                  goals=streak.GOALS, sprint_best=sprint.best_day(k["id"]), play_locked=arena.locked_reason(play),
                   due=len(engine.due_cards(k["id"], 99)), streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
                   stars=engine.total_stars(k["id"]), rec=rec, auto=engine.day_summary(rec),
                   cov=explore.coverage(k["id"], m), lit=explore.lit_today(k["id"]), ahead=explore.ahead(k["id"], m),
@@ -1308,6 +1332,50 @@ def arena_answer(request: Request, match_id: int, body: dict = Body(...)):
 @app.post("/api/arena/{match_id}/end")
 def arena_end(request: Request, match_id: int, body: dict = Body(...)):
     return arena.end(kid_or_redirect(request), match_id, str(body.get("result") or ""), body.get("stats") or {})
+
+
+# ================================================================== 冲刺（app/sprint.py）和每日目标
+
+@app.exception_handler(sprint.SprintError)
+async def _sprint_error(request: Request, exc: sprint.SprintError):
+    return JSONResponse({"error": str(exc)}, status_code=exc.status)
+
+
+@app.get("/sprint", response_class=HTMLResponse)
+def sprint_page(request: Request):
+    k = kid_or_redirect(request)
+    ok, left = sprint.is_open(k)
+    return render(request, "sprint.html", open=ok, left=left, today_points=sprint.points_today(k["id"]),
+                  best=sprint.best_day(k["id"], db.today().isoformat()), tier_at=sprint.TIER_AT,
+                  goal=streak.today_state(k, engine.today_plan(k["id"])["plan"], 0, sprint.points_today(k["id"])))
+
+
+@app.post("/api/sprint/start")
+def sprint_start(request: Request):
+    return sprint.start(kid_or_redirect(request))
+
+
+@app.get("/api/sprint/{run_id}/q")
+def sprint_question(request: Request, run_id: int):
+    return sprint.question(kid_or_redirect(request), run_id)
+
+
+@app.post("/api/sprint/{run_id}/a")
+def sprint_answer(request: Request, run_id: int, body: dict = Body(...)):
+    return sprint.answer(kid_or_redirect(request), run_id, str(body.get("item_id") or ""), body.get("answer"),
+                         dont_know=bool(body.get("dont_know")))
+
+
+@app.post("/api/sprint/{run_id}/end")
+def sprint_end(request: Request, run_id: int):
+    return sprint.end(kid_or_redirect(request), run_id)
+
+
+@app.post("/api/goal")
+def goal_set(request: Request, body: dict = Body(...)):
+    if not streak.set_goal(kid_or_redirect(request)["id"], str(body.get("goal") or "")):
+        raise HTTPException(400, "没有这个目标")
+    return {"ok": True}
 
 
 @app.get("/warmup", response_class=HTMLResponse)

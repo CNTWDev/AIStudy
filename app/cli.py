@@ -31,7 +31,7 @@ def _ok(flag: bool, text: str) -> bool:
 
 def check(with_llm: bool) -> int:
     good = True
-    print("AIStudy 自检")
+    print("beejoy 自检")
     try:
         db.one("SELECT 1 AS ok")
         _ok(True, f"数据库连接正常（{db.DIALECT}）")

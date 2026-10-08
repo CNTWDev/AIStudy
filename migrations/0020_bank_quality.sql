@@ -1,4 +1,4 @@
--- 0019 题库自己长、自己把关（见 app/bankflow.py）：
+-- 0020 题库自己长、自己把关（见 app/bankflow.py）：
 -- 同型题分组（换了数字、说法稍有不同的同一道题算一组）、AI 独立校对答案、按真实作答校准难度（1-5 级）、
 -- 家里拍的卷子改编成新题进公共题库（原卷仍只给自己家）。
 ALTER TABLE items ADD COLUMN near_key TEXT;

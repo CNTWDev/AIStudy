@@ -3,24 +3,29 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>{% block title %}{{ SITE }} 学习本{% endblock %}</title>
+<title>{% block title %}{{ SITE }}{% endblock %}</title>
+{% set mascot = mascot_of(user) %}
 <link rel="stylesheet" href="/static/app.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+<link rel="icon" type="image/svg+xml" href="/static/brand/{{ mascot }}.svg">
+<link rel="apple-touch-icon" href="/static/brand/icon-180.png">
+<link rel="manifest" href="/static/brand/site.webmanifest">
+<meta name="theme-color" content="#FBF7EC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16130F" media="(prefers-color-scheme: dark)">
 <script src="/static/app.js"></script>
 </head>
-<body{% if user and user.role == 'kid' %} data-kid="1"{% endif %}>
+<body data-tone="{{ tone }}"{% if user and user.role == 'kid' %} data-kid="1"{% endif %}>
 {% if user and user.role == 'parent' and kid %}
 <div class="banner">正在查看 <b>{{ kid.name }}</b> 的学习（家长只查看和管理，做题请用孩子的账号）· <a href="/parent">回到家长页</a></div>
 {% endif %}
 <header class="top">
-  <a class="logo" href="/">📚 {{ SITE }}</a>
+  <a class="logo" href="/" aria-label="{{ SITE }} 首页">{{ mascot_svg(mascot, 30) }}{% if SITE == 'beejoy' %}{{ wordmark_svg(19) }}{% else %}<span>{{ SITE }}</span>{% endif %}</a>
   {% if user %}<span class="who"><span class="me">{{ (kid or user).name }}{% if kid %}<span class="g"> · {{ stage_label(kid.grade) }}</span>{% endif %}</span>
     {% if user.role == 'parent' %}<a href="/parent">家长页</a>{% endif %}{% if is_self_learner(user) %}<a href="/me/courses">我的课程</a>{% endif %}{% if user.is_admin or user.role == 'admin' %}<a href="/admin">管理</a>{% endif %}
     {% if user.role == 'kid' %}<a href="#" id="qlbtn" title="查单词、词语，翻译句子；也可以直接选中页面上的文字">🔎 查词</a>{% endif %}<a href="/settings">账号</a></span>{% endif %}
 </header>
 <main class="wrap">{% block body %}{% endblock %}</main>
 {% if user and user.role == 'kid' and not request.url.path.startswith('/diagnose') %}
-<button id="askbtn" data-name="{{ ASSISTANT }}" data-icon="{{ ASSISTANT_ICON }}" title="问{{ ASSISTANT }}：哪里不懂就问">{{ ASSISTANT_ICON }}<span>问{{ ASSISTANT }}</span></button>
+<button id="askbtn" data-name="{{ ASSISTANT }}" data-icon="{{ ASSISTANT_ICON }}" title="问{{ ASSISTANT }}：哪里不懂就问">{% if ASSISTANT_ICON == '🙋' %}{{ mascot_svg(mascot, 30) }}{% else %}{{ ASSISTANT_ICON }}{% endif %}<span>问{{ ASSISTANT }}</span></button>
 <div id="askpanel">
   <div class="askhead"><b class="grow">{{ ASSISTANT_ICON }} 问{{ ASSISTANT }}</b><button id="asknew" class="btn ghost sm">换个问题</button><button id="askclose" class="btn ghost sm">✕</button></div>
   <div id="askctx" class="small muted"></div>
@@ -32,7 +37,7 @@
 {% if kid %}
 {% set p = request.url.path %}
 <nav class="tabs">
-  <a href="/today" class="{{ 'on' if p.startswith('/today') or p.startswith('/review') or p.startswith('/words') or p.startswith('/warmup') }}"><span class="i">☀️</span>今天</a>
+  <a href="/today" class="{{ 'on' if p.startswith('/today') or p.startswith('/sprint') or p.startswith('/review') or p.startswith('/words') or p.startswith('/warmup') }}"><span class="i">☀️</span>今天</a>
   <a href="/subjects" class="{{ 'on' if p.startswith('/subjects') or p.startswith('/papers') or p.startswith('/progress') or p.startswith('/map') or p.startswith('/learn') or p.startswith('/diagnose') }}"><span class="i">🗺️</span>学科</a>
   {% if not readonly %}{% if not is_adult(kid.grade) or game_minutes(kid) %}<a href="/arena" class="play {{ 'on' if p.startswith('/arena') }}"><span class="i">🎮</span>乐园</a>{% endif %}
   <a href="/reading" class="{{ 'on' if p.startswith('/reading') }}"><span class="i">📖</span>阅读</a>{% endif %}

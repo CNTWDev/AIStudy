@@ -9,10 +9,10 @@
 <div class="calendar" role="grid" aria-label="学习日历">
   {% for w in '一二三四五六日' %}<div class="wh">{{ w }}</div>{% endfor %}
   {% for d in cal %}
-  {% set tip = d.day ~ (' · 今天' if d.today else '') ~ ('' if d.future else '：学了 ' ~ d.minutes ~ ' 分钟' ~ ('，已打卡' if d.checked else '')) %}
+  {% set tip = d.day ~ (' · 今天' if d.today else '') ~ ('' if d.future else '：学了 ' ~ d.minutes ~ ' 分钟' ~ ('，已打卡' if d.checked else '') ~ ('，用补签卡保住了连续天数' if d.frozen else '')) %}
   {% if d.future %}<span class="d future" title="{{ d.day }}">{{ d.dn }}</span>
   {% else %}<{{ 'a href="/day/' ~ d.day ~ '"' if link else 'span' }} class="d l{{ d.level }} {{ 'today' if d.today }}" title="{{ tip }}" aria-label="{{ tip }}">
-    {{ d.dn if d.dn != 1 else d.month ~ '月' }}{% if d.minutes %}<span class="m">{{ d.minutes }}′</span>{% endif %}{% if d.checked %}<span class="ck">✓</span>{% endif %}
+    {{ d.dn if d.dn != 1 else d.month ~ '月' }}{% if d.minutes %}<span class="m">{{ d.minutes }}′</span>{% endif %}{% if d.checked %}<span class="ck">✓</span>{% endif %}{% if d.frozen %}<span class="fz" aria-hidden="true">🧊</span>{% endif %}
   </{{ 'a' if link else 'span' }}>{% endif %}
   {% endfor %}
 </div>

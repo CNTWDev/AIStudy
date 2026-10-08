@@ -1,4 +1,4 @@
-// AIStudy 划词查词：在网页上选中文字后显示「查」按钮和释义气泡
+// beejoy 划词查词：在网页上选中文字后显示「查」按钮和释义气泡
 (() => {
   if (window.__aistudy) return;
   window.__aistudy = true;

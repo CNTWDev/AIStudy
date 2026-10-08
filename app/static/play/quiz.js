@@ -1,5 +1,7 @@
-/* 统一答题面板（所有游戏共用）：出题、判分、经验值、冷冻都走服务器（app/arena/），游戏只管玩法。
+/* 统一答题面板（所有游戏和冲刺共用）：出题、判分、经验值、冷冻都走服务器（app/arena/、app/sprint.py），游戏只管玩法。
      const quiz = new ArenaQuiz({matchId, onAnswer, onXP, onOpen, onClose, dock});
+     冲刺用：{base: '/api/sprint/<id>', dontKnow: true, rightHtml: res => '…'}：换接口、加「这题不会」、自定义答对提示；
+     服务器回 freeze_ms: 0 时答错不冷冻，看完答案自己点下一题。
      quiz.open();   // 弹出式（火柴人：左下角「答题」按钮）
    dock：传一个容器元素就变成「常驻」式，一直显示在游戏下方（闪电赛跑、星星守卫：答题就是操作）。
    答对：+经验值、撒花，马上出下一题；答错：冷冻 5 秒（瞎答更久），显示正确答案和思路。
@@ -8,6 +10,7 @@ class ArenaQuiz {
   constructor(opts) {
     this.o = opts; this.item = null; this.frozenUntil = 0; this.busy = false; this.streak = 0;
     this.docked = !!opts.dock;
+    this.base = opts.base || `/api/arena/${opts.matchId}`;
     this.isOpen = this.docked;
     const el = document.createElement('div');
     el.className = 'aq' + (this.docked ? ' aq-docked' : '');
@@ -44,7 +47,7 @@ class ArenaQuiz {
     if (this.stopped) return;
     this.body.innerHTML = '<div class="aq-wait"><span></span><span></span><span></span></div>';
     try {
-      const r = await fetch(`/api/arena/${this.o.matchId}/q`);
+      const r = await fetch(`${this.base}/q`);
       const d = await r.json();
       if (r.status === 423) { this.frozenUntil = Date.now() + (d.freeze_ms || 5000); return this.showFreeze(); }
       if (!r.ok) throw new Error(d.error || d.detail || '出错了');
@@ -69,6 +72,7 @@ class ArenaQuiz {
       const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', extra, '0', '⌫'];
       h += `<div class="aq-pad">${keys.map(k => `<button type="button" data-k="${k}"${k === '⌫' ? ' class="del"' : ''}>${k}</button>`).join('')}</div>`;
     }
+    if (this.o.dontKnow) h += `<button type="button" class="aq-dk">🤔 这题不会</button>`;
     h += `<div class="aq-fb"></div>`;
     this.body.innerHTML = h;
     const say = this.body.querySelector('.aq-say');
@@ -83,6 +87,7 @@ class ArenaQuiz {
       this.body.querySelector('.aq-ok').onclick = () => this.submit(inp.value);
     }
     this.body.querySelectorAll('.aq-opt').forEach(b => b.onclick = () => this.submit(b.dataset.i, b));
+    const dk = this.body.querySelector('.aq-dk'); if (dk) dk.onclick = () => this.submit('', null, true);
   }
   onKey(e) {
     if (!this.isOpen) return;
@@ -104,12 +109,12 @@ class ArenaQuiz {
     if (inp && inp.readOnly && /^[0-9./-]$/.test(e.key)) { inp.value = (inp.value + e.key).slice(0, 12); e.preventDefault(); e.stopPropagation(); }
     else if (inp && inp.readOnly && e.key === 'Backspace') { inp.value = inp.value.slice(0, -1); e.preventDefault(); e.stopPropagation(); }
   }
-  async submit(answer, btn) {
+  async submit(answer, btn, dk) {
     if (this.busy || !this.item) return;
-    if (String(answer ?? '').trim() === '') { const i = this.body.querySelector('.aq-in'); i && i.classList.add('shake'); setTimeout(() => i && i.classList.remove('shake'), 400); return; }
+    if (!dk && String(answer ?? '').trim() === '') { const i = this.body.querySelector('.aq-in'); i && i.classList.add('shake'); setTimeout(() => i && i.classList.remove('shake'), 400); return; }
     this.busy = true;
     try {
-      const res = await api(`/api/arena/${this.o.matchId}/a`, {item_id: this.item.id, answer: String(answer).replace('−', '-')});
+      const res = await api(`${this.base}/a`, dk ? {item_id: this.item.id, dont_know: true} : {item_id: this.item.id, answer: String(answer).replace('−', '-')});
       const it = this.item; this.item = null;
       this.body.querySelectorAll('button:not(.aq-x):not(.aq-say)').forEach(b => b.disabled = true);
       if (btn) btn.classList.add(res.correct ? 'right' : 'wrong');
@@ -119,7 +124,7 @@ class ArenaQuiz {
       }
       this.streak = res.correct ? (res.streak || this.streak + 1) : 0;
       this.o.onAnswer && this.o.onAnswer(res);
-      if (res.correct) this.showRight(res); else { this.frozenUntil = Date.now() + (res.freeze_ms || 5000); this.showWrong(res); }
+      if (res.correct) this.showRight(res); else { this.frozenUntil = Date.now() + (res.freeze_ms ?? 5000); this.showWrong(res); }
     } catch (e) {
       this.body.querySelector('.aq-fb').innerHTML = `<div class="err">${esc(e.message)}</div>`;
       if (/过期/.test(e.message)) setTimeout(() => this.load(), 800);
@@ -140,7 +145,8 @@ class ArenaQuiz {
     this.o.onXP && this.o.onXP(res);
     this.el.querySelector('.aq-streak').textContent = res.streak >= 2 ? `🔥 连对 ${res.streak}` : '';
     const fb = this.body.querySelector('.aq-fb');
-    fb.innerHTML = `<div class="aq-right pop"><div class="aq-xp">+${res.xp} ⚡${res.crit ? ' <span class="aq-crit">暴击 ×2！</span>' : ''}</div>` +
+    fb.innerHTML = this.o.rightHtml ? `<div class="aq-right pop">${this.o.rightHtml(res)}</div>` :
+      `<div class="aq-right pop"><div class="aq-xp">+${res.xp} ⚡${res.crit ? ' <span class="aq-crit">暴击 ×2！</span>' : ''}</div>` +
       (res.special ? `<div class="aq-sp">💥 连对 ${res.streak} 题，攒到一次大招！</div>` : '') + '</div>';
     if (this.docked || this.o.autoNext) setTimeout(() => { if (this.isOpen && !this.item && !this.frozen) this.load(); }, this.docked ? 650 : 750);
     else {
@@ -149,8 +155,17 @@ class ArenaQuiz {
     }
   }
   showWrong(res) {
-    window.Play && (Play.sfx.play('wrong'), Play.sfx.play('freeze', 0.25));
     this.el.querySelector('.aq-streak').textContent = '';
+    if (!this.frozen) {   // 不冷冻（冲刺）：看懂答案和思路，自己点下一题
+      window.Play && Play.sfx.play(res.dont_know ? 'pop' : 'wrong');
+      this.body.querySelector('.aq-fb').innerHTML =
+        `<div class="aq-wrong pop"><div>${res.dont_know ? '没关系，看看答案：' : '正确答案：'}<b>${esc(res.answer)}</b></div>` +
+        (res.explain ? `<div class="small">${esc(res.explain)}</div>` : '') + (this.o.wrongHtml ? this.o.wrongHtml(res) : '') +
+        `<button type="button" class="btn lg block aq-next">${res.dont_know ? '记住了' : '看懂了'}，下一题 →</button></div>`;
+      const nx = this.body.querySelector('.aq-next'); nx.onclick = () => this.load(); setTimeout(() => nx.focus({preventScroll: true}), 30);
+      return;
+    }
+    window.Play && (Play.sfx.play('wrong'), Play.sfx.play('freeze', 0.25));
     this.el.querySelector('.aq-card').classList.add('frozen');
     this.body.querySelector('.aq-fb').innerHTML =
       `<div class="aq-wrong pop"><div>正确答案：<b>${esc(res.answer)}</b></div>` +
