@@ -7,6 +7,7 @@ os.environ["DATABASE_URL"] = os.environ.get("TEST_DATABASE_URL") or f"sqlite:///
 os.environ["LLM_CONFIG_FILE"] = os.path.join(os.environ["DATA_DIR"], "no-llm.toml")
 os.environ["LLM_PROVIDER"] = "mock"
 os.environ["SECRET_KEY"] = "test"
+os.environ["AISTUDY_JOBS"] = "0"  # 不开后台题库流水线（测试里直接调用 bankflow.run_once）
 os.environ["REGISTRATION"] = "invite"
 os.environ["METHODS_FILE"] = os.path.join(os.environ["DATA_DIR"], "no-methods.toml")  # 不受本机 config/methods.toml 影响
 

@@ -7,16 +7,30 @@ TUTOR = (
     "你是一位耐心、鼓励式的中国家庭学习辅导老师，面向上海的中小学生。"
     "讲解要短、具体、一步一步，先给最容易的一步，避免一次给太多。"
 )
+TUTOR_ADULT = (
+    "你是一位专业、务实的辅导老师，学习者是成年人（在职备考职业资格考试，或学习大学、专业课程）。"
+    "用平等、简洁的口吻，直奔重点，结合真实工作场景举例；不用哄小孩的语气，不用夸张的表扬。"
+)
+
+
+def _adult(grade: str) -> bool:
+    from ..catalog import is_adult
+    return is_adult(grade)
+
+
+def _tutor(grade: str) -> str:
+    return TUTOR_ADULT if _adult(grade) else TUTOR
 
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"items": 2, "teach": 2, "context": 1, "passage": 1}
+PROMPT_VERSION = {"items": 2, "teach": 2, "context": 1, "passage": 1, "variant": 1, "verify": 1}
 
 
 def _audience(grade: str, pack) -> str:
     from ..catalog import stage_label
-    s = f"学生年级：{stage_label(grade)}。学科：{pack.subject_name}（{pack.edition}）。"
+    who = f"学习者：成年人（{stage_label(grade)}）。" if _adult(grade) else f"学生年级：{stage_label(grade)}。"
+    s = f"{who}学科：{pack.subject_name}（{pack.edition}）。"
     if pack.teach_lang == "en" and pack.item_lang == "en":
         s += "学生在国际学校，这一科用英文授课和考试，但英文基础较弱：题干用英文，同时给中文翻译，讲解用中文并标出关键英文术语。"
     elif pack.item_lang == "en":
@@ -53,12 +67,43 @@ def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=
         f"{purpose_txt}\n优先用 mcq/num/fill（能自动判分），short 最多 1 道。不要照搬教材原文。"
         f"答案必须正确且唯一，请自己检查一遍。\n输出格式：{_item_schema()}"
     )
-    data = ask_json("items", TUTOR + "你也是严谨的出题人。", user, user_id=user_id, effort="medium", cache=False)
+    data = ask_json("items", _tutor(grade) + "你也是严谨的出题人。", user, user_id=user_id, effort="medium", cache=False)
     items = data.get("items", []) if isinstance(data, dict) else data
     from .. import itemtypes
     return [{**itemtypes.normalize(i), "difficulty": i.get("difficulty", 2), **({"kp_ids": i["kp_ids"]} if i.get("kp_ids") else {})}
             for i in items
             if isinstance(i, dict) and i.get("q") and i.get("type") in itemtypes.TYPES]
+
+
+def solve_item(item: dict, pack, grade: str) -> dict:
+    """校对答案：不给参考答案，让 AI 自己独立做一遍（可以在 config/llm.toml 的 [tasks.verify] 指定另一个模型）。"""
+    from .. import itemtypes
+    t = itemtypes.of(item)
+    fmt = {"mcq": "answer 为你选的选项下标（从 0 开始的整数）", "num": "answer 为数值（不带单位）",
+           "fill": "answer 为要填的内容（字符串）"}.get(item["type"], "answer 为你的答案")
+    opts = "".join(f"\n{i}. {o}" for i, o in enumerate(item.get("options") or [])) if item["type"] == "mcq" else ""
+    code = f"\n代码：\n{item['code']}" if item.get("code") else ""
+    user = (f"{_audience(grade, pack)}\n请认真独立地做下面这道{t.label}，一步步想清楚再给答案。\n题目：{item['q']}{code}{opts}\n\n"
+            "如果题目本身有错、条件不够、或者不止一个正确答案，ok 填 false，并在 problem 里一句话说明。\n"
+            f'输出格式：{{"answer": ..., "ok": true, "problem": "", "why": "一句话思路"}}，其中 {fmt}。')
+    data = ask_json("verify", "你是严谨的出题审校老师。", user, effort="medium", max_tokens=1500, cache=False)
+    return data if isinstance(data, dict) else {}
+
+
+def make_variant(item: dict, kp: dict, pack, grade: str) -> dict | None:
+    """把家里拍的卷子上的一道题改编成一道新题：考同一个知识点、难度相当，但换掉数字、情境和说法，不照抄原题。"""
+    from .. import itemtypes
+    user = (f"{_audience(grade, pack)}\n知识点：{kp['name']}\n下面是一道学校卷子上的原题（{itemtypes.of(item).label}）：\n{item['q']}\n"
+            + ("".join(f"{'ABCDEFGH'[i]}. {o}  " for i, o in enumerate(item.get("options") or [])) + "\n" if item.get("options") else "")
+            + "\n请改编成一道新题：考同一个知识点、同样的思路和难度，但换掉数字、人名、情境和措辞，不要照抄原题的句子。"
+            "能自动判分的尽量用 mcq/num/fill。答案必须正确且唯一，请自己再做一遍检查。\n"
+            f"输出格式：{_item_schema()}（只出 1 道）")
+    data = ask_json("variant", _tutor(grade) + "你也是严谨的出题人。", user, effort="medium", cache=False)
+    items = data.get("items", []) if isinstance(data, dict) else data
+    for i in items or []:
+        if isinstance(i, dict) and i.get("q") and i.get("type") in itemtypes.TYPES:
+            return {**itemtypes.normalize(i), "difficulty": i.get("difficulty", 2)}
+    return None
 
 
 def teach(kp: dict, pack, grade: str, user_id=None, known: list[str] | None = None) -> dict:
@@ -68,11 +113,11 @@ def teach(kp: dict, pack, grade: str, user_id=None, known: list[str] | None = No
     user = (
         f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n"
         f"已有学习方法：{kp.get('method','')}\n{bridge}\n"
-        "请把这个知识点拆成 3-4 个很小的步骤教给学生，每步一两句话，配一个生活化的小例子；"
+        f"请把这个知识点拆成 3-4 个很小的步骤教给学生，每步一两句话，配一个{'工作中的实际' if _adult(grade) else '生活化的小'}例子；"
         "最后给一个「一句话记住」。如有英文术语，给出英文和中文。\n"
         '输出：{"steps":[{"title":"..","text":".."}],"example":{"q":"..","a":".."},"remember":"..","terms":[{"en":"..","zh":".."}]}'
     )
-    return ask_json("teach", TUTOR, user, user_id=user_id, effort="medium", cache=False)  # 存在题库 contents 里
+    return ask_json("teach", _tutor(grade), user, user_id=user_id, effort="medium", cache=False)  # 存在题库 contents 里
 
 
 def kp_context(kp: dict, pack, grade: str, user_id=None) -> dict:
@@ -87,7 +132,7 @@ def kp_context(kp: dict, pack, grade: str, user_id=None) -> dict:
         "内容必须准确，不确定的历史细节宁可不写。不要照搬教材原文。\n"
         '输出：{"story":"..","uses":[".."],"fun":"..","next":".."}'
     )
-    return ask_json("context", TUTOR, user, user_id=user_id, effort="low", cache=False)  # 存在题库 contents 里
+    return ask_json("context", _tutor(grade), user, user_id=user_id, effort="low", cache=False)  # 存在题库 contents 里
 
 
 def lookup(query: str, context: str, lang: str, grade: str, user_id=None) -> dict:
@@ -100,14 +145,14 @@ def lookup(query: str, context: str, lang: str, grade: str, user_id=None) -> dic
         )
     else:
         want = (
-            '{"word":"词语","pinyin":"拼音","meaning":"在这句话里的意思（用孩子听得懂的话）","other_meanings":["其他常见意思"],'
+            '{"word":"词语","pinyin":"拼音","meaning":"在这句话里的意思（' + ("说清楚、简洁" if _adult(grade) else "用孩子听得懂的话") + '）","other_meanings":["其他常见意思"],'
             '"near":["近义词"],"opposite":["反义词"],"example":"一个例句","tip":"记忆或书写提示(可选)"}'
         )
     user = (
         f"学生（{stage_label(grade)}）在阅读时不懂这个{'英文单词/短语' if lang == 'en' else '字词'}：「{query}」\n"
         f"所在句子：{context or '（无）'}\n请按学生水平解释，意思要贴合这句话。输出：{want}"
     )
-    return ask_json("lookup", TUTOR, user, user_id=user_id, effort="low", max_tokens=1500)
+    return ask_json("lookup", _tutor(grade), user, user_id=user_id, effort="low", max_tokens=1500)
 
 
 def explain_sentence(sentence: str, lang: str, grade: str, user_id=None) -> dict:
@@ -117,7 +162,7 @@ def explain_sentence(sentence: str, lang: str, grade: str, user_id=None) -> dict
         "请：1) 给出通顺的意思（英文句子给中文翻译）；2) 拆开句子结构，指出主干和难点；3) 点出 1-2 个值得积累的词或表达。\n"
         '输出：{"meaning":"..","structure":"..","points":[{"text":"..","note":".."}]}'
     )
-    return ask_json("explain", TUTOR, user, user_id=user_id, effort="low", max_tokens=1500)
+    return ask_json("explain", _tutor(grade), user, user_id=user_id, effort="low", max_tokens=1500)
 
 
 def sentence_feedback(word: str, meaning: str, sentence: str, lang: str, grade: str, user_id=None) -> dict:
@@ -128,7 +173,7 @@ def sentence_feedback(word: str, meaning: str, sentence: str, lang: str, grade: 
         "给一个改正后的句子，以及一个更好的示范句。语气鼓励，简短。\n"
         '输出：{"ok":true/false,"praise":"..","issue":"没有问题时为空","corrected":"..","better":"..","score":1-5}'
     )
-    return ask_json("sentence", TUTOR, user, user_id=user_id, effort="low", max_tokens=1200, cache=False)
+    return ask_json("sentence", _tutor(grade), user, user_id=user_id, effort="low", max_tokens=1200, cache=False)
 
 
 def make_passage(lang: str, grade: str, topic: str, length: str, review_words: list[str], user_id=None) -> dict:
@@ -139,11 +184,11 @@ def make_passage(lang: str, grade: str, topic: str, length: str, review_words: l
     else:
         spec = f"写一篇适合{stage_label(grade)}学生的中文短文，{length}，语言规范优美但不难懂。"
     user = (
-        f"{spec}主题：{topic or '孩子感兴趣的日常、自然或科学话题'}。{words}不要照搬已有出版物。\n"
+        f"{spec}主题：{topic or ('职场、社会、经济或科学话题' if _adult(grade) else '孩子感兴趣的日常、自然或科学话题')}。{words}不要照搬已有出版物。\n"
         "再出 3 道阅读理解选择题（考概括、细节、词义各一）。\n"
         '输出：{"title":"..","body":"正文，段落之间用\\n\\n分隔","questions":[{"q":"..","options":["..","..","..",".."],"answer":0,"explain":"中文解析"}]}'
     )
-    return ask_json("passage", TUTOR + "你也是儿童读物作者。", user, user_id=user_id, effort="medium", cache=False)
+    return ask_json("passage", _tutor(grade) + ("" if _adult(grade) else "你也是儿童读物作者。"), user, user_id=user_id, effort="medium", cache=False)
 
 
 PAPER_SCHEMA = (
@@ -169,7 +214,7 @@ def parse_paper(pack, grade: str, candidates: list[dict], images=None, text: str
         "能自动判分的题尽量用 mcq/num/fill；作文、论述用 short。\n\n"
         f"候选知识点：\n{kp_lines}\n\n输出格式：{PAPER_SCHEMA}"
     )
-    data = ask_json("paper", "你是严谨的中小学阅卷老师和出题人。" + TUTOR, user, user_id=user_id, effort="high",
+    data = ask_json("paper", "你是严谨的阅卷老师和出题人。" + _tutor(grade), user, user_id=user_id, effort="high",
                     max_tokens=16000, cache=False, images=images)
     if not isinstance(data, dict):
         data = {"questions": data if isinstance(data, list) else []}
@@ -190,17 +235,28 @@ ASK_TUTOR = (
 )
 
 
+ASK_TUTOR_ADULT = (
+    "你叫{name}，是陪成年人学习的 AI 辅导老师。学习者还在做这道题时，不直接说出最终答案（选项、数值、要填的内容），"
+    "而是用一两个问题或提示引导他自己想出来；上下文注明已经做完这道题时，直接讲清楚答案的依据和道理。"
+    "语气平等、专业、简洁，每次回复 2-4 句，还在引导时以一个问题结尾。"
+    "法规类问题点明依据的是哪类规定；不确定的细节如实说不确定，不编造法规条文或数字。"
+    "如果问题和学习无关，简短回应后拉回学习。"
+)
+
+
 def ask_tutor(grade: str, pack, context: str, history: list[tuple[str, str]], question: str, secret: str = "",
               user_id=None, name: str = "小艾") -> dict:
     """问一问：结合当前页面 / 题目，引导式回答。secret = 题目的正确答案和讲解（只给小助手参考，不能说出来）。"""
-    system = ASK_TUTOR.replace("{name}", name)
+    adult = _adult(grade)
+    system = (ASK_TUTOR_ADULT if adult else ASK_TUTOR).replace("{name}", name)
     aud = _audience(grade, pack) if pack else f"学生年级：{grade}。"
-    conv = "\n".join(f"{'孩子' if r == 'user' else name}：{t}" for r, t in history[-12:])
+    me = "学习者" if adult else "孩子"
+    conv = "\n".join(f"{me if r == 'user' else name}：{t}" for r, t in history[-12:])
     user = (
-        f"{aud}\n\n孩子现在看的页面和题目：\n<<<\n{context[:3000]}\n>>>\n"
+        f"{aud}\n\n{me}现在看的页面和题目：\n<<<\n{context[:3000]}\n>>>\n"
         + (f"\n（只给你参考、绝不能说出来的正确答案和讲解：{secret[:1500]}）\n" if secret else "")
         + (f"\n之前的对话：\n{conv}\n" if conv else "")
-        + f"\n孩子现在说：{question[:1000]}\n\n"
+        + f"\n{me}现在说：{question[:1000]}\n\n"
         '输出：{"reply":"你的回复（2-4句，以问题结尾）","reveals_answer":false}。'
         "reveals_answer 表示你的回复里是否直接说出了最终答案，如实填写。"
     )

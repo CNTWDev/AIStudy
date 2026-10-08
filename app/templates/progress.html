@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 {% block body %}
 <a href="/today" class="back">← 今天</a>
-<h1>学校学到哪了</h1>
+<h1>{{ '学习进度和考试日期' if adult else '学校学到哪了' }}</h1>
 {% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
-<p class="muted small">每隔一两周更新一次就行（1 分钟）。选好「正在学」，再勾上这个学期学校已经学过的。
-每天的任务会跟着调整：跟上学校正在学的 → 回头抽查学过的 → 补前面没打牢的基础 → 提前看一眼下一个。</p>
+{% if adult %}<p class="muted small">设好考试日期，系统按剩下的天数算出每天要学几个考点，按大纲顺序排进「今天」；离考试两周时不再学新内容，改成把还没掌握的高频考点过一遍。
+已经自己看过书的部分，可以在下面勾上「已经学过的」。</p>
+{% else %}<p class="muted small">每隔一两周更新一次就行（1 分钟）。选好「正在学」，再勾上这个学期学校已经学过的。
+每天的任务会跟着调整：跟上学校正在学的 → 回头抽查学过的 → 补前面没打牢的基础 → 提前看一眼下一个。</p>{% endif %}
 
 {% set ns = namespace(first=(rows|selectattr('stale')|map(attribute='pack.id')|first) or (rows[0].pack.id if rows else None)) %}
 {% for v in rows %}
@@ -12,29 +14,35 @@
 <details class="card" id="p-{{ pid }}" {{ 'open' if (open_pack == pid) or (not open_pack and pid == ns.first) }}>
   <summary class="row">
     <div class="grow"><b>{{ v.pack.subject_name }}</b> <span class="muted small">{{ v.pack.edition }} · {{ stage_label(v.stage) }}</span></div>
-    {% if v.stale %}<span class="badge warn">{{ '还没设置' if not v.updated else '该更新了' }}</span>
+    {% if v.exam and v.exam.days_left >= 0 %}<span class="badge">离考试 {{ v.exam.days_left }} 天</span>
+    {% elif v.pack.system == 'cert' and not v.exam_date %}<span class="badge warn">还没设考试日期</span>
+    {% elif v.stale and v.pack.system != 'cert' %}<span class="badge warn">{{ '还没设置' if not v.updated else '该更新了' }}</span>
     {% else %}<span class="muted small">{{ v.updated[:10] }} 更新</span>{% endif %}
   </summary>
   <div class="bar" style="margin:10px 0"><span style="width:{{ 100 * v.learned|length / (v.total or 1) }}%;background:var(--learn)"></span></div>
-  <div class="muted small">学校已学 {{ v.learned|length }} / {{ v.total }} 个知识点
+  {% if v.exam %}<div class="small" style="margin-bottom:6px">{% if v.exam.phase == 'learn' %}还剩 {{ v.exam.todo|length }} 个考点没学，每天学 {{ v.exam.per_day }} 个，离考试两周时学完。
+    {% elif v.exam.phase == 'sprint' %}考前冲刺：已学 {{ v.exam.learned }} / {{ v.exam.total }}，已掌握 {{ v.exam.mastered }} 个，每天把还没掌握的高频考点过一遍。
+    {% else %}考试日期已过，可以改成下一次的考试日期。{% endif %}</div>{% endif %}
+  <div class="muted small">{{ '已学' if adult else '学校已学' }} {{ v.learned|length }} / {{ v.total }} 个知识点
     {% if v.current %} · 正在学 <a href="/learn/{{ v.current.id }}">{{ v.current.name }}</a>{% endif %}
     {% if v.next %} · 接下来 <a href="/learn/{{ v.next.id }}?task=preview">{{ v.next.name }}</a>{% endif %}
     · <a href="/map/{{ pid }}">知识地图</a></div>
 
   <form method="post" action="/progress/{{ pid }}" class="prog" style="margin-top:12px">
     <div class="row">
-      <div><label>年级 / 学段</label>
+      <div><label>考试日期{% if v.pack.system != 'cert' %}（选填）{% endif %}</label><input type="date" name="exam_date" value="{{ v.exam_date or '' }}"></div>
+      <div><label>{{ '学段' if adult else '年级 / 学段' }}</label>
         <select name="stage">{% for st in v.pack.stages %}<option value="{{ st }}" {{ 'selected' if st == v.stage }}>{{ stage_label(st) }}</option>{% endfor %}</select></div>
-      <div class="grow"><label>现在学校正在学</label>
+      <div class="grow"><label>{{ '现在正在学' if adult else '现在学校正在学' }}</label>
         <select name="current" class="cur">
-          <option value="">（不确定 / 放假中）</option>
+          <option value="">{{ '（不确定）' if adult else '（不确定 / 放假中）' }}</option>
           {% for sname, kps in v.strands %}<optgroup label="{{ sname }}">
             {% for kp in kps %}<option value="{{ kp.id }}" {{ 'selected' if v.current and v.current.id == kp.id }}>{{ kp.name }}</option>{% endfor %}
           </optgroup>{% endfor %}
         </select></div>
     </div>
     <div class="row small" style="margin:10px 0 4px">
-      <b class="grow">本学段学校已经学过的</b>
+      <b class="grow">{{ '已经学过的' if adult else '本学段学校已经学过的' }}</b>
       <a href="#" class="upto">勾上「正在学」之前的</a> · <a href="#" class="none">全不选</a>
     </div>
     {% for sname, kps in v.strands %}

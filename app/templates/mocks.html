@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/subjects" class="small">← 学科</a>
+<h1>模拟考</h1>
+<p class="muted small">整套的真题、名校卷、名师卷，都由管理员核对过。像真的考试一样，找一段完整的时间一口气做完；
+做完看诊断：哪些考点真的不会、哪些是粗心、要往回补什么。分数不重要，认真、专注地做完一整套才是这次的收获。</p>
+{% if packs|length > 1 %}<div class="row small">
+  <a class="pill {{ 'st-mastered' if not pack }}" href="/mocks">全部</a>
+  {% for p in packs %}<a class="pill {{ 'st-mastered' if pack == p.id }}" href="/mocks?pack={{ p.id }}">{{ p.subject_name }}</a>{% endfor %}
+</div>{% endif %}
+
+{% for m in mocks %}{% set b = m.bp %}
+<div class="card row">
+  <div class="grow"><b>{{ b.title }}</b>
+    <div class="muted small">{{ m.pack.subject_name }} · {{ m.label }} · {{ b.n }} 题{% if b.minutes %} · 建议 {{ b.minutes }} 分钟{% endif %}
+      {% set done = m.mine|selectattr('status', 'equalto', 'done')|list %}{% if done %} · 做过 {{ done|length }} 次{% endif %}</div></div>
+  {% if m.open %}<a class="btn sm" href="/papers/{{ m.open }}">接着做</a>
+  {% elif not readonly %}<form method="post" action="/mocks/{{ b.id }}/start"><button class="btn sm {{ 'ghost' if done }}">{{ '再做一次' if done else '开始' }}</button></form>{% endif %}
+  {% for d in done[:1] %}<a class="small" href="/papers/{{ d.id }}/report">上次的诊断</a>{% endfor %}
+</div>
+{% else %}
+<div class="card"><p class="muted small" style="margin:0">你选的课里还没有发布的整套卷子。平时练习里遇到的真题会标出来源。</p></div>
+{% endfor %}
+{% endblock %}

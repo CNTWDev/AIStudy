@@ -17,6 +17,24 @@
 {% endif %}
 <a class="btn ghost sm" href="/admin/users/{{ u.id }}">账号管理</a>
 {%- endmacro %}
+{% macro kid_table(kids, first='孩子') %}
+  <table style="margin-top:8px">
+    <tr><th>{{ first }}</th><th>年级 / 教材</th><th>今天</th><th>坚持</th><th>本周</th><th>待复习 / 生词</th><th>薄弱点</th><th>系统发现</th><th></th></tr>
+    {% for k in kids %}
+    <tr>
+      <td><b><a href="/admin/users/{{ k.u.id }}">{{ k.u.name }}</a></b> {{ status_pill(k.u) }}<div class="muted small">{{ k.u.email }}</div></td>
+      <td class="small">{{ stage_label(k.u.grade) }}<br><span class="muted">{% for p in k.packs %}{{ p.pack.subject_name }}{{ '、' if not loop.last }}{% else %}未选教材{% endfor %}</span></td>
+      <td class="small">{{ k.today_done }}/{{ k.today.plan|length }} 项<br><span class="muted">{{ k.today.minutes }} 分钟</span></td>
+      <td class="small">连续 {{ k.streak }} 天</td>
+      <td class="small">{{ k.week_days }} 天 · {{ k.week_min }} 分钟</td>
+      <td class="small">{{ k.due }} / {{ k.words }}</td>
+      <td class="small">{{ k.weak_n }}{% if k.weak %}<br><span class="muted">{{ k.weak[0].name }}</span>{% endif %}</td>
+      <td class="small">{% for i in k.insights[:2] %}<div>🔍 {{ i.title }}</div>{% else %}<span class="muted">—</span>{% endfor %}</td>
+      <td class="small"><a href="/admin/kids/{{ k.u.id }}">报告</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endmacro %}
 {% block body %}
 <h1>管理后台</h1>
 <nav class="subnav">{% for key, label in tabs %}<a href="/admin?tab={{ key }}" class="{{ 'on' if tab == key }}">{{ label }}{% if key == 'overview' and stats.pending %} <span class="badge">{{ stats.pending }}</span>{% endif %}</a>{% endfor %}</nav>
@@ -26,6 +44,7 @@
 <div class="stats">
   <div class="stat"><b>{{ stats.families }}</b><span>家庭</span></div>
   <div class="stat"><b>{{ stats.kids }}</b><span>孩子</span></div>
+  {% if stats.selfs %}<div class="stat"><b>{{ stats.selfs }}</b><span>自学者</span></div>{% endif %}
   <div class="stat"><b>{{ stats.active_kids }}</b><span>近 7 天在学</span></div>
   <div class="stat"><b>{{ stats.pending }}</b><span>待审批</span></div>
   <div class="stat"><b>{{ stats.invites_open }}</b><span>可用邀请码</span></div>
@@ -89,25 +108,16 @@
       {% if f.p.id != me.id and f.p.status == 'active' %}<form method="post" action="/admin/users/{{ f.p.id }}/admin" style="display:inline"><input type="hidden" name="on" value="{{ '' if f.p.is_admin else '1' }}"><button class="btn ghost sm">{{ '取消管理员' if f.p.is_admin else '设为管理员' }}</button></form>{% endif %}</div>
   </div>
   {% if f.kids %}
-  <table style="margin-top:8px">
-    <tr><th>孩子</th><th>年级 / 教材</th><th>今天</th><th>坚持</th><th>本周</th><th>待复习 / 生词</th><th>薄弱点</th><th>系统发现</th><th></th></tr>
-    {% for k in f.kids %}
-    <tr>
-      <td><b><a href="/admin/users/{{ k.u.id }}">{{ k.u.name }}</a></b> {{ status_pill(k.u) }}<div class="muted small">{{ k.u.email }}</div></td>
-      <td class="small">{{ stage_label(k.u.grade) }}<br><span class="muted">{% for p in k.packs %}{{ p.pack.subject_name }}{{ '、' if not loop.last }}{% else %}未选教材{% endfor %}</span></td>
-      <td class="small">{{ k.today_done }}/{{ k.today.plan|length }} 项<br><span class="muted">{{ k.today.minutes }} 分钟</span></td>
-      <td class="small">连续 {{ k.streak }} 天</td>
-      <td class="small">{{ k.week_days }} 天 · {{ k.week_min }} 分钟</td>
-      <td class="small">{{ k.due }} / {{ k.words }}</td>
-      <td class="small">{{ k.weak_n }}{% if k.weak %}<br><span class="muted">{{ k.weak[0].name }}</span>{% endif %}</td>
-      <td class="small">{% for i in k.insights[:2] %}<div>🔍 {{ i.title }}</div>{% else %}<span class="muted">—</span>{% endfor %}</td>
-      <td class="small"><a href="/admin/kids/{{ k.u.id }}">报告</a></td>
-    </tr>
-    {% endfor %}
-  </table>
+  {{ kid_table(f.kids) }}
   {% else %}<p class="muted small">还没有添加孩子。</p>{% endif %}
 </div>
 {% else %}<div class="card muted">没有找到。</div>{% endfor %}
+{% if selfs %}
+<div class="card">
+  <h3 style="margin:0">自学者 <span class="muted small">自己注册、自己选课的学习账号，没有家长</span></h3>
+  {{ kid_table(selfs, '自学者') }}
+</div>
+{% endif %}
 <form class="card" method="post" action="/admin/users/create">
   <h3>直接创建账号</h3>
   <p class="muted small">家长账号：添加孩子、查看和安排孩子的学习。管理员账号：只管理网站，不带孩子。</p>
@@ -165,8 +175,29 @@
   <div><b>{{ B.by_kind.get('context', 0) }}</b><span>份背景和用处</span></div>
   <div><b>{{ B.by_kind.get('passage', 0) }}</b><span>篇阅读短文</span></div>
 </div>
-<p class="muted small" style="margin-bottom:0">AI 现场生成的题目、讲解、背景和短文都会存进来，以后先用库里的，不够才再生成。题目来源：{% for k, v in B.by_source.items() %}{{ {'ai': 'AI 出题', 'seed': '内置', 'paper': '试卷导入'}.get(k, k) }} {{ v }}{{ '，' if not loop.last }}{% endfor %}。
-  <a href="/admin/bank/export.json">导出整个题库（JSON）</a>，不含孩子的作答记录和试卷原题。</p></div>
+<p class="muted small" style="margin-bottom:0">AI 现场生成的题目、讲解、背景和短文都会存进来，以后先用库里的，不够才再生成。题目来源：{% for k, v in B.by_source.items() %}{{ {'ai': 'AI 出题', 'seed': '内置', 'paper': '试卷导入', 'bank': '卷库'}.get(k, k) }} {{ v }}{{ '，' if not loop.last }}{% endfor %}。
+  <a href="/admin/bank/export.json">导出整个题库（JSON）</a>，不含孩子的作答记录、试卷原题和卷库的题。</p></div>
+
+{% set F2 = flow %}
+<div class="card">
+  <div class="card-h"><span class="ico">⚙️</span><h3>题库流水线</h3></div>
+  <p class="muted small">后台每 15 分钟自动跑一小批，不用人管：家里拍的卷子（家长同意分享的）由 AI 改编成新题，校对通过才进公共题库；
+  AI 不看答案独立做一遍来校对，对不上的暂停使用、出现在下面「被标记有问题」里；换了数字的同一道题归成一组，不当新题出；
+  做的人够多以后按真实作答校准难度（1 很容易 … 5 很难），只用来给每个人配合适的题。每天最多调用 AI {{ F2.ai_limit }} 次（今天 {{ F2.ai_today }} 次）。</p>
+  <div class="statline" style="margin:0">
+    <div><b>{{ F2.verified }}</b><span>道已校对</span></div>
+    <div><b>{{ F2.todo }}</b><span>道待校对</span></div>
+    <div><b>{{ F2.held }}</b><span>道校对没过</span></div>
+    <div><b>{{ F2.variants }}</b><span>道卷子改编题</span></div>
+    <div><b>{{ F2.pending }}</b><span>道改编待校对</span></div>
+    <div><b>{{ F2.groups }}</b><span>个同型组</span></div>
+    <div><b>{{ F2.calibrated }}</b><span>道按作答定了难度</span></div>
+  </div>
+  {% if F2.levels %}<p class="small">难度分布：{% for lv in [1, 2, 3, 4, 5] %}{{ lv }} 级 {{ F2.levels.get(lv, 0) }}{{ '，' if not loop.last }}{% endfor %}</p>{% endif %}
+  <form method="post" action="/admin/bank/maintain" class="row small" style="margin-top:6px">
+    <button class="btn sm soft">现在跑一轮</button>
+    <span class="muted">{% if F2.last_run %}上次 {{ F2.last_run[:16]|replace('T', ' ') }}{% else %}还没跑过{% endif %}</span></form>
+</div>
 
 {% if B.review or B.review_contents %}
 <div class="card">
@@ -212,6 +243,77 @@
   {% endfor %}
 </div>
 {% endif %}
+
+{% elif tab == 'papers' %}
+<div class="card">
+  <div class="card-h"><span class="ico">📥</span><h3>导入一份卷子</h3></div>
+  <p class="muted small">真题、名校卷、名师卷、考后回忆版：拍照或粘贴文字，AI 拆题、对上知识点、给出答案和讲解，存成<b>草稿</b>。
+  你逐题核对后点「发布」，题目才进公共题库：练习时比 AI 出的题优先，学习者也能把整套卷子当模拟考做。卷子只存在服务器上，不进代码仓库，也不随题库导出。</p>
+  {% if not llm_on %}<div class="hint">服务器还没有配置 AI，暂时不能解析卷子。</div>{% endif %}
+  <form id="bpf">
+    <div class="row">
+      <div class="grow"><label>课程</label><select name="pack_id" id="bppack">{% for p in bp_packs %}<option value="{{ p.id }}" data-stages="{{ p.stages|join(',') }}">{{ p.subject_name }} · {{ p.edition }}</option>{% endfor %}</select></div>
+      <div><label>学段</label><select name="stage" id="bpstage"></select></div>
+      <div><label>类型</label><select name="kind">{% for k, v in bp_kinds.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select></div>
+    </div>
+    <div class="row">
+      <div class="grow"><label>名称（可不填，AI 会从卷子上读）</label><input type="text" name="title" placeholder="例如：2024 年海淀区六年级数学期末"></div>
+      <div><label>年份</label><input type="text" name="year" placeholder="2024" style="width:80px"></div>
+      <div><label>限时（分钟）</label><input type="number" name="minutes" min="0" style="width:90px"></div>
+    </div>
+    <div class="row">
+      <div class="grow"><label>考试</label><input type="text" name="exam" placeholder="期末 / 中考 / 基金从业 3 月"></div>
+      <div class="grow"><label>地区</label><input type="text" name="region" placeholder="北京海淀"></div>
+      <div class="grow"><label>学校 / 老师 / 出处</label><input type="text" name="org" placeholder="人大附中"></div>
+    </div>
+    <label>拍照（每页一张，最多 {{ max_images }} 张）</label>
+    <input type="file" id="bpphotos" accept="image/*" multiple>
+    <div id="bpthumbs" class="row" style="flex-wrap:wrap;margin-top:6px"></div>
+    <details style="margin-top:10px"><summary class="small">没有照片？粘贴题目文字</summary>
+      <textarea name="text" style="min-height:120px"></textarea></details>
+    <button class="btn" id="bpgo" style="margin-top:12px" {{ 'disabled' if not llm_on }}>上传并解析</button>
+    <div id="bpmsg" class="small" style="margin-top:8px"></div>
+  </form>
+</div>
+<div class="card">
+  <div class="card-h"><span class="ico">🗂️</span><h3>卷库（{{ bps|length }}）</h3></div>
+  {% for b in bps %}
+  <a class="kp row" href="/admin/bank-papers/{{ b.id }}" style="display:flex;text-decoration:none;color:inherit">
+    <div class="grow"><b>{{ b.title }}</b>
+      <div class="muted small">{{ catalog.packs[b.pack_id].subject_name if b.pack_id in catalog.packs else b.pack_id }}{% if b.stage %} · {{ stage_label(b.stage) }}{% endif %} · {{ bp_label(b) }} · {{ b.n }} 题{% if b.used %} · 做过 {{ b.used }} 次{% endif %}</div></div>
+    <span class="pill {{ {'published': 'st-mastered', 'draft': 'st-learning'}.get(b.status, 'st-weak') }}">{{ bp_status[b.status] }}</span>
+  </a>
+  {% else %}<p class="muted small">还没有导入过卷子。</p>{% endfor %}
+</div>
+<script>
+const bpfiles = [];
+const fillStages = () => { const o = $('#bppack').selectedOptions[0]; $('#bpstage').innerHTML = (o ? o.dataset.stages.split(',') : []).map(s => `<option>${esc(s)}</option>`).join(''); };
+$('#bppack').onchange = fillStages; fillStages();
+$('#bpphotos').onchange = e => {
+  for (const f of e.target.files) {
+    if (bpfiles.length >= {{ max_images }}) { toast('最多 {{ max_images }} 张'); break; }
+    bpfiles.push(f);
+    const im = document.createElement('img'); im.src = URL.createObjectURL(f);
+    im.style.cssText = 'height:80px;border-radius:8px;margin:2px;border:1px solid var(--line)';
+    $('#bpthumbs').appendChild(im);
+  }
+  e.target.value = '';
+};
+$('#bpf').onsubmit = async e => {
+  e.preventDefault();
+  const fd = new FormData($('#bpf'));
+  bpfiles.forEach((b, i) => fd.append('photos', b, `page${i + 1}.jpg`));
+  if (!bpfiles.length && (fd.get('text') || '').trim().length < 10) { toast('先上传照片，或者粘贴题目文字'); return; }
+  $('#bpgo').disabled = true;
+  $('#bpmsg').textContent = '🤖 AI 正在拆题、对知识点、做答案……一般要一两分钟，请不要关闭页面。';
+  try {
+    const r = await fetch('/admin/bank-papers', {method: 'POST', body: fd});
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || d.detail || ('出错了 ' + r.status));
+    location.href = '/admin/bank-papers/' + d.id;
+  } catch (err) { $('#bpmsg').innerHTML = `<span class="err">${esc(err.message)}</span>`; $('#bpgo').disabled = false; }
+};
+</script>
 
 {% elif tab == 'arena' %}
 {% set F = fair %}

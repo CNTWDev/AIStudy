@@ -1,5 +1,5 @@
 {
- "_doc": "学科：名字、图标、颜色、所属领域，以及语言类学科教的是哪种语言（lang）。教材包的 subject 引用这里的 id；加学科只改这个文件。domain：language 语言 / math 数学 / science 科学 / humanities 人文 / social 社会 / computing 计算机。",
+ "_doc": "学科：名字、图标、颜色、所属领域，以及语言类学科教的是哪种语言（lang）。教材包的 subject 引用这里的 id；加学科只改这个文件。domain：language 语言 / math 数学 / science 科学 / humanities 人文 / social 社会 / computing 计算机 / finance 金融（职业资格考试）。",
  "subjects": [
   {
    "id": "chinese",
@@ -93,6 +93,13 @@
    "icon": "⌨️",
    "tone": "violet",
    "domain": "computing"
+  },
+  {
+   "id": "fund_law",
+   "name": "基金法律法规",
+   "icon": "📜",
+   "tone": "warn",
+   "domain": "finance"
   }
  ]
 }

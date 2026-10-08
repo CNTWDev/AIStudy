@@ -6,7 +6,9 @@
   fixed 每天都有（坚持比做对更重要，不受时间预算限制），flex 按顺序排、超出每天可用时间就截掉，
   "a+b" 表示两类交替穿插（交错练习），limits 是每类的上限。
 """
-from . import db, engine, evidence, explore, insights
+from datetime import timedelta
+
+from . import bankpapers, db, engine, evidence, explore, insights
 from .catalog import catalog, stage_rank
 
 
@@ -56,7 +58,8 @@ def _scan_packs(c: Ctx) -> dict:
     for e in c.enrolls:
         pack_id, stage = e["pack_id"], e["stage"]
         pv = engine.progress_view(c.user_id, e)
-        if pv["stale"]:
+        cert = catalog.packs[pack_id].system == "cert"  # 职业资格考试：按考试日期走，不跟学校进度
+        if pv["stale"] and not cert:
             out["stale"].append(catalog.packs[pack_id].subject_name)
         # 跟上学校：正在学的知识点没掌握，就练它；进度之后的下一个可以预习
         if e["progress_kp"] and catalog.kp(e["progress_kp"]):
@@ -79,7 +82,7 @@ def _scan_packs(c: Ctx) -> dict:
                                  "why": f"{'学校学过' if k['id'] in c.taught else '以前学过'}，看看还记得吗（会就很快过）",
                                  "minutes": 6, "pack": pack_id})
         diag = db.one("SELECT id FROM diag_sessions WHERE user_id=? AND pack_id=? AND status='done'", c.user_id, pack_id)
-        if not diag:
+        if not diag and not cert:  # 考证一般从零学起，不先摸底（想测可以在「学科」里自己点诊断）
             out["diagnose"].append(pack_id)
         kp_ids = set(catalog.ids_for(pack_id, e["track"]))
         weak = sorted([c.mastery[k] for k in kp_ids if k in c.mastery and model.needs_work(c.mastery[k])],
@@ -98,7 +101,7 @@ def _scan_packs(c: Ctx) -> dict:
                 out["weak"].append({"type": "weak", "kp": w["kp_id"], "title": f"攻克：{kp['name']}",
                                     "why": f"掌握度 {int(w['score'] * 100)}%，{'刚学' if w['status'] == 'learning' else '薄弱'}",
                                     "minutes": 12, "pack": pack_id})
-        if diag and not e["progress_kp"]:  # 诊断前不安排预习
+        if diag and not e["progress_kp"] and not e["exam_date"]:  # 诊断前不安排预习；有考试日期的由 src_exam 安排新内容
             for k in engine.frontier(c.user_id, pack_id, stage, c.mastery)[:2]:
                 out["preview"].append({"type": "preview", "kp": k["id"], "title": f"预习：{k['name']}",
                                        "why": "前置已具备" + ("，高频考点" if k.get("hot") else ""), "minutes": 8, "pack": pack_id})
@@ -111,6 +114,15 @@ def src_progress(c: Ctx) -> list[dict]:
     stale = c.per_pack["stale"]
     return [{"type": "progress", "title": "更新一下学校进度（1 分钟）",
              "why": f"{'、'.join(stale[:3])}：告诉系统学校学到哪了，计划才跟得上", "minutes": 2, "url": "/progress"}] if stale else []
+
+
+def src_exam_date(c: Ctx) -> list[dict]:
+    """职业资格考试的课还没设考试日期：先设一个，计划才能按剩余天数排。"""
+    names = [catalog.packs[e["pack_id"]].subject_name for e in c.enrolls
+             if catalog.packs[e["pack_id"]].system == "cert" and not e["exam_date"]]
+    return [{"type": "progress", "title": "设定考试日期（1 分钟）",
+             "why": f"{'、'.join(names[:3])}：告诉系统哪天考试，每天学多少就按剩下的天数排", "minutes": 2,
+             "url": "/progress"}] if names else []
 
 
 def src_warmup(c: Ctx) -> list[dict]:
@@ -156,6 +168,43 @@ def src_reading(c: Ctx) -> list[dict]:
     return out
 
 
+def src_exam(c: Ctx) -> list[dict]:
+    """有考试日期的课：离考试两周以上，按剩余天数算出每天要学几个新考点，按大纲顺序排；
+    最后两周不学新内容，改成把还没掌握的高频考点过一遍。"""
+    out = []
+    for e in c.enrolls:
+        ex = engine.exam_view(c.user_id, e, c.mastery, c.taught)
+        if not ex or ex["phase"] == "past":
+            continue
+        pack_id = e["pack_id"]
+        if ex["phase"] == "learn":
+            n = min(ex["per_day"], c.limit("exam", 4))
+            pace = (f"每天学 {ex['per_day']} 个能学完" if n == ex["per_day"]
+                    else f"每天要学 {ex['per_day']} 个才学得完，今天先排 {n} 个，有余力可以去「学科」多学几个")
+            for i, k in enumerate(ex["todo"][:n]):
+                kp = catalog.kps[k]
+                out.append({"type": "exam", "kp": k, "title": f"按考期学：{kp['name']}", "pack": pack_id,
+                            "why": f"离考试还有 {ex['days_left']} 天，还剩 {len(ex['todo'])} 个考点，{pace}",
+                            "minutes": 10, "url": f"/learn/{k}?task=preview", "keep": i == 0})
+        else:
+            left = [k for k in catalog.ids_for(pack_id, e["track"])
+                    if catalog.kps[k].get("hot") and c.mastery.get(k, {}).get("status") != "mastered"]
+            left.sort(key=lambda k: c.mastery.get(k, {}).get("score") or 0)
+            # 冲刺期每周一套整卷模拟考（卷库里有发布的卷子、手上没有没做完的模拟考时）
+            last = bankpapers.last_mock_day(c.user_id, pack_id)
+            if (not last or last <= (db.today() - timedelta(days=7)).isoformat()) and bankpapers.for_learner(c.user_id, [e]) \
+                    and not db.one("SELECT 1 AS ok FROM papers WHERE user_id=? AND pack_id=? AND bank_paper_id IS NOT NULL "
+                                   "AND status='ready'", c.user_id, pack_id):
+                out.append({"type": "paper", "pack": pack_id, "title": f"{catalog.packs[pack_id].subject_name}整卷模拟考",
+                            "why": f"离考试还有 {ex['days_left']} 天，找一段完整的时间按考试的节奏做一套", "minutes": 40,
+                            "url": f"/mocks?pack={pack_id}"})
+            for i, k in enumerate(left[:c.limit("exam", 3)]):
+                out.append({"type": "exam", "kp": k, "title": f"考前过一遍：{catalog.kps[k]['name']}", "pack": pack_id,
+                            "why": f"离考试还有 {ex['days_left']} 天，高频考点还没掌握", "minutes": 8,
+                            "url": f"/learn/{k}?task=exam", "keep": i == 0})
+    return out
+
+
 def src_sync(c: Ctx) -> list[dict]:
     return c.per_pack["sync"]
 
@@ -166,9 +215,10 @@ def src_top(c: Ctx) -> list[dict]:
 
 
 def src_paper(c: Ctx) -> list[dict]:
-    return [{"type": "paper", "title": f"试卷订正：{p['title']}", "why": "把卷子上的题在线再做一遍，做完看诊断",
-             "minutes": 20, "url": f"/papers/{p['id']}"}
-            for p in db.q("SELECT id, title FROM papers WHERE user_id=? AND status='ready' ORDER BY id", c.user_id)]
+    return [{"type": "paper", "url": f"/papers/{p['id']}",
+             **({"title": f"模拟考：{p['title']}", "why": "接着把这套卷子做完，做完看诊断", "minutes": 30} if p["bank_paper_id"] else
+                {"title": f"试卷订正：{p['title']}", "why": "把卷子上的题在线再做一遍，做完看诊断", "minutes": 20})}
+            for p in db.q("SELECT id, title, bank_paper_id FROM papers WHERE user_id=? AND status='ready' ORDER BY id", c.user_id)]
 
 
 def src_diagnose(c: Ctx) -> list[dict]:
@@ -216,8 +266,8 @@ def src_review(c: Ctx) -> list[dict]:
              "minutes": min(10, 2 + n), "url": "/review?group=other"}] if n else []
 
 
-SOURCES = {"progress": src_progress, "warmup": src_warmup, "words": src_words, "mistakes": src_mistakes,
-           "reading": src_reading, "sync": src_sync, "top": src_top, "paper": src_paper, "diagnose": src_diagnose,
+SOURCES = {"progress": src_progress, "exam_date": src_exam_date, "warmup": src_warmup, "words": src_words, "mistakes": src_mistakes,
+           "reading": src_reading, "exam": src_exam, "sync": src_sync, "top": src_top, "paper": src_paper, "diagnose": src_diagnose,
            "weak": src_weak, "backfill": src_backfill, "check": src_check, "preview": src_preview, "review": src_review}
 DEFAULT_LIMITS = {"sync": 2, "top": 1, "paper": 1, "diagnose": 1, "check": 2, "preview": 1}
 

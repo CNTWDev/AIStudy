@@ -17,7 +17,8 @@ function renderItem(box, item, opts) {
   const L = 'ABCDEFG';
   // 输入控件由服务端题型注册表给出（app/itemtypes.py 的 widget）：choice 选项 / self 自评 / text 输入框
   const W = item.widget || (item.type === 'mcq' ? 'choice' : item.type === 'short' ? 'self' : 'text');
-  let html = `<div class="q"><div style="font-weight:600">${esc(item.q)}</div>` +
+  let html = `<div class="q">` + (item.src ? `<div class="muted small">📄 ${esc(item.src)}</div>` : '') +
+    `<div style="font-weight:600">${esc(item.q)}</div>` +
     (item.code ? `<pre class="code">${esc(item.code)}</pre>` : '') +
     (item.zh ? `<div class="muted small">${esc(item.zh)}</div>` : '');
   if (W === 'choice') {

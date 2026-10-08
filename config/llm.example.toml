@@ -66,6 +66,10 @@ type = "mock"
 #
 # 试卷拍照解析需要「能看图片」的模型：Claude 可以直接用；DeepSeek 目前不能看图，
 # 可以给这个任务单独指定通义千问的视觉模型（先在上面打开 [providers.qwen]）：
+# 题库校对答案：最好用和出题不同的模型独立做一遍，两个模型都算对才更可靠
+# [tasks.verify]
+# provider = "deepseek"
+#
 # [tasks.paper]
 # provider = "qwen"
 # model = "qwen-vl-max"

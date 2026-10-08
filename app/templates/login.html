@@ -19,8 +19,13 @@
   {% endif %}
   {% if mode in ('first', 'open', 'invite', 'approval') %}
   <details class="card" {{ 'open' if mode == 'first' or show_register }}>
-    {% if mode != 'first' %}<summary><b>新家庭注册家长账号</b></summary>{% endif %}
+    {% if mode != 'first' %}<summary><b>注册新账号</b></summary>{% endif %}
     <form method="post" action="/register">
+      {% if mode != 'first' %}
+      <label>我是</label>
+      <label class="row" style="margin:4px 0 0;font-weight:400"><input type="radio" name="who" value="parent" style="width:auto" checked> <span class="grow"><b>家长</b> <span class="muted small">给孩子开账号、安排和查看孩子的学习</span></span></label>
+      <label class="row" style="margin:4px 0 0;font-weight:400"><input type="radio" name="who" value="self" style="width:auto"> <span class="grow"><b>自己学</b> <span class="muted small">自己选课、自己定考试日期（比如备考基金从业资格）</span></span></label>
+      {% endif %}
       <label>你的称呼</label><input type="text" name="name" placeholder="例如：小明妈妈" required>
       <label>邮箱</label><input type="email" name="email" required value="{{ email or '' }}">
       <label>密码（至少 6 位）</label><input type="password" name="password" required minlength="6" autocomplete="new-password">
@@ -28,7 +33,7 @@
       <label>邀请码（向管理员或已经在用的家长索取）</label><input type="text" name="invite" required value="{{ invite or '' }}" placeholder="例如 3F2A-91BC-07DE">
       {% elif mode == 'approval' %}
       <label>邀请码（有就填，直接开通；没有可以留空，提交后等管理员审批）</label><input type="text" name="invite" value="{{ invite or '' }}" placeholder="例如 3F2A-91BC-07DE">
-      <label>没有邀请码时：简单介绍一下（例如：谁介绍的、孩子几年级）</label><input type="text" name="note" maxlength="200">
+      <label>没有邀请码时：简单介绍一下（例如：谁介绍的、孩子几年级、想学什么）</label><input type="text" name="note" maxlength="200">
       {% endif %}
       <div style="margin-top:16px"><button class="btn" style="width:100%">{{ '提交申请' if mode == 'approval' and not invite else '创建账号' }}</button></div>
     </form>

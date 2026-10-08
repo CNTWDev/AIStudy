@@ -2,7 +2,7 @@
 import json
 from datetime import date, timedelta
 
-from . import bank, db, evidence, itemtypes, llm
+from . import bank, bankflow, db, evidence, itemtypes, llm
 from . import streak as _streak
 from .catalog import catalog, stage_rank
 
@@ -104,18 +104,28 @@ save_items = bank.save_items
 
 
 def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="") -> list[dict]:
-    """取题：先用题库里的（这个知识点的，加上别的教材里同一概念的），优先没做过的、难度从低到高；
+    """取题：先用题库里的（这个知识点的，加上别的教材里同一概念的），优先没做过的、卷库真题优先、难度从低到高；
     不够且配置了 AI 时现场出题，存进题库，以后别的孩子也能用。"""
     rows = bank.candidates(user_id, kp_id)
-    fresh = [r for r in rows if r["done"] == 0]
+    fresh = [r for r in rows if r["done"] == 0 and not r["gdone"]]
+    # 同型组里做过别的题（换了数字的同一道题）：排在新题后面；做错过的那组，先出同组没做过的，再出原题
+    twins = [r for r in rows if r["done"] == 0 and r["gdone"]]
     redo = [r for r in rows if r["done"] > 0 and r["ok"] == 0]  # 做错过的题，换个时间再做
     # 交叉验证：优先没用过的题型（已经用选择题答对过，就先给填空 / 计算）
     m = db.one("SELECT evidence FROM mastery WHERE user_id=? AND kp_id=?", user_id, kp_id)
     seen_fmts = set(db.jload(m["evidence"], {}).get("fmts", [])) if m and m["evidence"] else set()
-    pool = sorted(fresh, key=lambda r: (r["other"] or 0, itemtypes.fmt(r["type"]) in seen_fmts, r["difficulty"])) + redo
+    # 卷库里管理员核对过的真题 / 名校卷 / 名师卷，比 AI 出的题优先
+    pool = sorted(fresh, key=lambda r: (r["other"] or 0, r["source"] != "bank", itemtypes.fmt(r["type"]) in seen_fmts,
+                                        bankflow.level(r))) + sorted(twins, key=bankflow.level) + redo
     if purpose == "diagnose":
         pool = sorted(rows, key=lambda r: (r["done"] > 0, r["other"] or 0, abs(r["difficulty"] - 2)))
-    picked = [{**bank.row_to_item(r), "kp_id": kp_id} for r in pool[:n]]  # 共用的题，这次记在正在学的知识点上
+    seen, uniq = set(), []
+    for r in pool:  # 一次不出同一组的两道题
+        if r["near_key"] and r["near_key"] in seen:
+            continue
+        seen.add(r["near_key"])
+        uniq.append(r)
+    picked = [{**bank.row_to_item(r), "kp_id": kp_id} for r in uniq[:n]]  # 共用的题，这次记在正在学的知识点上
     if len(picked) < n and llm.enabled():
         grade = grade or catalog.default_grade
         kp = catalog.kp(kp_id)
@@ -459,6 +469,45 @@ def next_after(pack_id: str, kp_id: str, mastery: dict, taught: set, track: str 
                for p in catalog.prereqs(k, required_only=True)):
             return kp
     return None
+
+
+# ------------------------------------------------------------------ 考试日期（按剩余天数排进度）
+
+SPRINT_DAYS = 14  # 最后两周不再学新内容，留给冲刺：高频考点、薄弱点、错题
+
+
+def set_exam_date(user_id: int, pack_id: str, day: str | None) -> bool:
+    """设置 / 清除某门课的考试日期（YYYY-MM-DD；空 = 清除）。日期不合法返回 False。"""
+    day = (day or "").strip()
+    if day:
+        try:
+            day = date.fromisoformat(day).isoformat()
+        except ValueError:
+            return False
+    db.run("UPDATE enrollments SET exam_date=? WHERE user_id=? AND pack_id=?", day, user_id, pack_id)
+    return True
+
+
+def exam_view(user_id: int, e, mastery: dict | None = None, taught: set | None = None) -> dict | None:
+    """一门课离考试还有几天、还剩多少没学、每天要学几个。没有考试日期返回 None。
+    已学 = 掌握度在「学习中 / 已掌握」，或者在「学习进度」里勾过学过的。"""
+    if not e["exam_date"] or e["pack_id"] not in catalog.packs:
+        return None
+    try:
+        exam = date.fromisoformat(e["exam_date"])
+    except ValueError:
+        return None
+    mastery = get_mastery(user_id) if mastery is None else mastery
+    taught = taught_set(user_id) if taught is None else taught
+    ids = catalog.ids_for(e["pack_id"], e["track"])
+    status = {k: mastery.get(k, {}).get("status") for k in ids}
+    todo = [k for k in ids if status[k] not in ("learning", "mastered") and k not in taught]
+    days_left = (exam - db.today()).days
+    learn_days = days_left - SPRINT_DAYS
+    return {"pack": catalog.packs[e["pack_id"]], "date": exam.isoformat(), "days_left": days_left,
+            "total": len(ids), "learned": len(ids) - len(todo), "mastered": sum(v == "mastered" for v in status.values()),
+            "todo": todo, "phase": "past" if days_left < 0 else "learn" if learn_days > 0 and todo else "sprint",
+            "per_day": -(-len(todo) // learn_days) if learn_days > 0 and todo else 0}
 
 
 # ------------------------------------------------------------------ 阅读 / 单词进度（tracks）

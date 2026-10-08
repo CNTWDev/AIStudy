@@ -27,8 +27,9 @@ _normalize = itemtypes.normalize
 _num = itemtypes._num
 
 
-def create(user_id: int, pack_id: str, *, title="", exam_date="", images=None, text="", created_by=None) -> int:
-    """images: [(media_type, bytes)]。先让 AI 解析（失败就什么都不保存），再入库。"""
+def create(user_id: int, pack_id: str, *, title="", exam_date="", images=None, text="", created_by=None, shared=True) -> int:
+    """images: [(media_type, bytes)]。先让 AI 解析（失败就什么都不保存），再入库。
+    shared：家长同意的话，题目会由 AI 改编成新题进公共题库（原卷和作答不公开，见 app/bankflow.py）。"""
     kid = db.one("SELECT * FROM users WHERE id=?", user_id)
     pack = catalog.packs[pack_id]
     stage = engine.enrollment_stage(user_id, pack_id) or catalog.default_stage(pack_id, kid["grade"])
@@ -42,9 +43,10 @@ def create(user_id: int, pack_id: str, *, title="", exam_date="", images=None, t
     now = db.now()
     with db.tx() as t:
         pid = t.insert(
-            "INSERT INTO papers(user_id,pack_id,title,exam_date,source,raw_text,notes,status,created_by,created_at) "
-            "VALUES(?,?,?,?,?,?,?,?,?,?)", user_id, pack_id, (title or data.get("title") or "试卷")[:80], exam_date[:10],
-            "photo" if images else "text", text[:20000], str(data.get("notes") or "")[:500], "ready", created_by, now)
+            "INSERT INTO papers(user_id,pack_id,title,exam_date,source,raw_text,notes,status,created_by,created_at,shared) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?,?)", user_id, pack_id, (title or data.get("title") or "试卷")[:80], exam_date[:10],
+            "photo" if images else "text", text[:20000], str(data.get("notes") or "")[:500], "ready", created_by, now,
+            1 if shared else 0)
         for i, q in enumerate(qs):
             kp = q.get("kp_id") if q.get("kp_id") in valid else None
             it = _normalize(q)
@@ -61,6 +63,9 @@ def create(user_id: int, pack_id: str, *, title="", exam_date="", images=None, t
                   int(page) if str(page).isdigit() else None,
                   q.get("marked") if q.get("marked") in ("right", "wrong", "partial") else "",
                   str(q.get("student_answer") or "")[:300])
+    from . import bankflow
+    for r in db.q("SELECT item_id, kp_id FROM paper_items WHERE paper_id=?", pid):
+        bankflow.assign_near(r["item_id"], kp_id=r["kp_id"] or "")
     names = []
     if images:
         d = PAPER_DIR / str(pid)

@@ -1,20 +1,26 @@
 {% extends "base.html" %}
 {% block body %}
-<h1>{{ '编辑' if k else '添加' }}孩子</h1>
+<h1>{{ '我的课程' if self_mode else ('编辑' if k else '添加') ~ '孩子' }}</h1>
 {% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
-<form method="post" action="/parent/kids/save" class="card">
-  {% if k %}<input type="hidden" name="id" value="{{ k.id }}">{% endif %}
-  <label>名字</label><input type="text" name="name" value="{{ k.name if k else '' }}" required placeholder="例如：姐姐">
+<form method="post" action="{{ '/me/courses' if self_mode else '/parent/kids/save' }}" class="card">
+  {% if k and not self_mode %}<input type="hidden" name="id" value="{{ k.id }}">{% endif %}
+  <label>{{ '称呼' if self_mode else '名字' }}</label><input type="text" name="name" value="{{ k.name if k else '' }}" required placeholder="例如：姐姐">
+  {% if self_mode %}<p class="muted small" style="margin:4px 0 0">登录邮箱和密码在右上角「账号」里改。</p>{% else %}
   <label>登录邮箱</label><input type="email" name="email" value="{{ k.email if k else '' }}" required>
   {% if not k %}<label>密码（至少 6 位，孩子用它登录）</label><input type="text" name="password" required minlength="6" autocomplete="off">{% endif %}
   {% if k %}<label style="display:flex;gap:8px;align-items:center;font-weight:normal"><input type="checkbox" name="disabled" value="1" style="width:auto" {{ 'checked' if k.status == 'disabled' }}> 暂停这个账号（孩子暂时不能登录，学习记录保留）</label>{% endif %}
+  {% endif %}
   <div class="row">
     <div class="grow"><label>年级</label><select name="grade" id="grade">{% for g in GRADES %}<option value="{{ g }}" data-rank="{{ stage_rank(g) }}" {{ 'selected' if k and k.grade == g }}>{{ stage_label(g) }}</option>{% endfor %}</select></div>
     <div class="grow"><label>每天学习分钟</label><input type="number" name="daily_minutes" min="15" max="240" value="{{ k.daily_minutes if k else 60 }}"></div>
   </div>
+  <p class="muted small" style="margin:4px 0 0">{% if self_mode %}成年人选「成人」：AI 用成人的口吻讲解。{% else %}成人学习者（比如备考基金从业资格）年级选「成人」：AI 用成人的口吻讲解，不显示乐园。成年人也可以自己注册「自己学」的账号，自己选课。{% endif %}</p>
+  {% if not self_mode %}
+  <div id="games">
   <label>每天最多玩游戏</label><select name="game_minutes">{% set gm = game_minutes(k) if k else 20 %}{% for m in GAME_MINUTE_CHOICES %}<option value="{{ m }}" {{ 'selected' if m == gm }}>{{ '不玩' if m == 0 else m ~ ' 分钟' }}</option>{% endfor %}</select>
   <label>什么时候可以玩</label><select name="game_unlock">{% set gu = game_unlock(k) if k else 'half' %}{% for v, n in UNLOCK_CHOICES.items() %}<option value="{{ v }}" {{ 'selected' if v == gu }}>{{ n }}</option>{% endfor %}</select>
   <p class="muted small" style="margin:4px 0 0">「乐园」里的游戏边玩边答题，题目按孩子自己的水平出，答题计入学习记录（游戏时间不计入每天的学习分钟）。今天的任务全部做完再奖励 10 分钟，每点亮一个知识点再奖励 2 分钟（最多 6 分钟）。今天没有任务时随时能玩。</p>
+  </div>
   <label>学校（选填）</label><input type="text" name="school" value="{{ k.school if k else '' }}">
   <label>学校类型</label>
   <select name="preset" id="preset">
@@ -22,12 +28,14 @@
     {% for pr in presets %}<option value="{{ pr.id }}" data-packs='{{ pr.packs|tojson }}' {{ 'selected' if k and k.preset == pr.id }}>{{ pr.name }}</option>{% endfor %}
   </select>
   <p class="muted small" style="margin:4px 0 0">选了学校类型会把下面每门课的教材和方向自动选好，你仍然可以逐科改（比如英语用剑桥教材）。</p>
+  {% endif %}
   {% set cur_method = methods.for_user(k.id).id if k else methods.site_default() %}
   <label>学习方式</label>
   <select name="method" id="method">{% for m in methods.choices() %}<option value="{{ m.id }}" data-desc="{{ m.desc }}" {{ 'selected' if m.id == cur_method }}>{{ m.name }}</option>{% endfor %}</select>
   <p class="muted small" id="method-desc" style="margin:4px 0 0"></p>
   <h2>学科与教材</h2>
-  <p class="muted small">每门课选孩子学校用的教材版本就行，学段按上面的年级自动对应。之后在「学校进度」里点到学校正在教的那一课，系统据此往前补漏、往后预习。</p>
+  {% if self_mode %}<p class="muted small">选你要学的课。考试日期选填：填了以后，每天学多少按离考试剩下的天数排，离考试两周时转为冲刺复习。以后也可以在「学习进度和考试日期」里改。</p>
+  {% else %}<p class="muted small">每门课选孩子学校用的教材版本就行，学段按上面的年级自动对应。之后在「学校进度」里点到学校正在教的那一课，系统据此往前补漏、往后预习。职业资格考试的课可以直接填考试日期。</p>{% endif %}
   {% for subj, packs in packs_by_subject.items() %}
   {% set cur = (packs|selectattr('id', 'in', enrolled)|first) %}
   <div class="card" style="margin:8px 0;padding:10px 12px">
@@ -36,18 +44,26 @@
     {% for p in packs %}
     <label class="row" style="margin:4px 0 0;font-weight:400"><input type="radio" name="subj_{{ p.subject }}" value="{{ p.id }}" data-start="{{ stage_rank(p.stages[0]) }}" data-end="{{ stage_rank(p.stages[-1]) }}" style="width:auto" {{ 'checked' if cur and cur.id == p.id }}>
       <span class="grow"><b>{{ p.edition }}</b> <span class="muted small">{{ p.region }}{% if k and stage_rank(p.stages[0]) > stage_rank(k.grade) %} · {{ stage_label(p.stages[0]) }}开始，现在选就是提前预习{% endif %}</span>
-      {% if p.tracks %}<select name="track_{{ p.id }}" class="trk" style="margin-top:4px" title="方向">{% for t in p.tracks %}<option value="{{ t.id }}" {{ 'selected' if p.track(tracks.get(p.id)) == t.id }}>{{ t.name }}</option>{% endfor %}</select>{% endif %}</span></label>
+      {% if p.tracks %}<select name="track_{{ p.id }}" class="trk" style="margin-top:4px" title="方向">{% for t in p.tracks %}<option value="{{ t.id }}" {{ 'selected' if p.track(tracks.get(p.id)) == t.id }}>{{ t.name }}</option>{% endfor %}</select>{% endif %}
+      {% if self_mode or p.system == 'cert' %}<span class="small muted examd" style="display:flex;gap:6px;align-items:center;margin-top:4px">考试日期 <input type="date" name="exam_{{ p.id }}" value="{{ exams.get(p.id) or '' }}" style="width:auto"></span>{% endif %}</span></label>
     {% endfor %}
   </div>
   {% endfor %}
-  <div style="margin-top:16px"><button class="btn">保存</button> <a class="btn ghost" href="/parent">取消</a></div>
+  <div style="margin-top:16px"><button class="btn">保存</button> <a class="btn ghost" href="{{ '/today' if self_mode else '/parent' }}">取消</a></div>
 </form>
 <script>
 // 学习方式说明：换了以后，系统会按孩子已有的学习记录重新判断掌握情况
 const _md = () => { const o = $('#method').selectedOptions[0]; $('#method-desc').textContent = o ? o.dataset.desc + '（换了以后会按已有的学习记录重新判断掌握情况。）' : ''; };
 $('#method').onchange = _md; _md();
+// 成人学习者（大学及以上）不显示乐园设置；隐藏的输入框不提交，保留原设置
+const _games = () => { if (!$('#games')) return; const adult = +($('#grade').selectedOptions[0]?.dataset.rank || 0) >= 13;
+  $('#games').style.display = adult ? 'none' : ''; $$('#games select').forEach(x => x.disabled = adult); };
+$('#grade').addEventListener('change', _games); _games();
 // 选学校类型 → 预填每门课的教材和方向（这个年级还没开、或已经学完的科目不预选，家长仍可手动选）
-$('#preset').onchange = () => {
+// 考试日期只在选中的那套教材下面显示
+const _exams = () => $$('.examd').forEach(x => { x.style.display = x.closest('label').querySelector('input[type=radio]').checked ? 'flex' : 'none'; });
+$$('input[type=radio][name^=subj_]').forEach(r => r.addEventListener('change', _exams)); _exams();
+if ($('#preset')) $('#preset').onchange = () => {
   const o = $('#preset').selectedOptions[0]; if (!o || !o.dataset.packs) return;
   const packs = JSON.parse(o.dataset.packs);
   const g = +($('#grade').selectedOptions[0]?.dataset.rank || 0);
@@ -61,5 +77,5 @@ $('#preset').onchange = () => {
   }
 };
 </script>
-{% if k %}{% include "_account_security.html" %}{% endif %}
+{% if k and not self_mode %}{% include "_account_security.html" %}{% endif %}
 {% endblock %}

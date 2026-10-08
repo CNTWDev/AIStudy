@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block body %}
-<a href="/papers" class="small">← 试卷</a>
+<a href="{{ '/mocks' if p.bank_paper_id else '/papers' }}" class="small">← {{ '模拟考' if p.bank_paper_id else '试卷' }}</a>
 <h1>{{ p.title }}</h1>
 {% set marked = rows|selectattr('orig')|list %}
 {% set wrong = marked|rejectattr('orig', 'equalto', 'right')|list %}
@@ -9,7 +9,11 @@
     {% if marked %} · 原卷批改：对 {{ marked|length - wrong|length }}、错/扣分 {{ wrong|length }}（错题已放进错题本）{% endif %}</div>
   {% if p.notes %}<p class="small">🤖 {{ p.notes }}</p>{% endif %}
   {% if images %}<div class="small">原卷照片：{% for im in images %}<a href="/papers/{{ p.id }}/img/{{ im }}" target="_blank">第 {{ loop.index }} 张</a> {% endfor %}</div>{% endif %}
-  <p class="small" style="margin-bottom:0">把每道题在线再做一遍：会的很快过，不会的点「🤔 这道题还不会」。AI 给的答案偶尔会错，觉得不对就点「答案有问题」，这题不算分。</p>
+  {% if p.bank_paper_id %}
+  <p class="small" style="margin-bottom:0">模拟考：一道一道做下去，不会的点「🤔 这道题还不会」，别猜。{% if bp_minutes %}建议 {{ bp_minutes }} 分钟内做完，已用 <b id="mclock">0:00</b>。{% endif %}
+    做完看诊断，重要的是认真做完，分数只是参考。</p>
+  {% else %}
+  <p class="small" style="margin-bottom:0">把每道题在线再做一遍：会的很快过，不会的点「🤔 这道题还不会」。AI 给的答案偶尔会错，觉得不对就点「答案有问题」，这题不算分。</p>{% endif %}
   {% if wrong %}<label class="small" style="font-weight:400;margin-top:8px"><input type="checkbox" id="onlywrong"> 只做原卷做错的 {{ wrong|length }} 题</label>{% endif %}
   <div class="daybar" style="margin-top:10px"><span id="pbar"></span></div>
 </div>
@@ -22,9 +26,9 @@
     {% if r.page and images and r.page <= images|length %}<a href="/papers/{{ p.id }}/img/{{ images[r.page - 1] }}" target="_blank">📷 看原题</a>{% endif %}
   </div>
   <div class="muted small">知识点：{% if r.kp %}<a href="/learn/{{ r.kp.id }}">{{ r.kp.name }}</a>{% else %}未对应{% endif %}
-    <details style="display:inline"><summary style="display:inline;cursor:pointer">（改）</summary>
+    {% if not p.bank_paper_id %}<details style="display:inline"><summary style="display:inline;cursor:pointer">（改）</summary>
       <select class="kpsel" data-pi="{{ r.id }}"><option value="">（不对应知识点）</option>
-        {% for c in cands %}<option value="{{ c.id }}" {{ 'selected' if r.kp_id == c.id }}>{{ stage_label(c.stage) }} · {{ c.name }}</option>{% endfor %}</select></details>
+        {% for c in cands %}<option value="{{ c.id }}" {{ 'selected' if r.kp_id == c.id }}>{{ stage_label(c.stage) }} · {{ c.name }}</option>{% endfor %}</select></details>{% endif %}
     {% if r.orig_answer %} · 卷面上写的：{{ r.orig_answer }}{% endif %}</div>
   {% if r.flagged %}<p class="muted small">已标记「答案有问题」，这题不计入诊断。</p>
   {% elif r.answered_at %}<p class="small">{{ '🤔 还不会' if r.dont_know else ('✅ 重做对了' if r.correct else '❌ 重做还错') }} · 正确答案：{{ answer_display(r.item) }}</p>
@@ -76,5 +80,11 @@ $('#finish').onclick = async () => {
   setTimeout(() => location.href = `/papers/${PID}/report`, 900);
 };
 progress();
+const clock = $('#mclock');
+if (clock) {
+  const key = 'mock0-' + PID, t0 = +(sessionStorage.getItem(key) || Date.now()); sessionStorage.setItem(key, t0);
+  const tick = () => { const s = Math.floor((Date.now() - t0) / 1000); clock.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+  tick(); setInterval(tick, 1000);
+}
 </script>{% endif %}
 {% endblock %}

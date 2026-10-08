@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="small"><a href="/admin?tab=papers">← 卷库</a></p>
+<h1>{{ bp.title }} <span class="pill {{ {'published': 'st-mastered', 'draft': 'st-learning'}.get(bp.status, 'st-weak') }}">{{ status[bp.status] }}</span></h1>
+{% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
+<p class="muted small">{{ pack.subject_name if pack }} · {{ label }} · {{ rows|length }} 题{% if used %} · 学习者做过 {{ used }} 次{% endif %}
+  {% if images %} · 原卷：{% for im in images %}<a href="/admin/bank-papers/{{ bp.id }}/img/{{ im }}" target="_blank">第 {{ loop.index }} 张</a> {% endfor %}{% endif %}</p>
+{% if bp.notes %}<p class="small">🤖 {{ bp.notes }}</p>{% endif %}
+
+<div class="card">
+  {% if bp.status == 'draft' %}
+  <p class="small" style="margin-top:0">逐题看一遍：题干有没有认错、答案对不对、知识点对不对。认错或看不清的题直接删掉。核对完点发布。</p>
+  {% elif bp.status == 'published' %}
+  <p class="small" style="margin-top:0">已发布：题目在公共题库里，练习时会标出「{{ label }}」；学习者可以在「模拟考」里做整套卷子。发布后改题会立即生效。</p>
+  {% else %}<p class="small" style="margin-top:0">已下架：题目不再出给学习者，已经开始的模拟考还能做完。</p>{% endif %}
+  <form method="post" action="/admin/bank-papers/{{ bp.id }}/status" class="row">
+    {% if bp.status != 'published' %}<button class="btn" name="action" value="publish">发布</button>{% endif %}
+    {% if bp.status == 'published' %}<button class="btn ghost sm" name="action" value="retire" onclick="return confirm('下架这份卷子的所有题？')">下架</button>{% endif %}
+    {% if not bp.published_at and not used %}<button class="btn ghost sm" name="action" value="delete" onclick="return confirm('删除这份卷子和它的题？')">删除</button>{% endif %}
+  </form>
+</div>
+
+<details class="card"><summary><b>卷子信息</b></summary>
+<form method="post" action="/admin/bank-papers/{{ bp.id }}/meta">
+  <label>名称</label><input type="text" name="title" value="{{ bp.title }}">
+  <div class="row">
+    <div><label>类型</label><select name="kind">{% for k, v in kinds.items() %}<option value="{{ k }}" {{ 'selected' if k == bp.kind }}>{{ v }}</option>{% endfor %}</select></div>
+    <div><label>学段</label><select name="stage">{% for s in pack.stages %}<option value="{{ s }}" {{ 'selected' if s == bp.stage }}>{{ stage_label(s) }}</option>{% endfor %}</select></div>
+    <div><label>年份</label><input type="text" name="year" value="{{ bp.year }}" style="width:80px"></div>
+    <div><label>限时（分钟）</label><input type="number" name="minutes" value="{{ bp.minutes or '' }}" style="width:90px"></div>
+  </div>
+  <div class="row">
+    <div class="grow"><label>考试</label><input type="text" name="exam" value="{{ bp.exam }}"></div>
+    <div class="grow"><label>地区</label><input type="text" name="region" value="{{ bp.region }}"></div>
+    <div class="grow"><label>学校 / 老师 / 出处</label><input type="text" name="org" value="{{ bp.org }}"></div>
+  </div>
+  <label>备注</label><input type="text" name="notes" value="{{ bp.notes }}">
+  <button class="btn sm" style="margin-top:10px">保存</button>
+</form></details>
+
+{% for r in rows %}{% set it = r.item %}
+<form class="card" id="bpi-{{ r.id }}" method="post" action="/admin/bank-papers/{{ bp.id }}/items/{{ r.id }}">
+  <div class="row small">
+    <b class="grow">第 <input type="text" name="label" value="{{ r.label }}" style="width:50px;display:inline"> 题</b>
+    <span>分值 <input type="text" name="points" value="{{ r.points|string|replace('.0', '') if r.points is not none else '' }}" style="width:50px;display:inline"></span>
+    <select name="type" style="width:auto">{% for k, t in types.items() %}<option value="{{ k }}" {{ 'selected' if k == it.type }}>{{ t.label }}</option>{% endfor %}</select>
+    {% if r.page and images and r.page <= images|length %}<a href="/admin/bank-papers/{{ bp.id }}/img/{{ images[r.page - 1] }}" target="_blank">📷 原题</a>{% endif %}
+  </div>
+  <label>题干</label><textarea name="q" style="min-height:60px">{{ it.q }}</textarea>
+  {% if it.type == 'mcq' %}<label>选项（一行一个）</label><textarea name="options" style="min-height:80px">{{ (it.options or [])|join('\n') }}</textarea>{% endif %}
+  <label>答案 <span class="muted small">（选择题写字母；填空题几个都算对的用 | 隔开；简答题写参考答案）</span></label>
+  <input type="text" name="answer" value="{{ r.answer_text }}">
+  <label>讲解</label><textarea name="explain" style="min-height:50px">{{ it.explain or '' }}</textarea>
+  <label>知识点</label>
+  <select name="kp_id"><option value="">（不对应知识点：只出现在模拟考里，不进练习）</option>
+    {% for k in kps %}<option value="{{ k.id }}" {{ 'selected' if it.kp_id == k.id }}>{{ stage_label(k.stage) }} · {{ k.name }}</option>{% endfor %}</select>
+  <div class="row" style="margin-top:8px">
+    <button class="btn sm">保存这题</button>
+    <button class="btn ghost sm" name="delete" value="1" onclick="return confirm('删掉这道题？')">删掉</button>
+    {% if it.n_attempts %}<span class="muted small">{{ it.n_attempts }} 次作答</span>{% endif %}
+  </div>
+</form>
+{% endfor %}
+{% endblock %}

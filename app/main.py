@@ -9,9 +9,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import arena, auth, bank, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, sprint, streak, webpage
+from . import arena, auth, bank, bankflow, bankpapers, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, sprint, streak, webpage
 from .auth import LoginRequired
-from .catalog import GRADES, catalog, stage_label, stage_rank
+from .catalog import GRADES, catalog, is_adult, stage_label, stage_rank
 from .content import content
 from .methods import methods
 from . import brand
@@ -27,6 +27,7 @@ async def lifespan(app):
     bank.sync()
     methods.load()
     evidence.ensure_current()  # 学习方式 / 参数 / 算法变了的孩子：按学习记录重算掌握状态
+    bankflow.start_background()  # 题库流水线：改编入库、校对答案、校准难度
     yield
     db.close()
 
@@ -38,7 +39,7 @@ app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), 
 templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
-                             stage_rank=stage_rank, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock,
+                             stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock,
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES)
 templates.env.globals.update(MASCOTS=brand.MASCOTS, mascot_of=brand.mascot_of, mascot_chosen=brand.has_chosen, mascot_svg=brand.mascot_svg,
                              wordmark_svg=brand.wordmark_svg)
@@ -163,7 +164,7 @@ def login(request: Request, email: str = Form(...), password: str = Form(...)):
 
 @app.post("/register")
 def register(request: Request, email: str = Form(...), password: str = Form(...), name: str = Form(...),
-             invite: str = Form(""), note: str = Form("")):
+             invite: str = Form(""), note: str = Form(""), who: str = Form("parent")):
     mode = _reg_mode()
     if mode == "closed":
         raise HTTPException(403, "注册已关闭，请联系管理员创建账号")
@@ -182,9 +183,11 @@ def register(request: Request, email: str = Form(...), password: str = Form(...)
         elif mode == "invite":
             raise ValueError("需要邀请码才能注册（向管理员或已经在用的家长索取）")
         status = "pending" if (mode == "approval" and not inv) else "active"
-        # 第一个账号是网站管理员（不带孩子）；之后注册的都是家长
-        uid = auth.create_user(email, password, name, "admin" if mode == "first" else "parent", is_admin=(mode == "first"),
-                               status=status,
+        # 第一个账号是网站管理员（不带孩子）；之后注册的是家长，或者自己学的自学者（没有家长的学习账号，默认成人）
+        self_learn = who == "self" and mode != "first"
+        role = "admin" if mode == "first" else "kid" if self_learn else "parent"
+        uid = auth.create_user(email, password, name, role, is_admin=(mode == "first"), status=status,
+                               grade="ADULT" if self_learn else "",
                                invited_by=inv["created_by"] if inv else None, invite_code=inv["code"] if inv else None,
                                apply_note=note)
     except ValueError as e:
@@ -195,7 +198,7 @@ def register(request: Request, email: str = Form(...), password: str = Form(...)
         return render(request, "message.html", title="申请已提交",
                       text="管理员审批通过后，就可以用这个邮箱和密码登录了。", link="/login")
     auth.login(request, auth.get_user(uid))
-    return RedirectResponse("/admin" if mode == "first" else "/parent", 303)
+    return RedirectResponse("/admin" if mode == "first" else "/me/courses" if self_learn else "/parent", 303)
 
 
 @app.get("/logout")
@@ -279,7 +282,7 @@ def settings_mascot(request: Request, mascot: str = Form(...)):
 @app.post("/settings/profile")
 def settings_profile(request: Request, name: str = Form(...), email: str = Form(...)):
     u = auth.require_user(request)
-    if u["role"] == "kid":
+    if u["role"] == "kid" and not auth.is_self_learner(u):
         return _back(err="孩子账号的名字和邮箱由家长修改")
     try:
         email = auth.validate_email(email)
@@ -340,7 +343,7 @@ def kid_brief(k) -> dict:
 
 
 ADMIN_TABS = [("overview", "概览"), ("stats", "数据统计"), ("families", "家庭与孩子"), ("invites", "邀请码"),
-              ("tree", "邀请关系"), ("bank", "题库"), ("arena", "游戏公平"), ("log", "安全日志"), ("system", "站点设置")]
+              ("tree", "邀请关系"), ("bank", "题库"), ("papers", "卷库"), ("arena", "游戏公平"), ("log", "安全日志"), ("system", "站点设置")]
 
 
 @app.get("/admin", response_class=HTMLResponse)
@@ -354,7 +357,8 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
     week_ago = (db.today() - timedelta(days=7)).isoformat()
     ctx["stats"] = {
         "families": sum(1 for u in users if u["role"] == "parent" and u["status"] == "active"),
-        "kids": sum(1 for u in users if u["role"] == "kid"),
+        "kids": sum(1 for u in users if u["role"] == "kid" and u["parent_id"]),
+        "selfs": sum(1 for u in users if auth.is_self_learner(u)),
         "pending": len(ctx["pending"]),
         "active_kids": db.one("SELECT COUNT(DISTINCT user_id) AS n FROM days WHERE day>=? AND (minutes>0 OR checked_in=1)",
                               week_ago)["n"],
@@ -374,6 +378,8 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
             fams.append({"p": p, "kids": kids,
                          "invited": [u for u in users if u["invited_by"] == p["id"]]})
         ctx["families"] = fams
+        ctx["selfs"] = [kid_brief(u) for u in users if auth.is_self_learner(u)
+                        and (not q or q.lower() in (u["email"] + u["name"]).lower())]
     elif tab == "invites":
         invites = db.q("SELECT v.*, u.name AS creator_name, u.email AS creator_email FROM invites v "
                        "LEFT JOIN users u ON u.id=v.created_by ORDER BY v.created_at DESC LIMIT 200")
@@ -383,7 +389,7 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
                 used_by.setdefault(u["invite_code"], []).append(u)
         ctx["invites"], ctx["used_by"] = invites, used_by
     elif tab == "tree":
-        parents = [u for u in users if u["role"] in ("parent", "admin")]  # 管理员也是邀请树的起点
+        parents = [u for u in users if u["role"] in ("parent", "admin") or auth.is_self_learner(u)]  # 管理员也是邀请树的起点
         children = {}
         for u in parents:
             children.setdefault(u["invited_by"] if u["invited_by"] in by_id else None, []).append(u)
@@ -405,6 +411,11 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
         ctx["daily"], ctx["totals"], ctx["kid_rows"] = _site_stats(users)
     elif tab == "bank":
         ctx["bank"] = bank.overview()
+        ctx["flow"] = bankflow.stats()
+    elif tab == "papers":
+        ctx.update(bps=bankpapers.listing(), bp_kinds=bankpapers.KINDS, bp_status=bankpapers.STATUS, bp_label=bankpapers.label,
+                   bp_packs=sorted(catalog.packs.values(), key=lambda p: (p.subject_name, p.edition)),
+                   max_images=papers.MAX_IMAGES, llm_on=llm.enabled())
     elif tab == "arena":
         ctx["fair"] = arena.fairness()
     elif tab == "log":
@@ -622,6 +633,19 @@ def admin_bank_status(request: Request, target: str, tid: str, status: str = For
     return _admin_back("bank", "已恢复使用" if status == "active" else "已下架")
 
 
+@app.post("/admin/bank/maintain")
+async def admin_bank_maintain(request: Request):
+    """手动跑一轮题库流水线（平时后台每 15 分钟自动跑）。"""
+    auth.require_admin(request)
+    from starlette.concurrency import run_in_threadpool
+    res = await run_in_threadpool(bankflow.run_once, True)
+    if res.get("skipped"):
+        return _admin_back("bank", "另一个进程正在跑，稍后再看")
+    v, p = res.get("verify") or {}, res.get("variants") or {}
+    return _admin_back("bank", f"跑完了：改编新题 {p.get('made', 0)} 道，校对 {v.get('checked', 0)} 道（拦下 {v.get('held', 0)} 道），"
+                               f"校准难度 {res.get('calibrated', 0)} 道")
+
+
 @app.get("/admin/bank/export.json")
 def admin_bank_export(request: Request):
     auth.require_admin(request)
@@ -710,7 +734,8 @@ def _kid_form_packs(form, grade: str, old: dict, grade_changed: bool) -> list[tu
 @app.get("/parent/kids/new", response_class=HTMLResponse)
 def kid_new_page(request: Request):
     auth.require_parent(request)
-    return render(request, "kid_form.html", k=None, enrolled={}, tracks={}, presets=catalog.presets, packs_by_subject=catalog.by_subject())
+    return render(request, "kid_form.html", k=None, enrolled={}, tracks={}, exams={}, presets=catalog.presets,
+                  packs_by_subject=catalog.by_subject())
 
 
 @app.get("/parent/kids/{kid_id}/edit", response_class=HTMLResponse)
@@ -720,12 +745,17 @@ def kid_edit_page(request: Request, kid_id: int):
     return _kid_form(request, k)
 
 
-def _kid_form(request: Request, k, **extra):
+def _kid_form(request: Request, k, self_mode=False, **extra):
+    """家长编辑孩子，和自学者编辑「我的课程」共用一张表单（self_mode：不显示邮箱密码、游戏、学校这些家长管的项）。"""
     es = enrollments(k["id"])
     enrolled = {e["pack_id"]: e["stage"] for e in es}
+    acct = {} if self_mode else account_ctx(k, f"/parent/kids/{k['id']}/account", force=False)
+    by_subject = catalog.by_subject(k["school_type"] or "")
+    if is_adult(k["grade"]):  # 成人：职业资格考试的课排前面
+        by_subject = dict(sorted(by_subject.items(), key=lambda kv: not any(p.system == "cert" for p in kv[1])))
     return render(request, "kid_form.html", k=k, enrolled=enrolled, tracks={e["pack_id"]: e["track"] for e in es},
-                  presets=catalog.presets, packs_by_subject=catalog.by_subject(k["school_type"] or ""),
-                  **account_ctx(k, f"/parent/kids/{k['id']}/account", force=False), **extra)
+                  exams={e["pack_id"]: e["exam_date"] for e in es}, self_mode=self_mode,
+                  presets=catalog.presets, packs_by_subject=by_subject, **acct, **extra)
 
 
 @app.post("/parent/kids/{kid_id}/account")
@@ -765,6 +795,7 @@ async def kid_save(request: Request):
     pw = form.get("password") or ""
     if not name:
         raise HTTPException(400, "请填写孩子的名字")
+    _check_exam_dates(form)
     try:
         email = auth.validate_email(email)
         if pw:
@@ -795,10 +826,25 @@ async def kid_save(request: Request):
                                       school=form.get("school") or "", daily_minutes=minutes)
         except ValueError as e:
             raise HTTPException(400, str(e))
+    _save_learning(kid_id, form, grade, old_grade)
+    return RedirectResponse("/parent", 303)
+
+
+def _check_exam_dates(form) -> None:
+    for key in form.keys():
+        if key.startswith("exam_") and (form.get(key) or "").strip():
+            try:
+                date.fromisoformat(form.get(key).strip())
+            except ValueError:
+                raise HTTPException(400, "考试日期格式不对")
+
+
+def _save_learning(kid_id: int, form, grade: str, old_grade, games: bool = True) -> None:
+    """保存学习安排：学习方式、游戏、每门课的教材 / 方向 / 考试日期、学校模板。家长编辑孩子和自学者「我的课程」共用。"""
     set_method(kid_id, form.get("method") or "")
-    if form.get("game_minutes") is not None:
+    if games and form.get("game_minutes") is not None:
         arena.set_game_minutes(kid_id, form.get("game_minutes"))
-    if form.get("game_unlock"):
+    if games and form.get("game_unlock"):
         arena.set_game_unlock(kid_id, form.get("game_unlock"))
     old = {e["pack_id"]: e["stage"] for e in enrollments(kid_id)}
     chosen = _kid_form_packs(form, grade, old, grade != old_grade)
@@ -807,12 +853,43 @@ async def kid_save(request: Request):
         db.run("INSERT INTO enrollments(user_id,pack_id,stage,active,track) VALUES(?,?,?,1,?) "
                "ON CONFLICT(user_id,pack_id) DO UPDATE SET stage=excluded.stage, active=1, track=excluded.track",
                kid_id, pid, stage, track)
+        if f"exam_{pid}" in form:  # 考试日期：学习者（或家长）自己定，系统按剩下的天数排计划
+            engine.set_exam_date(kid_id, pid, form.get(f"exam_{pid}"))
         engine.seed_vocab(kid_id, pid, config.SEED_DIR)
-    preset = catalog.preset(form.get("preset") or "")
-    db.run("UPDATE users SET preset=?, school_type=? WHERE id=?", preset["id"] if preset else "",
-           preset["school_type"] if preset else "", kid_id)
+    if games:  # 学校模板只在家长的表单里
+        preset = catalog.preset(form.get("preset") or "")
+        db.run("UPDATE users SET preset=?, school_type=? WHERE id=?", preset["id"] if preset else "",
+               preset["school_type"] if preset else "", kid_id)
     engine.today_plan(kid_id, rebuild=True)
-    return RedirectResponse("/parent", 303)
+
+
+# ================================================================== 自学者：我的课程
+
+def require_self_learner(request: Request):
+    u = auth.require_user(request)
+    if not auth.is_self_learner(u):
+        raise HTTPException(403, "孩子的课程由家长在家长页安排" if u["role"] == "kid" else "「我的课程」是自学账号用的")
+    return u
+
+
+@app.get("/me/courses", response_class=HTMLResponse)
+def my_courses(request: Request):
+    return _kid_form(request, require_self_learner(request), self_mode=True)
+
+
+@app.post("/me/courses")
+async def my_courses_save(request: Request):
+    u = require_self_learner(request)
+    form = await request.form()
+    _check_exam_dates(form)
+    grade = form.get("grade") or u["grade"]
+    if grade not in GRADES:
+        raise HTTPException(400, "年级不对")
+    minutes = max(15, min(240, int(form.get("daily_minutes") or u["daily_minutes"] or 60)))
+    db.run("UPDATE users SET name=?, grade=?, daily_minutes=? WHERE id=?",
+           (form.get("name") or "").strip()[:40] or u["name"], grade, minutes, u["id"])
+    _save_learning(u["id"], form, grade, u["grade"], games=False)
+    return RedirectResponse("/today", 303)
 
 
 # ================================================================== 家长：阅读与单词安排
@@ -895,6 +972,8 @@ def parent_as(request: Request, kid_id: int, next: str = "/today"):
 def today(request: Request):
     k = kid_or_redirect(request, manage=True)
     if not enrollments(k["id"]):
+        if auth.is_self_learner(k):
+            return RedirectResponse("/me/courses", 303)
         return render(request, "message.html", title="还没有选择学科",
                       text="请家长在「家长页 → 编辑孩子」里勾选要学的教材。")
     t = engine.today_plan(k["id"])
@@ -905,8 +984,9 @@ def today(request: Request):
     m = engine.get_mastery(k["id"])
     rec = engine.day_record(k["id"], t["day"])
     play = arena.status(k)
+    exams = [x for x in (engine.exam_view(k["id"], e, m) for e in enrollments(k["id"])) if x and x["days_left"] >= 0]
     day = streak.today_state(k, t["plan"], t["minutes"], sprint.points_today(k["id"]))
-    return render(request, "today.html", manual_done=engine.MANUAL_DONE, t=t, play=play, day=day, settled=settled,
+    return render(request, "today.html", manual_done=engine.MANUAL_DONE, t=t, play=play, day=day, settled=settled, exams=exams,
                   goals=streak.GOALS, sprint_best=sprint.best_day(k["id"]), play_locked=arena.locked_reason(play),
                   due=len(engine.due_cards(k["id"], 99)), streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
                   stars=engine.total_stars(k["id"]), rec=rec, auto=engine.day_summary(rec),
@@ -1065,8 +1145,9 @@ def progress_page(request: Request, pack: str = "", msg: str = ""):
         v["strands"] = [(catalog.strand_name(e["pack_id"], s), lst) for s, lst in by_strand.items()]
         v["next"] = engine.next_after(e["pack_id"], e["progress_kp"], m, engine.taught_set(k["id"]), e["track"]) if e["progress_kp"] else None
         v["total"] = len(catalog.ids_for(e["pack_id"], e["track"]))
+        v["exam_date"], v["exam"] = e["exam_date"], engine.exam_view(k["id"], e, m)
         rows.append(v)
-    return render(request, "progress.html", rows=rows, open_pack=pack, msg=msg)
+    return render(request, "progress.html", rows=rows, open_pack=pack, msg=msg, adult=is_adult(k["grade"]))
 
 
 @app.post("/progress/{pack_id}")
@@ -1076,6 +1157,8 @@ async def progress_save(request: Request, pack_id: str):
     if pack_id not in {e["pack_id"] for e in enrollments(k["id"])}:
         raise HTTPException(404)
     f = await request.form()
+    if "exam_date" in f and not engine.set_exam_date(k["id"], pack_id, f.get("exam_date")):
+        raise HTTPException(400, "考试日期格式不对")
     stage = f.get("stage") or None
     old = engine.enrollment_stage(k["id"], pack_id)
     if stage and stage != old:
@@ -1342,17 +1425,11 @@ def papers_page(request: Request, pack: str = ""):
     lst = db.q("SELECT p.*, (SELECT COUNT(*) FROM paper_items i WHERE i.paper_id=p.id) AS n FROM papers p "
                "WHERE p.user_id=? ORDER BY p.id DESC", k["id"])
     return render(request, "papers.html", es=[(e, catalog.packs[e["pack_id"]]) for e in es], papers=lst, pack=pack,
-                  max_images=papers.MAX_IMAGES, llm_on=llm.enabled())
+                  max_images=papers.MAX_IMAGES, llm_on=llm.enabled(), helped=bankflow.contributed(k["id"]))
 
 
-@app.post("/api/papers")
-async def papers_create(request: Request):
-    k = kid_or_redirect(request, manage=True)
-    u = auth.current_user(request)
-    f = await request.form()
-    pack_id = f.get("pack_id") or ""
-    if pack_id not in {e["pack_id"] for e in enrollments(k["id"])}:
-        raise HTTPException(400, "请选择学科")
+async def _read_photos(f) -> list:
+    """上传的试卷照片 → [(media_type, bytes)]，顺便检查格式、大小、张数。"""
     images = []
     for up in f.getlist("photos"):
         if not hasattr(up, "read"):
@@ -1367,12 +1444,25 @@ async def papers_create(request: Request):
         images.append((up.content_type, data))
     if len(images) > papers.MAX_IMAGES:
         raise HTTPException(400, f"一次最多 {papers.MAX_IMAGES} 张照片")
+    return images
+
+
+@app.post("/api/papers")
+async def papers_create(request: Request):
+    k = kid_or_redirect(request, manage=True)
+    u = auth.current_user(request)
+    f = await request.form()
+    pack_id = f.get("pack_id") or ""
+    if pack_id not in {e["pack_id"] for e in enrollments(k["id"])}:
+        raise HTTPException(400, "请选择学科")
+    images = await _read_photos(f)
     text = (f.get("text") or "").strip()
     if not images and len(text) < 10:
         raise HTTPException(400, "请拍照上传，或者粘贴题目文字")
     from starlette.concurrency import run_in_threadpool
     pid = await run_in_threadpool(papers.create, k["id"], pack_id, title=(f.get("title") or "").strip(),
-                                  exam_date=f.get("exam_date") or "", images=images, text=text, created_by=u["id"])
+                                  exam_date=f.get("exam_date") or "", images=images, text=text, created_by=u["id"],
+                                  shared="share_choice" not in f or bool(f.get("shared")))
     engine.today_plan(k["id"], rebuild=True)
     return {"ok": True, "id": pid}
 
@@ -1384,7 +1474,8 @@ def paper_page(request: Request, paper_id: int):
     rs = papers.rows(paper_id)
     pack = catalog.packs.get(p["pack_id"])
     stage = engine.enrollment_stage(k["id"], p["pack_id"]) or k["grade"]
-    return render(request, "paper.html", p=p, rows=rs, pack=pack, images=db.jload(p["images"], []),
+    bp = bankpapers.get(p["bank_paper_id"]) if p["bank_paper_id"] else None
+    return render(request, "paper.html", p=p, rows=rs, pack=pack, images=db.jload(p["images"], []), bp_minutes=bp["minutes"] if bp else 0,
                   cands=papers.candidates(p["pack_id"], stage) if pack else [],
                   qs=[{"id": r["id"], "item_id": r["item_id"], "type": r["item"]["type"], "q": r["item"]["q"], "zh": r["item"].get("zh", ""),
                        "options": r["item"].get("options", []), "unit": r["item"].get("unit", ""),
@@ -1413,6 +1504,8 @@ def paper_set_kp(request: Request, paper_id: int, body: dict = Body(...)):
     """家长 / 孩子觉得 AI 对应的知识点不对，手动改。"""
     k = kid_or_redirect(request, manage=True)
     p = _paper_or_404(k, paper_id)
+    if p["bank_paper_id"]:
+        raise HTTPException(400, "模拟考的题来自公共卷库，知识点由管理员核对")
     kp_id = body.get("kp_id") or None
     if kp_id and kp_id not in catalog.packs[p["pack_id"]].kp_ids:
         raise HTTPException(400, "知识点不在这门课里")
@@ -1462,7 +1555,7 @@ def paper_delete(request: Request, paper_id: int):
 def _ask_item(k, item_id: str):
     """孩子能看到的题：公共题库的题，或自己试卷里的题。"""
     row = db.one("SELECT * FROM items WHERE id=?", item_id) if item_id else None
-    if not row:
+    if not row or row["status"] == "draft":
         return None
     if row["source"] == "paper" and not db.one(
             "SELECT 1 AS ok FROM paper_items i JOIN papers p ON p.id=i.paper_id WHERE i.item_id=? AND p.user_id=?", item_id, k["id"]):
@@ -1969,3 +2062,123 @@ def healthz():
     ok, _ = llm.check()
     return {"ok": True, "db": db.DIALECT, "packs": len(catalog.packs), "kps": len(catalog.kps),
             "llm": llm.settings().default if ok else "off"}
+
+
+# ================================================================== 公共卷库：管理员导入真题 / 名校卷 / 名师卷，学习者做整卷模拟考
+
+def _bp_or_404(bp_id: int):
+    bp = bankpapers.get(bp_id)
+    if not bp:
+        raise HTTPException(404, "没有这份卷子")
+    return bp
+
+
+def _bp_back(bp_id: int, msg="", anchor=""):
+    from urllib.parse import urlencode
+    return RedirectResponse(f"/admin/bank-papers/{bp_id}?" + urlencode({"msg": msg}) + (f"#{anchor}" if anchor else ""), 303)
+
+
+@app.post("/admin/bank-papers")
+async def admin_bp_create(request: Request):
+    a = auth.require_admin(request)
+    f = await request.form()
+    pack_id = f.get("pack_id") or ""
+    if pack_id not in catalog.packs:
+        raise HTTPException(400, "请选择课程")
+    images = await _read_photos(f)
+    text = (f.get("text") or "").strip()
+    if not images and len(text) < 10:
+        raise HTTPException(400, "请上传卷子照片，或者粘贴题目文字")
+    from starlette.concurrency import run_in_threadpool
+    try:
+        bp = await run_in_threadpool(bankpapers.create, a["id"], pack_id, kind=f.get("kind") or "real", stage=f.get("stage") or "",
+                                     title=(f.get("title") or "").strip(), exam=(f.get("exam") or "").strip(),
+                                     year=(f.get("year") or "").strip(), region=(f.get("region") or "").strip(),
+                                     org=(f.get("org") or "").strip(),
+                                     minutes=int(f.get("minutes")) if str(f.get("minutes") or "").isdigit() else 0,
+                                     images=images, text=text)
+    except llm.LLMError as e:
+        raise HTTPException(400, str(e))
+    return {"ok": True, "id": bp}
+
+
+@app.get("/admin/bank-papers/{bp_id}", response_class=HTMLResponse)
+def admin_bp_page(request: Request, bp_id: int, msg: str = ""):
+    auth.require_admin(request)
+    bp = _bp_or_404(bp_id)
+    pack = catalog.packs.get(bp["pack_id"])
+    return render(request, "admin_bank_paper.html", bp=bp, pack=pack, rows=bankpapers.rows(bp_id), msg=msg,
+                  label=bankpapers.label(bp), kinds=bankpapers.KINDS, status=bankpapers.STATUS, types=itemtypes.TYPES,
+                  images=db.jload(bp["images"], []), kps=[catalog.kps[k] for k in pack.kp_ids] if pack else [],
+                  used=db.one("SELECT COUNT(*) AS n FROM papers WHERE bank_paper_id=?", bp_id)["n"])
+
+
+@app.get("/admin/bank-papers/{bp_id}/img/{name}")
+def admin_bp_image(request: Request, bp_id: int, name: str):
+    from fastapi.responses import FileResponse
+    auth.require_admin(request)
+    if name not in db.jload(_bp_or_404(bp_id)["images"], []):
+        raise HTTPException(404)
+    return FileResponse(bankpapers.DIR / str(bp_id) / name)
+
+
+@app.post("/admin/bank-papers/{bp_id}/meta")
+async def admin_bp_meta(request: Request, bp_id: int):
+    auth.require_admin(request)
+    _bp_or_404(bp_id)
+    bankpapers.update_meta(bp_id, dict(await request.form()))
+    return _bp_back(bp_id, "已保存")
+
+
+@app.post("/admin/bank-papers/{bp_id}/items/{bpi_id}")
+async def admin_bp_item(request: Request, bp_id: int, bpi_id: int):
+    auth.require_admin(request)
+    _bp_or_404(bp_id)
+    f = dict(await request.form())
+    if f.get("delete"):
+        bankpapers.remove_item(bp_id, bpi_id)
+        return _bp_back(bp_id, "已删掉这道题")
+    try:
+        typ = bankpapers.update_item(bp_id, bpi_id, f)
+    except KeyError:
+        raise HTTPException(404)
+    msg = "已保存" if typ == (f.get("type") or typ) else f"答案格式不对，这题改成了{itemtypes.TYPES[typ].label}，请再看一眼"
+    return _bp_back(bp_id, msg, f"bpi-{bpi_id}")
+
+
+@app.post("/admin/bank-papers/{bp_id}/status")
+def admin_bp_status(request: Request, bp_id: int, action: str = Form(...)):
+    auth.require_admin(request)
+    _bp_or_404(bp_id)
+    if action == "publish":
+        try:
+            n = bankpapers.publish(bp_id)
+        except ValueError as e:
+            return _bp_back(bp_id, str(e))
+        return _bp_back(bp_id, f"已发布：{n} 道题进了公共题库，学习者可以做整卷模拟考")
+    if action == "retire":
+        bankpapers.retire(bp_id)
+        return _bp_back(bp_id, "已下架")
+    if action == "delete":
+        if not bankpapers.delete(bp_id):
+            return _bp_back(bp_id, "发布过或有人做过的卷子不能删，可以下架")
+        return _admin_back("papers", "已删除")
+    raise HTTPException(400)
+
+
+@app.get("/mocks", response_class=HTMLResponse)
+def mocks_page(request: Request, pack: str = ""):
+    k = kid_or_redirect(request, manage=True)
+    es = enrollments(k["id"])
+    lst = bankpapers.for_learner(k["id"], [e for e in es if not pack or e["pack_id"] == pack])
+    return render(request, "mocks.html", mocks=lst, pack=pack, packs=[catalog.packs[e["pack_id"]] for e in es])
+
+
+@app.post("/mocks/{bp_id}/start")
+def mock_start(request: Request, bp_id: int):
+    k = kid_or_redirect(request)
+    if not any(m["bp"]["id"] == bp_id for m in bankpapers.for_learner(k["id"], enrollments(k["id"]))):
+        raise HTTPException(404, "没有这套卷子")
+    pid = bankpapers.start_mock(k["id"], bp_id)
+    engine.today_plan(k["id"], rebuild=True)
+    return RedirectResponse(f"/papers/{pid}", 303)
