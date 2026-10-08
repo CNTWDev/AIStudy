@@ -369,7 +369,7 @@ FastAPI 应用（app/main.py）
 
 ### 5.13 品牌与界面（beejoy）
 
-- 名字 beejoy（bee + joy），域名 beejoy.ai。站点名默认「beejoy」（管理后台「站点设置」可改；改成别的名字时顶栏显示文字，不显示字标）。
+- 名字 beejoy（bee + joy），域名 beejoy.ai。站点名默认「beejoy」（管理后台「站点设置」可改；改成别的名字时顶栏显示文字，不显示字标）。改名前存进库里的「AIStudy」当作没设置（`sitecfg.LEGACY`）。横排标志（形象 + 字标）另有 `logo.svg` / `logo-dark.svg` 和 1050px 的 PNG，给页面以外的地方用。
 - 颜色在 `app/static/app.css` 顶部：主色蜂蜜黄。`--brand` 是实心填充（按钮、进度、选中），按钮上的字用 `--on-brand`（深棕）；
   正文里的品牌色文字（链接、选中标签）用 `--brand-ink`，因为黄色字在浅底上看不清。深色模式整套重定义。
 - 图形在 `app/static/brand/`：五个小伙伴形象（`hive` 蜂巢宝宝、`buzzy` 小蜜蜂、`letter` 字母 b、`flyer` 飞飞、`drop` 蜜糖滴）、字标 `wordmark.svg`（Fredoka 字体转成路径，不用加载字体）、

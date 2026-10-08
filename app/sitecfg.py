@@ -29,8 +29,15 @@ def _load() -> dict:
         return _cache
 
 
+# 改名之前的站点名：后台「站点设置」保存时会把当时显示的默认名「AIStudy」一起存进库里，
+# 升级后它会一直盖住新的默认名 beejoy。这些旧名字一律当作「没设置」。
+LEGACY = {"site_name": {"aistudy"}}
+
+
 def get(key: str) -> str:
     v = _load().get(key)
+    if v and v.replace(" ", "").lower() in LEGACY.get(key, ()):
+        v = None
     return v if v not in (None, "") else DEFAULTS[key]()
 
 
