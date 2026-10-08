@@ -152,3 +152,16 @@ def test_pack_languages():
     assert catalog.packs["eng-shanghai"].item_lang == "en" and catalog.packs["eng-shanghai"].teach_lang == "zh"
     assert catalog.packs["chn-igcse"].item_lang == "zh"  # 国际学校的中文课：题目和讲解都是中文
     assert catalog.packs["math-shanghai"].kind == "textbook" and catalog.packs["math-cambridge"].kind == "syllabus"
+
+
+def test_adult_learner_prompts_and_fund_pack():
+    from app.catalog import catalog, is_adult
+    from app.llm import tasks
+    assert is_adult("ADULT") and is_adult("U1") and not is_adult("G12") and not is_adult("IGCSE") and not is_adult("")
+    pack = catalog.packs["fund-law"]
+    assert pack.kind == "syllabus" and pack.system == "cert" and pack.stages == ["FUND-1"]
+    assert "成年人" in tasks._audience("ADULT", pack) and tasks._tutor("ADULT") == tasks.TUTOR_ADULT
+    assert "学生年级" in tasks._audience("G8", pack) and tasks._tutor("G8") == tasks.TUTOR
+    kps = [catalog.kps[k] for k in pack.kp_ids]
+    assert len(kps) > 100 and {k["req"] for k in kps} == {"掌握", "理解", "了解"}
+    assert all(k["hot"] == (k["req"] == "掌握") for k in kps)

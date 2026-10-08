@@ -89,9 +89,11 @@ FastAPI 应用（app/main.py）
 - 不同学制的知识点靠 `year` 比先后，诊断回溯和跨教材推断都用它。
 - 学制（`systems`）带 `international` 和 `lang`：这个学制的课默认用什么语言授课和出题。代码不再按教材 id 猜。
 - 没有统一学制的课程（少儿编程、某个技术栈、兴趣课）用 `course` 学制，级别在教材包里自己定义（见 4.2 的 `levels`）。
+- 职业资格考试（基金从业、证券从业、会计……）用 `cert` 学制，`kind` 写 `syllabus`，级别同样在包里用 `levels` 定义（如 `FUND-1` 基金从业·科目一，year 18）。
+- **成人学习者**：年级选「成人」（`ADULT`，year 18）；年级在 U1 及以上都算成人（`catalog.is_adult`）。成人的 AI 提示词换成成人口吻（`llm/tasks.py` 的 `TUTOR_ADULT`、`ASK_TUTOR_ADULT`），乐园默认关闭、不显示入口；`cert` 学制的课不自动安排摸底诊断，也不提醒更新学校进度。
 - 加学制或年级只改这个文件。孩子的「年级」从 `grades` 里选，`default_grade` 是新建孩子时的默认值。
 
-学科表 `curricula/_meta/subjects.json`：学科 id、名字、图标、颜色、领域（language / math / science / humanities / social / computing），语言类学科还有 `lang`（它教的是哪种语言）。加学科只改这个文件，页面上的图标、语言课的判断都从这里来。
+学科表 `curricula/_meta/subjects.json`：学科 id、名字、图标、颜色、领域（language / math / science / humanities / social / computing / finance），语言类学科还有 `lang`（它教的是哪种语言）。加学科只改这个文件，页面上的图标、语言课的判断都从这里来。
 
 ### 4.2 教材包（`curricula/<pack_id>.json`）
 
@@ -232,6 +234,10 @@ FastAPI 应用（app/main.py）
 - 每个教材包：当前学段、「现在学校正在学」的知识点（`enrollments.progress_kp`）、本学段已经学过的知识点（`kp_taught`）。
 - 「学过」= 以前学段的全部 + 本学段勾选的。系统据此：跟上「正在学」、在学过的范围里往回抽查、顺着前置关系补漏、在同一板块往前预习一步。
 - 掌握度（`mastery`）和「学过」是两回事：学过但没检测的会被「回顾小检查」轮到；检测出薄弱的进入补弱和补前置。这样形成一张网：往回巩固、相互补漏、往前推进。
+
+考试日期（`enrollments.exam_date`，在 `/progress` 设置）：设了日期的课由 `plan.src_exam` 安排新内容。离考试超过两周（`engine.SPRINT_DAYS`）时，
+把还没学的考点（不在「学习中 / 已掌握」、也没勾过「学过」）按大纲顺序平均分到剩下的天数里，每天几个（上限 `limits.exam`，默认 4）；
+最后两周不学新内容，改成把还没掌握的高频考点（`hot`）过一遍。`cert` 学制的课没设日期时，清单第一项提醒设定考试日期（`src_exam_date`）。
 
 ### 5.3.2 试卷
 

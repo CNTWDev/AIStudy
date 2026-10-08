@@ -24,6 +24,15 @@
   {% elif total and done == total and not t.checked_in and not readonly %}<a class="btn lg go" href="#daylog">写一句一日记录</a>{% endif %}
 </div>
 
+{% for x in exams %}
+<a class="card examcard" href="/progress#p-{{ x.pack.id }}" style="display:block">
+  <div class="row"><b class="grow">📅 {{ x.pack.subject_name }}考试</b><span>还有 <b>{{ x.days_left }}</b> 天</span></div>
+  <div class="bar" style="margin:8px 0 4px"><span style="width:{{ (100 * x.learned / (x.total or 1))|round }}%;background:var(--learn)"></span></div>
+  <div class="small muted">已学 {{ x.learned }} / {{ x.total }} 个考点 · 已掌握 {{ x.mastered }} 个 ·
+    {% if x.phase == 'learn' %}每天学 {{ x.per_day }} 个，离考试两周时学完{% else %}考前冲刺：每天过一遍还没掌握的高频考点{% endif %}</div>
+</a>
+{% endfor %}
+
 {% if not readonly %}
 <div class="quick">
   <a href="/review"><span class="qi">🔁</span><span><b>复习</b><small>{% if due %}有 {{ due }} 张卡到期{% else %}今天的卡都复习完了{% endif %}</small></span></a>
@@ -43,7 +52,7 @@
 
 <div class="card">
   <div class="card-h"><span class="ico">✅</span><h3>今天的任务</h3>{% if not readonly %}<button class="linkbtn" id="rebuild" title="按最新的情况重新排一遍今天的任务">↻ 重新安排</button>{% endif %}</div>
-  {% if not (total and done == total) %}<p class="muted small" style="margin:-4px 0 8px">从上往下一项一项做。不会的题点「这道题还不会」就行，坚持比做对更重要：每完成一项得一颗 ⭐。 <a href="/progress">学校学到哪了？</a></p>{% endif %}
+  {% if not (total and done == total) %}<p class="muted small" style="margin:-4px 0 8px">从上往下一项一项做。不会的题点「这道题还不会」就行，坚持比做对更重要：每完成一项得一颗 ⭐。 <a href="/progress">{{ '学习进度和考试日期' if is_adult(me.grade) else '学校学到哪了？' }}</a></p>{% endif %}
   <div class="steplist">
   {% for x in t.plan %}
   <div class="step {{ 'done' if x.done }} {{ 'next' if x.id == ns.next }}" data-id="{{ x.id }}" data-type="{{ x.type }}">

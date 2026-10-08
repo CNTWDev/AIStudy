@@ -12,9 +12,12 @@
     <div class="grow"><label>年级</label><select name="grade" id="grade">{% for g in GRADES %}<option value="{{ g }}" data-rank="{{ stage_rank(g) }}" {{ 'selected' if k and k.grade == g }}>{{ stage_label(g) }}</option>{% endfor %}</select></div>
     <div class="grow"><label>每天学习分钟</label><input type="number" name="daily_minutes" min="15" max="240" value="{{ k.daily_minutes if k else 60 }}"></div>
   </div>
+  <p class="muted small" style="margin:4px 0 0">成人学习者（比如备考基金从业资格）年级选「成人」：AI 用成人的口吻讲解，不显示乐园。</p>
+  <div id="games">
   <label>每天最多玩游戏</label><select name="game_minutes">{% set gm = game_minutes(k) if k else 20 %}{% for m in GAME_MINUTE_CHOICES %}<option value="{{ m }}" {{ 'selected' if m == gm }}>{{ '不玩' if m == 0 else m ~ ' 分钟' }}</option>{% endfor %}</select>
   <label>什么时候可以玩</label><select name="game_unlock">{% set gu = game_unlock(k) if k else 'half' %}{% for v, n in UNLOCK_CHOICES.items() %}<option value="{{ v }}" {{ 'selected' if v == gu }}>{{ n }}</option>{% endfor %}</select>
   <p class="muted small" style="margin:4px 0 0">「乐园」里的游戏边玩边答题，题目按孩子自己的水平出，答题计入学习记录（游戏时间不计入每天的学习分钟）。今天的任务全部做完再奖励 10 分钟，每点亮一个知识点再奖励 2 分钟（最多 6 分钟）。今天没有任务时随时能玩。</p>
+  </div>
   <label>学校（选填）</label><input type="text" name="school" value="{{ k.school if k else '' }}">
   <label>学校类型</label>
   <select name="preset" id="preset">
@@ -46,6 +49,10 @@
 // 学习方式说明：换了以后，系统会按孩子已有的学习记录重新判断掌握情况
 const _md = () => { const o = $('#method').selectedOptions[0]; $('#method-desc').textContent = o ? o.dataset.desc + '（换了以后会按已有的学习记录重新判断掌握情况。）' : ''; };
 $('#method').onchange = _md; _md();
+// 成人学习者（大学及以上）不显示乐园设置；隐藏的输入框不提交，保留原设置
+const _games = () => { const adult = +($('#grade').selectedOptions[0]?.dataset.rank || 0) >= 13;
+  $('#games').style.display = adult ? 'none' : ''; $$('#games select').forEach(x => x.disabled = adult); };
+$('#grade').addEventListener('change', _games); _games();
 // 选学校类型 → 预填每门课的教材和方向（这个年级还没开、或已经学完的科目不预选，家长仍可手动选）
 $('#preset').onchange = () => {
   const o = $('#preset').selectedOptions[0]; if (!o || !o.dataset.packs) return;

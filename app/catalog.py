@@ -52,6 +52,13 @@ def stage_label(stage: str) -> str:
     return STAGE_LABEL.get(stage, stage)
 
 
+ADULT_YEAR = 13  # 大学一年级及以上（含「成人」）算成人学习者：AI 用成人的口吻，不显示乐园
+
+
+def is_adult(grade: str | None) -> bool:
+    return bool(grade) and stage_rank(grade) < 99 and stage_rank(grade) >= ADULT_YEAR
+
+
 @dataclass
 class Pack:
     id: str

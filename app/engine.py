@@ -458,6 +458,45 @@ def next_after(pack_id: str, kp_id: str, mastery: dict, taught: set, track: str 
     return None
 
 
+# ------------------------------------------------------------------ 考试日期（按剩余天数排进度）
+
+SPRINT_DAYS = 14  # 最后两周不再学新内容，留给冲刺：高频考点、薄弱点、错题
+
+
+def set_exam_date(user_id: int, pack_id: str, day: str | None) -> bool:
+    """设置 / 清除某门课的考试日期（YYYY-MM-DD；空 = 清除）。日期不合法返回 False。"""
+    day = (day or "").strip()
+    if day:
+        try:
+            day = date.fromisoformat(day).isoformat()
+        except ValueError:
+            return False
+    db.run("UPDATE enrollments SET exam_date=? WHERE user_id=? AND pack_id=?", day, user_id, pack_id)
+    return True
+
+
+def exam_view(user_id: int, e, mastery: dict | None = None, taught: set | None = None) -> dict | None:
+    """一门课离考试还有几天、还剩多少没学、每天要学几个。没有考试日期返回 None。
+    已学 = 掌握度在「学习中 / 已掌握」，或者在「学习进度」里勾过学过的。"""
+    if not e["exam_date"] or e["pack_id"] not in catalog.packs:
+        return None
+    try:
+        exam = date.fromisoformat(e["exam_date"])
+    except ValueError:
+        return None
+    mastery = get_mastery(user_id) if mastery is None else mastery
+    taught = taught_set(user_id) if taught is None else taught
+    ids = catalog.ids_for(e["pack_id"], e["track"])
+    status = {k: mastery.get(k, {}).get("status") for k in ids}
+    todo = [k for k in ids if status[k] not in ("learning", "mastered") and k not in taught]
+    days_left = (exam - db.today()).days
+    learn_days = days_left - SPRINT_DAYS
+    return {"pack": catalog.packs[e["pack_id"]], "date": exam.isoformat(), "days_left": days_left,
+            "total": len(ids), "learned": len(ids) - len(todo), "mastered": sum(v == "mastered" for v in status.values()),
+            "todo": todo, "phase": "past" if days_left < 0 else "learn" if learn_days > 0 and todo else "sprint",
+            "per_day": -(-len(todo) // learn_days) if learn_days > 0 and todo else 0}
+
+
 # ------------------------------------------------------------------ 阅读 / 单词进度（tracks）
 
 TRACK_KINDS = {"read_zh": "中文名著", "read_en": "英文阅读", "words": "每天新词"}

@@ -870,3 +870,50 @@ def test_event_log_and_methods():
     assert not [t for t in plan.build_plan(kid) if t["type"] == "preview"]
     assert set_method(kid, "balanced")
     assert not set_method(kid, "no-such-method")
+
+
+def test_adult_exam_course():
+    """成人学习者备考基金从业：没有乐园、不先摸底；设了考试日期后按剩余天数排新考点，最后两周冲刺高频考点。"""
+    from datetime import timedelta
+
+    from app import db, engine
+    from app.catalog import catalog
+    with TestClient(app) as c:
+        c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+        c.post("/admin/users/create", data={"email": "fp@x.com", "password": "secret1", "name": "家长", "role": "parent"})
+        c.get("/logout")
+        c.post("/login", data={"email": "fp@x.com", "password": "secret1"})
+        r = c.post("/parent/kids/save", data={"name": "妈妈", "email": "mom@x.com", "password": "secret1", "grade": "ADULT",
+                                          "daily_minutes": "60", "subj_fund_law": "fund-law"})
+        assert r.url.path == "/parent"
+        mom = db.one("SELECT * FROM users WHERE email='mom@x.com'")
+        assert db.one("SELECT stage FROM enrollments WHERE user_id=?", mom["id"])["stage"] == "FUND-1"
+        c.get("/logout")
+
+        c.post("/login", data={"email": "mom@x.com", "password": "secret1"})
+        page = c.get("/today").text
+        assert 'href="/arena"' not in page and "学习进度和考试日期" in page
+        plan = c.post("/api/plan/rebuild").json()["plan"]
+        types = [t["type"] for t in plan]
+        assert plan[0]["title"].startswith("设定考试日期") and "diagnose" not in types and "exam" not in types, types
+        assert "考试日期" in c.get("/progress").text
+        assert c.post("/progress/fund-law", data={"exam_date": "2026-13-40"}).status_code == 400
+
+        # 离考试 60 天：103 个考点要在 46 天里学完 → 每天 3 个，按大纲顺序
+        day = (db.today() + timedelta(days=60)).isoformat()
+        c.post("/progress/fund-law", data={"exam_date": day})
+        plan = c.post("/api/plan/rebuild").json()["plan"]
+        exam = [t for t in plan if t["type"] == "exam"]
+        assert [t["kp"] for t in exam] == catalog.ids_for("fund-law")[:3], plan
+        assert exam[0]["title"].startswith("按考期学") and "?task=preview" in exam[0]["url"]
+        assert all(t["done"] for t in plan if t["title"].startswith("设定考试日期"))  # 设好日期就自动打勾
+        assert "还有 <b>60</b> 天" in c.get("/today").text
+        assert c.get(exam[0]["url"]).status_code == 200
+        assert c.get(f"/api/practice/{exam[0]['kp']}?n=3&purpose=preview").status_code == 200
+
+        # 离考试一周：不再学新内容，冲刺还没掌握的高频考点（大纲要求「掌握」的）
+        c.post("/progress/fund-law", data={"exam_date": (db.today() + timedelta(days=7)).isoformat()})
+        exam = [t for t in c.post("/api/plan/rebuild").json()["plan"] if t["type"] == "exam"]
+        assert exam and all(t["title"].startswith("考前过一遍") and catalog.kps[t["kp"]]["hot"] for t in exam)
+        e = db.one("SELECT * FROM enrollments WHERE user_id=? AND pack_id='fund-law'", mom["id"])
+        assert engine.exam_view(mom["id"], e)["phase"] == "sprint"

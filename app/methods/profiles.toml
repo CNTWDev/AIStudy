@@ -11,6 +11,7 @@
 #   flex   学知识点的任务，按顺序排，超出每天可用时间就截掉；"a+b" 表示两类交替穿插（交错练习）
 #   limits 每类最多几个（weak 是每个学科最多几个）
 #   prefer_hot  高频考点排前面
+#   exam / exam_date  设了考试日期的课按剩余天数排新内容（最后两周冲刺高频考点）；职业资格考试的课没设日期时提醒设一个
 # 可用的任务类型见 app/plan.py 的 SOURCES。
 
 default = "balanced"
@@ -22,8 +23,8 @@ basis = "Roediger & Karpicke 2006（检索练习）；Cepeda 等 2006（间隔�
 mastery = { model = "bkt" }
 memory = { model = "fsrs", target_r = 0.85 }
 [profiles.balanced.plan]
-fixed = ["progress", "warmup", "words", "mistakes", "reading"]
-flex = ["sync", "top", "paper", "diagnose", "weak+backfill", "check", "preview", "review"]
+fixed = ["progress", "exam_date", "warmup", "words", "mistakes", "reading"]
+flex = ["sync", "top", "paper", "diagnose", "exam", "weak+backfill", "check", "preview", "review"]
 limits = { sync = 2, top = 1, paper = 1, diagnose = 1, weak = 3, check = 2, preview = 1 }
 
 [profiles.mastery]
@@ -33,8 +34,8 @@ basis = "Bloom 1968 / Guskey 2007（掌握学习）；Kulik 等 1990（掌握学
 mastery = { model = "bkt", master_p = 0.9, min_days = 3 }
 memory = { model = "fsrs", target_r = 0.9 }
 [profiles.mastery.plan]
-fixed = ["progress", "warmup", "words", "mistakes", "reading"]
-flex = ["sync", "top", "paper", "diagnose", "backfill", "weak", "check", "review"]
+fixed = ["progress", "exam_date", "warmup", "words", "mistakes", "reading"]
+flex = ["sync", "top", "paper", "diagnose", "exam", "backfill", "weak", "check", "review"]
 limits = { sync = 2, top = 1, paper = 1, diagnose = 1, weak = 3, check = 3, preview = 0 }
 
 [profiles.exam]
@@ -44,7 +45,7 @@ basis = "Agarwal 等 2021（检索练习对考试成绩的综述）；Cepeda 等
 mastery = { model = "bkt" }
 memory = { model = "fsrs", target_r = 0.9 }
 [profiles.exam.plan]
-fixed = ["progress", "words", "mistakes", "reading"]
-flex = ["top", "paper", "weak+backfill", "check", "review"]
+fixed = ["progress", "exam_date", "words", "mistakes", "reading"]
+flex = ["top", "exam", "paper", "weak+backfill", "check", "review"]
 limits = { top = 1, paper = 1, weak = 4, check = 3, preview = 0 }
 prefer_hot = true

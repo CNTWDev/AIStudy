@@ -11,7 +11,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from . import arena, auth, bank, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, webpage
 from .auth import LoginRequired
-from .catalog import GRADES, catalog, stage_label, stage_rank
+from .catalog import GRADES, catalog, is_adult, stage_label, stage_rank
 from .content import content
 from .methods import methods
 
@@ -36,7 +36,7 @@ app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), 
 templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
-                             stage_rank=stage_rank, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock,
+                             stage_rank=stage_rank, is_adult=is_adult, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock,
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES)
 
 
@@ -883,7 +883,8 @@ def today(request: Request):
     m = engine.get_mastery(k["id"])
     rec = engine.day_record(k["id"], t["day"])
     play = arena.status(k)
-    return render(request, "today.html", manual_done=engine.MANUAL_DONE, t=t, play=play, play_locked=arena.locked_reason(play),
+    exams = [x for x in (engine.exam_view(k["id"], e, m) for e in enrollments(k["id"])) if x and x["days_left"] >= 0]
+    return render(request, "today.html", manual_done=engine.MANUAL_DONE, t=t, play=play, exams=exams, play_locked=arena.locked_reason(play),
                   due=len(engine.due_cards(k["id"], 99)), streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
                   stars=engine.total_stars(k["id"]), rec=rec, auto=engine.day_summary(rec),
                   cov=explore.coverage(k["id"], m), lit=explore.lit_today(k["id"]), ahead=explore.ahead(k["id"], m),
@@ -1041,8 +1042,9 @@ def progress_page(request: Request, pack: str = "", msg: str = ""):
         v["strands"] = [(catalog.strand_name(e["pack_id"], s), lst) for s, lst in by_strand.items()]
         v["next"] = engine.next_after(e["pack_id"], e["progress_kp"], m, engine.taught_set(k["id"]), e["track"]) if e["progress_kp"] else None
         v["total"] = len(catalog.ids_for(e["pack_id"], e["track"]))
+        v["exam_date"], v["exam"] = e["exam_date"], engine.exam_view(k["id"], e, m)
         rows.append(v)
-    return render(request, "progress.html", rows=rows, open_pack=pack, msg=msg)
+    return render(request, "progress.html", rows=rows, open_pack=pack, msg=msg, adult=is_adult(k["grade"]))
 
 
 @app.post("/progress/{pack_id}")
@@ -1052,6 +1054,8 @@ async def progress_save(request: Request, pack_id: str):
     if pack_id not in {e["pack_id"] for e in enrollments(k["id"])}:
         raise HTTPException(404)
     f = await request.form()
+    if "exam_date" in f and not engine.set_exam_date(k["id"], pack_id, f.get("exam_date")):
+        raise HTTPException(400, "考试日期格式不对")
     stage = f.get("stage") or None
     old = engine.enrollment_stage(k["id"], pack_id)
     if stage and stage != old:

@@ -10,6 +10,7 @@ import random
 from datetime import datetime
 
 from .. import db, explore
+from ..catalog import is_adult
 
 DEFAULT_GAME_MINUTES = 20
 GAME_MINUTE_CHOICES = (0, 10, 20, 30, 45, 60)
@@ -34,10 +35,12 @@ def _settings(kid: dict) -> dict:
 
 
 def game_minutes(kid: dict) -> int:
+    """每天能玩几分钟。成人学习者默认不玩（不显示乐园），家长明确设置过的以设置为准。"""
+    default = 0 if is_adult(kid.get("grade")) else DEFAULT_GAME_MINUTES
     try:
-        return int(_settings(kid).get("game_minutes", DEFAULT_GAME_MINUTES))
+        return int(_settings(kid).get("game_minutes", default))
     except (TypeError, ValueError):
-        return DEFAULT_GAME_MINUTES
+        return default
 
 
 def game_unlock(kid: dict) -> str:
