@@ -11,6 +11,7 @@
   python -m app.cli mark-weak 孩子邮箱 知识点ID ...    导入已知薄弱点（如以前的试卷分析）
   python -m app.cli bank-maintain                    手动跑一轮题库流水线（改编入库、校对答案、校准难度；平时后台自动跑）
   python -m app.cli backup [目标目录]                 备份数据库（PostgreSQL 用 pg_dump）
+  python -m app.cli library fetch [--all] [书的id ...] 下载书库的公版原文（默认只下还没有的；--all 全部重新下载）
 """
 import os
 import shutil
@@ -65,6 +66,9 @@ def check(with_llm: bool) -> int:
                 _ok(True, f"AI 实际调用成功：{out}")
             except llm.LLMError as e:
                 good &= _ok(False, f"AI 实际调用失败：{e}")
+    from . import tts_web
+    ok, why = tts_web.check()
+    print(f"  [{' OK ' if ok else 'INFO'}] 朗读：{why}" + ("" if ok else "（用浏览器自带的声音）"))
     print("全部正常" if good else "有问题需要处理（见上面 [FAIL]）")
     return 0 if good else 1
 
@@ -126,6 +130,15 @@ def main(argv) -> int:
         return check("--llm" in args)
     if cmd == "check-curricula":
         return check_curricula()
+    if cmd == "library":
+        from .library import library
+        if not args or args[0] != "fetch":
+            print("用法：python -m app.cli library fetch [--all] [书的id ...]")
+            return 2
+        ids = [a for a in args[1:] if not a.startswith("--")] or None
+        ok, bad = library.fetch_all(only_missing="--all" not in args and not ids, ids=ids)
+        print(f"书库：下载成功 {ok} 本，失败 {bad} 本" + ("（失败的可以在管理后台「书库」上传 txt）" if bad else ""))
+        return 0
     if cmd == "backup":
         print("已备份到", backup(Path(args[0]) if args else config.DATA_DIR / "backups"))
         return 0

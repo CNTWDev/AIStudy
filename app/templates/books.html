@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/reading" class="small">← 阅读</a>
+<div class="ph"><h1>📚 书库</h1></div>
+<p class="lead">真正的名著原文。一次只读一页，不认识的词点一下就查，读累了可以点 ▶ 听。</p>
+{% if reading %}
+<h2>在读</h2>
+<div class="shelf">{% for b in reading %}
+  <a class="book" href="/books/{{ b.id }}/p/{{ [b.p.page + 1, b.n_pages]|min }}" style="--h:{{ (b.id|length * 47) % 360 }}">
+    <span class="cover">{{ b.emoji }}</span><b>{{ b.title_zh or b.title }}</b>
+    <span class="small muted">{% if b.p.finished_at %}读完啦 🎉{% else %}第 {{ b.p.page }} / {{ b.n_pages }} 页{% endif %}</span>
+    <span class="daybar"><span style="width:{{ 100 * b.p.page / b.n_pages }}%"></span></span>
+  </a>{% endfor %}</div>
+{% endif %}
+<div class="seg" style="margin:16px 0 4px">
+  <a class="chip {{ 'on' if not lang }}" href="/books">全部</a><a class="chip {{ 'on' if lang == 'en' }}" href="/books?lang=en">英文</a><a class="chip {{ 'on' if lang == 'zh' }}" href="/books?lang=zh">中文</a>
+</div>
+{% for lv, name in levels.items() if books|selectattr('level', 'equalto', lv)|list %}
+<h2>{{ name }}</h2>
+<div class="shelf">{% for b in books if b.level == lv %}
+  <a class="book" href="/books/{{ b.id }}" style="--h:{{ (b.id|length * 47) % 360 }}">
+    <span class="cover">{{ b.emoji }}</span><b>{{ b.title_zh or b.title }}</b>
+    <span class="small muted">{% if b.title_zh %}{{ b.title }} · {% endif %}{{ b.n_pages }} 页</span>
+    {% if b.for_me %}<span class="pill">适合我的年级</span>{% endif %}{% if tracks.get(b.id) %}<span class="pill">每天在读</span>{% endif %}
+  </a>{% endfor %}</div>
+{% endfor %}
+{% set others = books|rejectattr('level', 'in', levels.keys()|list)|list %}
+{% if others %}<h2>中文名著</h2>
+<div class="shelf">{% for b in others %}
+  <a class="book" href="/books/{{ b.id }}" style="--h:{{ (b.id|length * 47) % 360 }}">
+    <span class="cover">{{ b.emoji }}</span><b>{{ b.title }}</b><span class="small muted">{{ b.author }} · {{ b.n_pages }} 页</span>
+    {% if b.for_me %}<span class="pill">适合我的年级</span>{% endif %}{% if tracks.get(b.id) %}<span class="pill">每天在读</span>{% endif %}
+  </a>{% endfor %}</div>{% endif %}
+{% if not books %}<div class="card"><p>书库里的书还没下载好。请管理员在「管理 → 书库」里点「下载全部」。</p></div>{% endif %}
+{% if missing and user.is_admin %}<p class="small muted">还有 {{ missing|length }} 本没下载，<a href="/admin/library">去下载</a></p>{% endif %}
+<details class="card small"><summary>📕 还在版权期的好书（买纸质书或去图书馆借）</summary>
+{% for x in not_pd %}<p><b>{{ x.title }}</b> · {{ x.author }} · {{ x.grades|map('replace', 'G', '')|join('、') }} 年级<br><span class="muted">{{ x.why }}</span></p>{% endfor %}
+</details>
+{% endblock %}

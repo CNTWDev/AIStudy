@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/books" class="small">← 书库</a>
+<div class="bookhead" style="--h:{{ (b.id|length * 47) % 360 }}">
+  <span class="cover big">{{ b.emoji }}</span>
+  <div><h1 style="margin:0">{{ b.title_zh or b.title }}</h1>
+    <div class="muted small">{% if b.title_zh %}{{ b.title }} · {% endif %}{{ b.author }} · {{ chs|length }} {{ b.unit_name }} · {{ t.n_pages }} 页</div>
+    <p class="small">{{ b.why }}</p></div>
+</div>
+<div class="card">
+  <div class="row" style="justify-content:space-between">
+    <div><b>{% if p.finished_at %}读完啦 🎉{% elif p.page %}读到第 {{ p.page }} / {{ t.n_pages }} 页{% else %}还没开始{% endif %}</b>
+      <div class="muted small">{% if track %}每天读 {{ track.daily_amount }} 页 · 今天读了 {{ today.pages }} 页{% else %}今天读了 {{ today.pages }} 页{% endif %}
+        {% if today.listen_seconds %} · 听了 {{ (today.listen_seconds / 60)|round|int }} 分钟{% endif %}{% if ltrack %}（每天听 {{ ltrack.daily_minutes }} 分钟）{% endif %}
+        · 🔖 {{ p.chapters_done|length }} 枚书签</div></div>
+  </div>
+  <div class="daybar"><span style="width:{{ 100 * p.page / t.n_pages }}%"></span></div>
+  <div class="row">
+    <a class="btn lg" href="/books/{{ b.id }}/p/{{ [p.page + 1, t.n_pages]|min }}">📖 {{ '接着读' if p.page else '开始读' }}</a>
+    <a class="btn ghost lg" href="/books/{{ b.id }}/p/{{ [[p.listen_page, p.page]|max, 1]|max if p.listen_page else [p.page + 1, t.n_pages]|min }}?listen=1">🎧 听书</a>
+  </div>
+</div>
+<h2>{{ b.unit_name if b.unit_name not in ('页',) else '目录' }}地图</h2>
+<div class="chmap">
+{% for c in chs %}<a href="/books/{{ b.id }}/p/{{ c.start }}" class="ch {{ 'done' if c.done }} {{ 'now' if not c.done and (loop.first or chs[loop.index0 - 1].done) }}">
+  <span class="n">{{ '🔖' if c.star else ('✓' if c.done else c.n) }}</span><span class="t">{{ c.title }}</span><span class="small muted">{{ c.pages }} 页</span></a>{% endfor %}
+</div>
+{% endblock %}

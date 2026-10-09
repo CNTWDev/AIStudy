@@ -158,7 +158,9 @@ def src_reading(c: Ctx) -> list[dict]:
     langs = {catalog.packs[e["pack_id"]].lang for e in c.enrolls} - {""}
     for kind, lang, label in (("read_en", "en", "英语阅读"), ("read_zh", "zh", "名著接着读")):
         tr = [t for t in active if t["kind"] == kind]
-        if tr:
+        if tr and tr[0]["ref"].startswith("lib:"):  # 书库里的书：在网站上按页读，读够自动打勾
+            out.append(_library_task(c, tr[0], kind, label))
+        elif tr:
             t, seg = tr[0], engine.track_today(tr[0])
             out.append({"type": kind, "track": t["id"], "title": f"{label}：《{t['title']}》{seg['label']}",
                         "why": f"读 {t['daily_minutes']} 分钟，读完用一句话说说讲了什么",
@@ -166,7 +168,31 @@ def src_reading(c: Ctx) -> list[dict]:
         elif lang in langs:
             out.append({"type": kind, "lang": lang, "title": f"{'英文' if lang == 'en' else '中文'}阅读 15 分钟",
                         "why": "读一篇短文，不懂的词点一下就查，收藏后自动进单词复习", "minutes": 15, "url": f"/reading?lang={lang}"})
+    for t in active:
+        if t["kind"] == "listen" and t["ref"].startswith("lib:"):
+            bid = t["ref"][4:]
+            from .library_web import progress
+            p = progress(c.user_id, bid)
+            start = max(1, p["listen_page"] or (p["page"] + 1))
+            out.append({"type": "listen", "track": t["id"], "title": f"🎧 听书 {t['daily_minutes']} 分钟：《{t['title']}》",
+                        "why": "跟着声音看文字，正在读的段落会亮起来；听够时间自动完成", "minutes": t["daily_minutes"],
+                        "url": f"/books/{bid}/p/{start}?listen=1"})
     return out
+
+
+def _library_task(c: Ctx, t, kind: str, label: str) -> dict:
+    from .library import library
+    bid = t["ref"][4:]
+    n = max(1, t["daily_amount"])
+    start = t["position"] + 1
+    total = t["total_units"] or (library.text(bid) or {}).get("n_pages", 0)
+    if total and start > total:
+        return {"type": kind, "track": t["id"], "title": f"{label}：《{t['title']}》读完啦 🎉", "why": "请家长换一本新书",
+                "minutes": 1, "url": f"/books/{bid}"}
+    end = min(start + n - 1, total) if total else start + n - 1
+    return {"type": kind, "track": t["id"], "title": f"📖 {label}：《{t['title']}》第 {start}–{end} 页" if end > start else
+            f"📖 {label}：《{t['title']}》第 {start} 页", "why": f"今天读 {n} 页，不认识的词点一下就查；读够自动打勾",
+            "minutes": t["daily_minutes"], "url": f"/books/{bid}/p/{start}"}
 
 
 def src_exam(c: Ctx) -> list[dict]:

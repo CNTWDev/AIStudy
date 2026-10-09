@@ -123,6 +123,10 @@ class MockProvider(Provider):
 
 
 MOCK = {
+    "book_guide": {"gist": "示例：主人公出发去冒险，路上交到了第一个朋友。", "hook": "读读看：主人公为什么要出发？",
+                   "words": [{"w": "kite", "zh": "风筝"}, {"w": "hill", "zh": "小山"}],
+                   "quiz": [{"q": "示例：主人公带了什么去小山？", "options": ["风筝", "皮球", "书包"], "answer": 0, "explain": "第一段就写了。"},
+                            {"q": "示例：那天天气怎么样？", "options": ["下雨", "刮大风", "下雪"], "answer": 1, "explain": "风很大。"}]},
     "verify": {"answer": 1, "ok": True, "problem": "", "why": "示例"},
     "variant": {"items": [{"type": "mcq", "difficulty": 2, "q": "示例改编题：1 km = ? m", "options": ["10", "100", "1000", "10000"],
                            "answer": 2, "hint": "千米和米", "explain": "1 千米 = 1000 米。"}]},

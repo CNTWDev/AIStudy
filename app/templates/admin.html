@@ -375,8 +375,38 @@ $('#bpf').onsubmit = async e => {
     <tr><td>数据库</td><td>{{ db_dialect }}</td></tr>
     <tr><td>AI</td><td>{% if llm_status[0] %}<b>可用</b> · {{ llm_status[1] }}{% else %}<b>未就绪</b> · {{ llm_status[1] }}{% endif %}
       <div class="muted small">在服务器 config/llm.toml 修改后重启；<code>install.sh check --llm</code> 可实际测试</div></td></tr>
+    <tr><td>书库</td><td><a href="/admin/library">📚 下载 / 上传名著原文</a></td></tr>
+    <tr><td>朗读</td><td>{% if tts_status[0] %}<b>可用</b> · {{ tts_status[1] }}{% else %}<b>未开启</b> · {{ tts_status[1] }}{% endif %}
+      <div class="muted small">已缓存 {{ tts_stats.ready }} 段 · {{ tts_stats.chars }} 字 · {{ (tts_stats.bytes / 1048576)|round(1) }} MB · 共播放 {{ tts_stats.hits }} 次 · 今天新生成 {{ tts_stats.today_chars }} 字</div>
+      <div class="muted small">在服务器 config/tts.toml 修改后重启</div></td></tr>
     <tr><td>数据库迁移</td><td class="small">{% for m in migrations %}{{ m.name }}：{{ '已执行' if m.applied_at else '待执行' }}<br>{% endfor %}</td></tr>
   </table></div>
 </div>
+{% endif %}
+{% if tab == 'system' %}
+<div class="card" id="ttscard">
+  <h3 style="margin-top:0">朗读：挑声音、试语速</h3>
+  <p class="muted small">现在的语速：单词 {{ tts_speeds.word }} · 句子 {{ tts_speeds.sentence }} · 阅读/听书 {{ tts_speeds.passage }}。同一段文字按 {{ tts_audition|join('、') }} 各生成一次（只花一次钱，以后试听读缓存），听完把合适的值写进 config/tts.toml 的 [speed]。</p>
+  <div class="row"><select id="ttslang" style="width:auto"><option value="en">英文</option><option value="zh">中文</option></select>
+    <button class="btn ghost sm" id="ttsvoices" type="button">列出可用的声音</button></div>
+  <div id="ttsvl" class="small" style="max-height:260px;overflow:auto"></div>
+  <label>试听文字</label>
+  <textarea id="ttstext" style="min-height:70px">Once upon a time, there was a little girl who lived in a village near the forest. Whenever she went out, she wore a red riding cloak, so everyone in the village called her Little Red Riding Hood.</textarea>
+  <div class="row">{% for v in tts_audition %}<button class="btn ghost sm" type="button" data-sp="{{ v }}">▶ {{ v }}</button>{% endfor %}<span class="muted small" id="ttsmsg"></span></div>
+</div>
+<script>
+$('#ttsvoices').onclick = async () => {
+  $('#ttsvl').textContent = '正在获取…';
+  const r = await api('/api/admin/tts/voices?lang=' + $('#ttslang').value);
+  $('#ttsvl').innerHTML = r.error ? `<div class="err">${esc(r.error)}</div>` : r.voices.map(v => `<div><code>${esc(v.id)}</code> <b>${esc(v.name)}</b> ${esc(v.gender || '')} <span class="muted">${esc(v.tagline || v.description || '')}</span></div>`).join('') || '没有';
+};
+$$('[data-sp]').forEach(b => b.onclick = async () => {
+  $('#ttsmsg').textContent = '';
+  const r = await api('/api/tts', {text: $('#ttstext').value, lang: $('#ttslang').value, use: 'passage', speed: +b.dataset.sp});
+  if (r.fallback) { $('#ttsmsg').textContent = '还不能用：' + r.why; return; }
+  Speak.stop(); Speak.file(r.url, Speak.n).catch(() => { $('#ttsmsg').textContent = '播放失败'; });
+  $('#ttsmsg').textContent = (r.cached ? '读缓存 ' : '新生成 ') + b.dataset.sp;
+});
+</script>
 {% endif %}
 {% endblock %}

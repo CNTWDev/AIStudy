@@ -139,12 +139,133 @@ async function finishTask(type, extra) {
   location.href = '/today';
 }
 
-/* 朗读（浏览器自带语音，英文） */
-function say(text, lang) {
-  if (!window.speechSynthesis) return;
-  const u = new SpeechSynthesisUtterance(text); u.lang = lang || 'en-US'; u.rate = .85;
-  speechSynthesis.cancel(); speechSynthesis.speak(u);
-}
+/* ---------- 朗读：服务器朗读（同一句话只生成一次，以后读缓存）；没开或出错时用浏览器自带的声音 ---------- */
+const Speak = {
+  audio: null, n: 0, playing: false, slow: false, _end: null,
+  langOf(t) { return /[一-鿿]/.test(t) && !/[A-Za-z]{3,}/.test(t) ? 'zh' : 'en'; },
+  useOf(t) { return t.trim().split(/\s+/).length <= 2 && t.length <= 24 ? 'word' : 'sentence'; },
+  server(lang) { return (window.TTS_LANGS || []).includes(lang); },
+  stop() {
+    Speak.n++; Speak.playing = false;
+    if (Speak.audio) { Speak.audio.onended = Speak.audio.onerror = null; Speak.audio.pause(); }
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    if (Speak._end) { const f = Speak._end; Speak._end = null; f(false); }
+  },
+  /* 读一段文字，读完返回 true；被打断（又点了别的）返回 false */
+  async play(text, lang, use) {
+    text = String(text || '').trim(); if (!text) return false;
+    lang = (lang || Speak.langOf(text)).slice(0, 2).toLowerCase();
+    use = use || Speak.useOf(text);
+    Speak.stop();
+    const my = Speak.n;
+    let url = '';
+    if (Speak.server(lang)) { try { url = (await api('/api/tts', {text, lang, use})).url || ''; } catch (e) {} }
+    if (my !== Speak.n) return false;
+    if (url) { try { return await Speak.file(url, my); } catch (e) { if (my !== Speak.n) return false; } }
+    return Speak.browser(text, lang, use, my);
+  },
+  /* 先登记好下一段（只拿地址，不播放），连续朗读时用来减少等待 */
+  async prepare(text, lang, use) {
+    lang = (lang || Speak.langOf(text)).slice(0, 2).toLowerCase();
+    if (!Speak.server(lang)) return '';
+    try { const r = await api('/api/tts', {text, lang, use: use || 'passage'}); if (r.url) { const a = new Audio(); a.preload = 'auto'; a.src = r.url; } return r.url || ''; } catch (e) { return ''; }
+  },
+  file(url, my) {
+    return new Promise((res, rej) => {
+      const a = Speak.audio || (Speak.audio = new Audio());
+      a.src = url; a.defaultPlaybackRate = a.playbackRate = Speak.slow ? .85 : 1;
+      if ('preservesPitch' in a) a.preservesPitch = true;
+      Speak._end = res; Speak.playing = true;
+      a.onended = () => { Speak.playing = false; Speak._end = null; res(true); };
+      a.onerror = () => { Speak.playing = false; Speak._end = null; rej(new Error('audio')); };
+      a.play().catch(e => { if (my === Speak.n) { Speak.playing = false; Speak._end = null; rej(e); } });
+    });
+  },
+  browser(text, lang, use, my) {
+    if (!window.speechSynthesis) return Promise.resolve(false);
+    return new Promise(res => {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = lang === 'zh' ? 'zh-CN' : 'en-US';
+      u.rate = ({word: .7, sentence: .8, passage: .85})[use] * (Speak.slow ? .85 : 1);
+      Speak._end = res; Speak.playing = true;
+      u.onend = u.onerror = () => { Speak.playing = false; if (Speak._end === res) Speak._end = null; res(my === Speak.n); };
+      speechSynthesis.speak(u);
+    });
+  },
+  setSlow(on) { Speak.slow = on; if (Speak.audio) Speak.audio.playbackRate = on ? .85 : 1; },
+};
+function say(text, lang, use) { return Speak.play(text, lang, use); }
+/* 一个 🔊 按钮的 HTML：<button class="say" data-say="..." data-lang="en"> （全站统一用事件委托处理点击） */
+function sayBtn(text, lang, cls) { return `<button type="button" class="btn ghost sm say ${cls || ''}" data-say="${esc(text)}" data-lang="${esc(lang || '')}" title="读一读">🔊</button>`; }
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-say]'); if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  b.classList.add('saying'); Speak.play(b.dataset.say, b.dataset.lang || '', b.dataset.use || '').finally(() => b.classList.remove('saying'));
+}, true);
+
+/* 连续朗读一组段落（阅读页、读书、听书）：逐段（长段按句子切成小块）读，正在读的段落高亮，提前准备下一块。
+   Listen.mount(段落元素数组, {lang, bar: 放播放条的元素, onProgress(i), onDone()}) */
+const Listen = {
+  els: [], lang: 'en', i: 0, on: false, opt: {},
+  chunks(t, max) {
+    t = t.replace(/\s+/g, ' ').trim(); if (t.length <= max) return t ? [t] : [];
+    const out = []; let cur = '';
+    for (const s of t.split(/(?<=[.!?。！？；;…]["'”’」』）)]?)\s*/)) {
+      if (cur && (cur + s).length > max) { out.push(cur.trim()); cur = ''; }
+      cur += (cur && /^[A-Za-z]/.test(s) ? ' ' : '') + s;
+      while (cur.length > max) { out.push(cur.slice(0, max)); cur = cur.slice(max); }
+    }
+    if (cur.trim()) out.push(cur.trim());
+    return out;
+  },
+  mount(els, opt) {
+    Listen.els = els; Listen.opt = opt || {}; Listen.lang = Listen.opt.lang || 'en'; Listen.i = Listen.opt.start || 0;
+    const bar = document.createElement('div'); bar.className = 'listenbar';
+    bar.innerHTML = `<button class="btn sm" data-l="play">▶ 听</button><button class="btn ghost sm" data-l="prev" title="上一段">⏮</button>` +
+      `<button class="btn ghost sm" data-l="next" title="下一段">⏭</button><button class="btn ghost sm" data-l="slow" title="再慢一点">🐢</button>` +
+      `<span class="muted small" data-l="pos"></span>`;
+    (Listen.opt.bar || document.body).appendChild(bar); Listen.bar = bar;
+    bar.onclick = e => {
+      const b = e.target.closest('[data-l]'); if (!b) return;
+      const a = b.dataset.l;
+      if (a === 'play') Listen.on ? Listen.pause() : Listen.play();
+      else if (a === 'prev') Listen.jump(Listen.i - 1);
+      else if (a === 'next') Listen.jump(Listen.i + 1);
+      else if (a === 'slow') { Speak.setSlow(!Speak.slow); b.classList.toggle('on', Speak.slow); toast(Speak.slow ? '🐢 再慢一点' : '正常语速'); }
+    };
+    els.forEach(el => el.classList.add('lp'));
+    Listen.show();
+  },
+  show() {
+    if (!Listen.bar) return;
+    $('[data-l=play]', Listen.bar).textContent = Listen.on ? '⏸ 暂停' : (Listen.i > 0 ? '▶ 接着听' : '▶ 听');
+    $('[data-l=pos]', Listen.bar).textContent = `${Math.min(Listen.i + 1, Listen.els.length)} / ${Listen.els.length} 段`;
+    Listen.els.forEach((el, i) => el.classList.toggle('reading', Listen.on && i === Listen.i));
+  },
+  pause() { Listen.on = false; Speak.stop(); Listen.show(); },
+  jump(i) { Speak.stop(); Listen.i = Math.max(0, Math.min(Listen.els.length - 1, i)); Listen.on = false; Listen.play(); },
+  async play() {
+    if (Listen.i >= Listen.els.length) Listen.i = 0;
+    Listen.on = true; Listen.show();
+    const run = ++Listen.run;
+    while (Listen.on && run === Listen.run && Listen.i < Listen.els.length) {
+      const el = Listen.els[Listen.i];
+      el.scrollIntoView({block: 'center', behavior: 'smooth'});
+      const parts = Listen.chunks(el.textContent, 400);
+      const nextEl = Listen.els[Listen.i + 1];
+      for (let k = 0; k < parts.length; k++) {
+        const nxt = parts[k + 1] || (nextEl ? Listen.chunks(nextEl.textContent, 400)[0] : '');
+        if (nxt) Speak.prepare(nxt, Listen.lang, 'passage');
+        const ok = await Speak.play(parts[k], Listen.lang, 'passage');
+        if (!ok || run !== Listen.run || !Listen.on) return;
+      }
+      if (Listen.opt.onProgress) Listen.opt.onProgress(Listen.i);
+      Listen.i++; Listen.show();
+    }
+    if (Listen.i >= Listen.els.length) { Listen.on = false; Listen.show(); if (Listen.opt.onDone) Listen.opt.onDone(); }
+  },
+  run: 0,
+};
 
 /* ---------- 问一问小助手：每个页面右下角，结合当前题目引导式回答（不给答案） ---------- */
 const Ask = {
@@ -333,11 +454,10 @@ const QuickLook = {
     try {
       const r = await api('/api/lookup', {q, context: QuickLook.ctx, lang, auto: true, item_id: QuickLook.item, page: location.pathname});
       $('#qlres').innerHTML = `<h3 style="margin:8px 0 4px">${esc(r.word || q)} <span class="muted small">${esc(r.phonetic || r.pinyin || '')} ${esc(r.pos || '')}</span>` +
-        (lang === 'en' ? ` <button class="btn ghost sm" id="qlsay">🔊</button>` : '') + `</h3>` +
+        sayBtn(r.word || q, lang) + `</h3>` +
         `<p style="margin:4px 0"><b>${esc(r.meaning || '')}</b>${r.simple_en ? `<br><span class="muted small">${esc(r.simple_en)}</span>` : ''}</p>` +
-        (r.example ? `<p class="small">例：${esc(r.example)}${r.example_zh ? `<br><span class="muted">${esc(r.example_zh)}</span>` : ''}</p>` : '') +
+        (r.example ? `<p class="small">例：${esc(r.example)} ${sayBtn(r.example, 'en')}${r.example_zh ? `<br><span class="muted">${esc(r.example_zh)}</span>` : ''}</p>` : '') +
         (r.tip ? `<div class="hint">💡 ${esc(r.tip)}</div>` : '') + QuickLook.saved(r);
-      if ($('#qlsay')) $('#qlsay').onclick = () => say(r.word || q);
       QuickLook.bindFav(r.word || q, r.meaning || '');
     } catch (e) { $('#qlres').innerHTML = `<div class="err">${esc(e.message)}</div>` + `<button class="btn sm" id="qlfav">➕ 先加入复习</button>`; QuickLook.bindFav(q, ''); }
   },
@@ -347,7 +467,7 @@ const QuickLook = {
     $('#qlres').innerHTML = '<span class="loading">正在翻译</span>';
     try {
       const r = await api('/api/translate', {text: q, item_id: QuickLook.item, page: location.pathname});
-      $('#qlres').innerHTML = `<p class="small muted" style="margin:8px 0 2px">${esc(q.slice(0, 300))}</p>` +
+      $('#qlres').innerHTML = `<p class="small muted" style="margin:8px 0 2px">${esc(q.slice(0, 300))} ${sayBtn(q.slice(0, 600))}</p>` +
         `<p style="margin:4px 0"><b>${esc(r.meaning || '')}</b></p>` +
         (r.structure ? `<p class="small">🧩 ${esc(r.structure)}</p>` : '') +
         ((r.points || []).length ? `<p class="small">${r.points.map(x => `<span class="pill">${esc(x.text)}：${esc(x.note)}</span>`).join(' ')}</p>` : '') +
@@ -379,12 +499,13 @@ const SelMenu = {
         if (b.dataset.a === 'look') QuickLook.go(t);
         else if (b.dataset.a === 'tr') QuickLook.translate(t);
         else if (b.dataset.a === 'add') { api('/api/collect', {text: t, context: QuickLook.ctx, page: location.pathname}).then(() => toast('➕ 已加入复习')).catch(err => toast(err.message)); }
+        else if (b.dataset.a === 'say') say(t);
         else if (b.dataset.a === 'ask' && window.Ask && $('#askbtn')) Ask.open();
       };
     }
     const word = QuickLook.isWord(text);
     SelMenu.el.innerHTML = (word ? `<button data-a="look">🔍 查词</button>` : '') + `<button data-a="tr">🌐 翻译</button>` +
-      `<button data-a="add">➕ 加入复习</button>` + ($('#askbtn') ? `<button data-a="ask">${esc($('#askbtn').dataset.icon)} 问${esc($('#askbtn').dataset.name)}</button>` : '');
+      `<button data-a="say">🔊 读一读</button><button data-a="add">➕ 加入复习</button>` + ($('#askbtn') ? `<button data-a="ask">${esc($('#askbtn').dataset.icon)} 问${esc($('#askbtn').dataset.name)}</button>` : '');
     const r = sel.getRangeAt(0).getBoundingClientRect();
     const top = r.top + scrollY - 46, left = Math.max(8, Math.min(r.left + scrollX + r.width / 2 - 120, scrollX + innerWidth - 260));
     Object.assign(SelMenu.el.style, {top: (top < scrollY + 4 ? r.bottom + scrollY + 8 : top) + 'px', left: left + 'px'});
@@ -416,6 +537,7 @@ const Beat = {
   },
   step() {
     const now = Date.now(), idle = $('.reader') ? 180000 : 90000;
+    if (Speak.playing && !document.hidden) Beat.last = now;  // 在听朗读也算在学
     if (!document.hidden && now - Beat.last < idle) Beat.acc += Math.min(now - Beat.tick, 5000);
     Beat.tick = now;
   },

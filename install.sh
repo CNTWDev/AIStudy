@@ -318,14 +318,18 @@ setup_config() {
   else
     ok "保留已有的 config/llm.toml"
   fi
+  if [[ ! -f "$APP_DIR/config/tts.toml" ]]; then
+    cp "$APP_DIR/config/tts.example.toml" "$APP_DIR/config/tts.toml"
+    ok "已生成 config/tts.toml（朗读：要用时填写 Cartesia 的 api_key 和声音）"
+  fi
 }
 
 fix_permissions() {
   id "$SERVICE_USER" >/dev/null 2>&1 || useradd --system --home-dir "$APP_DIR" --shell /usr/sbin/nologin "$SERVICE_USER" 2>/dev/null \
     || useradd -r -d "$APP_DIR" -s /sbin/nologin "$SERVICE_USER"
   chown -R "$SERVICE_USER:$SERVICE_USER" "$APP_DIR/data"
-  chown "root:$SERVICE_USER" "$(ENV_FILE)" "$APP_DIR/config/llm.toml"
-  chmod 640 "$(ENV_FILE)" "$APP_DIR/config/llm.toml"
+  chown "root:$SERVICE_USER" "$(ENV_FILE)" "$APP_DIR/config/llm.toml" "$APP_DIR/config/tts.toml"
+  chmod 640 "$(ENV_FILE)" "$APP_DIR/config/llm.toml" "$APP_DIR/config/tts.toml"
 }
 
 # ---------------------------------------------------------------- Python 依赖
@@ -362,6 +366,9 @@ backup_db() {
 migrate_db() {
   step "迁移数据库"
   run_cli migrate | sed 's/^/  /'
+  step "书库：下载还没有的公版名著原文（失败不影响安装，之后可在管理后台重试）"
+  (cd "$APP_DIR" && timeout 900 runuser -u "$SERVICE_USER" -- "$VENV/bin/python" -m app.cli library fetch) 2>&1 | sed 's/^/  /' \
+    || warn "书库下载没完成，稍后在「管理 → 书库」里点「下载所有还没有的」"
 }
 
 # ---------------------------------------------------------------- 服务
@@ -453,6 +460,7 @@ summary() {
   echo "  第一次打开时注册的账号会成为管理员。"
   echo
   echo "  AI 配置：  sudo nano $APP_DIR/config/llm.toml   填 api_key 后执行  sudo systemctl restart $APP_NAME"
+  echo "  朗读配置：sudo nano $APP_DIR/config/tts.toml   （可选，不填就用浏览器自带的声音）"
   echo "  检查配置：sudo $APP_DIR/install.sh check --llm"
   echo "  以后升级：sudo $APP_DIR/install.sh upgrade"
   echo "  数据备份：$APP_DIR/data/backups（每次升级前自动备份）"

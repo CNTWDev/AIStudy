@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/admin?tab=system" class="small">← 管理</a>
+<h1>📚 书库</h1>
+{% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
+<p class="muted small">只放公有领域的书。原文由服务器从古腾堡 / 维基文库下载（也可以命令行 <code>python -m app.cli library fetch</code>），整理好存在 data/library/。
+服务器访问不了某个来源时，可以在别处下载 txt（UTF-8 或 GBK），在下面上传。书单在 content/library.json。</p>
+<form method="post" action="/admin/library/fetch" class="row"><input type="hidden" name="missing" value="1"><button class="btn">下载所有还没有的</button></form>
+<div class="card"><div class="tw"><table>
+<tr><th>书</th><th>状态</th><th>章 / 页</th><th></th></tr>
+{% for b in books %}<tr class="small">
+  <td>{{ b.emoji }} <b>{{ b.title_zh or b.title }}</b>{% if b.title_zh %} <span class="muted">{{ b.title }}</span>{% endif %}<br><span class="muted">{{ b.id }} · {{ b.level or '' }} {{ b.grades|join(' ') }}</span></td>
+  <td>{% if b.job %}{{ b.job }}{% elif b.ready %}✓ {{ b.fetched_at }}<br><span class="muted">{{ b.src.type }}{% if b.src.id %} #{{ b.src.id }}{% endif %}</span>{% else %}<span class="muted">没下载</span>{% endif %}</td>
+  <td>{% if b.ready %}{{ b.n_chapters }} / {{ b.n_pages }}<details><summary>章节</summary>{% for c in b.chapters %}<div>{{ loop.index }}. {{ c }}</div>{% endfor %}</details>{% endif %}</td>
+  <td class="nw"><form method="post" action="/admin/library/fetch" style="display:inline"><input type="hidden" name="bid" value="{{ b.id }}"><button class="btn ghost sm">{{ '重新下载' if b.ready else '下载' }}</button></form>
+    <form method="post" action="/admin/library/upload" enctype="multipart/form-data" class="row" style="margin-top:4px"><input type="hidden" name="bid" value="{{ b.id }}"><input type="file" name="file" accept=".txt,text/plain" required style="max-width:180px"><button class="btn ghost sm">上传</button></form></td>
+</tr>{% endfor %}
+</table></div></div>
+<details class="card small"><summary>只列书名的书（还在版权期）</summary>{% for x in not_pd %}<p><b>{{ x.title }}</b> · {{ x.author }} · {{ x.why }}</p>{% endfor %}</details>
+{% endblock %}

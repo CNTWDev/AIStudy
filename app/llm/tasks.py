@@ -24,7 +24,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"items": 2, "teach": 2, "context": 1, "passage": 1, "variant": 1, "verify": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 2, "teach": 2, "context": 1, "passage": 1, "variant": 1, "verify": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -189,6 +189,26 @@ def make_passage(lang: str, grade: str, topic: str, length: str, review_words: l
         '输出：{"title":"..","body":"正文，段落之间用\\n\\n分隔","questions":[{"q":"..","options":["..","..","..",".."],"answer":0,"explain":"中文解析"}]}'
     )
     return ask_json("passage", _tutor(grade) + ("" if _adult(grade) else "你也是儿童读物作者。"), user, user_id=user_id, effort="medium", cache=False)
+
+
+def book_guide(book: dict, ch: int, chapter_title: str, text: str, grade: str, user_id=None) -> dict:
+    """名著某一章的导读：所有孩子共用，生成一次存进 contents。读前给关键词和一个带着读的问题，读后两道小题。"""
+    from ..catalog import stage_label
+    en = book["lang"] == "en"
+    who = f"读者是{stage_label(grade)}的中国孩子" + ("，英文水平一般，第一次读英文原版书" if en else "")
+    words = ('"words":[{"w":"这一章里最影响理解的 5 个英文单词或短语（原文里的写法）","zh":"在本章里的中文意思","note":"一句很短的提示(可选)"}],'
+             if en else '"words":[{"w":"这一章里孩子可能不懂的 5 个字词","zh":"用孩子听得懂的话解释","pinyin":"拼音"}],')
+    user = (
+        f"{who}，正在读《{book['title']}》（{book.get('author', '')}）第 {ch} 部分「{chapter_title}」。下面是这一部分的原文（可能只是开头）：\n"
+        f"<<<\n{text}\n>>>\n"
+        "请写一份帮孩子降低阅读难度、又不剧透结局的导读，全部用简单的中文（单词本身保留英文）。输出：{"
+        '"gist":"用一两句话概括这一部分讲了什么（孩子读完后看，也作为下一部分开头的「上回说到」）",'
+        '"hook":"读之前给孩子的一个问题，带着它去读，不剧透答案",'
+        + words +
+        '"quiz":[{"q":"读后小题（中文出题，考这一部分的情节或人物，不考冷门细节）","options":["..","..",".."],"answer":0,"explain":"一句解释"}]'
+        "}\nquiz 出 2 道，选项 3 个。"
+    )
+    return ask_json("book_guide", TUTOR + "你也是很会带孩子读整本书的阅读老师。", user, user_id=user_id, effort="low", max_tokens=2000, cache=False)
 
 
 PAPER_SCHEMA = (

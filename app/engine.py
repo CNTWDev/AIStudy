@@ -596,7 +596,7 @@ def exam_view(user_id: int, e, mastery: dict | None = None, taught: set | None =
 
 # ------------------------------------------------------------------ 阅读 / 单词进度（tracks）
 
-TRACK_KINDS = {"read_zh": "中文名著", "read_en": "英文阅读", "words": "每天新词"}
+TRACK_KINDS = {"read_zh": "中文名著", "read_en": "英文阅读", "listen": "每天听书", "words": "每天新词"}
 
 
 def tracks(user_id: int, active_only=True) -> list:

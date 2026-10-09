@@ -1,0 +1,44 @@
+# beejoy 的朗读（TTS）配置。
+# 使用方法：复制为 config/tts.toml（install.sh 会自动复制），填上 API Key 和声音，然后重启服务：
+#     sudo systemctl restart aistudy
+# 检查配置：  sudo /opt/aistudy/install.sh check
+#
+# config/tts.toml 里有密钥，已被 .gitignore 忽略，不会提交到 git。任何值都可以写成 "${环境变量名}"。
+#
+# 省钱的办法：每段文字只生成一次。文字（规整后）连同 声音/模型/语速 算 MD5，
+# 音频存成 data/tts/ab/cd/<md5>.mp3，以后谁再听都直接读这个文件，不再花钱。
+# 不支持孩子自己换声音：每种语言固定一个声音，缓存命中率才高。
+# 没开（provider = "none"）或某种语言没配声音时，网页用浏览器自带的声音朗读，功能照常。
+
+# 提供方：cartesia / none（关闭）/ mock（假声音，只用于测试）
+provider = "none"
+
+# 每次最多读多少字（长文章前端会按句子切开读）
+max_chars = 1200
+# 每个账号每天最多新生成多少字；全站每天最多新生成多少字（读已有的缓存不算）。Cartesia 大约 1 个字符 = 1 credit
+daily_chars_per_user = 20000
+daily_chars_total = 200000
+
+[cartesia]
+api_key = ""                        # 填 sk_car_... ；或写 "${CARTESIA_API_KEY}"
+# 模型建议锁定带日期的版本：厂商升级模型后音色不变，和旧缓存听起来一致
+model = "sonic-3.6-2026-08-27"
+api_version = "2026-08-14"          # Cartesia-Version 请求头
+timeout = 60                        # 秒
+# base_url = ""                     # 通过代理访问时填写
+# 输出格式：mp3 24kHz 64kbps，讲话足够清楚，每分钟约 0.5 MB
+format = { container = "mp3", sample_rate = 24000, bit_rate = 64000 }
+
+# 每种语言一个固定的声音 id。没配的语言用浏览器自带的声音。
+# 填好 api_key 后，管理后台「系统 → 朗读」里可以列出所有声音、按不同语速试听，再把选中的 id 填到这里。
+[voices]
+en = ""
+# zh = ""
+
+# 语速（Cartesia 只接受 0.6 ~ 1.5；这是「建议值」不是严格倍数，放慢主要靠拉长停顿和音节）
+# word = 查词、单词复习；sentence = 例句、划词「读一读」；passage = 阅读、读书、听书
+# 孩子在播放条上还能点 🐢 再放慢到 0.85 倍（浏览器处理，不重新生成、不花钱）
+[speed]
+word = 0.7
+sentence = 0.7
+passage = 0.8

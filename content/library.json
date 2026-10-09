@@ -1,0 +1,962 @@
+{
+ "meta": {
+  "version": 1,
+  "notes": [
+   "pd=true 的书是公有领域作品，服务器从 source 指定的地方下载原文（python -m app.cli library fetch），切好章节存到 data/library/。",
+   "其余好书只列书名和推荐理由（not_pd），因为还在版权期，不放原文。",
+   "level：英文 L1（图画书、寓言）→ L4（初中原版）；grades 是建议年级（上海五四学制按统编册次）。",
+   "source.match：下载后核对书名，对不上时按书名在古腾堡目录里重新找。convert=t2s：繁体转简体。",
+   "下载不了的书（比如服务器访问不了维基文库），管理员可以在后台「书库」上传 txt 原文。"
+  ]
+ },
+ "levels": {
+  "L1": "第 1 级：图画书、寓言，一页几句话",
+  "L2": "第 2 级：经典童话、短章节书",
+  "L3": "第 3 级：中篇章节书（五六年级起）",
+  "L4": "第 4 级：初中原版经典"
+ },
+ "books": [
+  {
+   "id": "en-peter-rabbit",
+   "lang": "en",
+   "title": "The Tale of Peter Rabbit",
+   "title_zh": "彼得兔的故事",
+   "author": "Beatrix Potter",
+   "level": "L1",
+   "grades": [
+    "G2",
+    "G3",
+    "G4"
+   ],
+   "unit_name": "页",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 14838,
+    "match": "The Tale of Peter Rabbit"
+   },
+   "why": "最经典的英文图画书之一，全书只有一千来词，句子短，读完一本很有成就感。",
+   "page_words": 120,
+   "emoji": "🐇"
+  },
+  {
+   "id": "en-velveteen",
+   "lang": "en",
+   "title": "The Velveteen Rabbit",
+   "title_zh": "绒布小兔子",
+   "author": "Margery Williams",
+   "level": "L1",
+   "grades": [
+    "G3",
+    "G4",
+    "G5"
+   ],
+   "unit_name": "页",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 11757,
+    "match": "The Velveteen Rabbit"
+   },
+   "why": "温暖的短篇童话，讲「爱让玩具变真」，词汇不难，适合大声朗读。",
+   "page_words": 150,
+   "emoji": "🧸"
+  },
+  {
+   "id": "en-aesop",
+   "lang": "en",
+   "title": "Aesop's Fables",
+   "title_zh": "伊索寓言",
+   "author": "Aesop (tr. G. F. Townsend)",
+   "level": "L1",
+   "grades": [
+    "G3",
+    "G4",
+    "G5",
+    "G6"
+   ],
+   "unit_name": "则",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 21,
+    "match": "Aesop's Fables"
+   },
+   "why": "每则只有几句话，一天读几则，结尾一句寓意，适合练「读完说一句话」。",
+   "split": "titles",
+   "page_words": 150,
+   "emoji": "🦊"
+  },
+  {
+   "id": "en-just-so",
+   "lang": "en",
+   "title": "Just So Stories",
+   "title_zh": "原来如此的故事",
+   "author": "Rudyard Kipling",
+   "level": "L2",
+   "grades": [
+    "G3",
+    "G4",
+    "G5",
+    "G6"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 2781,
+    "match": "Just So Stories"
+   },
+   "why": "「大象的鼻子为什么这么长」这类好玩的来历故事，语言有节奏，特别适合听。",
+   "split": "titles",
+   "emoji": "🐘"
+  },
+  {
+   "id": "en-dolittle",
+   "lang": "en",
+   "title": "The Story of Doctor Dolittle",
+   "title_zh": "杜立德医生的故事",
+   "author": "Hugh Lofting",
+   "level": "L2",
+   "grades": [
+    "G3",
+    "G4",
+    "G5",
+    "G6"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 501,
+    "match": "The Story of Doctor Dolittle"
+   },
+   "why": "会说动物语言的医生去非洲救猴子，情节简单有趣，孩子很容易读进去。",
+   "emoji": "🦜"
+  },
+  {
+   "id": "en-pooh",
+   "lang": "en",
+   "title": "Winnie-the-Pooh",
+   "title_zh": "小熊维尼",
+   "author": "A. A. Milne",
+   "level": "L2",
+   "grades": [
+    "G3",
+    "G4",
+    "G5"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 67098,
+    "match": "Winnie-the-Pooh"
+   },
+   "why": "每章一个小故事，对话多、幽默，读起来轻松。",
+   "emoji": "🍯"
+  },
+  {
+   "id": "en-oz",
+   "lang": "en",
+   "title": "The Wonderful Wizard of Oz",
+   "title_zh": "绿野仙踪",
+   "author": "L. Frank Baum",
+   "level": "L2",
+   "grades": [
+    "G4",
+    "G5",
+    "G6",
+    "G7"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 55,
+    "match": "The Wonderful Wizard of Oz"
+   },
+   "why": "冒险路线清楚，每章一个小关卡，章节短，适合作为第一本英文章节书。",
+   "emoji": "🌪️"
+  },
+  {
+   "id": "en-alice",
+   "lang": "en",
+   "title": "Alice's Adventures in Wonderland",
+   "title_zh": "爱丽丝漫游奇境",
+   "author": "Lewis Carroll",
+   "level": "L3",
+   "grades": [
+    "G4",
+    "G5",
+    "G6",
+    "G7",
+    "G8"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 11,
+    "match": "Alice's Adventures in Wonderland"
+   },
+   "why": "想象力最强的经典，文字游戏多，建议配合听书读。",
+   "emoji": "🐰"
+  },
+  {
+   "id": "en-peter-pan",
+   "lang": "en",
+   "title": "Peter Pan",
+   "title_zh": "彼得·潘",
+   "author": "J. M. Barrie",
+   "level": "L3",
+   "grades": [
+    "G5",
+    "G6",
+    "G7",
+    "G8"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 16,
+    "match": "Peter Pan"
+   },
+   "why": "永远长不大的男孩，冒险和亲情都有；句子偏长，适合五年级以上。",
+   "emoji": "🧚"
+  },
+  {
+   "id": "en-pinocchio",
+   "lang": "en",
+   "title": "The Adventures of Pinocchio",
+   "title_zh": "木偶奇遇记",
+   "author": "Carlo Collodi (tr. C. Della Chiesa)",
+   "level": "L2",
+   "grades": [
+    "G4",
+    "G5",
+    "G6"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 500,
+    "match": "The Adventures of Pinocchio"
+   },
+   "why": "统编版四年级「快乐读书吧」推荐书目的英文版，中英对照读很合适。",
+   "emoji": "🤥"
+  },
+  {
+   "id": "en-happy-prince",
+   "lang": "en",
+   "title": "The Happy Prince and Other Tales",
+   "title_zh": "快乐王子",
+   "author": "Oscar Wilde",
+   "level": "L2",
+   "grades": [
+    "G4",
+    "G5",
+    "G6",
+    "G7"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 902,
+    "match": "The Happy Prince and Other Tales"
+   },
+   "why": "五篇短篇童话，语言优美，每篇一两天读完。",
+   "split": "titles",
+   "emoji": "🕊️"
+  },
+  {
+   "id": "en-grimm",
+   "lang": "en",
+   "title": "Grimms' Fairy Tales",
+   "title_zh": "格林童话",
+   "author": "Brothers Grimm",
+   "level": "L2",
+   "grades": [
+    "G3",
+    "G4",
+    "G5",
+    "G6"
+   ],
+   "unit_name": "篇",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 2591,
+    "match": "Grimms' Fairy Tales"
+   },
+   "why": "孩子大多听过中文版，读英文时故事熟悉、难度自然下降。统编三年级「快乐读书吧」推荐。",
+   "split": "titles",
+   "emoji": "🏰"
+  },
+  {
+   "id": "en-andersen",
+   "lang": "en",
+   "title": "Andersen's Fairy Tales",
+   "title_zh": "安徒生童话",
+   "author": "Hans Christian Andersen",
+   "level": "L2",
+   "grades": [
+    "G3",
+    "G4",
+    "G5",
+    "G6"
+   ],
+   "unit_name": "篇",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 1597,
+    "match": "Andersen's Fairy Tales"
+   },
+   "why": "统编三年级「快乐读书吧」推荐，中文熟悉的故事读英文版。",
+   "split": "titles",
+   "emoji": "🧜"
+  },
+  {
+   "id": "en-five-children",
+   "lang": "en",
+   "title": "Five Children and It",
+   "title_zh": "五个孩子和一个怪物",
+   "author": "E. Nesbit",
+   "level": "L3",
+   "grades": [
+    "G4",
+    "G5",
+    "G6",
+    "G7"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 778,
+    "match": "Five Children and It"
+   },
+   "why": "每天一个愿望、每天一场麻烦，章节独立，读得停不下来。",
+   "emoji": "🏖️"
+  },
+  {
+   "id": "en-jungle-book",
+   "lang": "en",
+   "title": "The Jungle Book",
+   "title_zh": "丛林之书",
+   "author": "Rudyard Kipling",
+   "level": "L3",
+   "grades": [
+    "G5",
+    "G6",
+    "G7",
+    "G8"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 236,
+    "match": "The Jungle Book"
+   },
+   "why": "狼孩毛克利的丛林故事，动物角色鲜明。",
+   "emoji": "🐺"
+  },
+  {
+   "id": "en-black-beauty",
+   "lang": "en",
+   "title": "Black Beauty",
+   "title_zh": "黑骏马",
+   "author": "Anna Sewell",
+   "level": "L3",
+   "grades": [
+    "G5",
+    "G6",
+    "G7",
+    "G8"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 271,
+    "match": "Black Beauty"
+   },
+   "why": "以马的口吻讲故事，章节短、词汇常用，适合练连续阅读。",
+   "emoji": "🐎"
+  },
+  {
+   "id": "en-secret-garden",
+   "lang": "en",
+   "title": "The Secret Garden",
+   "title_zh": "秘密花园",
+   "author": "Frances Hodgson Burnett",
+   "level": "L3",
+   "grades": [
+    "G6",
+    "G7",
+    "G8",
+    "G9"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 113,
+    "match": "The Secret Garden"
+   },
+   "why": "孤独的女孩找到一座被锁住的花园，成长主题，初中女孩特别喜欢。",
+   "emoji": "🌹"
+  },
+  {
+   "id": "en-little-princess",
+   "lang": "en",
+   "title": "A Little Princess",
+   "title_zh": "小公主",
+   "author": "Frances Hodgson Burnett",
+   "level": "L3",
+   "grades": [
+    "G5",
+    "G6",
+    "G7",
+    "G8"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 146,
+    "match": "A Little Princess"
+   },
+   "why": "从富家小姐到阁楼女佣，讲坚强和善良，语言比《秘密花园》容易一些。",
+   "emoji": "👑"
+  },
+  {
+   "id": "en-heidi",
+   "lang": "en",
+   "title": "Heidi",
+   "title_zh": "海蒂",
+   "author": "Johanna Spyri",
+   "level": "L3",
+   "grades": [
+    "G5",
+    "G6",
+    "G7",
+    "G8"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 1448,
+    "match": "Heidi"
+   },
+   "why": "阿尔卑斯山上的小女孩，节奏舒缓，适合睡前听。",
+   "emoji": "🏔️"
+  },
+  {
+   "id": "en-anne",
+   "lang": "en",
+   "title": "Anne of Green Gables",
+   "title_zh": "绿山墙的安妮",
+   "author": "L. M. Montgomery",
+   "level": "L4",
+   "grades": [
+    "G7",
+    "G8",
+    "G9"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 45,
+    "match": "Anne of Green Gables"
+   },
+   "why": "话多又爱幻想的安妮，对话生动，读完口语表达会变丰富。",
+   "emoji": "🏡"
+  },
+  {
+   "id": "en-wind-willows",
+   "lang": "en",
+   "title": "The Wind in the Willows",
+   "title_zh": "柳林风声",
+   "author": "Kenneth Grahame",
+   "level": "L4",
+   "grades": [
+    "G6",
+    "G7",
+    "G8",
+    "G9"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 289,
+    "match": "The Wind in the Willows"
+   },
+   "why": "河岸动物的友情，描写细腻，词汇量要求较高。",
+   "emoji": "🐸"
+  },
+  {
+   "id": "en-tom-sawyer",
+   "lang": "en",
+   "title": "The Adventures of Tom Sawyer",
+   "title_zh": "汤姆·索亚历险记",
+   "author": "Mark Twain",
+   "level": "L4",
+   "grades": [
+    "G6",
+    "G7",
+    "G8",
+    "G9"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 74,
+    "match": "The Adventures of Tom Sawyer"
+   },
+   "why": "统编六年级「快乐读书吧」推荐书目，原文有方言，配合听书。",
+   "emoji": "🛶"
+  },
+  {
+   "id": "en-treasure-island",
+   "lang": "en",
+   "title": "Treasure Island",
+   "title_zh": "金银岛",
+   "author": "Robert Louis Stevenson",
+   "level": "L4",
+   "grades": [
+    "G7",
+    "G8",
+    "G9"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 120,
+    "match": "Treasure Island"
+   },
+   "why": "海盗寻宝，悬念强，适合不爱读书的孩子。",
+   "emoji": "🏴‍☠️"
+  },
+  {
+   "id": "en-railway-children",
+   "lang": "en",
+   "title": "The Railway Children",
+   "title_zh": "铁路边的孩子们",
+   "author": "E. Nesbit",
+   "level": "L3",
+   "grades": [
+    "G5",
+    "G6",
+    "G7",
+    "G8"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 1874,
+    "match": "The Railway Children"
+   },
+   "why": "三个孩子在铁路边的生活和一个谜团，温暖、好读。",
+   "emoji": "🚂"
+  },
+  {
+   "id": "en-little-women",
+   "lang": "en",
+   "title": "Little Women",
+   "title_zh": "小妇人",
+   "author": "Louisa May Alcott",
+   "level": "L4",
+   "grades": [
+    "G7",
+    "G8",
+    "G9"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 514,
+    "match": "Little Women"
+   },
+   "why": "四姐妹的成长故事，篇幅长，适合读完前几本之后挑战。",
+   "emoji": "👭"
+  },
+  {
+   "id": "en-sherlock",
+   "lang": "en",
+   "title": "The Adventures of Sherlock Holmes",
+   "title_zh": "福尔摩斯探案集",
+   "author": "Arthur Conan Doyle",
+   "level": "L4",
+   "grades": [
+    "G8",
+    "G9"
+   ],
+   "unit_name": "篇",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 1661,
+    "match": "The Adventures of Sherlock Holmes"
+   },
+   "why": "12 个独立的短篇案子，逻辑推理，初二以上适合。",
+   "split": "titles",
+   "emoji": "🔍"
+  },
+  {
+   "id": "zh-xiyouji",
+   "lang": "zh",
+   "title": "西游记",
+   "author": "吴承恩",
+   "level": "",
+   "grades": [
+    "G5",
+    "G6",
+    "G7"
+   ],
+   "unit_name": "回",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 23962,
+    "match": "西遊記",
+    "convert": "t2s"
+   },
+   "why": "统编五年级下「快乐读书吧」和七年级上名著导读。原著是半文半白，第一遍可以只读精彩回目、配合听书。",
+   "emoji": "🐒"
+  },
+  {
+   "id": "zh-sanguo",
+   "lang": "zh",
+   "title": "三国演义",
+   "author": "罗贯中",
+   "level": "",
+   "grades": [
+    "G5",
+    "G7",
+    "G8",
+    "G9"
+   ],
+   "unit_name": "回",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 23950,
+    "match": "三國演義",
+    "convert": "t2s"
+   },
+   "why": "统编五年级下「快乐读书吧」推荐。原著语言偏文言，建议先听后读。",
+   "emoji": "⚔️"
+  },
+  {
+   "id": "zh-shuihu",
+   "lang": "zh",
+   "title": "水浒传",
+   "author": "施耐庵",
+   "level": "",
+   "grades": [
+    "G5",
+    "G9"
+   ],
+   "unit_name": "回",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 23863,
+    "match": "水滸傳",
+    "convert": "t2s"
+   },
+   "why": "统编五年级下「快乐读书吧」、九年级上名著导读。",
+   "emoji": "🗡️"
+  },
+  {
+   "id": "zh-honglou",
+   "lang": "zh",
+   "title": "红楼梦",
+   "author": "曹雪芹",
+   "level": "",
+   "grades": [
+    "G5",
+    "G9"
+   ],
+   "unit_name": "回",
+   "pd": true,
+   "source": {
+    "type": "gutenberg",
+    "id": 24264,
+    "match": "紅樓夢",
+    "convert": "t2s"
+   },
+   "why": "统编五年级下「快乐读书吧」推荐（读片段即可）、高中整本书阅读。",
+   "emoji": "🏮"
+  },
+  {
+   "id": "zh-zhaohua",
+   "lang": "zh",
+   "title": "朝花夕拾",
+   "author": "鲁迅",
+   "level": "",
+   "grades": [
+    "G7"
+   ],
+   "unit_name": "篇",
+   "pd": true,
+   "source": {
+    "type": "wikisource",
+    "page": "朝花夕拾",
+    "convert": "t2s"
+   },
+   "why": "统编七年级上必读名著，10 篇回忆童年的散文，《从百草园到三味书屋》在课本里。",
+   "emoji": "🌸"
+  },
+  {
+   "id": "zh-nahan",
+   "lang": "zh",
+   "title": "呐喊",
+   "author": "鲁迅",
+   "level": "",
+   "grades": [
+    "G8",
+    "G9"
+   ],
+   "unit_name": "篇",
+   "pd": true,
+   "source": {
+    "type": "wikisource",
+    "page": "吶喊",
+    "convert": "t2s"
+   },
+   "why": "《故乡》《社戏》《孔乙己》都出自这里，初中课文的原书。",
+   "emoji": "📢"
+  },
+  {
+   "id": "zh-luotuo",
+   "lang": "zh",
+   "title": "骆驼祥子",
+   "author": "老舍",
+   "level": "",
+   "grades": [
+    "G7"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "wikisource",
+    "page": "駱駝祥子",
+    "convert": "t2s"
+   },
+   "why": "统编七年级下必读名著，北京话、口语化，读起来不难。",
+   "emoji": "🐫"
+  },
+  {
+   "id": "zh-aide",
+   "lang": "zh",
+   "title": "爱的教育",
+   "author": "亚米契斯（夏丏尊 译）",
+   "level": "",
+   "grades": [
+    "G6"
+   ],
+   "unit_name": "篇",
+   "pd": true,
+   "source": {
+    "type": "wikisource",
+    "page": "愛的教育",
+    "convert": "t2s"
+   },
+   "why": "统编六年级上「快乐读书吧」推荐，夏丏尊 1924 年的经典译本，按日记分段，一天几篇。",
+   "emoji": "✉️"
+  },
+  {
+   "id": "zh-huolan",
+   "lang": "zh",
+   "title": "呼兰河传",
+   "author": "萧红",
+   "level": "",
+   "grades": [
+    "G5",
+    "G6"
+   ],
+   "unit_name": "章",
+   "pd": true,
+   "source": {
+    "type": "wikisource",
+    "page": "呼蘭河傳",
+    "convert": "t2s"
+   },
+   "why": "《祖父的园子》《火烧云》选自这本书，五年级课文的原书。",
+   "emoji": "🔥"
+  },
+  {
+   "id": "zh-sanzijing",
+   "lang": "zh",
+   "title": "三字经",
+   "author": "王应麟（传）",
+   "level": "",
+   "grades": [
+    "G1",
+    "G2",
+    "G3"
+   ],
+   "unit_name": "段",
+   "pd": true,
+   "source": {
+    "type": "wikisource",
+    "page": "三字經",
+    "convert": "t2s"
+   },
+   "why": "三字一句、押韵，适合跟着听、跟着念。",
+   "page_chars": 120,
+   "emoji": "📜"
+  },
+  {
+   "id": "zh-lunyu",
+   "lang": "zh",
+   "title": "论语",
+   "author": "孔子弟子及再传弟子",
+   "level": "",
+   "grades": [
+    "G6",
+    "G7",
+    "G8",
+    "G9"
+   ],
+   "unit_name": "篇",
+   "pd": true,
+   "source": {
+    "type": "wikisource",
+    "page": "論語",
+    "convert": "t2s"
+   },
+   "why": "初中课文《论语十二章》的出处，一天读几则。",
+   "emoji": "🎋"
+  }
+ ],
+ "not_pd": [
+  {
+   "title": "Charlotte's Web（夏洛的网）",
+   "author": "E. B. White",
+   "grades": [
+    "G3",
+    "G4",
+    "G5"
+   ],
+   "why": "最适合三四年级的英文章节书之一。"
+  },
+  {
+   "title": "Matilda / Charlie and the Chocolate Factory",
+   "author": "Roald Dahl",
+   "grades": [
+    "G4",
+    "G5",
+    "G6"
+   ],
+   "why": "幽默、好读，很多孩子靠它爱上英文书。"
+  },
+  {
+   "title": "Magic Tree House 系列",
+   "author": "Mary Pope Osborne",
+   "grades": [
+    "G2",
+    "G3",
+    "G4"
+   ],
+   "why": "分级明确的入门章节书，每本很短。"
+  },
+  {
+   "title": "Diary of a Wimpy Kid（小屁孩日记）",
+   "author": "Jeff Kinney",
+   "grades": [
+    "G4",
+    "G5",
+    "G6"
+   ],
+   "why": "图文结合，日常口语多，不爱读书的孩子也能读下去。"
+  },
+  {
+   "title": "Wonder（奇迹男孩）",
+   "author": "R. J. Palacio",
+   "grades": [
+    "G6",
+    "G7",
+    "G8"
+   ],
+   "why": "初中常用的整本书阅读书目。"
+  },
+  {
+   "title": "Harry Potter 系列",
+   "author": "J. K. Rowling",
+   "grades": [
+    "G6",
+    "G7",
+    "G8",
+    "G9"
+   ],
+   "why": "初中英文阅读的「升级挑战」。"
+  },
+  {
+   "title": "城南旧事",
+   "author": "林海音",
+   "grades": [
+    "G5",
+    "G6"
+   ],
+   "why": "统编五年级上「快乐读书吧」推荐。"
+  },
+  {
+   "title": "草房子",
+   "author": "曹文轩",
+   "grades": [
+    "G4",
+    "G5",
+    "G6"
+   ],
+   "why": "国内儿童文学经典。"
+  },
+  {
+   "title": "稻草人",
+   "author": "叶圣陶",
+   "grades": [
+    "G3"
+   ],
+   "why": "统编三年级上「快乐读书吧」推荐。"
+  },
+  {
+   "title": "寄小读者",
+   "author": "冰心",
+   "grades": [
+    "G5",
+    "G6"
+   ],
+   "why": "写给孩子的书信散文。"
+  },
+  {
+   "title": "红星照耀中国",
+   "author": "埃德加·斯诺",
+   "grades": [
+    "G8"
+   ],
+   "why": "统编八年级上必读名著（译本仍在版权期）。"
+  },
+  {
+   "title": "海底两万里（中译本）",
+   "author": "凡尔纳",
+   "grades": [
+    "G7"
+   ],
+   "why": "统编七年级下必读名著；原著是公版，但常见中译本仍在版权期。"
+  }
+ ]
+}
