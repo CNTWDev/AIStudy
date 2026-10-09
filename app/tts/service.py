@@ -1,4 +1,5 @@
 """TTS 服务本体：prepare（查/登记）+ open（读文件 / 边生成边读）。"""
+import logging
 import os
 import threading
 import time
@@ -11,6 +12,7 @@ from .text import cache_key, normalize
 
 STALE_SECONDS = 180      # .part 超过这么久没变化，认为生成它的进程已经没了
 CHUNK = 16 * 1024
+log = logging.getLogger("tts")
 
 
 class TTSError(Exception):
@@ -147,6 +149,7 @@ class TTS:
                 os.close(fd)
             _unlink(part)
             self.index.update(rec["key"], status="failed", error=str(e)[:500])
+            log.warning("朗读生成失败（%s，%s）：%s", rec["lang"], rec["text"][:40], e)
         finally:
             first.set()
 

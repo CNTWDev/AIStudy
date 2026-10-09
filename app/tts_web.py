@@ -4,6 +4,7 @@
   POST /api/tts {text, lang, use}  → {url, cached}；不能朗读时 {fallback: true, why}（前端改用浏览器自带朗读）
   GET  /tts/<key>                  → 音频（有文件读文件，没有就边生成边播放并写盘）
 """
+import logging
 import os
 import time
 from pathlib import Path
@@ -21,6 +22,7 @@ USES = ("word", "sentence", "passage")
 AUDITION_SPEEDS = (0.6, 0.7, 0.8, 0.9)
 
 router = APIRouter()
+log = logging.getLogger("aistudy.tts")
 
 
 class DBIndex:
@@ -117,8 +119,17 @@ def tts_audio(request: Request, key: str):
     except KeyError:
         raise HTTPException(404)
     except TTSError as e:
+        log.warning("朗读失败 %s：%s", key, e)
         raise HTTPException(503, str(e))
     return StreamingResponse(chunks, media_type=s.content_type, headers={"Cache-Control": "no-store"})
+
+
+@router.get("/api/tts/status/{key}")
+def tts_status(request: Request, key: str):
+    """播放失败时前端来问原因：这段的状态和上次生成失败的报错。"""
+    auth.require_user(request)
+    r = DBIndex().get(key) or {}
+    return {"status": r.get("status", "missing"), "error": r.get("error", ""), "file": service().path(key).exists()}
 
 
 @router.get("/api/admin/tts/voices")

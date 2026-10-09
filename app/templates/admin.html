@@ -404,7 +404,11 @@ $$('[data-sp]').forEach(b => b.onclick = async () => {
   $('#ttsmsg').textContent = '';
   const r = await api('/api/tts', {text: $('#ttstext').value, lang: $('#ttslang').value, use: 'passage', speed: +b.dataset.sp});
   if (r.fallback) { $('#ttsmsg').textContent = '还不能用：' + r.why; return; }
-  Speak.stop(); Speak.file(r.url, Speak.n).catch(() => { $('#ttsmsg').textContent = '播放失败'; });
+  Speak.stop(); Speak.file(r.url, Speak.n).catch(async () => {
+    let why = '';
+    try { const st = await api('/api/tts/status/' + r.key); why = st.error || (st.file ? '音频生成了，但浏览器放不出来（看看电脑有没有静音，或换个浏览器）' : '生成没有完成，看服务器日志'); } catch (e) { why = e.message; }
+    $('#ttsmsg').textContent = '播放失败：' + why;
+  });
   $('#ttsmsg').textContent = (r.cached ? '读缓存 ' : '新生成 ') + b.dataset.sp;
 });
 </script>

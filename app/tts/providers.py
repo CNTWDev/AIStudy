@@ -72,8 +72,9 @@ class Cartesia(Provider):
         return ""
 
     def _headers(self):
-        return {"Authorization": f"Bearer {self.s.api_key}", "Cartesia-Version": self.version,
-                "Content-Type": "application/json"}
+        # 文档里 bytes 接口写的是 Bearer，WebSocket 写的是 X-API-Key：两个都带上
+        return {"Authorization": f"Bearer {self.s.api_key}", "X-API-Key": self.s.api_key,
+                "Cartesia-Version": self.version, "Content-Type": "application/json"}
 
     def stream(self, text, *, lang, voice, speed):
         import httpx
