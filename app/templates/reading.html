@@ -5,6 +5,7 @@
 {% if r.source and r.source.startswith('web:') %}<p class="small muted">来自 <a href="{{ r.source[4:] }}" target="_blank" rel="noopener noreferrer">{{ r.source[4:].split('/')[2] if r.source[4:].count('/') >= 2 else r.source[4:] }}</a>（只供自己学习阅读）</p>{% endif %}
 <p class="muted small">{{ '点一下不懂的单词就能查。' if r.lang == 'en' else '用手指长按/鼠标选中不懂的字词就能查；点一个句子可以问「这句什么意思」。' }} 已查 <span id="nlook">{{ looked|length }}</span> 个。</p>
 <div class="row" style="margin-bottom:8px"><input type="text" id="manual" class="grow" placeholder="也可以直接输入要查的词"><button class="btn sm" id="manualbtn">查</button></div>
+<div id="listenhere"></div>
 <div class="card reader" id="reader" lang="{{ 'en' if r.lang == 'en' else 'zh-CN' }}">{% for p in paras %}<p>{{ p }}</p>{% endfor %}</div>
 {% if questions %}
 <div class="card" id="qs"><h3 style="margin-top:0">读完了？做 {{ questions|length }} 道小题</h3>
@@ -29,6 +30,7 @@ $$('#reader p').forEach(p => {
     p.innerHTML = text.split(/(?<=[。！？；!?])/).map(s => `<span class="s">${esc(s)}</span>`).join('');
   }
 });
+Listen.mount($$('#reader p'), {lang: LANG, bar: $('#listenhere')});
 function sentenceOf(el) {
   const para = el.closest('p').textContent;
   if (LANG !== 'en') return el.closest('.s') ? el.closest('.s').textContent : para;
@@ -44,14 +46,14 @@ async function lookup(q, ctx, el) {
   try { r = await api('/api/lookup', {q, context: ctx, lang: LANG, reading_id: RID}); }
   catch (e) { openSheet(`<h2 style="margin-top:0">${esc(q)}</h2><div class="err">${esc(e.message)}</div>` + manualSave(q, ctx)); bindManual(q, ctx); return; }
   if (el) el.classList.add('seen'); looked.add(q.toLowerCase()); $('#nlook').textContent = looked.size;
-  const head = LANG === 'en' ? `${esc(r.word || q)} <span class="muted small">${esc(r.phonetic || '')} ${esc(r.pos || '')}</span>` : `${esc(r.word || q)} <span class="muted small">${esc(r.pinyin || '')}</span>`;
+  const head = (LANG === 'en' ? `${esc(r.word || q)} <span class="muted small">${esc(r.phonetic || '')} ${esc(r.pos || '')}</span>` : `${esc(r.word || q)} <span class="muted small">${esc(r.pinyin || '')}</span>`) + ' ' + sayBtn(r.word || q, LANG);
   openSheet(`<h2 style="margin-top:0">${head}</h2>
     <p><b>${esc(r.meaning)}</b>${r.simple_en ? `<br><span class="muted small">${esc(r.simple_en)}</span>` : ''}</p>
     ${r.other_meanings && r.other_meanings.length ? `<p class="small">其他意思：${r.other_meanings.map(esc).join('；')}</p>` : ''}
     ${r.near && r.near.length ? `<p class="small">近义：${r.near.map(esc).join('、')}${r.opposite && r.opposite.length ? '　反义：' + r.opposite.map(esc).join('、') : ''}</p>` : ''}
-    ${r.example ? `<p class="small">例：${esc(r.example)}${r.example_zh ? `<br><span class="muted">${esc(r.example_zh)}</span>` : ''}</p>` : ''}
+    ${r.example ? `<p class="small">例：${esc(r.example)} ${sayBtn(r.example, LANG)}${r.example_zh ? `<br><span class="muted">${esc(r.example_zh)}</span>` : ''}</p>` : ''}
     ${r.tip ? `<div class="hint">💡 ${esc(r.tip)}</div>` : ''}
-    <p class="small muted">原句：${esc(ctx)}</p>
+    <p class="small muted">原句：${esc(ctx)} ${sayBtn(ctx, LANG)}</p>
     <div class="row"><button class="btn" id="fav">⭐ 收藏到生词本</button><button class="btn ghost" id="expl">这句看不懂</button></div>
     <div id="favmsg"></div>
     <h3>✏️ 用它造个句子</h3><div class="row"><input type="text" id="mysent" class="grow" placeholder="${LANG === 'en' ? 'Write a sentence with ' + esc(r.word || q) : '用「' + esc(r.word || q) + '」写一句话'}"><button class="btn sm" id="chk">让 AI 看看</button></div><div id="sentfb"></div><div id="explbox"></div>`);

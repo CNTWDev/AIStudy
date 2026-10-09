@@ -6,4 +6,5 @@ __pycache__/
 venv/
 .pytest_cache/
 config/llm.toml
+config/tts.toml
 *.sql.gz

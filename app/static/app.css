@@ -436,3 +436,10 @@ transition:border-color .15s,background .15s,transform .12s;height:100%}
 .trend-leg .pt-i.few{background:var(--card);border:1.5px solid var(--brand-ink)}
 .trend-leg .avg-i{width:18px;height:0;border-radius:0;border-top:2.5px solid var(--brand-ink)}
 .trend-leg .g80-i{width:18px;height:0;border-radius:0;border-top:1px dashed var(--ok)}
+/* 朗读 */
+.btn.say{min-height:32px;padding:2px 8px;font-size:15px;vertical-align:middle}.btn.say.saying{animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.45}}
+.listenbar{position:sticky;top:8px;z-index:15;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px;margin:8px 0;
+background:color-mix(in srgb,var(--card) 94%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.listenbar .on{background:var(--learn-2);color:var(--learn)}
+.lp{transition:background .3s;border-radius:8px}.lp.reading{background:var(--learn-2);box-shadow:0 0 0 6px var(--learn-2)}

@@ -35,13 +35,15 @@ async def lifespan(app):
 app = FastAPI(title="beejoy", lifespan=lifespan)
 app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY, max_age=60 * 60 * 24 * 60,
                    same_site="lax", https_only=config.HTTPS_ONLY)
+from . import tts_web  # noqa: E402
+app.include_router(tts_web.router)
 app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), name="static")
 templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
                              stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock,
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES,
-                             trend_words=records.trend_words)
+                             trend_words=records.trend_words, tts_info=tts_web.client_info)
 templates.env.globals.update(MASCOTS=brand.MASCOTS, mascot_of=brand.mascot_of, mascot_chosen=brand.has_chosen, mascot_svg=brand.mascot_svg,
                              wordmark_svg=brand.wordmark_svg)
 # 样式和脚本的地址带上文件修改时间，升级后浏览器不会继续用缓存里的旧版本
@@ -428,7 +430,8 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
         from . import migrate
         ctx["admins"] = [u for u in users if u["role"] == "admin" or u["is_admin"]]
         ctx.update(reg_mode=sitecfg.registration(), reg_modes=sitecfg.REG_MODES, site={k: sitecfg.get(k) for k in sitecfg.DEFAULTS},
-                   llm_status=llm.check(), migrations=migrate.status(),
+                   llm_status=llm.check(), migrations=migrate.status(), tts_status=tts_web.check(), tts_stats=tts_web.stats(),
+                   tts_speeds=tts_web.service().s.speeds, tts_audition=tts_web.AUDITION_SPEEDS,
                    version=_version(), db_dialect=db.DIALECT)
     ctx["me"] = a
     return render(request, "admin.html", **ctx)

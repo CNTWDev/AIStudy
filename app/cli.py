@@ -65,6 +65,9 @@ def check(with_llm: bool) -> int:
                 _ok(True, f"AI 实际调用成功：{out}")
             except llm.LLMError as e:
                 good &= _ok(False, f"AI 实际调用失败：{e}")
+    from . import tts_web
+    ok, why = tts_web.check()
+    print(f"  [{' OK ' if ok else 'INFO'}] 朗读：{why}" + ("" if ok else "（用浏览器自带的声音）"))
     print("全部正常" if good else "有问题需要处理（见上面 [FAIL]）")
     return 0 if good else 1
 
