@@ -9,7 +9,7 @@
 {% set t = active.get(kind) %}
 {% if t %}
 <div class="hint">正在{{ label }}：<b>{{ t.title }}</b> · 已完成 {{ t.position }}{% if t.total_units %}/{{ t.total_units }}{% endif %} {{ t.unit_name }}
-  {% if kind == 'words' %}· 每天 {{ t.daily_amount }} 个新词{% else %}· 每天 {{ t.daily_amount }} {{ t.unit_name }}、{{ t.daily_minutes }} 分钟 · 明天：{{ seg[kind].label }}{% endif %}
+  {% if kind == 'words' %}· 每天 {{ t.daily_amount }} 个新词{% elif kind == 'listen' %}· 每天 {{ t.daily_minutes }} 分钟{% else %}· 每天 {{ t.daily_amount }} {{ t.unit_name }}、{{ t.daily_minutes }} 分钟 · 明天：{{ seg[kind].label }}{% endif %}
   <form method="post" action="/parent/kids/{{ k.id }}/tracks" class="row" style="margin-top:6px">
     <input type="hidden" name="kind" value="{{ kind }}">
     <span class="small">把进度改成已完成</span><input type="number" name="position" value="{{ t.position }}" min="0" style="width:90px">
@@ -27,6 +27,9 @@
     <input type="hidden" name="kind" value="read_zh">
     <label>选一本书（按年级排列，带 ★ 的是统编教材「快乐读书吧 / 名著导读」要求的）</label>
     <select name="ref" onchange="this.form.querySelector('.custom').style.display = this.value === 'custom' ? '' : 'none'">
+      {% if lib.zh %}<optgroup label="📚 网站书库（在网上读、能听，按页算，每页约 600 字）">
+        {% for b in lib.zh %}<option value="lib:{{ b.id }}">{{ b.emoji }} {{ b.title_zh or b.title }}{% if b.title_zh %} · {{ b.title }}{% endif %} · {{ b.n_pages }} 页{% if k.grade in b.grades %} ★{% endif %}</option>{% endfor %}
+      </optgroup>{% endif %}
       {% for g, books in content.zh_by_grade() %}<optgroup label="{{ stage_label(g) }}">
         {% for b in books %}<option value="{{ b.id }}" title="{{ b.term or '' }} {{ b.daily_amount if b.daily_amount is string else '' }}">{{ '★ ' if b.type == 'required' }}{{ b.title }}{% if b.author %}（{{ b.author }}）{% endif %}{% if b.total_units %} · {{ b.total_units }}{{ b.unit_name }}{% endif %}</option>{% endfor %}
       </optgroup>{% endfor %}
@@ -38,7 +41,7 @@
         <div><label>单位</label><input type="text" name="unit_name" value="章" style="width:70px"></div></div>
     </div>
     <div class="row">
-      <div><label>每天读几{{ '章/回' }}</label><input type="number" name="daily_amount" value="1" min="1" max="10"></div>
+      <div><label>每天读几{{ '章/回' }}（书库的书：几页）</label><input type="number" name="daily_amount" value="1" min="1" max="10"></div>
       <div><label>每天几分钟</label><input type="number" name="daily_minutes" value="15" min="5" max="90"></div>
       <div><label>已经读完几章</label><input type="number" name="position" value="0" min="0"></div>
     </div>
@@ -55,6 +58,9 @@
   <form method="post" action="/parent/kids/{{ k.id }}/tracks">
     <input type="hidden" name="kind" value="read_en">
     <select name="ref" onchange="this.form.querySelector('.custom').style.display = this.value === 'custom' ? '' : 'none'">
+      {% if lib.en %}<optgroup label="📚 网站书库（在网上读、能听，按页算，每页约 250 词）">
+        {% for b in lib.en %}<option value="lib:{{ b.id }}">{{ b.emoji }} {{ b.title_zh or b.title }}{% if b.title_zh %} · {{ b.title }}{% endif %} · {{ b.n_pages }} 页{% if k.grade in b.grades %} ★{% endif %}</option>{% endfor %}
+      </optgroup>{% endif %}
       {% for lv in content.en_levels %}<optgroup label="{{ lv.id }}{% if lv.headwords %}（约 {{ lv.headwords }} 词）{% endif %}">
         {% for b in lv.books %}<option value="{{ b.id }}">{{ b.title }}{% if b.series %} · {{ b.series }}{% endif %}{% if b.level %} {{ b.level }}{% endif %}</option>{% endfor %}
       </optgroup>{% endfor %}
@@ -66,11 +72,25 @@
         <input type="hidden" name="unit_name" value="章"></div>
     </div>
     <div class="row">
-      <div><label>每天读几章</label><input type="number" name="daily_amount" value="1" min="1" max="10"></div>
+      <div><label>每天读几章（书库的书：几页）</label><input type="number" name="daily_amount" value="1" min="1" max="10"></div>
       <div><label>每天几分钟</label><input type="number" name="daily_minutes" value="15" min="5" max="90"></div>
     </div>
     <div style="margin-top:10px"><button class="btn">{{ '换成这本' if active.read_en else '开始读' }}</button></div>
   </form>
+</div>
+
+<div class="card">
+  <div class="card-h"><span class="ico">🎧</span><h3>每天听书</h3></div>
+  {{ current('listen', '听') }}
+  <p class="muted small">从书库里选一本，孩子每天跟着声音看文字（正在读的段落会亮起来），听够时间自动完成。可以和「读」选同一本（先听后读），也可以选一本更难的只听。声音由朗读服务生成，同一段只生成一次。</p>
+  {% if lib.en or lib.zh %}
+  <form method="post" action="/parent/kids/{{ k.id }}/tracks">
+    <input type="hidden" name="kind" value="listen">
+    <select name="ref">{% for l, name in (('en', '英文'), ('zh', '中文')) %}{% if lib[l] %}<optgroup label="{{ name }}">{% for b in lib[l] %}<option value="lib:{{ b.id }}">{{ b.emoji }} {{ b.title_zh or b.title }}{% if k.grade in b.grades %} ★{% endif %}</option>{% endfor %}</optgroup>{% endif %}{% endfor %}</select>
+    <div class="row"><div><label>每天听几分钟</label><input type="number" name="daily_minutes" value="10" min="5" max="60"></div></div>
+    <div style="margin-top:10px"><button class="btn">{{ '换成这本' if active.listen else '开始听' }}</button></div>
+  </form>
+  {% else %}<p class="small">书库里的书还没下载好（管理员在「管理 → 书库」里下载）。</p>{% endif %}
 </div>
 
 <div class="card">
@@ -102,5 +122,5 @@
 {% endif %}
 
 {% if history %}<div class="card"><h3 style="margin-top:0">读过 / 学过的</h3>
-{% for t in history %}<p class="small">{{ {'read_zh':'📕','read_en':'📘','words':'🔤'}[t.kind] }} {{ t.title }} · 完成 {{ t.position }}{% if t.total_units %}/{{ t.total_units }}{% endif %} {{ t.unit_name }} · {{ t.created_at[:10] }} 开始</p>{% endfor %}</div>{% endif %}
+{% for t in history %}<p class="small">{{ {'read_zh':'📕','read_en':'📘','listen':'🎧','words':'🔤'}[t.kind] }} {{ t.title }} · 完成 {{ t.position }}{% if t.total_units %}/{{ t.total_units }}{% endif %} {{ t.unit_name }} · {{ t.created_at[:10] }} 开始</p>{% endfor %}</div>{% endif %}
 {% endblock %}

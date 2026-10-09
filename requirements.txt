@@ -8,3 +8,4 @@ anthropic>=1.0
 psycopg[binary]>=3.2
 psycopg-pool>=3.2
 tomli>=2.0; python_version < "3.11"
+opencc-python-reimplemented>=0.1.7  # 书库：繁体原文转简体

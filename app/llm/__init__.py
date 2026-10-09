@@ -7,11 +7,11 @@
 """
 from .base import ChatRequest, LLMError, Provider, register
 from .service import ask_json, check, enabled, model_of, ping, reload, settings
-from .tasks import PROMPT_VERSION, ask_tutor, explain_sentence, generate_items, kp_context, lookup, make_passage, make_variant, parse_paper, sentence_feedback, solve_item, teach
+from .tasks import PROMPT_VERSION, ask_tutor, book_guide, explain_sentence, generate_items, kp_context, lookup, make_passage, make_variant, parse_paper, sentence_feedback, solve_item, teach
 
 __all__ = [
     "PROMPT_VERSION",
     "ChatRequest", "LLMError", "Provider", "register", "ask_json", "check", "enabled", "model_of", "ping", "reload", "settings",
-    "ask_tutor", "explain_sentence", "generate_items", "kp_context", "lookup", "make_passage", "make_variant", "parse_paper", "sentence_feedback",
+    "ask_tutor", "book_guide", "explain_sentence", "generate_items", "kp_context", "lookup", "make_passage", "make_variant", "parse_paper", "sentence_feedback",
     "solve_item", "teach",
 ]

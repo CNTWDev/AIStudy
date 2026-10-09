@@ -35,8 +35,9 @@ async def lifespan(app):
 app = FastAPI(title="beejoy", lifespan=lifespan)
 app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY, max_age=60 * 60 * 24 * 60,
                    same_site="lax", https_only=config.HTTPS_ONLY)
-from . import tts_web  # noqa: E402
+from . import library_web, tts_web  # noqa: E402
 app.include_router(tts_web.router)
+app.include_router(library_web.router)
 app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), name="static")
 templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
@@ -907,8 +908,10 @@ def kid_plan_page(request: Request, kid_id: int, msg: str = ""):
     k = auth.kid_of(p, kid_id)
     all_tracks = engine.tracks(kid_id, active_only=False)
     active = {t["kind"]: t for t in all_tracks if t["active"]}
+    from .library import library
     return render(request, "kid_plan.html", k=k, active=active, history=[t for t in all_tracks if not t["active"]],
-                  content=content, msg=msg, seg={kd: engine.track_today(t) for kd, t in active.items() if kd != "words"})
+                  content=content, msg=msg, seg={kd: engine.track_today(t) for kd, t in active.items() if kd != "words"},
+                  lib={l: sorted(library.shelf(l), key=lambda b: (k["grade"] not in b.get("grades", []), b.get("level", ""))) for l in ("en", "zh")})
 
 
 @app.post("/parent/kids/{kid_id}/tracks")
@@ -937,6 +940,18 @@ async def kid_tracks_save(request: Request, kid_id: int):
             if not wl:
                 raise HTTPException(400, "请选择词表")
             title, unit_name, units, total = wl["title"], "词", [], len(wl["words"])
+        elif ref.startswith("lib:"):  # 书库：按页算，进度接着孩子已经在网站上读到的地方
+            from .library import library
+            bid = ref[4:]
+            lb, lt = library.books.get(bid), library.text(bid)
+            if not lb or not lt:
+                raise HTTPException(400, "这本书的原文还没下载好")
+            title, unit_name, units, total = lb.get("title_zh") or lb["title"], "页", [], lt["n_pages"]
+            if not position:
+                from .library_web import progress
+                position = progress(kid_id, bid)["page"]
+        elif kind == "listen":
+            raise HTTPException(400, "听书请从书库里选一本")
         elif ref and ref != "custom":
             b = content.book(ref)
             if not b:

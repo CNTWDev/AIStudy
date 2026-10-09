@@ -439,7 +439,29 @@ transition:border-color .15s,background .15s,transform .12s;height:100%}
 /* 朗读 */
 .btn.say{min-height:32px;padding:2px 8px;font-size:15px;vertical-align:middle}.btn.say.saying{animation:pulse 1s infinite}
 @keyframes pulse{50%{opacity:.45}}
-.listenbar{position:sticky;top:8px;z-index:15;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px;margin:8px 0;
+.listenbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px;margin:8px 0;
 background:color-mix(in srgb,var(--card) 94%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
 .listenbar .on{background:var(--learn-2);color:var(--learn)}
 .lp{transition:background .3s;border-radius:8px}.lp.reading{background:var(--learn-2);box-shadow:0 0 0 6px var(--learn-2)}
+/* 书库 */
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:10px 0 18px}
+.book{display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:16px;background:var(--card);border:1px solid var(--line);color:var(--ink);box-shadow:var(--shadow);transition:transform .15s}
+.book:hover{transform:translateY(-2px);color:var(--ink)}.book b{font-size:15px;line-height:1.3}.book .daybar{height:8px;margin:2px 0 0}
+.cover{display:flex;align-items:center;justify-content:center;height:96px;border-radius:12px;font-size:44px;
+background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 70% 78%))}
+@media (prefers-color-scheme:dark){.cover{background:linear-gradient(150deg,hsl(var(--h) 30% 26%),hsl(calc(var(--h) + 40) 30% 20%))}}
+.cover.big{width:110px;height:140px;flex:none;font-size:56px}
+.bookhead{display:flex;gap:16px;align-items:flex-start;margin:10px 0}
+.chmap{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.chmap .ch{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.chmap .ch .n{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--line-2);font-weight:700;font-size:13px}
+.chmap .ch .t{flex:1;font-size:14px;line-height:1.3}.chmap .ch.done .n{background:var(--ok-2);color:var(--ok)}
+.chmap .ch.now{border-color:var(--learn);box-shadow:0 0 0 3px var(--learn-2)}
+.chtitle{text-align:center;margin:14px 0 6px}
+.book-text{font-size:19px;line-height:1.85}.book-text.big{font-size:22px}.book-text.bigger{font-size:26px;line-height:1.9}
+.book-text p{margin:0 0 .9em;position:relative}
+.paraq{margin-left:6px;border:1px solid var(--line);background:var(--card);color:var(--faint);border-radius:8px;font-size:12px;padding:0 6px;cursor:pointer;vertical-align:middle;line-height:1.6}
+.paraq:hover{color:var(--ink)}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:14px 0 30px}
+.prep .chip .btn.say{min-height:24px;padding:0 4px;font-size:13px}
+#listenhere{position:sticky;top:64px;z-index:15}

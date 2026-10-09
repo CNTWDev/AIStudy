@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="row" style="justify-content:space-between">
+  <a href="/books/{{ b.id }}" class="small">← {{ b.title_zh or b.title }}</a>
+  <span class="small muted">{% if goal %}今天 <b id="tpages">{{ today.pages }}</b> / {{ goal }} 页{% else %}今天读了 <b id="tpages">{{ today.pages }}</b> 页{% endif %}
+    {% if lgoal %} · 听 <b id="tmin">{{ (today.listen_seconds / 60)|round|int }}</b> / {{ lgoal }} 分钟{% endif %}
+    · <button class="linkbtn" id="fsize" title="字大一点 / 小一点">Aa</button></span>
+</div>
+{% if pg.first %}
+<h1 class="chtitle">{{ pg.chapter_title }}</h1>
+<div id="prep" class="card prep" hidden></div>
+{% else %}
+<div class="small muted" style="margin:6px 0">{{ pg.chapter_title }} · 第 {{ pg.page_in_chapter }} / {{ pg.chapter_pages }} 页</div>
+{% endif %}
+<div id="listenhere"></div>
+<div class="card reader book-text" id="reader" lang="{{ 'en' if b.lang == 'en' else 'zh-CN' }}">{% for x in pg.paras %}<p>{{ x }}</p>{% endfor %}</div>
+{% if pg.last %}<div id="after" class="card" hidden></div>{% endif %}
+<div class="pager">
+  {% if pg.n > 1 %}<a class="btn ghost" href="/books/{{ b.id }}/p/{{ pg.n - 1 }}{{ '?listen=1' if listen }}">‹ 上一页</a>{% else %}<span></span>{% endif %}
+  <span class="muted small">{{ pg.n }} / {{ pg.total }}</span>
+  {% if pg.n < pg.total %}<a class="btn" id="next" href="/books/{{ b.id }}/p/{{ pg.n + 1 }}{{ '?listen=1' if listen }}">下一页 ›</a>
+  {% else %}<button class="btn" id="next">读完了 🎉</button>{% endif %}
+</div>
+<div class="sheet" id="sheet"><button class="btn ghost sm close" onclick="closeSheet()">关闭</button><div id="sheetbody"></div></div>
+<script>
+const BID = {{ b.id|tojson }}, LANG = {{ b.lang|tojson }}, PAGE = {{ pg.n }}, TOTAL = {{ pg.total }}, CH = {{ pg.chapter }};
+const LISTEN = {{ 'true' if listen else 'false' }}, KID = !!document.body.dataset.kid, LAST = {{ 'true' if pg.last else 'false' }};
+const UNIT = {{ b.unit_name|tojson }};
+Run.start('read', {race: false});
+// 字号（只记在这台设备上）
+const FS = ['', 'big', 'bigger'];
+let fs = 0; try { fs = +(localStorage.getItem('bookfs') || 0); } catch (e) {}
+const applyFs = () => { $('#reader').classList.remove('big', 'bigger'); if (FS[fs]) $('#reader').classList.add(FS[fs]); };
+applyFs(); $('#fsize').onclick = () => { fs = (fs + 1) % 3; applyFs(); try { localStorage.setItem('bookfs', fs); } catch (e) {} };
+
+// 英文：每个词都能点；中文：选中字词就能查
+function openSheet(html) { $('#sheetbody').innerHTML = html; $('#sheet').classList.add('on'); }
+function closeSheet() { $('#sheet').classList.remove('on'); }
+if (LANG === 'en') $$('#reader p').forEach(p => { p.innerHTML = p.textContent.split(/([A-Za-z][A-Za-z'’-]*)/).map((s, i) => i % 2 ? `<span class="w">${esc(s)}</span>` : esc(s)).join(''); });
+function sentenceOf(el) {
+  const para = el.closest('p').textContent, sents = para.match(/[^.!?]+[.!?]*["”’]?\s*/g) || [para];
+  let pos = 0, before = 0; for (const n of el.closest('p').childNodes) { if (n === el) { before = pos; break; } pos += n.textContent.length; }
+  let acc = 0; for (const s of sents) { if (before < acc + s.length) return s.trim(); acc += s.length; } return para;
+}
+async function lookup(q, ctx, el) {
+  openSheet(`<h2 style="margin-top:0">${esc(q)}</h2><span class="loading">正在查</span>`);
+  try {
+    const r = await api('/api/lookup', {q, context: ctx, lang: LANG, auto: true, page: location.pathname});
+    if (el) el.classList.add('seen');
+    openSheet(`<h2 style="margin-top:0">${esc(r.word || q)} <span class="muted small">${esc(r.phonetic || r.pinyin || '')} ${esc(r.pos || '')}</span> ${sayBtn(r.word || q, LANG)}</h2>
+      <p><b>${esc(r.meaning || '')}</b>${r.simple_en ? `<br><span class="muted small">${esc(r.simple_en)}</span>` : ''}</p>
+      ${r.example ? `<p class="small">例：${esc(r.example)} ${sayBtn(r.example, LANG)}${r.example_zh ? `<br><span class="muted">${esc(r.example_zh)}</span>` : ''}</p>` : ''}
+      <p class="small muted">原句：${esc(ctx)} ${sayBtn(ctx, LANG)}</p>
+      <div class="row">${r.auto_added ? `<span class="small" style="color:var(--ok)">✓ 已自动加入复习（${esc(r.auto_added)}）</span>` : `<button class="btn sm" id="fav">⭐ 收藏到生词本</button>`}
+      <button class="btn ghost sm" id="tr">🌐 这句什么意思</button></div><div id="trbox"></div>`);
+    if ($('#fav')) $('#fav').onclick = async () => { await api('/api/collect', {text: r.word || q, meaning: r.meaning || '', context: ctx, page: location.pathname}); $('#fav').outerHTML = '<span class="small" style="color:var(--ok)">✓ 已收藏，明天开始复习</span>'; };
+    $('#tr').onclick = () => explain(ctx);
+  } catch (e) { openSheet(`<h2 style="margin-top:0">${esc(q)}</h2><div class="err">${esc(e.message)}</div>`); }
+}
+async function explain(s) {
+  const box = $('#trbox') || $('#sheetbody'); box.innerHTML = '<span class="loading">正在想</span>';
+  try { const r = await api('/api/translate', {text: s, page: location.pathname}); box.innerHTML = `<p><b>${esc(r.meaning || '')}</b></p>${r.structure ? `<p class="small">🧩 ${esc(r.structure)}</p>` : ''}`; }
+  catch (e) { box.innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+}
+$('#reader').addEventListener('click', e => {
+  const w = e.target.closest('.w'); if (w && !Listen.on) lookup(w.textContent, sentenceOf(w), w);
+});
+// 每段末尾一个小按钮：这段看不懂 → 翻译 / 讲一讲（AI 结果有缓存）
+$$('#reader p').forEach(p => { const b = document.createElement('button'); b.className = 'paraq'; b.textContent = LANG === 'en' ? '中' : '?'; b.title = '这段看不懂'; b.onclick = e => { e.stopPropagation(); openSheet(`<p class="small muted">${esc(p.textContent.slice(0, 400))}</p><div id="trbox"></div>`); explain(p.textContent.slice(0, 600)); }; p.appendChild(b); });
+
+// 读前：上回说到 + 关键词 + 带着问题读（每章第一页）
+async function loadGuide() {
+  if (!$('#prep') && !LAST) return null;
+  let g = {};
+  try { g = await api(`/api/books/${BID}/guide/${CH}`); } catch (e) {}
+  if ($('#prep') && (g.recap || g.hook || (g.words || []).length)) {
+    $('#prep').innerHTML = (g.recap ? `<p class="small"><b>上回说到</b>：${esc(g.recap)}</p>` : '') +
+      ((g.words || []).length ? `<p class="small"><b>先认识这几个${LANG === 'en' ? '词' : '字词'}</b></p><div class="chips">${g.words.map(w => `<span class="chip">${esc(w.w)} <span class="sub">${esc(w.zh || '')}${w.pinyin ? ' ' + esc(w.pinyin) : ''}</span> ${sayBtn(w.w, LANG)}</span>`).join('')}</div>` : '') +
+      (g.hook ? `<div class="hint">🔎 带着问题读：${esc(g.hook)}</div>` : '');
+    $('#prep').hidden = false;
+  }
+  return g;
+}
+const guideP = loadGuide();
+
+// 读完一页：翻页时记下（同一页只算一次）
+async function markRead() {
+  if (!KID) return null;
+  try { const r = await api(`/api/books/${BID}/read`, {page: PAGE}); $('#tpages').textContent = r.today.pages; return r; } catch (e) { return null; }
+}
+// 读完一章：两道小题 + 一句话说说，答对得一枚书签
+async function afterChapter() {
+  const g = await guideP || {};
+  const qs = (g.quiz || []).slice(0, 2);
+  const box = $('#after'); if (!box) return false;
+  box.innerHTML = `<h3 style="margin-top:0">🎉 这一${esc(UNIT)}读完了</h3>` + (g.gist ? `<p class="small muted">${LANG === 'en' ? '' : ''}</p>` : '') +
+    qs.map((q, i) => `<div class="rq" data-i="${i}" style="margin-bottom:10px"><b>${i + 1}. ${esc(q.q)}</b>${q.options.map((o, j) => `<button class="opt" data-o="${j}">${'ABC'[j]}. ${esc(o)}</button>`).join('')}<div class="fbq small"></div></div>`).join('') +
+    `<label>用一句话说说这${esc(UNIT)}讲了什么（写一个词也行，可以不写）</label><textarea id="sum" style="min-height:50px"></textarea>` +
+    `<div class="row" style="margin-top:8px"><button class="btn" id="done">完成 ✓</button>${g.gist ? `<button class="btn ghost sm" id="gist">看看概括</button>` : ''}</div><div id="gistbox"></div>`;
+  box.hidden = false; box.scrollIntoView({behavior: 'smooth', block: 'center'});
+  let right = 0;
+  $$('.rq', box).forEach(el => { const q = qs[+el.dataset.i]; $$('.opt', el).forEach(b => b.onclick = () => {
+    if (el.dataset.ans) return; el.dataset.ans = 1; const ok = +b.dataset.o === q.answer; if (ok) right++;
+    b.classList.add(ok ? 'right' : 'wrong'); if (!ok) $$('.opt', el)[q.answer].classList.add('right');
+    $('.fbq', el).textContent = (ok ? '✓ 对了！' : '再想想：') + (q.explain || ''); }); });
+  if ($('#gist')) $('#gist').onclick = () => { $('#gistbox').innerHTML = `<p class="small">${esc(g.gist)}</p>`; };
+  return new Promise(res => { $('#done').onclick = async () => {
+    $('#done').disabled = true;
+    try { const r = await api(`/api/books/${BID}/quiz/${CH}`, {right, summary: $('#sum').value}); if (r.bookmark) { toast('🔖 得到一枚书签！'); cheer(box); } } catch (e) {}
+    res(true);
+  }; });
+}
+$('#next').addEventListener('click', async e => {
+  e.preventDefault();
+  if (!KID) { if ($('#next').href) location.href = $('#next').href; return; }
+  const r = await markRead();
+  if (LAST && !LISTEN && $('#after') && $('#after').hidden) { await afterChapter(); }
+  if (r && r.finished) { toast('🎉 整本书读完了！'); cheer(); setTimeout(() => location.href = `/books/${BID}`, 1500); return; }
+  if ($('#next').href) location.href = $('#next').href;
+});
+
+// 听书：读完这一页自动翻页；正在读的段落高亮；每 30 秒记一次听书时间
+Listen.mount($$('#reader p'), {lang: LANG, bar: $('#listenhere'), onDone: async () => {
+  if (KID) await markRead();
+  if (PAGE < TOTAL && LISTEN) location.href = `/books/${BID}/p/${PAGE + 1}?listen=1&auto=1`;
+  else if (PAGE >= TOTAL) toast('🎉 听完了！');
+}});
+if (KID) { let acc = 0; setInterval(() => { if (Speak.playing && !document.hidden) acc++; if (acc >= 30) { const s = acc; acc = 0; api(`/api/books/${BID}/listen`, {page: PAGE, seconds: s}).then(r => { if ($('#tmin')) $('#tmin').textContent = Math.round(r.today.listen_seconds / 60); }).catch(() => {}); } }, 1000); }
+if (LISTEN && new URLSearchParams(location.search).get('auto')) setTimeout(() => Listen.play(), 400);
+</script>
+{% endblock %}
