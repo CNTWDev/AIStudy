@@ -105,3 +105,27 @@ def test_web_api():
 def app_():
     from app.main import app
     return app
+
+
+def test_failure_reason_is_visible(monkeypatch):
+    """厂商报错时：/tts/<key> 返回 503 带原因，/api/tts/status 也能查到原因（试听页显示出来）。"""
+    from app.tts.providers import TTSProviderError
+
+    def boom(self, text, **kw):
+        raise TTSProviderError("Cartesia 401：Invalid API key")
+        yield b""  # noqa
+    with TestClient(app_()) as c:
+        if c.get("/login").text.count("创建网站管理员账号"):
+            c.post("/register", data={"email": "admin@x.com", "password": "secret1", "name": "站长"})
+        else:
+            c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+        monkeypatch.setattr(Mock, "stream", boom)
+        r = c.post("/api/tts", json={"text": "This one will fail.", "lang": "en"}).json()
+        assert "url" in r, r
+        a = c.get(r["url"])
+        assert a.status_code == 503 and "Invalid API key" in a.text, (a.status_code, a.text[:200])
+        st = c.get("/api/tts/status/" + r["key"]).json()
+        assert st["status"] == "failed" and "Invalid API key" in st["error"] and not st["file"]
+        monkeypatch.undo()
+        assert c.get(r["url"]).status_code == 200  # 修好后再点一次就重新生成
+        assert c.get("/api/tts/status/" + r["key"]).json()["status"] == "ready"

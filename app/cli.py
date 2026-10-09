@@ -11,6 +11,7 @@
   python -m app.cli mark-weak 孩子邮箱 知识点ID ...    导入已知薄弱点（如以前的试卷分析）
   python -m app.cli bank-maintain                    手动跑一轮题库流水线（改编入库、校对答案、校准难度；平时后台自动跑）
   python -m app.cli backup [目标目录]                 备份数据库（PostgreSQL 用 pg_dump）
+  python -m app.cli tts-test [文字]                  朗读：不经过缓存真实调用一次，打印配置和厂商返回的原始报错
   python -m app.cli library fetch [--all] [书的id ...] 下载书库的公版原文（默认只下还没有的；--all 全部重新下载）
 """
 import os
@@ -73,6 +74,40 @@ def check(with_llm: bool) -> int:
     return 0 if good else 1
 
 
+def tts_test(text: str) -> int:
+    from . import tts_web
+    svc = tts_web.service()
+    s = svc.s
+    key = s.api_key
+    print(f"配置文件：{s.source or tts_web.TTS_CONFIG_FILE}")
+    print(f"提供方：{s.provider}  模型：{s.model}  API 版本：{s.api_version or '(默认)'}")
+    print(f"api_key：{(key[:8] + '…' + key[-4:]) if len(key) > 12 else ('(空)' if not key else '(太短)')}")
+    print(f"声音：{s.voices or '(没配)'}  语速：{s.speeds}")
+    if not svc.ready:
+        print(f"[FAIL] 还不能用：{svc.problem or '没开启'}")
+        return 1
+    lang = "zh" if any("\u4e00" <= ch <= "\u9fff" for ch in text) else "en"
+    voice = s.voice(lang)
+    if not voice:
+        print(f"[FAIL] 没给 {lang} 配声音（[voices] 里 {lang} = \"声音 id\"）")
+        return 1
+    try:
+        n = sum(len(c) for c in svc.provider.stream(text, lang=lang, voice=voice, speed=s.speed("sentence")))
+    except Exception as e:  # noqa: BLE001
+        print(f"[FAIL] 调用失败：{e}")
+        return 1
+    print(f"[ OK ] 生成成功：{n} 字节音频（{lang}，声音 {voice}）")
+    try:
+        tts_web.TTS_DIR.mkdir(parents=True, exist_ok=True)
+        probe = tts_web.TTS_DIR / ".write-test"
+        probe.write_text("ok"); probe.unlink()
+        print(f"[ OK ] 缓存目录可写：{tts_web.TTS_DIR}")
+    except OSError as e:
+        print(f"[FAIL] 缓存目录写不进去：{tts_web.TTS_DIR}（{e}）")
+        return 1
+    return 0
+
+
 def backup(target: Path) -> Path:
     target.mkdir(parents=True, exist_ok=True)
     stamp = f"{datetime.now():%Y%m%d-%H%M%S}"
@@ -130,6 +165,8 @@ def main(argv) -> int:
         return check("--llm" in args)
     if cmd == "check-curricula":
         return check_curricula()
+    if cmd == "tts-test":
+        return tts_test(" ".join(args) or "Hello, this is a test.")
     if cmd == "library":
         from .library import library
         if not args or args[0] != "fetch":
