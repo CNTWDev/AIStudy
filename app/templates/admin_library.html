@@ -5,12 +5,16 @@
 {% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
 <p class="muted small">只放公有领域的书。原文由服务器从古腾堡 / 维基文库下载（也可以命令行 <code>python -m app.cli library fetch</code>），整理好存在 data/library/。
 服务器访问不了某个来源时，可以在别处下载 txt（UTF-8 或 GBK），在下面上传。书单在 content/library.json。</p>
-<form method="post" action="/admin/library/fetch" class="row"><input type="hidden" name="missing" value="1"><button class="btn">下载所有还没有的</button></form>
+<form method="post" action="/admin/library/fetch" class="row" style="display:inline-flex"><input type="hidden" name="missing" value="1"><button class="btn">下载还没有的和坏了的</button></form>
+<form method="post" action="/admin/library/rebuild" class="row" style="display:inline-flex"><button class="btn ghost">按新规则重新整理已下载的</button></form>
+<p class="small muted">标「孩子看不到」的书下载失败或内容不对，不会出现在孩子的书架和每日计划里；点「重新下载」或上传 txt 修好后自动出现。</p>
 <div class="card"><div class="tw"><table>
 <tr><th>书</th><th>状态</th><th>章 / 页</th><th></th></tr>
 {% for b in books %}<tr class="small">
   <td>{{ b.emoji }} <b>{{ b.title_zh or b.title }}</b>{% if b.title_zh %} <span class="muted">{{ b.title }}</span>{% endif %}<br><span class="muted">{{ b.id }} · {{ b.level or '' }} {{ b.grades|join(' ') }}</span></td>
-  <td>{% if b.job %}{{ b.job }}{% elif b.ready %}✓ {{ b.fetched_at }}<br><span class="muted">{{ b.src.type }}{% if b.src.id %} #{{ b.src.id }}{% endif %}</span>{% else %}<span class="muted">没下载</span>{% endif %}</td>
+  <td>{% if b.job %}{{ b.job }}{% elif b.ready %}{{ '✓' if b.ok else '⚠ 孩子看不到' }} {{ b.fetched_at }}<br><span class="muted">{{ b.src.type }}{% if b.src.id %} #{{ b.src.id }}{% endif %}</span>
+    {% for x in b.problems %}<div class="muted"{% if x.startswith('!') %} style="color:var(--warn)"{% endif %}>{{ x.lstrip('!') }}</div>{% endfor %}
+    {% if b.outdated %}<div class="muted">旧版排版，重新下载一次就用上新排版</div>{% endif %}{% else %}<span class="muted">没下载（孩子看不到）</span>{% endif %}</td>
   <td>{% if b.ready %}{{ b.n_chapters }} / {{ b.n_pages }}<details><summary>章节</summary>{% for c in b.chapters %}<div>{{ loop.index }}. {{ c }}</div>{% endfor %}</details>{% endif %}</td>
   <td class="nw"><form method="post" action="/admin/library/fetch" style="display:inline"><input type="hidden" name="bid" value="{{ b.id }}"><button class="btn ghost sm">{{ '重新下载' if b.ready else '下载' }}</button></form>
     <form method="post" action="/admin/library/upload" enctype="multipart/form-data" class="row" style="margin-top:4px"><input type="hidden" name="bid" value="{{ b.id }}"><input type="file" name="file" accept=".txt,text/plain" required style="max-width:180px"><button class="btn ghost sm">上传</button></form></td>

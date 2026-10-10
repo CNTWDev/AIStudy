@@ -20,7 +20,7 @@ FAKE_ZH = "".join(f"第{n}回 {t}\n\n" + ("小猴子在山上找桃子吃，找�
 
 def test_build_book():
     b = build_book(FAKE_EN, "en", gutenberg=True, page_size=150)
-    assert [c["title"] for c in b["chapters"]] == ["Chapter I. The Kite", "Chapter II. The Wind", "Chapter III. Home Again"]
+    assert [c["title"] for c in b["chapters"]] == ["The Kite", "The Wind", "Home Again"]  # 目录不全也切得出第三章
     assert "license" not in str(b) and "Contents" not in str(b)
     assert b["n_pages"] == sum(len(c["pages"]) for c in b["chapters"]) and b["n_pages"] >= 6
     z = build_book(FAKE_ZH, "zh")
@@ -35,7 +35,7 @@ def test_read_listen_guide_and_plan():
             c.post("/register", data={"email": "admin@x.com", "password": "secret1", "name": "站长"})
         else:
             c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
-        assert "下载所有还没有的" in c.get("/admin/library").text
+        assert "下载还没有的和坏了的" in c.get("/admin/library").text
         r = c.post("/admin/library/upload", data={"bid": "en-oz"},
                    files={"file": ("oz.txt", io.BytesIO(FAKE_EN.encode()), "text/plain")})
         assert "已导入" in r.text or r.status_code == 200
@@ -61,7 +61,7 @@ def test_read_listen_guide_and_plan():
         assert read["url"] == "/books/en-oz/p/1" and "第 1–2 页" in read["title"] and "listen=1" in listen["url"]
         shelf = c.get("/books").text
         assert "绿野仙踪" in shelf and "还在版权期的好书" in shelf
-        assert "Chapter II. The Wind" in c.get("/books/en-oz").text
+        assert "The Wind" in c.get("/books/en-oz").text
         p1 = c.get("/books/en-oz/p/1").text
         assert "Mia had a red kite" in p1 and 'id="prep"' in p1
         g = c.get("/api/books/en-oz/guide/1").json()  # AI（mock）写导读，存下来所有孩子共用
@@ -86,3 +86,118 @@ def test_read_listen_guide_and_plan():
         assert c.get("/books/no-such-book").status_code == 404
         assert c.post("/api/books/en-oz/read", json={"page": 999}).status_code == 400
         assert c.get("/admin/library").status_code == 403
+
+
+# 下面几段模仿古腾堡原文常见的样子（都是随手写的句子，不是真书）
+MESSY = """The Project Gutenberg eBook of A Test Book
+
+Title: A Test Book
+
+*** START OF THE PROJECT GUTENBERG EBOOK A
+TEST BOOK ***
+
+Produced by Somebody and the Online Proofreading Team.
+
+[Illustration: A boy with a kite]
+
+                           A TEST BOOK
+
+                               BY
+                           SOMEONE OLD
+
+                    LONDON: SOME PUBLISHER, 1900
+
+     CONTENTS
+
+     PART ONE
+     1.  THE RED KITE . . . . . . . . . 1
+     2.  THE STRONG WIND: AND WHAT
+            HAPPENED NEXT . . . . . . . 9
+
+     PART TWO
+     3.  HOME AGAIN  . . . . . . . . . 17
+
+
+
+
+PART ONE--The Beginning
+
+1
+
+The Red Kite
+
+ONCE upon a time a boy called Tom had a red kite. """ + "He ran up the green hill with it every day after school, and his little dog ran after him. " * 12 + """
+
+          Up, up, little kite,
+        Fly into the light!
+          Over the hill
+        And higher still.
+
+""" + ("Tom looked up at the sky--it was blue and very clear. " * 10 + "\n\n") * 3 + """
+2
+
+The Strong Wind: and What Happened Next
+
+THE WIND was very strong that day, so the kite flew over the tall trees. """ + "Tom held the string with both hands and laughed. " * 15 + "\n\n" + ("The dog barked at the kite all the way down the lane. " * 10 + "\n\n") * 3 + """
+PART TWO--The End of the Day
+
+3
+
+Home Again
+
+AT LAST they walked home for dinner. """ + "Mother had made a big pie, and Tom told her all about the kite. " * 15 + """
+
+THE END
+
+*** END OF THE PROJECT GUTENBERG EBOOK A TEST BOOK ***
+Section 1. General Terms of Use...
+"""
+
+
+def test_messy_gutenberg_text():
+    b = build_book(MESSY, "en", gutenberg=True)
+    assert [c["title"] for c in b["chapters"]] == ["The Red Kite", "The Strong Wind: and What Happened Next", "Home Again"], \
+        [c["title"] for c in b["chapters"]]
+    allp = [p for c in b["chapters"] for p in c["paras"]]
+    text = "\n".join(allp)
+    for junk in ("Produced by", "Illustration", "SOMEONE OLD", "CONTENTS", "PART ONE", "PART TWO", "General Terms", "THE END"):
+        assert junk not in text, junk
+    first = [c["paras"][0] for c in b["chapters"]]
+    assert first[0].startswith("Once upon a time") and first[1].startswith("The wind was") and first[2].startswith("At last they")
+    poem = next(p for p in allp if "little kite" in p)
+    assert poem == "Up, up, little kite,\nFly into the light!\nOver the hill\nAnd higher still."   # 诗保留分行
+    assert "sky—it was" in text and "--" not in text
+    assert b["problems"] == [] and b["format"] >= 2
+
+
+def test_bad_download_is_hidden_and_old_books_rebuilt():
+    from app.library import text as T
+    with TestClient(__import__("app.main", fromlist=["app"]).app) as c:
+        if c.get("/login").text.count("创建网站管理员账号"):
+            c.post("/register", data={"email": "admin@x.com", "password": "secret1", "name": "站长"})
+        else:
+            c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+        # 下载到的是一个错误网页：存下了，但孩子的书架上没有
+        bad = "<html><body><div>Sorry, this page is not available.</div></body></html>"
+        c.post("/admin/library/upload", data={"bid": "en-alice"}, files={"file": ("a.txt", io.BytesIO(bad.encode()), "text/plain")})
+        assert library.ready("en-alice") and not library.available("en-alice")
+        assert all(b["id"] != "en-alice" for b in library.shelf())
+        assert "孩子看不到" in c.get("/admin/library").text
+        c.get("/logout")
+        c.post("/login", data={"email": "libk@x.com", "password": "secret1"})   # 上一个测试建的孩子
+        assert c.get("/books/en-alice").status_code == 404 and c.get("/books/en-alice/p/1").status_code == 404
+        assert "/books/en-alice" not in c.get("/books").text
+        c.get("/logout")
+        c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+        # 用旧规则整理的书：读的时候自动用存着的原文重新整理
+        c.post("/admin/library/upload", data={"bid": "en-alice"}, files={"file": ("a.txt", io.BytesIO(MESSY.encode()), "text/plain")})
+        assert library.available("en-alice")
+        import json
+        d = json.loads(library.path("en-alice").read_text(encoding="utf-8"))
+        d["format"] = 1
+        d["chapters"][0]["title"] = "OLD"
+        library.path("en-alice").write_text(json.dumps(d), encoding="utf-8")
+        library._cache.clear()
+        t = library.text("en-alice")
+        assert t["format"] == T.FORMAT and t["chapters"][0]["title"] == "The Red Kite"
+        assert "孩子看不到" not in c.get("/admin/library").text.split("en-alice")[1][:600]

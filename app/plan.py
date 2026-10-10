@@ -165,6 +165,8 @@ def src_reading(c: Ctx) -> list[dict]:
     langs = {catalog.packs[e["pack_id"]].lang for e in c.enrolls} - {""}
     for kind, lang, label in (("read_en", "en", "英语阅读"), ("read_zh", "zh", "名著接着读")):
         tr = [t for t in active if t["kind"] == kind]
+        if tr and tr[0]["ref"].startswith("lib:") and not _lib_ok(tr[0]):
+            tr = []   # 这本书现在读不了（原文坏了、被下架）：先当没选书
         if tr and tr[0]["ref"].startswith("lib:"):  # 书库里的书：在网站上按页读，读够自动打勾
             out.append(_library_task(c, tr[0], kind, label))
         elif tr:
@@ -179,7 +181,7 @@ def src_reading(c: Ctx) -> list[dict]:
             out.append({"type": kind, "lang": lang, "title": f"{'英文' if lang == 'en' else '中文'}阅读 15 分钟",
                         "why": "读一篇短文，不懂的词点一下就查，收藏后自动进单词复习", "minutes": 15, "url": f"/reading/today?lang={lang}"})
     for t in active:
-        if t["kind"] == "listen" and t["ref"].startswith("lib:"):
+        if t["kind"] == "listen" and t["ref"].startswith("lib:") and _lib_ok(t):
             bid = t["ref"][4:]
             from .library_web import progress
             p = progress(c.user_id, bid)
@@ -190,12 +192,17 @@ def src_reading(c: Ctx) -> list[dict]:
     return out
 
 
+def _lib_ok(t) -> bool:
+    from .library import library
+    return library.available(t["ref"][4:])
+
+
 def _library_task(c: Ctx, t, kind: str, label: str) -> dict:
     from .library import library
     bid = t["ref"][4:]
     n = max(1, t["daily_amount"])
     start = t["position"] + 1
-    total = t["total_units"] or (library.text(bid) or {}).get("n_pages", 0)
+    total = (library.text(bid) or {}).get("n_pages", 0) or t["total_units"]  # 书重新整理过页数会变，以现在的为准
     if total and start > total:
         return {"type": kind, "track": t["id"], "title": f"{label}：《{t['title']}》读完啦 🎉", "why": "请家长换一本新书",
                 "minutes": 1, "url": f"/books/{bid}"}
