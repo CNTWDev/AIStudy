@@ -152,6 +152,12 @@ def src_mistakes(c: Ctx) -> list[dict]:
              "minutes": min(10, 2 + min(n, 8)), "url": "/review?group=mistakes"}] if n else []
 
 
+def _news_title(c: Ctx) -> str | None:
+    from . import news
+    u = db.one("SELECT grade, settings FROM users WHERE id=?", c.user_id)
+    return news.today_title(u) if u else None
+
+
 def src_reading(c: Ctx) -> list[dict]:
     out = []
     active = engine.tracks(c.user_id)
@@ -165,6 +171,9 @@ def src_reading(c: Ctx) -> list[dict]:
             out.append({"type": kind, "track": t["id"], "title": f"{label}：《{t['title']}》{seg['label']}",
                         "why": f"读 {t['daily_minutes']} 分钟，读完用一句话说说讲了什么",
                         "minutes": t["daily_minutes"], "url": f"/track/{t['id']}"})
+        elif lang == "en" and lang in langs and (nt := _news_title(c)):  # 没指定书：英文阅读读今天的新闻
+            out.append({"type": kind, "lang": lang, "title": f"英文阅读：今日新闻《{nt}》",
+                        "why": "世界上今天发生的一件大事，按你的水平写成英文；不懂的词点一下就查，读完做小题", "minutes": 12, "url": "/news"})
         elif lang in langs:
             out.append({"type": kind, "lang": lang, "title": f"{'英文' if lang == 'en' else '中文'}阅读 15 分钟",
                         "why": "读一篇短文，不懂的词点一下就查，收藏后自动进单词复习", "minutes": 15, "url": f"/reading?lang={lang}"})

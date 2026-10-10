@@ -1,0 +1,27 @@
+{
+  "_note": "每日新闻：从这些新闻源（RSS / Atom）里每天选一条最重要、适合孩子学习的新闻，按年级改写成分级英文短文。license: pd = 公有领域（可整篇转载），cc-by-nd = 署名-不改动（可原样转载），copyright = 有版权（只给标题和原文链接，正文由 AI 根据事实重新写）。cn: 估计中国大陆服务器能不能直接访问（只作说明，访问不了的源会被自动跳过）。要改源，把这个文件复制成 config/news.json 再改（升级不会覆盖）。",
+  "hour": 6,
+  "sources": [
+    {"id": "bbc-world", "name": "BBC News", "url": "https://feeds.bbci.co.uk/news/world/rss.xml", "license": "copyright", "topics": ["world"], "cn": false},
+    {"id": "bbc-sci", "name": "BBC News", "url": "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml", "license": "copyright", "topics": ["science", "environment"], "cn": false},
+    {"id": "bbc-biz", "name": "BBC News", "url": "https://feeds.bbci.co.uk/news/business/rss.xml", "license": "copyright", "topics": ["economy"], "cn": false},
+    {"id": "guardian-world", "name": "The Guardian", "url": "https://www.theguardian.com/world/rss", "license": "copyright", "topics": ["world"], "cn": false},
+    {"id": "npr", "name": "NPR", "url": "https://feeds.npr.org/1001/rss.xml", "license": "copyright", "topics": ["world", "economy"], "cn": false},
+    {"id": "aljazeera", "name": "Al Jazeera", "url": "https://www.aljazeera.com/xml/rss/all.xml", "license": "copyright", "topics": ["world"], "cn": true},
+    {"id": "cgtn-world", "name": "CGTN", "url": "https://www.cgtn.com/subscribe/rss/section/world.xml", "license": "copyright", "topics": ["world"], "cn": true},
+    {"id": "chinadaily-world", "name": "China Daily", "url": "https://www.chinadaily.com.cn/rss/world_rss.xml", "license": "copyright", "topics": ["world"], "cn": true},
+    {"id": "chinadaily-biz", "name": "China Daily", "url": "https://www.chinadaily.com.cn/rss/bizchina_rss.xml", "license": "copyright", "topics": ["economy"], "cn": true},
+    {"id": "conversation", "name": "The Conversation", "url": "https://theconversation.com/global/articles.atom", "license": "cc-by-nd", "topics": ["science", "economy", "society"], "cn": true},
+    {"id": "snexplores", "name": "Science News Explores", "url": "https://www.snexplores.org/feed", "license": "copyright", "topics": ["science"], "cn": true},
+    {"id": "sciencedaily", "name": "ScienceDaily", "url": "https://www.sciencedaily.com/rss/top/science.xml", "license": "copyright", "topics": ["science"], "cn": true},
+    {"id": "nasa", "name": "NASA", "url": "https://www.nasa.gov/news-release/feed/", "license": "pd", "topics": ["space", "science"], "cn": true},
+    {"id": "esa", "name": "ESA", "url": "https://www.esa.int/rssfeed/Our_Activities/Space_Science", "license": "copyright", "topics": ["space"], "cn": true},
+    {"id": "voa-le", "name": "VOA Learning English", "url": "https://learningenglish.voanews.com/api/zmg_pebmyp", "license": "pd", "topics": ["world", "science"], "cn": false}
+  ],
+  "levels": {
+    "L1": {"name": "入门", "who": "小学 1–3 年级", "band": "primary", "max_year": 3, "cefr": "A1", "words": "60-90 个英文单词", "sentences": "8 句以内，每句不超过 10 个词，只用一般现在时和一般过去时", "glossary": 5, "questions": 2, "discuss": false, "minutes": 5},
+    "L2": {"name": "初级", "who": "小学 4–6 年级", "band": "primary", "max_year": 6, "cefr": "A2", "words": "120-180 个英文单词", "sentences": "句子简短，少用从句", "glossary": 6, "questions": 3, "discuss": false, "minutes": 8},
+    "L3": {"name": "中级", "who": "初中（含 IGCSE）", "band": "secondary", "max_year": 9, "cefr": "B1", "words": "250-350 个英文单词", "sentences": "可以有常见从句，长句不超过 25 个词", "glossary": 8, "questions": 4, "discuss": true, "minutes": 12},
+    "L4": {"name": "高级", "who": "高中 / A-Level / IB", "band": "secondary", "max_year": 99, "cefr": "B2", "words": "400-500 个英文单词", "sentences": "接近真实新闻报道的句式", "glossary": 10, "questions": 4, "discuss": true, "minutes": 15}
+  }
+}

@@ -38,10 +38,10 @@ def _check_url(url: str) -> str:
     return url.strip()
 
 
-def fetch(url: str) -> tuple[str, str]:
-    """返回 (最终网址, HTML 文本)。"""
+def fetch(url: str, accept: tuple[str, ...] = ("html", "text")) -> tuple[str, str]:
+    """返回 (最终网址, HTML 文本)。accept：允许的内容类型（Content-Type 里包含其中一个就行；抓 RSS 时加上 "xml"）。"""
     url = _check_url(url)
-    with httpx.Client(timeout=TIMEOUT, follow_redirects=False, headers={"User-Agent": UA, "Accept": "text/html,*/*"}) as c:
+    with httpx.Client(timeout=TIMEOUT, follow_redirects=False, headers={"User-Agent": UA, "Accept": "text/html,application/xml,*/*"}) as c:
         for _ in range(MAX_REDIRECTS + 1):
             try:
                 with c.stream("GET", url) as r:
@@ -51,7 +51,7 @@ def fetch(url: str) -> tuple[str, str]:
                     if r.status_code >= 400:
                         raise FetchError(f"网页打不开（{r.status_code}）。有的网站需要登录或不让程序访问，可以改用「贴一段文字」")
                     ctype = r.headers.get("content-type", "")
-                    if "html" not in ctype and "text" not in ctype:
+                    if not any(a in ctype for a in accept):
                         raise FetchError("这个链接不是网页文章（可能是图片、PDF 或下载文件）")
                     buf = b""
                     for chunk in r.iter_bytes():

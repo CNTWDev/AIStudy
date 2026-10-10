@@ -2,6 +2,8 @@
 {% block body %}
 <div class="ph"><h1>阅读</h1></div>
 <a class="tile" href="/books" style="margin:10px 0"><span class="e">📚</span><span><b>书库：读名著原文</b><span>《爱丽丝》《绿野仙踪》《西游记》……一页一页读，不认识的词点一下，读累了点 ▶ 听</span></span></a>
+{% set nt = news_today_title(user) if user and user.role == 'kid' else None %}
+<a class="tile" href="/news" style="margin:10px 0"><span class="e">📰</span><span><b>今日新闻{% if nt %}：{{ nt }}{% endif %}</b><span>每天从世界各地的新闻里选一条最值得知道的，按你的水平写成英文短文；不认识的词点一下就查</span></span></a>
 <p class="lead">大量读是提分的根本。读的时候<b>点一下不懂的词</b>就能查，觉得有用就收藏，收藏的词会自动进入复习。</p>
 
 <div class="card">

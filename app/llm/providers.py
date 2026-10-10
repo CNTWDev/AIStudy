@@ -161,4 +161,13 @@ MOCK = {
     "context": {"story": "很久以前，人们为了公平地交换东西，需要一个大家都认可的办法。", "uses": ["买东西算账的时候", "做实验记录数据的时候"],
                 "fun": "古埃及人用身体的一部分当尺子。", "next": "学会它，就能去解决更复杂的问题。"},
     "ping": {"ok": True},
+    "news_pick": {"secondary": [{"i": 0, "why": "示例：和经济课有关", "topic": "economy", "subjects": ["经济"]},
+                                {"i": 1, "why": "示例备选", "topic": "science", "subjects": ["物理"]}],
+                  "primary": [{"i": 1, "why": "示例：孩子感兴趣的科学新闻", "topic": "science", "subjects": ["科学"]}]},
+    "news_write": {"title": "A New Kind of Battery", "body": "Scientists made a new battery this week.\n\nIt can charge a phone in five minutes.",
+                   "glossary": [{"w": "battery", "zh": "电池"}, {"w": "charge", "zh": "充电"}],
+                   "background": "示例：电池是手机和电动车的心脏。", "links": [{"subject": "物理", "point": "电能和化学能的转化"}],
+                   "discuss": {"q": "Would you buy a phone that charges in five minutes? Why?", "zh": "你会买吗？说说理由。"},
+                   "questions": [{"q": "What did scientists make?", "options": ["A car", "A battery", "A phone", "A robot"],
+                                  "answer": 1, "explain": "第一句就说了 battery。"}]},
 }
