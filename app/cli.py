@@ -13,6 +13,7 @@
   python -m app.cli backup [目标目录]                 备份数据库（PostgreSQL 用 pg_dump）
   python -m app.cli tts-test [文字]                  朗读：不经过缓存真实调用一次，打印配置和厂商返回的原始报错
   python -m app.cli library fetch [--all] [书的id ...] 下载书库的公版原文（默认只下还没有的；--all 全部重新下载）
+  python -m app.cli news [--sources]                 每日新闻：马上抓取、精选、改写今天的新闻（平时后台每天早上自动跑）；--sources 只测试各新闻源能不能访问
 """
 import os
 import shutil
@@ -211,6 +212,21 @@ def main(argv) -> int:
         from . import bankflow
         catalog.load()
         print(bankflow.run_once(force=True))
+    elif cmd == "news":
+        from . import news
+        if "--sources" in args:
+            cands, status = news.collect()
+            for sid, st in status.items():
+                print(("  [ OK ] " if st["ok"] else "  [FAIL] ") + f"{sid:18} {st['name']}：" +
+                      (f"{st['n']} 条，最新 {st['newest']}" if st["ok"] else st["error"]))
+            print(f"最近的候选新闻 {len(cands)} 条")
+            return 0
+        catalog.load()
+        res = news.run_daily(force=True)
+        res.pop("sources", None)
+        print(res)
+        for p in db.q("SELECT day, band, source_name, title, why FROM news_picks WHERE day=?", db.today().isoformat()):
+            print(f"  {news.BANDS[p['band']]}：{p['title']}（{p['source_name']}）— {p['why']}")
     elif cmd == "mark-weak":
         catalog.load()
         u = auth.by_email(args[0])

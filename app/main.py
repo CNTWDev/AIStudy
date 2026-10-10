@@ -28,6 +28,7 @@ async def lifespan(app):
     methods.load()
     evidence.ensure_current()  # 学习方式 / 参数 / 算法变了的孩子：按学习记录重算掌握状态
     bankflow.start_background()  # 题库流水线：改编入库、校对答案、校准难度
+    news.start_background()  # 每日新闻：每天早上选一条、按级别改写
     yield
     db.close()
 
@@ -35,7 +36,8 @@ async def lifespan(app):
 app = FastAPI(title="beejoy", lifespan=lifespan)
 app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY, max_age=60 * 60 * 24 * 60,
                    same_site="lax", https_only=config.HTTPS_ONLY)
-from . import library_web, tts_web  # noqa: E402
+from . import library_web, news, news_web, tts_web  # noqa: E402
+app.include_router(news_web.router)
 app.include_router(tts_web.router)
 app.include_router(library_web.router)
 app.mount("/static", StaticFiles(directory=config.BASE_DIR / "app" / "static"), name="static")
@@ -47,6 +49,7 @@ templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LA
                              trend_words=records.trend_words, tts_info=tts_web.client_info)
 templates.env.globals.update(MASCOTS=brand.MASCOTS, mascot_of=brand.mascot_of, mascot_chosen=brand.has_chosen, mascot_svg=brand.mascot_svg,
                              wordmark_svg=brand.wordmark_svg)
+templates.env.globals["news_today_title"] = news.today_title
 # 样式和脚本的地址带上文件修改时间，升级后浏览器不会继续用缓存里的旧版本
 _STATIC = config.BASE_DIR / "app" / "static"
 templates.env.globals["ASSET_V"] = str(int(max((_STATIC / f).stat().st_mtime for f in ("app.css", "app.js"))))
@@ -1858,7 +1861,7 @@ def reading_view(request: Request, rid: int):
     qs = db.jload(r["questions"], [])
     looked = db.q("SELECT query, result FROM lookups WHERE user_id=? AND reading_id=? ORDER BY id", k["id"], rid)
     return render(request, "reading.html", r=r, paras=[p for p in r["body"].split("\n") if p.strip()],
-                  questions=[{"q": q["q"], "options": q.get("options", [])} for q in qs],
+                  questions=[{"q": q["q"], "options": q.get("options", [])} for q in qs], news=news.reading_extra(r),
                   looked=[{"q": l["query"], "r": db.jload(l["result"], {})} for l in looked])
 
 
