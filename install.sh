@@ -12,6 +12,7 @@
 #   sudo /opt/aistudy/install.sh upgrade
 #
 # 其他命令：
+#   domain     换域名：sudo /opt/aistudy/install.sh domain --domain 新域名（多个用逗号隔开）
 #   check      检测环境、数据库、AI 配置（加 --llm 会真实调用一次 AI）
 #   backup     立即备份数据库到 /opt/aistudy/data/backups
 #   status     查看服务状态        logs    查看最近日志        restart   重启服务
@@ -21,6 +22,7 @@
 #   --repo URL        代码仓库（默认 https://github.com/CNTWDev/AIStudy.git）
 #   --branch NAME     分支（默认 main）
 #   --domain NAME     绑定域名并用 Caddy 自动申请 HTTPS 证书（需先把域名解析到这台服务器）
+#                     多个域名用逗号隔开，如 beejoy.ai,www.beejoy.ai；第一个是主域名（用于生成链接）
 #   --port N          应用监听端口（默认 8000）
 #   --db-url URL      使用已有的 PostgreSQL（不在本机安装数据库），如 postgresql://user:pass@host:5432/aistudy
 #   --mirror cn       使用国内 pip 镜像（服务器在中国大陆时建议加上）
@@ -159,11 +161,12 @@ check_env() {
     if systemctl is-active --quiet "$APP_NAME" 2>/dev/null; then ok "端口 $PORT 由 $APP_NAME 使用中"
     else warn "端口 $PORT 已被其他程序占用，可用 --port 换一个"; fi
   fi
-  if [[ -n "$DOMAIN" ]]; then
-    local ip; ip=$(getent hosts "$DOMAIN" | awk '{print $1}' | head -1 || true)
-    if [[ -n "$ip" ]]; then ok "域名 $DOMAIN 解析到 $ip（请确认这是本机公网 IP，且安全组放行 80/443）"
-    else warn "域名 $DOMAIN 还没有解析，HTTPS 证书会申请失败"; fi
-  fi
+  local d
+  for d in ${DOMAIN//,/ }; do
+    local ip; ip=$(getent hosts "$d" | awk '{print $1}' | head -1 || true)
+    if [[ -n "$ip" ]]; then ok "域名 $d 解析到 $ip（请确认这是本机公网 IP，且安全组放行 80/443）"
+    else warn "域名 $d 还没有解析，HTTPS 证书会申请失败"; fi
+  done
   [[ $good -eq 1 ]]
 }
 
@@ -309,7 +312,7 @@ setup_config() {
   fi
   if [[ -n "$DOMAIN" ]]; then
     set_env HTTPS_ONLY 1
-    set_env PUBLIC_URL "https://$DOMAIN"
+    set_env PUBLIC_URL "https://${DOMAIN%%,*}"
   fi
   mkdir -p "$APP_DIR/config" "$APP_DIR/data/backups"
   if [[ ! -f "$APP_DIR/config/llm.toml" ]]; then
@@ -380,7 +383,7 @@ write_service() {
   fi
   local host="127.0.0.1"
   [[ -n "$DOMAIN" ]] || host="0.0.0.0"
-  if [[ -f "/etc/systemd/system/$APP_NAME.service" ]] && ! grep -q -- "--port $PORT" "/etc/systemd/system/$APP_NAME.service" && [[ "$CMD" == "upgrade" ]]; then
+  if [[ -f "/etc/systemd/system/$APP_NAME.service" ]] && ! grep -q -- "--port $PORT" "/etc/systemd/system/$APP_NAME.service" && [[ "$CMD" == "upgrade" || "$CMD" == "domain" ]]; then
     PORT="$(grep -oE -- '--port [0-9]+' "/etc/systemd/system/$APP_NAME.service" | awk '{print $2}')"
     grep -q -- "--host 127.0.0.1" "/etc/systemd/system/$APP_NAME.service" && host="127.0.0.1"
   fi
@@ -414,6 +417,18 @@ EOF
 setup_caddy() {
   [[ -n "$DOMAIN" ]] || return 0
   step "配置 HTTPS（Caddy，自动申请和续期证书）"
+  # 80/443 已被 nginx / Apache 等占用时，Caddy 起不来；不要假装成功，提示改那边的配置
+  local other
+  other="$(ss -ltnp 2>/dev/null | grep -E '[:.](80|443)[[:space:]]' | grep -oE '\(\("[^"]+"' | tr -d '("' | grep -vx caddy | sort -u | tr '\n' ' ' || true)"
+  if [[ -n "$other" ]]; then
+    warn "80/443 端口已被 ${other}占用，跳过 Caddy"
+    warn "请在 ${other}里把 ${DOMAIN//,/ } 反向代理到 127.0.0.1:$PORT，并为它申请证书。nginx 示例："
+    echo "      server_name ${DOMAIN//,/ };"
+    echo "      location / { proxy_pass http://127.0.0.1:$PORT; proxy_set_header Host \$host;"
+    echo "                   proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Proto \$scheme; }"
+    echo "      证书：certbot --nginx -d ${DOMAIN//,/ -d }"
+    return 0
+  fi
   if ! command -v caddy >/dev/null; then
     case "$PKG" in
       apt)
@@ -429,14 +444,32 @@ setup_caddy() {
   command -v caddy >/dev/null || die "Caddy 安装失败。也可以自己用 Nginx 反向代理到 127.0.0.1:$PORT"
   cat > /etc/caddy/Caddyfile <<EOF
 # 由 AIStudy install.sh 生成
-$DOMAIN {
+${DOMAIN//,/, } {
 	encode gzip
 	reverse_proxy 127.0.0.1:$PORT
 }
 EOF
   systemctl enable caddy >/dev/null 2>&1
   systemctl reload caddy 2>/dev/null || systemctl restart caddy
-  ok "https://$DOMAIN → 127.0.0.1:$PORT"
+  ok "https://${DOMAIN//,/ https://} → 127.0.0.1:$PORT"
+}
+
+# 在本机直接访问 https://域名（不经过外网），确认 Caddy 证书和应用都正常。
+# 本机通、外面打不开（例如 403），说明请求在到达服务器之前就被拦了：云厂商未备案拦截、CDN / WAF、DNS 指错等。
+local_https_check() {
+  local d out good
+  for d in ${DOMAIN//,/ }; do
+    good=""
+    for _ in $(seq 1 30); do
+      if out="$(curl -fsS -m 10 --resolve "$d:443:127.0.0.1" "https://$d/healthz" 2>&1)"; then good=1; break; fi
+      sleep 2
+    done
+    if [[ -n "$good" ]]; then ok "本机访问 https://$d 正常"
+    else
+      warn "本机访问 https://$d 失败：$out"
+      warn "多半是证书没申请下来：看 journalctl -u caddy -n 50；确认域名 A 记录指向本机、安全组放行 80/443"
+    fi
+  done
 }
 
 health_check() {
@@ -510,6 +543,31 @@ cmd_upgrade() {
   echo; echo "${C_G}${C_B}升级完成：$OLD_REV → $NEW_REV${C_0}"
 }
 
+# 换域名：只改 Caddy 和 .env 里的 PUBLIC_URL，不动代码和数据
+cmd_domain() {
+  need_root
+  [[ -n "$DOMAIN" ]] || die "用法：install.sh domain --domain 新域名（多个用逗号隔开，如 beejoy.ai,www.beejoy.ai）"
+  [[ -f "$(ENV_FILE)" ]] || die "$APP_DIR 里没有安装 AIStudy，请先运行 install"
+  detect_os
+  check_env || true
+  local old; old="$(get_env PUBLIC_URL)"
+  step "更新 .env"
+  set_env HTTPS_ONLY 1
+  set_env PUBLIC_URL "https://${DOMAIN%%,*}"
+  ok "PUBLIC_URL：${old:-（空）} → https://${DOMAIN%%,*}"
+  # 以前没绑域名时应用监听 0.0.0.0，现在改成只给 Caddy 访问
+  write_service
+  setup_caddy
+  health_check
+  step "从本机检查 HTTPS"
+  local_https_check
+  echo
+  echo "  如果本机检查正常，但浏览器打开新域名报 403 / 打不开，问题在服务器外面："
+  echo "  · 服务器在中国大陆：新域名必须在这家云厂商做 ICP 备案（并非所有后缀都能备案），否则 80/443 会被拦截"
+  echo "  · 域名开了 CDN / 代理（如 Cloudflare 橙色云朵、阿里云 ESA）：检查它的 WAF 规则，或先关掉代理直连"
+  echo "  · 用 dig +short ${DOMAIN%%,*} 确认解析到的是这台服务器的公网 IP"
+}
+
 cmd_check() {
   [[ -d "$APP_DIR/app" ]] || die "$APP_DIR 里没有安装 AIStudy"
   check_env || true
@@ -525,9 +583,10 @@ case "$CMD" in
   install) cmd_install ;;
   upgrade|update) cmd_upgrade ;;
   check) cmd_check ;;
+  domain) cmd_domain ;;
   backup) need_root; run_cli backup "$APP_DIR/data/backups" ;;
   status) systemctl status "$APP_NAME" --no-pager ;;
   logs) journalctl -u "$APP_NAME" -n 200 --no-pager ;;
   restart) need_root; systemctl restart "$APP_NAME"; health_check ;;
-  help|-h|--help|*) sed -n '2,40p' "${BASH_SOURCE[0]:-/dev/null}" 2>/dev/null | sed 's/^# \{0,1\}//' || echo "用法：install.sh install|upgrade|check|backup|status|logs|restart" ;;
+  help|-h|--help|*) sed -n '2,40p' "${BASH_SOURCE[0]:-/dev/null}" 2>/dev/null | sed 's/^# \{0,1\}//' || echo "用法：install.sh install|upgrade|domain|check|backup|status|logs|restart" ;;
 esac

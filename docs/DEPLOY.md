@@ -112,6 +112,25 @@ sudo /opt/aistudy/install.sh upgrade
 会自动：拉取 GitHub 上的最新代码 → **备份数据库**到 `/opt/aistudy/data/backups` → 更新依赖 → 执行新的数据库迁移 →
 重启服务 → 健康检查。如果升级后服务起不来，脚本会打印回退命令。`.env`、`config/llm.toml` 和数据不会被改动。
 
+## 5.1 换域名
+
+先把新域名的 A 记录解析到这台服务器，然后：
+
+```bash
+sudo /opt/aistudy/install.sh domain --domain beejoy.ai,www.beejoy.ai   # 多个域名用逗号隔开，第一个是主域名
+```
+
+会自动：改 `.env` 的 `PUBLIC_URL`（邀请链接、重设密码链接用它）→ 重写 Caddy 配置并申请新证书 → 重启 → 在服务器本机用新域名访问一次。
+想让旧域名继续能用，把旧域名也写进列表即可。登录状态不受影响。
+
+如果服务器上已经有 nginx（或 Apache）占着 80/443，脚本不会启用 Caddy，而是打印一段 nginx 配置：在 nginx 里给新域名加 `server_name`、`proxy_pass http://127.0.0.1:端口`，再用 `certbot --nginx -d 新域名` 申请证书即可。
+
+**本机检查通过、浏览器却报 `403 Forbidden` 或打不开**：请求在到达服务器之前就被拦了，和本应用无关（应用和 Caddy 都不会返回这个 403）。逐个排查：
+
+- **服务器在中国大陆**：新域名必须在这家云厂商完成 ICP 备案，否则 80/443 的访问会被云厂商拦截。不是所有域名后缀都能备案（以工信部公布的列表为准）；不能备案的域名，只能换香港 / 海外服务器。
+- **域名开了 CDN / 代理**（Cloudflare 的橙色云朵、阿里云 ESA / CDN 等）：检查它的 WAF / 防火墙规则，或先关掉代理（DNS only）直连试试。
+- **解析没指到这台服务器，或者不止一个 IP**：`dig +short beejoy.ai @8.8.8.8` 应该**只有**服务器公网 IP 一行。多出来的 IP 多半是注册商的停放页 / 转发服务器（例如 GoDaddy 的 `15.197.148.33`、`3.33.130.190`，它们返回的就是 `Request forbidden by administrative rules`），浏览器会随机连到它们。在注册商的 DNS 里删掉这些记录，并关掉域名转发。
+
 ## 6. 日常运维
 
 | 要做什么 | 命令 |
