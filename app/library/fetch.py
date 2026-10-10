@@ -70,9 +70,11 @@ def wikisource_html(page: str) -> str:
 
 def html_to_text(h: str) -> str:
     h = re.sub(r"<(script|style|table)[^>]*>.*?</\1>", "", h, flags=re.S | re.I)
-    h = re.sub(r'<(div|span)[^>]*class="[^"]*(mw-editsection|reference|noprint|ws-noexport|header)[^"]*"[^>]*>.*?</\1>', "",
+    h = re.sub(r'<(div|span)[^>]*class="[^"]*(mw-editsection|reference|noprint|ws-noexport|header|licenseContainer|license|navbox|catlinks|toc|mw-references-wrap|wst-|metadata)[^"]*"[^>]*>.*?</\1>', "",
                h, flags=re.S | re.I)
     h = re.sub(r"<sup[^>]*>.*?</sup>", "", h, flags=re.S | re.I)
+    h = re.sub(r'<(div|ul|ol)[^>]*id="toc"[^>]*>.*?</\1>', "", h, flags=re.S | re.I)
+    h = re.sub(r"<!--.*?-->", "", h, flags=re.S)
     h = re.sub(r"<br\s*/?>", "\n", h, flags=re.I)
     h = re.sub(r"</(p|div|h\d|li|dd|dt)>", "\n\n", h, flags=re.I)
     h = re.sub(r"<[^>]+>", "", h)

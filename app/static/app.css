@@ -460,6 +460,10 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .chtitle{text-align:center;margin:14px 0 6px}
 .book-text{font-size:19px;line-height:1.85}.book-text.big{font-size:22px}.book-text.bigger{font-size:26px;line-height:1.9}
 .book-text p{margin:0 0 .9em;position:relative}
+.book-text{max-width:40em;margin-left:auto;margin-right:auto;overflow-wrap:break-word;hyphens:auto;text-align:left}
+.book-text p.verse{white-space:pre-line;padding-left:1.2em;border-left:3px solid var(--line);font-style:italic}
+.book-text:lang(zh) p:not(.verse){text-indent:2em}
+.chno{margin-top:8px}
 .paraq{margin-left:6px;border:1px solid var(--line);background:var(--card);color:var(--faint);border-radius:8px;font-size:12px;padding:0 6px;cursor:pointer;vertical-align:middle;line-height:1.6}
 .paraq:hover{color:var(--ink)}
 .pager{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:14px 0 30px}

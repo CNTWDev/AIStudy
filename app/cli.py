@@ -12,7 +12,8 @@
   python -m app.cli bank-maintain                    手动跑一轮题库流水线（改编入库、校对答案、校准难度；平时后台自动跑）
   python -m app.cli backup [目标目录]                 备份数据库（PostgreSQL 用 pg_dump）
   python -m app.cli tts-test [文字]                  朗读：不经过缓存真实调用一次，打印配置和厂商返回的原始报错
-  python -m app.cli library fetch [--all] [书的id ...] 下载书库的公版原文（默认只下还没有的；--all 全部重新下载）
+  python -m app.cli library fetch [--all] [书的id ...] 下载书库的公版原文（默认只下还没有的、坏了的；--all 全部重新下载）
+  python -m app.cli library rebuild                    按新的整理规则重新整理已下载的书（不重新下载）
   python -m app.cli news [--sources]                 每日新闻：马上抓取、精选、改写今天的新闻（平时后台每天早上自动跑）；--sources 只测试各新闻源能不能访问
 """
 import os
@@ -170,8 +171,12 @@ def main(argv) -> int:
         return tts_test(" ".join(args) or "Hello, this is a test.")
     if cmd == "library":
         from .library import library
+        if args and args[0] == "rebuild":
+            ok, bad = library.rebuild_all()
+            print(f"书库：重新整理 {ok} 本" + (f"，失败 {bad} 本" if bad else ""))
+            return 0
         if not args or args[0] != "fetch":
-            print("用法：python -m app.cli library fetch [--all] [书的id ...]")
+            print("用法：python -m app.cli library fetch [--all] [书的id ...] | library rebuild")
             return 2
         ids = [a for a in args[1:] if not a.startswith("--")] or None
         ok, bad = library.fetch_all(only_missing="--all" not in args and not ids, ids=ids)

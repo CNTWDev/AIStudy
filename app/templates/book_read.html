@@ -7,13 +7,14 @@
     · <button class="linkbtn" id="fsize" title="字大一点 / 小一点">Aa</button></span>
 </div>
 {% if pg.first %}
+{% if b.lang == 'en' and pg.n_chapters > 1 %}<div class="small muted chno">第 {{ pg.chapter }} 章 · 共 {{ pg.n_chapters }} 章</div>{% endif %}
 <h1 class="chtitle">{{ pg.chapter_title }}</h1>
 <div id="prep" class="card prep" hidden></div>
 {% else %}
 <div class="small muted" style="margin:6px 0">{{ pg.chapter_title }} · 第 {{ pg.page_in_chapter }} / {{ pg.chapter_pages }} 页</div>
 {% endif %}
 <div id="listenhere"></div>
-<div class="card reader book-text" id="reader" lang="{{ 'en' if b.lang == 'en' else 'zh-CN' }}">{% for x in pg.paras %}<p>{{ x }}</p>{% endfor %}</div>
+<div class="card reader book-text" id="reader" lang="{{ 'en' if b.lang == 'en' else 'zh-CN' }}">{% for x in pg.paras %}<p{% if '\n' in x %} class="verse"{% endif %}>{{ x }}</p>{% endfor %}</div>
 {% if pg.last %}<div id="after" class="card" hidden></div>{% endif %}
 <div class="pager">
   {% if pg.n > 1 %}<a class="btn ghost" href="/books/{{ b.id }}/p/{{ pg.n - 1 }}{{ '?listen=1' if listen }}">‹ 上一页</a>{% else %}<span></span>{% endif %}

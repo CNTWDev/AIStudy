@@ -6,7 +6,8 @@
    "其余好书只列书名和推荐理由（not_pd），因为还在版权期，不放原文。",
    "level：英文 L1（图画书、寓言）→ L4（初中原版）；grades 是建议年级（上海五四学制按统编册次）。",
    "source.match：下载后核对书名，对不上时按书名在古腾堡目录里重新找。convert=t2s：繁体转简体。",
-   "下载不了的书（比如服务器访问不了维基文库），管理员可以在后台「书库」上传 txt 原文。"
+   "下载不了的书（比如服务器访问不了维基文库），管理员可以在后台「书库」上传 txt 原文。",
+   "fixes：这本书原文的修正，[正则, 替换成]，在整理之前做（去掉插图说明、补上首字下沉丢掉的字母）。split=none：不切章。min_words：正文少于这么多词/字就当没下载好。"
   ]
  },
  "levels": {
@@ -60,7 +61,21 @@
    },
    "why": "温暖的短篇童话，讲「爱让玩具变真」，词汇不难，适合大声朗读。",
    "page_words": 150,
-   "emoji": "🧸"
+   "emoji": "🧸",
+   "fixes": [
+    [
+     "(?s)^\\s*List of Illustrations.*?(?=^\\s*_{5,})",
+     ""
+    ],
+    [
+     "^\\s*(Christmas Morning|The Skin Horse Tells His Story|Spring Time|Summer Days|Anxious Times|The Fairy Flower|At Last! At Last!)\\s*$",
+     ""
+    ],
+    [
+     "^HERE was once a velveteen rabbit",
+     "THERE was once a velveteen rabbit"
+    ]
+   ]
   },
   {
    "id": "en-aesop",

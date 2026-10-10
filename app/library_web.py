@@ -79,7 +79,7 @@ def shelf(request: Request, lang: str = ""):
     reading = []
     for r in db.q("SELECT * FROM book_progress WHERE user_id=? ORDER BY updated_at DESC", k["id"]):
         b, t = library.books.get(r["book_id"]), library.text(r["book_id"])
-        if b and t:
+        if b and t and library.available(r["book_id"]):
             reading.append({**b, "p": dict(r), "n_pages": t["n_pages"]})
     books = library.shelf(lang)
     grade = k["grade"] or ""
@@ -87,8 +87,13 @@ def shelf(request: Request, lang: str = ""):
         b["for_me"] = grade in (b.get("grades") or [])
     books.sort(key=lambda b: (b["lang"] != "en" if lang != "zh" else b["lang"] != "zh", b.get("level", ""), not b["for_me"]))
     return m.render(request, "books.html", books=books, reading=reading, lang=lang, levels=library.levels,
-                    not_pd=library.not_pd, missing=[b for b in library.books.values() if not library.ready(b["id"])],
+                    not_pd=library.not_pd, missing=[b for b in library.books.values() if not library.available(b["id"])],
                     tracks={t["ref"][len(LIB):]: t for t in engine.tracks(k["id"]) if t["ref"].startswith(LIB)})
+
+
+def _not_ready(m, request, b):
+    return m.render(request, "message.html", title=b.get("title_zh") or b["title"], link="/books",
+                    text="这本书暂时还不能读（原文没下载好）。先去书架挑一本别的吧。", status_code=404)
 
 
 @router.get("/books/{bid}", response_class=HTMLResponse)
@@ -97,9 +102,8 @@ def book_home(request: Request, bid: str):
     k = m.kid_or_redirect(request, manage=True)
     b = book_or_404(bid)
     t = library.text(bid)
-    if not t:
-        return m.render(request, "message.html", title=b["title"], text="这本书的原文还没下载好，请家长或管理员在「管理 → 书库」里下载。",
-                        status_code=404)
+    if not t or not library.available(bid):
+        return _not_ready(m, request, b)
     p = progress(k["id"], bid)
     chs, start = [], 1
     for i, c in enumerate(t["chapters"], 1):
@@ -115,6 +119,8 @@ def read_page(request: Request, bid: str, n: int, listen: int = 0):
     m = _main()
     k = m.kid_or_redirect(request, manage=True)
     b = book_or_404(bid)
+    if not library.available(bid):
+        return _not_ready(m, request, b)
     pg = library.page(bid, n)
     if not pg:
         if library.ready(bid):
@@ -223,7 +229,8 @@ def admin_library(request: Request, msg: str = ""):
 @router.post("/admin/library/fetch")
 def admin_fetch(request: Request, bid: str = Form(""), missing: str = Form("")):
     auth.require_admin(request)
-    ids = [bid] if bid else [b for b in library.books if not (missing and library.ready(b))]
+    ids = [bid] if bid else [b for b, x in library.books.items() if x.get("pd", True)
+                             and not (missing and library.available(b) and not library.outdated(b))]
     library.fetch_background(ids)
     return RedirectResponse("/admin/library?msg=" + f"开始下载 {len(ids)} 本，过一会儿刷新这个页面看结果", 303)
 
@@ -244,4 +251,13 @@ async def admin_upload(request: Request, bid: str = Form(...), file: UploadFile 
         d = library.import_text(bid, text, note=f"管理员上传 {file.filename}")
     except (FetchError, ValueError) as e:
         return RedirectResponse(f"/admin/library?msg=上传失败：{e}", 303)
-    return RedirectResponse(f"/admin/library?msg=已导入：{len(d['chapters'])} 章 · {d['n_pages']} 页", 303)
+    warn = "；".join(x.lstrip("!") for x in d.get("problems", []))
+    return RedirectResponse(f"/admin/library?msg=已导入：{len(d['chapters'])} 章 · {d['n_pages']} 页" + (f"。注意：{warn}" if warn else ""), 303)
+
+
+@router.post("/admin/library/rebuild")
+def admin_rebuild(request: Request):
+    """按现在的整理规则把已下载的书重新整理一遍（用存着的原文，不重新下载）。"""
+    auth.require_admin(request)
+    ok, bad = library.rebuild_all(log=lambda *_: None)
+    return RedirectResponse(f"/admin/library?msg=重新整理了 {ok} 本" + (f"，{bad} 本失败" if bad else ""), 303)
