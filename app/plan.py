@@ -9,7 +9,7 @@
 """
 from datetime import timedelta
 
-from . import bankpapers, db, engine, evidence, explore, insights
+from . import bankpapers, db, engine, evidence, explore, insights, trace
 from .catalog import catalog, stage_rank
 
 
@@ -334,7 +334,9 @@ def _take(c: Ctx, kind: str) -> list[dict]:
 def build_plan(user_id: int) -> list[dict]:
     c = Ctx(user_id)
     fixed = [t for kind in c.policy.get("fixed", []) for t in _take(c, kind)]
-    flex, seen = [], set()
+    # 今天追根找到的结论（先补根、再回来打）：不管哪种学习方式都排在学知识点的任务最前面
+    flex, seen = trace.today_tasks(user_id, c.mastery), set()
+    seen |= {(t["type"], t.get("kp"), t.get("pack"), t.get("url")) for t in flex}
     for group in c.policy.get("flex", []):
         for t in interleave(*[_take(c, k) for k in group.split("+")]):
             key = (t["type"], t.get("kp"), t.get("pack"), t.get("url"))

@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from . import arena, auth, bank, bankflow, bankpapers, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, recall, records, sitecfg, sprint, streak, webpage
+from . import arena, auth, bank, bankflow, bankpapers, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, recall, records, sitecfg, sprint, streak, trace, webpage
 from .auth import LoginRequired
 from .catalog import GRADES, catalog, is_adult, stage_label, stage_rank
 from .content import content
@@ -1286,8 +1286,8 @@ def api_practice(request: Request, kp_id: str, n: int = 3, purpose: str = "pract
         raise HTTPException(404)
     purpose = purpose if purpose in ("practice", "preview") else "practice"
     items = engine.items_for(k["id"], kp_id, n=min(n, 5), purpose=purpose, grade=k["grade"])
-    # 穿插一道「以前学过的」：优先这个知识点没测过的前置，答完顺便摸清过去
-    if purpose == "practice" and len(items) >= 2:
+    # 穿插一道「以前学过的」：优先这个知识点没测过 / 只是推断会的前置（预习新内容时更要先看地基稳不稳），答完顺便摸清过去
+    if len(items) >= 2:
         probe = explore.pick(k["id"], 1, k["grade"], near_kp=kp_id, exclude={kp_id})
         if probe:
             items.insert(1, probe[0])
@@ -1311,7 +1311,8 @@ def api_answer(request: Request, body: dict = Body(...)):
         if mode == "probe":
             pr = body.get("probe") or {}
             explore.after_probe(k["id"], kp_id, False, int(pr.get("depth") or 0), pr.get("from") or "")
-        return {"correct": False, "dont_know": True, **itemtypes.reveal(it), "hint": it.get("hint", "")}
+        return {"correct": False, "dont_know": True, **itemtypes.reveal(it), "hint": it.get("hint", ""),
+                "trace": trace.offer(k["id"], kp_id, True) if mode in trace.COUNT_MODES else None}
     if itemtypes.of(it).self_rated:
         if "self" not in body:  # 先给参考答案，孩子对照后自评
             return {"reveal": True, "answer": it.get("model", ""), "points": it.get("points", []), "explain": it.get("explain", "")}
@@ -1325,9 +1326,55 @@ def api_answer(request: Request, body: dict = Body(...)):
     if mode == "probe":
         pr = body.get("probe") or {}
         out["probe"] = explore.after_probe(k["id"], kp_id, bool(correct), int(pr.get("depth") or 0), pr.get("from") or "")
+    if not correct and mode in trace.COUNT_MODES:  # 今天第二次错：可以当场追根
+        out["trace"] = trace.offer(k["id"], kp_id)
     if explore.light(k["id"], kp_id, old, status):  # 第一次掌握：点亮
         out["lit"] = {"kp": kp_id, "name": catalog.kp(kp_id)["name"], "today": len(explore.lit_today(k["id"]))}
     return out
+
+
+# ------------------------------------------------------------------ 追根：卡住了当场找「为什么不会」（app/trace.py）
+
+@app.post("/api/trace/start")
+def api_trace_start(request: Request, body: dict = Body(...)):
+    k = kid_or_redirect(request)
+    kp_id = body.get("kp_id") or ""
+    if not catalog.kp(kp_id):
+        raise HTTPException(404)
+    t = db.one("SELECT id FROM traces WHERE user_id=? AND kp_id=? AND day=?", k["id"], kp_id, db.today().isoformat())
+    return {"id": t["id"] if t else trace.start(k["id"], kp_id, body.get("item_id") or "", body.get("answer"))}
+
+
+def _trace_or_404(k, tid: int):
+    t = trace.get(k["id"], tid)
+    if not t:
+        raise HTTPException(404, "没有这次追根")
+    return t
+
+
+@app.get("/trace/{tid}", response_class=HTMLResponse)
+def trace_page(request: Request, tid: int, back: str = ""):
+    k = kid_or_redirect(request)
+    t = _trace_or_404(k, tid)
+    back = back if back.startswith("/") and not back.startswith("//") else f"/learn/{t['kp_id']}"
+    return render(request, "trace.html", t=t, kp=catalog.kp(t["kp_id"]), back=back, max_steps=trace.MAX_STEPS)
+
+
+@app.get("/api/trace/{tid}/next")
+def api_trace_next(request: Request, tid: int):
+    k = kid_or_redirect(request)
+    _trace_or_404(k, tid)
+    return trace.next_step(k["id"], tid, k["grade"])
+
+
+@app.post("/api/trace/{tid}/answer")
+def api_trace_answer(request: Request, tid: int, body: dict = Body(...)):
+    k = kid_or_redirect(request)
+    _trace_or_404(k, tid)
+    res = trace.answer(k["id"], tid, body)
+    if res.get("error"):
+        raise HTTPException(400, res["error"])
+    return res
 
 
 @app.post("/api/learn/done")

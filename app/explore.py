@@ -13,7 +13,7 @@ import random
 from datetime import timedelta
 
 from . import db, engine, evidence
-from .catalog import catalog, stage_rank
+from .catalog import catalog, stage_label, stage_rank
 
 MAX_DEPTH = 3
 RECENT_DAYS = 7  # 测过的点一周内不再抽到
@@ -44,10 +44,20 @@ def coverage(user_id: int, mastery: dict | None = None) -> list[dict]:
             continue
         st = [mastery.get(k, {}) for k in rng]
         known = sum(1 for m in st if m.get("status") not in (None, "unknown"))
+        # 按学段分开看：哪个年级的旧知识还没摸、哪里只是推断会、哪里薄弱（家长页显示）
+        stages: dict[str, dict] = {}
+        for k, m in zip(rng, st):
+            g = stages.setdefault(catalog.kps[k]["stage"], {"total": 0, "known": 0, "inferred": 0, "weak": 0})
+            g["total"] += 1
+            g["known"] += m.get("status") not in (None, "unknown")
+            g["inferred"] += m.get("source") == "inferred"
+            g["weak"] += m.get("status") == "weak"
         out.append({"pack": catalog.packs[e["pack_id"]], "total": len(rng), "known": known,
                     "inferred": sum(1 for m in st if m.get("source") == "inferred"),
                     "weak": sum(1 for m in st if m.get("status") == "weak"),
-                    "pct": round(100 * known / len(rng))})
+                    "pct": round(100 * known / len(rng)),
+                    "stages": [{"stage": sg, "label": stage_label(sg), **v, "pct": round(100 * v["known"] / v["total"])}
+                               for sg, v in sorted(stages.items(), key=lambda x: stage_rank(x[0]))]})
     return out
 
 
@@ -78,11 +88,32 @@ def _queued(user_id: int) -> list:
                 user_id)
 
 
+def _today_kps(user_id: int) -> list[str]:
+    """今天清单里要学 / 要练的知识点（只读已经排好的清单，不触发排计划，避免互相调用）。"""
+    row = db.one("SELECT plan FROM days WHERE user_id=? AND day=?", user_id, db.today().isoformat())
+    return [t["kp"] for t in db.jload(row["plan"], []) if t.get("kp") and catalog.kp(t["kp"])] if row else []
+
+
+def _near(kp_id: str, depth: int = 3) -> list[tuple[dict, int]]:
+    """和一个知识点「有关的旧知识」：它的必须前置（往回 depth 层），加上它要用到的别科知识（物理用到的数学）。"""
+    out = list(catalog.ancestors(kp_id, depth=depth))
+    have = {p["id"] for p, _ in out}
+    for r in catalog.related(kp_id, types=["uses"]):
+        if r["dir"] == "out" and r["kp"]["id"] not in have:
+            out.append((r["kp"], 1))
+    return out
+
+
 def candidates(user_id: int, mastery: dict | None = None, near_kp: str | None = None) -> list[dict]:
-    """按信息量排序的摸底候选。每项：{kp, reason, depth, from}。
-    near_kp：在学某个知识点时，优先它没测过的前置。"""
+    """按信息量排序的摸底 / 校正候选。每项：{kp, reason, depth, from}。
+
+    「以前学过的」不只是测一次就完：没测过的要摸底，只是推断会的要确认，学会很久的按遗忘规律要复查。
+    挑哪个讲相关性——和正在学的、今天要学的、学校正在教的有关的旧知识排前面；
+    再讲覆盖面——哪个学科的哪一块、哪个年级摸得最少，就往那里多放一点，慢慢把过去整个过一遍。
+    near_kp：在学某个知识点时，优先它没测过 / 没确认的前置。"""
     mastery = engine.get_mastery(user_id) if mastery is None else mastery
     unknown = lambda k: mastery.get(k, {}).get("status") in (None, "unknown")  # noqa: E731
+    guessed = lambda k: mastery.get(k, {}).get("source") == "inferred" and mastery[k].get("status") != "weak"  # noqa: E731
     recent = _recent(user_id)
     out, seen = [], set()
 
@@ -92,35 +123,66 @@ def candidates(user_id: int, mastery: dict | None = None, near_kp: str | None = 
             out.append({"kp": k, "reason": reason, "depth": depth, "from": frm})
 
     if near_kp:
-        for p, d in catalog.ancestors(near_kp, depth=2):
+        for p, d in _near(near_kp):
             if unknown(p["id"]):
                 add(p["id"], f"「{catalog.kps[near_kp]['name']}」要用到它", d, near_kp)
+        for p, d in _near(near_kp):
+            if guessed(p["id"]):
+                add(p["id"], f"「{catalog.kps[near_kp]['name']}」要用到它，确认一下真的会", d, near_kp)
     # 之前答错留下的「往回追」队列
     for q in _queued(user_id):
-        if unknown(q["kp_id"]) or mastery.get(q["kp_id"], {}).get("source") == "inferred":
+        if unknown(q["kp_id"]) or guessed(q["kp_id"]):
             add(q["kp_id"], q["reason"], q["depth"], q["from_kp"])
     taught = engine.taught_set(user_id)
+    # 今天要学的知识点用到的旧知识：先把地基摸清
+    today_near: dict[str, str] = {}
+    for k in _today_kps(user_id):
+        for p, _ in _near(k):
+            today_near.setdefault(p["id"], catalog.kps[k]["name"])
     scored = []
     for e in _enrolls(user_id):
         rng = past_range(user_id, e, taught)
         rset = set(rng)
         cur = catalog.kp(e["progress_kp"]) if e["progress_kp"] else None
-        near = {p["id"] for p, _ in catalog.ancestors(cur["id"], depth=3)} if cur else set()
+        near = {p["id"] for p, _ in _near(cur["id"])} if cur else set()
+        # 覆盖面：每一块（知识线 strand）、每个学段摸清了多少，摸得少的地方加分
+        cells: dict[tuple, list] = {}
         for k in rng:
-            if not unknown(k):
-                continue
             kp = catalog.kps[k]
-            # 答对能推断的未测前置越多越值得测；被越多旧知识点依赖越基础
-            up = sum(1 for p, _ in catalog.ancestors(k, depth=3) if unknown(p["id"]))
-            down = sum(1 for s in catalog.successors(k) if s["id"] in rset and unknown(s["id"]))
-            score = 2 * up + down + (4 if k in near else 0) + (2 if kp.get("hot") else 0) + random.random()
-            why = "和学校正在学的内容有关" if k in near else ("高频考点" if kp.get("hot") else "以前学过，看看还记得吗")
+            known = not unknown(k) and not guessed(k)
+            cells.setdefault(("s", kp.get("strand")), []).append(known)
+            cells.setdefault(("g", kp["stage"]), []).append(known)
+        gap = {c: 1 - sum(v) / len(v) for c, v in cells.items()}
+        for k in rng:
+            kp = catalog.kps[k]
+            spread = 1.5 * gap[("s", kp.get("strand"))] + 1.5 * gap[("g", kp["stage"])]
+            rel = 4 if k in near else 3 if k in today_near else 0
+            hot = 2 if kp.get("hot") else 0
+            if unknown(k):
+                # 答对能推断的未测前置越多越值得测；被越多旧知识点依赖越基础
+                up = sum(1 for p, _ in catalog.ancestors(k, depth=3) if unknown(p["id"]))
+                down = sum(1 for sc in catalog.successors(k) if sc["id"] in rset and unknown(sc["id"]))
+                score = 2 * up + down + rel + hot + spread + random.random()
+            elif guessed(k):  # 只是推断会：信息量比未测的小，但相关的、覆盖少的地方也值得确认
+                score = 0.5 * (rel + hot) + spread + random.random()
+                if score < 2:
+                    continue
+            else:
+                continue
+            why = ("和学校正在学的内容有关" if k in near else f"今天要学的「{today_near[k]}」要用到它" if k in today_near
+                   else "以前推断你会，确认一下" if guessed(k) else "高频考点" if hot else "以前学过，看看还记得吗")
             scored.append((score, e["pack_id"], k, why))
+    # 学会很久了、按遗忘规律快忘了的：穿插一两道（复习任务里没排到的）
+    for v in evidence.due_checks(user_id, mastery, limit=4):
+        k = v["kp_id"]
+        if catalog.kp(k):
+            scored.append((3 + (3 if k in today_near else 0) + random.random(), catalog.kp_pack[k], k,
+                           f"{int(evidence.days_since(v['last_ev']))} 天没碰了，看看还记得吗"))
     scored.sort(reverse=True)
     # 各学科轮流，避免一天全是同一科
     by_pack: dict[str, list] = {}
-    for s in scored:
-        by_pack.setdefault(s[1], []).append(s)
+    for sc in scored:
+        by_pack.setdefault(sc[1], []).append(sc)
     lists = list(by_pack.values())
     i = 0
     while any(i < len(lst) for lst in lists):

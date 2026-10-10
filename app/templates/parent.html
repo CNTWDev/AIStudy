@@ -30,7 +30,12 @@
   {% endfor %}
   {% if k.cov %}<p class="small" style="margin:6px 0">🗺️ 以前学过的内容已摸清：{% for c in k.cov %}{{ c.pack.subject_name }} {{ c.pct }}%（{{ c.known }}/{{ c.total }}）{{ '，' if not loop.last }}{% endfor %}
     {% if k.vocab.estimate %} · 英语核心词约 {{ k.vocab.estimate }} 个{% endif %}
-    <br><span class="muted">系统每天在热身和练习里穿插几道以前的题，慢慢摸清，不用专门考试。</span></p>{% endif %}
+    <br><span class="muted">系统每天在热身和练习里穿插几道以前的题（优先和正在学的有关的，再往摸得少的年级和板块铺开），推断会的也会回头确认，不用专门考试。</span></p>
+  <details class="small covd"><summary>按年级看摸清了多少</summary>
+    {% for c in k.cov %}<div style="margin:6px 0"><b>{{ c.pack.subject_name }}</b>
+      {% for g in c.stages %}<div class="row"><span style="min-width:5.5em">{{ g.label }}</span><span class="bar grow" style="margin:0"><span style="width:{{ g.pct }}%"></span></span>
+        <span class="muted nw">{{ g.known }}/{{ g.total }}{% if g.inferred %} · 推断 {{ g.inferred }}{% endif %}{% if g.weak %} · <span style="color:var(--warn)">薄弱 {{ g.weak }}</span>{% endif %}</span></div>{% endfor %}</div>{% endfor %}
+  </details>{% endif %}
   {% if k.arena.week_answered or k.arena.week_minutes %}<p class="small" style="margin:6px 0">🎮 乐园本周：玩了 {{ k.arena.week_minutes }} 分钟，答题 {{ k.arena.week_answered }} 道（对 {{ k.arena.week_right }} 道）{% if k.arena.week_focus %}，专注指数 {{ k.arena.week_focus }}{% endif %} · 乐园 Lv.{{ k.arena.level }}，贴纸 {{ k.arena.stickers }} 张 · 每天 {{ '不玩' if k.arena.minutes == 0 else k.arena.minutes ~ ' 分钟' }}，{{ k.arena.rule }}</p>{% endif %}
   {% if k.trend %}<div class="trend-mini"><p class="small" style="margin:6px 0 4px">📊 {{ trend_words(k.trend.series[0]) }} · <a href="/parent/kids/{{ k.u.id }}#acc-trend">看每天的曲线 →</a></p>{{ trend_ui.spark(k.trend) }}</div>{% endif %}
   {% if k.weekly %}<p class="small" style="margin:6px 0">📈 上周进步（{{ k.weekly.from[5:] }}~{{ k.weekly.to[5:] }}）：{{ k.weekly.lines|join('；') }}</p>{% endif %}

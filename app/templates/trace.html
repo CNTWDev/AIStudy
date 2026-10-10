@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="{{ back }}" class="small">← 回到「{{ kp.name }}」</a>
+<h1>🔍 找找根在哪</h1>
+<p class="muted small">「{{ kp.name }}」卡住了，不要紧。最多 {{ max_steps }} 道小题，看看是哪一块基础没打牢。凭第一感觉答，不会就点「不会」。</p>
+<div class="tdots" id="dots"></div>
+<div class="tchain" id="chain"></div>
+<div id="tbox" class="card"><span class="loading">正在找</span></div>
+<script>
+const TID = {{ t.id }}, KP = {{ kp.id|tojson }}, KPNAME = {{ kp.name|tojson }}, BACK = {{ back|tojson }}, MAX = {{ max_steps }};
+window.ASK_CTX = {kp: KP};
+let done = [];  // 已经测过的：{name, correct, kind}
+function dots(n) { $('#dots').innerHTML = Array.from({length: MAX}, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join(''); }
+function chain(cur, root) {
+  // 从卡住的点往下画：卡住的点 ← 测过的前置 ← 正在测的
+  const rows = [`<div class="tn no"><span class="ic">✗</span><span class="grow">${esc(KPNAME)}</span><span class="muted small">卡住的地方</span></div>`];
+  // 箭头写清楚是谁要用到它：答错的点成为新的「卡点」，后面的题都是它要用到的
+  let focus = KPNAME;
+  const arrow = k => `<div class="arrow">↓ ${k === 'lang' ? '换成中文问一次' : `「${esc(focus)}」要用到`}</div>`;
+  for (const s of done) {
+    const isRoot = root && s.kp === root;
+    rows.push(arrow(s.kind),
+      `<div class="tn ${s.correct ? 'ok' : 'no'}${isRoot ? ' root' : ''}"><span class="ic">${s.correct ? '✓' : '✗'}</span>` +
+      `<span class="grow">${esc(s.kind === 'lang' ? '同一个知识点（中文）' : s.name)}</span>` +
+      `<span class="muted small">${isRoot ? '根在这里' : s.correct ? '没问题' : '这里也不稳'}</span></div>`);
+    if (!s.correct && s.kind !== 'lang') focus = s.name;
+  }
+  if (cur) rows.push(arrow(cur.kind),
+    `<div class="tn cur"><span class="ic">?</span><span class="grow">${esc(cur.kind === 'lang' ? '同一个知识点（中文）' : cur.name)}</span>` +
+    `<span class="muted small">${esc(cur.subject || '')}</span></div>`);
+  $('#chain').innerHTML = rows.join('');
+}
+function showResult(r) {
+  done = r.chain; dots(MAX); chain(null, r.root && r.root.kp);
+  const nx = r.next || [];
+  $('#tbox').innerHTML = `<p class="pop" style="font-size:18px"><b>${esc(r.message)}</b></p>` +
+    (nx.length ? `<p class="small muted">已经排进今天的任务：${nx.map(x => esc(x.title)).join('、')}</p>` : '') +
+    `<div class="row">` + (nx.length ? `<a class="btn" href="${esc(nx[0].url)}">${esc(nx[0].title)} →</a>` : '') +
+    `<a class="btn ghost" href="${esc(BACK)}">回到「${esc(KPNAME)}」</a><a class="btn ghost" href="/today">回到今天</a></div>`;
+  if (r.result !== 'root') confetti();
+}
+async function step() {
+  $('#tbox').innerHTML = '<span class="loading">正在找下一个</span>';
+  try {
+    const r = await api(`/api/trace/${TID}/next`);
+    if (r.done) return showResult(r);
+    const s = r.step, it = r.item;
+    dots(s.n - 1); chain(s);
+    $('#tbox').innerHTML = `<div class="probe-tag">第 ${s.n}/${s.max} 题 · ${esc(s.why)}</div>`;
+    const box = document.createElement('div'); $('#tbox').appendChild(box);
+    const body = extra => Object.assign({item_id: it.id, kp: s.kp, kind: s.kind}, extra);
+    renderItem(box, it, {
+      submit: (answer, self, ms) => api(`/api/trace/${TID}/answer`, body(self ? {self, ms} : {answer, ms})),
+      dontKnow: () => api(`/api/trace/${TID}/answer`, body({dont_know: true})),
+      onDone: res => {
+        done.push({kp: s.kp, name: s.name, correct: !!res.correct, kind: s.kind});
+        chain(null);
+        const nx = document.createElement('div'); nx.className = 'row'; nx.style.marginTop = '10px';
+        nx.innerHTML = `<button class="btn">${res.result ? '看结果' : '下一题 →'}</button>`;
+        nx.querySelector('.btn').onclick = () => res.result ? showResult(res.result) : step();
+        box.appendChild(nx);
+      },
+    });
+  } catch (e) { $('#tbox').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+}
+dots(0); chain(null);
+step();
+</script>
+{% endblock %}

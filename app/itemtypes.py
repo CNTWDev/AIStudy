@@ -130,7 +130,7 @@ class Short(ItemType):
 
 TYPES: dict[str, ItemType] = {t.id: t for t in (Choice(), Fill(), Number(), Short())}
 FALLBACK = TYPES["short"]
-FIELDS = ("q", "zh", "code", "options", "answer", "unit", "tol", "model", "points", "explain", "hint")
+FIELDS = ("q", "zh", "code", "options", "answer", "unit", "tol", "model", "points", "explain", "hint", "traps")
 
 
 def of(item: dict | str) -> ItemType:
@@ -166,7 +166,8 @@ def normalize(raw: dict) -> dict:
 def public(item: dict) -> dict:
     """给前端的：加上 widget，去掉答案。"""
     t = of(item)
-    return {**{k: v for k, v in item.items() if k not in ("answer", "model", "points", "explain")},
+    # traps（错项指向哪个前置）会暴露哪些选项是错的，不给前端
+    return {**{k: v for k, v in item.items() if k not in ("answer", "model", "points", "explain", "traps")},
             "widget": t.widget, "self_rated": t.self_rated}
 
 
