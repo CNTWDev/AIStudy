@@ -125,6 +125,19 @@ def detect(user_id: int) -> list[dict]:
                     "action": "", "for_kid": 1, "title": "考试时会做的题丢了分",
                     "detail": f"{names}：重做都对了，考试时留 5 分钟专门检查这几类题"})
 
+    # 10. 追根当场找到的（几道小题一路往回测出来的，比 1 的统计推断更直接）
+    from . import trace
+    for r in trace.recent(user_id, days=WINDOW_DAYS):
+        path = " → ".join(f"{'✓' if c['correct'] else '✗'}{'中文版' if c['kind'] == 'lang' else c['name']}" for c in r["chain"])
+        if r["result"] == "root" and m.get(r["root"]["kp"], {}).get("status") != "mastered":
+            out.append({"kind": "trace", "key": f"{r['kp']}>{r['root']['kp']}", "kp_id": r["root"]["kp"], "severity": 3,
+                        "action": "backfill", "for_kid": 1, "title": f"「{r['name']}」卡住，根在「{r['root']['name']}」",
+                        "detail": f"{r['day']} 当场追根测出来的：✗{r['name']} → {path}"})
+        elif r["result"] == "lang" and m.get(r["kp"], {}).get("status") != "mastered":
+            out.append({"kind": "trace_lang", "key": r["kp"], "kp_id": None, "severity": 2, "action": "", "for_kid": 1,
+                        "title": f"「{r['name']}」用中文会做，卡在英文上",
+                        "detail": "这一科用英文考：这个点的英文术语已经放进单词复习，弄熟它们比再刷题更管用"})
+
     # 9. 习惯（只给家长看）
     week = db.q("SELECT day, minutes, checked_in FROM days WHERE user_id=? AND day>=? AND day<?", user_id, _since(7),
                 db.today().isoformat())

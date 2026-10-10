@@ -55,6 +55,17 @@ def _item_schema() -> str:
     )
 
 
+def _traps_note(kp: dict) -> str:
+    """追根用：选择题的错误选项尽量设计成典型错误，并标出「选它说明哪个前置没懂」（见 app/trace.py）。"""
+    from ..catalog import catalog
+    pre = catalog.prereqs(kp["id"])[:8]
+    if not pre:
+        return ""
+    return ("\n选择题的错误选项请尽量对应学生的典型错误；如果某个错误选项正好说明学生没懂下面某个前置知识点，"
+            '在这道题里加 "traps": {"错误选项下标": "前置知识点 id"}（没有就不写）。前置知识点：'
+            + "；".join(f"{p['id']}={p['name']}" for p in pre))
+
+
 def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=None) -> list[dict]:
     purpose_txt = {
         "practice": f"生成 {n} 道练习题，难度从易到难（1,2,3）。",
@@ -65,7 +76,7 @@ def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=
         f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n"
         f"诊断思路参考：{kp.get('probe','')}\n关键词：{', '.join(kp.get('terms', []))}\n\n"
         f"{purpose_txt}\n优先用 mcq/num/fill（能自动判分），short 最多 1 道。不要照搬教材原文。"
-        f"答案必须正确且唯一，请自己检查一遍。\n输出格式：{_item_schema()}"
+        f"答案必须正确且唯一，请自己检查一遍。\n输出格式：{_item_schema()}{_traps_note(kp)}"
     )
     data = ask_json("items", _tutor(grade) + "你也是严谨的出题人。", user, user_id=user_id, effort="medium", cache=False)
     items = data.get("items", []) if isinstance(data, dict) else data

@@ -47,7 +47,7 @@
 {% if not readonly %}<script>
 const KP = {{ kp.id|tojson }}, TASK = {{ task|tojson }};
 window.ASK_CTX = {kp: KP};
-let items = [], idx = 0, right = 0, wrongStreak = 0;
+let items = [], idx = 0, right = 0, wrongStreak = 0, lastAnswer = null;
 $('#teachbtn').onclick = async () => {
   $('#teach').innerHTML = '<span class="loading">AI 正在准备讲解</span>';
   try {
@@ -85,16 +85,26 @@ function show() {
     `<div class="muted small">第 ${idx + 1}/${items.length} 题 · 难度 ${'★'.repeat(it.difficulty || 1)}</div>`;
   $('#items').appendChild(box);
   renderItem(box, it, {
-    submit: (answer, self, ms) => api('/api/answer', base(self ? {self, ms} : {answer, ms})),
+    submit: (answer, self, ms) => { lastAnswer = answer; return api('/api/answer', base(self ? {self, ms} : {answer, ms})); },
     dontKnow: () => api('/api/answer', base({dont_know: true})),
     onDone: res => {
       Run.hit(!!res.correct); Combo.hit(!!res.correct, box); celebrate(res, box);
       if (p) { if (res.correct) right++; }
       else if (res.correct) { right++; wrongStreak = 0; } else wrongStreak++;
       const nx = document.createElement('div'); nx.className = 'row'; nx.style.marginTop = '10px';
-      nx.innerHTML = `<button class="btn">下一题 →</button>` + (wrongStreak >= 2 && {{ pre|length }} ? `<a class="btn ghost" href="#" onclick="window.scrollTo(0,document.body.scrollHeight);return false">🧱 退一步：先补前置</a>` : '');
+      nx.innerHTML = `<button class="btn">下一题 →</button>` + (wrongStreak >= 2 && !res.trace && {{ pre|length }} ? `<a class="btn ghost" href="#" onclick="window.scrollTo(0,document.body.scrollHeight);return false">🧱 退一步：先补前置</a>` : '');
       nx.querySelector('.btn').onclick = () => { idx++; show(); };
       box.appendChild(nx);
+      // 今天第二次卡在这个点（或点了「还不会」）：当场追根，几道小题找出是哪块基础没打牢（app/trace.py）
+      if (res.trace) {
+        const tb = document.createElement('div'); tb.className = 'hint tracebtn';
+        tb.innerHTML = `🔍 卡住了？找找根在哪：最多 4 道小题，看看是哪块基础没打牢。<div class="row" style="margin-top:6px"><button class="btn sm">开始找</button></div>`;
+        tb.querySelector('.btn').onclick = async () => {
+          const r = await api('/api/trace/start', {kp_id: KP, item_id: it.id, answer: res.dont_know ? null : lastAnswer});
+          location.href = `/trace/${r.id}?back=` + encodeURIComponent(location.pathname + location.search);
+        };
+        box.appendChild(tb);
+      }
     }
   });
 }
