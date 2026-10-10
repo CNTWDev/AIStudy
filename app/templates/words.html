@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui %}
 {% block body %}
 <a href="/review" class="back">← 复习</a>
 <h1>我的本子</h1>
@@ -13,6 +14,26 @@
 {% if s.fb.corrected %}<div class="small">改正：{{ s.fb.corrected }}</div>{% endif %}
 {% if s.fb.better %}<div class="small muted">示范：{{ s.fb.better }}</div>{% endif %}</div>
 {% else %}<div class="empty card"><div class="e">✍️</div><b>还没有造句</b>在生词本里给单词造个句子，AI 会帮你看看。</div>{% endfor %}
+{% elif kind == 'mistake' %}
+<p class="muted small">做错的题、点了「这道题还不会」的题都在这里，系统会按时间叫你回来重做：隔天做对 2 次，换一道同类的新题，也做对就过关；过关 3 周后再回头看一眼，还会就真的掌握了。</p>
+{% set td = today_iso %}
+{% for c in cards %}
+{% set kp = catalog.kp(c.kp_id) if c.kp_id else None %}
+<div class="card mcard">
+  <div class="mc-head">
+    <span class="grow muted small">{% if kp %}{{ kp.name }} · {% endif %}{{ c.created_at[5:10] }} 记下</span>
+    {% if c.extra.passed and c.due >= '9999' %}<span class="pill st-mastered">🏅 已掌握</span>
+    {% elif c.extra.passed %}<span class="pill st-mastered">🏅 {{ c.extra.passed[5:] }} 过关 · {{ c.due[5:] }} 回头看</span>
+    {% elif c.due <= td %}<span class="pill st-weak">今天要重做</span>
+    {% else %}<span class="pill st-learning">{% if c.extra.variant %}下次换一道同类题{% elif c.extra.streak %}已隔天做对 {{ c.extra.streak }} 次{% else %}要重做{% endif %} · {{ c.due[5:] }}</span>{% endif %}
+    {% if not readonly %}<button class="linkbtn" title="从本子里删掉" onclick="if(confirm('删除？'))api('/api/cards/{{ c.id }}/delete',{}).then(()=>this.closest('.card').remove())">删除</button>{% endif %}
+  </div>
+  {% if c.view %}{{ ui.question(c.view) }}
+  {% else %}<div class="qc"><div class="qc-stem">{{ c.front }}</div>
+    <dl class="qc-ans">{% if c.extra.my_answer %}<div><dt>我的答案</dt><dd>{{ c.extra.my_answer }}</dd></div>{% endif %}
+      <div><dt>答案</dt><dd class="qc-explain">{{ c.back }}</dd></div></dl></div>{% endif %}
+</div>
+{% else %}<div class="empty card"><div class="e">🎯</div><b>错题本是空的</b>做错的题、点了「这道题还不会」的题，都会自动放进来。</div>{% endfor %}
 {% else %}
 {% for c in cards %}
 <div class="card" style="padding:12px">

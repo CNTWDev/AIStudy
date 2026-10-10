@@ -17,5 +17,6 @@
 <div class="card"><h3 style="margin-top:0">已经会了 👍</h3>
 {% for d in rep.ok %}{% set k = kp(d.kp) %}<span class="pill st-mastered">{{ k.name }}</span> {% endfor %}</div>
 {% endif %}
-<p>今天的计划已按诊断结果更新。<a class="btn" href="/today">去看今日计划</a></p>
+<p>今天的计划已按诊断结果更新。</p>
+<div class="row"><a class="btn lg" href="/go">接着做今天的下一项 →</a><a class="btn ghost" href="/today">看今天的清单</a></div>
 {% endblock %}

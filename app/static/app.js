@@ -11,18 +11,56 @@ function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;',
 function $(s, el) { return (el || document).querySelector(s); }
 function $$(s, el) { return [...(el || document).querySelectorAll(s)]; }
 
-/* 题目组件：渲染一道题，作答后调用 onDone(result) */
+/* ---------- 题目的统一展示 ----------
+   所有显示题目的地方用同一套样子（服务端是 _ui.html 的 question 宏，数据来自 itemtypes.view）：
+   · 不带答案（出题）：题干 + 选项（A B C…）/ 输入框
+   · 带答案（判完、错题本、订正过的卷子）：选项上标出「✓ 正确答案」「我选的」，下面分栏写 答案 / 我的答案 / 解析 / 要点 */
+const QKEYS = 'ABCDEFGH';
+function qStem(item, num) {
+  return (item.src ? `<div class="qc-meta"><span>📄 ${esc(item.src)}</span></div>` : '') +
+    `<div class="qc-stem">${num ? `<span class="qc-n">${esc(num)}</span>` : ''}${esc(item.q)}</div>` +
+    (item.code ? `<pre class="code">${esc(item.code)}</pre>` : '') +
+    (item.zh ? `<div class="qc-zh">${esc(item.zh)}</div>` : '');
+}
+function qOpt(text, i, tag) { return `<${tag || 'button'} class="opt${tag ? ' static' : ''}" data-i="${i}"><b class="qc-key">${QKEYS[i] || i + 1}</b><span class="qc-ot">${esc(text)}</span></${tag || 'button'}>`; }
+/* 选项上标出正确答案和自己选的 */
+function qMark(box, rightIdx, mineIdx) {
+  $$('.opt', box).forEach((b, i) => {
+    if (i === +rightIdx && rightIdx != null && rightIdx !== '') { b.classList.add('right'); if (!$('.qc-tag.ok', b)) b.insertAdjacentHTML('beforeend', '<span class="qc-tag ok">✓ 正确答案</span>'); }
+    if (mineIdx != null && mineIdx !== '' && i === +mineIdx) {
+      if (i !== +rightIdx) b.classList.add('wrong');
+      if (!$('.qc-tag.mine', b)) b.insertAdjacentHTML('beforeend', `<span class="qc-tag mine ${i === +rightIdx ? 'ok' : 'no'}">${i === +rightIdx ? '我选的 ✓' : '我选的'}</span>`);
+    }
+  });
+}
+/* 带答案的几栏：答案 / 我的答案 / 解析 / 要点 */
+function qAns(a) {
+  const rows = [];
+  if (a.answer != null && a.answer !== '') rows.push(['答案', esc(a.answer)]);
+  if (a.mine) rows.push(['我的答案', esc(a.mine)]);
+  if (a.explain) rows.push(['解析', `<span class="qc-explain">${esc(a.explain)}</span>`]);
+  if (a.points && a.points.length) rows.push(['要点', `<ul>${a.points.map(p => `<li>${esc(p)}</li>`).join('')}</ul>`]);
+  return rows.length ? `<dl class="qc-ans">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>` : '';
+}
+/* 一整道「带答案」的题（v 的结构同 itemtypes.view） */
+function qView(v, num) {
+  let h = `<div class="qc">${qStem(v, num)}`;
+  if (v.options && v.options.length) h += `<div class="qc-opts">${v.options.map((o, i) => qOpt(o.text != null ? o.text : o, i, 'div')).join('')}</div>`;
+  const mineOpt = (v.options || []).some(o => o.mine);
+  h += qAns({answer: v.answer, mine: mineOpt ? '' : v.mine, explain: v.explain, points: v.points}) + '</div>';
+  const wrap = document.createElement('div'); wrap.innerHTML = h;
+  qMark(wrap, (v.options || []).findIndex(o => o.right), (v.options || []).findIndex(o => o.mine) >= 0 ? (v.options || []).findIndex(o => o.mine) : null);
+  return wrap.innerHTML;
+}
+
+/* 题目组件：渲染一道题（不带答案），作答后在同一张卡上显示带答案的版本，再调用 onDone(result) */
 function renderItem(box, item, opts) {
   opts = opts || {};
-  const L = 'ABCDEFG';
   // 输入控件由服务端题型注册表给出（app/itemtypes.py 的 widget）：choice 选项 / self 自评 / text 输入框
   const W = item.widget || (item.type === 'mcq' ? 'choice' : item.type === 'short' ? 'self' : 'text');
-  let html = `<div class="q">` + (item.src ? `<div class="muted small">📄 ${esc(item.src)}</div>` : '') +
-    `<div style="font-weight:600">${esc(item.q)}</div>` +
-    (item.code ? `<pre class="code">${esc(item.code)}</pre>` : '') +
-    (item.zh ? `<div class="muted small">${esc(item.zh)}</div>` : '');
+  let html = `<div class="q qc">` + qStem(item);
   if (W === 'choice') {
-    html += item.options.map((o, i) => `<button class="opt" data-i="${i}">${L[i]}. ${esc(o)}</button>`).join('');
+    html += `<div class="qc-opts">${item.options.map((o, i) => qOpt(o, i)).join('')}</div>`;
   } else if (W === 'self') {
     html += `<textarea class="ans" placeholder="先自己写一写（写关键词也行）"></textarea>`;
   } else {
@@ -36,8 +74,13 @@ function renderItem(box, item, opts) {
     `<div class="hintbox"></div><div class="fbbox"></div></div>`;
   box.innerHTML = html;
   box.classList.add('askable'); box.dataset.askItem = item.item_id || item.id || ''; delete box.dataset.answered;
-  const _done = opts.onDone; opts.onDone = res => { box.dataset.answered = '1'; flagRow(box, item); _done && _done(res); };
   let chosen = null;
+  const _done = opts.onDone;
+  opts.onDone = res => {
+    box.dataset.answered = '1';
+    if (W === 'choice') qMark(box, res.answer_index, res.dont_know ? null : chosen);
+    flagRow(box, item); _done && _done(res);
+  };
   const t0 = Date.now();  // 做题用时：系统用它发现「会做但很慢」
   $$('.opt', box).forEach(b => b.onclick = () => { $$('.opt', box).forEach(x => x.classList.remove('sel')); b.classList.add('sel'); chosen = b.dataset.i; });
   const hb = $('.hintbtn', box);
@@ -49,7 +92,7 @@ function renderItem(box, item, opts) {
       const res = await opts.dontKnow();
       $$('.opt', box).forEach(b => b.disabled = true);
       $$('.submit,.hintbtn,.dkbtn', box).forEach(b => b.remove());
-      $('.fbbox', box).innerHTML = feedback(res);
+      $('.fbbox', box).innerHTML = feedback(res, {choice: W === 'choice'});
       opts.onDone && opts.onDone(res);
     } catch (e) { dk.disabled = false; $('.fbbox', box).innerHTML = `<div class="err">${esc(e.message)}</div>`; }
   };
@@ -63,16 +106,20 @@ function renderItem(box, item, opts) {
     try {
       const res = await opts.submit(answer, undefined, Date.now() - t0);
       if (res.reveal) {
-        $('.fbbox', box).innerHTML = `<div class="fb ok"><b>参考答案：</b>${esc(res.answer)}` +
-          (res.points && res.points.length ? `<ul>${res.points.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : '') +
-          `<div class="row"><span>对照要点，你答到了吗？</span><button class="btn sm selfok">基本答到</button><button class="btn ghost sm selfno">还差一些</button></div></div>`;
+        $('.fbbox', box).innerHTML = `<div class="fb dk">` + qAns({answer: res.answer, points: res.points}).replace('<dt>答案</dt>', '<dt>参考答案</dt>') +
+          `<div class="row" style="margin-top:10px"><span>对照要点，你答到了吗？</span><button class="btn sm selfok">基本答到</button><button class="btn ghost sm selfno">还差一些</button></div></div>`;
         btn.remove();
-        const go = async v => { const r2 = await opts.submit(answer, v, Date.now() - t0); $('.fbbox', box).innerHTML += feedback(r2); opts.onDone && opts.onDone(r2); $$('.selfok,.selfno', box).forEach(x => x.remove()); };
+        const go = async v => {
+          const r2 = await opts.submit(answer, v, Date.now() - t0);
+          $('.selfok', box).closest('.row').remove();
+          $('.fbbox', box).insertAdjacentHTML('beforeend', feedback({...r2, answer: '', points: []}, {}));
+          opts.onDone && opts.onDone(r2);
+        };
         $('.selfok', box).onclick = () => go('ok'); $('.selfno', box).onclick = () => go('no');
         return;
       }
       if (W === 'choice') $$('.opt', box).forEach(b => { if (b.dataset.i === chosen) b.classList.add(res.correct ? 'right' : 'wrong'); b.disabled = true; });
-      $('.fbbox', box).innerHTML = feedback(res);
+      $('.fbbox', box).innerHTML = feedback(res, {choice: W === 'choice', mine: W === 'choice' ? '' : answer});
       btn.remove(); if (dk) dk.remove();
       if (res.correct) cheer(box);
       opts.onDone && opts.onDone(res);
@@ -96,17 +143,19 @@ function flagRow(box, item) {
   box.appendChild(row);
 }
 const PRAISE = ['✅ 对了！', '✅ 漂亮！', '✅ 答对了，继续！', '✅ 很稳！', '✅ 就是这样！'];
-function feedback(res) {
+/* 判完以后的反馈：先一句结论，再是带答案的几栏（同 qAns）。o.choice：选择题的答案已经标在选项上，不再重复；o.mine：自己写的答案 */
+function feedback(res, o) {
+  o = o || {};
   if (res.dont_know) {
-    return `<div class="fb dk pop">📌 没关系，知道自己哪里不会就是进步。先看懂它：` +
-      `<div style="margin-top:6px"><b>答案：</b>${esc(res.answer)}</div>` +
-      (res.explain ? `<div class="small" style="margin-top:6px">${esc(res.explain)}</div>` : '') +
-      `<div class="small muted" style="margin-top:6px">已放进错题本，过几天再练一次就会了。</div></div>`;
+    return `<div class="fb dk pop"><div class="fb-v">📌 没关系，知道自己哪里不会就是进步。先看懂它：</div>` +
+      qAns({answer: res.answer, explain: res.explain, points: res.points}) +
+      `<div class="fb-note">已放进错题本，过几天再练一次就会了。</div></div>`;
   }
   if (res.correct === undefined) return '';
-  return `<div class="fb ${res.correct ? 'ok' : 'no'} pop">${res.correct ? PRAISE[Math.floor(Math.random() * PRAISE.length)] : '差一点！正确答案是 <b>' + esc(res.answer) + '</b>'}` +
-    (res.explain ? `<div class="small" style="margin-top:6px">${esc(res.explain)}</div>` : '') +
-    (res.correct || res.redo ? '' : `<div class="small muted">已放进错题本，过几天会再出现。做错也算练过，继续！</div>`) + `</div>`;
+  const wrongAns = res.correct ? '' : res.answer;
+  return `<div class="fb ${res.correct ? 'ok' : 'no'} pop"><div class="fb-v">${res.correct ? PRAISE[Math.floor(Math.random() * PRAISE.length)] : '❌ 差一点！'}</div>` +
+    qAns({answer: (o.choice && res.answer_index != null) ? '' : wrongAns, mine: res.correct ? '' : o.mine, explain: res.explain, points: res.correct ? [] : res.points}) +
+    (res.correct || res.redo ? '' : `<div class="fb-note">已放进错题本，过几天会再出现。做错也算练过，继续！</div>`) + `</div>`;
 }
 
 /* ---------- 即时反馈：小动画 ---------- */
@@ -132,14 +181,67 @@ function confetti() {
     document.body.appendChild(p); setTimeout(() => p.remove(), 3000);
   }
 }
-/* 做完一项任务：+1 ⭐ 并回到今天 */
+/* ---------- 一路做下去：做完一项，不用回首页，直接接下一项（见 docs/DESIGN.md 5.16） ----------
+   做完一项：底部弹出一张小卡「✓ 完成 · 今天 4/8 · 下一项：…  [继续 →]」。刚做的题和讲解还留在页面上，
+   做错了能先看清楚再走；学完一节可以先休息 3 分钟；全部做完给冲刺、乐园和一日记录的入口。 */
+function _ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+const Flow = {
+  done(st) {
+    if (!st || !st.total) { location.href = '/today'; return; }
+    _ls('secs:' + st.day, st.secs_done);  // 今天页不再重复弹「第 n 节完成」
+    $$('.flow-sheet,.flow-pill').forEach(x => x.remove());
+    const nx = st.next, sec = st.section;
+    const head = st.all_done ? '🎉 今天的任务全部完成！' : sec ? `🎉 第 ${sec.n} 节完成！` : st.just ? '✓ 完成一项 +1 ⭐' : '👉 接着做今天的任务';
+    const sub = st.all_done ? '坚持比做对更重要，今天你做到了。' : sec ? (sec.base ? '保底完成，今天的连续天数保住了。' : `又亮了一格，还剩 ${sec.left} 节。`) : '';
+    const m = document.createElement('div'); m.className = 'flow-sheet'; m.setAttribute('role', 'dialog');
+    m.innerHTML = `<div class="fs-card"><button type="button" class="fs-x" aria-label="先看看这页" title="先看看这页">✕</button>
+      <div class="fs-h"><b>${head}</b>${sub ? `<span>${sub}</span>` : ''}</div>
+      <div class="fs-prog"><span>今天 ${st.done}/${st.total}</span><i><b style="width:${Math.round(100 * st.done / st.total)}%"></b></i></div>
+      ${nx ? `<a class="fs-next" href="${esc(nx.url)}"><span class="fs-k">下一项 · 第 ${nx.n} 项${nx.minutes ? ' · 约 ' + nx.minutes + ' 分钟' : ''}</span><b>${esc(nx.title)}</b>${nx.why ? `<span class="fs-why">${esc(nx.why)}</span>` : ''}<span class="btn lg block fs-go">继续 →</span></a>`
+        : `<div class="fs-end"><a class="btn lg" href="/sprint">⚡ 还想做？来冲刺</a><a class="btn soft lg" href="/arena">🎮 去乐园</a></div>`}
+      <div class="fs-alt">${sec && nx ? '<button type="button" class="linkbtn fs-rest">☕ 休息 3 分钟</button>' : ''}<a class="linkbtn" href="/today${st.all_done ? '#daylog' : ''}">${st.all_done ? '📝 写一句一日记录' : '回到今天'}</a></div></div>`;
+    document.body.appendChild(m);
+    const go = $('.fs-next', m); if (go) setTimeout(() => go.focus(), 50);
+    if (st.all_done || sec) confetti(); else if (st.just) cheer($('.fs-card', m));
+    $('.fs-x', m).onclick = () => { m.remove(); if (nx) Flow.pill(nx); };
+    const rb = $('.fs-rest', m); if (rb) rb.onclick = () => restTimer($('.fs-card', m), () => { m.remove(); Flow.done({...st, section: null}); });
+    if (st.just) Flow.strip(st);
+  },
+  /* 收起来以后：右下角留一个「下一项 →」 */
+  pill(nx) {
+    const a = document.createElement('a'); a.className = 'flow-pill'; a.href = nx.url; a.innerHTML = `下一项：<b>${esc(nx.title)}</b> →`;
+    document.body.appendChild(a);
+  },
+  /* 页面顶上的「今天 3/8」条：这一项标成做完，按钮变成直接去下一项 */
+  strip(st) {
+    const b = $('.flowbar'); if (!b) return;
+    b.classList.add('done');
+    const n = $('.flb-prog b', b); if (n) n.textContent = `${st.done}/${st.total}`;
+    const t = $('.flb-t', b); if (t && !t.textContent.startsWith('✓')) t.textContent = '✓ 做完了：' + t.textContent.replace(/^第 \d+ 项：/, '');
+    const g = $('.flb-go', b);
+    if (g && st.next) { g.href = st.next.url; g.textContent = '下一项 ›'; } else if (g) g.remove();
+  },
+};
+/* 做完一项任务：+1 ⭐，接着做下一项 */
 async function finishTask(type, extra) {
-  try { await api('/api/plan/task-done', Object.assign({type}, extra || {})); } catch (e) {}
-  sessionStorage.setItem('justDone', type);
-  location.href = '/today';
+  let r = {};
+  try { r = await api('/api/plan/task-done', Object.assign({type}, extra || {})); } catch (e) {}
+  if (r.flow && r.flow.total) Flow.done(r.flow); else location.href = '/today';
 }
-
-/* ---------- 朗读：服务器朗读（同一句话只生成一次，以后读缓存）；没开或出错时用浏览器自带的声音 ---------- */
+/* 课间休息 3 分钟（学完一节时） */
+function restTimer(card, done) {
+  const tips = ['站起来伸个懒腰 🙆', '看看窗外最远的地方 🌳', '喝几口水 💧', '转转脖子和肩膀 🔄', '闭上眼睛深呼吸 3 次 😌'];
+  let left = 180, i = 0;
+  card.innerHTML = `<div class="big">☕</div><b>课间休息</b><div class="rest-t">3:00</div><p class="rest-tip">${tips[0]}</p><button type="button" class="btn ghost block">休息好了，继续 →</button>`;
+  card.classList.add('resting');
+  const t = card.querySelector('.rest-t'), tip = card.querySelector('.rest-tip');
+  const timer = setInterval(() => {
+    left--; t.textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
+    if (left % 20 === 0) tip.textContent = tips[++i % tips.length];
+    if (left <= 0) { clearInterval(timer); t.textContent = '时间到！'; toast('⏰ 休息好了，开始下一项吧'); }
+  }, 1000);
+  card.querySelector('button').onclick = () => { clearInterval(timer); done(); };
+}
 const Speak = {
   audio: null, n: 0, playing: false, slow: false, _end: null,
   langOf(t) { return /[一-鿿]/.test(t) && !/[A-Za-z]{3,}/.test(t) ? 'zh' : 'en'; },

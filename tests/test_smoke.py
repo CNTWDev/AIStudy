@@ -3,6 +3,8 @@
 默认用临时 SQLite。要在 PostgreSQL 上跑：
   TEST_DATABASE_URL=postgresql://用户:密码@127.0.0.1/空数据库 python -m pytest -q
 """
+from datetime import timedelta
+
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -113,7 +115,14 @@ def test_full_flow(monkeypatch):
             body = {"item_id": v["id"], "self": "ok"} if v["type"] == "short" else {"item_id": v["id"], "answer": right(v)}
             res = c.post(f"/api/review/{cid}/answer", json=body).json()
             assert res["passed"], res
-        assert db.one("SELECT due FROM cards WHERE id=?", cid)["due"] == recall.PASSED_DUE  # 过关：不再出现
+        # 过关：先不移出，3 周后回头做一次原题；还会才真正掌握，不再出现
+        assert db.one("SELECT due FROM cards WHERE id=?", cid)["due"] == (db.today() + timedelta(days=recall.RECHECK_DAYS)).isoformat()
+        db.run("UPDATE cards SET due=? WHERE id=?", db.today().isoformat(), cid)
+        q = recall.quiz(kid_a, db.one("SELECT * FROM cards WHERE id=?", cid))
+        assert q["recheck"] and q["item"]["id"] == it["id"]  # 回头看做的是原题
+        res = c.post(f"/api/review/{cid}/answer", json={"item_id": it["id"], "answer": right(it)}).json()
+        assert res["kept"], res
+        assert db.one("SELECT due FROM cards WHERE id=?", cid)["due"] == recall.PASSED_DUE
 
         # 单词复习：看意思选单词（四选一），系统判对错
         db.run("DELETE FROM cards WHERE user_id=? AND kind='word'", kid_a)

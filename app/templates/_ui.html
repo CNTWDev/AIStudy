@@ -54,3 +54,28 @@
 <div class="bar mb" title="已掌握 {{ s.mastered }} · 学习中 {{ s.learning }} · 薄弱 {{ s.weak }} · 未测 {{ s.unknown }}"><span style="width:{{ 100*s.mastered/s.total if s.total else 0 }}%;background:var(--ok)"></span><span style="width:{{ 100*s.learning/s.total if s.total else 0 }}%;background:var(--learn)"></span><span style="width:{{ 100*s.weak/s.total if s.total else 0 }}%;background:var(--warn)"></span></div>
 <div class="mleg"><span><i class="dot mastered"></i>已掌握 <b>{{ s.mastered }}</b></span><span><i class="dot learning"></i>学习中 <b>{{ s.learning }}</b></span><span><i class="dot weak"></i>薄弱 <b>{{ s.weak }}</b></span><span><i class="dot"></i>没测过 <b>{{ s.unknown }}</b></span></div>
 {% endmacro %}
+
+{# 一道题的统一展示（和 app.js 的 qView / renderItem 同一个样子）。v 来自 itemtypes.view(item, mine)：
+   带答案（错题本、订正过的卷子）：选项上标「✓ 正确答案」「我选的」，下面分栏：答案 / 我的答案 / 解析 / 要点。
+   with_answer=False 的 v 没有 answer，就只显示题干和选项。 #}
+{% macro question(v, num=None) %}
+<div class="qc">
+  {% if v.src %}<div class="qc-meta"><span>📄 {{ v.src }}</span></div>{% endif %}
+  <div class="qc-stem">{% if num %}<span class="qc-n">{{ num }}</span>{% endif %}{{ v.q }}</div>
+  {% if v.code %}<pre class="code">{{ v.code }}</pre>{% endif %}
+  {% if v.zh %}<div class="qc-zh">{{ v.zh }}</div>{% endif %}
+  {% if v.options %}<div class="qc-opts">{% for o in v.options %}
+    <div class="opt static {{ 'right' if o.right }} {{ 'wrong' if o.mine and not o.right }}"><b class="qc-key">{{ o.key }}</b><span class="qc-ot">{{ o.text }}</span>
+      {%- if o.right %}<span class="qc-tag ok">✓ 正确答案</span>{% endif %}{% if o.mine %}<span class="qc-tag mine {{ 'ok' if o.right else 'no' }}">我选的{{ ' ✓' if o.right }}</span>{% endif %}</div>
+  {% endfor %}</div>{% endif %}
+  {% if v.answer is defined %}
+  {% set mine_opt = v.options|selectattr('mine')|list %}
+  <dl class="qc-ans">
+    {% if v.answer and not (v.options and v.options|selectattr('right')|list) %}<div><dt>答案</dt><dd>{{ v.answer }}{% if v.unit and v.unit not in v.answer %} {{ v.unit }}{% endif %}</dd></div>{% endif %}
+    {% if v.mine and not mine_opt %}<div><dt>我的答案</dt><dd>{{ v.mine }}</dd></div>{% endif %}
+    {% if v.explain %}<div><dt>解析</dt><dd class="qc-explain">{{ v.explain }}</dd></div>{% endif %}
+    {% if v.points %}<div><dt>要点</dt><dd><ul>{% for p in v.points %}<li>{{ p }}</li>{% endfor %}</ul></dd></div>{% endif %}
+  </dl>
+  {% endif %}
+</div>
+{% endmacro %}

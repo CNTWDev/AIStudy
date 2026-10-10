@@ -36,9 +36,9 @@ $('#timer').onclick = () => {
 $$('.moods button').forEach(b => b.onclick = () => { $$('.moods button').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); feeling = b.dataset.m; });
 $('#save').onclick = async () => {
   $('#save').disabled = true;
-  await api('/api/track/{{ t.id }}/log', {to: $('#to') ? +$('#to').value : 0, pages: $('#pages') ? $('#pages').value : '',
+  const r = await api('/api/track/{{ t.id }}/log', {to: $('#to') ? +$('#to').value : 0, pages: $('#pages') ? $('#pages').value : '',
     summary: $('#summary').value, feeling, minutes: +$('#mins').value});
-  sessionStorage.setItem('justDone', '{{ t.kind }}'); location.href = '/today';
+  if (r.flow && r.flow.total) Flow.done(r.flow); else location.href = '/today';
 };
 </script>
 {% endblock %}

@@ -116,6 +116,7 @@ $('#next').addEventListener('click', async e => {
   const r = await markRead();
   if (LAST && !LISTEN && $('#after') && $('#after').hidden) { await afterChapter(); }
   if (r && r.finished) { toast('🎉 整本书读完了！'); cheer(); setTimeout(() => location.href = `/books/${BID}`, 1500); return; }
+  if (r && r.flow) { Flow.done(r.flow); return; }  // 今天的页数读够了：问一下是接着做下一项，还是继续读
   if ($('#next').href) location.href = $('#next').href;
 });
 
@@ -125,7 +126,7 @@ Listen.mount($$('#reader p'), {lang: LANG, bar: $('#listenhere'), onDone: async 
   if (PAGE < TOTAL && LISTEN) location.href = `/books/${BID}/p/${PAGE + 1}?listen=1&auto=1`;
   else if (PAGE >= TOTAL) toast('🎉 听完了！');
 }});
-if (KID) { let acc = 0; setInterval(() => { if (Speak.playing && !document.hidden) acc++; if (acc >= 30) { const s = acc; acc = 0; api(`/api/books/${BID}/listen`, {page: PAGE, seconds: s}).then(r => { if ($('#tmin')) $('#tmin').textContent = Math.round(r.today.listen_seconds / 60); }).catch(() => {}); } }, 1000); }
+if (KID) { let acc = 0; setInterval(() => { if (Speak.playing && !document.hidden) acc++; if (acc >= 30) { const s = acc; acc = 0; api(`/api/books/${BID}/listen`, {page: PAGE, seconds: s}).then(r => { if ($('#tmin')) $('#tmin').textContent = Math.round(r.today.listen_seconds / 60); if (r.flow) Flow.done(r.flow); }).catch(() => {}); } }, 1000); }
 if (LISTEN && new URLSearchParams(location.search).get('auto')) setTimeout(() => Listen.play(), 400);
 </script>
 {% endblock %}

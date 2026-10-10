@@ -46,7 +46,7 @@ templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LA
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
                              stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock,
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES,
-                             trend_words=records.trend_words, tts_info=tts_web.client_info)
+                             trend_words=records.trend_words, tts_info=tts_web.client_info, qview=itemtypes.view)
 templates.env.globals.update(MASCOTS=brand.MASCOTS, mascot_of=brand.mascot_of, mascot_chosen=brand.has_chosen, mascot_svg=brand.mascot_svg,
                              wordmark_svg=brand.wordmark_svg)
 templates.env.globals["news_today_title"] = news.today_title
@@ -107,10 +107,31 @@ def render(request: Request, name: str, status_code: int = 200, **ctx):
             db.one("SELECT * FROM users WHERE id=? AND parent_id=?", request.session.get("as_kid"), user["id"])
             if request.session.get("as_kid") and user["role"] == "parent" else None)
     # readonly：家长在看孩子的页面——只能查看和管理，不能替孩子做题
+    if user and user["role"] == "kid" and request.url.path != "/today":
+        ctx["dayflow"] = _flow_here(request, user)
     base = {"user": user, "kid": kid, "readonly": bool(user and user["role"] != "kid"),
             "SITE": sitecfg.get("site_name"), "ASSISTANT": sitecfg.get("assistant_name"),
             "ASSISTANT_ICON": sitecfg.get("assistant_icon"), "tone": ui_tone(kid or user)}
     return templates.TemplateResponse(request, name, {**base, **ctx}, status_code=status_code)
+
+
+def _flow_here(request: Request, kid) -> dict | None:
+    """这个页面是今天清单里的哪一项：页面顶上显示「今天 3/8 · 正在做…」，随时能去下一项（见 engine.flow_match）。"""
+    plan = engine.plan_of_today(kid["id"])
+    if not plan:
+        return None
+    path, query = request.url.path, dict(request.query_params)
+    lang = query.get("lang") if path == "/reading/today" else None
+    m = re.fullmatch(r"/reading/(\d+)", path)
+    if m:
+        r = db.one("SELECT lang FROM readings WHERE id=? AND user_id=?", int(m.group(1)), kid["id"])
+        lang = r["lang"] if r else None
+    t = engine.flow_match(plan, path, query, lang)
+    if not t:
+        return None
+    nxt = engine.next_task(plan, t["id"])
+    return {"task": t, "n": plan.index(t) + 1, "total": len(plan), "done": sum(1 for x in plan if x.get("done")),
+            "dots": [bool(x.get("done")) for x in plan], "next": nxt}
 
 
 PARENT_READONLY = "家长账号用来查看和管理。做题、阅读、复习请让孩子用自己的账号登录。"
@@ -1020,6 +1041,22 @@ def today(request: Request):
                   found=insights.open_insights(k["id"], for_kid=me["role"] == "kid", limit=4 if me["role"] == "kid" else 10))
 
 
+@app.get("/go")
+def go_next(request: Request, after: str = ""):
+    """今天的统一入口：直接进下一项没做的任务（after：先跳过这一项）。都做完了回到今天。"""
+    k = kid_or_redirect(request)
+    if not engine.plan_of_today(k["id"]):
+        engine.today_plan(k["id"])
+    t = engine.next_task(engine.plan_of_today(k["id"]), after or None)
+    return RedirectResponse(t["url"] if t else "/today", 303)
+
+
+@app.get("/api/flow")
+def flow_get(request: Request, current: str = ""):
+    k = kid_or_redirect(request)
+    return engine.flow_state(k["id"], current or None)
+
+
 @app.post("/api/plan/rebuild")
 def plan_rebuild(request: Request):
     k = kid_or_redirect(request)
@@ -1040,8 +1077,9 @@ def plan_task_done(request: Request, body: dict = Body(...)):
     match = {"type": body.get("type")}
     if body.get("kp"):
         match["kp"] = body["kp"]
-    engine.mark_task_by(k["id"], **match)
-    return {"ok": True, "stars": engine.total_stars(k["id"])}
+    hit = engine.mark_task_by(k["id"], **match)
+    cur = (hit or [None])[0] or body.get("current")
+    return {"ok": True, "stars": engine.total_stars(k["id"]), "flow": engine.flow_state(k["id"], cur)}
 
 
 # ================================================================== 跟自己比：PB、「上周的我」、专注计时
@@ -1121,7 +1159,8 @@ def track_log(request: Request, tid: int, body: dict = Body(...)):
     engine.log_reading(k["id"], tid, to_pos=int(body.get("to") or 0), minutes=int(body.get("minutes") or 0),
                        summary=(body.get("summary") or "").strip(), feeling=body.get("feeling") or "",
                        pages=str(body.get("pages") or ""))
-    return {"ok": True, "stars": engine.total_stars(k["id"])}
+    cur = next((t["id"] for t in engine.plan_of_today(k["id"]) if t.get("track") == tid), None)
+    return {"ok": True, "stars": engine.total_stars(k["id"]), "flow": engine.flow_state(k["id"], cur)}
 
 
 # ================================================================== 学科与知识图谱
@@ -1272,8 +1311,7 @@ def api_answer(request: Request, body: dict = Body(...)):
         if mode == "probe":
             pr = body.get("probe") or {}
             explore.after_probe(k["id"], kp_id, False, int(pr.get("depth") or 0), pr.get("from") or "")
-        return {"correct": False, "dont_know": True, "answer": _answer_display(it), "explain": it.get("explain", ""),
-                "hint": it.get("hint", "")}
+        return {"correct": False, "dont_know": True, **itemtypes.reveal(it), "hint": it.get("hint", "")}
     if itemtypes.of(it).self_rated:
         if "self" not in body:  # 先给参考答案，孩子对照后自评
             return {"reveal": True, "answer": it.get("model", ""), "points": it.get("points", []), "explain": it.get("explain", "")}
@@ -1283,8 +1321,7 @@ def api_answer(request: Request, body: dict = Body(...)):
     old = (db.one("SELECT status FROM mastery WHERE user_id=? AND kp_id=?", k["id"], kp_id) or {}).get("status")
     status = engine.record_attempt(k["id"], it, kp_id, mode, bool(correct), body.get("answer", body.get("self", "")),
                                    ms=body.get("ms"))
-    out = {"correct": bool(correct), "answer": _answer_display(it), "explain": it.get("explain", ""),
-           "status": status, "status_label": engine.STATUS_LABEL[status]}
+    out = {"correct": bool(correct), **itemtypes.reveal(it), "status": status, "status_label": engine.STATUS_LABEL[status]}
     if mode == "probe":
         pr = body.get("probe") or {}
         out["probe"] = explore.after_probe(k["id"], kp_id, bool(correct), int(pr.get("depth") or 0), pr.get("from") or "")
@@ -1300,8 +1337,8 @@ def api_learn_done(request: Request, body: dict = Body(...)):
     if body.get("summary"):
         kp = catalog.kp(kp_id)
         engine.add_card(k["id"], "kp", kp["name"], body["summary"][:500], {"method": kp.get("method", "")}, kp_id)
-    engine.mark_task_by(k["id"], kp=kp_id)
-    return {"ok": True}
+    hit = engine.mark_task_by(k["id"], kp=kp_id)
+    return {"ok": True, "flow": engine.flow_state(k["id"], (hit or [None])[0])}
 
 
 @app.get("/api/context/{kp_id}")
@@ -1705,7 +1742,7 @@ def diag_answer(request: Request, sid: int, body: dict = Body(...)):
     if not r:
         return {"ok": False}
     it = r["item"]
-    return {"correct": bool(r["ok"]), "answer": _answer_display(it) if it else "", "explain": it.get("explain", "") if it else ""}
+    return {"correct": bool(r["ok"]), **(itemtypes.reveal(it) if it else {"answer": "", "explain": ""})}
 
 
 @app.post("/api/diag/{sid}/finish")
@@ -1784,8 +1821,15 @@ def words(request: Request, kind: str = "word"):
     sents = db.q("SELECT * FROM sentences WHERE user_id=? ORDER BY id DESC LIMIT 100", k["id"]) if kind == "sentence" else []
     counts = {r["kind"]: r["n"] for r in db.q("SELECT kind, COUNT(*) AS n FROM cards WHERE user_id=? GROUP BY kind", k["id"])}
     counts["sentence"] = db.one("SELECT COUNT(*) AS n FROM sentences WHERE user_id=?", k["id"])["n"]
-    return render(request, "words.html", cards=[{**dict(c), "extra": db.jload(c["extra"], {})} for c in cards],
-                  sents=[{**dict(s), "fb": db.jload(s["feedback"], {})} for s in sents], kind=kind, counts=counts)
+    cards = [{**dict(c), "extra": db.jload(c["extra"], {})} for c in cards]
+    if kind == "mistake":  # 错题：按原题结构显示（题干、选项、答案、我的答案、解析），找不到原题的老错题退回文字
+        for c in cards:
+            it = recall._item(c["extra"].get("item_id"))
+            c["view"] = itemtypes.view(it, c["extra"].get("my_answer")) if it else None
+        cards.sort(key=lambda c: (bool(c["extra"].get("passed")), c["due"]))  # 要重做的在前，过关的在后
+    return render(request, "words.html", cards=cards,
+                  sents=[{**dict(s), "fb": db.jload(s["feedback"], {})} for s in sents], kind=kind, counts=counts,
+                  today_iso=db.today().isoformat())
 
 
 @app.post("/api/cards")
@@ -1808,11 +1852,30 @@ def delete_card(request: Request, card_id: int):
 
 # ================================================================== 阅读
 
+def _today_reading(uid: int, lang: str, ai_only=False):
+    """今天已经开始的那篇（没读完的优先）：每日阅读进来先看它，不再一进来就生成新的。"""
+    return db.one("SELECT * FROM readings WHERE user_id=? AND lang=? AND created_at>=?" + (" AND source='ai'" if ai_only else "") +
+                  " ORDER BY CASE WHEN finished_at IS NULL THEN 0 ELSE 1 END, id DESC LIMIT 1", uid, lang, db.today().isoformat())
+
+
+@app.get("/reading/today")
+def reading_today(request: Request, lang: str = "en"):
+    """每日阅读任务的入口：今天读过 / 生成过就直接打开那篇；还没有才进写文章的工具。"""
+    k = kid_or_redirect(request)
+    lang = lang if lang in ("en", "zh") else "en"
+    r = _today_reading(k["id"], lang)
+    if r:
+        return RedirectResponse(f"/reading/{r['id']}", 303)
+    return reading_list(request, lang, daily=True)
+
+
 @app.get("/reading", response_class=HTMLResponse)
-def reading_list(request: Request, lang: str = "en"):
+def reading_list(request: Request, lang: str = "en", daily: bool = False):
     k = kid_or_redirect(request)
     rows = db.q("SELECT id, title, lang, source, minutes, finished_at, created_at FROM readings WHERE user_id=? ORDER BY id DESC LIMIT 50", k["id"])
-    return render(request, "reading_list.html", rows=rows, lang=lang, cross={l: engine.cross_topics(k["id"], l) for l in ("en", "zh")})
+    lang = lang if lang in ("en", "zh") else "en"
+    return render(request, "reading_list.html", rows=rows, lang=lang, daily=daily, today_r=_today_reading(k["id"], lang),
+                  cross={l: engine.cross_topics(k["id"], l) for l in ("en", "zh")})
 
 
 @app.post("/reading/new")
@@ -1821,6 +1884,9 @@ async def reading_new(request: Request):
     form = await request.form()
     lang = form.get("lang") if form.get("lang") in ("en", "zh") else "en"
     if form.get("mode") == "ai":
+        dup = _today_reading(k["id"], lang, ai_only=True)
+        if dup and not dup["finished_at"] and not form.get("again"):  # 今天写的那篇还没读完：先读它（连点、来回进出不会多生成）
+            return RedirectResponse(f"/reading/{dup['id']}?dup=1", 303)
         review_words = [r["front"] for r in db.q(
             "SELECT front FROM cards WHERE user_id=? AND kind='word' AND due<=? ORDER BY due LIMIT 8",
             k["id"], (db.today() + timedelta(days=3)).isoformat())] if lang == "en" else []
@@ -1860,9 +1926,18 @@ def reading_view(request: Request, rid: int):
         raise HTTPException(404)
     qs = db.jload(r["questions"], [])
     looked = db.q("SELECT query, result FROM lookups WHERE user_id=? AND reading_id=? ORDER BY id", k["id"], rid)
+    answers = db.jload(r["answers"], None) if r["finished_at"] else None
     return render(request, "reading.html", r=r, paras=[p for p in r["body"].split("\n") if p.strip()],
                   questions=[{"q": q["q"], "options": q.get("options", [])} for q in qs], news=news.reading_extra(r),
+                  done_views=[_reading_view(q, (answers or {}).get(str(i))) for i, q in enumerate(qs)] if answers is not None else None,
+                  dup=request.query_params.get("dup") == "1", is_today=r["created_at"] >= db.today().isoformat(),
                   looked=[{"q": l["query"], "r": db.jload(l["result"], {})} for l in looked])
+
+
+def _reading_view(q: dict, mine) -> dict:
+    """阅读小题也是选择题：用统一的题目展示结构（itemtypes.view）。"""
+    return itemtypes.view({"type": "mcq", "q": q.get("q", ""), "options": q.get("options", []), "answer": q.get("answer"),
+                           "explain": q.get("explain", "")}, mine)
 
 
 # ------------------------------------------------------------------ 划词：查词 / 翻译 / 加入复习（网站任何页面都能用）
@@ -1975,16 +2050,20 @@ def reading_finish(request: Request, rid: int, body: dict = Body(...)):
         raise HTTPException(404)
     qs = db.jload(r["questions"], [])
     answers = body.get("answers") or {}
+    if r["finished_at"] and r["answers"]:  # 已经交过：不重复算，原样给回上次的结果
+        answers = db.jload(r["answers"], {})
     results = []
     for i, q in enumerate(qs):
         a = answers.get(str(i))
         ok = a is not None and str(a) == str(q.get("answer"))
-        results.append({"ok": ok, "answer": q.get("answer"), "explain": q.get("explain", "")})
+        results.append({"ok": ok, "answer": q.get("answer"), "explain": q.get("explain", ""), "view": _reading_view(q, a)})
     minutes = max(1, min(120, int(body.get("minutes") or 1)))
-    db.run("UPDATE readings SET finished_at=?, minutes=minutes+? WHERE id=?", db.now(), minutes, rid)
+    if not r["finished_at"]:
+        db.run("UPDATE readings SET finished_at=?, minutes=minutes+?, answers=? WHERE id=?", db.now(), minutes,
+               db.jdump({str(k2): v for k2, v in answers.items()}), rid)
     engine._touch_day(k["id"])  # 在线阅读的时间由页面自动计时
-    engine.mark_task_by(k["id"], type="read_" + r["lang"], lang=r["lang"])
-    return {"results": results}
+    hit = engine.mark_task_by(k["id"], type="read_" + r["lang"], lang=r["lang"])
+    return {"results": results, "flow": engine.flow_state(k["id"], hit[0]) if hit else None}
 
 
 # ================================================================== 记录
