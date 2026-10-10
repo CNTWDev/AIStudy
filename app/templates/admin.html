@@ -376,6 +376,7 @@ $('#bpf').onsubmit = async e => {
     <tr><td>AI</td><td>{% if llm_status[0] %}<b>可用</b> · {{ llm_status[1] }}{% else %}<b>未就绪</b> · {{ llm_status[1] }}{% endif %}
       <div class="muted small">在服务器 config/llm.toml 修改后重启；<code>install.sh check --llm</code> 可实际测试</div></td></tr>
     <tr><td>书库</td><td><a href="/admin/library">📚 下载 / 上传名著原文</a></td></tr>
+    <tr><td>每日新闻</td><td><a href="/admin/news">📰 今天选了哪条、各新闻源能不能访问、换一篇</a></td></tr>
     <tr><td>朗读</td><td>{% if tts_status[0] %}<b>可用</b> · {{ tts_status[1] }}{% else %}<b>未开启</b> · {{ tts_status[1] }}{% endif %}
       <div class="muted small">已缓存 {{ tts_stats.ready }} 段 · {{ tts_stats.chars }} 字 · {{ (tts_stats.bytes / 1048576)|round(1) }} MB · 共播放 {{ tts_stats.hits }} 次 · 今天新生成 {{ tts_stats.today_chars }} 字</div>
       <div class="muted small">在服务器 config/tts.toml 修改后重启</div></td></tr>

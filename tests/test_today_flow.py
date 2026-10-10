@@ -97,7 +97,7 @@ def test_plan_order_and_mistakes():
         types = [t["type"] for t in p]
         # 主线：热身 → 错题（旧账先清）→ 单词 → 学新的 / 补弱的 → 阅读收尾
         assert "mistakes" in types and types.index("mistakes") < types.index("words")
-        assert types[-1] == "read_en" and p[-1]["url"] == "/reading/today?lang=en"
+        assert types[-1] == "read_en" and p[-1]["url"] in ("/reading/today?lang=en", "/news")  # 有今日新闻就读新闻
         # 错题本按原题结构显示：题干、选项、正确答案、我选的、解析
         page = c.get("/words?kind=mistake").text
         assert 'class="qc"' in page and "qc-ans" in page and "今天要重做" in page

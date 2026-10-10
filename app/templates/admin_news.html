@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/admin?tab=system" class="small">← 管理</a>
+<h1>📰 每日新闻</h1>
+{% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
+<p class="muted small">每天早上 {{ hour }} 点以后，后台从下面的新闻源里抓最近一两天的新闻，由 AI 当编辑给小学、中学各选一条，
+再按孩子的级别改写成英文短文（每个级别写一次，所有孩子共用）。孩子读的是改写稿，页面上写明来源并给原文链接；
+只有公有领域 / 允许原样转载的源才在站内提供原文。新闻源和级别在 <code>content/news.json</code>（要改就复制成 <code>config/news.json</code>）。</p>
+{% if not ai %}<div class="err">AI 还没配置好，每日新闻不会运行。</div>{% endif %}
+<form method="post" action="/admin/news/run" class="row"><button class="btn" data-busy="已开始…">🔄 重新抓取精选今天的新闻</button>
+  <span class="muted small">上次运行：{{ st.last_run or '还没有' }}{% if st.last.error %} · <span class="err">{{ st.last.error }}</span>{% endif %}
+  {% if st.last.candidates is defined %} · 候选 {{ st.last.candidates }} 条{% endif %}</span></form>
+
+<h2>选出的新闻</h2>
+<div class="card"><div class="tw"><table>
+<tr><th>日期</th><th>新闻</th><th>已写级别</th><th></th></tr>
+{% for p in rows %}<tr class="small">
+  <td class="nw">{{ p.day }}<br><span class="muted">{{ bands[p.band] }}</span></td>
+  <td><a href="{{ p.url }}" target="_blank" rel="noopener noreferrer"><b>{{ p.title }}</b></a><br>
+    <span class="muted">{{ p.source_name }} · {{ LICENSE.get(p.license, p.license) }}{% if p.topic %} · {{ p.topic }}{% endif %}{% if p.subjects %} · {{ p.subjects|join('、') }}{% endif %} · 材料 {{ p.n_facts }} 字</span>
+    {% if p.why %}<br>💡 {{ p.why }}{% endif %}</td>
+  <td>{{ p.levels|join(' ') or '—' }}<br><span class="muted">{{ p.n_read }} 人次读</span></td>
+  <td class="nw">{% if p.n_alts %}<form method="post" action="/admin/news/swap"><input type="hidden" name="pick_id" value="{{ p.id }}"><button class="btn ghost sm">换一篇（备选 {{ p.n_alts }}）</button></form>{% endif %}</td>
+</tr>{% else %}<tr><td colspan="4" class="muted">还没有选过新闻</td></tr>{% endfor %}
+</table></div></div>
+
+<h2>新闻源</h2>
+<div class="card"><div class="tw"><table>
+<tr><th>源</th><th>版权</th><th>大陆可访问</th><th>上次抓取</th></tr>
+{% for s in sources %}{% set r = (st.last.sources or {}).get(s.id) %}<tr class="small">
+  <td><b>{{ s.name }}</b> <span class="muted">{{ s.id }}</span>{% if s.off %} <span class="muted">（已关闭）</span>{% endif %}<br><span class="muted">{{ s.topics|join(' / ') }}</span></td>
+  <td>{{ LICENSE.get(s.license, s.license) }}</td>
+  <td>{{ '估计可以' if s.cn else '多半不行' }}</td>
+  <td>{% if not r %}<span class="muted">—</span>{% elif r.ok %}✓ {{ r.n }} 条{% if r.newest %}<br><span class="muted">最新 {{ r.newest }}</span>{% endif %}{% else %}<span class="err">✗ {{ r.error }}</span>{% endif %}</td>
+</tr>{% endfor %}
+</table></div></div>
+
+<h2>级别</h2>
+<div class="card"><div class="tw"><table>
+<tr><th>级别</th><th>适合</th><th>篇幅</th><th>附带</th></tr>
+{% for id, L in levels.items() %}<tr class="small"><td><b>{{ id }}</b> {{ L.name }}</td><td>{{ L.who }} · CEFR {{ L.cefr }}</td><td>{{ L.words }}，约 {{ L.minutes }} 分钟</td>
+  <td>生词 {{ L.glossary }} 个 · 小题 {{ L.questions }} 道{% if L.discuss %} · 口语讨论题{% endif %}</td></tr>{% endfor %}
+</table></div>
+<p class="muted small">孩子的级别按年级自动定；孩子在新闻页上可以自己换「简单一点 / 难一点」，以后就按换过的级别。</p></div>
+{% endblock %}

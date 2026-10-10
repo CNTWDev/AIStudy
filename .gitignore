@@ -8,3 +8,4 @@ venv/
 config/llm.toml
 config/tts.toml
 *.sql.gz
+config/news.json

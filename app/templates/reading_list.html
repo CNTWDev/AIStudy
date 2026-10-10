@@ -11,6 +11,8 @@
 {% elif daily %}
 <p class="lead" style="margin-top:6px">今天还没读。点下面的「✨ 生成短文」，AI 按你的水平写一篇（话题不选也行）；读完做几道小题就完成。</p>
 {% endif %}
+{% set nt = news_today_title(user) if user and user.role == 'kid' and lang == 'en' else None %}
+{% if nt or not daily %}<a class="tile" href="/news" style="margin:10px 0"><span class="e">📰</span><span><b>今日新闻{% if nt %}：{{ nt }}{% endif %}</b><span>每天从世界各地的新闻里选一条最值得知道的，按你的水平写成英文短文；不懂的词点一下就查</span></span></a>{% endif %}
 {% if not daily %}<a class="tile" href="/books" style="margin:10px 0"><span class="e">📚</span><span><b>书库：读名著原文</b><span>《爱丽丝》《绿野仙踪》《西游记》……一页一页读，不认识的词点一下，读累了点 ▶ 听</span></span></a>
 <p class="lead">大量读是提分的根本。读的时候<b>点一下不懂的词</b>就能查，觉得有用就收藏，收藏的词会自动进入复习。</p>
 {% endif %}

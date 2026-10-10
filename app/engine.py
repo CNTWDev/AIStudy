@@ -787,7 +787,7 @@ def flow_match(plan: list[dict], path: str, query: dict, reading_lang: str | Non
         want = dict(x.split("=", 1) for x in tq.split("&") if "=" in x)
         if tp == path and all(query.get(k) == v for k, v in want.items()):
             return 3
-        if reading_lang and t.get("type") == "read_" + reading_lang and tp.startswith("/reading"):
+        if reading_lang and t.get("type") == "read_" + reading_lang and not t.get("track"):  # AI 短文、今日新闻都在阅读器里读
             return 2
         for pre in ("/books/", "/papers/", "/track/"):
             if path.startswith(pre) and tp.startswith(pre) and path.split("/")[2] == tp.split("/")[2]:

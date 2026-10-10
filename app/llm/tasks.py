@@ -24,7 +24,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 2, "teach": 2, "context": 1, "passage": 1, "variant": 1, "verify": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 2, "teach": 2, "context": 1, "passage": 1, "variant": 1, "verify": 1, "news_pick": 1, "news_write": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -209,6 +209,56 @@ def book_guide(book: dict, ch: int, chapter_title: str, text: str, grade: str, u
         "}\nquiz 出 2 道，选项 3 个。"
     )
     return ask_json("book_guide", TUTOR + "你也是很会带孩子读整本书的阅读老师。", user, user_id=user_id, effort="low", max_tokens=2000, cache=False)
+
+
+NEWS_EDITOR = (
+    "你是一位给中国中小学生编英文新闻读物的资深编辑，熟悉 IGCSE、中考英语和各科课本。"
+    "你只报道事实，立场客观中立，不评论政治是非，不渲染暴力和恐怖细节。"
+)
+
+
+def news_pick(candidates: list[dict], day: str) -> dict:
+    """从候选新闻里给小学、中学各挑出最合适的几条（排好序）。candidates: [{i, source, title, summary, topics}]。"""
+    lines = "\n".join(f"[{c['i']}] ({c['source']}; {'/'.join(c.get('topics') or [])}) {c['title']} — {c.get('summary', '')[:200]}"
+                      for c in candidates)
+    user = (
+        f"今天是 {day}。下面是各新闻源最近一两天的新闻（编号、来源、标题、摘要）：\n{lines}\n\n"
+        "请给两组读者各选 3 条，按推荐顺序排列，每天只读第一条，后两条是备选：\n"
+        "secondary（初中、高中，含 IGCSE / A-Level）：选当天全世界最重要、以后考试和讨论里可能用到的新闻："
+        "国际大事、经济（利率、通胀、贸易、就业、新产业）、科技和人工智能、太空和科学发现、气候和环境、公共卫生、"
+        "教育、文化和重大体育赛事、诺贝尔奖等。优先能连到课本知识（物理、化学、生物、地理、经济、历史）的、"
+        "影响会持续一段时间的、几家媒体都在报道的。\n"
+        "primary（小学）：选孩子看得懂、有兴趣、正面的新闻：科学发现、动物、太空、环境保护、发明、体育、节日和文化。\n"
+        "两组都不要选：凶杀和犯罪、恐怖袭击、战争伤亡细节、灾难伤亡数字为主的报道、性、毒品、名人八卦、选举口水战、"
+        "没有证实的消息、广告软文；有争议的政治话题宁可不选。两组可以选同一条，但小学一般不选纯政治和经济新闻。\n"
+        '输出：{"secondary":[{"i":编号,"why":"为什么选它（中文一句，说清和孩子学习的关系）","topic":"world|economy|science|tech|space|environment|health|culture|sports",'
+        '"subjects":["相关学科，如 经济、物理、地理"]}],"primary":[同样格式]}'
+    )
+    return ask_json("news_pick", NEWS_EDITOR, user, effort="medium", max_tokens=1500, cache=False)
+
+
+def news_write(pick: dict, level: dict, day: str) -> dict:
+    """按级别把一条新闻改写成分级英文短文（用自己的话写，只用材料里的事实），附词汇、背景、小题和讨论题。"""
+    q = level["questions"]
+    discuss = ('"discuss":{"q":"一个能用英文说两三分钟的讨论问题（练口语，和读者的生活或观点有关）","zh":"问题的中文意思和回答思路提示"},'
+               if level.get("discuss") else "")
+    user = (
+        f"读者是{level['who']}的中国学生，英文水平约 CEFR {level['cefr']}。新闻日期：{day}。来源：{pick['source_name']}。\n"
+        f"标题：{pick['title']}\n事实材料（原文摘录，可能不完整）：\n<<<\n{pick['facts'][:6000]}\n>>>\n\n"
+        f"请为这位读者写一篇英文新闻短文：{level['words']}，{level['sentences']}。要求：\n"
+        "1. 用你自己的话重新写，不要照抄材料里的句子（连续相同的词不超过 6 个），不要编造材料里没有的事实、数字和引语；\n"
+        "2. 第一段讲清楚什么时候、在哪里、发生了什么；后面讲为什么重要；最后可以讲接下来会怎样；\n"
+        "3. 生词控制在读者能靠上下文猜的范围，专有名词第一次出现时用简单的话解释；\n"
+        "4. 客观中立，不评论政治是非；\n"
+        f"5. 再出 {q} 道阅读理解选择题（英文出题，4 个选项，考主旨、细节、词义、推理），explain 用中文。\n"
+        '输出：{"title":"英文标题","body":"正文，段落之间用\\n\\n分隔",'
+        f'"glossary":[{{"w":"文中最影响理解的 {level["glossary"]} 个英文词或短语（原文写法）","zh":"在文中的中文意思"}}],'
+        '"background":"用 2-3 句简单的中文讲这件事的背景、为什么值得关注（读前看）",'
+        '"links":[{"subject":"学科","point":"这条新闻和课本里哪个知识点有关（中文一句，没有就不写）"}],'
+        f'{discuss}'
+        '"questions":[{"q":"..","options":["..","..","..",".."],"answer":0,"explain":"中文解析"}]}'
+    )
+    return ask_json("news_write", NEWS_EDITOR + "你也是很会写分级读物的作者。", user, effort="medium", max_tokens=3000, cache=False)
 
 
 PAPER_SCHEMA = (

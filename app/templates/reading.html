@@ -3,7 +3,13 @@
 {% block body %}
 <a href="/reading" class="small">← 阅读</a>
 <h1>{{ r.title }}</h1>
-{% if r.source and r.source.startswith('web:') %}<p class="small muted">来自 <a href="{{ r.source[4:] }}" target="_blank" rel="noopener noreferrer">{{ r.source[4:].split('/')[2] if r.source[4:].count('/') >= 2 else r.source[4:] }}</a>（只供自己学习阅读）</p>{% endif %}
+{% if news %}{% set pk = news.pick %}
+<p class="small muted">📰 {% if pk %}根据 {{ pk.source_name }} {{ pk.day }} 的报道改写 · <a href="{{ pk.url }}" target="_blank" rel="noopener noreferrer">原文链接</a>（{{ news.license }}）{% else %}每日新闻{% endif %}</p>
+<div class="chips" style="margin:0 0 10px">{% for L in news.levels %}<a class="chip{{ ' on' if L.id == news.level }}" href="/news?level={{ L.id }}" title="{{ L.who }}">{{ L.name }}<span class="sub">{{ L.who }}</span></a>{% endfor %}</div>
+{% if news.background %}<div class="hint" style="margin-bottom:10px">🧭 <b>读前了解：</b>{{ news.background }}</div>{% endif %}
+{% if news.glossary %}<details class="card small" style="margin-bottom:10px"><summary>🔑 先看看这 {{ news.glossary|length }} 个关键词（点词看详细解释）</summary>
+<div class="chips">{% for g in news.glossary %}<button type="button" class="chip gl" data-w="{{ g.w }}">{{ g.w }}<span class="sub">{{ g.zh }}</span></button>{% endfor %}</div></details>{% endif %}
+{% elif r.source and r.source.startswith('web:') %}<p class="small muted">来自 <a href="{{ r.source[4:] }}" target="_blank" rel="noopener noreferrer">{{ r.source[4:].split('/')[2] if r.source[4:].count('/') >= 2 else r.source[4:] }}</a>（只供自己学习阅读）</p>{% endif %}
 <p class="muted small">{{ '点一下不懂的单词就能查。' if r.lang == 'en' else '用手指长按/鼠标选中不懂的字词就能查；点一个句子可以问「这句什么意思」。' }} 已查 <span id="nlook">{{ looked|length }}</span> 个。</p>
 <div class="row" style="margin-bottom:8px"><input type="text" id="manual" class="grow" placeholder="也可以直接输入要查的词"><button class="btn sm" id="manualbtn">查</button></div>
 <div id="listenhere"></div>
@@ -22,6 +28,13 @@
 {% for q in questions %}{% set qi = loop.index0 %}<div class="rq qc" data-i="{{ qi }}"><div class="qc-stem"><span class="qc-n">{{ loop.index }}</span>{{ q.q }}</div>
 <div class="qc-opts">{% for o in q.options %}<button class="opt" data-o="{{ loop.index0 }}"><b class="qc-key">{{ 'ABCDEFGH'[loop.index0] }}</b><span class="qc-ot">{{ o }}</span></button>{% endfor %}</div></div>{% endfor %}
 </div>{% endif %}
+{% if news and (news.discuss or news.links) %}<div class="card">
+{% if news.discuss %}<h3 style="margin-top:0">🗣️ 说一说</h3><p><b>{{ news.discuss.q }}</b></p>{% if news.discuss.zh %}<p class="small muted">{{ news.discuss.zh }}</p>{% endif %}
+<p class="small muted">用英文对着家长说两三分钟，或者写三五句话。练的正是口语考试里的「说观点、给理由」。</p>{% endif %}
+{% if news.links %}<h3>📘 和课本的联系</h3>{% for x in news.links %}<p class="small">• <b>{{ x.subject }}</b>：{{ x.point }}</p>{% endfor %}{% endif %}
+</div>{% endif %}
+{% if news and news.free and news.pick %}<form method="post" action="/reading/url" class="row small" style="margin-bottom:8px"><input type="hidden" name="url" value="{{ news.pick.url }}"><input type="hidden" name="lang" value="en">
+<button class="btn ghost sm">📄 挑战读原文</button><span class="muted">这家媒体允许原样转载，原文放进阅读器同样能点词查</span></form>{% endif %}
 <div class="row" id="finrow"><button class="btn lg" id="finish">✅ 读完了，交卷</button><span class="muted small">计时：<span id="timer">0</span> 分钟</span></div>
 {% endif %}
 
@@ -103,6 +116,11 @@ document.addEventListener('selectionchange', () => {
   else $('#selbtn').style.display = 'none';
 });
 $('#selbtn').onclick = () => { const sel = getSelection(); const s = String(sel).trim(); const el = sel.anchorNode.parentElement; lookup(s, el.closest('.s') ? el.closest('.s').textContent : el.closest('p').textContent); $('#selbtn').style.display = 'none'; };
+$$('.chip.gl').forEach(b => b.onclick = () => {
+  const w = b.dataset.w, p = $$('#reader p').map(x => x.textContent).find(t => t.toLowerCase().includes(w.toLowerCase())) || '';
+  const sents = p.match(/[^.!?]+[.!?]*["”’]?\s*/g) || [p];
+  lookup(w, (sents.find(x => x.toLowerCase().includes(w.toLowerCase())) || p).trim());
+});
 $('#manualbtn').onclick = () => { const q = $('#manual').value.trim(); if (q) lookup(q, ''); };
 const answers = {};
 $$('.rq .opt').forEach(b => b.onclick = () => { const q = b.closest('.rq'); $$('.opt', q).forEach(x => x.classList.remove('sel')); b.classList.add('sel'); answers[q.dataset.i] = b.dataset.o; });
