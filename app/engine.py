@@ -734,7 +734,7 @@ def mark_task_by(user_id: int, **match):
     return hit
 
 
-# ------------------------------------------------------------------ 一路做下去：今天的任务串成一条线（见 docs/DESIGN.md 5.15）
+# ------------------------------------------------------------------ 一路做下去：今天的任务串成一条线（见 docs/DESIGN.md 5.16）
 
 def plan_of_today(user_id: int) -> list[dict]:
     """只读今天已经排好的清单（不现场排计划）：每个页面都要用，必须便宜。"""
@@ -774,8 +774,9 @@ def flow_state(user_id: int, current: str | None = None) -> dict:
     out["secs_done"] = sum(1 for sc in secs if sc["complete"])
     idx = next((i for i, t in enumerate(plan) if t["id"] == current), None)
     sc = next((sc for sc in secs if idx in sc["tasks"]), None) if idx is not None else None
-    if sc and sc["complete"] and len(secs) > 1 and not out["all_done"]:
-        out["section"] = {"n": sc["n"], "of": len(secs), "base": sc["n"] == 1}
+    # 刚好学完一节（而且前面几节也都完成了）：停一下、亮一格。先跳着做了后面的，不算「学完一节」
+    if sc and sc["complete"] and len(secs) > 1 and not out["all_done"] and all(x["complete"] for x in secs[:sc["n"]]):
+        out["section"] = {"n": sc["n"], "of": len(secs), "left": sum(1 for x in secs if not x["complete"]), "base": sc["n"] == 1}
     return out
 
 

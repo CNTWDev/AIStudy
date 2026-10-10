@@ -52,7 +52,10 @@ function showItem(box, c, q) {
       if (res.answer_index != null && opts[res.answer_index]) opts[res.answer_index].classList.add('right');
       // 上次做错时选的那个：标出来，看清自己当时错在哪
       if (q.last != null && q.last !== '' && /^\d+$/.test(String(q.last)) && opts[+q.last]) opts[+q.last].insertAdjacentHTML('beforeend', '<span class="qc-tag no">上次选的</span>');
-      else if (q.last && !opts.length) $('.fbbox', qb).insertAdjacentHTML('beforeend', `<div class="small muted">上次答的：${esc(q.last)}</div>`);
+      else if (q.last && !opts.length) {  // 填空、计算：「上次的答案」放进带答案的那几栏里
+        const dl = $('.fbbox .qc-ans', qb), row = `<div><dt>上次答的</dt><dd>${esc(q.last)}</dd></div>`;
+        if (dl) dl.insertAdjacentHTML('beforeend', row); else $('.fbbox', qb).insertAdjacentHTML('beforeend', `<dl class="qc-ans">${row}</dl>`);
+      }
       let note = '';
       if (res.kept) note = '🏅 隔了几周还会，这道题真的掌握了！';
       else if (res.passed) note = '🏅 过关！3 周后再回头看一眼，还会就彻底掌握了。';

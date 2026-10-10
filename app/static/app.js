@@ -181,7 +181,7 @@ function confetti() {
     document.body.appendChild(p); setTimeout(() => p.remove(), 3000);
   }
 }
-/* ---------- 一路做下去：做完一项，不用回首页，直接接下一项（见 docs/DESIGN.md 5.15） ----------
+/* ---------- 一路做下去：做完一项，不用回首页，直接接下一项（见 docs/DESIGN.md 5.16） ----------
    做完一项：底部弹出一张小卡「✓ 完成 · 今天 4/8 · 下一项：…  [继续 →]」。刚做的题和讲解还留在页面上，
    做错了能先看清楚再走；学完一节可以先休息 3 分钟；全部做完给冲刺、乐园和一日记录的入口。 */
 function _ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
@@ -192,7 +192,7 @@ const Flow = {
     $$('.flow-sheet,.flow-pill').forEach(x => x.remove());
     const nx = st.next, sec = st.section;
     const head = st.all_done ? '🎉 今天的任务全部完成！' : sec ? `🎉 第 ${sec.n} 节完成！` : st.just ? '✓ 完成一项 +1 ⭐' : '👉 接着做今天的任务';
-    const sub = st.all_done ? '坚持比做对更重要，今天你做到了。' : sec ? (sec.base ? '保底完成，今天的连续天数保住了。' : `又亮了一格，还剩 ${sec.of - sec.n} 节。`) : '';
+    const sub = st.all_done ? '坚持比做对更重要，今天你做到了。' : sec ? (sec.base ? '保底完成，今天的连续天数保住了。' : `又亮了一格，还剩 ${sec.left} 节。`) : '';
     const m = document.createElement('div'); m.className = 'flow-sheet'; m.setAttribute('role', 'dialog');
     m.innerHTML = `<div class="fs-card"><button type="button" class="fs-x" aria-label="先看看这页" title="先看看这页">✕</button>
       <div class="fs-h"><b>${head}</b>${sub ? `<span>${sub}</span>` : ''}</div>
