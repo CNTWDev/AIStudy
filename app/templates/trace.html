@@ -36,7 +36,7 @@ function showResult(r) {
   $('#tbox').innerHTML = `<p class="pop" style="font-size:18px"><b>${esc(r.message)}</b></p>` +
     (nx.length ? `<p class="small muted">已经排进今天的任务：${nx.map(x => esc(x.title)).join('、')}</p>` : '') +
     `<div class="row">` + (nx.length ? `<a class="btn" href="${esc(nx[0].url)}">${esc(nx[0].title)} →</a>` : '') +
-    `<a class="btn ghost" href="${esc(BACK)}">回到「${esc(KPNAME)}」</a><a class="btn ghost" href="/today">回到今天</a></div>`;
+    `<a class="btn ghost" href="${esc(BACK)}">回到「${esc(KPNAME)}」</a><a class="btn ghost" href="/go">继续今天的学习</a></div>`;
   if (r.result !== 'root') confetti();
 }
 async function step() {
