@@ -106,7 +106,7 @@ def answer(user_id: int, paper: dict, pi_id: int, body: dict) -> dict:
     if not pi:
         return {"error": "没有这道题"}
     it = engine._item_row_to_dict(db.one("SELECT * FROM items WHERE id=?", pi["item_id"]))
-    reveal = {"answer": engine.answer_display(it), "explain": it.get("explain", ""), "points": it.get("points", [])}
+    reveal = itemtypes.reveal(it)
     if body.get("flag"):  # 孩子 / 家长觉得 AI 给的答案不对：这题不计入诊断
         db.run("UPDATE paper_items SET flagged=1 WHERE id=?", pi_id)
         return {"ok": True, "flagged": True}

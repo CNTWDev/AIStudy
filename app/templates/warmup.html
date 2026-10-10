@@ -11,7 +11,7 @@ function bar() { $('#wbar').style.width = (items.length ? 100 * idx / items.leng
 async function load() {
   try {
     items = (await api('/api/warmup')).items;
-    if (!items.length) { $('#wbox').innerHTML = '<p>今天没有要热身的题，直接开始下一项吧。</p><button class="btn" onclick="finishTask(\'warmup\')">完成</button>'; return; }
+    if (!items.length) { $('#wbox').innerHTML = '<p>今天没有要热身的题，直接开始下一项吧。</p>'; finishTask('warmup'); return; }
     Run.start('warmup', {total: items.length, mount: $('#wbox')});
     show();
   } catch (e) { $('#wbox').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
@@ -26,10 +26,9 @@ function show() {
   bar();
   if (idx >= items.length) {
     $('#wbox').innerHTML = `<p class="pop" style="font-size:20px"><b>热身完成：${right}/${items.length}</b> ${right === items.length ? '全对 🎉' : '👍'}</p>` +
-      `<p class="small muted">${lit ? `点亮了 ${lit} 个知识点 🌟 · ` : ''}${found ? `找到 ${found} 个要补的地方，已经排进以后的练习` : '你的学习地图又清楚了一些'}</p>` +
-      `<button class="btn" onclick="finishTask('warmup')">完成，回到今天</button>`;
+      `<p class="small muted">${lit ? `点亮了 ${lit} 个知识点 🌟 · ` : ''}${found ? `找到 ${found} 个要补的地方，已经排进以后的练习` : '你的学习地图又清楚了一些'}</p>`;
     Run.finish();
-    if (right === items.length) confetti();
+    finishTask('warmup');
     return;
   }
   const it = items[idx];

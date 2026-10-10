@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
 <div class="row"><h1 class="grow">{{ {"words":"单词复习","mistakes":"错题重做","other":"知识点回顾"}.get(group, "复习") }}</h1><a class="btn ghost sm" href="/words">生词本 / 错题本</a></div>
-<p class="muted small">{% if group == 'mistakes' %}错题原样再做一遍，系统来判。隔天连续做对 2 次，会换一道同类的新题，也做对了就过关、移出错题本。
+<p class="muted small">{% if group == 'mistakes' %}错题原样再做一遍，系统来判。隔天连续做对 2 次，会换一道同类的新题，也做对了就过关；过关 3 周后再回头看一眼。
 {% else %}每张都要作答，系统来判。答对了下次隔得更久；答错了过一会儿再来一次。{% endif %}</p>
 <div class="card flash" id="flash"><span class="loading">加载中</span></div>
 <script>
@@ -25,9 +25,10 @@ function nextBtn(box, res, c) {
 function show() {
   const box = $('#flash');
   if (i >= cards.length) {
-    box.innerHTML = `<div class="face pop">🎉 ${cards.length ? '完成了！答对 ' + known + ' 张' : '现在没有要复习的'}</div><button class="btn" id="back2">回到今天 +1 ⭐</button>`;
-    if (cards.length) { confetti(); Run.finish(); }
-    $('#back2').onclick = () => TASK ? finishTask(TASK) : (location.href = '/today');
+    box.innerHTML = `<div class="face pop">🎉 ${cards.length ? '完成了！答对 ' + known + ' 张' : '现在没有要复习的'}</div>` +
+      (TASK ? '' : '<a class="btn" href="/go">接着做今天的任务 →</a>');
+    if (cards.length) Run.finish();
+    if (TASK) finishTask(TASK);  // 这一项做完了：底部弹出下一项，不用回首页
     return;
   }
   const c = cards[i], q = c.quiz || {mode: 'self'};
@@ -39,7 +40,7 @@ function show() {
 
 /* 错题重做 / 知识点题：原题原样（选项齐全），系统判对错 */
 function showItem(box, c, q) {
-  const tag = c.kind === 'mistake' ? (q.variant ? ' · 换一道同类题，做对就过关' : (q.streak ? ` · 已隔天做对 ${q.streak} 次` : '')) : '';
+  const tag = c.kind === 'mistake' ? (q.recheck ? ' · 过关后回头看一眼' : q.variant ? ' · 换一道同类题，做对就过关' : (q.streak ? ` · 已隔天做对 ${q.streak} 次` : '')) : '';
   box.innerHTML = head(c, tag) + '<div class="qbox" style="text-align:left"></div>';
   const qb = $('.qbox', box), it = q.item;
   renderItem(qb, it, {
@@ -50,10 +51,11 @@ function showItem(box, c, q) {
       const opts = $$('.opt', qb);
       if (res.answer_index != null && opts[res.answer_index]) opts[res.answer_index].classList.add('right');
       // 上次做错时选的那个：标出来，看清自己当时错在哪
-      if (q.last != null && q.last !== '' && /^\d+$/.test(String(q.last)) && opts[+q.last]) opts[+q.last].insertAdjacentHTML('beforeend', ' <span class="badge warn">上次选的</span>');
+      if (q.last != null && q.last !== '' && /^\d+$/.test(String(q.last)) && opts[+q.last]) opts[+q.last].insertAdjacentHTML('beforeend', '<span class="qc-tag no">上次选的</span>');
       else if (q.last && !opts.length) $('.fbbox', qb).insertAdjacentHTML('beforeend', `<div class="small muted">上次答的：${esc(q.last)}</div>`);
       let note = '';
-      if (res.passed) note = '🏅 过关！这道题已经移出错题本。';
+      if (res.kept) note = '🏅 隔了几周还会，这道题真的掌握了！';
+      else if (res.passed) note = '🏅 过关！3 周后再回头看一眼，还会就彻底掌握了。';
       else if (res.variant_next) note = '👍 隔天连续做对了！下次换一道同类的新题，做对就过关。';
       else if (res.correct && res.need > 0) note = `再隔天做对 ${res.need} 次就能过关。`;
       else if (c.kind === 'mistake' && !res.correct) note = '没关系，看懂上面的讲解，明天再做一次。';

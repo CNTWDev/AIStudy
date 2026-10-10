@@ -25,7 +25,7 @@
     </div>
     {% if not readonly and not mascot_chosen(user) %}<a class="pick" href="/settings#mascot">{{ mascot_svg('buzzy', 22) }}选一个你最喜欢的小伙伴 →</a>{% endif %}
   </div>
-  {% if nx and not readonly %}<a class="btn lg go" href="{{ nx.url }}">开始第 {{ t.plan.index(nx) + 1 }} 项 →</a>
+  {% if nx and not readonly %}<a class="btn lg go" href="/go" title="从第 {{ t.plan.index(nx) + 1 }} 项开始，做完一项自动接下一项">{{ '▶ 开始今天的学习' if done == 0 else '▶ 接着做第 ' ~ (t.plan.index(nx) + 1) ~ ' 项' }}</a>
   {% elif total and done == total and not t.checked_in and not readonly %}<a class="btn lg go" href="#daylog">写一句一日记录</a>{% endif %}
 </div>
 
@@ -71,7 +71,7 @@
 
 <div class="card">
   <div class="card-h"><span class="ico">✅</span><h3>今天的任务</h3>{% if not readonly %}<button class="linkbtn" id="rebuild" title="按最新的情况重新排一遍今天的任务">↻ 重新安排</button>{% endif %}</div>
-  {% if not (total and done == total) %}<p class="muted small" style="margin:-4px 0 8px">从上往下一项一项做。不会的题点「这道题还不会」就行，坚持比做对更重要：每完成一项得一颗 ⭐。 <a href="/progress">{{ '学习进度和考试日期' if is_adult(me.grade) else '学校学到哪了？' }}</a></p>{% endif %}
+  {% if not (total and done == total) %}<p class="muted small" style="margin:-4px 0 8px">点上面的「开始」一路做下去，做完一项自动接下一项。不会的题点「这道题还不会」就行，坚持比做对更重要：每完成一项得一颗 ⭐。 <a href="/progress">{{ '学习进度和考试日期' if is_adult(me.grade) else '学校学到哪了？' }}</a></p>{% endif %}
   <div class="steplist">
   {% set sec_of = {} %}{% for sc in day.sections %}{% for i in sc.tasks %}{% set _ = sec_of.update({i: sc}) %}{% endfor %}{% endfor %}
   {% for x in t.plan %}
@@ -194,20 +194,8 @@ function sectionDone(n) {
   m.innerHTML = `<div class="sec-card"><div class="big">🎉</div><b>第 ${n} 节完成！</b><p class="muted">${n === 1 ? '保底完成，今天的连续天数保住了。' : '又亮了一格。'}还剩 ${DAY.n - n} 节。</p>
     <button type="button" class="btn lg block" data-a="rest">☕ 休息 3 分钟</button><button type="button" class="btn ghost lg block" data-a="go">继续第 ${n + 1} 节 →</button></div>`;
   document.body.appendChild(m); confetti();
-  m.querySelector('[data-a=go]').onclick = () => { m.remove(); const b = $('.step.next .btn'); if (b) b.focus(); };
-  m.querySelector('[data-a=rest]').onclick = () => rest(m.querySelector('.sec-card'), () => m.remove());
-}
-function rest(card, done) {
-  const tips = ['站起来伸个懒腰 🙆', '看看窗外最远的地方 🌳', '喝几口水 💧', '转转脖子和肩膀 🔄', '闭上眼睛深呼吸 3 次 😌'];
-  let left = 180, i = 0;
-  card.innerHTML = `<div class="big">☕</div><b>课间休息</b><div class="rest-t">3:00</div><p class="rest-tip">${tips[0]}</p><button type="button" class="btn ghost block">休息好了，继续 →</button>`;
-  const t = card.querySelector('.rest-t'), tip = card.querySelector('.rest-tip');
-  const timer = setInterval(() => {
-    left--; t.textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
-    if (left % 20 === 0) tip.textContent = tips[++i % tips.length];
-    if (left <= 0) { clearInterval(timer); t.textContent = '时间到！'; toast('⏰ 休息好了，开始下一节吧'); }
-  }, 1000);
-  card.querySelector('button').onclick = () => { clearInterval(timer); done(); };
+  m.querySelector('[data-a=go]').onclick = () => { location.href = '/go'; };
+  m.querySelector('[data-a=rest]').onclick = () => restTimer(m.querySelector('.sec-card'), () => m.remove());
 }
 $('#goalchg').onclick = () => { const p = $('#goalcard .goal-pick'); p.hidden = !p.hidden; };
 $$('#goalcard .goal-pick button').forEach(b => b.onclick = async () => { await api('/api/goal', {goal: b.dataset.g}); location.reload(); });

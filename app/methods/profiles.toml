@@ -7,7 +7,9 @@
 # 然后在这里用 model = "新名字" 引用。
 #
 # plan（每日计划）：
-#   fixed  每天都有的任务，按顺序（坚持比做对更重要，不受时间预算限制）
+#   fixed  每天都有的任务，排在最前，按顺序（坚持比做对更重要，不受时间预算限制）
+#          主线是「先易后难再放松」：热身（几道小题进入状态）→ 错题重做（旧账先清）→ 单词 → flex 学新的、补弱的 → tail
+#   tail   每天都有的任务，排在最后（默认是阅读：大量输入，放松收尾），同样不受时间预算限制
 #   flex   学知识点的任务，按顺序排，超出每天可用时间就截掉；"a+b" 表示两类交替穿插（交错练习）
 #   limits 每类最多几个（weak 是每个学科最多几个）
 #   prefer_hot  高频考点排前面
@@ -23,8 +25,9 @@ basis = "Roediger & Karpicke 2006（检索练习）；Cepeda 等 2006（间隔�
 mastery = { model = "bkt" }
 memory = { model = "fsrs", target_r = 0.85 }
 [profiles.balanced.plan]
-fixed = ["exam_date", "warmup", "words", "mistakes", "reading"]
+fixed = ["exam_date", "warmup", "mistakes", "words"]
 flex = ["sync", "top", "paper", "diagnose", "exam", "weak+backfill", "check", "preview", "review"]
+tail = ["reading"]
 limits = { sync = 2, top = 1, paper = 1, diagnose = 1, weak = 3, check = 2, preview = 1 }
 
 [profiles.mastery]
@@ -34,8 +37,9 @@ basis = "Bloom 1968 / Guskey 2007（掌握学习）；Kulik 等 1990（掌握学
 mastery = { model = "bkt", master_p = 0.9, min_days = 3 }
 memory = { model = "fsrs", target_r = 0.9 }
 [profiles.mastery.plan]
-fixed = ["exam_date", "warmup", "words", "mistakes", "reading"]
+fixed = ["exam_date", "warmup", "mistakes", "words"]
 flex = ["sync", "top", "paper", "diagnose", "exam", "backfill", "weak", "check", "review"]
+tail = ["reading"]
 limits = { sync = 2, top = 1, paper = 1, diagnose = 1, weak = 3, check = 3, preview = 0 }
 
 [profiles.exam]
@@ -45,7 +49,8 @@ basis = "Agarwal 等 2021（检索练习对考试成绩的综述）；Cepeda 等
 mastery = { model = "bkt" }
 memory = { model = "fsrs", target_r = 0.9 }
 [profiles.exam.plan]
-fixed = ["exam_date", "words", "mistakes", "reading"]
+fixed = ["exam_date", "mistakes", "words"]
 flex = ["top", "exam", "paper", "weak+backfill", "check", "review"]
+tail = ["reading"]
 limits = { top = 1, paper = 1, weak = 4, check = 3, preview = 0 }
 prefer_hot = true

@@ -24,7 +24,15 @@
     {% if user.role == 'parent' %}<a href="/parent">家长页</a>{% endif %}{% if is_self_learner(user) %}<a href="/me/courses">我的课程</a>{% endif %}{% if user.is_admin or user.role == 'admin' %}<a href="/admin">管理</a>{% endif %}
     {% if user.role == 'kid' %}<a href="#" id="qlbtn" title="查单词、词语，翻译句子；也可以直接选中页面上的文字">🔎 查词</a>{% endif %}<a href="/settings">账号</a></span>{% endif %}
 </header>
-<main class="wrap">{% block body %}{% endblock %}</main>
+<main class="wrap">
+{% if dayflow %}{# 今天清单里的一项：顶上一条进度，随时回清单或去下一项（见 engine.flow_match） #}
+<div class="flowbar {{ 'done' if dayflow.task.done }}">
+  <a class="flb-prog" href="/today" title="回到今天的清单"><b>{{ dayflow.done }}/{{ dayflow.total }}</b><span class="flb-dots" aria-hidden="true">{% for d in dayflow.dots %}<i class="{{ 'ok' if d }} {{ 'cur' if loop.index == dayflow.n }}"></i>{% endfor %}</span></a>
+  <span class="flb-t">{{ '✓ 做完了：' if dayflow.task.done else '第 ' ~ dayflow.n ~ ' 项：' }}{{ dayflow.task.title }}</span>
+  {% if dayflow.next %}<a class="flb-go" href="{{ dayflow.next.url if dayflow.task.done else '/go?after=' ~ dayflow.task.id }}">{{ '下一项 ›' if dayflow.task.done else '先做下一项 ›' }}</a>{% endif %}
+</div>
+{% endif %}
+{% block body %}{% endblock %}</main>
 {% if user and user.role == 'kid' and not request.url.path.startswith('/diagnose') %}
 <button id="askbtn" data-name="{{ ASSISTANT }}" data-icon="{{ ASSISTANT_ICON }}" title="问{{ ASSISTANT }}：哪里不懂就问">{% if ASSISTANT_ICON == '🙋' %}{{ mascot_svg(mascot, 30) }}{% else %}{{ ASSISTANT_ICON }}{% endif %}<span>问{{ ASSISTANT }}</span></button>
 <div id="askpanel">

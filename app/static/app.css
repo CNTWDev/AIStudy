@@ -465,3 +465,61 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .pager{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:14px 0 30px}
 .prep .chip .btn.say{min-height:24px;padding:0 4px;font-size:13px}
 #listenhere{position:sticky;top:64px;z-index:15}
+
+/* ---------- 题目的统一展示（作答版 / 带答案版，见 app.js qView、_ui.html question） ---------- */
+.qc-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.qc-stem{font-weight:650;font-size:16.5px;line-height:1.6;white-space:pre-line}
+.qc-n{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;border-radius:8px;background:var(--brand-2);color:var(--brand-ink);font-size:13px;font-weight:700;margin-right:8px;vertical-align:1px}
+.qc-zh{color:var(--muted);font-size:14px;margin-top:2px}
+.qc-opts{margin-top:4px}
+.opt{display:flex;align-items:center;gap:10px}
+.qc-key{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;background:var(--line-2);color:var(--muted);font-size:13px;font-weight:700;flex:none;transition:background .15s,color .15s}
+.qc-ot{flex:1;min-width:0}
+.opt.sel .qc-key{background:var(--brand);color:var(--on-brand)}
+.opt.right .qc-key{background:var(--ok);color:#fff}.opt.wrong .qc-key{background:var(--warn);color:#fff}
+.opt.static{cursor:default}.opt.static:hover{border-color:var(--line);background:var(--card)}
+.opt.static.right,.opt.static.right:hover{border-color:var(--ok);background:var(--ok-2)}.opt.static.wrong,.opt.static.wrong:hover{border-color:var(--warn);background:var(--warn-2)}
+.opt:disabled{cursor:default;color:var(--ink);opacity:1}
+.qc-tag{flex:none;font-size:12px;font-weight:700;white-space:nowrap;padding:1px 8px;border-radius:99px;background:var(--card)}
+.qc-tag.ok{color:var(--ok)}.qc-tag.no{color:var(--warn)}.qc-tag+.qc-tag{margin-left:-4px}
+.qc-ans{margin:12px 0 0;display:grid;gap:8px;text-align:left}
+.qc-ans>div{display:grid;grid-template-columns:4.6em 1fr;gap:10px;align-items:baseline}
+.qc-ans dt{font-size:12.5px;font-weight:700;color:var(--muted);text-align:center;background:var(--line-2);border-radius:8px;padding:1px 0;white-space:nowrap}
+.qc-ans dd{margin:0;font-size:15px;line-height:1.65;min-width:0;overflow-wrap:anywhere}
+.qc-ans ul{margin:0;padding-left:18px}
+.qc-explain{white-space:pre-line}
+.fb .qc-ans dt{background:color-mix(in srgb,var(--card) 70%,transparent)}
+.fb-v{font-weight:700;font-size:16px}
+.fb-note{font-size:13px;color:var(--muted);margin-top:10px}
+.rq{margin-bottom:18px}.rq:last-of-type{margin-bottom:6px}
+.mcard{padding:14px 16px}.mc-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+
+/* ---------- 一路做下去：页面顶上的「今天 3/8」条、做完一项的小卡（见 app.js Flow） ---------- */
+.flowbar{display:flex;align-items:center;gap:10px;padding:8px 10px 8px 8px;margin:0 0 12px;border-radius:16px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);font-size:14px}
+.flb-prog{display:flex;align-items:center;gap:8px;flex:none;color:var(--ink);padding:4px 8px;border-radius:12px;background:var(--brand-2)}
+.flb-prog b{font-variant-numeric:tabular-nums}
+.flb-dots{display:flex;gap:3px}.flb-dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.flb-dots i.ok{background:var(--ok)}.flb-dots i.cur{background:var(--brand);box-shadow:0 0 0 2px var(--brand-3)}
+.flb-t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.flowbar.done .flb-t{color:var(--ok);font-weight:600}
+.flb-go{flex:none;font-weight:650;padding:4px 10px;border-radius:99px;white-space:nowrap}.flb-go:hover{background:var(--brand-2)}
+.flowbar.done .flb-go{background:var(--brand);color:var(--on-brand)}
+@media (max-width:520px){.flb-dots{display:none}}
+.flow-sheet{position:fixed;left:0;right:0;bottom:0;z-index:70;display:flex;justify-content:center;padding:0 12px calc(12px + env(safe-area-inset-bottom));pointer-events:none}
+.fs-card{position:relative;pointer-events:auto;width:100%;max-width:460px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:18px 18px 10px;box-shadow:0 -6px 40px rgba(0,0,0,.18);animation:fsin .35s cubic-bezier(.2,.9,.3,1.15)}
+@keyframes fsin{from{transform:translateY(110%)}to{transform:none}}
+.fs-x{position:absolute;right:10px;top:10px;border:0;background:var(--line-2);color:var(--muted);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px}
+.fs-h b{display:block;font-size:19px;padding-right:34px}.fs-h span{display:block;color:var(--muted);font-size:14px;margin-top:2px}
+.fs-prog{display:flex;align-items:center;gap:10px;margin:10px 0 12px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.fs-prog i{flex:1;height:8px;border-radius:99px;background:var(--line-2);overflow:hidden}.fs-prog i b{display:block;height:100%;background:var(--ok);border-radius:99px;transition:width .6s}
+.fs-next{display:block;padding:14px;border-radius:18px;background:var(--brand-2);border:1.5px solid var(--brand-3);color:var(--ink)}
+.fs-next:hover,.fs-next:focus-visible{color:var(--ink);border-color:var(--brand);outline:none}
+.fs-k{display:block;font-size:12.5px;color:var(--brand-ink);font-weight:650}
+.fs-next>b{display:block;font-size:17px;margin:2px 0}.fs-why{display:block;font-size:13px;color:var(--muted)}
+.fs-go{margin-top:10px}
+.fs-end{display:grid;gap:8px}
+.fs-alt{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;margin-top:6px}
+.fs-card.resting{text-align:center;padding-bottom:18px}.fs-card.resting .big{font-size:48px}.fs-card.resting>b{font-size:20px;display:block}
+.flow-pill{position:fixed;right:14px;bottom:calc(96px + env(safe-area-inset-bottom));z-index:65;max-width:min(78vw,360px);padding:10px 16px;border-radius:99px;background:var(--brand);color:var(--on-brand);font-size:14px;box-shadow:var(--shadow-lg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.flow-pill:hover{color:var(--on-brand);background:var(--brand-d)}
+.today-read{display:flex;align-items:center;gap:12px;color:var(--ink)}.today-read .tr-e{font-size:30px}.today-read .grow b{display:block}.today-read .grow span{display:block}

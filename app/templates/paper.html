@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui %}
 {% block body %}
 <a href="{{ '/mocks' if p.bank_paper_id else '/papers' }}" class="small">← {{ '模拟考' if p.bank_paper_id else '试卷' }}</a>
 <h1>{{ p.title }}</h1>
@@ -31,7 +32,8 @@
         {% for c in cands %}<option value="{{ c.id }}" {{ 'selected' if r.kp_id == c.id }}>{{ stage_label(c.stage) }} · {{ c.name }}</option>{% endfor %}</select></details>{% endif %}
     {% if r.orig_answer %} · 卷面上写的：{{ r.orig_answer }}{% endif %}</div>
   {% if r.flagged %}<p class="muted small">已标记「答案有问题」，这题不计入诊断。</p>
-  {% elif r.answered_at %}<p class="small">{{ '🤔 还不会' if r.dont_know else ('✅ 重做对了' if r.correct else '❌ 重做还错') }} · 正确答案：{{ answer_display(r.item) }}</p>
+  {% elif r.answered_at %}<p class="small" style="margin:6px 0 0"><b>{{ '🤔 还不会' if r.dont_know else ('✅ 重做对了' if r.correct else '❌ 重做还错') }}</b></p>
+  {{ ui.question(qview(r.item, None if r.dont_know else r.answer)) }}
   {% elif readonly %}<p class="muted small">还没订正</p>
   {% else %}<div class="qbox" data-pi="{{ r.id }}"></div>{% endif %}
 </div>

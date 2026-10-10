@@ -53,8 +53,9 @@ def track_for(uid: int, bid: str, kind: str | None = None):
     return rows[0] if rows else None
 
 
-def _check_goals(uid: int, bid: str):
-    """读够今天的页数、听够今天的分钟：今天的任务自动打勾。"""
+def _check_goals(uid: int, bid: str) -> dict | None:
+    """读够今天的页数、听够今天的分钟：今天的任务自动打勾。这次刚打上勾的，返回接下来做什么（engine.flow_state）。"""
+    before = {x["id"] for x in engine.plan_of_today(uid) if x.get("done")}
     t = today_of(uid, bid)
     for tr in engine.tracks(uid):
         if tr["ref"] != LIB + bid:
@@ -64,6 +65,8 @@ def _check_goals(uid: int, bid: str):
                 engine.mark_task_by(uid, type="listen")
         elif t["pages"] >= max(1, tr["daily_amount"]):
             engine.mark_task_by(uid, type=tr["kind"])
+    newly = [x["id"] for x in engine.plan_of_today(uid) if x.get("done") and x["id"] not in before]
+    return engine.flow_state(uid, newly[0]) if newly else None
 
 
 # ================================================================== 孩子：书架、书、读
@@ -145,8 +148,8 @@ def api_read(request: Request, bid: str, body: dict = Body(...)):
             if tr["ref"] == LIB + bid and tr["kind"] != "listen":
                 db.run("UPDATE tracks SET position=?, last_day=?, finished_at=? WHERE id=?", n, day,
                        db.now() if n >= t["n_pages"] else None, tr["id"])
-        _check_goals(k["id"], bid)
-    return {"ok": True, "new": new, "today": today_of(k["id"], bid), "finished": n >= t["n_pages"]}
+    flow = _check_goals(k["id"], bid) if new else None
+    return {"ok": True, "new": new, "today": today_of(k["id"], bid), "finished": n >= t["n_pages"], "flow": flow}
 
 
 @router.post("/api/books/{bid}/listen")
@@ -160,8 +163,7 @@ def api_listen(request: Request, bid: str, body: dict = Body(...)):
     db.run("UPDATE book_progress SET listen_seconds=listen_seconds+?, listen_page=?, updated_at=? WHERE user_id=? AND book_id=?",
            s, n, db.now(), k["id"], bid)
     db.run("UPDATE book_days SET listen_seconds=listen_seconds+? WHERE user_id=? AND day=? AND book_id=?", s, k["id"], day, bid)
-    _check_goals(k["id"], bid)
-    return {"ok": True, "today": today_of(k["id"], bid)}
+    return {"ok": True, "today": today_of(k["id"], bid), "flow": _check_goals(k["id"], bid)}
 
 
 def guide(bid: str, ch: int, grade: str, user_id=None, generate=True) -> dict:

@@ -1,8 +1,19 @@
 {% extends "base.html" %}
 {% block body %}
-<div class="ph"><h1>阅读</h1></div>
-<a class="tile" href="/books" style="margin:10px 0"><span class="e">📚</span><span><b>书库：读名著原文</b><span>《爱丽丝》《绿野仙踪》《西游记》……一页一页读，不认识的词点一下，读累了点 ▶ 听</span></span></a>
+<div class="ph"><h1>{{ '今天的阅读' if daily else '阅读' }}</h1></div>
+{% if today_r %}
+<a class="card today-read" href="/reading/{{ today_r.id }}">
+  <span class="tr-e">{{ '📖' if not today_r.finished_at else '✅' }}</span>
+  <span class="grow"><b>{{ '接着读今天这篇' if not today_r.finished_at else '今天已经读完' }}：{{ today_r.title }}</b>
+    <span class="small muted">{{ '每天读一篇就够，读完做几道小题就打卡' if not today_r.finished_at else '想多读可以在下面再写一篇，或者去书库读名著' }}</span></span>
+  <span class="btn {{ '' if not today_r.finished_at else 'ghost' }}">{{ '去读 →' if not today_r.finished_at else '看看' }}</span>
+</a>
+{% elif daily %}
+<p class="lead" style="margin-top:6px">今天还没读。点下面的「✨ 生成短文」，AI 按你的水平写一篇（话题不选也行）；读完做几道小题就完成。</p>
+{% endif %}
+{% if not daily %}<a class="tile" href="/books" style="margin:10px 0"><span class="e">📚</span><span><b>书库：读名著原文</b><span>《爱丽丝》《绿野仙踪》《西游记》……一页一页读，不认识的词点一下，读累了点 ▶ 听</span></span></a>
 <p class="lead">大量读是提分的根本。读的时候<b>点一下不懂的词</b>就能查，觉得有用就收藏，收藏的词会自动进入复习。</p>
+{% endif %}
 
 <div class="card">
   <div class="tabset" role="tablist">

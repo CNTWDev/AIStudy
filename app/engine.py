@@ -175,7 +175,7 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
     status = update_mastery(user_id, kp_id, correct, weight=weight, source=mode, item=item, dont_know=dont_know)
     if correct and status in ("mastered", "learning"):  # 别的教材里同一概念、还没测过的：推断为「学习中」
         infer_equivalents(user_id, kp_id)
-    if item and not correct and mode in ("practice", "diagnose", "probe", "paper", "exam"):
+    if item and not correct and _goes_to_mistakes(item, mode, dont_know, ms):
         # 错题自动进错题本（以卡片形式参与间隔复习）
         back = f"{itemtypes.display(item)}\n{item.get('explain', '')}"
         add_card(user_id, "mistake", item["q"], back.strip(), {"item_id": item["id"], "zh": item.get("zh", ""),
@@ -183,6 +183,20 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
     if touch:
         _touch_day(user_id)
     return status
+
+
+MISTAKE_MODES = ("practice", "diagnose", "probe", "paper", "exam", "review")
+QUICK_GUESS_MS = 3000  # 游戏、冲刺里 3 秒内答错多半是手快蒙的，不进错题本
+
+
+def _goes_to_mistakes(item: dict, mode: str, dont_know: bool, ms) -> bool:
+    """哪些做错的题进错题本：正式练习、诊断、摸底、试卷、知识点回顾都进；
+    游戏和冲刺里题库的题（不是现场生成的口算），认真想了还错、或点了不会的也进——以前这两处做错的从来回不来。"""
+    if mode in MISTAKE_MODES:
+        return True
+    if mode in QUICK_MODES and (dont_know or (ms or 0) >= QUICK_GUESS_MS):
+        return bool(item.get("id")) and bool(db.one("SELECT id FROM items WHERE id=?", item["id"]))
+    return False
 
 
 # ------------------------------------------------------------------ 跨教材融合（见 catalog 的 concepts / links）
@@ -670,7 +684,7 @@ def build_plan(user_id: int) -> list[dict]:
 def today_plan(user_id: int, rebuild=False) -> dict:
     day = db.today().isoformat()
     row = db.one("SELECT * FROM days WHERE user_id=? AND day=?", user_id, day)
-    plan = db.jload(row["plan"], []) if row else []
+    plan = _upgrade_urls(db.jload(row["plan"], []) if row else [])
     if rebuild or not plan:
         old_done = [t for t in plan if t.get("done")]
         plan = build_plan(user_id)
@@ -711,10 +725,76 @@ def mark_task_by(user_id: int, **match):
     if not row:
         return
     plan = db.jload(row["plan"], [])
+    hit = []
     for t in plan:
         if all(t.get(k) == v for k, v in match.items()):
             t["done"] = True
+            hit.append(t["id"])
     db.run("UPDATE days SET plan=? WHERE user_id=? AND day=?", db.jdump(plan), user_id, day)
+    return hit
+
+
+# ------------------------------------------------------------------ 一路做下去：今天的任务串成一条线（见 docs/DESIGN.md 5.15）
+
+def plan_of_today(user_id: int) -> list[dict]:
+    """只读今天已经排好的清单（不现场排计划）：每个页面都要用，必须便宜。"""
+    row = db.one("SELECT plan FROM days WHERE user_id=? AND day=?", user_id, db.today().isoformat())
+    return _upgrade_urls(db.jload(row["plan"], []) if row else [])
+
+
+def _upgrade_urls(plan: list[dict]) -> list[dict]:
+    """升级前排好的清单：每日阅读的入口改成 /reading/today（今天读过就直接打开那篇）。"""
+    for t in plan:
+        if (t.get("url") or "").startswith("/reading?lang="):
+            t["url"] = t["url"].replace("/reading?", "/reading/today?", 1)
+    return plan
+
+
+def next_task(plan: list[dict], after: str | None = None) -> dict | None:
+    """下一项：after 之后第一项没做的；后面都做完了，再从头找（先跳过的那项）。"""
+    ids = [t["id"] for t in plan]
+    start = ids.index(after) + 1 if after in ids else 0
+    for t in plan[start:] + plan[:start]:
+        if not t.get("done") and t["id"] != after:
+            return t
+    return None
+
+
+def flow_state(user_id: int, current: str | None = None) -> dict:
+    """做完一项（current）以后：今天做到哪了、下一项是什么、是不是刚好学完一节、是不是全做完了。"""
+    plan = plan_of_today(user_id)
+    done = sum(1 for t in plan if t.get("done"))
+    nxt = next_task(plan, current)
+    out = {"day": db.today().isoformat(), "done": done, "total": len(plan), "all_done": bool(plan) and done == len(plan),
+           "next": None, "section": None, "just": any(t["id"] == current and t.get("done") for t in plan)}
+    if nxt:
+        out["next"] = {"id": nxt["id"], "n": plan.index(nxt) + 1, "title": nxt["title"], "why": nxt.get("why", ""),
+                       "minutes": nxt.get("minutes"), "url": nxt["url"]}
+    secs = _streak.sections(plan)
+    out["secs_done"] = sum(1 for sc in secs if sc["complete"])
+    idx = next((i for i, t in enumerate(plan) if t["id"] == current), None)
+    sc = next((sc for sc in secs if idx in sc["tasks"]), None) if idx is not None else None
+    if sc and sc["complete"] and len(secs) > 1 and not out["all_done"]:
+        out["section"] = {"n": sc["n"], "of": len(secs), "base": sc["n"] == 1}
+    return out
+
+
+def flow_match(plan: list[dict], path: str, query: dict, reading_lang: str | None = None) -> dict | None:
+    """当前页面是今天清单里的哪一项（页面顶上的「今天 3/8」条用）。没做完的优先。"""
+    def score(t):
+        url = t.get("url") or ""
+        tp, _, tq = url.partition("?")
+        want = dict(x.split("=", 1) for x in tq.split("&") if "=" in x)
+        if tp == path and all(query.get(k) == v for k, v in want.items()):
+            return 3
+        if reading_lang and t.get("type") == "read_" + reading_lang and tp.startswith("/reading"):
+            return 2
+        for pre in ("/books/", "/papers/", "/track/"):
+            if path.startswith(pre) and tp.startswith(pre) and path.split("/")[2] == tp.split("/")[2]:
+                return 2
+        return 0
+    ranked = sorted(((score(t), not t.get("done"), -i, t) for i, t in enumerate(plan)), key=lambda x: x[:3], reverse=True)
+    return ranked[0][3] if ranked and ranked[0][0] else None
 
 
 # ------------------------------------------------------------------ 统计

@@ -170,5 +170,40 @@ def public(item: dict) -> dict:
             "widget": t.widget, "self_rated": t.self_rated}
 
 
+def reveal(item: dict) -> dict:
+    """作答以后给前端的「带答案」部分：答案、选择题的正确选项下标、解析、要点。各处判完题都用它，显示才一致。"""
+    out = {"answer": display(item), "explain": item.get("explain", ""), "points": item.get("points") or []}
+    if of(item).widget == "choice":
+        try:
+            out["answer_index"] = int(item.get("answer"))
+        except (TypeError, ValueError):
+            pass
+    return out
+
+
+def view(item: dict, mine=None, with_answer=True) -> dict:
+    """一道题的统一展示结构（页面上所有显示题目的地方都用它，见 _ui.html 的 question 和 app.js 的 qView）：
+    题干（q / zh / code / src）、选项（A B C… 带「正确」「我选的」标记）、答案、我的答案、解析、要点、提示。
+    with_answer=False 是「不带答案」的版本（去掉答案、解析和对错标记），用来出题。"""
+    t = of(item)
+    ans_i = reveal(item).get("answer_index") if with_answer else None
+    mine_i = None
+    if t.widget == "choice" and mine not in (None, "") and str(mine).strip().lstrip("-").isdigit():
+        mine_i = int(str(mine).strip())
+    opts = [{"key": "ABCDEFGH"[i] if i < 8 else str(i + 1), "text": str(o), "right": with_answer and i == ans_i,
+             "mine": with_answer and i == mine_i} for i, o in enumerate(item.get("options") or [])]
+    v = {"type": t.id, "label": t.label, "q": item.get("q", ""), "zh": item.get("zh", ""), "code": item.get("code", ""),
+         "src": item.get("src", ""), "unit": item.get("unit", ""), "options": opts, "hint": item.get("hint", "")}
+    if with_answer:
+        r = reveal(item)
+        mine_text = ""
+        if mine not in (None, ""):
+            mine_text = (f"{opts[mine_i]['key']}. {opts[mine_i]['text']}" if mine_i is not None and 0 <= mine_i < len(opts)
+                         else str(mine))
+        v.update(answer=r["answer"], explain=r["explain"], points=r["points"], mine=mine_text,
+                 mine_right=bool(mine_text) and mine_i is not None and mine_i == ans_i)
+    return v
+
+
 def schema_text() -> str:
     return "；".join(t.schema for t in TYPES.values())

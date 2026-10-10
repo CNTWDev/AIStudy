@@ -3,7 +3,8 @@
 - 每个任务来源是一个函数：看孩子的情况，给出一类候选任务（单词、错题、补弱、预习……）。
   加一类任务 = 写一个来源函数，登记到 SOURCES。
 - 每天做哪些、按什么顺序、每类最多几个，由孩子的学习方式决定（app/methods/profiles.toml 的 plan）：
-  fixed 每天都有（坚持比做对更重要，不受时间预算限制），flex 按顺序排、超出每天可用时间就截掉，
+  fixed 每天都有、排在最前（坚持比做对更重要，不受时间预算限制），flex 按顺序排、超出每天可用时间就截掉，
+  tail 每天都有、排在最后（默认是阅读），
   "a+b" 表示两类交替穿插（交错练习），limits 是每类的上限。
 """
 from datetime import timedelta
@@ -148,7 +149,7 @@ def src_words(c: Ctx) -> list[dict]:
 
 def src_mistakes(c: Ctx) -> list[dict]:
     n = len(engine.due_cards(c.user_id, 300, "mistakes"))
-    return [{"type": "mistakes", "title": f"错题重做 {min(n, 8)} 道", "why": "原题再做一遍，隔天做对两次换一道新题，做对就过关",
+    return [{"type": "mistakes", "title": f"错题重做 {min(n, 8)} 道", "why": "以前做错的题回来了：原题再做一遍，隔天做对两次换一道新题，做对就过关",
              "minutes": min(10, 2 + min(n, 8)), "url": "/review?group=mistakes"}] if n else []
 
 
@@ -167,7 +168,7 @@ def src_reading(c: Ctx) -> list[dict]:
                         "minutes": t["daily_minutes"], "url": f"/track/{t['id']}"})
         elif lang in langs:
             out.append({"type": kind, "lang": lang, "title": f"{'英文' if lang == 'en' else '中文'}阅读 15 分钟",
-                        "why": "读一篇短文，不懂的词点一下就查，收藏后自动进单词复习", "minutes": 15, "url": f"/reading?lang={lang}"})
+                        "why": "读一篇短文，不懂的词点一下就查，收藏后自动进单词复习", "minutes": 15, "url": f"/reading/today?lang={lang}"})
     for t in active:
         if t["kind"] == "listen" and t["ref"].startswith("lib:"):
             bid = t["ref"][4:]
@@ -331,14 +332,18 @@ def build_plan(user_id: int) -> list[dict]:
             if key not in seen:  # 同一个任务不排两次（比如自动发现的那条已经排在前面）
                 seen.add(key)
                 flex.append(t)
+    # tail：每天都有、排在最后的任务（默认是阅读：学完新的，用大量输入放松收尾），和 fixed 一样不受时间预算限制
+    tail = [t for kind in c.policy.get("tail", []) for t in _take(c, kind)]
     budget = c.user["daily_minutes"] or 60
-    out, used, n_flex = [], 0, 0
-    for is_flex, t in [(False, t) for t in fixed] + [(True, t) for t in flex]:
+    out, used, n_flex = [], sum(t["minutes"] for t in tail), 0
+    for part, t in [("fixed", t) for t in fixed] + [("flex", t) for t in flex] + [("tail", t) for t in tail]:
+        is_flex = part == "flex"
         if is_flex and n_flex and not t.get("keep") and used + t["minutes"] > budget:
             continue
         n_flex += is_flex
         t["id"] = f"t{len(out)}"
         t["done"] = False
         out.append(t)
-        used += t["minutes"]
+        if part != "tail":  # tail 的时间开头已经算进去了
+            used += t["minutes"]
     return out

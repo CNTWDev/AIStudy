@@ -1,7 +1,8 @@
 """复习要作答：卡片不再只让孩子自己点「记得 / 模糊」（全靠自觉），而是出成题、由系统判对错。
 
 - 错题（mistake）：原题原样重做，选项齐全。隔天连续做对 2 次 → 换一道同知识点的「变式题」，
-  也做对了才算过关、移出错题本（防止只是背住了这道题的答案）。做错了明天再来。
+  也做对了才算过关（防止只是背住了这道题的答案）。做错了明天再来。
+  过关以后 RECHECK_DAYS 天再回头做一次原题：还会就真的掌握了（不再出现）；忘了就重新回到错题本里练。
 - 生词 / 短语 / 术语（word / phrase / term）：刚学的「看意思选单词」（四选一），熟一点的「看意思写单词」（拼写）。
 - 知识点卡（kp）：从题库里取一道这个知识点的题来做。
 - 实在出不了题的（意思还没查到的词、老的错题找不到原题、题库里没题的知识点）才退回自评。
@@ -18,6 +19,7 @@ PASS_STREAK = 2        # 隔天连续做对几次，换变式题
 PASS_NO_VARIANT = 3    # 找不到变式题时，隔天连续做对几次算过关
 SPELL_FROM_BOX = 2     # 复习过几轮（box）之后，从四选一升级为拼写
 PASSED_DUE = "9999-12-31"
+RECHECK_DAYS = 21      # 过关后隔多久回头看一眼
 _LATIN = re.compile(r"[A-Za-z][A-Za-z '\-.]*")
 _NO_MEANING = "（意思还没查到"
 
@@ -42,11 +44,11 @@ def quiz(user_id: int, c) -> dict:
     """一张到期的卡 → 怎么考。返回 {mode: item / choice / spell / self, ...}，不含答案。"""
     kind, ex = c["kind"], _extra(c)
     if kind == "mistake":
-        variant = bool(ex.get("variant"))
-        it = _item(ex.get("variant") or ex.get("item_id"))
+        variant = bool(ex.get("variant")) and not ex.get("passed")  # 过关后的回头看：做原题
+        it = _item(ex.get("variant") if variant else ex.get("item_id")) or _item(ex.get("item_id"))
         if it:
             return {"mode": "item", "item": {**itemtypes.public(it), "id": it["id"]}, "variant": variant,
-                    "last": None if variant else ex.get("my_answer"), "streak": ex.get("streak", 0)}
+                    "recheck": bool(ex.get("passed")), "last": None if variant else ex.get("my_answer"), "streak": ex.get("streak", 0)}
     elif kind in WORD_KINDS:
         q = _word_quiz(user_id, c)
         if q:
@@ -120,10 +122,7 @@ def answer(user_id: int, card_id: int, body: dict) -> dict:
             return {"error": "这道题不是这张卡的"}
     elif c["kind"] != "kp" or item["id"] not in {r["id"] for r in bank.candidates(user_id, c["kp_id"])}:
         return {"error": "这道题不是这张卡的"}
-    reveal = {"answer": itemtypes.display(item), "explain": item.get("explain", ""), "points": item.get("points", []),
-              "redo": True}  # 前端：不再显示「已放进错题本」
-    if item["type"] == "mcq":
-        reveal["answer_index"] = item.get("answer")
+    reveal = {**itemtypes.reveal(item), "redo": True}  # 前端：不再显示「已放进错题本」
     dk = bool(body.get("dont_know"))
     if dk:
         correct = False
@@ -146,6 +145,13 @@ def answer(user_id: int, card_id: int, body: dict) -> dict:
 
 def _after_mistake(user_id: int, c, ex: dict, item: dict, correct: bool, fmt: str) -> dict:
     today = db.today().isoformat()
+    if ex.get("passed"):  # 过关后的回头看
+        if correct:
+            ex["kept"] = today
+            engine.schedule_card(user_id, c, "good", due=PASSED_DUE, extra=ex, fmt=fmt)
+            return {"passed": True, "kept": True}
+        ex.pop("passed", None)
+        ex.pop("kept", None)
     on_variant = item["id"] == ex.get("variant")
     if not correct:
         ex.update(streak=0, streak_day="")
@@ -156,9 +162,7 @@ def _after_mistake(user_id: int, c, ex: dict, item: dict, correct: bool, fmt: st
         ex["streak"] = ex.get("streak", 0) + 1
         ex["streak_day"] = today
     if on_variant:
-        ex["passed"] = today
-        engine.schedule_card(user_id, c, "good", due=PASSED_DUE, extra=ex, fmt=fmt)
-        return {"passed": True}
+        return _pass(user_id, c, ex, today, fmt)
     if ex["streak"] >= PASS_STREAK:
         v = _variant(user_id, c, ex)
         if v:
@@ -166,11 +170,17 @@ def _after_mistake(user_id: int, c, ex: dict, item: dict, correct: bool, fmt: st
             engine.schedule_card(user_id, c, "good", extra=ex, fmt=fmt)
             return {"variant_next": True, "streak": ex["streak"]}
         if ex["streak"] >= PASS_NO_VARIANT:
-            ex["passed"] = today
-            engine.schedule_card(user_id, c, "good", due=PASSED_DUE, extra=ex, fmt=fmt)
-            return {"passed": True}
+            return _pass(user_id, c, ex, today, fmt)
     engine.schedule_card(user_id, c, "good", extra=ex, fmt=fmt)
     return {"streak": ex["streak"], "need": (PASS_STREAK if c["kp_id"] else PASS_NO_VARIANT) - ex["streak"]}
+
+
+def _pass(user_id: int, c, ex: dict, today: str, fmt: str) -> dict:
+    """过关：先不移出，RECHECK_DAYS 天后回头再做一次原题。"""
+    ex["passed"] = today
+    due = db.today() + timedelta(days=RECHECK_DAYS)
+    engine.schedule_card(user_id, c, "good", due=due, extra=ex, fmt=fmt)
+    return {"passed": True, "recheck_on": due.isoformat()}
 
 
 def _variant(user_id: int, c, ex: dict) -> dict | None:

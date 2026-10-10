@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui %}
 {% block body %}
 <a href="/reading" class="small">← 阅读</a>
 <h1>{{ r.title }}</h1>
@@ -7,19 +8,29 @@
 <div class="row" style="margin-bottom:8px"><input type="text" id="manual" class="grow" placeholder="也可以直接输入要查的词"><button class="btn sm" id="manualbtn">查</button></div>
 <div id="listenhere"></div>
 <div class="card reader" id="reader" lang="{{ 'en' if r.lang == 'en' else 'zh-CN' }}">{% for p in paras %}<p>{{ p }}</p>{% endfor %}</div>
+{% if dup and not r.finished_at %}<div class="note-bar">📌 今天写的这篇还没读完，先读完它吧（每天一篇就够）。
+  <form method="post" action="/reading/new" style="display:inline"><input type="hidden" name="mode" value="ai"><input type="hidden" name="lang" value="{{ r.lang }}"><input type="hidden" name="again" value="1">
+  <button class="linkbtn" data-busy="正在写…">不喜欢这篇？换一篇</button></form></div>{% endif %}
+{% if done_views is not none %}
+<div class="card" id="qs"><h3 style="margin-top:0">✅ 这篇读完了{% if done_views %} · 小题答对 {{ done_views|selectattr('mine_right')|list|length }}/{{ done_views|length }}{% endif %}</h3>
+{% for v in done_views %}<div class="rq">{{ ui.question(v, loop.index) }}</div>{% endfor %}
+<p class="small muted" style="margin-bottom:0">{% if is_today %}今天的阅读已经完成。还想读？{% else %}想再读一篇？{% endif %}<a href="/reading?lang={{ r.lang }}">再来一篇 →</a></p>
+</div>
+{% else %}
 {% if questions %}
 <div class="card" id="qs"><h3 style="margin-top:0">读完了？做 {{ questions|length }} 道小题</h3>
-{% for q in questions %}{% set qi = loop.index0 %}<div class="rq" data-i="{{ qi }}" style="margin-bottom:12px"><div><b>{{ loop.index }}. {{ q.q }}</b></div>
-{% for o in q.options %}<button class="opt" data-o="{{ loop.index0 }}">{{ 'ABCD'[loop.index0] }}. {{ o }}</button>{% endfor %}<div class="fbq"></div></div>{% endfor %}
+{% for q in questions %}{% set qi = loop.index0 %}<div class="rq qc" data-i="{{ qi }}"><div class="qc-stem"><span class="qc-n">{{ loop.index }}</span>{{ q.q }}</div>
+<div class="qc-opts">{% for o in q.options %}<button class="opt" data-o="{{ loop.index0 }}"><b class="qc-key">{{ 'ABCDEFGH'[loop.index0] }}</b><span class="qc-ot">{{ o }}</span></button>{% endfor %}</div></div>{% endfor %}
 </div>{% endif %}
-<div class="row"><button class="btn" id="finish">✅ 读完打卡</button><span class="muted small">计时：<span id="timer">0</span> 分钟</span></div>
+<div class="row" id="finrow"><button class="btn lg" id="finish">✅ 读完了，交卷</button><span class="muted small">计时：<span id="timer">0</span> 分钟</span></div>
+{% endif %}
 
 <div class="sheet" id="sheet"><button class="btn ghost sm close" onclick="closeSheet()">关闭</button><div id="sheetbody"></div></div>
 <button class="btn" id="selbtn" style="position:fixed;right:16px;bottom:90px;display:none;z-index:20">查「<span></span>」</button>
 <script>
 const RID = {{ r.id }}, LANG = {{ r.lang|tojson }};
 Run.start('read', {race: false});
-const t0 = Date.now(); setInterval(() => $('#timer').textContent = Math.round((Date.now() - t0) / 60000), 15000);
+const t0 = Date.now(); setInterval(() => { if ($('#timer')) $('#timer').textContent = Math.round((Date.now() - t0) / 60000); }, 15000);
 const looked = new Set({{ looked|map(attribute='q')|list|tojson }}.map(s => s.toLowerCase()));
 // 把正文拆成可点的单词 / 句子
 $$('#reader p').forEach(p => {
@@ -95,13 +106,21 @@ $('#selbtn').onclick = () => { const sel = getSelection(); const s = String(sel)
 $('#manualbtn').onclick = () => { const q = $('#manual').value.trim(); if (q) lookup(q, ''); };
 const answers = {};
 $$('.rq .opt').forEach(b => b.onclick = () => { const q = b.closest('.rq'); $$('.opt', q).forEach(x => x.classList.remove('sel')); b.classList.add('sel'); answers[q.dataset.i] = b.dataset.o; });
-$('#finish').onclick = async () => {
-  const r = await api(`/api/reading/${RID}/finish`, {minutes: Math.max(1, Math.round((Date.now() - t0) / 60000)), answers});
-  r.results.forEach((x, i) => { const q = $(`.rq[data-i="${i}"]`); if (!q) return;
-    $$('.opt', q).forEach(o => { if (+o.dataset.o === +x.answer) o.classList.add('right'); else if (o.classList.contains('sel')) o.classList.add('wrong'); });
-    $('.fbq', q).innerHTML = `<div class="small muted">${esc(x.explain)}</div>`; });
-  $('#finish').textContent = '已打卡 ✓'; $('#finish').disabled = true;
-  Run.finish({n_items: r.results.length, n_right: r.results.filter(x => x.ok).length, best_combo: 0});
+if ($('#finish')) $('#finish').onclick = async () => {
+  const left = $$('.rq').length - Object.keys(answers).length;
+  if (left > 0 && !confirm(`还有 ${left} 道小题没做，确定交卷吗？`)) return;
+  $('#finish').disabled = true;
+  let r;
+  try { r = await api(`/api/reading/${RID}/finish`, {minutes: Math.max(1, Math.round((Date.now() - t0) / 60000)), answers}); }
+  catch (e) { $('#finish').disabled = false; toast(e.message); return; }
+  // 交卷后：每道题换成「带答案」的样子（正确答案、我选的、解析），做错的一眼就能看到
+  const right = r.results.filter(x => x.ok).length;
+  r.results.forEach((x, i) => { const q = $(`.rq[data-i="${i}"]`); if (q) { q.classList.remove('qc'); q.innerHTML = qView(x.view, i + 1); } });
+  if (r.results.length) $('#qs h3').textContent = `小题答对 ${right}/${r.results.length}` + (right === r.results.length ? ' 🎉' : '，看看错在哪');
+  $('#finrow').innerHTML = `<span class="pill st-mastered">✓ 读完 · 打卡了</span>`;
+  Run.finish({n_items: r.results.length, n_right: right, best_combo: 0});
+  if (r.results.length && right < r.results.length) { const w = $$('.rq .opt.wrong')[0]; if (w) w.scrollIntoView({behavior: 'smooth', block: 'center'}); }
+  if (r.flow) setTimeout(() => Flow.done(r.flow), r.results.length && right < r.results.length ? 900 : 300);
 };
 </script>
 {% endblock %}

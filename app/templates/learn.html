@@ -74,7 +74,7 @@ function show() {
   if (idx >= items.length) {
     $('#items').innerHTML = `<p><b>做完了：${right}/${items.length} 正确。</b> ${right === items.length ? '太棒了 🎉' : '每做一题都算数，继续加油！'}</p>` +
       (CTX && CTX.next ? `<div class="hint">🚀 ${esc(CTX.next)}</div>` : '') +
-      `<button class="btn ghost sm" onclick="loadItems()">再来 3 题</button>`; Run.finish(); return;
+      `<div class="row"><button class="btn" onclick="$('#finish').scrollIntoView({behavior:'smooth',block:'center'});$('#summary').focus()">写一句总结，完成这一项 ↓</button><button class="btn ghost sm" onclick="loadItems()">再来 3 题</button></div>`; Run.finish(); return;
   }
   const it = items[idx];
   const box = document.createElement('div');
@@ -107,6 +107,10 @@ api('/api/context/' + KP).then(c => {
     (c.fun ? `<p class="small muted">💡 你知道吗？${esc(c.fun)}</p>` : '');
   $('#ctxli').style.display = '';
 }).catch(() => {});
-$('#finish').onclick = async () => { await api('/api/learn/done', {kp_id: KP, summary: $('#summary').value}); sessionStorage.setItem('justDone', 'learn'); location.href = '/today'; };
+$('#finish').onclick = async () => {
+  $('#finish').disabled = true;
+  try { const r = await api('/api/learn/done', {kp_id: KP, summary: $('#summary').value}); if (r.flow && r.flow.total) return Flow.done(r.flow); } catch (e) {}
+  location.href = '/today';
+};
 </script>{% endif %}
 {% endblock %}
