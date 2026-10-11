@@ -176,6 +176,8 @@ a.kp:hover{border-color:var(--brand-3);color:var(--ink);transform:translateX(2px
 .fb{padding:14px;border-radius:14px;margin-top:12px}.fb.ok{background:var(--ok-2)}.fb.no{background:var(--warn-2)}
 .reader{font-size:19px;line-height:1.9}.reader .w{cursor:pointer;border-radius:4px}.reader .w:hover{background:var(--brand-2)}.reader .w.seen{border-bottom:2px dotted var(--learn)}
 .reader p{margin:0 0 1em}
+.reader.veiled p{color:transparent;background:repeating-linear-gradient(transparent 0 .55em,var(--line) .55em 1.35em,transparent 1.35em 1.9em);border-radius:6px;user-select:none;pointer-events:none}
+.reader.veiled p.reading{background:repeating-linear-gradient(transparent 0 .55em,var(--learn-2) .55em 1.35em,transparent 1.35em 1.9em)}
 .sheet{position:fixed;left:0;right:0;bottom:0;max-height:75vh;overflow:auto;background:var(--card);border-top:1px solid var(--line);border-radius:22px 22px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.15);padding:18px 18px calc(24px + env(safe-area-inset-bottom));z-index:60;display:none;max-width:720px;margin:0 auto}
 .sheet.on{display:block;animation:up .25s ease-out}.sheet .close{float:right}
 @keyframes up{from{transform:translateY(30px);opacity:0}}

@@ -2106,8 +2106,9 @@ def reading_finish(request: Request, rid: int, body: dict = Body(...)):
         results.append({"ok": ok, "answer": q.get("answer"), "explain": q.get("explain", ""), "view": _reading_view(q, a)})
     minutes = max(1, min(120, int(body.get("minutes") or 1)))
     if not r["finished_at"]:
-        db.run("UPDATE readings SET finished_at=?, minutes=minutes+?, answers=? WHERE id=?", db.now(), minutes,
-               db.jdump({str(k2): v for k2, v in answers.items()}), rid)
+        mode = "listen" if body.get("mode") == "listen" and r["lang"] == "en" and qs else "read"
+        db.run("UPDATE readings SET finished_at=?, minutes=minutes+?, answers=?, mode=? WHERE id=?", db.now(), minutes,
+               db.jdump({str(k2): v for k2, v in answers.items()}), mode, rid)
     engine._touch_day(k["id"])  # 在线阅读的时间由页面自动计时
     hit = engine.mark_task_by(k["id"], type="read_" + r["lang"], lang=r["lang"])
     return {"results": results, "flow": engine.flow_state(k["id"], hit[0]) if hit else None}

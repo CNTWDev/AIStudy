@@ -87,7 +87,11 @@ def test_daily_news_flow(monkeypatch):
         assert r2 != rid
         assert db.one("SELECT level FROM readings WHERE id=?", int(r2.rsplit("/", 1)[1]))["level"] == "L2"
         assert news.level_for(db.one("SELECT * FROM users WHERE email='newsk8@x.com'")) == "L2"
-        c.post(f"/api/reading/{rid.rsplit('/', 1)[1]}/finish", json={"minutes": 3, "answers": {"0": 1}})
+        assert "先听后读" in page  # 英文短文可以先只听不看原文做小题
+        n = int(rid.rsplit('/', 1)[1])
+        c.post(f"/api/reading/{n}/finish", json={"minutes": 3, "answers": {"0": 1}, "mode": "listen"})
+        assert db.one("SELECT mode FROM readings WHERE id=?", n)["mode"] == "listen"
+        assert "🎧 先听后读" in c.get(rid).text
         c.get("/logout")
 
         # 初一和初二同级别：共用同一篇改写稿，不重新生成

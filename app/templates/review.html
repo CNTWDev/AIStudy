@@ -34,7 +34,7 @@ function show() {
   const c = cards[i], q = c.quiz || {mode: 'self'};
   Run.total = cards.length;
   if (q.mode === 'item') return showItem(box, c, q);
-  if (q.mode === 'choice' || q.mode === 'spell') return showWord(box, c, q);
+  if (q.mode === 'choice' || q.mode === 'spell' || q.mode === 'dictate') return showWord(box, c, q);
   showSelf(box, c);
 }
 
@@ -69,25 +69,30 @@ function showItem(box, c, q) {
   });
 }
 
-/* 单词：看意思选单词（四选一），熟了以后看意思写单词 */
+/* 单词：看意思选单词（四选一），熟了以后看意思写单词，再熟一点和听音写单词轮换 */
 function showWord(box, c, q) {
   const speak = /^[A-Za-z]/.test(c.front) ? `<button class="btn ghost sm" id="say">🔊</button>` : '';
-  let html = head(c) + `<div class="face" style="min-height:120px">${esc(q.q)}${q.hint ? `<div class="muted small">${esc(q.hint)}</div>` : ''}</div>`;
+  const dictate = q.mode === 'dictate';
+  let html = head(c, dictate ? ' · 听写' : '') + (dictate
+    ? `<div class="face" style="min-height:120px"><button class="btn lg" id="say">🔊 听一听</button><div class="muted small" style="margin-top:8px">听读音，写出这个${c.kind === 'term' ? '术语' : '单词'}（可以多听几遍）</div></div>`
+    : `<div class="face" style="min-height:120px">${esc(q.q)}${q.hint ? `<div class="muted small">${esc(q.hint)}</div>` : ''}</div>`);
   if (q.mode === 'choice') {
     html += `<div style="text-align:left">${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
   } else {
     html += `<div class="muted small">${esc(q.shape)} · 写出这个${c.kind === 'term' ? '术语' : '单词'}</div>` +
-      `<div class="row" style="margin-top:8px"><input type="text" class="ans grow" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="写在这里">${speak}<button class="btn" id="go">提交</button></div>`;
+      `<div class="row" style="margin-top:8px"><input type="text" class="ans grow" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="写在这里">${dictate ? '' : speak}<button class="btn" id="go">提交</button></div>`;
   }
   html += `<div class="row" style="justify-content:center;margin-top:8px"><button class="linkbtn" id="dk">🤔 想不起来</button></div><div class="fbbox"></div>`;
   box.innerHTML = html;
-  if ($('#say', box)) $('#say', box).onclick = () => say(q.say || c.front);
+  if ($('#say', box)) $('#say', box).onclick = () => say(q.say || c.front, 'en', 'word');
+  if (dictate) say(q.say || c.front, 'en', 'word');
   const done = async (answer, el) => {
     $$('.opt,#go,#dk', box).forEach(b => b.disabled = true);
     const res = await post(c, {answer, mode: q.mode, dont_know: answer === null});
     if (q.mode === 'choice') $$('.opt', box).forEach(b => { if (b.dataset.v === res.answer) b.classList.add('right'); else if (b === el) b.classList.add('wrong'); });
     $('.fbbox', box).innerHTML = `<div class="fb ${res.correct ? 'ok' : 'no'} pop">${res.correct ? '✅ 对了！' : '正确答案是 <b>' + esc(res.answer) + '</b>'}` +
       (!res.correct && answer ? `<div class="small muted">${q.mode === 'choice' ? '你选的' : '你写的'}：${esc(answer)}</div>` : '') +
+      (dictate && res.meaning ? `<div class="small">${esc(res.meaning.split('\n')[0])}</div>` : '') +
       (res.example ? `<div class="small">例：${esc(res.example)}</div>` : '') +
       (/^[A-Za-z]/.test(res.answer) ? ` <button class="btn ghost sm" onclick="say(${esc(JSON.stringify(res.answer))})">🔊</button>` : '') + `</div>`;
     if (/^[A-Za-z]/.test(res.answer)) say(res.answer);
