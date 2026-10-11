@@ -25,6 +25,8 @@
     <b class="grow">第 {{ r.label }} 题{% if r.points %} <span class="muted">（{{ r.points|round(1)|string|replace('.0', '') }} 分）</span>{% endif %}</b>
     {% if r.orig == 'wrong' %}<span class="pill st-weak">原卷 ✗</span>{% elif r.orig == 'partial' %}<span class="pill st-learning">原卷扣分</span>{% elif r.orig == 'right' %}<span class="pill st-mastered">原卷 ✓</span>{% endif %}
     {% if r.page and images and r.page <= images|length %}<a href="/papers/{{ p.id }}/img/{{ images[r.page - 1] }}" target="_blank">📷 看原题</a>{% endif %}
+    {% if images and not p.bank_paper_id %}<button class="linkbtn figbtn" data-pi="{{ r.id }}" data-page="{{ (r.item.fig or {}).page or r.page or 1 }}"
+      data-box="{{ (r.item.fig or {}).box|tojson if (r.item.fig or {}).box else '' }}">✂️ {{ '调整图' if r.item.fig else '框出图' }}</button>{% endif %}
   </div>
   <div class="muted small">知识点：{% if r.kp %}<a href="/learn/{{ r.kp.id }}">{{ r.kp.name }}</a>{% else %}未对应{% endif %}
     {% if not p.bank_paper_id %}<details style="display:inline"><summary style="display:inline;cursor:pointer">（改）</summary>
@@ -47,6 +49,14 @@
     <button class="btn ghost sm">删除这份试卷</button></form>
 </div>
 
+{% if images and not p.bank_paper_id %}<script>
+/* 原卷上的图裁歪了、没裁到：在整页照片上重新框 */
+$$('.figbtn').forEach(b => b.onclick = () => figCrop({
+  pages: {{ images|tojson }}.map(n => `/papers/{{ p.id }}/img/${n}`), page: +b.dataset.page,
+  box: b.dataset.box ? JSON.parse(b.dataset.box) : null,
+  onSave: async d => { await api(`/api/papers/{{ p.id }}/fig`, {pi: +b.dataset.pi, ...d}); location.reload(); },
+}));
+</script>{% endif %}
 {% if not readonly %}<script>
 const PID = {{ p.id }}, QS = {{ qs|tojson }};
 function progress() {

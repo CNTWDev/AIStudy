@@ -12,6 +12,7 @@ import shutil
 import uuid
 
 from . import bank, config, db, itemtypes, llm
+from .figures import photo
 from .catalog import catalog, stage_rank
 
 KINDS = {"real": "真题", "school": "名校卷", "teacher": "名师卷", "recall": "回忆版"}
@@ -35,6 +36,7 @@ def create(admin_id: int, pack_id: str, *, kind="real", stage="", title="", exam
     """images: [(media_type, bytes)]。先让 AI 拆题（失败就什么都不保存），再存成草稿。"""
     pack = catalog.packs[pack_id]
     stage = stage if stage in pack.stages else pack.stages[0]
+    pages = [b for _, b in (images or [])]
     imgs = [(mt, base64.b64encode(b).decode()) for mt, b in (images or [])]
     # 真题会考到整套教材 / 大纲里的任何地方：候选知识点给到这个学段为止的全部
     cands = [catalog.kps[k] for k in pack.kp_ids if stage_rank(catalog.kps[k]["stage"]) <= stage_rank(stage)]
@@ -51,7 +53,7 @@ def create(admin_id: int, pack_id: str, *, kind="real", stage="", title="", exam
             text[:20000], (notes or str(data.get("notes") or ""))[:500], "draft", admin_id, now)
         for i, q in enumerate(qs):
             kp = q.get("kp_id") if q.get("kp_id") in valid else None
-            iid = _insert_item(t, itemtypes.normalize(q), kp, now, bp)
+            iid = _insert_item(t, itemtypes.normalize({**q, "fig": photo.from_parse(q, pages)}), kp, now, bp)
             page = q.get("page")
             t.run("INSERT INTO bank_paper_items(bank_paper_id,seq,label,item_id,points,page) VALUES(?,?,?,?,?,?)",
                   bp, i + 1, str(q.get("label") or i + 1)[:20], iid, itemtypes._num(q.get("score")),
@@ -131,7 +133,7 @@ def update_item(bp_id: int, bpi_id: int, f: dict) -> str:
         raw["answer"] = ans
     if typ != "mcq":
         raw["options"] = None
-    it = itemtypes.normalize(raw)
+    it = itemtypes.normalize(raw) or itemtypes.normalize({**raw, "fig": None})  # 图文件丢了：保留题目，去掉图
     data = db.jload(db.one("SELECT data FROM items WHERE id=?", r["item_id"])["data"], {})
     body = {k: v for k, v in it.items() if k != "type"}
     if data.get("src"):
@@ -153,6 +155,21 @@ def update_item(bp_id: int, bpi_id: int, f: dict) -> str:
     from . import bankflow
     bankflow.assign_near(r["item_id"], kp_id=kp or "")
     return it["type"]
+
+
+def set_fig(bp_id: int, bpi_id: int, page: int = 0, box=None):
+    """重新框一道题在原卷上的图；box 为 None 就去掉图。框不合格 raise ValueError。"""
+    r = db.one("SELECT * FROM bank_paper_items WHERE id=? AND bank_paper_id=?", bpi_id, bp_id)
+    if not r:
+        raise KeyError(bpi_id)
+    fig = None
+    if box is not None:
+        names = db.jload(get(bp_id)["images"], [])
+        if not 1 <= page <= len(names):
+            raise ValueError("没有这一页")
+        old = db.jload(db.one("SELECT data FROM items WHERE id=?", r["item_id"])["data"], {}).get("fig") or {}
+        fig = photo.cut((DIR / str(bp_id) / names[page - 1]).read_bytes(), box, page, old.get("alt", ""))
+    bank.set_fig(r["item_id"], fig)
 
 
 def remove_item(bp_id: int, bpi_id: int):

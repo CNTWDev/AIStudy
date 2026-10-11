@@ -134,7 +134,8 @@ MOCK = {
     "paper": {"title": "示例测验", "subject_guess": "", "notes": "示例数据",
               "questions": [
                   {"label": "1", "type": "mcq", "q": "示例：1 m = ? cm", "options": ["10", "100", "1000", "0.1"], "answer": 1,
-                   "explain": "1 米 = 100 厘米。", "score": 2, "page": 1, "student_answer": "C", "marked": "wrong"},
+                   "explain": "1 米 = 100 厘米。", "score": 2, "page": 1, "student_answer": "C", "marked": "wrong",
+                   "fig": {"page": 1, "box": [120, 250, 630, 540], "alt": "示例：一把刻度尺"}},
                   {"label": "2", "type": "num", "q": "示例：2 + 3 = ?", "answer": 5, "explain": "2 加 3 等于 5。",
                    "score": 2, "page": 1, "student_answer": "5", "marked": "right"},
                   {"label": "3", "type": "short", "q": "示例：说说你是怎么想的。", "model": "言之有理即可",

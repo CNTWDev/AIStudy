@@ -8,6 +8,7 @@ import base64
 import uuid
 
 from . import bank, config, db, engine, itemtypes, llm
+from .figures import photo
 from .catalog import catalog, stage_rank
 
 MAX_IMAGES = 8
@@ -34,6 +35,7 @@ def create(user_id: int, pack_id: str, *, title="", exam_date="", images=None, t
     pack = catalog.packs[pack_id]
     stage = engine.enrollment_stage(user_id, pack_id) or catalog.default_stage(pack_id, kid["grade"])
     cands = candidates(pack_id, stage)
+    pages = [b for _, b in (images or [])]
     imgs = [(mt, base64.b64encode(b).decode()) for mt, b in (images or [])]
     data = llm.parse_paper(pack, kid["grade"], cands, images=imgs, text=text, user_id=user_id)
     qs = data.get("questions", [])
@@ -49,7 +51,7 @@ def create(user_id: int, pack_id: str, *, title="", exam_date="", images=None, t
             1 if shared else 0)
         for i, q in enumerate(qs):
             kp = q.get("kp_id") if q.get("kp_id") in valid else None
-            it = _normalize(q)
+            it = _normalize({**q, "fig": photo.from_parse(q, pages)})  # 题目上的图从原卷照片上裁下来
             iid = "PP-" + uuid.uuid4().hex[:10]
             body = {k: v for k, v in it.items() if k != "type"}
             t.run("INSERT INTO items(id,kp_id,kp_ids,type,difficulty,data,source,created_at) VALUES(?,?,?,?,?,?,?,?)",
@@ -86,6 +88,23 @@ def create(user_id: int, pack_id: str, *, title="", exam_date="", images=None, t
             engine.add_card(user_id, "mistake", it["q"], (engine.answer_display(it) + "\n" + it.get("explain", "")).strip(),
                             {"item_id": it["id"], "my_answer": pi["orig_answer"]})
     return pid
+
+
+def page_bytes(paper: dict, page: int) -> bytes:
+    names = db.jload(paper["images"], [])
+    if not 1 <= page <= len(names):
+        raise ValueError("没有这一页")
+    return (PAPER_DIR / str(paper["id"]) / names[page - 1]).read_bytes()
+
+
+def set_fig(paper: dict, pi_id: int, page: int = 0, box=None):
+    """重新框一道题在原卷上的图；box 为 None 就去掉图。框不合格 raise ValueError。"""
+    pi = db.one("SELECT * FROM paper_items WHERE id=? AND paper_id=?", pi_id, paper["id"])
+    if not pi:
+        raise KeyError(pi_id)
+    old = db.jload(db.one("SELECT data FROM items WHERE id=?", pi["item_id"])["data"], {}).get("fig") or {}
+    fig = photo.cut(page_bytes(paper, page), box, page, old.get("alt", "")) if box is not None else None
+    bank.set_fig(pi["item_id"], fig)
 
 
 def get(user_id: int, paper_id: int):

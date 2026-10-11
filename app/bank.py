@@ -29,7 +29,9 @@ def fingerprint(*parts) -> str:
 
 
 def item_hash(it: dict) -> str:
-    return fingerprint(it.get("type"), it.get("q"), it.get("options") or "", it.get("answer", it.get("model", "")))
+    # 「如图，求 AB」这种题文字一样、图不一样就是两道题；没有图的题哈希和以前一样
+    fig = [it["fig"]] if it.get("fig") else []
+    return fingerprint(it.get("type"), it.get("q"), it.get("options") or "", it.get("answer", it.get("model", "")), *fig)
 
 
 def kp_lang(kp_id: str) -> str:
@@ -86,6 +88,20 @@ def save_items(kp_id: str, items: list[dict], source="ai", purpose="", grade="",
             link(iid, k, "also")
         out.append(row_to_item(db.one("SELECT * FROM items WHERE id=?", iid)))
     return out
+
+
+def set_fig(item_id: str, fig: dict | None):
+    """换掉 / 去掉一道题的图（家长、管理员重新框原卷上的图）。"""
+    r = db.one("SELECT * FROM items WHERE id=?", item_id)
+    data = db.jload(r["data"], {})
+    if fig:
+        data["fig"] = fig
+    else:
+        data.pop("fig", None)
+    it = {**row_to_item(r), **data}
+    if not fig:
+        it.pop("fig", None)
+    db.run("UPDATE items SET data=?, qhash=?, updated_at=? WHERE id=?", db.jdump(data), item_hash(it), db.now(), item_id)
 
 
 def candidates(user_id: int, kp_id: str) -> list:

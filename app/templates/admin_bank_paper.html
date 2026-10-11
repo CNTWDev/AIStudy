@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui %}
 {% block body %}
 <p class="small"><a href="/admin?tab=papers">← 卷库</a></p>
 <h1>{{ bp.title }} <span class="pill {{ {'published': 'st-mastered', 'draft': 'st-learning'}.get(bp.status, 'st-weak') }}">{{ status[bp.status] }}</span></h1>
@@ -45,8 +46,11 @@
     <span>分值 <input type="text" name="points" value="{{ r.points|string|replace('.0', '') if r.points is not none else '' }}" style="width:50px;display:inline"></span>
     <select name="type" style="width:auto">{% for k, t in types.items() %}<option value="{{ k }}" {{ 'selected' if k == it.type }}>{{ t.label }}</option>{% endfor %}</select>
     {% if r.page and images and r.page <= images|length %}<a href="/admin/bank-papers/{{ bp.id }}/img/{{ images[r.page - 1] }}" target="_blank">📷 原题</a>{% endif %}
+    {% if images %}<button type="button" class="linkbtn figbtn" data-bpi="{{ r.id }}" data-page="{{ (it.fig or {}).page or r.page or 1 }}"
+      data-box="{{ (it.fig or {}).box|tojson if (it.fig or {}).box else '' }}">✂️ {{ '调整图' if it.fig else '框出图' }}</button>{% endif %}
   </div>
   <label>题干</label><textarea name="q" style="min-height:60px">{{ it.q }}</textarea>
+  {{ ui.figure(qfig(it)) }}
   {% if it.type == 'mcq' %}<label>选项（一行一个）</label><textarea name="options" style="min-height:80px">{{ (it.options or [])|join('\n') }}</textarea>{% endif %}
   <label>答案 <span class="muted small">（选择题写字母；填空题几个都算对的用 | 隔开；简答题写参考答案）</span></label>
   <input type="text" name="answer" value="{{ r.answer_text }}">
@@ -61,4 +65,11 @@
   </div>
 </form>
 {% endfor %}
+{% if images %}<script>
+$$('.figbtn').forEach(b => b.onclick = () => figCrop({
+  pages: {{ images|tojson }}.map(n => `/admin/bank-papers/{{ bp.id }}/img/${n}`), page: +b.dataset.page,
+  box: b.dataset.box ? JSON.parse(b.dataset.box) : null,
+  onSave: async d => { await api(`/admin/bank-papers/{{ bp.id }}/items/${b.dataset.bpi}/fig`, d); location.reload(); },
+}));
+</script>{% endif %}
 {% endblock %}

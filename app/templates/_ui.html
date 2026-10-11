@@ -58,12 +58,18 @@
 {# 一道题的统一展示（和 app.js 的 qView / renderItem 同一个样子）。v 来自 itemtypes.view(item, mine)：
    带答案（错题本、订正过的卷子）：选项上标「✓ 正确答案」「我选的」，下面分栏：答案 / 我的答案 / 解析 / 要点。
    with_answer=False 的 v 没有 answer，就只显示题干和选项。 #}
+{# 题目上的图（itemtypes.view / figures.present 给的 fig）：点一下放大，和 app.js 的 qFig 一样 #}
+{% macro figure(f) %}{% if f %}<figure class="qc-fig" tabindex="0" title="点一下放大">
+  {%- if f.svg %}{{ f.svg|safe }}{% else %}<img src="{{ f.img }}" alt="{{ f.alt }}" loading="lazy">{% endif -%}
+</figure>{% endif %}{% endmacro %}
+
 {% macro question(v, num=None) %}
 <div class="qc">
   {% if v.src %}<div class="qc-meta"><span>📄 {{ v.src }}</span></div>{% endif %}
   <div class="qc-stem">{% if num %}<span class="qc-n">{{ num }}</span>{% endif %}{{ v.q }}</div>
   {% if v.code %}<pre class="code">{{ v.code }}</pre>{% endif %}
   {% if v.zh %}<div class="qc-zh">{{ v.zh }}</div>{% endif %}
+  {{ figure(v.fig) }}
   {% if v.options %}<div class="qc-opts">{% for o in v.options %}
     <div class="opt static {{ 'right' if o.right }} {{ 'wrong' if o.mine and not o.right }}"><b class="qc-key">{{ o.key }}</b><span class="qc-ot">{{ o.text }}</span>
       {%- if o.right %}<span class="qc-tag ok">✓ 正确答案</span>{% endif %}{% if o.mine %}<span class="qc-tag mine {{ 'ok' if o.right else 'no' }}">我选的{{ ' ✓' if o.right }}</span>{% endif %}</div>
