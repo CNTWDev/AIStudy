@@ -20,7 +20,66 @@ function qStem(item, num) {
   return (item.src ? `<div class="qc-meta"><span>📄 ${esc(item.src)}</span></div>` : '') +
     `<div class="qc-stem">${num ? `<span class="qc-n">${esc(num)}</span>` : ''}${esc(item.q)}</div>` +
     (item.code ? `<pre class="code">${esc(item.code)}</pre>` : '') +
-    (item.zh ? `<div class="qc-zh">${esc(item.zh)}</div>` : '');
+    (item.zh ? `<div class="qc-zh">${esc(item.zh)}</div>` : '') + qFig(item.fig);
+}
+/* 题目上的图：svg 是服务端按画图说明画好的（app/figures/），img 是原卷上裁下来的图 */
+function qFig(f) {
+  if (!f) return '';
+  return `<figure class="qc-fig" tabindex="0" title="点一下放大">${f.svg ? f.svg : `<img src="${esc(f.img)}" alt="${esc(f.alt)}" loading="lazy">`}</figure>`;
+}
+/* 点图放大看 */
+document.addEventListener('click', e => {
+  const f = e.target.closest && e.target.closest('.qc-fig');
+  if (!f) return;
+  const box = document.createElement('div');
+  box.className = 'fig-zoom';
+  box.innerHTML = `<div class="fig-zoom-in">${f.innerHTML}</div>`;
+  box.onclick = () => box.remove();
+  document.body.appendChild(box);
+});
+
+/* 框出原卷照片上的图：pages 是整页照片的地址，box 是千分比 [左, 上, 右, 下]；
+   onSave({page, box}) 或 onSave({remove: true}) 由调用的页面去存 */
+function figCrop(opts) {
+  let page = opts.page || 1, box = opts.box || null;
+  const ov = document.createElement('div');
+  ov.className = 'fig-crop';
+  ov.innerHTML = `<div class="fig-crop-in card">
+    <div class="row small"><b class="grow">在照片上拖一个框，框住整张图</b>
+      ${opts.pages.length > 1 ? opts.pages.map((_, i) => `<button class="btn ghost sm pg" data-p="${i + 1}">第 ${i + 1} 张</button>`).join('') : ''}</div>
+    <div class="fig-crop-stage"><img draggable="false"><div class="fig-crop-box"></div></div>
+    <div class="row" style="margin-top:8px"><button class="btn sm save">保存</button>
+      ${opts.box ? '<button class="btn ghost sm rm">去掉这张图</button>' : ''}<button class="btn ghost sm cancel">取消</button></div></div>`;
+  document.body.appendChild(ov);
+  const img = $('img', ov), rect = $('.fig-crop-box', ov), stage = $('.fig-crop-stage', ov);
+  const draw = () => {
+    rect.style.display = box ? '' : 'none';
+    if (box) Object.assign(rect.style, {left: box[0] / 10 + '%', top: box[1] / 10 + '%', width: (box[2] - box[0]) / 10 + '%', height: (box[3] - box[1]) / 10 + '%'});
+    $$('.pg', ov).forEach(b => b.classList.toggle('soft', +b.dataset.p === page));
+  };
+  const show = p => { page = p; img.src = opts.pages[p - 1]; draw(); };
+  $$('.pg', ov).forEach(b => b.onclick = () => { box = null; show(+b.dataset.p); });
+  const at = e => {
+    const r = img.getBoundingClientRect();
+    return [Math.round(Math.min(1000, Math.max(0, (e.clientX - r.left) / r.width * 1000))),
+            Math.round(Math.min(1000, Math.max(0, (e.clientY - r.top) / r.height * 1000)))];
+  };
+  let start = null;
+  stage.onpointerdown = e => { e.preventDefault(); stage.setPointerCapture(e.pointerId); start = at(e); box = [...start, ...start]; draw(); };
+  stage.onpointermove = e => {
+    if (!start) return;
+    const p = at(e);
+    box = [Math.min(start[0], p[0]), Math.min(start[1], p[1]), Math.max(start[0], p[0]), Math.max(start[1], p[1])]; draw();
+  };
+  stage.onpointerup = () => { start = null; };
+  const done = async payload => {
+    try { await opts.onSave(payload); ov.remove(); } catch (err) { toast(err.message); }
+  };
+  $('.save', ov).onclick = () => box && box[2] - box[0] > 20 && box[3] - box[1] > 20 ? done({page, box}) : toast('先在照片上拖一个框');
+  const rm = $('.rm', ov);
+  if (rm) rm.onclick = () => done({remove: true});
+  $('.cancel', ov).onclick = () => ov.remove();
+  show(page);
 }
 function qOpt(text, i, tag) { return `<${tag || 'button'} class="opt${tag ? ' static' : ''}" data-i="${i}"><b class="qc-key">${QKEYS[i] || i + 1}</b><span class="qc-ot">${esc(text)}</span></${tag || 'button'}>`; }
 /* 选项上标出正确答案和自己选的 */

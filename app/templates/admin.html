@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui %}
 {% macro status_pill(u) -%}
 {% if u.status == 'pending' %}<span class="pill st-learning">待审批</span>{% elif u.status == 'disabled' %}<span class="pill st-weak">已停用</span>{% elif u.status == 'rejected' %}<span class="pill st-weak">未通过</span>{% endif %}
 {%- if u.locked_until and u.locked_until > now %} <span class="pill st-weak">锁定中</span>{% endif %}
@@ -205,6 +206,7 @@
   {% for it in B.review %}
   <div class="kp" style="display:block">
     <div><b>{{ it.q }}</b>{% if it.zh %} <span class="muted small">{{ it.zh }}</span>{% endif %}</div>
+    {{ ui.figure(qfig(it)) }}
     {% if it.options %}<div class="small">{% for o in it.options %}{{ 'ABCD'[loop.index0] }}. {{ o }}{{ ' ✓' if it.answer|string == loop.index0|string }}　{% endfor %}</div>{% else %}<div class="small">答案：{{ it.answer or it.model }}</div>{% endif %}
     <div class="small muted">{{ it.kp_id }} · {{ it.n_flags }} 人标记：{{ it.why|join('、') }}</div>
     <form method="post" action="/admin/bank/item/{{ it.id }}/status" class="row" style="margin-top:6px">

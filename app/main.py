@@ -10,6 +10,8 @@ from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
 from . import arena, auth, bank, bankflow, bankpapers, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, recall, records, sitecfg, sprint, streak, trace, webpage
+from . import figures
+from .figures import photo
 from .auth import LoginRequired
 from .catalog import GRADES, catalog, is_adult, stage_label, stage_rank
 from .content import content
@@ -46,7 +48,8 @@ templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LA
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
                              stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock,
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES,
-                             trend_words=records.trend_words, tts_info=tts_web.client_info, qview=itemtypes.view)
+                             trend_words=records.trend_words, tts_info=tts_web.client_info, qview=itemtypes.view,
+                             qfig=figures.present)
 templates.env.globals.update(MASCOTS=brand.MASCOTS, mascot_of=brand.mascot_of, mascot_chosen=brand.has_chosen, mascot_svg=brand.mascot_svg,
                              wordmark_svg=brand.wordmark_svg)
 templates.env.globals["news_today_title"] = news.today_title
@@ -1561,7 +1564,10 @@ async def _read_photos(f) -> list:
             raise HTTPException(400, "只支持 JPG / PNG / WEBP 图片")
         if len(data) > papers.MAX_IMAGE_BYTES:
             raise HTTPException(400, "图片太大（单张不超过 6 MB）")
-        images.append((up.content_type, data))
+        try:  # 按拍照方向摆正、太大的缩小：AI 报告的图的位置和以后裁图都按摆正后的照片算
+            images.append(photo.prepare_page(up.content_type, data))
+        except ValueError as e:
+            raise HTTPException(400, str(e))
     if len(images) > papers.MAX_IMAGES:
         raise HTTPException(400, f"一次最多 {papers.MAX_IMAGES} 张照片")
     return images
@@ -1597,8 +1603,7 @@ def paper_page(request: Request, paper_id: int):
     bp = bankpapers.get(p["bank_paper_id"]) if p["bank_paper_id"] else None
     return render(request, "paper.html", p=p, rows=rs, pack=pack, images=db.jload(p["images"], []), bp_minutes=bp["minutes"] if bp else 0,
                   cands=papers.candidates(p["pack_id"], stage) if pack else [],
-                  qs=[{"id": r["id"], "item_id": r["item_id"], "type": r["item"]["type"], "q": r["item"]["q"], "zh": r["item"].get("zh", ""),
-                       "options": r["item"].get("options", []), "unit": r["item"].get("unit", ""),
+                  qs=[{**_public_item(r["item"]), "id": r["id"], "item_id": r["item_id"],
                        "done": bool(r["answered_at"]), "flagged": bool(r["flagged"])} for r in rs])
 
 
@@ -1610,6 +1615,46 @@ def paper_image(request: Request, paper_id: int, name: str):
     if name not in db.jload(p["images"], []):
         raise HTTPException(404)
     return FileResponse(papers.PAPER_DIR / str(paper_id) / name)
+
+
+def _fig_body(body: dict) -> tuple[int, list | None]:
+    if body.get("remove"):
+        return 0, None
+    return int(body.get("page") or 1), body.get("box")
+
+
+@app.post("/api/papers/{paper_id}/fig")
+def paper_set_fig(request: Request, paper_id: int, body: dict = Body(...)):
+    """原卷上的图裁歪了：家长 / 孩子重新框，或者去掉。"""
+    k = kid_or_redirect(request, manage=True)
+    p = _paper_or_404(k, paper_id)
+    if p["bank_paper_id"]:
+        raise HTTPException(400, "模拟考的题来自公共卷库，图由管理员核对")
+    try:
+        papers.set_fig(p, int(body.get("pi") or 0), *_fig_body(body))
+    except KeyError:
+        raise HTTPException(404)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return {"ok": True}
+
+
+@app.get("/fig/{item_id}/{name}")
+def figure_file(request: Request, item_id: str, name: str):
+    """题目上从原卷裁下来的图。孩子自己卷子上的图只给这个孩子、家长和管理员看。"""
+    from fastapi.responses import FileResponse
+    u = auth.require_user(request)
+    r = db.one("SELECT source, data FROM items WHERE id=?", item_id)
+    fig = db.jload(r["data"], {}).get("fig") if r else None
+    f = photo.path(name)
+    if not fig or fig.get("file") != name or not f or not f.exists():
+        raise HTTPException(404)
+    if r["source"] == "paper" and not (u["is_admin"] or u["role"] == "admin"):
+        owner = db.one("SELECT p.user_id, u.parent_id FROM paper_items pi JOIN papers p ON p.id=pi.paper_id "
+                       "JOIN users u ON u.id=p.user_id WHERE pi.item_id=?", item_id)
+        if not owner or u["id"] not in (owner["user_id"], owner["parent_id"]):
+            raise HTTPException(404)
+    return FileResponse(f, headers={"Cache-Control": "private, max-age=31536000, immutable"})
 
 
 @app.post("/api/papers/{paper_id}/answer")
@@ -2324,6 +2369,19 @@ async def admin_bp_item(request: Request, bp_id: int, bpi_id: int):
         raise HTTPException(404)
     msg = "已保存" if typ == (f.get("type") or typ) else f"答案格式不对，这题改成了{itemtypes.TYPES[typ].label}，请再看一眼"
     return _bp_back(bp_id, msg, f"bpi-{bpi_id}")
+
+
+@app.post("/admin/bank-papers/{bp_id}/items/{bpi_id}/fig")
+def admin_bp_fig(request: Request, bp_id: int, bpi_id: int, body: dict = Body(...)):
+    auth.require_admin(request)
+    _bp_or_404(bp_id)
+    try:
+        bankpapers.set_fig(bp_id, bpi_id, *_fig_body(body))
+    except KeyError:
+        raise HTTPException(404)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return {"ok": True}
 
 
 @app.post("/admin/bank-papers/{bp_id}/status")

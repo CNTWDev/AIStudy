@@ -24,7 +24,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 2, "teach": 2, "context": 1, "passage": 1, "variant": 1, "verify": 1, "news_pick": 1, "news_write": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 3, "teach": 2, "context": 1, "passage": 1, "variant": 2, "verify": 2, "news_pick": 1, "news_write": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -44,15 +44,36 @@ def _audience(grade: str, pack) -> str:
     return s
 
 
-def _item_schema() -> str:
-    """出题格式：题型和答案格式来自题型注册表（app/itemtypes.py），加题型不用改这里。"""
-    from .. import itemtypes
+def _item_schema(pack=None) -> str:
+    """出题格式：题型和答案格式来自题型注册表（app/itemtypes.py），配图的写法来自配图注册表（app/figures/），
+    加题型、加图的种类都不用改这里。配图只给用得上的学科（见各种图的 subjects）。"""
+    from .. import figures, itemtypes
+    figs = figures.prompt_for(pack.subject) if pack is not None else ""
     return (
         '{"items":[{"type":"' + "|".join(itemtypes.TYPES) + '","difficulty":1-3,"q":"题干","zh":"中文翻译(可选)",'
-        '"code":"题目里的一段代码(可选，编程类题目才用)","options":["仅选择题"],"answer":"见下","unit":"单位(可选)",'
+        '"code":"题目里的一段代码(可选，编程类题目才用)",' + ('"fig":{"kind":"..."}(可选，见下),' if figs else "")
+        + '"options":["仅选择题"],"answer":"见下","unit":"单位(可选)",'
         '"tol":"允许误差(可选)","model":"参考答案","points":["得分要点"],'
-        '"hint":"一句提示，不直接给答案","explain":"中文讲解，2-3句"}]}\n各题型：' + itemtypes.schema_text()
+        '"hint":"一句提示，不直接给答案","explain":"中文讲解，2-3句"}]}\n各题型：' + itemtypes.schema_text() + figs
     )
+
+
+def _normalized(items) -> list[dict]:
+    """AI 给的题 → 题库格式；图画不出来 / 和题对不上的题丢掉（itemtypes.normalize 返回 None）。"""
+    from .. import itemtypes
+    out = []
+    for i in items or []:
+        if not (isinstance(i, dict) and i.get("q") and i.get("type") in itemtypes.TYPES):
+            continue
+        it = itemtypes.normalize(i)
+        if it is not None:
+            out.append({**it, "difficulty": i.get("difficulty", 2), **({"kp_ids": i["kp_ids"]} if i.get("kp_ids") else {})})
+    return out
+
+
+def _fig_text(item: dict) -> str:
+    from .. import figures
+    return f"\n{figures.describe(item['fig'])}" if item.get("fig") else ""
 
 
 def _traps_note(kp: dict) -> str:
@@ -76,14 +97,10 @@ def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=
         f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n"
         f"诊断思路参考：{kp.get('probe','')}\n关键词：{', '.join(kp.get('terms', []))}\n\n"
         f"{purpose_txt}\n优先用 mcq/num/fill（能自动判分），short 最多 1 道。不要照搬教材原文。"
-        f"答案必须正确且唯一，请自己检查一遍。\n输出格式：{_item_schema()}{_traps_note(kp)}"
+        f"答案必须正确且唯一，请自己检查一遍。\n输出格式：{_item_schema(pack)}{_traps_note(kp)}"
     )
     data = ask_json("items", _tutor(grade) + "你也是严谨的出题人。", user, user_id=user_id, effort="medium", cache=False)
-    items = data.get("items", []) if isinstance(data, dict) else data
-    from .. import itemtypes
-    return [{**itemtypes.normalize(i), "difficulty": i.get("difficulty", 2), **({"kp_ids": i["kp_ids"]} if i.get("kp_ids") else {})}
-            for i in items
-            if isinstance(i, dict) and i.get("q") and i.get("type") in itemtypes.TYPES]
+    return _normalized(data.get("items", []) if isinstance(data, dict) else data)
 
 
 def solve_item(item: dict, pack, grade: str) -> dict:
@@ -94,7 +111,7 @@ def solve_item(item: dict, pack, grade: str) -> dict:
            "fill": "answer 为要填的内容（字符串）"}.get(item["type"], "answer 为你的答案")
     opts = "".join(f"\n{i}. {o}" for i, o in enumerate(item.get("options") or [])) if item["type"] == "mcq" else ""
     code = f"\n代码：\n{item['code']}" if item.get("code") else ""
-    user = (f"{_audience(grade, pack)}\n请认真独立地做下面这道{t.label}，一步步想清楚再给答案。\n题目：{item['q']}{code}{opts}\n\n"
+    user = (f"{_audience(grade, pack)}\n请认真独立地做下面这道{t.label}，一步步想清楚再给答案。\n题目：{item['q']}{code}{_fig_text(item)}{opts}\n\n"
             "如果题目本身有错、条件不够、或者不止一个正确答案，ok 填 false，并在 problem 里一句话说明。\n"
             f'输出格式：{{"answer": ..., "ok": true, "problem": "", "why": "一句话思路"}}，其中 {fmt}。')
     data = ask_json("verify", "你是严谨的出题审校老师。", user, effort="medium", max_tokens=1500, cache=False)
@@ -102,18 +119,22 @@ def solve_item(item: dict, pack, grade: str) -> dict:
 
 
 def make_variant(item: dict, kp: dict, pack, grade: str) -> dict | None:
-    """把家里拍的卷子上的一道题改编成一道新题：考同一个知识点、难度相当，但换掉数字、情境和说法，不照抄原题。"""
+    """把家里拍的卷子上的一道题改编成一道新题：考同一个知识点、难度相当，但换掉数字、情境和说法，不照抄原题。
+    原题有图的：改编题按原图的描述重新画（画图说明），不用原卷照片；画不出来就不改编（返回 None）。"""
     from .. import itemtypes
-    user = (f"{_audience(grade, pack)}\n知识点：{kp['name']}\n下面是一道学校卷子上的原题（{itemtypes.of(item).label}）：\n{item['q']}\n"
+    fig_note = ("\n原题有一张图，改编题也必须带 fig（按下面的配图写法重新画，数据跟着改编后的题目走）；"
+                "如果这种图没法用下面的写法画出来，就输出 {\"items\": []}。") if item.get("fig") else ""
+    user = (f"{_audience(grade, pack)}\n知识点：{kp['name']}\n下面是一道学校卷子上的原题（{itemtypes.of(item).label}）：\n{item['q']}{_fig_text(item)}\n"
             + ("".join(f"{'ABCDEFGH'[i]}. {o}  " for i, o in enumerate(item.get("options") or [])) + "\n" if item.get("options") else "")
             + "\n请改编成一道新题：考同一个知识点、同样的思路和难度，但换掉数字、人名、情境和措辞，不要照抄原题的句子。"
-            "能自动判分的尽量用 mcq/num/fill。答案必须正确且唯一，请自己再做一遍检查。\n"
-            f"输出格式：{_item_schema()}（只出 1 道）")
+            "能自动判分的尽量用 mcq/num/fill。答案必须正确且唯一，请自己再做一遍检查。" + fig_note + "\n"
+            f"输出格式：{_item_schema(pack)}（只出 1 道）")
     data = ask_json("variant", _tutor(grade) + "你也是严谨的出题人。", user, effort="medium", cache=False)
-    items = data.get("items", []) if isinstance(data, dict) else data
-    for i in items or []:
-        if isinstance(i, dict) and i.get("q") and i.get("type") in itemtypes.TYPES:
-            return {**itemtypes.normalize(i), "difficulty": i.get("difficulty", 2)}
+    for it in _normalized(data.get("items", []) if isinstance(data, dict) else data):
+        if item.get("fig") and not it.get("fig"):
+            return None
+        it.pop("kp_ids", None)
+        return it
     return None
 
 
@@ -275,7 +296,10 @@ def news_write(pick: dict, level: dict, day: str) -> dict:
 PAPER_SCHEMA = (
     '{"title":"卷子标题（看不出就空）","notes":"整体观察，1-2句，例如主要丢分在哪类题",'
     '"questions":[{"label":"题号，如 3(2)","page":"在第几张图片（从1开始）","type":"mcq|num|fill|short",'
-    '"q":"题干（完整抄录，图表用文字简述）","zh":"英文题的中文翻译(可选)","options":["仅mcq"],'
+    '"q":"题干（完整抄录文字）","zh":"英文题的中文翻译(可选)","options":["仅mcq"],'
+    '"fig":"题目有图（几何图、电路图、坐标图、实验装置、示意图等）时才写：{\\"page\\":图在第几张照片,'
+    '\\"box\\":[左,上,右,下]（图在这张照片上的位置，按照片宽、高的千分比 0-1000，框住整张图和图上的字母数字）,'
+    '\\"alt\\":\\"把图上的信息用文字准确写出来：标的字母、数字、刻度、连接关系\\"}；几道小题共用一张图就都写同一个框",'
     '"answer":"mcq为正确选项下标(整数)；num为数值；fill为可接受答案字符串列表；short省略",'
     '"unit":"num题单位(可选)","tol":"num题允许误差(可选)","model":"short题参考答案","points":["short题得分要点"],'
     '"explain":"中文讲解2-3句","score":"这道题的分值(看不出就空)","kp_id":"从候选知识点里选一个最主要的ID",'

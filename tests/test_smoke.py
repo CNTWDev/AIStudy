@@ -10,6 +10,17 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 
+
+def photo_jpg(w=800, h=600) -> bytes:
+    """一张真的 JPG（试卷照片）：上传时会检查能不能打开、按拍照方向摆正。"""
+    import io
+    from PIL import Image, ImageDraw
+    img = Image.new("RGB", (w, h), "white")
+    ImageDraw.Draw(img).rectangle((100, 150, 500, 320), outline="black", width=4)
+    buf = io.BytesIO()
+    img.save(buf, "JPEG")
+    return buf.getvalue()
+
 def test_full_flow(monkeypatch):
     with TestClient(app) as c:
         assert c.get("/healthz").json()["kps"] > 500
@@ -424,7 +435,7 @@ def test_paper_import_and_diagnosis():
         assert c.post("/api/papers", data={"pack_id": "nope", "text": "x" * 20}).status_code == 400
         assert c.post("/api/papers", data={"pack_id": "math-shanghai"},
                       files=[("photos", ("a.txt", b"hello", "text/plain"))]).status_code == 400
-        jpg = b"\xff\xd8\xff\xe0" + b"0" * 100
+        jpg = photo_jpg()
         r = c.post("/api/papers", data={"pack_id": "math-shanghai", "title": "第三单元测验", "exam_date": "2026-10-01"},
                    files=[("photos", ("p1.jpg", jpg, "image/jpeg")), ("photos", ("p2.jpg", jpg, "image/jpeg"))])
         assert r.status_code == 200, r.text
@@ -1097,7 +1108,7 @@ def test_bank_papers_admin_import_and_mock():
         c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
         assert "导入一份卷子" in c.get("/admin?tab=papers").text
         assert c.post("/admin/bank-papers", data={"pack_id": "fund-law"}).status_code == 400
-        jpg = b"\xff\xd8\xff\xe0" + b"0" * 100
+        jpg = photo_jpg()
         r = c.post("/admin/bank-papers", data={"pack_id": "fund-law", "stage": e["stage"], "kind": "school", "title": "期末卷",
                                                "year": "2024", "region": "上海徐汇", "org": "某某小学", "exam": "期末", "minutes": "60"},
                    files=[("photos", ("p1.jpg", jpg, "image/jpeg"))])
