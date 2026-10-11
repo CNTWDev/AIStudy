@@ -43,10 +43,13 @@
 {% endfor %}
 </div>
 
-<div class="ah-sec"><h2>🏅 贴纸墙</h2><span class="small muted">只奖励真的做到的事：答对、坚持、点亮知识点</span></div>
+{# 贴纸墙收起来：游戏卡片才是这一页的主角，贴纸点开再看 #}
+<details class="ah-wallbox">
+  <summary class="ah-sec"><h2>🏅 贴纸墙 <small>{{ a.wall|selectattr('got')|list|length }}/{{ a.wall|length }}</small></h2><span class="small muted">只奖励真的做到的事：答对、坚持、点亮知识点</span></summary>
 <div class="ah-wall">
 {% for s in a.wall %}<div class="ah-st{{ ' got' if s.got }}" title="{{ s.how }}"><span class="i">{{ s.icon }}</span><b>{{ s.name }}</b><small>{{ s.at if s.got else s.how }}</small></div>{% endfor %}
 </div>
+</details>
 
 <details class="card" style="margin-top:18px">
   <summary><b>⚖️ 为什么说乐园是公平的？</b></summary>

@@ -223,3 +223,7 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 .ah-stage{margin:4px 0 0;font-weight:800;font-size:13px;color:#c77700}
 .pl-start.has-map .pl-me{display:none}.pl-start.has-map .pl-title{margin:0 0 2px}
 @media (max-width:520px){.pl-start.has-map .pl-label{display:none}.pm-gift{font-size:12px}.pm-lv{width:40px;height:48px}.pm-lv.boss{width:44px}}
+.ah-wallbox>summary{cursor:pointer;list-style:none;flex-wrap:wrap}.ah-wallbox>summary::-webkit-details-marker{display:none}
+.ah-wallbox>summary h2::after{content:" ›";color:var(--faint);display:inline-block;transition:transform .2s}.ah-wallbox[open]>summary h2::after{transform:rotate(90deg)}
+.ah-wallbox>summary h2 small{font-size:14px;color:var(--muted);font-weight:600}
+.ah-sec h2{white-space:nowrap}
