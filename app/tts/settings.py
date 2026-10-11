@@ -21,6 +21,7 @@ class TTSSettings:
     api_version: str = ""
     timeout: float = 60
     voices: dict[str, str] = field(default_factory=dict)      # 语言 → 声音 id；没配的语言不朗读
+    roles: dict[str, dict[str, str]] = field(default_factory=dict)  # 语言 → {角色 → 声音 id}（听力对话里的男声、女声……）
     speeds: dict[str, float] = field(default_factory=lambda: dict(DEFAULT_SPEEDS))  # 用途 → 语速
     format: dict = field(default_factory=dict)                  # 输出格式（提供方自己解释）
     max_chars: int = 1200                  # 一次最多读多少字（长文章由前端按句子切开）
@@ -34,8 +35,11 @@ class TTSSettings:
     def enabled(self) -> bool:
         return self.provider not in ("", "none") and not self.error
 
-    def voice(self, lang: str) -> str:
-        return self.voices.get(lang) or self.voices.get(lang.split("-")[0], "")
+    def voice(self, lang: str, role: str = "") -> str:
+        """角色配了声音用角色的，没配用这种语言的默认声音。"""
+        base = lang.split("-")[0]
+        by_role = (self.roles.get(lang) or self.roles.get(base) or {}).get(role, "") if role else ""
+        return by_role or self.voices.get(lang) or self.voices.get(base, "")
 
     def speed(self, use: str) -> float:
         v = self.speeds.get(use, self.speeds.get("sentence", 1.0))
@@ -60,6 +64,8 @@ def parse_settings(data: dict, source: str = "") -> TTSSettings:
     s.format = dict(p.pop("format", {}) or {})
     s.extra = p
     s.voices = {str(k): str(_env(v)) for k, v in (data.get("voices") or {}).items() if _env(v)}
+    s.roles = {str(lang): {str(r): str(_env(v)) for r, v in roles.items() if _env(v)}
+               for lang, roles in (data.get("roles") or {}).items() if isinstance(roles, dict)}
     s.speeds = dict(DEFAULT_SPEEDS, **{str(k): float(v) for k, v in (data.get("speed") or {}).items()})
     s.max_chars = int(data.get("max_chars", s.max_chars))
     s.daily_chars_per_user = int(data.get("daily_chars_per_user", s.daily_chars_per_user))

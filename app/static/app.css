@@ -477,6 +477,7 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .qc-n{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;border-radius:8px;background:var(--brand-2);color:var(--brand-ink);font-size:13px;font-weight:700;margin-right:8px;vertical-align:1px}
 .qc-zh{color:var(--muted);font-size:14px;margin-top:2px}
 /* 题目上的图：画的图跟着文字颜色（深色模式自动变色），原卷照片垫白底；点一下放大 */
+.qc-audio{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:4px 0 10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--learn-2)}.qc-audio .qa-slow.on{background:var(--brand-2)}
 .qc-fig{margin:10px 0 4px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);text-align:center;cursor:zoom-in;overflow:hidden}
 .qc-fig svg{max-width:100%;height:auto;vertical-align:middle}
 .qc-fig img{max-width:100%;max-height:340px;border-radius:6px;background:#fff;vertical-align:middle}

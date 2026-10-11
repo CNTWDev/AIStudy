@@ -53,12 +53,13 @@ class TTS:
         return sorted(self.s.voices) if self.ready else []
 
     # ---------------------------------------------------------------- 查 / 登记
-    def prepare(self, text: str, lang: str, use: str = "sentence", *, user=None, speed: float | None = None) -> Clip:
-        """speed 只给管理员试听用；平时语速由配置按用途决定。"""
+    def prepare(self, text: str, lang: str, use: str = "sentence", *, user=None, speed: float | None = None,
+                role: str = "") -> Clip:
+        """speed 只给管理员试听用；平时语速由配置按用途决定。role：对话里的角色（男声、女声……），没配就用默认声音。"""
         if not self.ready:
             raise TTSError(self.problem or "朗读服务没有开启")
         lang = (lang or "en").lower()
-        voice = self.s.voice(lang)
+        voice = self.s.voice(lang, role)
         if not voice:
             raise TTSError(f"没有给 {lang} 配声音")
         t = normalize(text, lang)

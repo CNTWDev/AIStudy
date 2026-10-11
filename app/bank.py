@@ -29,9 +29,9 @@ def fingerprint(*parts) -> str:
 
 
 def item_hash(it: dict) -> str:
-    # 「如图，求 AB」这种题文字一样、图不一样就是两道题；没有图的题哈希和以前一样
-    fig = [it["fig"]] if it.get("fig") else []
-    return fingerprint(it.get("type"), it.get("q"), it.get("options") or "", it.get("answer", it.get("model", "")), *fig)
+    # 「如图，求 AB」「听录音，回答问题」这种题文字一样、图或录音不一样就是两道题；没有图和录音的题哈希和以前一样
+    extra = [it[k] for k in ("fig", "audio") if it.get(k)]
+    return fingerprint(it.get("type"), it.get("q"), it.get("options") or "", it.get("answer", it.get("model", "")), *extra)
 
 
 def kp_lang(kp_id: str) -> str:

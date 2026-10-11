@@ -4,9 +4,10 @@
 加一种题型：写一个 ItemType 子类，登记到 TYPES；前端只认 widget（choice / text / self），
 新的输入方式才需要在 app/static/app.js 的 renderItem 里加一个分支。
 题目都可以带 code 字段（一段代码，前端按代码块显示），编程课的读代码、填代码题用现有题型就行。
-题目也都可以带 fig 字段（一张图：程序按「画图说明」画的图，或原卷上裁下来的图），见 app/figures/。
+题目也都可以带 fig 字段（一张图：程序按「画图说明」画的图，或原卷上裁下来的图），见 app/figures/；
+带 audio 字段（一段录音稿，听力题），见 app/audio/。
 """
-from . import figures
+from . import audio, figures
 
 
 def _num(v):
@@ -132,7 +133,7 @@ class Short(ItemType):
 
 TYPES: dict[str, ItemType] = {t.id: t for t in (Choice(), Fill(), Number(), Short())}
 FALLBACK = TYPES["short"]
-FIELDS = ("q", "zh", "code", "fig", "options", "answer", "unit", "tol", "model", "points", "explain", "hint", "traps")
+FIELDS = ("q", "zh", "code", "fig", "audio", "options", "answer", "unit", "tol", "model", "points", "explain", "hint", "traps")
 
 
 def of(item: dict | str) -> ItemType:
@@ -156,12 +157,13 @@ def display(item: dict) -> str:
 
 def normalize(raw: dict) -> dict | None:
     """AI 给的一道题 → 题库格式。答案不合格的退化成自评的简答题（不丢题）；
-    带的图画不出来、或者和题目对不上，返回 None：图文不符的题宁可不要。"""
+    带的图画不出来、或者和题目对不上，带的录音稿不合格，返回 None：图文不符、听不了的题宁可不要。"""
     it = {k: raw.get(k) for k in FIELDS if raw.get(k) not in (None, "", [])}
-    if "fig" in it:
-        it["fig"] = figures.normalize(it["fig"])
-        if it["fig"] is None:
-            return None
+    for k, mod in (("fig", figures), ("audio", audio)):
+        if k in it:
+            it[k] = mod.normalize(it[k])
+            if it[k] is None:
+                return None
     t = TYPES.get(raw.get("type"))
     out = t.normalize(dict(it), raw) if t else None
     if out is None:
@@ -174,15 +176,18 @@ def public(item: dict) -> dict:
     """给前端的：加上 widget，去掉答案。"""
     t = of(item)
     # traps（错项指向哪个前置）会暴露哪些选项是错的，不给前端
-    out = {k: v for k, v in item.items() if k not in ("answer", "model", "points", "explain", "traps", "fig")}
+    out = {k: v for k, v in item.items() if k not in ("answer", "model", "points", "explain", "traps", "fig", "audio")}
     if item.get("fig"):
         out["fig"] = figures.present(item)  # 画好的图（画图说明里可能有答案，比如 checks，不给前端）
+    if item.get("audio"):
+        out["audio"] = audio.present(item)
     return {**out, "widget": t.widget, "self_rated": t.self_rated}
 
 
 def reveal(item: dict) -> dict:
-    """作答以后给前端的「带答案」部分：答案、选择题的正确选项下标、解析、要点。各处判完题都用它，显示才一致。"""
-    out = {"answer": display(item), "explain": item.get("explain", ""), "points": item.get("points") or []}
+    """作答以后给前端的「带答案」部分：答案、选择题的正确选项下标、解析、要点、听力原文。各处判完题都用它，显示才一致。"""
+    out = {"answer": display(item), "explain": item.get("explain", ""), "points": item.get("points") or [],
+           "transcript": audio.transcript(item)}
     if of(item).widget == "choice":
         try:
             out["answer_index"] = int(item.get("answer"))
@@ -193,7 +198,7 @@ def reveal(item: dict) -> dict:
 
 def view(item: dict, mine=None, with_answer=True) -> dict:
     """一道题的统一展示结构（页面上所有显示题目的地方都用它，见 _ui.html 的 question 和 app.js 的 qView）：
-    题干（q / zh / code / fig 图 / src）、选项（A B C… 带「正确」「我选的」标记）、答案、我的答案、解析、要点、提示。
+    题干（q / zh / code / fig 图 / audio 录音 / src）、选项（A B C… 带「正确」「我选的」标记）、答案、我的答案、解析、要点、听力原文、提示。
     with_answer=False 是「不带答案」的版本（去掉答案、解析和对错标记），用来出题。"""
     t = of(item)
     ans_i = reveal(item).get("answer_index") if with_answer else None
@@ -204,14 +209,14 @@ def view(item: dict, mine=None, with_answer=True) -> dict:
              "mine": with_answer and i == mine_i} for i, o in enumerate(item.get("options") or [])]
     v = {"type": t.id, "label": t.label, "q": item.get("q", ""), "zh": item.get("zh", ""), "code": item.get("code", ""),
          "src": item.get("src", ""), "unit": item.get("unit", ""), "options": opts, "hint": item.get("hint", ""),
-         "fig": figures.present(item)}
+         "fig": figures.present(item), "audio": audio.present(item)}
     if with_answer:
         r = reveal(item)
         mine_text = ""
         if mine not in (None, ""):
             mine_text = (f"{opts[mine_i]['key']}. {opts[mine_i]['text']}" if mine_i is not None and 0 <= mine_i < len(opts)
                          else str(mine))
-        v.update(answer=r["answer"], explain=r["explain"], points=r["points"], mine=mine_text,
+        v.update(answer=r["answer"], explain=r["explain"], points=r["points"], transcript=r["transcript"], mine=mine_text,
                  mine_right=bool(mine_text) and mine_i is not None and mine_i == ans_i)
     return v
 
