@@ -46,6 +46,20 @@
 {% if settled.earned %}<div class="note-bar ice">🧊 连续 {{ streak }} 天！得到 1 张补签卡。哪天状态不好没做完保底，它会帮你保住连续天数。</div>{% endif %}
 {% if t.minutes >= 90 and not readonly %}<div class="note-bar rest">👀 今天已经学了 {{ t.minutes }} 分钟，很棒！记得站起来走走、看看远处，让眼睛休息一下。</div>{% endif %}
 
+{% if progress_ask and not readonly %}
+<div class="note-bar" id="progask">📚 <b>这周学校学了啥？</b> {{ progress_ask[:3]|join('、') }}{{ ' 等' if progress_ask|length > 3 }}：点一下学到第几章，预习和复习能对得更准。
+  <a class="btn soft sm" href="/progress">去选章节（1 分钟）</a> <button type="button" class="linkbtn" id="progskip">这周跳过</button></div>
+<script>document.getElementById('progskip').onclick = async () => { try { await api('/api/progress/snooze', {}); } catch (e) {} document.getElementById('progask').remove(); };</script>
+{% endif %}
+{% for x in exams %}
+<a class="card examcard" href="/progress#p-{{ x.pack.id }}" style="display:block">
+  <div class="row"><b class="grow">📅 {{ x.pack.subject_name }}考试</b><span>还有 <b>{{ x.days_left }}</b> 天</span></div>
+  <div class="bar" style="margin:8px 0 4px"><span style="width:{{ (100 * x.learned / (x.total or 1))|round }}%;background:var(--learn)"></span></div>
+  <div class="small muted">已学 {{ x.learned }} / {{ x.total }} 个考点 · 已掌握 {{ x.mastered }} 个 ·
+    {% if x.phase == 'learn' %}每天学 {{ x.per_day }} 个，离考试两周时学完{% else %}考前冲刺：每天过一遍还没掌握的高频考点{% endif %}</div>
+</a>
+{% endfor %}
+
 <div class="today-main">
 <div class="tm-list">
 <div class="card tasks">
@@ -67,19 +81,6 @@
   </div>
   {% if total and not all_done %}<p class="tiny faint" style="margin:10px 0 0">不会的题点「这道题还不会」就行，坚持比做对更重要：每完成一项得一颗 ⭐。 <a href="/progress">{{ '学习进度和考试日期' if is_adult(me.grade) else '学校学到哪了？' }}</a></p>{% endif %}
 </div>
-{% if progress_ask and not readonly %}
-<div class="note-bar" id="progask">📚 <b>这周学校学了啥？</b> {{ progress_ask[:3]|join('、') }}{{ ' 等' if progress_ask|length > 3 }}：点一下学到第几章，预习和复习能对得更准。
-  <a class="btn soft sm" href="/progress">去选章节（1 分钟）</a> <button type="button" class="linkbtn" id="progskip">这周跳过</button></div>
-<script>document.getElementById('progskip').onclick = async () => { try { await api('/api/progress/snooze', {}); } catch (e) {} document.getElementById('progask').remove(); };</script>
-{% endif %}
-{% for x in exams %}
-<a class="card examcard" href="/progress#p-{{ x.pack.id }}" style="display:block">
-  <div class="row"><b class="grow">📅 {{ x.pack.subject_name }}考试</b><span>还有 <b>{{ x.days_left }}</b> 天</span></div>
-  <div class="bar" style="margin:8px 0 4px"><span style="width:{{ (100 * x.learned / (x.total or 1))|round }}%;background:var(--learn)"></span></div>
-  <div class="small muted">已学 {{ x.learned }} / {{ x.total }} 个考点 · 已掌握 {{ x.mastered }} 个 ·
-    {% if x.phase == 'learn' %}每天学 {{ x.per_day }} 个，离考试两周时学完{% else %}考前冲刺：每天过一遍还没掌握的高频考点{% endif %}</div>
-</a>
-{% endfor %}
 </div>
 
 <div class="tm-side">
@@ -115,9 +116,10 @@
 {# ---- 安静区：看看自己，不抢主线 ---- #}
 <h2 class="quiet-h">看看我的进步</h2>
 {% if not readonly and not mascot_chosen(user) %}<a class="pick" href="/settings#mascot">{{ mascot_svg('buzzy', 22) }}选一个你最喜欢的小伙伴 →</a>{% endif %}
+{# 安静区排版：要么整行，要么两张并排且等高（.quiet 网格 stretch），不再高低错落 #}
 <div class="quiet">
 {% if not readonly %}
-<div class="card goal-card {{ 'hit' if day.goal_reached }}" id="goalcard">
+<div class="card {{ '' if weekly else 'wide' }} goal-card {{ 'hit' if day.goal_reached }}" id="goalcard">
   <span class="gi">🎯</span>
   <div class="grow"><div class="gt"><b>今天的目标：{{ day.goal_name }}</b><button type="button" class="linkbtn" id="goalchg">换</button><span class="gpct">{{ '达成 🎉' if day.goal_reached else day.goal_pct ~ '%' }}</span></div>
     <div class="gbar"><i style="width:{{ day.goal_pct }}%"></i></div><div class="muted small">{{ day.goal_desc }}</div></div>
@@ -133,20 +135,11 @@
 {% endif %}
 
 {% set wk = week|rejectattr('future')|list %}
-<div class="card">
+<div class="card {{ '' if (cov or lit or vocab.estimate) else 'wide' }}">
   <div class="card-h"><h3>📊 这一周 <span class="muted small">{{ wk|sum(attribute='minutes') }} 分钟 · {{ wk|selectattr('level')|list|length }}/{{ wk|length }} 天{% if me.daily_minutes %} · 达标 {{ wk|selectattr('minutes', 'ge', me.daily_minutes)|list|length }} 天{% endif %}</span></h3><a class="small" href="/records">全部记录 →</a></div>
   {{ ui.week(week, me.daily_minutes) }}
   {% if me.daily_minutes %}<p class="tiny faint" style="margin:10px 0 0">虚线是每天 {{ me.daily_minutes }} 分钟的目标，达到了柱子变金色。点一天看那天做了什么。</p>{% endif %}
 </div>
-
-{% if mine.rows or mine.focus or badges.got or badges.next %}
-<div class="card">
-  <div class="card-h"><h3>🏅 我的纪录 <span class="muted small">只跟自己比；正确率 80% 以上才算</span></h3></div>
-  {% for r in mine.rows %}<div class="row small"><b>{{ r.label }}</b><span class="grow muted" style="text-align:right">{{ r.text }}</span></div>{% endfor %}
-  {% if mine.focus %}<div class="row small"><b>最长专注</b><span class="grow muted" style="text-align:right">{{ mine.focus }}（切走、发呆不计时）</span></div>{% endif %}
-  {% if badges.got or badges.next %}<div class="row small" style="margin-top:6px"><b>坚持徽章</b><span class="grow muted" style="text-align:right">{% for b in badges.got %}<span title="{{ b[2] }}">{{ b[1] }}</span> {% endfor %}{% if badges.next %}再坚持 {{ badges.to_next }} 天得 {{ badges.next[1] }}{% endif %}</span></div>{% endif %}
-</div>
-{% endif %}
 
 {% if cov or lit or vocab.estimate %}
 <div class="card explore">
@@ -161,8 +154,17 @@
 </div>
 {% endif %}
 
+{% if mine.rows or mine.focus or badges.got or badges.next %}
+<div class="card wide mine">
+  <div class="card-h"><h3>🏅 我的纪录 <span class="muted small">只跟自己比；正确率 80% 以上才算</span></h3></div>
+  {% for r in mine.rows %}<div class="row small"><b>{{ r.label }}</b><span class="grow muted" style="text-align:right">{{ r.text }}</span></div>{% endfor %}
+  {% if mine.focus %}<div class="row small"><b>最长专注</b><span class="grow muted" style="text-align:right">{{ mine.focus }}（切走、发呆不计时）</span></div>{% endif %}
+  {% if badges.got or badges.next %}<div class="row small" style="margin-top:6px"><b>坚持徽章</b><span class="grow muted" style="text-align:right">{% for b in badges.got %}<span title="{{ b[2] }}">{{ b[1] }}</span> {% endfor %}{% if badges.next %}再坚持 {{ badges.to_next }} 天得 {{ badges.next[1] }}{% endif %}</span></div>{% endif %}
+</div>
+{% endif %}
+
 {% if ahead %}
-<div class="card ahead">
+<div class="card wide ahead">
   <div class="card-h"><h3>🧭 前方</h3></div>
   {% for a in ahead %}
   <a href="/learn/{{ a.kp.id }}?task=preview"><b>{{ a.pack.subject_name }} · 下一站：{{ a.kp.name }}</b>
@@ -173,13 +175,14 @@
 {% endif %}
 
 {% if found %}
-<div class="card">
+<div class="card wide">
   <div class="card-h"><h3>🔍 {{ ASSISTANT }}发现{% if readonly %} <span class="muted small">（系统根据做题、复习、查词、提问、用时自动找出来的）</span>{% endif %}</h3></div>
   {% for f in found %}<div class="finding sev{{ f.severity }}"><b>{{ f.title }}</b><div class="small muted">{{ f.detail }}</div></div>{% endfor %}
   {% if not readonly %}<p class="small muted" style="margin-bottom:0">相关的练习已经放进上面的任务里了。</p>{% endif %}
 </div>
 {% endif %}
 </div>
+
 {% if not readonly %}<script>
 const DAY = {{ {'day': t.day, 'secs': day.sections|selectattr('complete')|list|length, 'n': day.sections|length, 'all': day.all_done, 'goal': day.goal_reached}|tojson }};
 function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
