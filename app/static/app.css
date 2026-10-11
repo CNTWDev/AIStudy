@@ -554,3 +554,54 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .tchain .arrow{color:var(--unk);font-size:12px;padding-left:16px}
 .tdots{display:flex;gap:6px;margin:8px 0}.tdots i{flex:1;height:6px;border-radius:99px;background:var(--line)}.tdots i.on{background:var(--brand)}
 .tracebtn{margin-top:10px}
+/* 今天页的视觉重心：一张「下一项」主卡 + 一颗大按钮；清单第二层；快捷入口和打卡第三层；「看看我的进步」放最下面、压低存在感 */
+.hero.focus{display:block;padding:20px 20px 16px;border:2px solid var(--brand-3);box-shadow:var(--shadow-lg)}
+.hero.focus .hi{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:13.5px;padding-right:60px}
+.hero.focus .hstat{white-space:nowrap;color:var(--ink)}
+.hero.focus .nx-l{margin-top:14px;font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--brand-ink)}
+.hero.focus .nx-t{font-size:24px;font-weight:800;line-height:1.3;margin:2px 0 4px}
+.hero.focus .nx-w{font-size:14px;color:var(--muted);margin:0 0 14px}
+.hero.focus .go{width:100%;font-size:19px;padding:16px;margin:0 0 14px}
+.hero.focus .hprog{display:flex;align-items:center;gap:10px}
+.hero.focus .hprog .dots{flex:1;display:flex;gap:4px}
+.hero.focus .hprog .dots i{flex:1;height:8px;border-radius:99px;background:var(--line-2);box-shadow:inset 0 0 0 1px var(--line)}
+.hero.focus .hprog .dots i.ok{background:var(--brand);box-shadow:none}
+.hero.focus .hprog .dots i.cur{background:var(--sun-2);box-shadow:inset 0 0 0 1.5px var(--brand)}
+.hero.focus .hprog b{font-size:14px;font-variant-numeric:tabular-nums}
+.hero.focus .base-line{margin:6px 0 0;font-size:12.5px}
+.hero.focus .buddy{top:-20px;right:16px;left:auto}
+.hero.focus.alldone{border-color:var(--ok)}
+@media (min-width:640px){.hero.focus{padding:24px 28px 18px}.hero.focus .nx-t{font-size:28px}.hero.focus .go{display:inline-flex;width:auto;min-width:280px;padding:15px 36px}}
+.today-main{display:grid;grid-template-columns:1fr;gap:0 16px;align-items:start}
+@media (min-width:820px){.today-main{grid-template-columns:minmax(0,1fr) 290px}.today-main .quick{grid-template-columns:1fr;margin-top:14px}.today-main .quick a.qplay{grid-column:auto}}
+.tasks .card-h h3 .small{font-weight:600;margin-left:4px}
+.step.next{padding:12px 12px;margin:4px -6px}.step.next .t{font-size:16.5px}
+.quick a.qsprint{border:2px solid color-mix(in srgb,var(--sun) 55%,transparent);background:linear-gradient(135deg,var(--sun-2),var(--card) 70%)}
+/* 安静区：没有阴影、标题小一号、两列铺开，看得到但不抢眼 */
+.quiet-h{font-size:15px;color:var(--muted);font-weight:700;margin:30px 2px 4px;display:flex;align-items:center;gap:10px}
+.quiet-h::after{content:"";flex:1;border-top:1px dashed var(--line)}
+.quiet{display:grid;grid-template-columns:1fr;gap:0 14px;align-items:start}
+@media (min-width:760px){.quiet{grid-template-columns:1fr 1fr}.quiet>.card{margin:7px 0}}
+.quiet>.card{box-shadow:none;background:color-mix(in srgb,var(--card) 70%,var(--bg));padding:14px 16px}
+.quiet .card-h h3{font-size:15px}.quiet .goal-card{margin:14px 0}
+.quiet .wkcard{border-width:1px}
+.daylog .moods{gap:6px}.daylog .moods button{width:44px;height:44px;font-size:24px}
+.quiet-h+.pick{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;background:var(--brand-2);color:var(--brand-ink);border-radius:99px;padding:3px 10px 3px 4px;margin:6px 0 4px}
+/* 学科页：学科卡片整张可点（去知识地图），按钮都降成浅色；工具放到下面一层 */
+.subj{position:relative;transition:transform .15s,box-shadow .15s,border-color .15s}.subj .cover{position:absolute;inset:0;border-radius:inherit;z-index:0}
+.subj>*:not(.cover){position:relative;z-index:1;pointer-events:none}.subj .acts,.subj .acts *{pointer-events:auto}
+.subj:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--brand-3)}
+.quiet-tiles{grid-template-columns:repeat(3,1fr)}.quiet-tiles .tile{box-shadow:none;background:color-mix(in srgb,var(--card) 70%,var(--bg));padding:10px 12px}.quiet-tiles .tile .e{font-size:22px}
+@media (max-width:560px){.quiet-tiles{gap:8px}.quiet-tiles .tile{flex-direction:column;text-align:center;gap:4px;padding:10px 6px}.quiet-tiles .tile b{font-size:13.5px}.quiet-tiles .tile div span{display:none}}
+.statline.st4>div{min-width:0}@media (max-width:560px){.statline.st4{display:grid;grid-template-columns:1fr 1fr}}
+.refl-more>summary{cursor:pointer;color:var(--brand-ink);padding:10px 0;list-style:none}.refl-more>summary::-webkit-details-marker{display:none}.refl-more[open]>summary{display:none}
+/* 家长页：每个孩子先看今天（大数字 + 进度条，整块点进清单），再看需要留意的；入口一排小链接，只有「学习报告」是实心按钮 */
+.ptoday{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 12px;margin:14px 0 10px;padding:14px 16px;border-radius:16px;background:var(--brand-2);border:1.5px solid var(--brand-3);color:var(--ink);transition:transform .15s,box-shadow .15s}
+.ptoday:hover{color:var(--ink);transform:translateY(-1px);box-shadow:var(--shadow)}
+.pt-n b{display:block;font-size:26px;line-height:1.15;font-family:var(--f-round);font-variant-numeric:tabular-nums}.pt-n b small{font-size:13px;color:var(--muted);font-weight:600}.pt-n span{font-size:12px;color:var(--muted)}
+.pt-bar{grid-column:1/-1;height:8px;border-radius:99px;background:color-mix(in srgb,var(--card) 70%,transparent);overflow:hidden}.pt-bar i{display:block;height:100%;background:var(--brand);border-radius:99px}
+.pt-more{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 10px}.pt-go{margin-left:auto;color:var(--brand-ink);font-weight:700}
+.pfound{margin:4px 0 10px}
+.pacts{display:flex;flex-wrap:wrap;gap:6px 4px;align-items:center;margin:6px 0 4px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.pacts a:not(.btn){font-size:14px;padding:6px 10px;border-radius:99px;color:var(--brand-ink)}.pacts a:not(.btn):hover{background:var(--brand-2)}
+.pquiet{color:var(--muted)}.pquiet b{color:var(--ink);font-weight:600}

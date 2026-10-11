@@ -4,7 +4,7 @@
 {% block body %}
 {% if report_for %}<a href="/parent" class="back">← 家长页</a>{% endif %}
 <div class="ph"><h1>{{ k.name }} 的学习记录</h1></div>
-<div class="statline" style="margin-top:14px">
+<div class="statline st4" style="margin-top:14px">
   <div><b>🔥 {{ streak }}</b><span>连续打卡（天）</span></div>
   <div><b>{{ cal|selectattr('level')|list|length }}</b><span>近 12 周学习的天数</span></div>
   <div><b>{{ tot.n or 0 }}</b><span>做题 · 正确率 {{ ((tot.ok or 0) * 100 / tot.n)|int if tot.n else 0 }}%</span></div>
@@ -29,9 +29,11 @@
 {% for kp, m in weak %}<tr><td class="tx">{% if not report_for %}<a href="/learn/{{ kp.id }}">{{ kp.name }}</a>{% else %}{{ kp.name }}{% endif %}</td><td class="nw">{{ stage_label(kp.stage) }}</td><td class="nw">{{ (m.score*100)|int }}%</td><td class="nw">{{ m.correct }}/{{ m.attempts }}</td></tr>{% endfor %}</table></div>{% endif %}
 {% if days %}<h2>每天的心情和留言</h2>
 <div class="card" style="padding:6px 18px">{% for d in days %}
+{% if loop.index == 8 %}<details class="refl-more"><summary class="small">再往前 {{ days|length - 7 }} 天 ›</summary>{% endif %}
 <div class="refl"><div class="dt">{% if not report_for %}<a href="/day/{{ d.day }}">{{ d.day[5:] }}</a>{% else %}{{ d.day[5:] }}{% endif %}</div>
   <div class="grow"><span class="mood">{{ d.mood or '' }}</span> {% if d.reflection %}{{ d.reflection }}{% else %}<span class="faint">打了卡</span>{% endif %}</div>
   <span class="tiny faint" style="white-space:nowrap">{{ d.minutes }} 分钟</span></div>
+{% if loop.last and loop.length > 7 %}</details>{% endif %}
 {% endfor %}</div>{% endif %}
 {% if found or solved %}<h2>🔍 系统发现</h2>
 {% for f in found %}<div class="finding sev{{ f.severity }}"><b>{{ f.title }}</b> <span class="muted small">{{ f.created_at[:10] }} 起</span><div class="small muted">{{ f.detail }}</div></div>{% endfor %}
