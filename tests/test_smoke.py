@@ -133,9 +133,14 @@ def test_full_flow(monkeypatch):
         assert wc["quiz"]["mode"] == "choice" and "apple" in wc["quiz"]["options"] and wc["quiz"]["q"] == "苹果"
         assert c.post(f"/api/review/{wc['id']}/answer", json={"answer": "river"}).json()["correct"] is False
         assert c.post(f"/api/review/{wc['id']}/answer", json={"answer": "Apple "}).json()["correct"] is True
-        db.run("UPDATE cards SET box=3, due=? WHERE id=?", db.today().isoformat(), wc["id"])  # 熟了 → 拼写
+        db.run("UPDATE cards SET box=2, due=? WHERE id=?", db.today().isoformat(), wc["id"])  # 熟了 → 拼写
         q = recall.quiz(kid_a, db.one("SELECT * FROM cards WHERE id=?", wc["id"]))
         assert q["mode"] == "spell" and "apple" not in q["q"]
+        db.run("UPDATE cards SET box=3 WHERE id=?", wc["id"])  # 再熟一点 → 和听写轮换：只给读音，不给意思
+        q = recall.quiz(kid_a, db.one("SELECT * FROM cards WHERE id=?", wc["id"]))
+        assert q["mode"] == "dictate" and q["say"] == "apple" and "q" not in q
+        res = c.post(f"/api/review/{wc['id']}/answer", json={"answer": "aple", "mode": "dictate"}).json()
+        assert res["correct"] is False and res["meaning"] == "苹果"
         unknown = engine.add_card(kid_a, "word", "zephyr", "（意思还没查到，复习时想一想，或问一问）", due=db.today())
         assert recall.quiz(kid_a, db.one("SELECT * FROM cards WHERE id=?", unknown))["mode"] == "self"  # 出不了题才自评
 

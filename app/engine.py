@@ -814,7 +814,7 @@ def day_record(user_id: int, day: str) -> dict:
         "right": sum(1 for a in att if a["correct"]), "dont_know": sum(1 for a in att if a["dont_know"]),
         "wrong": sum(1 for a in att if not a["correct"] and not a["dont_know"]),
         "reads": db.q("SELECT * FROM reading_logs WHERE user_id=? AND day=? ORDER BY id", user_id, day),
-        "readings": db.q("SELECT id, title, lang, minutes FROM readings WHERE user_id=? AND finished_at>=? AND finished_at<?",
+        "readings": db.q("SELECT id, title, lang, minutes, mode FROM readings WHERE user_id=? AND finished_at>=? AND finished_at<?",
                          user_id, day, nxt),
         "new_cards": db.q("SELECT kind, front, back FROM cards WHERE user_id=? AND created_at>=? AND created_at<? ORDER BY id",
                           user_id, day, nxt),

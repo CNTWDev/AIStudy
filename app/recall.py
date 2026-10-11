@@ -3,7 +3,8 @@
 - 错题（mistake）：原题原样重做，选项齐全。隔天连续做对 2 次 → 换一道同知识点的「变式题」，
   也做对了才算过关（防止只是背住了这道题的答案）。做错了明天再来。
   过关以后 RECHECK_DAYS 天再回头做一次原题：还会就真的掌握了（不再出现）；忘了就重新回到错题本里练。
-- 生词 / 短语 / 术语（word / phrase / term）：刚学的「看意思选单词」（四选一），熟一点的「看意思写单词」（拼写）。
+- 生词 / 短语 / 术语（word / phrase / term）：刚学的「看意思选单词」（四选一），熟一点的「看意思写单词」（拼写），
+  再熟一点和「听音写单词」（听写，不给意思）轮换着来。
 - 知识点卡（kp）：从题库里取一道这个知识点的题来做。
 - 实在出不了题的（意思还没查到的词、老的错题找不到原题、题库里没题的知识点）才退回自评。
 """
@@ -18,6 +19,7 @@ WORD_KINDS = ("word", "phrase", "term")
 PASS_STREAK = 2        # 隔天连续做对几次，换变式题
 PASS_NO_VARIANT = 3    # 找不到变式题时，隔天连续做对几次算过关
 SPELL_FROM_BOX = 2     # 复习过几轮（box）之后，从四选一升级为拼写
+DICTATE_FROM_BOX = 3   # 再往后，拼写和听写轮换（box 为奇数时听写）
 PASSED_DUE = "9999-12-31"
 RECHECK_DAYS = 21      # 过关后隔多久回头看一眼
 _LATIN = re.compile(r"[A-Za-z][A-Za-z '\-.]*")
@@ -41,7 +43,7 @@ def _meaning(c) -> str:
 # ------------------------------------------------------------------ 出题
 
 def quiz(user_id: int, c) -> dict:
-    """一张到期的卡 → 怎么考。返回 {mode: item / choice / spell / self, ...}，不含答案。"""
+    """一张到期的卡 → 怎么考。返回 {mode: item / choice / spell / dictate / self, ...}，不含答案。"""
     kind, ex = c["kind"], _extra(c)
     if kind == "mistake":
         variant = bool(ex.get("variant")) and not ex.get("passed")  # 过关后的回头看：做原题
@@ -94,8 +96,10 @@ def _word_quiz(user_id: int, c) -> dict | None:
     latin = bool(_LATIN.fullmatch(front)) and len(front) <= 40
     hint = " · ".join(x for x in (ex.get("pos", ""), ex.get("zh", "") if ex.get("zh") != meaning else "") if x)
     if latin and c["box"] >= SPELL_FROM_BOX:
-        return {"mode": "spell", "q": meaning, "hint": hint, "say": front,
-                "shape": f"{len(front)} 个字母 · 首字母 {front[0]}" if " " not in front else f"{len(front.split())} 个词 · 首字母 {front[0]}"}
+        shape = f"{len(front)} 个字母" if " " not in front else f"{len(front.split())} 个词"
+        if c["box"] >= DICTATE_FROM_BOX and c["box"] % 2:  # 听写：只听读音，不给意思和首字母
+            return {"mode": "dictate", "say": front, "shape": shape}
+        return {"mode": "spell", "q": meaning, "hint": hint, "say": front, "shape": f"{shape} · 首字母 {front[0]}"}
     others = _distractors(user_id, c, latin)
     if len(others) < 3:
         return {"mode": "spell", "q": meaning, "hint": hint, "say": front,
@@ -200,9 +204,9 @@ def _answer_word(user_id: int, c, body: dict) -> dict:
     given = str(body.get("answer") or "").strip()
     norm = lambda s: " ".join(s.lower().replace("’", "'").split()).strip(".!?。")
     correct = bool(given) and not body.get("dont_know") and norm(given) == norm(c["front"])
-    engine.schedule_card(user_id, c, "good" if correct else "again", fmt="recall" if body.get("mode") == "spell" else "choice")
+    fmt = "recall" if body.get("mode") in ("spell", "dictate") else "choice"
+    engine.schedule_card(user_id, c, "good" if correct else "again", fmt=fmt)
     if c["kp_id"]:
-        engine.update_mastery(user_id, c["kp_id"], correct, weight=0.6, source="review",
-                              fmt="recall" if body.get("mode") == "spell" else "choice", kind="review")
+        engine.update_mastery(user_id, c["kp_id"], correct, weight=0.6, source="review", fmt=fmt, kind="review")
     ex = _extra(c)
     return {"correct": correct, "answer": c["front"], "meaning": c["back"], "example": ex.get("example", "")}

@@ -19,7 +19,7 @@
 {% if r.reads or r.readings %}<div class="card">
   <h3 style="margin-top:0">阅读</h3>
   {% for x in r.reads %}<p class="small">📖 《{{ x.title }}》{% if x.to_pos %} 读到第 {{ x.to_pos }}{% endif %}{% if x.pages %} {{ x.pages }}{% endif %} · {{ x.minutes }} 分钟 {{ x.feeling }}{% if x.summary %}<br><span class="muted">「{{ x.summary }}」</span>{% endif %}</p>{% endfor %}
-  {% for x in r.readings %}<p class="small">📄 {{ x.title }}（{{ '英文' if x.lang == 'en' else '中文' }}短文）</p>{% endfor %}
+  {% for x in r.readings %}<p class="small">{{ '🎧' if x.mode == 'listen' else '📄' }} {{ x.title }}（{{ '英文' if x.lang == 'en' else '中文' }}短文{{ '，先听后读' if x.mode == 'listen' }}）</p>{% endfor %}
 </div>{% endif %}
 {% if r.attempts %}<div class="card">
   <h3 style="margin-top:0">做题</h3>
