@@ -255,7 +255,7 @@ class WordSource(Source):
 def _short(d: dict) -> bool:
     opts = d.get("options") or []
     return (len(str(d.get("q", ""))) <= 90 and len(opts) == 4 and all(len(str(o)) <= 36 for o in opts)
-            and not d.get("code") and not d.get("passage") and not d.get("fig"))  # 带图的题不适合游戏里快速作答
+            and not d.get("code") and not d.get("passage") and not d.get("fig") and not d.get("audio"))  # 带图、带录音的题不适合游戏里快速作答
 
 
 def bank_level(r) -> int:

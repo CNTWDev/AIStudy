@@ -13,6 +13,7 @@ for chunk in tts.open(clip.key, user=42):                              # 有文�
 - **key** = MD5(提供方 · 模型 · 声音 · 语言 · 语速 · 格式 · 规整后的文字)。同一句话只生成一次。
 - **文件**：`<root>/ab/cd/<key>.mp3`；生成中是 `<key>.mp3.part`，用 `O_EXCL` 抢占，多进程也只生成一次。
 - **索引**：实现 `Index` 协议的 5 个方法即可接自己的数据库；自带 `SQLiteIndex`、`MemoryIndex`。
+- **角色**：`prepare(..., role="F")` 用 `[roles.<语言>]` 里这个角色的声音（对话里的男声、女声），没配就用默认声音。
 - **用途 / 语速**：`word` / `sentence` / `passage`，在配置的 `[speed]` 里改。
 - **限额**：每人每天、全站每天新生成的字数；读缓存不算。
 - **新厂商**：写 `Provider` 子类，`@register("名字")`。

@@ -24,7 +24,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 3, "teach": 2, "context": 1, "passage": 1, "variant": 2, "verify": 2, "news_pick": 1, "news_write": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 4, "teach": 2, "context": 1, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -44,17 +44,20 @@ def _audience(grade: str, pack) -> str:
     return s
 
 
-def _item_schema(pack=None) -> str:
+def _item_schema(pack=None, kp=None) -> str:
     """出题格式：题型和答案格式来自题型注册表（app/itemtypes.py），配图的写法来自配图注册表（app/figures/），
-    加题型、加图的种类都不用改这里。配图只给用得上的学科（见各种图的 subjects）。"""
-    from .. import figures, itemtypes
+    录音稿的写法来自 app/audio/，加题型、加图的种类都不用改这里。配图只给用得上的学科（见各种图的 subjects），
+    录音只给教材包里标了 audio 的板块（英语「听说」）。"""
+    from .. import audio, figures, itemtypes
     figs = figures.prompt_for(pack.subject) if pack is not None else ""
+    aud = audio.prompt_for(pack, kp) if kp is not None else ""
     return (
         '{"items":[{"type":"' + "|".join(itemtypes.TYPES) + '","difficulty":1-3,"q":"题干","zh":"中文翻译(可选)",'
         '"code":"题目里的一段代码(可选，编程类题目才用)",' + ('"fig":{"kind":"..."}(可选，见下),' if figs else "")
+        + ('"audio":{"lines":[...]}(见下),' if aud else "")
         + '"options":["仅选择题"],"answer":"见下","unit":"单位(可选)",'
         '"tol":"允许误差(可选)","model":"参考答案","points":["得分要点"],'
-        '"hint":"一句提示，不直接给答案","explain":"中文讲解，2-3句"}]}\n各题型：' + itemtypes.schema_text() + figs
+        '"hint":"一句提示，不直接给答案","explain":"中文讲解，2-3句"}]}\n各题型：' + itemtypes.schema_text() + figs + aud
     )
 
 
@@ -72,8 +75,10 @@ def _normalized(items) -> list[dict]:
 
 
 def _fig_text(item: dict) -> str:
-    from .. import figures
-    return f"\n{figures.describe(item['fig'])}" if item.get("fig") else ""
+    """题目带的图、录音稿的文字版（给 AI 校对、改编看）。"""
+    from .. import audio, figures
+    return ((f"\n{figures.describe(item['fig'])}" if item.get("fig") else "")
+            + (f"\n{audio.describe(item['audio'])}" if item.get("audio") else ""))
 
 
 def _traps_note(kp: dict) -> str:
@@ -97,7 +102,7 @@ def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=
         f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n"
         f"诊断思路参考：{kp.get('probe','')}\n关键词：{', '.join(kp.get('terms', []))}\n\n"
         f"{purpose_txt}\n优先用 mcq/num/fill（能自动判分），short 最多 1 道。不要照搬教材原文。"
-        f"答案必须正确且唯一，请自己检查一遍。\n输出格式：{_item_schema(pack)}{_traps_note(kp)}"
+        f"答案必须正确且唯一，请自己检查一遍。\n输出格式：{_item_schema(pack, kp)}{_traps_note(kp)}"
     )
     data = ask_json("items", _tutor(grade) + "你也是严谨的出题人。", user, user_id=user_id, effort="medium", cache=False)
     return _normalized(data.get("items", []) if isinstance(data, dict) else data)
@@ -122,16 +127,18 @@ def make_variant(item: dict, kp: dict, pack, grade: str) -> dict | None:
     """把家里拍的卷子上的一道题改编成一道新题：考同一个知识点、难度相当，但换掉数字、情境和说法，不照抄原题。
     原题有图的：改编题按原图的描述重新画（画图说明），不用原卷照片；画不出来就不改编（返回 None）。"""
     from .. import itemtypes
-    fig_note = ("\n原题有一张图，改编题也必须带 fig（按下面的配图写法重新画，数据跟着改编后的题目走）；"
+    extra_note = ("\n原题有一张图，改编题也必须带 fig（按下面的配图写法重新画，数据跟着改编后的题目走）；"
                 "如果这种图没法用下面的写法画出来，就输出 {\"items\": []}。") if item.get("fig") else ""
+    if item.get("audio"):
+        extra_note += "\n原题是听力题，改编题也必须带 audio（重新写一段录音稿，题目的答案要能从新录音里听出来）。"
     user = (f"{_audience(grade, pack)}\n知识点：{kp['name']}\n下面是一道学校卷子上的原题（{itemtypes.of(item).label}）：\n{item['q']}{_fig_text(item)}\n"
             + ("".join(f"{'ABCDEFGH'[i]}. {o}  " for i, o in enumerate(item.get("options") or [])) + "\n" if item.get("options") else "")
             + "\n请改编成一道新题：考同一个知识点、同样的思路和难度，但换掉数字、人名、情境和措辞，不要照抄原题的句子。"
-            "能自动判分的尽量用 mcq/num/fill。答案必须正确且唯一，请自己再做一遍检查。" + fig_note + "\n"
-            f"输出格式：{_item_schema(pack)}（只出 1 道）")
+            "能自动判分的尽量用 mcq/num/fill。答案必须正确且唯一，请自己再做一遍检查。" + extra_note + "\n"
+            f"输出格式：{_item_schema(pack, kp)}（只出 1 道）")
     data = ask_json("variant", _tutor(grade) + "你也是严谨的出题人。", user, effort="medium", cache=False)
     for it in _normalized(data.get("items", []) if isinstance(data, dict) else data):
-        if item.get("fig") and not it.get("fig"):
+        if (item.get("fig") and not it.get("fig")) or (item.get("audio") and not it.get("audio")):
             return None
         it.pop("kp_ids", None)
         return it

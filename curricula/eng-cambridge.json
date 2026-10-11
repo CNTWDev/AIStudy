@@ -76,7 +76,8 @@
   },
   {
    "id": "LIS",
-   "name": "听说"
+   "name": "听说",
+   "audio": true
   }
  ],
  "kps": [

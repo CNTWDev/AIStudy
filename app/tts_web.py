@@ -1,7 +1,7 @@
 """把朗读服务（app/tts，独立的包）接进网站：配置、数据库索引、接口、管理员试听页。
 
 前端只用两个接口：
-  POST /api/tts {text, lang, use}  → {url, cached}；不能朗读时 {fallback: true, why}（前端改用浏览器自带朗读）
+  POST /api/tts {text, lang, use, role?}  → {url, cached}；不能朗读时 {fallback: true, why}（前端改用浏览器自带朗读）
   GET  /tts/<key>                  → 音频（有文件读文件，没有就边生成边播放并写盘）
 """
 import logging
@@ -98,7 +98,9 @@ def api_tts(request: Request, body: dict = Body(...)):
     if body.get("speed") is not None and (u["is_admin"] or u["role"] == "admin"):  # 管理员试听不同语速
         speed = float(body["speed"])
     try:
-        clip = s.prepare(str(body.get("text") or "")[:5000], str(body.get("lang") or "en"), use, user=u["id"], speed=speed)
+        role = str(body.get("role") or "")[:8]
+        clip = s.prepare(str(body.get("text") or "")[:5000], str(body.get("lang") or "en"), use, user=u["id"], speed=speed,
+                         role=role if role.isalnum() else "")
     except TTSError as e:
         return {"fallback": True, "why": str(e)}
     return {"url": f"/tts/{clip.key}", "cached": clip.cached, "key": clip.key}

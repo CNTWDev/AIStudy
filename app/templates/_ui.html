@@ -63,9 +63,15 @@
   {%- if f.svg %}{{ f.svg|safe }}{% else %}<img src="{{ f.img }}" alt="{{ f.alt }}" loading="lazy">{% endif -%}
 </figure>{% endif %}{% endmacro %}
 
+{# 听力题的录音（itemtypes.view / audio.present 给的 audio）：和 app.js 的 qAudio 一样，点击由 app.js 统一处理 #}
+{% macro audio(a) %}{% if a %}<div class="qc-audio" data-plays="{{ a.plays }}"><button type="button" class="btn sm qa-play">🔊 听录音</button>
+<button type="button" class="btn ghost sm qa-slow" title="慢一点">🐢</button><span class="muted small qa-left"></span>
+<script type="application/json">{{ a|tojson }}</script></div>{% endif %}{% endmacro %}
+
 {% macro question(v, num=None) %}
 <div class="qc">
   {% if v.src %}<div class="qc-meta"><span>📄 {{ v.src }}</span></div>{% endif %}
+  {{ audio(v.audio) }}
   <div class="qc-stem">{% if num %}<span class="qc-n">{{ num }}</span>{% endif %}{{ v.q }}</div>
   {% if v.code %}<pre class="code">{{ v.code }}</pre>{% endif %}
   {% if v.zh %}<div class="qc-zh">{{ v.zh }}</div>{% endif %}
@@ -81,6 +87,7 @@
     {% if v.mine and not mine_opt %}<div><dt>我的答案</dt><dd>{{ v.mine }}</dd></div>{% endif %}
     {% if v.explain %}<div><dt>解析</dt><dd class="qc-explain">{{ v.explain }}</dd></div>{% endif %}
     {% if v.points %}<div><dt>要点</dt><dd><ul>{% for p in v.points %}<li>{{ p }}</li>{% endfor %}</ul></dd></div>{% endif %}
+    {% if v.transcript %}<div><dt>听力原文</dt><dd>{% for l in v.transcript %}<div>{% if l.who %}<b>{{ l.who }}：</b>{% endif %}{{ l.text }}</div>{% endfor %}</dd></div>{% endif %}
   </dl>
   {% endif %}
 </div>

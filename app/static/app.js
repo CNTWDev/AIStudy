@@ -17,7 +17,7 @@ function $$(s, el) { return [...(el || document).querySelectorAll(s)]; }
    · 带答案（判完、错题本、订正过的卷子）：选项上标出「✓ 正确答案」「我选的」，下面分栏写 答案 / 我的答案 / 解析 / 要点 */
 const QKEYS = 'ABCDEFGH';
 function qStem(item, num) {
-  return (item.src ? `<div class="qc-meta"><span>📄 ${esc(item.src)}</span></div>` : '') +
+  return (item.src ? `<div class="qc-meta"><span>📄 ${esc(item.src)}</span></div>` : '') + qAudio(item.audio) +
     `<div class="qc-stem">${num ? `<span class="qc-n">${esc(num)}</span>` : ''}${esc(item.q)}</div>` +
     (item.code ? `<pre class="code">${esc(item.code)}</pre>` : '') +
     (item.zh ? `<div class="qc-zh">${esc(item.zh)}</div>` : '') + qFig(item.fig);
@@ -27,6 +27,28 @@ function qFig(f) {
   if (!f) return '';
   return `<figure class="qc-fig" tabindex="0" title="点一下放大">${f.svg ? f.svg : `<img src="${esc(f.img)}" alt="${esc(f.alt)}" loading="lazy">`}</figure>`;
 }
+/* 听力题的录音（app/audio/）：一句一句交给朗读服务，按角色换声音。作答前最多听 plays 遍，答完不限 */
+function qAudio(a) {
+  if (!a || !a.lines || !a.lines.length) return '';
+  return `<div class="qc-audio" data-plays="${+a.plays || 2}"><button type="button" class="btn sm qa-play">🔊 听录音</button>` +
+    `<button type="button" class="btn ghost sm qa-slow" title="慢一点">🐢</button><span class="muted small qa-left"></span>` +
+    `<script type="application/json">${JSON.stringify(a).replace(/</g, '\\u003c')}</script></div>`;
+}
+document.addEventListener('click', async e => {
+  const el = e.target.closest && e.target.closest('.qc-audio'); if (!el) return;
+  if (e.target.closest('.qa-slow')) { Speak.setSlow(!Speak.slow); e.target.closest('.qa-slow').classList.toggle('on', Speak.slow); return; }
+  const btn = e.target.closest('.qa-play'); if (!btn) return;
+  const a = JSON.parse($('script', el).textContent);
+  const box = el.closest('.q.qc'), limited = box && !box.closest('[data-answered]');
+  const played = +(el.dataset.played || 0);
+  if (limited && played >= +el.dataset.plays) return;
+  el.dataset.played = played + 1;
+  const left = +el.dataset.plays - played - 1;
+  $('.qa-left', el).textContent = limited ? (left > 0 ? `还能听 ${left} 遍` : '已经听完了，答题吧') : '';
+  btn.disabled = true; btn.textContent = '🔊 正在播放…';
+  for (const ln of a.lines) { if (!(await Speak.play(ln.text, a.lang, 'sentence', ln.who))) break; }
+  btn.textContent = '🔊 再听一遍'; btn.disabled = limited && left <= 0;
+});
 /* 点图放大看 */
 document.addEventListener('click', e => {
   const f = e.target.closest && e.target.closest('.qc-fig');
@@ -99,6 +121,7 @@ function qAns(a) {
   if (a.mine) rows.push(['我的答案', esc(a.mine)]);
   if (a.explain) rows.push(['解析', `<span class="qc-explain">${esc(a.explain)}</span>`]);
   if (a.points && a.points.length) rows.push(['要点', `<ul>${a.points.map(p => `<li>${esc(p)}</li>`).join('')}</ul>`]);
+  if (a.transcript && a.transcript.length) rows.push(['听力原文', a.transcript.map(l => `<div>${l.who ? `<b>${esc(l.who)}：</b>` : ''}${esc(l.text)}</div>`).join('')]);
   return rows.length ? `<dl class="qc-ans">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>` : '';
 }
 /* 一整道「带答案」的题（v 的结构同 itemtypes.view） */
@@ -106,7 +129,7 @@ function qView(v, num) {
   let h = `<div class="qc">${qStem(v, num)}`;
   if (v.options && v.options.length) h += `<div class="qc-opts">${v.options.map((o, i) => qOpt(o.text != null ? o.text : o, i, 'div')).join('')}</div>`;
   const mineOpt = (v.options || []).some(o => o.mine);
-  h += qAns({answer: v.answer, mine: mineOpt ? '' : v.mine, explain: v.explain, points: v.points}) + '</div>';
+  h += qAns({answer: v.answer, mine: mineOpt ? '' : v.mine, explain: v.explain, points: v.points, transcript: v.transcript}) + '</div>';
   const wrap = document.createElement('div'); wrap.innerHTML = h;
   qMark(wrap, (v.options || []).findIndex(o => o.right), (v.options || []).findIndex(o => o.mine) >= 0 ? (v.options || []).findIndex(o => o.mine) : null);
   return wrap.innerHTML;
@@ -137,6 +160,7 @@ function renderItem(box, item, opts) {
   const _done = opts.onDone;
   opts.onDone = res => {
     box.dataset.answered = '1';
+    $$('.qc-audio', box).forEach(a => { $('.qa-left', a).textContent = '答完了，录音可以随便听'; $('.qa-play', a).disabled = false; });
     if (W === 'choice') qMark(box, res.answer_index, res.dont_know ? null : chosen);
     flagRow(box, item); _done && _done(res);
   };
@@ -207,13 +231,13 @@ function feedback(res, o) {
   o = o || {};
   if (res.dont_know) {
     return `<div class="fb dk pop"><div class="fb-v">📌 没关系，知道自己哪里不会就是进步。先看懂它：</div>` +
-      qAns({answer: res.answer, explain: res.explain, points: res.points}) +
+      qAns({answer: res.answer, explain: res.explain, points: res.points, transcript: res.transcript}) +
       `<div class="fb-note">已放进错题本，过几天再练一次就会了。</div></div>`;
   }
   if (res.correct === undefined) return '';
   const wrongAns = res.correct ? '' : res.answer;
   return `<div class="fb ${res.correct ? 'ok' : 'no'} pop"><div class="fb-v">${res.correct ? PRAISE[Math.floor(Math.random() * PRAISE.length)] : '❌ 差一点！'}</div>` +
-    qAns({answer: (o.choice && res.answer_index != null) ? '' : wrongAns, mine: res.correct ? '' : o.mine, explain: res.explain, points: res.correct ? [] : res.points}) +
+    qAns({answer: (o.choice && res.answer_index != null) ? '' : wrongAns, mine: res.correct ? '' : o.mine, explain: res.explain, points: res.correct ? [] : res.points, transcript: res.transcript}) +
     (res.correct || res.redo ? '' : `<div class="fb-note">已放进错题本，过几天会再出现。做错也算练过，继续！</div>`) + `</div>`;
 }
 
@@ -312,18 +336,18 @@ const Speak = {
     if (window.speechSynthesis) speechSynthesis.cancel();
     if (Speak._end) { const f = Speak._end; Speak._end = null; f(false); }
   },
-  /* 读一段文字，读完返回 true；被打断（又点了别的）返回 false */
-  async play(text, lang, use) {
+  /* 读一段文字，读完返回 true；被打断（又点了别的）返回 false。role：听力对话里的角色（F 女 / M 男 / C 孩子 / N 旁白） */
+  async play(text, lang, use, role) {
     text = String(text || '').trim(); if (!text) return false;
     lang = (lang || Speak.langOf(text)).slice(0, 2).toLowerCase();
     use = use || Speak.useOf(text);
     Speak.stop();
     const my = Speak.n;
     let url = '';
-    if (Speak.server(lang)) { try { url = (await api('/api/tts', {text, lang, use})).url || ''; } catch (e) {} }
+    if (Speak.server(lang)) { try { url = (await api('/api/tts', {text, lang, use, role: role || ''})).url || ''; } catch (e) {} }
     if (my !== Speak.n) return false;
     if (url) { try { return await Speak.file(url, my); } catch (e) { if (my !== Speak.n) return false; } }
-    return Speak.browser(text, lang, use, my);
+    return Speak.browser(text, lang, use, my, role);
   },
   /* 先登记好下一段（只拿地址，不播放），连续朗读时用来减少等待 */
   async prepare(text, lang, use) {
@@ -342,11 +366,12 @@ const Speak = {
       a.play().catch(e => { if (my === Speak.n) { Speak.playing = false; Speak._end = null; rej(e); } });
     });
   },
-  browser(text, lang, use, my) {
+  browser(text, lang, use, my, role) {
     if (!window.speechSynthesis) return Promise.resolve(false);
     return new Promise(res => {
       const u = new SpeechSynthesisUtterance(text);
       u.lang = lang === 'zh' ? 'zh-CN' : 'en-US';
+      u.pitch = ({M: .75, F: 1.15, C: 1.4})[role] || 1;  // 浏览器自带的声音分不出男女，用音高区分对话里的人
       u.rate = ({word: .7, sentence: .8, passage: .85})[use] * (Speak.slow ? .85 : 1);
       Speak._end = res; Speak.playing = true;
       u.onend = u.onerror = () => { Speak.playing = false; if (Speak._end === res) Speak._end = null; res(my === Speak.n); };
