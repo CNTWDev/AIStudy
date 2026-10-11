@@ -13,7 +13,7 @@
       {% if S.bonus_all %}<span>✅ 任务全做完 +{{ S.bonus_all }}</span>{% endif %}
       {% if S.bonus_sprint %}<span>⚡ 冲刺 +{{ S.bonus_sprint }}</span>{% endif %}
       {% if S.bonus_lit %}<span>🌟 点亮 {{ S.lit }} 个 +{{ S.bonus_lit }}</span>{% endif %}
-      {% if a.week.focus %}<span title="这一周实际答对 ÷ 预期答对。100 是正常发挥，越高越投入">💎 本周专注指数 {{ a.week.focus }}</span>{% endif %}
+      {% if a.week.focus %}<span title="100 = 平时的你，越高越投入">💎 本周专注值 {{ a.week.focus }}</span>{% endif %}
       <span>🏅 贴纸 {{ a.wall|selectattr('got')|list|length }}/{{ a.wall|length }}</span>
     </div>
   </div>
@@ -54,8 +54,8 @@
 <details class="card" style="margin-top:18px">
   <summary><b>⚖️ 为什么说乐园是公平的？</b></summary>
   <div class="ah-why">
-    <p>每道题都是按<b>你自己的水平</b>出的：系统知道你在每个知识点上大概会多少，会挑一道你有七八成把握答对的题。学得快的同学拿到的题更难，刚开始学的同学拿到的题更合适，所以大家答对的机会差不多，<b>比的是专注和投入</b>，不是谁本来会得多。</p>
-    <p>💎 <b>专注指数</b> = 实际答对的题数 ÷ 按你的水平预期能答对的题数 × 100。100 是正常发挥，超过 100 说明这局比平时的自己更投入。3 秒内就答错，像是在猜，会冷冻更久。</p>
+    <p>每道题都是按<b>你自己的水平</b>出的：乐园记得你每样东西大概会多少，会挑你有七八成把握答对的题。学得快的同学拿到的题更难，刚开始学的同学拿到的题更合适，所以大家答对的机会差不多，<b>比的是专注和投入</b>，不是谁本来会得多。</p>
+    <p>💎 <b>专注值</b>：100 就是平时的你。比如按你的水平这局大概能对 10 题，你对了 12 题，专注值就是 120，说明这局比平时更投入。3 秒内就答错，像是在猜，会冷冻更久。</p>
     <p>答错只冷冻几秒，不扣分；乱点会冷冻得更久。游戏里答的题也会记进学习记录，帮你发现哪里还不熟。这周在乐园答了 {{ a.week.answered }} 道题，对了 {{ a.week.right }} 道。</p>
   </div>
 </details>

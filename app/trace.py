@@ -242,7 +242,7 @@ def outcome_tasks(t, mastery: dict | None = None) -> list[dict]:
     done = lambda k: (mastery or {}).get(k, {}).get("status") == "mastered"  # noqa: E731
     pid = f"tr{t['id']}"
     if t["result"] == "root":
-        tasks = [{"type": "backfill", "kp": root, "for": kp_id, "title": f"追根：先补「{_name(root)}」",
+        tasks = [{"type": "backfill", "kp": root, "for": kp_id, "title": f"找到根了：先补「{_name(root)}」",
                   "why": f"「{name}」卡住的根在这里", "minutes": 10, "url": f"/learn/{root}?task=backfill", "id": f"{pid}-0"},
                  {"type": "weak", "kp": kp_id, "title": f"再战：{name}", "why": f"「{_name(root)}」补好了，回来再做几题",
                   "minutes": 8, "url": f"/learn/{kp_id}?task=weak", "id": f"{pid}-1"}]
@@ -250,7 +250,7 @@ def outcome_tasks(t, mastery: dict | None = None) -> list[dict]:
         tasks = [{"type": "words", "title": f"术语过关：{name}", "why": "中文会做、英文卡住了：先把这几个英文词弄熟",
                   "minutes": 5, "url": "/review?group=words", "id": f"{pid}-0"}]
     elif t["result"] == "self":
-        tasks = [{"type": "weak", "kp": kp_id, "title": f"换个讲法再学：{name}", "why": "前置都没问题，是这个点本身还没学会",
+        tasks = [{"type": "weak", "kp": kp_id, "title": f"换个讲法再学：{name}", "why": "要用到的基础你都会，是这一个本身还没弄懂",
                   "minutes": 10, "url": f"/learn/{kp_id}?task=weak", "id": f"{pid}-0"}]
     else:
         tasks = []

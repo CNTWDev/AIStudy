@@ -12,7 +12,7 @@
   {% if images %}<div class="small">原卷照片：{% for im in images %}<a href="/papers/{{ p.id }}/img/{{ im }}" target="_blank">第 {{ loop.index }} 张</a> {% endfor %}</div>{% endif %}
   {% if p.bank_paper_id %}
   <p class="small" style="margin-bottom:0">模拟考：一道一道做下去，不会的点「🤔 这道题还不会」，别猜。{% if bp_minutes %}建议 {{ bp_minutes }} 分钟内做完，已用 <b id="mclock">0:00</b>。{% endif %}
-    做完看诊断，重要的是认真做完，分数只是参考。</p>
+    做完看结果，重要的是认真做完，分数只是参考。</p>
   {% else %}
   <p class="small" style="margin-bottom:0">把每道题在线再做一遍：会的很快过，不会的点「🤔 这道题还不会」。AI 给的答案偶尔会错，觉得不对就点「答案有问题」，这题不算分。</p>{% endif %}
   {% if wrong %}<label class="small" style="font-weight:400;margin-top:8px"><input type="checkbox" id="onlywrong"> 只做原卷做错的 {{ wrong|length }} 题</label>{% endif %}
@@ -33,7 +33,7 @@
       <select class="kpsel" data-pi="{{ r.id }}"><option value="">（不对应知识点）</option>
         {% for c in cands %}<option value="{{ c.id }}" {{ 'selected' if r.kp_id == c.id }}>{{ stage_label(c.stage) }} · {{ c.name }}</option>{% endfor %}</select></details>{% endif %}
     {% if r.orig_answer %} · 卷面上写的：{{ r.orig_answer }}{% endif %}</div>
-  {% if r.flagged %}<p class="muted small">已标记「答案有问题」，这题不计入诊断。</p>
+  {% if r.flagged %}<p class="muted small">已标记「答案有问题」，这题不算。</p>
   {% elif r.answered_at %}<p class="small" style="margin:6px 0 0"><b>{{ '🤔 还不会' if r.dont_know else ('✅ 重做对了' if r.correct else '❌ 重做还错') }}</b></p>
   {{ ui.question(qview(r.item, None if r.dont_know else r.answer)) }}
   {% elif readonly %}<p class="muted small">还没订正</p>
@@ -44,7 +44,7 @@
 <div class="card">
   <p class="small" id="leftmsg"></p>
   {% if readonly %}<p class="small muted">孩子用自己的账号登录后，在这里在线订正；做完会出诊断。</p><a class="btn ghost sm" href="/papers/{{ p.id }}/report">看目前的诊断</a>
-  {% else %}<button class="btn" id="finish">做完了，看诊断</button>{% endif %}
+  {% else %}<button class="btn" id="finish">做完了，看结果</button>{% endif %}
   <form method="post" action="/papers/{{ p.id }}/delete" style="display:inline" onsubmit="return confirm('删除这份试卷和它的题目？（错题本里的错题会保留）')">
     <button class="btn ghost sm">删除这份试卷</button></form>
 </div>
@@ -62,7 +62,7 @@ const PID = {{ p.id }}, QS = {{ qs|tojson }};
 function progress() {
   const done = QS.filter(q => q.done || q.flagged).length;
   $('#pbar').style.width = (100 * done / Math.max(QS.length, 1)) + '%';
-  $('#leftmsg').textContent = done < QS.length ? `已做 ${done}/${QS.length} 题。没做完也可以先看诊断，回头再接着做。` : `🎉 全部做完了！`;
+  $('#leftmsg').textContent = done < QS.length ? `已做 ${done}/${QS.length} 题。没做完也可以先看结果，回头再接着做。` : `🎉 全部做完了！`;
 }
 QS.forEach(q => {
   const box = document.querySelector(`.qbox[data-pi="${q.id}"]`);

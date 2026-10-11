@@ -7,7 +7,7 @@ from datetime import timedelta
 
 from . import db, sprint
 
-KINDS = {"warmup": "热身", "words": "单词复习", "mistakes": "错题重做", "review": "知识点回顾",
+KINDS = {"warmup": "热身", "words": "单词复习", "mistakes": "错题重做", "review": "复习卡片",
          "practice": "知识点练习", "read": "阅读"}
 SPEED_KINDS = {"warmup", "words", "mistakes", "review"}
 MIN_ACC = 0.8
@@ -102,7 +102,7 @@ def weekly(user_id: int) -> dict | None:
     if w1["sec"] and w0["sec"] and w1["sec"] < w0["sec"]:
         lines.append(f"答对一题平均快了 {w0['sec'] - w1['sec']:.1f} 秒（{w0['sec']} → {w1['sec']} 秒）")
     if w1["acc"] is not None and w0["acc"] is not None and w1["acc"] > w0["acc"]:
-        lines.append(f"正确率提高了 {w1['acc'] - w0['acc']} 个百分点（{w0['acc']}% → {w1['acc']}%）")
+        lines.append(f"正确率从 {w0['acc']}% 提高到 {w1['acc']}%")
     if w1["lit"]:
         lines.append(f"新点亮 {w1['lit']} 个知识点")
     if w1["pbs"]:
@@ -230,13 +230,13 @@ def trend_words(s: dict) -> str:
     """一句话：最近 7 天和再前 7 天比。只说事实，不批评。"""
     now, prev = s["now"], s["prev"]
     if not now["n"]:
-        return f"最近 7 天还没做题；再前 7 天正确率 {prev['acc']}%（{prev['n']} 题）" if prev["n"] else "最近 7 天还没做题"
+        return f"最近 7 天还没做题；前一周正确率 {prev['acc']}%（{prev['n']} 题）" if prev["n"] else "最近 7 天还没做题"
     head = f"最近 7 天正确率 {now['acc']}%（{now['n']} 题）"
     if not prev["n"]:
         return head
     diff = now["acc"] - prev["acc"]
     if abs(diff) <= 2:
-        return f"{head}，和再前 7 天（{prev['acc']}%）差不多，很稳"
+        return f"{head}，和前一周（{prev['acc']}%）差不多，很稳"
     if diff > 0:
-        return f"{head}，比再前 7 天（{prev['acc']}%）高了 {diff} 个百分点 👍"
-    return f"{head}，比再前 7 天（{prev['acc']}%）低了 {-diff} 个百分点"
+        return f"{head}，比前一周的 {prev['acc']}% 高 👍"
+    return f"{head}，比前一周的 {prev['acc']}% 低一点"

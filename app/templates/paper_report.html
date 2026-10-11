@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
 <a href="/papers" class="small">← 试卷</a>
-<h1>诊断：{{ p.title }}</h1>
+<h1>{{ p.title }}：订正结果</h1>
 <div class="card">
   <div class="stats">
     <div class="stat"><b>{{ r.total }}</b><span>道题</span></div>
@@ -9,8 +9,8 @@
     <div class="stat"><b>{{ r.answered }}</b><span>在线重做</span></div>
     <div class="stat"><b>{{ r.redo_right }}</b><span>重做做对</span></div>
   </div>
-  {% if r.answered < r.total %}<p class="small">还有 {{ r.total - r.answered }} 题没重做，<a href="/papers/{{ p.id }}">接着做</a>，诊断会更准。</p>{% endif %}
-  <p class="small muted" style="margin-bottom:0">「重做还错 / 还不会」的知识点已经标成薄弱，接下来几天的「今天」任务里会自动安排练习和补前置；错题都在错题本里按天复习。</p>
+  {% if r.answered < r.total %}<p class="small">还有 {{ r.total - r.answered }} 题没重做，<a href="/papers/{{ p.id }}">接着做</a>，结果会更准。</p>{% endif %}
+  <p class="small muted" style="margin-bottom:0">重做还错、还不会的知识点，会排进接下来几天的任务里：先练它们，再补要用到的基础。错题都在错题本里，到时间会叫你回来重做。</p>
 </div>
 
 {% set need = r.groups|selectattr('need')|list %}
@@ -22,7 +22,7 @@
     {% if g.status %}<span class="pill st-{{ g.status }}">{{ STATUS_LABEL[g.status] }}</span>{% endif %}</div>
   <div class="muted small">第 {{ g.labels|join('、') }} 题 · 原卷错 {{ g.orig_wrong }}{% if g.lost %}（{{ g.lost|round(1)|string|replace('.0', '') }} 分）{% endif %}
     · 重做 对 {{ g.redo_right }} / 错 {{ g.redo_wrong }}{% if g.dont_know %} / 还不会 {{ g.dont_know }}{% endif %}</div>
-  {% if g.gaps %}<div class="small" style="margin-top:6px">往回补：{% for x in g.gaps %}<a href="/learn/{{ x.id }}?task=backfill">{{ x.name }}</a>（{{ stage_label(x.stage) }}）{{ '、' if not loop.last }}{% endfor %}</div>{% endif %}
+  {% if g.gaps %}<div class="small" style="margin-top:6px">先补基础：{% for x in g.gaps %}<a href="/learn/{{ x.id }}?task=backfill">{{ x.name }}</a>（{{ stage_label(x.stage) }}）{{ '、' if not loop.last }}{% endfor %}</div>{% endif %}
   {% if g.kp %}<a class="btn sm" style="margin-top:8px" href="/learn/{{ g.kp.id }}?task=weak">去练这个</a>{% endif %}
 </div>
 {% endfor %}

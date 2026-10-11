@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block body %}
-<div class="row"><h1 class="grow">{{ {"words":"单词复习","mistakes":"错题重做","other":"知识点回顾"}.get(group, "复习") }}</h1><a class="btn ghost sm" href="/words">生词本 / 错题本</a></div>
-<p class="muted small">{% if group == 'mistakes' %}错题原样再做一遍，系统来判。隔天连续做对 2 次，会换一道同类的新题，也做对了就过关；过关 3 周后再回头看一眼。
-{% else %}每张都要作答，系统来判。答对了下次隔得更久；答错了过一会儿再来一次。{% endif %}</p>
+<div class="row"><h1 class="grow">{{ {"words":"单词复习","mistakes":"错题重做","other":"复习卡片"}.get(group, "复习") }}</h1><a class="btn ghost sm" href="/words">生词本 / 错题本</a></div>
+<p class="muted small">{% if group == 'mistakes' %}错题原样再做一遍。隔天连续做对 2 次，会换一道同类的新题，也做对了就过关；过关 3 周后再回头看一眼。
+{% else %}每张都要作答。答对了下次隔得更久；答错了过一会儿再来一次。{% endif %}</p>
 <div class="card flash" id="flash"><span class="loading">加载中</span></div>
 <script>
 let cards = [], i = 0, known = 0;

@@ -1,22 +1,22 @@
 {% extends "base.html" %}
 {% block body %}
 <a href="/subjects" class="small">← 学科</a>
-<h1>{{ pack.subject_name }} 诊断报告</h1>
-<p class="muted">共测 {{ rep.ok|length + rep.weak|length }} 个知识点：通过 {{ rep.ok|length }}，需要补 {{ rep.weak|length }}。</p>
+<h1>{{ pack.subject_name }} 小测结果</h1>
+<p class="muted">这次试了 {{ rep.ok|length + rep.weak|length }} 个知识点：会 {{ rep.ok|length }} 个，还要练 {{ rep.weak|length }} 个。</p>
 {% if rep.roots %}
-<div class="card"><div class="card-h"><span class="ico">🎯</span><h3>最该先补的「断点」</h3></div>
-<p class="muted small">这些点做错了，而它们的前置都没问题——从这里补起，后面的会跟着顺。</p>
+<div class="card"><div class="card-h"><span class="ico">🎯</span><h3>最该先补的地方</h3></div>
+<p class="muted small">这些做错了，但它们要用到的基础你都会：从这里补起，后面的会跟着顺。</p>
 {% for d in rep.roots %}{% set k = kp(d.kp) %}<a class="kp" href="/learn/{{ k.id }}"><span class="n">{{ k.name }} <span class="muted small">{{ stage_label(k.stage) }}</span></span><span class="pill st-weak">去补</span></a>{% endfor %}</div>
 {% endif %}
 {% if rep.weak %}
-<div class="card"><h3 style="margin-top:0">需要加强</h3>
-{% for d in rep.weak %}{% set k = kp(d.kp) %}<a class="kp" href="/learn/{{ k.id }}"><span class="n">{{ k.name }}{% if d.from %} <span class="muted small">← 由「{{ kp(d.from).name }}」追溯</span>{% endif %}</span><span class="pill st-weak">薄弱</span></a>
+<div class="card"><h3 style="margin-top:0">还要多练练</h3>
+{% for d in rep.weak %}{% set k = kp(d.kp) %}<a class="kp" href="/learn/{{ k.id }}"><span class="n">{{ k.name }}{% if d.from %} <span class="muted small">← 做「{{ kp(d.from).name }}」时发现的</span>{% endif %}</span><span class="pill st-weak">还不稳</span></a>
 <div class="small muted" style="margin:-2px 0 8px 10px">方法：{{ k.method }}</div>{% endfor %}</div>
 {% endif %}
 {% if rep.ok %}
 <div class="card"><h3 style="margin-top:0">已经会了 👍</h3>
 {% for d in rep.ok %}{% set k = kp(d.kp) %}<span class="pill st-mastered">{{ k.name }}</span> {% endfor %}</div>
 {% endif %}
-<p>今天的计划已按诊断结果更新。</p>
+<p>今天的任务已经按这次的结果重新排好了。</p>
 <div class="row"><a class="btn lg" href="/go">接着做今天的下一项 →</a><a class="btn ghost" href="/today">看今天的清单</a></div>
 {% endblock %}

@@ -183,11 +183,11 @@ def end(kid: dict, match_id, result: str, stats: dict | None = None) -> dict:
     tips = []
     if f["index"] is not None:
         if f["index"] >= 110:
-            tips.append(f"专注指数 {f['index']}：比预期多答对了 {f['extra']} 道，这局很投入！")
+            tips.append(f"专注值 {f['index']}：比平时的你多答对了 {f['extra']} 道，这局很投入！")
         elif f["index"] >= 90:
-            tips.append(f"专注指数 {f['index']}：发挥稳定，和平时的你一样。")
+            tips.append(f"专注值 {f['index']}：发挥稳定，和平时的你一样。")
         else:
-            tips.append(f"专注指数 {f['index']}：比预期少答对了 {-f['extra']} 道，下局看清题目再答。")
+            tips.append(f"专注值 {f['index']}：比平时的你少答对了 {-f['extra']} 道，下局看清题目再答。")
     if f["guesses"] >= 2:
         tips.append(f"有 {f['guesses']} 道题 3 秒内就答错了，像是在猜。认真答，冷冻会少很多。")
     if clean.get("zero_energy_s", 0) >= 20:

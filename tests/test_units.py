@@ -161,7 +161,7 @@ def test_adult_learner_prompts_and_fund_pack():
     pack = catalog.packs["fund-law"]
     assert pack.kind == "syllabus" and pack.system == "cert" and pack.stages == ["FUND-1"]
     assert "成年人" in tasks._audience("ADULT", pack) and tasks._tutor("ADULT") == tasks.TUTOR_ADULT
-    assert "学生年级" in tasks._audience("G8", pack) and tasks._tutor("G8") == tasks.TUTOR
+    assert "学生年级" in tasks._audience("G8", pack) and tasks._tutor("G8").startswith(tasks.TUTOR) and "学长学姐" in tasks._tutor("G8") and "身边的东西" in tasks._tutor("G3")
     kps = [catalog.kps[k] for k in pack.kp_ids]
     assert len(kps) > 100 and {k["req"] for k in kps} == {"掌握", "理解", "了解"}
     assert all(k["hot"] == (k["req"] == "掌握") for k in kps)

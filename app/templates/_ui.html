@@ -51,8 +51,8 @@
 
 {# 掌握情况：一条分段进度条 + 图例 #}
 {% macro mastery(s) %}
-<div class="bar mb" title="已掌握 {{ s.mastered }} · 学习中 {{ s.learning }} · 薄弱 {{ s.weak }} · 未测 {{ s.unknown }}"><span style="width:{{ 100*s.mastered/s.total if s.total else 0 }}%;background:var(--ok)"></span><span style="width:{{ 100*s.learning/s.total if s.total else 0 }}%;background:var(--learn)"></span><span style="width:{{ 100*s.weak/s.total if s.total else 0 }}%;background:var(--warn)"></span></div>
-<div class="mleg"><span><i class="dot mastered"></i>已掌握 <b>{{ s.mastered }}</b></span><span><i class="dot learning"></i>学习中 <b>{{ s.learning }}</b></span><span><i class="dot weak"></i>薄弱 <b>{{ s.weak }}</b></span><span><i class="dot"></i>没测过 <b>{{ s.unknown }}</b></span></div>
+<div class="bar mb" title="学会了 {{ s.mastered }} · 在练 {{ s.learning }} · 还不稳 {{ s.weak }} · 还没试 {{ s.unknown }}"><span style="width:{{ 100*s.mastered/s.total if s.total else 0 }}%;background:var(--ok)"></span><span style="width:{{ 100*s.learning/s.total if s.total else 0 }}%;background:var(--learn)"></span><span style="width:{{ 100*s.weak/s.total if s.total else 0 }}%;background:var(--warn)"></span></div>
+<div class="mleg"><span><i class="dot mastered"></i>学会了 <b>{{ s.mastered }}</b></span><span><i class="dot learning"></i>在练 <b>{{ s.learning }}</b></span><span><i class="dot weak"></i>还不稳 <b>{{ s.weak }}</b></span><span><i class="dot"></i>还没试 <b>{{ s.unknown }}</b></span></div>
 {% endmacro %}
 
 {# 一道题的统一展示（和 app.js 的 qView / renderItem 同一个样子）。v 来自 itemtypes.view(item, mine)：

@@ -50,7 +50,7 @@ def test_full_flow(monkeypatch):
         # 姐姐登录
         r = c.post("/login", data={"email": "a@x.com", "password": "secret1"})
         assert "今天的任务" in r.text
-        assert "摸底诊断" in r.text
+        assert "小测：看看你会哪些" in r.text
         for path in ["/subjects", "/map/phy-cambridge", "/learn/PHY-IG-1.1-05", "/review", "/words", "/reading", "/records",
                      "/diagnose/phy-cambridge", "/words?kind=term", "/settings"]:
             assert c.get(path).status_code == 200, path
@@ -66,7 +66,7 @@ def test_full_flow(monkeypatch):
             c.post(f"/api/diag/{sid}/answer", json={"answer": "zzz", "self": "dont"})
         assert max(depths) >= 1, "做错后应该回溯到前置知识点"
         rep = c.get(f"/diagnose/report/{sid}")
-        assert "断点" in rep.text
+        assert "最该先补的地方" in rep.text
         plan = c.post("/api/plan/rebuild").json()["plan"]
         kinds = {t["type"] for t in plan}
         assert kinds & {"weak", "backfill"}, plan
@@ -554,7 +554,7 @@ def test_site_settings_and_insights():
         assert db.one("SELECT id FROM cards WHERE user_id=? AND LOWER(front)='glacier'", kid_b)  # 自动加入单词本
         assert any(t.get("auto") and t["why"].startswith("🔍") for t in plan), plan
         today = c.get("/today").text
-        assert "小星发现" in today and "根源可能在" in today
+        assert "小星发现" in today and "没打牢" in today
         c.get("/logout")
         # 家长页能看到系统发现
         c.post("/login", data={"email": "p@x.com", "password": "secret1"})
@@ -662,7 +662,7 @@ def test_explore_warmup_and_selection(monkeypatch):
         cov1 = {x["pack"].id: x["known"] for x in explore.coverage(kid)}
         assert cov1[tpack] > cov0.get(tpack, 0)
         today = c.get("/today").text
-        assert "我的学习地图" in today and "前方" in today and "核心英语词" in today
+        assert "我的学习地图" in today and "前方" in today and "常用英语单词" in today
         assert "data-kid" in today and 'id="qlbtn"' in today
         # 知识背景（mock AI）
         assert c.get(f"/api/context/{target}").json()["story"]
@@ -774,7 +774,7 @@ def test_accuracy_trend():
     assert al["pts"][-1]["few"] and not al["pts"][0]["few"]
     assert al["now"] == {"n": 23, "acc": 83} and al["prev"] == {"n": 10, "acc": 60}
     assert {s["name"] for s in tr["series"]} >= {"全部"} and len(tr["series"]) == 3   # 英语、数学各一条
-    assert "高了 23 个百分点" in records.trend_words(al)
+    assert "高 👍" in records.trend_words(al)
     assert records.accuracy_trend(999999) is None
     with TestClient(app) as c:
         c.post("/login", data={"email": "b2@x.com", "password": "kidpass1"})
@@ -1079,7 +1079,7 @@ def test_adult_exam_course():
         plan = c.post("/api/plan/rebuild").json()["plan"]
         exam = [t for t in plan if t["type"] == "exam"]
         assert [t["kp"] for t in exam] == catalog.ids_for("fund-law")[:3], plan
-        assert exam[0]["title"].startswith("按考期学") and "?task=preview" in exam[0]["url"]
+        assert exam[0]["title"].startswith("新考点") and "?task=preview" in exam[0]["url"]
         assert all(t["done"] for t in plan if t["title"].startswith("设定考试日期"))  # 设好日期就自动打勾
         assert "还有 <b>60</b> 天" in c.get("/today").text
         assert c.get(exam[0]["url"]).status_code == 200
