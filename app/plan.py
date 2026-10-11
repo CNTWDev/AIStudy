@@ -80,8 +80,8 @@ def _scan_packs(c: Ctx) -> dict:
             unchecked = [k for k in unchecked if catalog.kps[k].get("hot")] or unchecked
         if unchecked:
             k = catalog.kps[unchecked[c.day_seed % len(unchecked)]]
-            out["check"].append({"type": "check", "kp": k["id"], "title": f"回顾小检查：{k['name']}",
-                                 "why": f"{'学校学过' if k['id'] in c.taught else '以前学过'}，看看还记得吗（会就很快过）",
+            out["check"].append({"type": "check", "kp": k["id"], "title": f"还记得吗：{k['name']}",
+                                 "why": f"{'学校学过' if k['id'] in c.taught else '以前学过'}，做道小题看看（会的话很快就过）",
                                  "minutes": 6, "pack": pack_id})
         diag = db.one("SELECT id FROM diag_sessions WHERE user_id=? AND pack_id=? AND status='done'", c.user_id, pack_id)
         if not diag and not cert:  # 考证一般从零学起，不先摸底（想测可以在「学科」里自己点诊断）
@@ -97,16 +97,16 @@ def _scan_packs(c: Ctx) -> dict:
                    if c.mastery.get(p["id"], {}).get("status") in (None, "weak", "unknown")]
             if gap:
                 g = gap[0]
-                out["backfill"].append({"type": "backfill", "kp": g["id"], "for": w["kp_id"], "title": f"补前置：{g['name']}",
+                out["backfill"].append({"type": "backfill", "kp": g["id"], "for": w["kp_id"], "title": f"先打基础：{g['name']}",
                                         "why": f"「{kp['name']}」要用到它", "minutes": 10, "pack": pack_id})
             else:
                 out["weak"].append({"type": "weak", "kp": w["kp_id"], "title": f"攻克：{kp['name']}",
-                                    "why": f"掌握度 {int(w['score'] * 100)}%，{'刚学' if w['status'] == 'learning' else '薄弱'}",
+                                    "why": "刚学不久，多练几次就熟了" if w["status"] == "learning" else "上次有点卡，再练一次会更稳",
                                     "minutes": 12, "pack": pack_id})
         if diag and not progress_kp and not e["exam_date"]:  # 诊断前不安排预习；有考试日期的由 src_exam 安排新内容
             for k in engine.frontier(c.user_id, pack_id, stage, c.mastery)[:2]:
                 out["preview"].append({"type": "preview", "kp": k["id"], "title": f"预习：{k['name']}",
-                                       "why": "前置已具备" + ("，高频考点" if k.get("hot") else ""), "minutes": 8, "pack": pack_id})
+                                       "why": "要先会的你都会了，可以先看一眼" + ("，考试常考" if k.get("hot") else ""), "minutes": 8, "pack": pack_id})
     return out
 
 
@@ -123,7 +123,7 @@ def src_exam_date(c: Ctx) -> list[dict]:
     names = [catalog.packs[e["pack_id"]].subject_name for e in c.enrolls
              if catalog.packs[e["pack_id"]].system == "cert" and not e["exam_date"]]
     return [{"type": "progress", "title": "设定考试日期（1 分钟）",
-             "why": f"{'、'.join(names[:3])}：告诉系统哪天考试，每天学多少就按剩下的天数排", "minutes": 2,
+             "why": f"{'、'.join(names[:3])}：填上哪天考试，每天学多少就按剩下的天数排", "minutes": 2,
              "url": "/progress"}] if names else []
 
 
@@ -134,7 +134,7 @@ def src_warmup(c: Ctx) -> list[dict]:
     if not (has_probe or has_words):
         return []
     n = (3 if has_probe else 0) + (2 if has_words else 0)
-    return [{"type": "warmup", "title": f"热身 {n} 题", "why": "先动动脑：混着以前学过的内容，答完系统更懂你",
+    return [{"type": "warmup", "title": f"热身 {n} 题", "why": "先动动脑：几道小题有新有旧，答错也没关系",
              "minutes": 4, "url": "/warmup"}]
 
 
@@ -144,12 +144,12 @@ def src_words(c: Ctx) -> list[dict]:
     if not n:
         return []
     return [{"type": "words", "title": f"单词：复习 {n} 个" + (f"（含新词 {new_words} 个）" if new_words else ""),
-             "why": "看意思选单词、写单词，系统来判；答错的过一会儿再来", "minutes": min(15, 3 + n // 4), "url": "/review?group=words"}]
+             "why": "看意思选单词、拼单词；答错的等一会儿还会再来", "minutes": min(15, 3 + n // 4), "url": "/review?group=words"}]
 
 
 def src_mistakes(c: Ctx) -> list[dict]:
     n = len(engine.due_cards(c.user_id, 300, "mistakes"))
-    return [{"type": "mistakes", "title": f"错题重做 {min(n, 8)} 道", "why": "以前做错的题回来了：原题再做一遍，隔天做对两次换一道新题，做对就过关",
+    return [{"type": "mistakes", "title": f"错题重做 {min(n, 8)} 道", "why": "以前做错的题回来了，这次做对，离过关又近一步",
              "minutes": min(10, 2 + min(n, 8)), "url": "/review?group=mistakes"}] if n else []
 
 
@@ -227,7 +227,7 @@ def src_exam(c: Ctx) -> list[dict]:
                     else f"每天要学 {ex['per_day']} 个才学得完，今天先排 {n} 个，有余力可以去「学科」多学几个")
             for i, k in enumerate(ex["todo"][:n]):
                 kp = catalog.kps[k]
-                out.append({"type": "exam", "kp": k, "title": f"按考期学：{kp['name']}", "pack": pack_id,
+                out.append({"type": "exam", "kp": k, "title": f"新考点：{kp['name']}", "pack": pack_id,
                             "why": f"离考试还有 {ex['days_left']} 天，还剩 {len(ex['todo'])} 个考点，{pace}",
                             "minutes": 10, "url": f"/learn/{k}?task=preview", "keep": i == 0})
         else:
@@ -244,7 +244,7 @@ def src_exam(c: Ctx) -> list[dict]:
                             "url": f"/mocks?pack={pack_id}"})
             for i, k in enumerate(left[:c.limit("exam", 3)]):
                 out.append({"type": "exam", "kp": k, "title": f"考前过一遍：{catalog.kps[k]['name']}", "pack": pack_id,
-                            "why": f"离考试还有 {ex['days_left']} 天，高频考点还没掌握", "minutes": 8,
+                            "why": f"离考试还有 {ex['days_left']} 天，这个考试常考，还不太熟", "minutes": 8,
                             "url": f"/learn/{k}?task=exam", "keep": i == 0})
     return out
 
@@ -260,14 +260,14 @@ def src_top(c: Ctx) -> list[dict]:
 
 def src_paper(c: Ctx) -> list[dict]:
     return [{"type": "paper", "url": f"/papers/{p['id']}",
-             **({"title": f"模拟考：{p['title']}", "why": "接着把这套卷子做完，做完看诊断", "minutes": 30} if p["bank_paper_id"] else
-                {"title": f"试卷订正：{p['title']}", "why": "把卷子上的题在线再做一遍，做完看诊断", "minutes": 20})}
+             **({"title": f"模拟考：{p['title']}", "why": "接着把这套卷子做完，做完看看哪里丢了分", "minutes": 30} if p["bank_paper_id"] else
+                {"title": f"试卷订正：{p['title']}", "why": "把卷子上的题在线再做一遍，做完看看哪些是真不会", "minutes": 20})}
             for p in db.q("SELECT id, title, bank_paper_id FROM papers WHERE user_id=? AND status='ready' ORDER BY id", c.user_id)]
 
 
 def src_diagnose(c: Ctx) -> list[dict]:
-    return [{"type": "diagnose", "pack": p, "title": f"{catalog.packs[p].subject_name}摸底诊断（约 10 分钟）",
-             "why": "先找到真正的薄弱点，计划才准", "minutes": 12, "url": f"/diagnose/{p}"} for p in c.per_pack["diagnose"]]
+    return [{"type": "diagnose", "pack": p, "title": f"{catalog.packs[p].subject_name}小测：看看你会哪些（约 10 分钟）",
+             "why": "测完就知道从哪开始最合适，不用做太难或太简单的题", "minutes": 12, "url": f"/diagnose/{p}"} for p in c.per_pack["diagnose"]]
 
 
 def _merge_auto(c: Ctx, kind: str) -> list[dict]:
@@ -294,8 +294,8 @@ def src_check(c: Ctx) -> list[dict]:
     out = []
     for m in confirm[:2]:
         need = "、".join(evidence.missing(c.user_id, m)[:2])
-        out.append({"type": "check", "kp": m["kp_id"], "title": f"确认一下：{catalog.kps[m['kp_id']]['name']}",
-                    "why": f"上次答对了，{need}才算真的掌握", "minutes": 5, "pack": catalog.kp_pack[m["kp_id"]]})
+        out.append({"type": "check", "kp": m["kp_id"], "title": f"再对一次就稳了：{catalog.kps[m['kp_id']]['name']}",
+                    "why": f"上次答对了！还差一步：{need}", "minutes": 5, "pack": catalog.kp_pack[m["kp_id"]]})
     planned = {t["kp"] for t in out}
     return out + [t for t in _merge_auto(c, "check") if t["kp"] not in planned]
 
@@ -306,7 +306,7 @@ def src_preview(c: Ctx) -> list[dict]:
 
 def src_review(c: Ctx) -> list[dict]:
     n = len(engine.due_cards(c.user_id, 100, "other"))
-    return [{"type": "review", "title": f"知识点回顾 {n} 张", "why": "间隔复习学过的知识点",
+    return [{"type": "review", "title": f"复习卡片 {n} 张", "why": "学过的隔几天看一眼，就不容易忘",
              "minutes": min(10, 2 + n), "url": "/review?group=other"}] if n else []
 
 

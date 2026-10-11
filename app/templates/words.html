@@ -13,9 +13,9 @@
 <div class="card"><div><b>{{ s.word }}</b>：{{ s.sentence }} {{ '✅' if s.ok else '✏️' }}</div>
 {% if s.fb.corrected %}<div class="small">改正：{{ s.fb.corrected }}</div>{% endif %}
 {% if s.fb.better %}<div class="small muted">示范：{{ s.fb.better }}</div>{% endif %}</div>
-{% else %}<div class="empty card"><div class="e">✍️</div><b>还没有造句</b>在生词本里给单词造个句子，AI 会帮你看看。</div>{% endfor %}
+{% else %}<div class="empty card"><div class="e">✍️</div><b>还没有造句</b>在生词本里给单词造个句子，{{ ASSISTANT }}会帮你看看。</div>{% endfor %}
 {% elif kind == 'mistake' %}
-<p class="muted small">做错的题、点了「这道题还不会」的题都在这里，系统会按时间叫你回来重做：隔天做对 2 次，换一道同类的新题，也做对就过关；过关 3 周后再回头看一眼，还会就真的掌握了。</p>
+<p class="muted small">做错的题、点了「这道题还不会」的题都在这里，到时间会叫你回来重做：隔天做对 2 次，换一道同类的新题，也做对就过关；过关 3 周后再回头看一眼，还会就真的掌握了。</p>
 {% set td = today_iso %}
 {% for c in cards %}
 {% set kp = catalog.kp(c.kp_id) if c.kp_id else None %}
@@ -41,14 +41,14 @@
     {% if not readonly %}<button class="linkbtn" title="从本子里删掉" onclick="if(confirm('删除？'))api('/api/cards/{{ c.id }}/delete',{}).then(()=>this.closest('.card').remove())">删除</button>{% endif %}</div>
   <div class="small" style="white-space:pre-wrap">{{ c.back }}</div>
   {% if c.extra.context %}<div class="small muted">原句：{{ c.extra.context }}</div>{% endif %}
-  {% if c.kind == 'word' and not readonly %}<div class="row" style="margin-top:6px"><input type="text" placeholder="用 {{ c.front }} 造个句子" class="grow sent"><button class="btn soft sm mk" data-w="{{ c.front }}" data-m="{{ c.back.split('\n')[0] }}" data-l="{{ c.extra.lang or 'en' }}">让 AI 看看</button></div><div class="fbx"></div>{% endif %}
+  {% if c.kind == 'word' and not readonly %}<div class="row" style="margin-top:6px"><input type="text" placeholder="用 {{ c.front }} 造个句子" class="grow sent"><button class="btn soft sm mk" data-w="{{ c.front }}" data-m="{{ c.back.split('\n')[0] }}" data-l="{{ c.extra.lang or 'en' }}">让{{ ASSISTANT }}看看</button></div><div class="fbx"></div>{% endif %}
 </div>
 {% else %}<div class="empty card"><div class="e">🗒️</div><b>这里还是空的</b>阅读时点词收藏、做错的题，都会自动放进来。</div>{% endfor %}
 {% endif %}
 <script>
 $$('.mk').forEach(b => b.onclick = async () => {
   const card = b.closest('.card'), s = $('.sent', card).value.trim(); if (!s) return;
-  b.disabled = true; $('.fbx', card).innerHTML = '<span class="loading">AI 正在看</span>';
+  b.disabled = true; $('.fbx', card).innerHTML = '<span class="loading">' + {{ (ASSISTANT ~ '正在看')|tojson }} + '</span>';
   try { const f = await api('/api/sentence', {word: b.dataset.w, meaning: b.dataset.m, sentence: s, lang: b.dataset.l});
     $('.fbx', card).innerHTML = `<div class="fb ${f.ok ? 'ok' : 'no'}">${esc(f.praise)}${f.issue ? '<br>⚠️ ' + esc(f.issue) : ''}${f.corrected ? '<br>改正：' + esc(f.corrected) : ''}${f.better ? '<br><span class="muted">示范：' + esc(f.better) + '</span>' : ''}</div>`;
   } catch (e) { $('.fbx', card).innerHTML = `<div class="err">${esc(e.message)}</div>`; }

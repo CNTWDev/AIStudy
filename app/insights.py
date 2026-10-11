@@ -45,8 +45,8 @@ def detect(user_id: int) -> list[dict]:
         if len(kids) >= 2:
             names = "、".join(_name(k) for k in kids[:3])
             out.append({"kind": "root", "key": p, "kp_id": p, "severity": 3, "action": "backfill", "for_kid": 1,
-                        "title": f"根源可能在「{_name(p)}」",
-                        "detail": f"{names}{'等' if len(kids) > 3 else ''} {len(kids)} 个知识点都要用到它，先把它补牢，后面会顺很多"})
+                        "title": f"可能是「{_name(p)}」没打牢",
+                        "detail": f"{names}{'等' if len(kids) > 3 else ''}都要用到它，先把它练熟，后面会顺很多"})
         if sum(1 for x in out if x["kind"] == "root") >= 3:
             break
 
@@ -112,8 +112,8 @@ def detect(user_id: int) -> list[dict]:
     for v in [v for v in evidence.due_checks(user_id, m, limit=6) if catalog.kp(v["kp_id"])][:2]:
         days = int(evidence.days_since(v["last_ev"]))
         out.append({"kind": "decay", "key": v["kp_id"], "kp_id": v["kp_id"], "severity": 1, "action": "check", "for_kid": 1,
-                    "title": f"「{_name(v['kp_id'])}」该复查了",
-                    "detail": f"{days} 天前学会的，按遗忘规律估计现在还记得 {int(v['recall'] * 100)}%，做一道小题巩固一下"})
+                    "title": f"「{_name(v['kp_id'])}」好久没练了",
+                    "detail": f"{days} 天前学会的，隔久了容易忘（估计还记得 {int(v['recall'] * 100)}%），做一道小题就能找回来"})
 
     # 8. 考试会做却丢分（原卷错、重做对）
     careless = db.q("SELECT i.kp_id, COUNT(*) AS n FROM paper_items i JOIN papers p ON p.id=i.paper_id "
@@ -132,7 +132,7 @@ def detect(user_id: int) -> list[dict]:
         if r["result"] == "root" and m.get(r["root"]["kp"], {}).get("status") != "mastered":
             out.append({"kind": "trace", "key": f"{r['kp']}>{r['root']['kp']}", "kp_id": r["root"]["kp"], "severity": 3,
                         "action": "backfill", "for_kid": 1, "title": f"「{r['name']}」卡住，根在「{r['root']['name']}」",
-                        "detail": f"{r['day']} 当场追根测出来的：✗{r['name']} → {path}"})
+                        "detail": f"{r['day']} 找根时发现的：✗{r['name']} → {path}"})
         elif r["result"] == "lang" and m.get(r["kp"], {}).get("status") != "mastered":
             out.append({"kind": "trace_lang", "key": r["kp"], "kp_id": None, "severity": 2, "action": "", "for_kid": 1,
                         "title": f"「{r['name']}」用中文会做，卡在英文上",
@@ -198,7 +198,7 @@ def plan_tasks(found: list[dict]) -> dict[str, list[dict]]:
         if not kp or f["action"] not in out or kp["id"] in seen:
             continue
         seen.add(kp["id"])
-        title = {"backfill": "补根源：", "weak": "再练练：", "check": "回顾小检查："}[f["action"]] + kp["name"]
+        title = {"backfill": "先打基础：", "weak": "再练练：", "check": "还记得吗："}[f["action"]] + kp["name"]
         out[f["action"]].append({"type": f["action"], "kp": kp["id"], "title": title, "why": "🔍 " + f["title"],
                                  "minutes": {"backfill": 10, "weak": 12, "check": 6}[f["action"]], "pack": kp["pack"],
                                  "auto": True})

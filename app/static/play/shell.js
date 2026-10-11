@@ -108,7 +108,7 @@
       const lv = r.level, sg = r.stage;
       end.querySelector('.pl-sum').innerHTML = `<div class="pl-title ${result}">${head}</div>
         ${sg ? stageHtml(sg) : ''}
-        <div class="pl-stats"><div class="focus" title="实际答对 ÷ 按你的水平预期答对 × 100。100 是正常发挥，越高越投入"><b>${r.focus ?? '—'}</b><span>💎 专注指数</span></div><div><b>${r.right}/${r.answered}</b><span>答对 / 答题</span></div><div><b>${r.best_streak || 0}</b><span>最长连对</span></div></div>
+        <div class="pl-stats"><div class="focus" title="100 = 平时的你。这局比平时多答对，就超过 100"><b>${r.focus ?? '—'}</b><span>💎 专注值</span></div><div><b>${r.right}/${r.answered}</b><span>答对 / 答题</span></div><div><b>${r.best_streak || 0}</b><span>最长连对</span></div></div>
         ${r.topics && r.topics.length ? `<div class="pl-topics">这局练了：${r.topics.map(t => `<span>${esc(t.topic)} <b>${t.right}/${t.n}</b></span>`).join('')}</div>` : ''}
         ${r.tips.length ? `<ul class="pl-tips">${r.tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
         ${lv ? `<div class="pl-lv"><span>乐园 Lv.${lv.level}</span><i><b style="width:${lv.pct}%"></b></i><small>再答对 ${lv.to_next} 题升级</small></div>` : ''}
@@ -127,7 +127,7 @@
       const stars = [0, 1, 2].map(i => `<span class="${i < sg.stars ? 'on' : ''}" style="animation-delay:${0.25 + i * 0.3}s">★</span>`).join('');
       const why = sg.stars ? '' : '<p class="small">打赢电脑就能拿第 1 颗星。能量快没了就去答题！</p>';
       return `<div class="pl-stage-res"><div class="ps-n">第 ${sg.n} 关</div><div class="ps-stars">${stars}</div>
-        <div class="ps-how">${[['win', '过关'], ['focus', '专注指数 90+'], ['hp', '血量剩一半']].map(([k, t]) => `<span class="${sg.checks[k] ? 'ok' : ''}">${sg.checks[k] ? '✓' : '·'} ${t}</span>`).join('')}</div>
+        <div class="ps-how">${[['win', '过关'], ['focus', '专注值 90+'], ['hp', '血量剩一半']].map(([k, t]) => `<span class="${sg.checks[k] ? 'ok' : ''}">${sg.checks[k] ? '✓' : '·'} ${t}</span>`).join('')}</div>
         ${sg.new_best && sg.best > 0 ? '<div class="ps-best">新纪录！</div>' : ''}${why}
         ${sg.unlocked ? `<div class="ps-unlock">${sg.unlocked.icon} 解锁了 <b>${esc(sg.unlocked.name)}</b>：${esc(sg.unlocked.how)}</div>` : ''}
         ${sg.all_clear && sg.first_clear ? '<div class="ps-unlock">🥋 30 关全部打通！你是火柴人大师！</div>' : ''}</div>`;

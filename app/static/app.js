@@ -275,7 +275,7 @@ const Flow = {
     $$('.flow-sheet,.flow-pill').forEach(x => x.remove());
     const nx = st.next, sec = st.section;
     const head = st.all_done ? '🎉 今天的任务全部完成！' : sec ? `🎉 第 ${sec.n} 节完成！` : st.just ? '✓ 完成一项 +1 ⭐' : '👉 接着做今天的任务';
-    const sub = st.all_done ? '坚持比做对更重要，今天你做到了。' : sec ? (sec.base ? '保底完成，今天的连续天数保住了。' : `又亮了一格，还剩 ${sec.left} 节。`) : '';
+    const sub = st.all_done ? '坚持比做对更重要，今天你做到了。' : sec ? (sec.base ? '第 1 节做完了，今天的连续天数保住啦。' : `又亮了一格，还剩 ${sec.left} 节。`) : '';
     const m = document.createElement('div'); m.className = 'flow-sheet'; m.setAttribute('role', 'dialog');
     m.innerHTML = `<div class="fs-card"><button type="button" class="fs-x" aria-label="先看看这页" title="先看看这页">✕</button>
       <div class="fs-h"><b>${head}</b>${sub ? `<span>${sub}</span>` : ''}</div>
@@ -523,7 +523,7 @@ function celebrate(res, el) {
     toast(`🌟 点亮新知识点：${res.lit.name}（今天第 ${res.lit.today} 个）`, 2400);
     confetti();
   } else if (res && res.probe && res.probe.inferred) {
-    toast(`🗺️ 地图又亮了一块：顺带摸清 ${res.probe.inferred + 1} 个知识点`, 2000);
+    toast(`🗺️ 地图又亮了一块：顺带确认了 ${res.probe.inferred + 1} 个知识点`, 2000);
   }
 }
 
@@ -592,7 +592,7 @@ const Run = {
                                 ms_total: Date.now() - Run.t0, best_combo: Run.best}, extra || {});
     try {
       const r = await api('/api/run', body);
-      (r.pbs || []).forEach((p, i) => setTimeout(() => { toast('🏅 新 PB！' + p.label, 2600); cheer(Run.el); }, 400 + i * 1200));
+      (r.pbs || []).forEach((p, i) => setTimeout(() => { toast('🏅 新纪录！' + p.label, 2600); cheer(Run.el); }, 400 + i * 1200));
       if (Run.el) $('.rpb', Run.el).textContent = r.pbs && r.pbs.length ? '🏅 破了 ' + r.pbs.length + ' 项个人纪录' : (r.first ? '已立下第一个纪录' : '');
       return r;
     } catch (e) { return null; }

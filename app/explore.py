@@ -170,7 +170,7 @@ def candidates(user_id: int, mastery: dict | None = None, near_kp: str | None = 
             else:
                 continue
             why = ("和学校正在学的内容有关" if k in near else f"今天要学的「{today_near[k]}」要用到它" if k in today_near
-                   else "以前推断你会，确认一下" if guessed(k) else "高频考点" if hot else "以前学过，看看还记得吗")
+                   else "以前猜你会，确认一下" if guessed(k) else "考试常考" if hot else "以前学过，看看还记得吗")
             scored.append((score, e["pack_id"], k, why))
     # 学会很久了、按遗忘规律快忘了的：穿插一两道（复习任务里没排到的）
     for v in evidence.due_checks(user_id, mastery, limit=4):

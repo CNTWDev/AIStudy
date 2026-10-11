@@ -16,7 +16,7 @@
   <div class="hi">{{ t.day[5:7]|int }} 月 {{ t.day[8:]|int }} 日 · 星期{{ td.wd if td else '' }}
     <span class="hstat" title="连续学习天数"><span class="flame">🔥</span> 连续 <b>{{ streak }}</b> 天</span>
     <span class="hstat" title="累计得到的星星">⭐ <b>{{ stars }}</b></span>
-    {% if day.cards %}<span class="hstat" title="哪天没达到保底，会自动用一张补上，连续天数不断">🧊 <b>{{ day.cards }}</b></span>{% endif %}</div>
+    {% if day.cards %}<span class="hstat" title="哪天没来得及做完第 1 节，会自动用一张补上，连续天数不断">🧊 <b>{{ day.cards }}</b></span>{% endif %}</div>
   {% if nx %}
   <div class="nx-l">{{ '今天从这里开始' if done == 0 else '下一项' }} · 第 {{ t.plan.index(nx) + 1 }} 项</div>
   <div class="nx-t">{{ nx.title }}</div>
@@ -38,12 +38,12 @@
     <span class="dots">{% for x in t.plan %}<i class="{{ 'ok' if x.done }} {{ 'cur' if x.id == ns.next }}"></i>{% endfor %}</span>
     <b>{{ done }}/{{ total }}</b>
   </div>
-  <div class="base-line {{ 'ok' if day.base }}">{% if day.base %}🛡️ 保底完成，连续天数保住了{% elif day.sections|length > 1 %}🛡️ 做完第 1 节（{{ day.sections[0].done }}/{{ day.sections[0].total }} 项）就保住连续天数{% else %}🛡️ 做完第 1 项就保住连续天数{% endif %}</div>
+  <div class="base-line {{ 'ok' if day.base }}">{% if day.base %}🛡️ 第 1 节做完了，连续天数保住啦{% elif day.sections|length > 1 %}🛡️ 做完第 1 节（{{ day.sections[0].done }}/{{ day.sections[0].total }} 项）就保住连续天数{% else %}🛡️ 做完第 1 项就保住连续天数{% endif %}</div>
   {% else %}<div class="base-line">🛡️ 今天学满 10 分钟就保住连续天数</div>{% endif %}
 </div>
 
-{% if settled.used %}<div class="note-bar ice">🧊 {{ '昨天' if settled.used|length == 1 else '前几天' }}没达到保底，自动用了 {{ settled.used|length }} 张补签卡，连续 {{ streak }} 天保住了！今天做完第 1 节就能接着往上涨。</div>{% endif %}
-{% if settled.earned %}<div class="note-bar ice">🧊 连续 {{ streak }} 天！得到 1 张补签卡。哪天状态不好没做完保底，它会帮你保住连续天数。</div>{% endif %}
+{% if settled.used %}<div class="note-bar ice">🧊 {{ '昨天' if settled.used|length == 1 else '前几天' }}没做完第 1 节，自动用了 {{ settled.used|length }} 张补签卡，连续 {{ streak }} 天保住了！今天做完第 1 节就能接着往上涨。</div>{% endif %}
+{% if settled.earned %}<div class="note-bar ice">🧊 连续 {{ streak }} 天！得到 1 张补签卡。哪天状态不好没做完第 1 节，它会帮你保住连续天数。</div>{% endif %}
 {% if t.minutes >= 90 and not readonly %}<div class="note-bar rest">👀 今天已经学了 {{ t.minutes }} 分钟，很棒！记得站起来走走、看看远处，让眼睛休息一下。</div>{% endif %}
 
 {% if progress_ask and not readonly %}
@@ -55,8 +55,8 @@
 <a class="card examcard" href="/progress#p-{{ x.pack.id }}" style="display:block">
   <div class="row"><b class="grow">📅 {{ x.pack.subject_name }}考试</b><span>还有 <b>{{ x.days_left }}</b> 天</span></div>
   <div class="bar" style="margin:8px 0 4px"><span style="width:{{ (100 * x.learned / (x.total or 1))|round }}%;background:var(--learn)"></span></div>
-  <div class="small muted">已学 {{ x.learned }} / {{ x.total }} 个考点 · 已掌握 {{ x.mastered }} 个 ·
-    {% if x.phase == 'learn' %}每天学 {{ x.per_day }} 个，离考试两周时学完{% else %}考前冲刺：每天过一遍还没掌握的高频考点{% endif %}</div>
+  <div class="small muted">学过 {{ x.learned }} / {{ x.total }} 个考点 · 学会 {{ x.mastered }} 个 ·
+    {% if x.phase == 'learn' %}每天学 {{ x.per_day }} 个，离考试两周时学完{% else %}最后冲刺：每天把常考、还不熟的过一遍{% endif %}</div>
 </a>
 {% endfor %}
 
@@ -68,7 +68,7 @@
   {% set sec_of = {} %}{% for sc in day.sections %}{% for i in sc.tasks %}{% set _ = sec_of.update({i: sc}) %}{% endfor %}{% endfor %}
   {% for x in t.plan %}
   {% set sc = sec_of.get(loop.index0) %}
-  {% if sc and sc.tasks[0] == loop.index0 and day.sections|length > 1 %}<div class="sec-h {{ 'ok' if sc.complete }}"><b>{{ '✓ ' if sc.complete }}第 {{ sc.n }} 节</b><span>约 {{ sc.minutes }} 分钟{% if sc.n == 1 %} · 保底{% endif %}</span></div>{% endif %}
+  {% if sc and sc.tasks[0] == loop.index0 and day.sections|length > 1 %}<div class="sec-h {{ 'ok' if sc.complete }}"><b>{{ '✓ ' if sc.complete }}第 {{ sc.n }} 节</b><span>约 {{ sc.minutes }} 分钟{% if sc.n == 1 %} · 做完就保住连续{% endif %}</span></div>{% endif %}
   <div class="step {{ 'done' if x.done }} {{ 'next' if x.id == ns.next }}" data-id="{{ x.id }}" data-type="{{ x.type }}">
     <div class="num">{{ '✓' if x.done else loop.index }}</div>
     <div class="grow">
@@ -143,12 +143,12 @@
 
 {% if cov or lit or vocab.estimate %}
 <div class="card explore">
-  <div class="card-h"><h3>🗺️ 我的学习地图 <span class="muted small">以前学过的内容，摸清了多少</span></h3></div>
+  <div class="card-h"><h3>🗺️ 我的学习地图 <span class="muted small">以前学过的，已经确认了多少</span></h3></div>
   {% for c in cov %}
-  <div class="row small"><span class="grow">{{ c.pack.subject_name }}</span><span class="muted">{{ c.known }}/{{ c.total }} · {{ c.pct }}%{% if c.weak %} · 要补 {{ c.weak }} 个{% endif %}</span></div>
+  <div class="row small"><span class="grow">{{ c.pack.subject_name }}</span><span class="muted">{{ c.known }}/{{ c.total }} · {{ c.pct }}%{% if c.weak %} · {{ c.weak }} 个还不稳{% endif %}</span></div>
   <div class="bar"><span data-w="{{ c.pct }}" style="width:{{ c.pct if readonly else 0 }}%"></span></div>
   {% endfor %}
-  {% if vocab.estimate %}<p class="small" style="margin:4px 0">🔤 估计认识约 <b>{{ vocab.estimate }}</b> 个核心英语词（已测 {{ vocab.tested }} 个，测得越多越准）</p>{% endif %}
+  {% if vocab.estimate %}<p class="small" style="margin:4px 0">🔤 估计你认识约 <b>{{ vocab.estimate }}</b> 个常用英语单词（已经试过 {{ vocab.tested }} 个，试得越多越准）</p>{% endif %}
   {% if lit %}<p class="small" style="margin:6px 0 0">今天点亮 🌟 {% for k in lit %}<span class="lit">{{ k.name }}</span>{% endfor %}</p>
   {% elif not readonly %}<p class="small muted" style="margin:6px 0 0">每天的「热身」和练习里会穿插几道以前的题，答对就点亮地图。</p>{% endif %}
 </div>
@@ -168,7 +168,7 @@
   <div class="card-h"><h3>🧭 前方</h3></div>
   {% for a in ahead %}
   <a href="/learn/{{ a.kp.id }}?task=preview"><b>{{ a.pack.subject_name }} · 下一站：{{ a.kp.name }}</b>
-    <div class="small muted">{% if a.need %}准备度 {{ a.ready }}/{{ a.need }}{% if a.missing %}，先把「{{ a.missing|map(attribute='name')|join('」「') }}」练熟会更轻松{% else %}，基础都齐了，可以先预习{% endif %}{% else %}不需要前置，随时可以开始{% endif %}
+    <div class="small muted">{% if a.need %}要先会的 {{ a.need }} 个，你会了 {{ a.ready }} 个{% if a.missing %}，先把「{{ a.missing|map(attribute='name')|join('」「') }}」练熟会更轻松{% else %}，可以先看一眼了{% endif %}{% else %}不用先学别的，随时可以开始{% endif %}
       {% if a.uses %} · 学会后能学：{{ a.uses|join('、') }}{% endif %}</div></a>
   {% endfor %}
 </div>
@@ -195,7 +195,7 @@ function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); l
 })();
 function sectionDone(n) {
   const m = document.createElement('div'); m.className = 'sec-pop';
-  m.innerHTML = `<div class="sec-card"><div class="big">🎉</div><b>第 ${n} 节完成！</b><p class="muted">${n === 1 ? '保底完成，今天的连续天数保住了。' : '又亮了一格。'}还剩 ${DAY.n - n} 节。</p>
+  m.innerHTML = `<div class="sec-card"><div class="big">🎉</div><b>第 ${n} 节完成！</b><p class="muted">${n === 1 ? '第 1 节做完了，今天的连续天数保住啦。' : '又亮了一格。'}还剩 ${DAY.n - n} 节。</p>
     <button type="button" class="btn lg block" data-a="rest">☕ 休息 3 分钟</button><button type="button" class="btn ghost lg block" data-a="go">继续第 ${n + 1} 节 →</button></div>`;
   document.body.appendChild(m); confetti();
   m.querySelector('[data-a=go]').onclick = () => { location.href = '/go'; };

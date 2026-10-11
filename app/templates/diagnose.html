@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 {% block body %}
 <a href="/subjects" class="small">← 学科</a>
-<h1>{{ pack.subject_name }} 摸底诊断</h1>
+<h1>{{ pack.subject_name }} 小测：看看你会哪些</h1>
 <div class="card" id="intro">
-  <p>从 <b>{{ stage_label(stage) }}</b> 的核心知识点开始，每个点 1 道题。<br>
-  做错了不要紧：系统会自动<b>往回追</b>它的前置知识，最多追 3 层，直到找到真正的「断点」。</p>
-  <p class="muted small">大约 10–15 分钟，最多 18 题。不会就选「不会」，不要猜——诊断越真实，计划越准。</p>
+  <p>从 <b>{{ stage_label(stage) }}</b> 最重要的内容开始，每样 1 道题。<br>
+  做错了不要紧：会接着问一两道更基础的题，找到你是从哪一步开始不会的，从那里补起最省力。</p>
+  <p class="muted small">大约 10–15 分钟，最多 18 题。这不是考试，不打分。不会就选「不会」，别猜：测得越真，后面的题越合你的水平。</p>
   <div class="row">
-    <button class="btn" id="go">开始诊断</button>
+    <button class="btn" id="go">开始小测</button>
     {% if running %}<button class="btn ghost" id="resume" data-sid="{{ running.id }}">继续上次</button>{% endif %}
   </div>
-  {% if history %}<p class="small" style="margin-top:12px">历史报告：{% for h in history %}<a href="/diagnose/report/{{ h.id }}">{{ h.finished_at[:10] }}</a> {% endfor %}</p>{% endif %}
+  {% if history %}<p class="small" style="margin-top:12px">以前的结果：{% for h in history %}<a href="/diagnose/report/{{ h.id }}">{{ h.finished_at[:10] }}</a> {% endfor %}</p>{% endif %}
 </div>
 <div id="stage" style="display:none">
-  <div class="row small muted"><span class="grow" id="prog"></span><button class="btn ghost sm" id="stop">结束并看报告</button></div>
+  <div class="row small muted"><span class="grow" id="prog"></span><button class="btn ghost sm" id="stop">先到这里，看结果</button></div>
   <div class="card" id="box"></div>
 </div>
 <script>
@@ -27,7 +27,7 @@ async function next() {
   let r;
   try { r = await api(`/api/diag/${sid}/next`); } catch (e) { $('#box').innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn" onclick="next()">重试</button>`; return; }
   if (r.done) { location.href = r.report; return; }
-  $('#prog').textContent = `第 ${r.n} 题` + (r.depth ? ` · 往回追第 ${r.depth} 层` : '');
+  $('#prog').textContent = `第 ${r.n} 题` + (r.depth ? ` · 往回找第 ${r.depth} 步` : '');
   const head = `<div class="small muted">${esc(r.kp.stage)} · ${esc(r.kp.name)}${r.kp.name_en ? ' · ' + esc(r.kp.name_en) : ''}</div>` +
     (r.from ? `<div class="hint small" style="margin:6px 0">刚才「${esc(r.from)}」没做对，看看是不是这个基础没打牢。</div>` : '');
   if (r.item) {

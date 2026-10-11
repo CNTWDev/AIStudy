@@ -6,7 +6,15 @@ from .service import ask_json
 TUTOR = (
     "你是一位耐心、鼓励式的中国家庭学习辅导老师，面向上海的中小学生。"
     "讲解要短、具体、一步一步，先给最容易的一步，避免一次给太多。"
+    "你写的话孩子会直接看到：用孩子听得懂、愿意听的话，不用「前置知识」「掌握度」「薄弱点」「诊断」「考点」这类老师和家长的术语，"
+    "课本里本来就有的学科名词可以用，第一次出现时顺手解释一句。"
 )
+
+# 按年龄换口吻：小学生要短句和身边的例子；初高中生要平等、不幼稚——青少年讨厌被当小孩，和小学生讨厌术语一样。
+VOICE_PRIMARY = ("学生是小学生：句子短，一句只说一件事，用身边的东西打比方（文具、零食、玩具、动物、游戏）；"
+                 "可以亲切，但不要「小朋友」「宝贝」这类称呼，不要一连串感叹号。")
+VOICE_TEEN = ("学生是初中或高中生：像一个懂行的学长学姐那样说话，平等、直接、不啰嗦；"
+              "不用「小朋友」、叠词、卖萌的语气，不用夸张的表扬；例子可以来自他们关心的东西（手机、游戏、运动、新闻、科技）。")
 TUTOR_ADULT = (
     "你是一位专业、务实的辅导老师，学习者是成年人（在职备考职业资格考试，或学习大学、专业课程）。"
     "用平等、简洁的口吻，直奔重点，结合真实工作场景举例；不用哄小孩的语气，不用夸张的表扬。"
@@ -18,13 +26,20 @@ def _adult(grade: str) -> bool:
     return is_adult(grade)
 
 
+def _voice(grade: str) -> str:
+    from ..catalog import stage_rank
+    if _adult(grade):
+        return ""
+    return VOICE_PRIMARY if stage_rank(grade) < 7 else VOICE_TEEN
+
+
 def _tutor(grade: str) -> str:
-    return TUTOR_ADULT if _adult(grade) else TUTOR
+    return TUTOR_ADULT if _adult(grade) else TUTOR + _voice(grade)
 
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 4, "teach": 2, "context": 1, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 4, "teach": 3, "context": 2, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -341,7 +356,7 @@ ASK_TUTOR = (
     "把问题拆成很小的一步，每次只推进一步，先问孩子一个他能回答的小问题，等他回答后再继续；"
     "他答对了具体地表扬一句，答错了不说「错」，而是给一个更小的提示或一个类比、生活里的例子。"
     "孩子卡住两次以上，就退一步，回到这道题要用到的更基础的知识。"
-    "每次回复简短：2-4 句话，最后以一个问题结尾。用孩子能懂的话。"
+    "每次回复简短：2-4 句话，最后以一个问题结尾。用孩子能懂的话，不说「前置知识」「掌握度」「诊断」这类术语。"
     "如果孩子已经做完了这道题（上下文会注明），可以讲清楚为什么，但仍然先让他自己说说思路。"
     "如果问题和学习无关，友好地聊一句再拉回学习。如果孩子表现出难过、害怕或被欺负，温柔回应，建议他告诉爸爸妈妈或老师。"
 )
@@ -360,7 +375,7 @@ def ask_tutor(grade: str, pack, context: str, history: list[tuple[str, str]], qu
               user_id=None, name: str = "小艾") -> dict:
     """问一问：结合当前页面 / 题目，引导式回答。secret = 题目的正确答案和讲解（只给小助手参考，不能说出来）。"""
     adult = _adult(grade)
-    system = (ASK_TUTOR_ADULT if adult else ASK_TUTOR).replace("{name}", name)
+    system = (ASK_TUTOR_ADULT if adult else ASK_TUTOR + _voice(grade)).replace("{name}", name)
     aud = _audience(grade, pack) if pack else f"学生年级：{grade}。"
     me = "学习者" if adult else "孩子"
     conv = "\n".join(f"{me if r == 'user' else name}：{t}" for r, t in history[-12:])

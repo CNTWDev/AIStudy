@@ -10,7 +10,7 @@ from .catalog import catalog, stage_rank
 
 # 游戏和冲刺里的快题：答得快慢受玩法影响，不进题目的用时统计，也不参与「做得慢」的发现
 QUICK_MODES = ("game", "sprint")
-STATUS_LABEL = {"unknown": "未测", "weak": "薄弱", "learning": "学习中", "mastered": "已掌握"}
+STATUS_LABEL = {"unknown": "还没试", "weak": "还不稳", "learning": "在练", "mastered": "学会了"}  # 孩子看得到：说状态，不打分
 
 
 def get_mastery(user_id: int) -> dict[str, dict]:

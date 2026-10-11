@@ -15,7 +15,7 @@
   <div class="card-h"><span class="ico">📅</span><h3>每天学习 <span class="muted small" style="font-weight:400">近 12 周</span></h3></div>
   {{ ui.heat(cal) }}
 </div>
-<h2>各科掌握情况</h2>
+<h2>{{ '各科掌握情况' if report_for else '各科学会了多少' }}</h2>
 <div class="cols">
 {% for p in packs %}{% set s = p.sum %}
 <div class="card subj">
@@ -24,8 +24,8 @@
 </div>
 {% endfor %}
 </div>
-{% if weak %}<h2>薄弱知识点</h2>
-<div class="tw"><table><tr><th>知识点</th><th>学段</th><th>掌握度</th><th>做题</th></tr>
+{% if weak %}<h2>{{ '薄弱知识点' if report_for else '还不稳、要多练的' }}</h2>
+<div class="tw"><table><tr><th>知识点</th><th>{{ '学段' if report_for else '年级' }}</th><th>{{ '掌握度' if report_for else '把握' }}</th><th>{{ '做题' if report_for else '做对' }}</th></tr>
 {% for kp, m in weak %}<tr><td class="tx">{% if not report_for %}<a href="/learn/{{ kp.id }}">{{ kp.name }}</a>{% else %}{{ kp.name }}{% endif %}</td><td class="nw">{{ stage_label(kp.stage) }}</td><td class="nw">{{ (m.score*100)|int }}%</td><td class="nw">{{ m.correct }}/{{ m.attempts }}</td></tr>{% endfor %}</table></div>{% endif %}
 {% if days %}<h2>每天的心情和留言</h2>
 <div class="card" style="padding:6px 18px">{% for d in days %}
@@ -35,12 +35,12 @@
   <span class="tiny faint" style="white-space:nowrap">{{ d.minutes }} 分钟</span></div>
 {% if loop.last and loop.length > 7 %}</details>{% endif %}
 {% endfor %}</div>{% endif %}
-{% if found or solved %}<h2>🔍 系统发现</h2>
+{% if found or solved %}<h2>🔍 {{ '系统发现' if report_for else ASSISTANT ~ '发现' }}</h2>
 {% for f in found %}<div class="finding sev{{ f.severity }}"><b>{{ f.title }}</b> <span class="muted small">{{ f.created_at[:10] }} 起</span><div class="small muted">{{ f.detail }}</div></div>{% endfor %}
-{% if solved %}<p class="small muted">最近已解决：{% for f in solved %}{{ f.title }}{{ '、' if not loop.last }}{% endfor %}</p>{% endif %}
+{% if solved %}<p class="small muted">{{ '最近已解决' if report_for else '最近搞定了' }}：{% for f in solved %}{{ f.title }}{{ '、' if not loop.last }}{% endfor %}</p>{% endif %}
 {% endif %}
 {% if papers %}<h2>试卷</h2>
-<div class="tw"><table><tr><th>日期</th><th>试卷</th><th>原卷错</th><th>重做对</th><th>要补的知识点</th></tr>
+<div class="tw"><table><tr><th>日期</th><th>试卷</th><th>原卷错</th><th>重做对</th><th>{{ '要补的知识点' if report_for else '还要练的' }}</th></tr>
 {% for p in papers %}<tr class="small"><td class="nw">{{ p.exam_date or p.created_at[:10] }}</td>
   <td class="tx">{% if not report_for %}<a href="/papers/{{ p.id }}{{ '/report' if p.status == 'done' }}">{{ p.title }}</a>{% else %}{{ p.title }}{% endif %}{% if p.status != 'done' %} <span class="pill st-learning nw">待订正</span>{% endif %}</td>
   <td class="nw">{{ p.rep.orig_wrong if p.rep.orig_marked else '-' }}</td><td class="nw">{{ p.rep.redo_right ~ '/' ~ p.rep.answered if p.rep.answered else '-' }}</td>
@@ -52,7 +52,7 @@
 {% for r in reads %}<tr class="small"><td class="nw">{{ r.day[5:] }}</td><td class="tx">{{ r.title }}</td><td>{{ r.to_pos or r.pages or '' }}</td><td class="nw">{{ r.minutes }}</td><td class="tx">{{ r.feeling }} {{ r.summary }}</td></tr>{% endfor %}</table></div>{% endif %}
 <h2>最近做题</h2>
 <div class="tw"><table><tr><th>时间</th><th>知识点</th><th>类型</th><th>结果</th></tr>
-{% for a in attempts %}<tr><td class="small nw">{{ a.created_at[5:16].replace('T',' ') }}</td><td class="tx">{{ a.kp.name if a.kp else a.kp_id }}</td><td class="small nw">{{ {'practice':'练习','diagnose':'诊断','diagnose-self':'诊断自评','review':'复习','paper':'试卷重做','exam':'原卷'}.get(a.mode, a.mode) }}</td><td class="nw">{{ '✅' if a.correct else ('🤔 还不会' if a.dont_know else '❌') }}</td></tr>
+{% for a in attempts %}<tr><td class="small nw">{{ a.created_at[5:16].replace('T',' ') }}</td><td class="tx">{{ a.kp.name if a.kp else a.kp_id }}</td><td class="small nw">{{ {'practice':'练习','diagnose':'小测','diagnose-self':'小测自评','review':'复习','paper':'试卷重做','exam':'原卷'}.get(a.mode, a.mode) }}</td><td class="nw">{{ '✅' if a.correct else ('🤔 还不会' if a.dont_know else '❌') }}</td></tr>
 {% else %}<tr><td colspan="4" class="muted">还没有记录</td></tr>{% endfor %}</table></div>
 {% if asks %}<h2>最近问{{ ASSISTANT }}的问题</h2>
 <div class="tw"><table>{% for a in asks %}<tr class="small"><td class="nw">{{ a.created_at[5:16].replace('T', ' ') }}</td><td class="tx">{{ a.text }}</td><td class="muted">{{ a.page }}</td></tr>{% endfor %}</table></div>{% endif %}

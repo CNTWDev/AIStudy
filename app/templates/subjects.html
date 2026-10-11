@@ -8,12 +8,12 @@
 <div class="card subj">
   <a class="cover" href="/map/{{ r.pack.id }}" aria-label="{{ r.pack.subject_name }}知识地图"></a>
   <div class="top">{{ ui.subj_ico(r.pack.subject, 46) }}<div class="grow"><h2>{{ r.pack.subject_name }}</h2><div class="ed">{{ r.pack.edition }} · {{ stage_label(r.e.stage) }}</div></div>
-    <div style="text-align:right"><div class="num-big" style="font-size:24px">{{ ((100 * s.mastered / s.total)|round|int) if s.total else 0 }}<small style="font-size:13px">%</small></div><div class="tiny faint">已掌握</div></div></div>
+    <div style="text-align:right"><div class="num-big" style="font-size:24px">{{ ((100 * s.mastered / s.total)|round|int) if s.total else 0 }}<small style="font-size:13px">%</small></div><div class="tiny faint">学会了</div></div></div>
   {{ ui.mastery(s) }}
   {% if r.e.progress_kp and catalog.kp(r.e.progress_kp) %}<div class="now">🏫 学校正在学：<b>{{ catalog.kp(r.e.progress_kp).name }}</b></div>{% endif %}
   <div class="acts">
     <a class="btn soft" href="/map/{{ r.pack.id }}">🗺️ 知识地图</a>
-    <a class="linkbtn" href="/diagnose/{{ r.pack.id }}">{{ '再诊断一次' if r.diag else '摸底诊断' }}</a>
+    <a class="linkbtn" href="/diagnose/{{ r.pack.id }}">{{ '再测一次' if r.diag else '小测一下' }}</a>
     <a class="linkbtn" href="/papers?pack={{ r.pack.id }}">导入试卷</a>
   </div>
 </div>
@@ -23,7 +23,7 @@
 <h2 class="quiet-h">工具</h2>
 <div class="tiles quiet-tiles">
   <a class="tile" href="/progress"><span class="e">📍</span><div><b>学校学到哪了</b><span>更新进度，每天的任务跟着学校走</span></div></a>
-  <a class="tile" href="/mocks"><span class="e">📝</span><div><b>模拟考</b><span>整套真题、名校卷，做完看诊断</span></div></a>
+  <a class="tile" href="/mocks"><span class="e">📝</span><div><b>模拟考</b><span>整套真题、名校卷，做完看哪里丢了分</span></div></a>
   <a class="tile" href="/papers"><span class="e">📷</span><div><b>导入试卷</b><span>拍照导入，错题自动进错题本</span></div></a>
 </div>
 <p class="muted small" style="text-align:center">想加新的科目或换教材？请家长在「家长页 → 编辑孩子」里改。</p>
