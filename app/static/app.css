@@ -572,18 +572,21 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .hero.focus .buddy{top:-20px;right:16px;left:auto}
 .hero.focus.alldone{border-color:var(--ok)}
 @media (min-width:640px){.hero.focus{padding:24px 28px 18px}.hero.focus .nx-t{font-size:28px}.hero.focus .go{display:inline-flex;width:auto;min-width:280px;padding:15px 36px}}
-.today-main{display:grid;grid-template-columns:1fr;gap:0 16px;align-items:start}
-@media (min-width:820px){.today-main{grid-template-columns:minmax(0,1fr) 290px}.today-main .quick{grid-template-columns:1fr;margin-top:14px}.today-main .quick a.qplay{grid-column:auto}}
+.today-main{display:grid;grid-template-columns:1fr;gap:0 16px;align-items:stretch}
+.tm-list,.tm-side{display:flex;flex-direction:column;gap:12px;min-width:0;margin:14px 0}.tm-list>*,.tm-side>*{margin:0!important}.tm-list>.tasks,.tm-side>.daylog{flex:1}
+@media (min-width:820px){.today-main{grid-template-columns:minmax(0,1fr) 290px}.today-main .quick{grid-template-columns:1fr;gap:12px}.today-main .quick a.qplay{grid-column:auto}}
 .tasks .card-h h3 .small{font-weight:600;margin-left:4px}
 .step.next{padding:12px 12px;margin:4px -6px}.step.next .t{font-size:16.5px}
 .quick a.qsprint{border:2px solid color-mix(in srgb,var(--sun) 55%,transparent);background:linear-gradient(135deg,var(--sun-2),var(--card) 70%)}
 /* 安静区：没有阴影、标题小一号、两列铺开，看得到但不抢眼 */
 .quiet-h{font-size:15px;color:var(--muted);font-weight:700;margin:30px 2px 4px;display:flex;align-items:center;gap:10px}
 .quiet-h::after{content:"";flex:1;border-top:1px dashed var(--line)}
-.quiet{display:grid;grid-template-columns:1fr;gap:0 14px;align-items:start}
-@media (min-width:760px){.quiet{grid-template-columns:1fr 1fr}.quiet>.card{margin:7px 0}}
+.quiet{display:grid;grid-template-columns:1fr;gap:14px;align-items:stretch;margin-top:12px}.quiet>.card{margin:0}
+@media (min-width:760px){.quiet{grid-template-columns:1fr 1fr}.quiet>.wide{grid-column:1/-1}
+.quiet .mine{display:grid;grid-template-columns:1fr 1fr;gap:6px 32px;align-content:start}.quiet .mine>.card-h{grid-column:1/-1;margin-bottom:4px}.quiet .mine>.row{margin:0!important}
+.quiet .ahead{display:grid;grid-template-columns:1fr 1fr;gap:0 28px}.quiet .ahead>.card-h{grid-column:1/-1}.quiet .ahead a:nth-of-type(2){border-top:0}}
 .quiet>.card{box-shadow:none;background:color-mix(in srgb,var(--card) 70%,var(--bg));padding:14px 16px}
-.quiet .card-h h3{font-size:15px}.quiet .goal-card{margin:14px 0}
+.quiet .card-h h3{font-size:15px}
 .quiet .wkcard{border-width:1px}
 .daylog .moods{gap:6px}.daylog .moods button{width:44px;height:44px;font-size:24px}
 .quiet-h+.pick{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;background:var(--brand-2);color:var(--brand-ink);border-radius:99px;padding:3px 10px 3px 4px;margin:6px 0 4px}
@@ -605,3 +608,4 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .pacts{display:flex;flex-wrap:wrap;gap:6px 4px;align-items:center;margin:6px 0 4px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
 .pacts a:not(.btn){font-size:14px;padding:6px 10px;border-radius:99px;color:var(--brand-ink)}.pacts a:not(.btn):hover{background:var(--brand-2)}
 .pquiet{color:var(--muted)}.pquiet b{color:var(--ink);font-weight:600}
+.quiet .wkcard:not([open]){display:flex;flex-direction:column;justify-content:center}
