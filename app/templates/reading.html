@@ -10,11 +10,12 @@
 {% if news.glossary %}<details class="card small" style="margin-bottom:10px"><summary>🔑 先看看这 {{ news.glossary|length }} 个关键词（点词看详细解释）</summary>
 <div class="chips">{% for g in news.glossary %}<button type="button" class="chip gl" data-w="{{ g.w }}">{{ g.w }}<span class="sub">{{ g.zh }}</span></button>{% endfor %}</div></details>{% endif %}
 {% elif r.source and r.source.startswith('web:') %}<p class="small muted">来自 <a href="{{ r.source[4:] }}" target="_blank" rel="noopener noreferrer">{{ r.source[4:].split('/')[2] if r.source[4:].count('/') >= 2 else r.source[4:] }}</a>（只供自己学习阅读）</p>{% endif %}
-<p class="muted small">{{ '点一下不懂的单词就能查。' if r.lang == 'en' else '用手指长按/鼠标选中不懂的字词就能查；点一个句子可以问「这句什么意思」。' }} 已查 <span id="nlook">{{ looked|length }}</span> 个。</p>
-<div class="row" style="margin-bottom:8px"><input type="text" id="manual" class="grow" placeholder="也可以直接输入要查的词"><button class="btn sm" id="manualbtn">查</button></div>
-{% if r.lang == 'en' and questions and done_views is none %}<div class="row small" id="lmode" style="margin-bottom:6px"><button class="btn ghost sm" id="lfirst" type="button">🎧 先听后读</button>
-<span class="muted" id="lmodetip">练听力：先只听不看原文，做完小题再看原文</span></div>{% endif %}
+<p class="muted small" id="lookhint">{{ '点一下不懂的单词就能查。' if r.lang == 'en' else '用手指长按/鼠标选中不懂的字词就能查；点一个句子可以问「这句什么意思」。' }} 已查 <span id="nlook">{{ looked|length }}</span> 个。</p>
+{% set can_listen = r.lang == 'en' and questions and done_views is none %}
+{% if can_listen %}<div class="card" id="lcard" hidden><h3 style="margin-top:0">🎧 先听后读</h3>
+<p class="small muted">只听，不看原文。听完做下面的小题，交卷后原文会打开，对照着找找哪里没听出来。</p></div>{% endif %}
 <div id="listenhere"></div>
+{% if can_listen %}<p class="small" id="ltoggle" style="margin:-4px 0 8px"><button class="linkbtn" id="lfirst" type="button">🎧 换成先听后读（练听力）</button></p>{% endif %}
 <div class="card reader" id="reader" lang="{{ 'en' if r.lang == 'en' else 'zh-CN' }}">{% for p in paras %}<p>{{ p }}</p>{% endfor %}</div>
 {% if dup and not r.finished_at %}<div class="note-bar">📌 今天写的这篇还没读完，先读完它吧（每天一篇就够）。
   <form method="post" action="/reading/new" style="display:inline"><input type="hidden" name="mode" value="ai"><input type="hidden" name="lang" value="{{ r.lang }}"><input type="hidden" name="again" value="1">
@@ -37,7 +38,8 @@
 </div>{% endif %}
 {% if news and news.free and news.pick %}<form method="post" action="/reading/url" class="row small" style="margin-bottom:8px"><input type="hidden" name="url" value="{{ news.pick.url }}"><input type="hidden" name="lang" value="en">
 <button class="btn ghost sm">📄 挑战读原文</button><span class="muted">这家媒体允许原样转载，原文放进阅读器同样能点词查</span></form>{% endif %}
-<div class="row" id="finrow"><button class="btn lg" id="finish">✅ 读完了，交卷</button><span class="muted small">计时：<span id="timer">0</span> 分钟</span></div>
+<div class="row" id="finrow"><button class="btn lg" id="finish">✅ 读完了，交卷</button><span class="muted small">计时：<span id="timer">0</span> 分钟</span>
+{% if can_listen %}<button class="linkbtn small" id="lpeek" type="button" hidden>听不懂？看原文</button>{% endif %}</div>
 {% endif %}
 
 <div class="sheet" id="sheet"><button class="btn ghost sm close" onclick="closeSheet()">关闭</button><div id="sheetbody"></div></div>
@@ -57,21 +59,20 @@ $$('#reader p').forEach(p => {
   }
 });
 Listen.mount($$('#reader p'), {lang: LANG, bar: $('#listenhere')});
-// 先听后读：原文先盖住，只听不看做小题；交卷时原文还没打开过，才算练了听力（mode=listen）
+// 先听后读：原文和查词先收起来，只留播放条；听完做小题，交卷后原文再打开。交卷时原文没打开过才算练了听力（mode=listen）
 let listening = false;
 function setListen(on) {
-  listening = on; $('#reader').classList.toggle('veiled', on);
-  $('#lfirst').textContent = on ? '👀 看原文' : '🎧 先听后读';
-  $('#lmodetip').textContent = on ? '原文先盖住了。点上面的 ▶ 听，听完做小题，交卷后再看原文' : '练听力：先只听不看原文，做完小题再看原文';
-  if ($('.qs-verb')) $('.qs-verb').textContent = on ? '听完了' : '读完了';
-  if ($('#finish')) $('#finish').textContent = on ? '✅ 听完了，交卷' : '✅ 读完了，交卷';
+  listening = on;
+  $('#reader').hidden = $('#lookhint').hidden = $('#ltoggle').hidden = on;
+  $('#lcard').hidden = $('#lpeek').hidden = !on;
+  (on ? $('#lcard') : $('#listenhere')).appendChild(Listen.bar);
+  $('.qs-verb').textContent = on ? '听完了' : '读完了';
+  $('#finish').textContent = on ? '✅ 听完了，交卷' : '✅ 读完了，交卷';
   try { localStorage.setItem('listenFirst', on ? '1' : ''); } catch (e) {}
 }
 if ($('#lfirst')) {
-  $('#lfirst').onclick = () => {
-    if (listening && Object.keys(answers).length < $$('.rq').length && !confirm('现在看原文，这篇就不算练听力了。先把小题做完再看？\n\n点「确定」现在就看原文。')) return;
-    setListen(!listening);
-  };
+  $('#lfirst').onclick = () => setListen(true);
+  $('#lpeek').onclick = () => { if (confirm('看了原文，这篇就不算练听力了。确定现在看？')) { setListen(false); $('#reader').scrollIntoView({behavior: 'smooth'}); } };
   let saved = ''; try { saved = localStorage.getItem('listenFirst') || ''; } catch (e) {}
   if (saved) setListen(true);
 }
@@ -141,7 +142,6 @@ $$('.chip.gl').forEach(b => b.onclick = () => {
   const sents = p.match(/[^.!?]+[.!?]*["”’]?\s*/g) || [p];
   lookup(w, (sents.find(x => x.toLowerCase().includes(w.toLowerCase())) || p).trim());
 });
-$('#manualbtn').onclick = () => { const q = $('#manual').value.trim(); if (q) lookup(q, ''); };
 const answers = {};
 $$('.rq .opt').forEach(b => b.onclick = () => { const q = b.closest('.rq'); $$('.opt', q).forEach(x => x.classList.remove('sel')); b.classList.add('sel'); answers[q.dataset.i] = b.dataset.o; });
 if ($('#finish')) $('#finish').onclick = async () => {
@@ -156,7 +156,7 @@ if ($('#finish')) $('#finish').onclick = async () => {
   r.results.forEach((x, i) => { const q = $(`.rq[data-i="${i}"]`); if (q) { q.classList.remove('qc'); q.innerHTML = qView(x.view, i + 1); } });
   if (r.results.length) $('#qs h3').textContent = `小题答对 ${right}/${r.results.length}` + (right === r.results.length ? ' 🎉' : '，看看错在哪');
   $('#finrow').innerHTML = `<span class="pill st-mastered">✓ ${listening ? '听完' : '读完'} · 打卡了</span>`;
-  if (listening) { $('#reader').classList.remove('veiled'); $('#lmode').remove(); toast('原文打开了：对照着再听一遍，找找哪里没听出来'); }
+  if (listening) { $('#reader').hidden = $('#lookhint').hidden = false; $('#lcard').remove(); $('#listenhere').appendChild(Listen.bar); toast('原文打开了：对照着再听一遍，找找哪里没听出来'); }
   Run.finish({n_items: r.results.length, n_right: right, best_combo: 0});
   if (r.results.length && right < r.results.length) { const w = $$('.rq .opt.wrong')[0]; if (w) w.scrollIntoView({behavior: 'smooth', block: 'center'}); }
   if (r.flow) setTimeout(() => Flow.done(r.flow), r.results.length && right < r.results.length ? 900 : 300);
