@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}教材与知识点 · {{ SITE }}{% endblock %}
+{% block body %}
+<a href="/admin">← 管理后台</a>
+<h1>教材与知识点</h1>
+<nav class="subnav"><a href="/admin/curricula" class="on">教材与知识点</a><a href="#inventory">版本核实</a><a href="#knowledge">知识点</a><a href="#publishing">发布与历史</a><a href="/admin?tab=bank">题库</a></nav>
+{% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
+<div class="card">
+  <div class="row"><div class="grow"><b>当前查看：管理草稿</b><p class="small muted">线上版本 {{ '#' ~ state.published_id if state.published_id else '仓库内置教材' }} · 草稿修订 {{ state.version }}。保存草稿后，检查并发布才会影响孩子学习。教材内容保存在数据库，随数据库一起备份。</p></div><a class="btn sm" href="/admin/curricula/edit/pack/_new">新增教材</a></div>
+  <div class="row small"><a href="/admin/curricula/edit/edition/_new">登记教材版本</a><a href="/admin/curricula/edit/book/_new">新增册次</a><a href="/admin/curricula/edit/concept/_new">新增共通知识</a><a href="/admin/curricula/edit/import/_new">导入教材 JSON</a><a href="/admin/curricula/export.json?scope=draft">导出完整草稿</a><a href="/admin/curricula/export.json">导出已发布内容</a></div>
+</div>
+<form class="card" method="get" action="/admin/curricula">
+  <label for="cq">搜索教材或知识点</label><input id="cq" name="q" value="{{ q }}" placeholder="名称、地区、教材或知识点 ID">
+  <div class="row" style="align-items:end;flex-wrap:wrap">
+    <div class="grow"><label>学科</label><select name="subject"><option value="">全部学科</option>{% for id,s in subjects.items() %}<option value="{{ id }}" {{ 'selected' if subject == id }}>{{ s.name }}</option>{% endfor %}</select></div>
+    <div class="grow"><label>教材</label><select name="pack_id"><option value="">全部教材</option>{% for id,p in draft.packs.items() %}<option value="{{ id }}" {{ 'selected' if pack_id == id }}>{{ p.edition }}</option>{% endfor %}</select></div>
+    <div class="grow"><label>学段</label><select name="stage"><option value="">全部学段</option>{% for id,label in stages %}<option value="{{ id }}" {{ 'selected' if stage == id }}>{{ label }}</option>{% endfor %}</select></div>
+    <div class="grow"><label>册次</label><select name="book_id"><option value="">全部册次</option>{% for b in books %}<option value="{{ b.id }}" {{ 'selected' if book_id == b.id }}>{{ b.name or b.title or b.id }}</option>{% endfor %}</select></div>
+    <div class="grow"><label>知识点缺口</label><select name="gap"><option value="">全部</option><option value="empty" {{ 'selected' if gap == 'empty' }}>暂无可用题目</option><option value="few" {{ 'selected' if gap == 'few' }}>可用题目少于 3 道</option><option value="unmapped" {{ 'selected' if gap == 'unmapped' }}>未映射到册次</option></select></div>
+    <div class="grow"><label>版本核实状态（仅库存）</label><select name="status"><option value="">全部状态</option>{% for id,label in labels.items() %}<option value="{{ id }}" {{ 'selected' if status == id }}>{{ label }}</option>{% endfor %}</select></div><button class="btn">查询</button><a class="btn ghost" href="/admin/curricula">清除</a>
+  </div>
+</form>
+{% if selected %}
+<div class="card"><div class="row"><h2 class="grow">{{ selected.edition }}</h2><a class="btn sm" href="/admin/curricula/edit/pack/{{ selected.id }}">编辑教材</a><a class="btn sm" href="/admin/curricula/edit/kp/_new?pack_id={{ selected.id }}">新增知识点</a></div>
+<p>{{ selected.region }} · {{ selected.subject_name }} · {{ selected.kp_ids|length }} 个知识点</p><p class="small muted">{{ selected.notes }}</p>
+<div class="row small"><a href="/admin/curricula/edit/strand/_new?pack_id={{ selected.id }}">新增板块</a>{% for strand in selected.strands %}<a href="/admin/curricula/edit/strand/{{ strand.id }}?pack_id={{ selected.id }}">编辑板块：{{ strand.name }}</a>{% endfor %}<a href="/admin/curricula/export.json?scope=draft&pack_id={{ selected.id }}">导出本教材草稿</a></div>
+<h3>章节目录</h3><p class="small muted">已建立册次的内容按显式映射显示；其他内容沿用原课程分组。此处分组不代表已经核实出版社的整册目录。</p>
+{% for sid, chapters in chapters %}<details><summary>{{ stage_label(sid) }} · {{ chapters|length }} 个分组</summary>{% for ch in chapters %}<div style="padding:8px 0"><b>{{ ch.name }}</b>{% if ch.book_id %}<span class="small muted"> · {{ ch.book_id }}</span>{% endif %}<div class="row small" style="flex-wrap:wrap">{% for kid in ch.kps %}<a href="/admin/curricula/edit/kp/{{ kid }}">{{ draft.kps[kid].name }}</a>{% endfor %}</div></div>{% endfor %}</details>{% endfor %}
+{% if books %}<h3>册次资料</h3>{% for b in books %}<p><a href="/admin/curricula/edit/book/{{ b.id }}">{{ b.name or b.title or b.id }}</a> · {{ stage_label(b.stage) }} · {{ labels.get(b.status,b.status) }}{% if b.isbn %} · ISBN {{ b.isbn }}{% endif %}</p>{% endfor %}{% endif %}</div>
+{% else %}
+<h2>教材课程（{{ packs|length }}）</h2><div class="tw"><table><tr><th>教材</th><th>学科 / 地区</th><th>知识点</th><th>操作</th></tr>{% for p in packs %}<tr><td><a href="/admin/curricula?pack_id={{ p.id }}">{{ p.edition }}</a><div class="small muted">{{ p.id }}</div></td><td>{{ p.subject_name }} / {{ p.region }}</td><td>{{ p.kp_ids|length }}</td><td><a href="/admin/curricula?pack_id={{ p.id }}">浏览目录</a> · <a href="/admin/curricula/edit/pack/{{ p.id }}">编辑</a> · <a href="/admin/curricula/edit/kp/_new?pack_id={{ p.id }}">新增知识点</a></td></tr>{% else %}<tr><td colspan="4">没有匹配的教材。</td></tr>{% endfor %}</table></div>
+{% endif %}
+<h2 id="knowledge">知识点（{{ row_count }}）</h2><p class="small muted">最多展示 200 条，请通过教材、学段或关键词缩小范围。覆盖数量直接来自题库；不同教材的同概念题目可共享，下面先展示明确关联本知识点的题目。</p>
+<div class="tw"><table><tr><th>知识点</th><th>教材 / 学段 / 单元</th><th>前置</th><th>共通知识</th><th>题目覆盖</th></tr>{% for r in rows %}<tr><td><a href="/admin/curricula/edit/kp/{{ r.kp.id }}">{{ r.kp.name }}</a><div class="small muted">{{ r.kp.id }}</div></td><td>{{ draft.packs[r.kp.pack].edition }}<br><span class="small muted">{{ stage_label(r.kp.stage) }} · {{ r.kp.unit or draft.strand_name(r.kp.pack,r.kp.strand) }}</span></td><td>{{ r.kp.prereqs|length }} 个</td><td>{% if r.concept %}<a href="/admin/curricula/edit/concept/{{ r.concept.id }}">{{ r.concept.name }}</a><div class="small muted">关联 {{ r.concept.kps|length }} 个教材知识点</div>{% else %}<span class="muted">尚未关联</span>{% endif %}</td><td>{{ r.coverage.active }} 道可用<br><span class="small muted">{{ r.coverage.checked }} 道已核对或内置</span></td></tr>{% else %}<tr><td colspan="5">没有匹配的知识点。</td></tr>{% endfor %}</table></div>
+<h2 id="inventory">版本核实与目录覆盖</h2>
+<p class="muted small">核实教材选用、核实整册目录、核实题目是不同的工作。待核实版本仅登记库存，不成为可选教材。</p>
+<div class="tw"><table><tr><th>版本</th><th>地区 / 学制</th><th>状态与覆盖</th><th>来源与下一步</th><th>操作</th></tr>{% for e in editions %}<tr><td>{{ e.name }}<div class="small muted">{{ e.publisher }} · {{ e.id }}</div></td><td>{{ e.region }} / {{ e.school_system }}</td><td>{{ labels.get(e.status,e.status) }}<br>{{ e.kp_count }} 个点 / {{ e.mapped_count }} 个册次映射<div class="small muted">{{ e.coverage }}</div></td><td>{% for source in e.sources or [] %}<a href="{{ source }}" target="_blank" rel="noopener noreferrer">来源 {{ loop.index }}</a> {% endfor %}<div class="small muted">{{ e.next_action }}</div></td><td><a href="/admin/curricula/edit/edition/{{ e.id }}">编辑版本</a>{% if e.pack_id %}<br><a href="/admin/curricula?pack_id={{ e.pack_id }}">浏览知识点</a>{% endif %}</td></tr>{% endfor %}</table></div>
+<h2 id="publishing">检查、发布与历史</h2>
+<div class="card"><p>当前草稿已通过结构与引用校验。发布会重新检查教材、知识点、前置环、册次和概念映射；已有 ID 保留，孩子的历史学习记录继续有效。</p>
+<form method="post" action="/admin/curricula/publish"><input type="hidden" name="version" value="{{ state.version }}"><label>本次发布说明</label><input name="note" required maxlength="1000" placeholder="例如：补充苏教数学四上第一个单元的知识点与目录"><button class="btn" style="margin-top:8px">检查并发布草稿</button></form>
+<form method="post" action="/admin/curricula/restore" style="margin-top:16px" onsubmit="return confirm('恢复当前线上内容到草稿，会放弃尚未发布的草稿修改。继续？')"><input type="hidden" name="version" value="{{ state.version }}"><input type="hidden" name="revision" value="0"><button class="btn ghost sm">放弃草稿修改，恢复当前线上内容</button></form></div>
+<div class="tw"><table><tr><th>发布版本</th><th>说明</th><th>发布人 / 时间</th><th>操作</th></tr>{% for r in history %}<tr><td>#{{ r.id }}{{ ' · 当前线上' if state.published_id == r.id }}</td><td>{{ r.note }}</td><td>{{ r.actor or '已删除账号' }}<br>{{ r.created_at }}</td><td><form method="post" action="/admin/curricula/restore"><input type="hidden" name="version" value="{{ state.version }}"><input type="hidden" name="revision" value="{{ r.id }}"><button class="linkbtn">恢复到草稿</button></form></td></tr>{% else %}<tr><td colspan="4">尚无后台发布记录，目前使用仓库内置教材。</td></tr>{% endfor %}</table></div>
+{% endblock %}

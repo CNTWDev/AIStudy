@@ -5,7 +5,7 @@ import sys
 import threading
 import time
 
-from . import bank, bankflow, config, db, engine, evidence, news
+from . import bank, bankflow, config, curriculum_admin, db, engine, evidence, news
 from .catalog import catalog
 from .content import content
 from .methods import methods
@@ -19,7 +19,7 @@ def main(once=False):
     for sig in (signal.SIGTERM, signal.SIGINT):
         signal.signal(sig, lambda *_: stopped.set())
     db.init()
-    catalog.load()
+    curriculum_admin.refresh(force=True)
     content.load()
     methods.load()
     engine.load_seed_items(config.SEED_DIR)
@@ -28,6 +28,7 @@ def main(once=False):
     next_bank = next_news = 0.0
     try:
         while not stopped.is_set():
+            curriculum_admin.refresh()
             now = time.monotonic()
             for name, run, due in [('bank', bankflow.run_once, next_bank), ('news', news.run_daily, next_news)]:
                 if now < due or stopped.is_set():

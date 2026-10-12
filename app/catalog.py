@@ -147,7 +147,8 @@ class Catalog:
         self.default_grade = "G3"             # 新建孩子时的默认年级（_meta/stages.json 的 default_grade）
 
     # ---- 加载 ----
-    def load(self, directory=None):
+    def load(self, directory=None, *, register_meta=True):
+        self._register_meta = register_meta
         directory = directory or config.CURRICULA_DIR
         self.packs, self.kps, self.kp_pack, self.errors = {}, {}, {}, []
         self._load_meta(directory / "_meta")
@@ -254,8 +255,9 @@ class Catalog:
         item = meta.get("item_lang") or subj_lang or teach
         levels = meta.get("levels") or []
         for lv in levels:  # 自定课程的级别挂到学段轴上，和年级比先后
-            STAGE_RANK[lv["id"]] = float(lv.get("year", 99))
-            STAGE_LABEL[lv["id"]] = lv.get("label", lv["id"])
+            if self._register_meta:
+                STAGE_RANK[lv["id"]] = float(lv.get("year", 99))
+                STAGE_LABEL[lv["id"]] = lv.get("label", lv["id"])
         return Pack(
             id=meta["id"], subject=meta["subject"], subject_name=meta.get("subject_name") or global_subj.get("name", meta["subject"]),
             edition=meta.get("edition", ""), region=meta.get("region", ""),
@@ -270,16 +272,17 @@ class Catalog:
         if f.exists():
             d = json.loads(f.read_text(encoding="utf-8"))
             self.systems, self.stages = d.get("systems", []), d.get("stages", [])
-            SYSTEMS.clear()
-            SYSTEMS.update({x["id"]: x for x in self.systems})
-            for s in self.stages:
-                STAGE_RANK[s["id"]] = float(s["year"])
-                STAGE_LABEL[s["id"]] = s.get("label", s["id"])
-            if d.get("grades"):
-                GRADES[:] = d["grades"]
+            if self._register_meta:
+                SYSTEMS.clear()
+                SYSTEMS.update({x["id"]: x for x in self.systems})
+                for s in self.stages:
+                    STAGE_RANK[s["id"]] = float(s["year"])
+                    STAGE_LABEL[s["id"]] = s.get("label", s["id"])
+                if d.get("grades"):
+                    GRADES[:] = d["grades"]
             self.default_grade = d.get("default_grade") or GRADES[0]
         f = meta_dir / "subjects.json"
-        if f.exists():
+        if f.exists() and self._register_meta:
             SUBJECTS.clear()
             SUBJECTS.update({x["id"]: x for x in json.loads(f.read_text(encoding="utf-8")).get("subjects", [])})
         f = meta_dir / "presets.json"
@@ -391,11 +394,11 @@ class Catalog:
         pack = self.packs.get(pack_id)
         if not pack or not pack.chapters:
             return []
+        explicit = []
         if hasattr(self, "textbooks"):
             explicit = self.textbooks.chapters(pack_id, stage, set(self.ids_for(pack_id, track)))
-            if explicit:
-                return explicit
-        kps = [self.kps[k] for k in self.ids_for(pack_id, track) if self.kps[k]["stage"] == stage]
+        mapped = {kid for ch in explicit for kid in ch["kps"]}
+        kps = [self.kps[k] for k in self.ids_for(pack_id, track) if self.kps[k]["stage"] == stage and k not in mapped]
         by_unit = len({k.get("unit") for k in kps if k.get("unit")}) > 1
         coarse = by_unit and len({k.get("unit") for k in kps}) > 15  # 大纲分得很细（1.1、1.2…）：归到大题
         out: dict[str, dict] = {}
@@ -423,7 +426,7 @@ class Catalog:
         nums = [(c["rank"], c["num"]) for c in chs if c["num"] < 999]
         if len(nums) == len(set(nums)):
             chs.sort(key=lambda c: (c["rank"], c["num"], c["first"]))
-        return chs
+        return explicit + chs
 
     def strand_name(self, pack_id: str, strand_id: str) -> str:
         for s in self.packs[pack_id].strands:

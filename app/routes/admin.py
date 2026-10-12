@@ -27,6 +27,8 @@ router = APIRouter()
 @router.get("/admin", response_class=HTMLResponse)
 def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str = "", q: str = ""):
     a = auth.require_admin(request)
+    if tab == "curricula":
+        return RedirectResponse("/admin/curricula", 303)
     ctx = {"tab": tab, "tabs": ADMIN_TABS, "msg": msg, "link": link, "now": db.now(), "q": q}
     users = db.q("SELECT u.*, i.name AS inviter_name, i.email AS inviter_email, p.name AS parent_name "
                  "FROM users u LEFT JOIN users i ON i.id=u.invited_by LEFT JOIN users p ON p.id=u.parent_id ORDER BY u.id")
@@ -370,12 +372,6 @@ def admin_bp_status(request: Request, bp_id: int, action: str = Form(...)):
             return _bp_back(bp_id, "发布过或有人做过的卷子不能删，可以下架")
         return _admin_back("papers", "已删除")
     raise HTTPException(400)
-
-
-@router.get('/admin/curricula', response_class=HTMLResponse)
-def curricula_inventory(request: Request):
-    auth.require_admin(request)
-    return render(request, 'curricula_inventory.html', editions=catalog.textbooks.inventory(catalog))
 
 
 @router.get('/admin/operations', response_class=HTMLResponse)

@@ -175,7 +175,7 @@ def kid_brief(k) -> dict:
             "arena": arena.parent_summary(k), "trend": records.accuracy_trend(k["id"], 14)}
 
 ADMIN_TABS = [("overview", "概览"), ("stats", "数据统计"), ("families", "家庭与孩子"), ("invites", "邀请码"),
-              ("tree", "邀请关系"), ("bank", "题库"), ("papers", "卷库"), ("arena", "游戏公平"), ("log", "安全日志"), ("system", "站点设置")]
+              ("tree", "邀请关系"), ("curricula", "教材与知识点"), ("bank", "题库"), ("papers", "卷库"), ("arena", "游戏公平"), ("log", "安全日志"), ("system", "站点设置")]
 
 def _site_stats(users):
     """数据统计：近 14 天每天的在学孩子数、学习分钟、做题数、AI 调用次数；每个孩子近 7 天的情况。"""

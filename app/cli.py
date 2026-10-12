@@ -3,7 +3,7 @@
   python -m app.cli migrate                         执行数据库迁移（升级后必须执行，install.sh 会自动执行）
   python -m app.cli migrate-status                  查看迁移状态
   python -m app.cli check [--llm]                   检测数据库、迁移、教材、AI 配置；--llm 会真实调用一次 AI
-  python -m app.cli curricula-report                导出教材版本核实状态与覆盖 JSON
+  python -m app.cli curricula-report [--published]  导出教材版本核实状态与覆盖 JSON（加 --published 看数据库已发布内容）
   python -m app.cli check-curricula                 只校验教材数据（学段、教材包、方向、跨教材关联、学校模板），不需要数据库
   python -m app.cli create-admin 邮箱 密码 [称呼]     创建管理员（或把已有家长账号设为管理员并重设密码）
   python -m app.cli reset-password 邮箱 新密码        重设任何账号的密码，并让它在所有设备上退出
@@ -45,7 +45,15 @@ def check(with_llm: bool) -> int:
         return 1
     pend = migrate.pending()
     good &= _ok(not pend, "数据库结构是最新的" if not pend else f"有 {len(pend)} 个迁移未执行：{', '.join(pend)}（运行 migrate）")
-    catalog.load()
+    try:
+        if pend:
+            catalog.load()
+        else:
+            from . import curriculum_admin
+            curriculum_admin.refresh(force=True)
+    except (ValueError, OSError) as exc:
+        _ok(False, f"已发布教材加载失败：{exc}")
+        return 1
     good &= _ok(len(catalog.kps) > 0, f"教材包 {len(catalog.packs)} 个，知识点 {len(catalog.kps)} 个")
     good &= _ok(not catalog.errors, "教材数据校验通过" if not catalog.errors else f"教材数据有 {len(catalog.errors)} 个问题（运行 check-curricula 查看）")
     if config.SECRET_KEY in ("", "dev-secret-change-me") or "请改" in config.SECRET_KEY:
@@ -168,7 +176,12 @@ def main(argv) -> int:
         return check("--llm" in args)
     if cmd == "curricula-report":
         import json
-        catalog.load()
+        if "--published" in args:
+            from . import curriculum_admin
+            db.init()
+            curriculum_admin.refresh(force=True)
+        else:
+            catalog.load()
         report = {"packs": len(catalog.packs), "kps": len(catalog.kps), "concepts": len(catalog.concepts),
                   "links": len(catalog.links), "errors": catalog.errors, "editions": catalog.textbooks.inventory(catalog)}
         print(json.dumps(report, ensure_ascii=False, indent=2))
@@ -222,8 +235,8 @@ def main(argv) -> int:
                                   int(args[0]) if args else 1, int(args[1]) if len(args) > 1 else 14)
         print("邀请码：", code)
     elif cmd == "bank-maintain":
-        from . import bankflow
-        catalog.load()
+        from . import bankflow, curriculum_admin
+        curriculum_admin.refresh(force=True)
         print(bankflow.run_once(force=True))
     elif cmd == "news":
         from . import news
@@ -234,14 +247,16 @@ def main(argv) -> int:
                       (f"{st['n']} 条，最新 {st['newest']}" if st["ok"] else st["error"]))
             print(f"最近的候选新闻 {len(cands)} 条")
             return 0
-        catalog.load()
+        from . import curriculum_admin
+        curriculum_admin.refresh(force=True)
         res = news.run_daily(force=True)
         res.pop("sources", None)
         print(res)
         for p in db.q("SELECT day, band, source_name, title, why FROM news_picks WHERE day=?", db.today().isoformat()):
             print(f"  {news.BANDS[p['band']]}：{p['title']}（{p['source_name']}）— {p['why']}")
     elif cmd == "mark-weak":
-        catalog.load()
+        from . import curriculum_admin
+        curriculum_admin.refresh(force=True)
         u = auth.by_email(args[0])
         if not u:
             print("没有这个邮箱"); return 1
