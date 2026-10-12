@@ -121,6 +121,7 @@ def test_course_pack_with_levels(tmp_path):
     from app.catalog import Catalog, config, stage_rank
     shutil.copytree(config.CURRICULA_DIR / "_meta", tmp_path / "_meta")
     (tmp_path / "_meta" / "presets.json").write_text('{"presets": []}', encoding="utf-8")  # 学校模板引用的是真教材
+    (tmp_path / "_meta" / "textbooks.json").unlink(missing_ok=True)
     (tmp_path / "py-kids.json").write_text(json.dumps({
         "pack": {"id": "py-kids", "subject": "programming", "edition": "少儿 Python（自定课程）", "system": "course",
                  "levels": [{"id": "PY-L1", "label": "入门", "year": 3}, {"id": "PY-L2", "label": "进阶", "year": 5}],

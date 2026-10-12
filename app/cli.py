@@ -3,6 +3,7 @@
   python -m app.cli migrate                         执行数据库迁移（升级后必须执行，install.sh 会自动执行）
   python -m app.cli migrate-status                  查看迁移状态
   python -m app.cli check [--llm]                   检测数据库、迁移、教材、AI 配置；--llm 会真实调用一次 AI
+  python -m app.cli curricula-report                导出教材版本核实状态与覆盖 JSON
   python -m app.cli check-curricula                 只校验教材数据（学段、教材包、方向、跨教材关联、学校模板），不需要数据库
   python -m app.cli create-admin 邮箱 密码 [称呼]     创建管理员（或把已有家长账号设为管理员并重设密码）
   python -m app.cli reset-password 邮箱 新密码        重设任何账号的密码，并让它在所有设备上退出
@@ -165,6 +166,13 @@ def main(argv) -> int:
         return 0
     if cmd == "check":
         return check("--llm" in args)
+    if cmd == "curricula-report":
+        import json
+        catalog.load()
+        report = {"packs": len(catalog.packs), "kps": len(catalog.kps), "concepts": len(catalog.concepts),
+                  "links": len(catalog.links), "errors": catalog.errors, "editions": catalog.textbooks.inventory(catalog)}
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return int(bool(catalog.errors))
     if cmd == "check-curricula":
         return check_curricula()
     if cmd == "tts-test":

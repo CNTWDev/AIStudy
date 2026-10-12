@@ -1,0 +1,29 @@
+{
+  "concepts": [
+    {
+      "id": "math-core-perimeter",
+      "name": "周长",
+      "kps": [
+        "MSH-GEO-09",
+        "SZ-M4-PERIMETER"
+      ]
+    },
+    {
+      "id": "math-core-area",
+      "name": "面积",
+      "kps": [
+        "MSH-GEO-10",
+        "SZ-M4-AREA"
+      ]
+    },
+    {
+      "id": "math-core-large-number",
+      "name": "多位数认识",
+      "kps": [
+        "MSH-NUM-23",
+        "SZ-M4-LARGE-NUMBER"
+      ]
+    }
+  ],
+  "links": []
+}

@@ -50,6 +50,7 @@ class AnthropicProvider(Provider):
             raise LLMError(f"AI 服务出错（{e.status_code}）") from e
         except anthropic.APIConnectionError as e:
             raise LLMError("连不上 AI 服务，请检查服务器网络") from e
+        req.usage.update(input_tokens=resp.usage.input_tokens, output_tokens=resp.usage.output_tokens)
         if resp.stop_reason == "refusal":
             raise LLMError("AI 没有回答这个请求，换个说法试试")
         return "".join(b.text for b in resp.content if b.type == "text")
@@ -98,7 +99,10 @@ class OpenAICompatProvider(Provider):
                                    "[tasks.paper] 里换成支持图片的模型，或者改用「粘贴题目文字」")
                 raise LLMError(f"AI 服务出错（{r.status_code}）")
             try:
-                return r.json()["choices"][0]["message"]["content"]
+                payload = r.json()
+                usage = payload.get("usage") or {}
+                req.usage.update(input_tokens=usage.get("prompt_tokens"), output_tokens=usage.get("completion_tokens"))
+                return payload["choices"][0]["message"]["content"]
             except (KeyError, IndexError, ValueError) as e:
                 raise LLMError("AI 返回格式不对，请再试一次") from e
         raise last

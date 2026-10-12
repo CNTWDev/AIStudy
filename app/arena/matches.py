@@ -95,6 +95,7 @@ def question(kid: dict, match_id, rng: random.Random | None = None) -> dict:
     return {"item": sources.public(pend["item"])}
 
 
+@db.atomic_user
 def answer(kid: dict, match_id, item_id: str, ans, dont_know=False, rng: random.Random | None = None) -> dict:
     rng = rng or random.Random()
     m = _match(kid, match_id)

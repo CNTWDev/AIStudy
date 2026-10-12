@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/admin">← 管理后台</a><h1>后台任务与 AI 调用</h1>
+<h2>任务</h2><div class="tw"><table><tr><th>任务</th><th>最近执行</th><th>运行租约</th><th>连续失败</th><th>结果</th></tr>
+{% for j in jobs %}<tr><td>{{ j.name }}</td><td>{{ j.last_run or '尚未运行' }}</td><td>{{ j.locked_until or '空闲' }}</td><td>{{ j.failures }}</td><td>{{ j.last_result }}</td></tr>{% endfor %}</table></div>
+<h2>今天的 AI 调用</h2><p class="muted small">按任务、模型汇总。供应商未返回的 token 数保持未知；失败请求计入调用额度。此处不保存孩子的提问和题目原文。</p>
+<div class="tw"><table><tr><th>任务／提供方／模型</th><th>状态</th><th>次数</th><th>总耗时（毫秒）</th><th>输入／输出 token</th></tr>
+{% for c in calls %}<tr><td>{{ c.task }}／{{ c.provider }}／{{ c.model }}</td><td>{{ c.status }}</td><td>{{ c.n }}</td><td>{{ c.elapsed_ms }}</td><td>{{ c.input_tokens if c.input_tokens is not none else '未知' }}{% if c.input_known and c.input_known < c.n %}（另 {{ c.n-c.input_known }} 次未知）{% endif %}／{{ c.output_tokens if c.output_tokens is not none else '未知' }}{% if c.output_known and c.output_known < c.n %}（另 {{ c.n-c.output_known }} 次未知）{% endif %}</td></tr>{% endfor %}</table></div>
+{% endblock %}

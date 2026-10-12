@@ -345,7 +345,7 @@ setup_venv() {
   local pipargs=(-q --disable-pip-version-check)
   if [[ "$MIRROR" == "cn" ]]; then pipargs+=(-i https://pypi.tuna.tsinghua.edu.cn/simple); fi
   "$VENV/bin/pip" install "${pipargs[@]}" --upgrade pip wheel
-  "$VENV/bin/pip" install "${pipargs[@]}" -r "$APP_DIR/requirements.txt"
+  "$VENV/bin/pip" install "${pipargs[@]}" -c "$APP_DIR/constraints.txt" -r "$APP_DIR/requirements.txt"
   ok "依赖已安装（$("$VENV/bin/python" --version)）"
 }
 
@@ -405,7 +405,31 @@ PrivateTmp=true
 [Install]
 WantedBy=multi-user.target
 EOF
+  cat > "/etc/systemd/system/$APP_NAME-worker.service" <<EOF
+[Unit]
+Description=AIStudy background worker
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=$SERVICE_USER
+Group=$SERVICE_USER
+WorkingDirectory=$APP_DIR
+ExecStart=$VENV/bin/python -m app.worker
+Restart=always
+RestartSec=10
+TimeoutStopSec=900
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+EOF
   systemctl daemon-reload
+  systemctl enable "$APP_NAME-worker" >/dev/null 2>&1
+  systemctl restart "$APP_NAME-worker"
   systemctl enable "$APP_NAME" >/dev/null 2>&1
   systemctl restart "$APP_NAME"
   ok "服务 $APP_NAME 已启动（监听 $host:$PORT）"
@@ -459,7 +483,7 @@ summary() {
   if [[ -n "$DOMAIN" ]]; then echo "  访问地址：https://$DOMAIN"; else echo "  访问地址：http://${ip:-服务器IP}:$PORT  （记得在云服务器安全组放行 $PORT 端口）"; fi
   echo "  第一次打开时注册的账号会成为管理员。"
   echo
-  echo "  AI 配置：  sudo nano $APP_DIR/config/llm.toml   填 api_key 后执行  sudo systemctl restart $APP_NAME"
+  echo "  AI 配置：  sudo nano $APP_DIR/config/llm.toml   填 api_key 后执行  sudo systemctl restart $APP_NAME $APP_NAME-worker"
   echo "  朗读配置：sudo nano $APP_DIR/config/tts.toml   （可选，不填就用浏览器自带的声音）"
   echo "  检查配置：sudo $APP_DIR/install.sh check --llm"
   echo "  以后升级：sudo $APP_DIR/install.sh upgrade"
@@ -528,6 +552,6 @@ case "$CMD" in
   backup) need_root; run_cli backup "$APP_DIR/data/backups" ;;
   status) systemctl status "$APP_NAME" --no-pager ;;
   logs) journalctl -u "$APP_NAME" -n 200 --no-pager ;;
-  restart) need_root; systemctl restart "$APP_NAME"; health_check ;;
+  restart) need_root; systemctl restart "$APP_NAME" "$APP_NAME-worker"; health_check ;;
   help|-h|--help|*) sed -n '2,40p' "${BASH_SOURCE[0]:-/dev/null}" 2>/dev/null | sed 's/^# \{0,1\}//' || echo "用法：install.sh install|upgrade|check|backup|status|logs|restart" ;;
 esac

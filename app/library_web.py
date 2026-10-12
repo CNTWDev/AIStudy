@@ -14,8 +14,8 @@ LIB = "lib:"
 
 
 def _main():
-    from . import main
-    return main
+    from . import web
+    return web
 
 
 def book_or_404(bid: str) -> dict:

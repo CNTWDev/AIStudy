@@ -9,15 +9,18 @@ import math
 
 
 class FSRS:
-    """FSRS 的记忆公式（Anki 等复习软件在用），参数按孩子取得保守些。
+    """受 FSRS/DSR 启发的简化记忆模型；不是完整 FSRS，也没有宣称普适最优参数。
     R = (1 + t / 9S)^-1：S 是「记忆稳定性」（天）。隔得越久、快忘时答对，S 涨得越多（间隔效应）；
     当天反复答对，S 几乎不涨。"""
-    id, version = "fsrs", 1
-    defaults = {"target_r": 0.85}
+    id, version = "fsrs", 2
+    defaults = {"target_r": 0.85, "max_interval": 180}
 
     def __init__(self, **params):
         self.params = {**self.defaults, **params}
         self.target_r = float(self.params["target_r"])
+        self.max_interval = int(self.params["max_interval"])
+        if not 0.7 <= self.target_r <= 0.97 or self.max_interval < 1:
+            raise ValueError("记忆模型：target_r 应在 0.7–0.97，max_interval 应为正整数")
 
     def recall(self, days: float, s: float) -> float:
         """stability 为 0 表示还没有记忆数据：按不衰减处理。"""
@@ -26,7 +29,7 @@ class FSRS:
         return (1 + days / (9 * s)) ** -1
 
     def interval(self, s: float) -> int:
-        return max(1, int(round(9 * s * (1 / self.target_r - 1))))
+        return min(self.max_interval, max(1, int(round(9 * s * (1 / self.target_r - 1)))))
 
     @staticmethod
     def first(grade: str) -> tuple[float, float]:

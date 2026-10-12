@@ -9,7 +9,10 @@
 """
 import hashlib
 import json
-import tomllib
+try:
+    import tomllib
+except ImportError:  # Python 3.10
+    import tomli as tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 

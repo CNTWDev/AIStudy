@@ -20,13 +20,27 @@ services:
     environment:
       DATABASE_URL: postgresql://aistudy:${POSTGRES_PASSWORD:-aistudy-change-me}@db:5432/aistudy
     volumes:
-      - ./config/llm.toml:/app/config/llm.toml:ro
+      - ./config:/app/config:ro
       - ./data:/app/data
     depends_on:
       db:
         condition: service_healthy
     expose:
       - "8000"
+  worker:
+    build: .
+    restart: unless-stopped
+    command: ["python", "-m", "app.worker"]
+    stop_grace_period: 15m
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://aistudy:${POSTGRES_PASSWORD:-aistudy-change-me}@db:5432/aistudy
+    volumes:
+      - ./config:/app/config:ro
+      - ./data:/app/data
+    depends_on:
+      db:
+        condition: service_healthy
   caddy:                          # 自动申请 HTTPS 证书的反向代理
     image: caddy:2
     restart: unless-stopped

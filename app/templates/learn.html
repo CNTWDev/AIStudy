@@ -80,7 +80,7 @@ function show() {
   const box = document.createElement('div');
   // 穿插的「以前学过的」题：记在它自己的知识点上，答完顺便摸清过去
   const p = it.probe, kp = p ? p.kp : KP;
-  const base = extra => Object.assign({item_id: it.id, kp_id: kp}, p ? {mode: 'probe', probe: {depth: p.depth, from: p.from}} : {}, extra);
+  const base = extra => Object.assign({item_id: it.id, kp_id: kp, request_id: it.request_id}, p ? {mode: 'probe', probe: {depth: p.depth, from: p.from}} : {}, extra);
   $('#items').innerHTML = (p ? `<div class="probe-tag">🔀 穿插一道以前学过的：${esc(p.name)}</div>` : '') +
     `<div class="muted small">第 ${idx + 1}/${items.length} 题 · 难度 ${'★'.repeat(it.difficulty || 1)}</div>`;
   $('#items').appendChild(box);

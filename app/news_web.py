@@ -8,8 +8,8 @@ router = APIRouter()
 
 
 def _main():
-    from . import main
-    return main
+    from . import web
+    return web
 
 
 @router.get("/news")

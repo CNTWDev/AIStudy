@@ -1,0 +1,591 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-12",
+  "editions": [
+    {
+      "id": "bio-cambridge",
+      "pack_id": "bio-cambridge",
+      "name": "Cambridge LS Science 0893 → IGCSE Biology 0610",
+      "region": "国际学校",
+      "status": "legacy",
+      "school_system": "cambridge",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "bio-shanghai",
+      "pack_id": "bio-shanghai",
+      "name": "沪教版生物学（五四学制）+ 沪科版高中2020",
+      "region": "上海公办",
+      "status": "legacy",
+      "school_system": "5-4",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "chem-cambridge",
+      "pack_id": "chem-cambridge",
+      "name": "Cambridge LS Science 0893 → IGCSE Chem 0620",
+      "region": "国际学校",
+      "status": "legacy",
+      "school_system": "cambridge",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "chem-shanghai",
+      "pack_id": "chem-shanghai",
+      "name": "沪科版化学（五·四学制新教材 + 高中 2020 版）",
+      "region": "上海公办",
+      "status": "legacy",
+      "school_system": "5-4",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "chn-igcse",
+      "pack_id": "chn-igcse",
+      "name": "剑桥 IGCSE 中文 0509 / 0523 / 0547",
+      "region": "国际学校",
+      "status": "legacy",
+      "school_system": "cambridge",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "chn-tongbian",
+      "pack_id": "chn-tongbian",
+      "name": "统编版（义务教育五·四学制 + 高中统编）",
+      "region": "全国·上海公办",
+      "status": "legacy",
+      "school_system": "5-4",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "econ-cambridge",
+      "pack_id": "econ-cambridge",
+      "name": "Cambridge IGCSE Economics 0455 (2027–2029)",
+      "region": "国际学校",
+      "status": "legacy",
+      "school_system": "cambridge",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "eng-cambridge",
+      "pack_id": "eng-cambridge",
+      "name": "剑桥英语（Primary / Lower Secondary → IGCSE 0510/0511/0500）",
+      "region": "国际学校",
+      "status": "legacy",
+      "school_system": "cambridge",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "eng-shanghai",
+      "pack_id": "eng-shanghai",
+      "name": "上海英语（五·四学制新教材 + 高中沪教版/上外版）",
+      "region": "上海公办",
+      "status": "legacy",
+      "school_system": "5-4",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "fund-law",
+      "pack_id": "fund-law",
+      "name": "基金从业资格考试 科目一：基金基础知识与法律法规（2025 年度修订大纲）",
+      "region": "中国证券投资基金业协会",
+      "status": "legacy",
+      "school_system": "cert",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "geo-shanghai",
+      "pack_id": "geo-shanghai",
+      "name": "中华地图学社地理（五·四学制2024版+高中2019版）",
+      "region": "上海公办",
+      "status": "legacy",
+      "school_system": "5-4",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "hist-shanghai",
+      "pack_id": "hist-shanghai",
+      "name": "统编历史（五·四学制中国/世界历史＋高中纲要/选必）",
+      "region": "上海公办",
+      "status": "legacy",
+      "school_system": "5-4",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "math-cambridge",
+      "pack_id": "math-cambridge",
+      "name": "Cambridge LS 0862 → IGCSE 0580/0606",
+      "region": "国际学校",
+      "status": "legacy",
+      "school_system": "cambridge",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "math-shanghai",
+      "pack_id": "math-shanghai",
+      "name": "沪教版数学（五·四学制新教材 + 高中 2020 版）",
+      "region": "上海公办",
+      "status": "legacy",
+      "school_system": "5-4",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "phy-cambridge",
+      "pack_id": "phy-cambridge",
+      "name": "Cambridge Lower Secondary Science → IGCSE Physics 0625",
+      "region": "国际学校",
+      "status": "legacy",
+      "school_system": "cambridge",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "phy-shanghai",
+      "pack_id": "phy-shanghai",
+      "name": "沪科版物理（五·四学制新教材 + 高中 2020 版）",
+      "region": "上海公办",
+      "status": "legacy",
+      "school_system": "5-4",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "sci-shanghai",
+      "pack_id": "sci-shanghai",
+      "name": "沪科技版科学（五·四学制，俞立中主编）",
+      "region": "上海公办",
+      "status": "legacy",
+      "school_system": "5-4",
+      "coverage": "原有知识点课程；册次目录仍按原数据，未据名称自动认定新版覆盖"
+    },
+    {
+      "id": "sz-chn-63",
+      "name": "语文 · 统编版",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "G1–G9",
+      "status": "partial",
+      "sources": [
+        "https://www.suzhou.gov.cn/szsrmzf/bmwj/202406/0c5c7cb5dbe849c58f359fbd2c2dcb5a.shtml"
+      ],
+      "coverage": "有版本使用依据，整册目录待核实",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-math-primary",
+      "name": "数学 · 苏教版",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "G1–G6",
+      "status": "partial",
+      "sources": [
+        "https://www.suzhou.gov.cn/szsrmzf/mszx/202608/15cfa67e4d9841128e27d99d4e344ea6.shtml"
+      ],
+      "coverage": "有版本使用依据，整册目录待核实",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-eng-primary",
+      "name": "英语 · 译林版",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "G3–G6",
+      "status": "partial",
+      "sources": [
+        "https://edu.yilin.com/index.php/NewsDetail/index?cat_id=2&id=81&nav_id=1"
+      ],
+      "coverage": "有版本使用依据，整册目录待核实",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-math-middle",
+      "name": "数学 · 苏科版",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "G7–G9",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-eng-middle",
+      "name": "英语 · 译林版",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "G7–G9",
+      "status": "partial",
+      "sources": [
+        "https://edu.yilin.com/index.php/NewsDetail/index?cat_id=2&id=81&nav_id=1"
+      ],
+      "coverage": "有版本使用依据，整册目录待核实",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-phy-middle",
+      "name": "物理 · 苏科版",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "G8–G9",
+      "status": "partial",
+      "sources": [
+        "https://szteacher.suzhou.edu.cn/News.aspx?ID=105935&NTID=28"
+      ],
+      "coverage": "有版本使用依据，整册目录待核实",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-politics",
+      "name": "道德与法治 · 统编版",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "G1–G9",
+      "status": "partial",
+      "sources": [
+        "https://www.suzhou.gov.cn/szsrmzf/bmwj/202406/0c5c7cb5dbe849c58f359fbd2c2dcb5a.shtml"
+      ],
+      "coverage": "有版本使用依据，整册目录待核实",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-history",
+      "name": "历史 · 统编版",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "G7–G9",
+      "status": "partial",
+      "sources": [
+        "https://www.suzhou.gov.cn/szsrmzf/bmwj/202406/0c5c7cb5dbe849c58f359fbd2c2dcb5a.shtml"
+      ],
+      "coverage": "有版本使用依据，整册目录待核实",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-pending-8",
+      "name": "科学 · 待核实",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "义务教育",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-pending-9",
+      "name": "化学 · 待核实",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "义务教育",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-pending-10",
+      "name": "生物 · 待核实",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "义务教育",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-pending-11",
+      "name": "地理 · 待核实",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "义务教育",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-pending-12",
+      "name": "音乐 · 待核实",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "义务教育",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-pending-13",
+      "name": "美术 · 待核实",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "义务教育",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-pending-14",
+      "name": "体育与健康 · 待核实",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "义务教育",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-pending-15",
+      "name": "劳动 · 待核实",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "义务教育",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-pending-16",
+      "name": "信息科技 · 待核实",
+      "region": "苏州",
+      "school_system": "6-3",
+      "grades": "义务教育",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-high-17",
+      "name": "语文 · 统编版",
+      "region": "苏州",
+      "school_system": "high-school",
+      "grades": "G10–G12",
+      "status": "partial",
+      "sources": [
+        "https://www.suzhou.gov.cn/szsrmzf/bmwj/202406/0c5c7cb5dbe849c58f359fbd2c2dcb5a.shtml"
+      ],
+      "coverage": "有版本使用依据，整册目录待核实",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-high-18",
+      "name": "历史 · 统编版",
+      "region": "苏州",
+      "school_system": "high-school",
+      "grades": "G10–G12",
+      "status": "partial",
+      "sources": [
+        "https://www.suzhou.gov.cn/szsrmzf/bmwj/202406/0c5c7cb5dbe849c58f359fbd2c2dcb5a.shtml"
+      ],
+      "coverage": "有版本使用依据，整册目录待核实",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-high-19",
+      "name": "思想政治 · 统编版",
+      "region": "苏州",
+      "school_system": "high-school",
+      "grades": "G10–G12",
+      "status": "partial",
+      "sources": [
+        "https://www.suzhou.gov.cn/szsrmzf/bmwj/202406/0c5c7cb5dbe849c58f359fbd2c2dcb5a.shtml"
+      ],
+      "coverage": "有版本使用依据，整册目录待核实",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-high-20",
+      "name": "数学 · 待核实",
+      "region": "苏州",
+      "school_system": "high-school",
+      "grades": "G10–G12",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-high-21",
+      "name": "英语 · 待核实",
+      "region": "苏州",
+      "school_system": "high-school",
+      "grades": "G10–G12",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-high-22",
+      "name": "物理 · 待核实",
+      "region": "苏州",
+      "school_system": "high-school",
+      "grades": "G10–G12",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-high-23",
+      "name": "化学 · 待核实",
+      "region": "苏州",
+      "school_system": "high-school",
+      "grades": "G10–G12",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-high-24",
+      "name": "生物 · 待核实",
+      "region": "苏州",
+      "school_system": "high-school",
+      "grades": "G10–G12",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-high-25",
+      "name": "地理 · 待核实",
+      "region": "苏州",
+      "school_system": "high-school",
+      "grades": "G10–G12",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-high-26",
+      "name": "信息技术 · 待核实",
+      "region": "苏州",
+      "school_system": "high-school",
+      "grades": "G10–G12",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-high-27",
+      "name": "通用技术 · 待核实",
+      "region": "苏州",
+      "school_system": "high-school",
+      "grades": "G10–G12",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-high-28",
+      "name": "音乐 · 待核实",
+      "region": "苏州",
+      "school_system": "high-school",
+      "grades": "G10–G12",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-high-29",
+      "name": "美术 · 待核实",
+      "region": "苏州",
+      "school_system": "high-school",
+      "grades": "G10–G12",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "sz-high-30",
+      "name": "体育与健康 · 待核实",
+      "region": "苏州",
+      "school_system": "high-school",
+      "grades": "G10–G12",
+      "status": "pending",
+      "sources": [],
+      "coverage": "待取得当前官方选用及册次目录",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+    },
+    {
+      "id": "math-sujiao-g4-pilot",
+      "pack_id": "math-sujiao-g4-pilot",
+      "name": "苏教版数学 · 四上已核实主题（部分覆盖）",
+      "publisher": "江苏凤凰教育出版社",
+      "region": "苏州",
+      "school_system": "6-3",
+      "curriculum_standard": "2022",
+      "status": "partial",
+      "sources": [
+        "https://www.suzhou.gov.cn/szsrmzf/mszx/202608/15cfa67e4d9841128e27d99d4e344ea6.shtml"
+      ],
+      "coverage": "5个知识点、4个已核实主题；主题顺序不代表完整教材目录"
+    }
+  ],
+  "books": [
+    {
+      "id": "sz-math-g4-2026-upper",
+      "edition_id": "math-sujiao-g4-pilot",
+      "title": "数学 四年级上册（2026秋主题试点）",
+      "stage": "G4",
+      "term": "上",
+      "order": 1,
+      "status": "partial",
+      "sources": [
+        "https://www.suzhou.gov.cn/szsrmzf/mszx/202608/15cfa67e4d9841128e27d99d4e344ea6.shtml"
+      ],
+      "isbn": null
+    }
+  ],
+  "mappings": [
+    {
+      "book_id": "sz-math-g4-2026-upper",
+      "kp_id": "SZ-M4-PERIMETER",
+      "unit_id": "shape",
+      "unit_name": "周长与面积",
+      "order": 0,
+      "status": "partial"
+    },
+    {
+      "book_id": "sz-math-g4-2026-upper",
+      "kp_id": "SZ-M4-AREA",
+      "unit_id": "shape",
+      "unit_name": "周长与面积",
+      "order": 1,
+      "status": "partial"
+    },
+    {
+      "book_id": "sz-math-g4-2026-upper",
+      "kp_id": "SZ-M4-QUANTITY",
+      "unit_id": "quantity",
+      "unit_name": "乘法数量关系",
+      "order": 2,
+      "status": "partial"
+    },
+    {
+      "book_id": "sz-math-g4-2026-upper",
+      "kp_id": "SZ-M4-LARGE-NUMBER",
+      "unit_id": "large-number",
+      "unit_name": "多位数认识",
+      "order": 3,
+      "status": "partial"
+    },
+    {
+      "book_id": "sz-math-g4-2026-upper",
+      "kp_id": "SZ-M4-LARGE-CALC",
+      "unit_id": "large-calc",
+      "unit_name": "大数运算",
+      "order": 4,
+      "status": "partial"
+    }
+  ]
+}
