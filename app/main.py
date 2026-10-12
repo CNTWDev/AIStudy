@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
-from . import arena, bank, config, db, engine, evidence, llm, sprint
+from . import arena, bank, config, curriculum_admin, db, engine, evidence, llm, sprint
 from .catalog import catalog
 from .content import content
 from .methods import methods
@@ -15,7 +15,7 @@ from . import library_web, news_web, tts_web
 @asynccontextmanager
 async def lifespan(app):
     db.init()
-    catalog.load()
+    curriculum_admin.refresh(force=True)
     content.load()
     engine.load_seed_items(config.SEED_DIR)
     bank.sync()
@@ -74,7 +74,15 @@ async def _sprint_error(request: Request, exc: sprint.SprintError):
     return JSONResponse({"error": str(exc)}, status_code=exc.status)
 
 
-from .routes import accounts, admin, family, learning, play, papers, reading, records
+from .routes import accounts, admin, curricula, family, learning, play, papers, reading, records
 
-for router_module in (accounts, admin, family, learning, play, papers, reading, records):
+for router_module in (accounts, admin, curricula, family, learning, play, papers, reading, records):
     app.include_router(router_module.router)
+
+
+@app.middleware("http")
+async def refresh_curriculum(request: Request, call_next):
+    if not request.url.path.startswith('/static/') and request.url.path != '/healthz':
+        from starlette.concurrency import run_in_threadpool
+        await run_in_threadpool(curriculum_admin.refresh)
+    return await call_next(request)

@@ -38,8 +38,8 @@
 {% endmacro %}
 {% block body %}
 <h1>管理后台</h1>
-<p class="small"><a href="/admin/curricula">教材版本与覆盖</a> · <a href="/admin/operations">后台任务与 AI 调用</a></p>
-<nav class="subnav">{% for key, label in tabs %}<a href="/admin?tab={{ key }}" class="{{ 'on' if tab == key }}">{{ label }}{% if key == 'overview' and stats.pending %} <span class="badge">{{ stats.pending }}</span>{% endif %}</a>{% endfor %}</nav>
+<p class="small"><a href="/admin/curricula">教材与知识点</a> · <a href="/admin/operations">后台任务与 AI 调用</a></p>
+<nav class="subnav">{% for key, label in tabs %}<a href="{{ '/admin/curricula' if key == 'curricula' else '/admin?tab=' ~ key }}" class="{{ 'on' if tab == key }}">{{ label }}{% if key == 'overview' and stats.pending %} <span class="badge">{{ stats.pending }}</span>{% endif %}</a>{% endfor %}</nav>
 {% if msg %}<div class="hint">{{ msg }}{% if link %}<br><input type="text" readonly value="{{ link }}" onclick="this.select()" style="margin-top:6px">{% endif %}</div>{% endif %}
 
 {% if tab == 'overview' %}

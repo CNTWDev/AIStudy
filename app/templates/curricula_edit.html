@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui %}
+{% set titles = {'pack':'教材','kp':'知识点','edition':'教材版本','book':'册次','concept':'共通知识','strand':'板块','import':'教材 JSON'} %}
+{% macro field(name,label,value='',required=false,area=false) %}<label for="f-{{ name }}">{{ label }}</label>{% if area %}<textarea id="f-{{ name }}" name="{{ name }}" rows="{{ 5 if name in ['desc','method','payload'] else 3 }}" {{ 'required' if required }}>{{ value or '' }}</textarea>{% else %}<input id="f-{{ name }}" name="{{ name }}" value="{{ value or '' }}" {{ 'required' if required }}>{% endif %}{% endmacro %}
+{% macro status(entry) %}<label>核实状态</label><select name="status">{% for id,label in labels.items() %}<option value="{{ id }}" {{ 'selected' if entry.get('status','partial') == id }}>{{ label }}</option>{% endfor %}</select><p class="small muted">已核实、部分核实必须填写来源；待核实版本不能关联已上线教材包。</p>{% endmacro %}
+{% macro stage_select(value) %}<label>学段</label><select name="stage" required>{% for id,label in stages %}<option value="{{ id }}" {{ 'selected' if id == value }}>{{ label }}（{{ id }}）</option>{% endfor %}</select>{% endmacro %}
+{% block title %}{{ titles[kind] }}管理 · {{ SITE }}{% endblock %}
+{% block body %}
+<a href="/admin/curricula{{ '?pack_id=' ~ pack_id if pack_id else '' }}">← 教材与知识点</a>
+<h1>{{ '新增' if new else '编辑' }}{{ titles[kind] }}</h1>
+{% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
+<p class="muted small">当前编辑管理草稿（修订 {{ state.version }}）；保存后需回管理页发布。已有 ID 用于关联题目和孩子的学习记录，保存时保持不变。</p>
+<form method="post" action="/admin/curricula/save/{{ kind }}" class="card">
+<input type="hidden" name="version" value="{{ state.version }}">
+{% if new %}{{ field('id',titles[kind] ~ ' ID（稳定标识，创建后保留）','',true) }}{% else %}<input type="hidden" name="id" value="{{ key }}"><p class="small muted">ID：{{ key }}</p>{% endif %}
+{% if kind == 'pack' %}
+{{ field('edition','教材名称',entry.get('edition'),true) }}
+<div class="row"><div class="grow"><label>学科</label><select name="subject" required>{% for id,s in subjects.items() %}<option value="{{ id }}" {{ 'selected' if entry.get('subject','math') == id }}>{{ s.name }}</option>{% endfor %}</select></div><div class="grow"><label>学制 / 课程体系</label><select name="system" required>{% for id,s in systems.items() %}<option value="{{ id }}" {{ 'selected' if entry.get('system','cn') == id }}>{{ s.name or id }}</option>{% endfor %}</select></div></div>
+{{ field('region','适用地区',entry.get('region')) }}
+<label>覆盖学段（可多选）</label><div class="row" style="flex-wrap:wrap">{% for id,label in stages %}<label class="small" style="display:inline-flex;align-items:center;gap:4px;font-weight:400"><input type="checkbox" style="width:auto" name="stages" value="{{ id }}" {{ 'checked' if id in entry.get('stages',[]) }}>{{ label }}</label>{% endfor %}</div>
+{{ field('notes','教材说明与覆盖边界',entry.get('notes'),area=true) }}
+{% if new %}{{ field('sources','核实来源链接（每行一个）','',true,true) }}{% endif %}
+{% elif kind == 'kp' %}
+<label>所属教材</label><select name="pack_id" required>{% for pid,p in draft.packs.items() %}<option value="{{ pid }}" {{ 'selected' if pid == pack_id }}>{{ p.edition }}</option>{% endfor %}</select>
+{{ field('name','知识点名称',entry.get('name'),true) }}{{ field('name_en','英文名称（可选）',entry.get('name_en')) }}
+{{ stage_select(entry.get('stage',draft.packs[pack_id].stages[0] if pack_id in draft.packs else 'G4')) }}
+<label>板块</label><select name="strand" required>{% if pack_id in draft.packs %}{% for s in draft.packs[pack_id].strands %}<option value="{{ s.id }}" {{ 'selected' if s.id == entry.get('strand') }}>{{ s.name }}（{{ s.id }}）</option>{% endfor %}{% else %}<option value="core">基础（请先选择教材并进入其新增知识点页面）</option>{% endif %}</select>
+{{ field('term','学期（上 / 下或课程安排）',entry.get('term')) }}{{ field('unit','原课程单元名称',entry.get('unit')) }}
+{{ field('desc','知识说明',entry.get('desc'),area=true) }}{{ field('method','学习方法',entry.get('method'),area=true) }}{{ field('probe','诊断 / 提问思路',entry.get('probe'),area=true) }}{{ field('terms','关键词（每行一个）',entry.get('terms',[])|join('\n'),area=true) }}
+{{ field('required','必须先会的知识点 ID（每行一个）',prerequisites|selectattr('strength','equalto','必须')|map(attribute='id')|join('\n'),area=true) }}
+{{ field('helpful','有帮助的知识点 ID（每行一个）',prerequisites|selectattr('strength','equalto','有帮助')|map(attribute='id')|join('\n'),area=true) }}
+<p class="small muted">前置可以来自其他教材。保存时检查引用与必须前置环；必须前置不能比当前知识点学段更晚。</p>
+{% elif kind == 'edition' %}
+{{ field('name','版本名称',entry.get('name'),true) }}{{ field('publisher','出版社',entry.get('publisher')) }}{{ field('region','地区',entry.get('region')) }}{{ field('school_system','学制（例如六三 / 五四）',entry.get('school_system')) }}{{ field('grades','覆盖年级说明',entry.get('grades')) }}
+<label>关联教材包</label><select name="pack_id"><option value="">仅登记库存，尚未上线</option>{% for pid,p in draft.packs.items() %}<option value="{{ pid }}" {{ 'selected' if entry.get('pack_id') == pid }}>{{ p.edition }}</option>{% endfor %}</select>
+{{ status(entry) }}{{ field('sources','核实来源链接（每行一个）',entry.get('sources',[])|join('\n'),area=true) }}{{ field('coverage','覆盖说明',entry.get('coverage'),area=true) }}{{ field('next_action','下一步核实 / 补齐工作',entry.get('next_action'),area=true) }}
+{% elif kind == 'book' %}
+{{ field('name','册次名称',entry.get('name') or entry.get('title'),true) }}
+<label>所属教材版本</label><select name="edition_id" required>{% for e in doc.textbooks.editions %}<option value="{{ e.id }}" {{ 'selected' if e.id == entry.get('edition_id') }}>{{ e.name }}</option>{% endfor %}</select>
+{{ stage_select(entry.get('stage','G4')) }}{{ field('term','学期 / 册别',entry.get('term')) }}{{ field('isbn','ISBN（未核实可留空）',entry.get('isbn')) }}{{ field('order','册次顺序（整数）',entry.get('order',0)|string,true) }}{{ status(entry) }}{{ field('sources','核实来源链接（每行一个）',entry.get('sources',[])|join('\n'),area=true) }}
+{% elif kind == 'concept' %}
+{{ field('name','共通知识名称',entry.get('name'),true) }}{{ field('kps','关联的教材知识点 ID（每行一个）',entry.get('kps',[])|join('\n'),area=true) }}
+<p class="hint">只有底层知识等价时才合并。名称相似、仅有前置关系或难度不同不自动等价。加入已属于其他概念的知识点，会从原概念移出；发布后系统按新映射重算共通知识状态。</p>
+{% elif kind == 'strand' %}<input type="hidden" name="pack_id" value="{{ pack_id }}">{{ field('name','板块名称',entry.get('name'),true) }}
+{% elif kind == 'import' %}{{ field('payload','教材 JSON（包含 pack、strands、kps）','',true,true) }}<p class="small muted">用于批量导入或迁移已有教材。保留原有知识点 ID；不允许借导入删除已存在的知识点或修改已有教材的学科 / 学制。导入仅写草稿，校验通过后再发布。</p>
+{% endif %}
+<div class="row" style="margin-top:16px"><button class="btn">校验并保存草稿</button><a class="btn ghost" href="/admin/curricula{{ '?pack_id=' ~ pack_id if pack_id else '' }}">返回</a></div>
+</form>
+{% if kind == 'kp' and not new %}
+<h2>册次与单元映射</h2><p class="small muted">这决定孩子报学校进度时看到的章节位置。只关联同教材、同学段的册次；顺序用于目录排序。</p>
+{% for m in mappings %}<div class="card"><p><a href="/admin/curricula/edit/book/{{ m.book_id }}">{{ m.book_id }}</a> → {{ m.unit_name or m.unit_id }} · 顺序 {{ m.order }}</p><form method="post" action="/admin/curricula/mapping"><input type="hidden" name="version" value="{{ state.version }}"><input type="hidden" name="kp_id" value="{{ key }}"><input type="hidden" name="book_id" value="{{ m.book_id }}"><input type="hidden" name="remove" value="1"><button class="linkbtn">移除此册次映射（保存到草稿）</button></form></div>{% else %}<p class="muted">尚无显式册次映射，学习端沿用原单元分组。</p>{% endfor %}
+<form class="card" method="post" action="/admin/curricula/mapping"><input type="hidden" name="version" value="{{ state.version }}"><input type="hidden" name="kp_id" value="{{ key }}"><label>选择册次</label><select name="book_id" required><option value="">选择匹配的册次</option>{% for b in doc.textbooks.books %}{% if b.stage == entry.stage and doc.textbooks.editions|selectattr('id','equalto',b.edition_id)|selectattr('pack_id','equalto',pack_id)|list %}<option value="{{ b.id }}">{{ b.name or b.title or b.id }}</option>{% endif %}{% endfor %}</select>{{ field('unit_id','单元稳定 ID（同一单元使用相同 ID）','',true) }}{{ field('unit_name','单元名称','',true) }}{{ field('order','知识点在目录中的顺序（整数）','0',true) }}<button class="btn sm" style="margin-top:8px">保存 / 替换此册次映射</button><p class="small muted">没有合适的册次？先到教材管理中登记版本，再新增册次。</p></form>
+<h2>知识关系</h2><div class="card"><h3>前置知识</h3>{% for p in prerequisites %}<p><a href="/admin/curricula/edit/kp/{{ p.id }}">{{ p.name }}</a> · {{ p.strength }} · <span class="small muted">{{ p.id }}</span></p>{% else %}<p class="muted">尚未设置。</p>{% endfor %}<h3>后续知识</h3>{% for p in following %}<p><a href="/admin/curricula/edit/kp/{{ p.id }}">{{ p.name }}</a> · <span class="small muted">{{ p.id }}</span></p>{% else %}<p class="muted">暂无把本知识点作为前置的内容。</p>{% endfor %}
+<h3>跨教材共通知识</h3>{% if concept %}<p><a href="/admin/curricula/edit/concept/{{ concept.id }}">{{ concept.name }}（编辑映射）</a></p>{% for kid in concept.kps %}<p><a href="/admin/curricula/edit/kp/{{ kid }}">{{ draft.kps[kid].name }}</a> · {{ draft.packs[draft.kps[kid].pack].edition }} · {{ kid }}</p>{% endfor %}{% else %}<p class="muted">尚未关联。<a href="/admin/curricula/edit/concept/_new">建立共通知识映射</a></p>{% endif %}</div>
+<h2>关联题目（最近 30 道）</h2><p class="small muted">题目内容维护与上下架在「题库 / 卷库」完成；这里可检查本知识点当前的题目与答案。</p>{% for row in questions %}<details class="card"><summary>{{ row.item.q }} <span class="small muted">· {{ {'active':'可用','pending':'待处理','review':'待核对','retired':'已下架'}.get(row.status,row.status) }}</span></summary>{{ ui.question(qview(row.item)) }}<p class="small muted">题目 ID：{{ row.id }} · 来源 {{ row.source }}</p></details>{% else %}<div class="card muted">暂无直接关联本知识点的题目。可从卷库导入已核实练习，或使用已有同概念题目。</div>{% endfor %}
+{% endif %}
+{% endblock %}
