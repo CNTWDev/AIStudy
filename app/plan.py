@@ -291,11 +291,20 @@ def src_check(c: Ctx) -> list[dict]:
     confirm = [m for k, m in c.mastery.items() if k in mine and m["status"] == "learning" and (m["score"] or 0) >= 0.6
                and m.get("last_ev") and evidence.days_since(m["last_ev"]) >= 0.5 and m["attempts"] and catalog.kp(k)]
     confirm.sort(key=lambda m: -(m["score"] or 0))
+    due = [m for m in evidence.due_checks(c.user_id, c.mastery, limit=len(c.mastery)) if m["kp_id"] in mine]
+    transferred = [m for k, m in c.mastery.items() if k in mine and m.get("source") == "concept-transfer"]
     out = []
-    for m in confirm[:2]:
+    selected, seen_concepts = [], set()
+    for m in due + confirm + transferred:
+        cid = catalog.concept_id(m["kp_id"])
+        if cid not in seen_concepts:
+            selected.append(m)
+            seen_concepts.add(cid)
+    for m in selected[:c.limit("check", 2)]:
         need = "、".join(evidence.missing(c.user_id, m)[:2])
-        out.append({"type": "check", "kp": m["kp_id"], "title": f"再对一次就稳了：{catalog.kps[m['kp_id']]['name']}",
-                    "why": f"上次答对了！还差一步：{need}", "minutes": 5, "pack": catalog.kp_pack[m["kp_id"]]})
+        label = "换个情境试试" if m.get("source") == "concept-transfer" else "隔一阵再试试" if m in due else "再练一次"
+        out.append({"type": "check", "kp": m["kp_id"], "title": f"{label}：{catalog.kps[m['kp_id']]['name']}",
+                    "why": "先不看答案，试着想起来；做完再看讲解", "minutes": 5, "keep": not out, "pack": catalog.kp_pack[m["kp_id"]]})
     planned = {t["kp"] for t in out}
     return out + [t for t in _merge_auto(c, "check") if t["kp"] not in planned]
 
@@ -343,10 +352,11 @@ def build_plan(user_id: int) -> list[dict]:
     fixed = [t for kind in c.policy.get("fixed", []) for t in _take(c, kind)]
     # 今天追根找到的结论（先补根、再回来打）：不管哪种学习方式都排在学知识点的任务最前面
     flex, seen = trace.today_tasks(user_id, c.mastery), set()
-    seen |= {(t["type"], t.get("kp"), t.get("pack"), t.get("url")) for t in flex}
+
+    seen |= {("concept", catalog.learning_key(t["kp"])) if t.get("kp") else (t["type"], t.get("kp"), t.get("pack"), t.get("url")) for t in flex}
     for group in c.policy.get("flex", []):
         for t in interleave(*[_take(c, k) for k in group.split("+")]):
-            key = (t["type"], t.get("kp"), t.get("pack"), t.get("url"))
+            key = ("concept", catalog.learning_key(t["kp"])) if t.get("kp") else (t["type"], t.get("kp"), t.get("pack"), t.get("url"))
             if key not in seen:  # 同一个任务不排两次（比如自动发现的那条已经排在前面）
                 seen.add(key)
                 flex.append(t)

@@ -184,6 +184,7 @@ def next_step(user_id: int, tid: int, grade: str) -> dict:
     return finish(user_id, get(user_id, tid))
 
 
+@db.atomic_user
 def answer(user_id: int, tid: int, body: dict) -> dict:
     t = get(user_id, tid)
     row = db.one("SELECT * FROM items WHERE id=?", body.get("item_id"))

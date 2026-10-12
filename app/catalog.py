@@ -24,10 +24,12 @@ course（没有统一教材的课程：少儿编程、大学课程、某个技�
 孩子自己的选择（年级、学校类型、每科选哪套教材、哪个方向、学到哪）存在数据库里，不进这些文件。
 """
 import json
+import hashlib
 import re
 from dataclasses import dataclass, field
 
 from . import config
+from .curriculum import Textbooks
 
 # 学段：默认值（没有 _meta/stages.json 时用），加载时会被文件覆盖 / 扩充
 STAGE_RANK = {f"G{i}": float(i) for i in range(1, 13)}
@@ -150,8 +152,24 @@ class Catalog:
         self.packs, self.kps, self.kp_pack, self.errors = {}, {}, {}, []
         self._load_meta(directory / "_meta")
         for path in sorted(directory.glob("*.json")):
-            d = json.loads(path.read_text(encoding="utf-8"))
+            try:
+                d = json.loads(path.read_text(encoding="utf-8"))
+                if not isinstance(d, dict) or not isinstance(d.get("pack"), dict) or not isinstance(d.get("kps"), list):
+                    raise ValueError("教材包必须包含 pack 对象和 kps 列表")
+                if not all(isinstance(d["pack"].get(k), str) and d["pack"][k] for k in ("id", "subject", "edition", "system")):
+                    raise ValueError("教材包身份字段缺失")
+                for kp in d["kps"]:
+                    if not isinstance(kp, dict) or not all(isinstance(kp.get(k), str) and kp[k] for k in ("id", "name", "stage", "strand")):
+                        raise ValueError("知识点身份字段缺失")
+                    if not isinstance(kp.get("prereqs", []), list) or not all(isinstance(x, str) or (isinstance(x, dict) and isinstance(x.get("id"), str)) for x in kp.get("prereqs", [])):
+                        raise ValueError("前置知识点结构不正确")
+            except (ValueError, TypeError) as exc:
+                self.errors.append(f"{path.name}: {exc}")
+                continue
             meta = d["pack"]
+            if meta["id"] in self.packs:
+                self.errors.append(f"{path.name}: 重复教材包 ID {meta['id']}")
+                continue
             pack = self._pack(meta, d)
             track_ids = {t["id"] for t in pack.tracks}
             for kp in d["kps"]:
@@ -187,7 +205,37 @@ class Catalog:
                 pid = choice["pack"] if isinstance(choice, dict) else choice
                 if pid not in self.packs:
                     self.errors.append(f"学校模板 {pr['id']}：{subj} 用的教材 {pid} 不存在")
+        self.textbooks = Textbooks().load(directory, self)
+        self.errors.extend(self.textbooks.errors)
+        self._validate_graph()
         return self
+
+    def _validate_graph(self):
+        # Iterative DFS avoids recursion limits on future larger curricula.
+        colors = {}
+        for root in self.kps:
+            if colors.get(root):
+                continue
+            stack = [(root, False)]
+            while stack:
+                kid, leaving = stack.pop()
+                if leaving:
+                    colors[kid] = 2
+                    continue
+                if colors.get(kid) == 2:
+                    continue
+                if colors.get(kid) == 1:
+                    self.errors.append(f"必须前置关系成环：{kid}")
+                    continue
+                colors[kid] = 1
+                stack.append((kid, True))
+                stack.extend((p["id"], False) for p in self.kps[kid]["prereqs"]
+                             if p.get("strength", "必须") == "必须" and p["id"] in self.kps)
+        for pr in self.presets:
+            for subj, choice in pr.get("packs", {}).items():
+                pid = choice["pack"] if isinstance(choice, dict) else choice
+                if pid in self.packs and self.packs[pid].subject != subj:
+                    self.errors.append(f"学校模板 {pr['id']}：{pid} 不属于学科 {subj}")
 
     def _pack(self, meta: dict, d: dict) -> Pack:
         global_subj = SUBJECTS.get(meta["subject"], {})
@@ -343,6 +391,10 @@ class Catalog:
         pack = self.packs.get(pack_id)
         if not pack or not pack.chapters:
             return []
+        if hasattr(self, "textbooks"):
+            explicit = self.textbooks.chapters(pack_id, stage, set(self.ids_for(pack_id, track)))
+            if explicit:
+                return explicit
         kps = [self.kps[k] for k in self.ids_for(pack_id, track) if self.kps[k]["stage"] == stage]
         by_unit = len({k.get("unit") for k in kps if k.get("unit")}) > 1
         coarse = by_unit and len({k.get("unit") for k in kps}) > 15  # 大纲分得很细（1.1、1.2…）：归到大题
@@ -396,6 +448,17 @@ class Catalog:
             for lst in out.values():
                 lst.sort(key=lambda p: bool(p.school_types) and school_type not in p.school_types)
         return out
+
+    def concept_id(self, kp_id: str) -> str:
+        """Unmapped knowledge points retain an independent identity."""
+        return self.concept_of.get(kp_id, "kp:" + kp_id)
+
+    @property
+    def concept_key(self) -> str:
+        return hashlib.sha256(json.dumps(self.concept_of, sort_keys=True).encode()).hexdigest()[:12]
+
+    def learning_key(self, kp_id: str) -> str:
+        return self.concept_id(kp_id)
 
     @staticmethod
     def subject(subject_id: str) -> dict:

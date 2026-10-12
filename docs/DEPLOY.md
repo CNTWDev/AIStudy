@@ -1,5 +1,7 @@
 # 部署上线
 
+> 2026-10 起需要同时运行 Web 和独立 worker。安装脚本注册 `aistudy-worker.service`；Docker Compose 包含 `worker` 服务。手动部署增加 `python -m app.worker`，改 AI 配置后重启两个进程；迁移前备份数据库。后台状态见管理页“任务与 AI 运行”。
+
 目标：孩子在自己的手机 / 平板 / 电脑浏览器里打开一个网址，用自己的邮箱登录。
 
 ## 1. 准备

@@ -120,6 +120,7 @@ def rows(paper_id: int) -> list[dict]:
     return [r for r in out if r["item"]]
 
 
+@db.atomic_user
 def answer(user_id: int, paper: dict, pi_id: int, body: dict) -> dict:
     pi = db.one("SELECT * FROM paper_items WHERE id=? AND paper_id=?", pi_id, paper["id"])
     if not pi:

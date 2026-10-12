@@ -14,7 +14,19 @@ STATUS_LABEL = {"unknown": "还没试", "weak": "还不稳", "learning": "在练
 
 
 def get_mastery(user_id: int) -> dict[str, dict]:
-    return {r["kp_id"]: dict(r) for r in db.q("SELECT * FROM mastery WHERE user_id=?", user_id)}
+    evidence.ensure_user(user_id)
+    out = {r["kp_id"]: dict(r) for r in db.q("SELECT * FROM mastery WHERE user_id=?", user_id)}
+    shared = evidence.concept_states(user_id)
+    for cid, state in shared.items():
+        concept = catalog.concepts.get(cid)
+        if not concept or not state["attempts"]:
+            continue
+        for kid in concept["kps"]:
+            if kid not in out or (not out[kid].get("attempts") and out[kid].get("status") != "mastered"):
+                out[kid] = {**state, "kp_id": kid, "score": min(0.65, evidence.now_p(user_id, state)),
+                            "status": "learning", "attempts": 0, "correct": 0, "stability": 0,
+                            "last_ev": None, "evidence": "{}", "source": "concept-transfer", "model": evidence.profile(user_id).key}
+    return out
 
 
 def update_mastery(user_id: int, kp_id: str, correct: bool, weight=1.0, source="practice", item=None, fmt=None,
@@ -44,6 +56,7 @@ def add_card(user_id: int, kind: str, front: str, back: str, extra=None, kp_id=N
         user_id, kind, front, back, db.jdump(extra or {}), kp_id, (due or db.today() + timedelta(days=1)).isoformat(), db.now(), starred)
 
 
+@db.atomic_user
 def review_card(user_id: int, card_id: int, grade: str):
     """grade: again(忘了) / hard(模糊) / good(记得)。下次复习按这个孩子学习方式的记忆模型排期
     （默认：记得的概率降到 85% 的那天）。只用于没法出题考的卡（意思还没查到的词等）；
@@ -54,7 +67,7 @@ def review_card(user_id: int, card_id: int, grade: str):
     r = schedule_card(user_id, c, grade)
     if c["kp_id"]:
         update_mastery(user_id, c["kp_id"], grade != "again", weight={"again": 0.6, "hard": 0.3, "good": 0.6}[grade],
-                       source="review", fmt="recall", kind="review")
+                       source="review-self", fmt="recall", kind="review")
     return r
 
 
@@ -158,6 +171,7 @@ def answer_display(it: dict) -> str:
     return itemtypes.display(it)
 
 
+@db.atomic_user
 def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, correct: bool, answer="", dont_know=False,
                    touch=True, ms=None, weight=1.0):
     """dont_know=True：孩子点了「这道题还不会」。算一次没答对，但掌握度只轻微下调，并把讲解放进错题本。
@@ -207,7 +221,9 @@ def infer_equivalents(user_id: int, kp_id: str) -> int:
     for k in catalog.equivalents(kp_id):
         cur = db.one("SELECT status FROM mastery WHERE user_id=? AND kp_id=?", user_id, k["id"])
         if not cur or cur["status"] == "unknown":
-            set_mastery(user_id, k["id"], 0.65, "learning", "concept")
+            shared = db.one("SELECT * FROM concept_mastery WHERE user_id=? AND concept_id=?", user_id, catalog.concept_id(kp_id))
+            prior = min(0.65, evidence.now_p(user_id, shared)) if shared else 0.3
+            set_mastery(user_id, k["id"], prior, "learning", "concept")
             n += 1
     return n
 
@@ -323,6 +339,7 @@ def diag_next(user_id: int, sid: int, grade: str):
     return None
 
 
+@db.atomic_user
 def diag_answer(user_id: int, sid: int, answer, self_rating: str | None = None):
     s = db.one("SELECT * FROM diag_sessions WHERE id=? AND user_id=?", sid, user_id)
     state = db.jload(s["state"])

@@ -223,43 +223,30 @@ def budget() -> int:
     return max(0, DAILY_AI - (j["ai_calls"] or 0))
 
 
-def _lease(seconds=600) -> bool:
-    """多个应用进程时只让一个跑：抢到租约的才跑。"""
-    _job()
-    now = db.now()
-    until = _later(seconds)
-    return db.run("UPDATE jobs SET locked_until=? WHERE name=? AND (locked_until='' OR locked_until IS NULL OR locked_until<?)",
-                  until, JOB, now) == 1
-
-
-def _later(seconds: int) -> str:
-    from datetime import datetime
-    now = datetime.fromisoformat(db.now())
-    return (now + timedelta(seconds=seconds)).isoformat(timespec="seconds")
-
-
 def run_once(force=False) -> dict:
-    if not _lease():
-        return {"skipped": "另一个进程正在跑"}
-    res = {}
-    try:
-        j = _job()
-        if llm.enabled():
-            left = budget()
-            if left:
-                res["variants"] = promote_batch(min(VARIANT_BATCH, left))
-            left = budget()
-            if left:
-                res["verify"] = verify_batch(min(VERIFY_BATCH, left))
-        last = db.jload(j["last_result"], {}) or {}
-        if force or last.get("calibrated_on") != db.today().isoformat():
-            res["calibrated"] = calibrate()
-            res["calibrated_on"] = db.today().isoformat()
-        else:
-            res["calibrated_on"] = last.get("calibrated_on")
-    finally:
-        db.run("UPDATE jobs SET locked_until='', last_run=?, last_result=? WHERE name=?", db.now(), db.jdump(res), JOB)
-    return res
+    from .jobs import lease
+    with lease(JOB) as task:
+        if task is None:
+            return {"skipped": "另一个进程正在跑"}
+        res = {}
+        try:
+            j = _job()
+            if llm.enabled():
+                left = budget()
+                if left:
+                    res["variants"] = promote_batch(min(VARIANT_BATCH, left))
+                left = budget()
+                if left:
+                    res["verify"] = verify_batch(min(VERIFY_BATCH, left))
+            last = db.jload(j["last_result"], {}) or {}
+            if force or last.get("calibrated_on") != db.today().isoformat():
+                res["calibrated"] = calibrate()
+                res["calibrated_on"] = db.today().isoformat()
+            else:
+                res["calibrated_on"] = last.get("calibrated_on")
+        finally:
+            task.result = res
+        return res
 
 
 def stats() -> dict:
@@ -277,20 +264,3 @@ def stats() -> dict:
                                                          "AND status='active' GROUP BY level")},
             "last_run": j["last_run"], "last": db.jload(j["last_result"], {}), "ai_today": j["ai_calls"] if j["day"] == db.today().isoformat() else 0,
             "ai_limit": DAILY_AI}
-
-
-def start_background():
-    """应用启动时开一个后台线程，每隔 INTERVAL 跑一轮。设 AISTUDY_JOBS=0 关掉（测试里就关掉了）。"""
-    if os.environ.get("AISTUDY_JOBS", "1") == "0":
-        return
-
-    def loop():
-        time.sleep(60)
-        while True:
-            try:
-                run_once()
-            except Exception:  # 后台任务出错不能影响网站
-                log.exception("bank job failed")
-            time.sleep(INTERVAL)
-
-    threading.Thread(target=loop, name="bankflow", daemon=True).start()

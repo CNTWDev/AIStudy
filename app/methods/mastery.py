@@ -35,7 +35,7 @@ class BKT:
     - 薄弱也要证据：不同的题错过两次以上、或者自己说了「还不会」。
     - 题目难度（题库里所有孩子的作答统计）也算进去：人人都对的题答对说明得少，人人都错的题答错说明得少。
     """
-    id, version = "bkt", 1
+    id, version = "bkt", 2
     defaults = {"master_p": 0.85, "weak_p": 0.35, "prior": 0.3, "diag_prior": 0.5, "learn_t": 0.12, "slip": 0.1,
                 "min_days": 2, "min_items": 2, "min_fmts": 2, "alt_items": 3, "shaky_p": 0.6}
     TEST_MODES = ("diagnose", "probe", "exam", "paper")  # 测出来的，不算「做一题学一点」
@@ -75,9 +75,11 @@ class BKT:
             st["status"] = "weak" if st["p"] < self.weak_p else "learning"
             return st
         if state is None:
-            state = {"p": self.diag_prior if ev.get("mode") in ("diagnose", "probe") else self.prior,
+            state = {"p": ev.get("prior") if ev.get("prior") is not None else self.diag_prior if ev.get("mode") in ("diagnose", "probe") else self.prior,
                      "s": 0.0, "d": 5.0, "last": None, "n": 0, "ev": empty_evidence()}
-        fmt, weight, correct = ev.get("fmt") or "other", float(ev.get("weight") or 1.0), bool(ev.get("correct"))
+        fmt, weight, correct = ev.get("fmt") or "other", max(0.0, min(1.0, float(ev.get("weight", 1.0)))), bool(ev.get("correct"))
+        if weight == 0:
+            return {**state, "status": self.judge(state["p"], state["ev"])}
         t = days_between(state["last"], at)
         s0, d0 = state["s"] or 0, state["d"] or 5
         p = state["p"] * self.memory.recall(t, s0)
@@ -91,13 +93,13 @@ class BKT:
         s, d = self.memory.review(s0, d0, t, grade)
         e = {k: (list(v) if isinstance(v, list) else v) for k, v in state["ev"].items()}
         day, ref = at[:10], ev.get("item_id") or f"{fmt}:{at[:10]}"
-        if correct:
+        if correct and weight >= 0.5 and ev.get("mode") != "review-self":
             e["days"] = (e["days"] + [day])[-10:]
             e["items"] = (e["items"] + [ref])[-20:]
             e["fmts"] = sorted(set(e["fmts"]) | {fmt})
             if e.get("dk") and len(set(e["days"])) >= 2:
                 e["dk"] = 0  # 之前说不会，后来隔天会了
-        else:
+        elif not correct:
             e["wrong"] = (e["wrong"] + [ref])[-10:]
             e["dk"] = e.get("dk", 0) + (1 if ev.get("dont_know") else 0)
         return {"p": p, "s": s, "d": d, "last": at, "n": state["n"] + 1, "ev": e, "status": self.judge(p, e)}

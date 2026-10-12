@@ -44,6 +44,7 @@
     {% for p in packs %}
     <label class="row" style="margin:4px 0 0;font-weight:400"><input type="radio" name="subj_{{ p.subject }}" value="{{ p.id }}" data-start="{{ stage_rank(p.stages[0]) }}" data-end="{{ stage_rank(p.stages[-1]) }}" style="width:auto" {{ 'checked' if cur and cur.id == p.id }}>
       <span class="grow"><b>{{ p.edition }}</b> <span class="muted small">{{ p.region }}{% if k and stage_rank(p.stages[0]) > stage_rank(k.grade) %} · {{ stage_label(p.stages[0]) }}开始，现在选就是提前预习{% endif %}</span>
+      {% if p.notes %}<div class="small muted">{{ p.notes }}</div>{% endif %}
       {% if p.tracks %}<select name="track_{{ p.id }}" class="trk" style="margin-top:4px" title="方向">{% for t in p.tracks %}<option value="{{ t.id }}" {{ 'selected' if p.track(tracks.get(p.id)) == t.id }}>{{ t.name }}</option>{% endfor %}</select>{% endif %}
       {% if self_mode or p.system == 'cert' %}<span class="small muted examd" style="display:flex;gap:6px;align-items:center;margin-top:4px">考试日期 <input type="date" name="exam_{{ p.id }}" value="{{ exams.get(p.id) or '' }}" style="width:auto"></span>{% endif %}</span></label>
     {% endfor %}

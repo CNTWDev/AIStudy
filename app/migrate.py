@@ -57,7 +57,7 @@ def pending() -> list[str]:
 
 def upgrade(verbose: bool = False) -> list[str]:
     applied = []
-    with db.tx() as t:
+    with db.tx(write=True) as t:
         if db.IS_PG:
             t.one("SELECT pg_advisory_xact_lock(?) AS ok", _PG_LOCK_ID)
         _ensure_table(t)

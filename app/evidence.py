@@ -13,6 +13,7 @@ import json
 from datetime import datetime
 
 from . import db, itemtypes
+from .catalog import catalog
 from .methods import methods
 from .methods.mastery import days_between, empty_evidence
 
@@ -52,12 +53,12 @@ def _guess(item: dict | None) -> float:
 
 
 def _model_ev(e: dict, item: dict | None, stats: dict | None) -> dict:
-    """事件表的一行 → 掌握模型要的证据（蒙对概率记在事件里；题库统计用最新的：大家做得越多，难度估得越准）。"""
+    """事件表的一行 → 掌握模型要的证据（蒙对概率记在事件里；新事件冻结当时题库统计，保证重算可复现；旧事件兼容当前统计）。"""
     data = db.jload(e["data"], {}) if isinstance(e.get("data"), str) else (e.get("data") or {})
     return {"kind": e["kind"], "correct": bool(e["correct"]), "at": e["created_at"], "mode": e["mode"],
             "fmt": e["fmt"] or "other", "weight": e["weight"] if e["weight"] is not None else 1.0,
             "dont_know": bool(e["dont_know"]), "value": e["value"], "item_id": e["item_id"],
-            "guess": data.get("guess", _guess(item)), "stats": stats}
+            "guess": data.get("guess", _guess(item)), "stats": data.get("stats", stats), "prior": data.get("prior")}
 
 
 # ------------------------------------------------------------------ 掌握状态
@@ -78,8 +79,8 @@ def _save(user_id, kp_id, st, *, attempts, correct, source, key):
            "attempts=excluded.attempts, correct=excluded.correct, status=excluded.status, source=excluded.source, "
            "updated_at=excluded.updated_at, stability=excluded.stability, difficulty=excluded.difficulty, "
            "last_ev=excluded.last_ev, evidence=excluded.evidence, model=excluded.model",
-           user_id, kp_id, round(st["p"], 4), attempts, correct, st["status"], source, st["last"] or db.now(),
-           round(st["s"], 3), round(st["d"], 3), st["last"], json.dumps(st["ev"], ensure_ascii=False), key)
+           user_id, kp_id, st["p"], attempts, correct, st["status"], source, st["last"] or db.now(),
+           st["s"], st["d"], st["last"], json.dumps(st["ev"], ensure_ascii=False), key)
 
 
 def _apply(user_id: int, kp_id: str, e: dict, item: dict | None) -> str:
@@ -97,23 +98,35 @@ def _apply(user_id: int, kp_id: str, e: dict, item: dict | None) -> str:
     return st["status"]
 
 
+@db.atomic_user
 def record(user_id: int, kp_id: str, correct: bool, *, item=None, mode="practice", fmt=None, weight=1.0,
            dont_know=False, kind="answer") -> str:
     """一条作答证据（做题 kind=answer，复习卡片 kind=review）：记事件，更新掌握状态，返回新状态。"""
+    ensure_user(user_id)
     fmt = fmt or itemtypes.fmt((item or {}).get("type"))
+    if mode == "review-self" or (item and itemtypes.of(item).self_rated):
+        weight = min(weight, 0.3)
+    shared = db.one("SELECT * FROM concept_mastery WHERE user_id=? AND concept_id=?", user_id, catalog.concept_id(kp_id))
+    prior = min(0.65, now_p(user_id, shared)) if shared and shared["attempts"] else None
     e = log(user_id, "kp", kp_id, kind, correct=correct, weight=weight, mode=mode, fmt=fmt,
-            item_id=(item or {}).get("id"), dont_know=dont_know, data={"guess": round(_guess(item), 4)})
-    return _apply(user_id, kp_id, e, item)
+            item_id=(item or {}).get("id"), dont_know=dont_know, data={"guess": round(_guess(item), 4), "concept_id": catalog.concept_id(kp_id), "prior": prior,
+                                                        "stats": dict(db.one("SELECT n_attempts, n_correct FROM items WHERE id=?", item["id"]) or {}) if item and item.get("id") else None})
+    status = _apply(user_id, kp_id, e, item)
+    _apply_concept(user_id, kp_id, e, item)
+    return status
 
 
+@db.atomic_user
 def infer(user_id: int, kp_id: str, value: float, source: str) -> str:
     """没有作答的推断（同一概念、前置、自评、导入）：只给一个概率，不算交叉验证的证据，所以不会直接变成「掌握」。"""
+    ensure_user(user_id)
     e = log(user_id, "kp", kp_id, "infer", value=value, mode=source)
     return _apply(user_id, kp_id, e, None)
 
 
 # ------------------------------------------------------------------ 重放：换了学习方式 / 参数 / 算法后按全部历史重算
 
+@db.atomic_user
 def replay(user_id: int) -> int:
     prof = profile(user_id)
     rows = db.q("SELECT e.*, i.type AS itype, i.data AS idata, i.n_attempts, i.n_correct FROM events e "
@@ -131,7 +144,22 @@ def replay(user_id: int) -> int:
                 n, ok = n + 1, ok + bool(r["correct"])
         _save(user_id, kp_id, st, attempts=n, correct=ok, source=evs[-1]["mode"], key=prof.key)
     db.run("UPDATE mastery SET model=? WHERE user_id=?", prof.key, user_id)  # 没有事件的行（很早以前的）也算对齐了
+    replay_concepts(user_id)
     return len(by_kp)
+
+
+@db.atomic_user
+def ensure_user(user_id):
+    key = profile(user_id).key
+    stale = db.one("SELECT 1 AS stale FROM mastery WHERE user_id=? AND model<>? LIMIT 1", user_id, key)
+    if stale:
+        replay(user_id)
+        return
+    shared = db.one("SELECT model FROM concept_mastery WHERE user_id=? LIMIT 1", user_id)
+    if shared and shared["model"] != concept_model(user_id):
+        replay_concepts(user_id)
+    elif not shared and db.one("SELECT 1 AS present FROM events WHERE user_id=? AND target='kp' AND kind<>'infer' LIMIT 1", user_id):
+        replay_concepts(user_id)
 
 
 def ensure_current() -> int:
@@ -143,7 +171,48 @@ def ensure_current() -> int:
              if r["model"] != profile(r["user_id"]).key}
     for uid in stale:
         replay(uid)
+    concept_users = {r["user_id"] for r in db.q("SELECT DISTINCT user_id FROM events WHERE target='kp'")}
+    for uid in concept_users - stale:
+        current = concept_model(uid)
+        row = db.one("SELECT model FROM concept_mastery WHERE user_id=? LIMIT 1", uid)
+        if not row or row["model"] != current:
+            replay_concepts(uid)
     return len(stale)
+
+
+def concept_model(user_id):
+    return profile(user_id).key + ":" + catalog.concept_key
+
+
+def _save_concept(user_id, cid, st, n, ok, mode):
+    db.run("INSERT INTO concept_mastery(user_id,concept_id,score,attempts,correct,status,source,updated_at,stability,difficulty,last_ev,evidence,model) "
+           "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(user_id,concept_id) DO UPDATE SET "
+           "score=excluded.score,attempts=excluded.attempts,correct=excluded.correct,status=excluded.status,"
+           "source=excluded.source,updated_at=excluded.updated_at,stability=excluded.stability,difficulty=excluded.difficulty,"
+           "last_ev=excluded.last_ev,evidence=excluded.evidence,model=excluded.model",
+           user_id, cid, st["p"], n, ok, st["status"], mode, db.now(), st["s"], st["d"], st["last"], db.jdump(st["ev"]), concept_model(user_id))
+
+
+def _apply_concept(user_id, kp_id, e, item):
+    cid = catalog.concept_id(kp_id)
+    row = db.one("SELECT * FROM concept_mastery WHERE user_id=? AND concept_id=?", user_id, cid)
+    st = profile(user_id).mastery.step(_state(row), _model_ev(e, item, None))
+    _save_concept(user_id, cid, st, (row["attempts"] if row else 0) + 1,
+                  (row["correct"] if row else 0) + bool(e["correct"]), e["mode"])
+
+
+@db.atomic_user
+def replay_concepts(user_id):
+    """Only observed evidence transfers; inference never becomes shared proof of mastery."""
+    db.run("DELETE FROM concept_mastery WHERE user_id=?", user_id)
+    for e in db.q("SELECT e.*, i.type AS itype, i.data AS idata FROM events e LEFT JOIN items i ON i.id=e.item_id "
+                  "WHERE e.user_id=? AND e.target='kp' AND e.kind<>'infer' ORDER BY e.id", user_id):
+        item = {**db.jload(e["idata"], {}), "id": e["item_id"], "type": e["itype"]} if e["itype"] else None
+        _apply_concept(user_id, e["target_id"], e, item)
+
+
+def concept_states(user_id):
+    return {r["concept_id"]: dict(r) for r in db.q("SELECT * FROM concept_mastery WHERE user_id=?", user_id)}
 
 
 # ------------------------------------------------------------------ 给页面和计划用
@@ -173,7 +242,7 @@ def explain(user_id: int, m: dict | None) -> dict | None:
     return {"p": int(round(now_p(user_id, m) * 100)), "recall": int(round(r * 100)) if s else None,
             "items": len(set(ev["items"])), "days": len(set(ev["days"])), "fmts": len(set(ev["fmts"])),
             "missing": [] if m.get("status") == "mastered" else missing(user_id, m),
-            "next": prof.memory.interval(s) if s else None, "method": prof.name}
+            "next": max(0, prof.memory.interval(s) - int(days_since(m.get("last_ev")))) if s else None, "method": prof.name}
 
 
 def due_checks(user_id: int, mastery: dict, limit=5) -> list[dict]:

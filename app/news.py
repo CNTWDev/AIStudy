@@ -339,13 +339,6 @@ def _job():
     return db.one("SELECT * FROM jobs WHERE name=?", JOB)
 
 
-def _lease(seconds=900) -> bool:
-    _job()
-    now = datetime.fromisoformat(db.now())
-    return db.run("UPDATE jobs SET locked_until=? WHERE name=? AND (locked_until='' OR locked_until IS NULL OR locked_until<?)",
-                  (now + timedelta(seconds=seconds)).isoformat(timespec="seconds"), JOB, now.isoformat(timespec="seconds")) == 1
-
-
 def status() -> dict:
     j = _job()
     return {"last_run": j["last_run"], "last": db.jload(j["last_result"], {}) or {}}
@@ -364,50 +357,35 @@ def run_daily(force: bool = False) -> dict:
         day = db.today().isoformat()
         if last.get("day") == day and last.get("error") and last.get("tried_at", "") > (now - timedelta(minutes=RETRY_MINUTES)).isoformat():
             return {"skipped": "刚失败过，稍后再试"}
-    if not _lease():
-        return {"skipped": "另一个进程正在跑"}
-    res = {}
-    try:
-        res = pick_today(force=force)
-        if res.get("done") and last.get("day") == res["day"]:
-            res = {**last, **res}  # 保留上次抓取时各个源的状态
-        res["written"] = []
-        for level in sorted(levels_in_use()):
-            pick = latest_pick(band_of(level))
-            if pick and pick["day"] == db.today().isoformat():
-                try:
-                    article(pick, level)
-                    res["written"].append(level)
-                except llm.LLMError as e:
-                    res.setdefault("write_errors", {})[level] = str(e)[:200]
-    except llm.LLMError as e:
-        res["error"] = str(e)[:300]
-    except Exception as e:  # noqa: BLE001  后台任务出错不能影响网站
-        log.exception("news job failed")
-        res["error"] = f"{type(e).__name__}: {e}"[:300]
-    finally:
-        res.setdefault("day", db.today().isoformat())
-        res["tried_at"] = now.isoformat(timespec="seconds")
-        db.run("UPDATE jobs SET locked_until='', last_run=?, last_result=? WHERE name=?", db.now(), db.jdump(res), JOB)
-    return res
+    from .jobs import lease
+    with lease(JOB) as task:
+        if task is None:
+            return {"skipped": "另一个进程正在跑"}
+        res = {}
+        try:
+            res = pick_today(force=force)
+            if res.get("done") and last.get("day") == res["day"]:
+                res = {**last, **res}  # 保留上次抓取时各个源的状态
+            res["written"] = []
+            for level in sorted(levels_in_use()):
+                pick = latest_pick(band_of(level))
+                if pick and pick["day"] == db.today().isoformat():
+                    try:
+                        article(pick, level)
+                        res["written"].append(level)
+                    except llm.LLMError as e:
+                        res.setdefault("write_errors", {})[level] = str(e)[:200]
+        except llm.LLMError as e:
+            res["error"] = str(e)[:300]
+        except Exception as e:  # noqa: BLE001  后台任务出错不能影响网站
+            log.exception("news job failed")
+            res["error"] = f"{type(e).__name__}: {e}"[:300]
+        finally:
+            res.setdefault("day", db.today().isoformat())
+            res["tried_at"] = now.isoformat(timespec="seconds")
+            task.result = res
+        return res
 
 
 def run_async(force: bool = False):
     threading.Thread(target=run_daily, kwargs={"force": force}, name="news-manual", daemon=True).start()
-
-
-def start_background():
-    """应用启动时开一个后台线程，每 20 分钟看一眼要不要选今天的新闻。设 AISTUDY_JOBS=0 关掉（测试里就关掉了）。"""
-    if os.environ.get("AISTUDY_JOBS", "1") == "0":
-        return
-
-    def loop():
-        time.sleep(90)
-        while True:
-            try:
-                run_daily()
-            except Exception:  # noqa: BLE001
-                log.exception("news job failed")
-            time.sleep(20 * 60)
-
-    threading.Thread(target=loop, name="news", daemon=True).start()

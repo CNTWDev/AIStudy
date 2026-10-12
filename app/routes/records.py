@@ -1,0 +1,44 @@
+"""records HTTP routes. Learning commands live in app.learning."""
+from fastapi import APIRouter
+from fastapi import Body, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from .. import db, llm, records
+from ..web import (
+    _records_ctx,
+    catalog,
+    kid_or_redirect,
+    render,
+)
+
+router = APIRouter()
+
+@router.get("/api/records/{kind}")
+def records_get(request: Request, kind: str):
+    k = kid_or_redirect(request)
+    if kind not in records.KINDS:
+        raise HTTPException(404, "没有这种任务")
+    return {"kind": kind, "label": records.KINDS[kind], "pb": records.personal_best(k["id"], kind),
+            "ghost": records.ghost(k["id"], kind) if kind in records.SPEED_KINDS else None}
+
+
+@router.post("/api/run")
+def run_save(request: Request, body: dict = Body(...)):
+    k = kid_or_redirect(request)
+    return records.record(k["id"], str(body.get("kind", "")), body.get("n_items"), body.get("n_right"),
+                          body.get("ms_active"), body.get("ms_total"), body.get("best_combo"))
+
+
+@router.get("/records", response_class=HTMLResponse)
+def records_page(request: Request):
+    k = kid_or_redirect(request, manage=True)
+    return render(request, "records.html", **_records_ctx(k), report_for=None)
+
+
+@router.get("/healthz")
+def healthz():
+    db.one("SELECT 1 AS ok")
+    ok, _ = llm.check()
+    return {"ok": True, "db": db.DIALECT, "packs": len(catalog.packs), "kps": len(catalog.kps),
+            "llm": llm.settings().default if ok else "off"}
+
+

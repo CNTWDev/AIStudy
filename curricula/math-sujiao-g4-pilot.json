@@ -1,0 +1,96 @@
+{
+  "pack": {
+    "id": "math-sujiao-g4-pilot",
+    "subject": "math",
+    "subject_name": "数学",
+    "edition": "苏教版数学 · 四上已核实主题（部分覆盖）",
+    "region": "苏州",
+    "system": "cn",
+    "kind": "textbook",
+    "school_types": [
+      "public"
+    ],
+    "stages": [
+      "G4"
+    ],
+    "notes": "2026秋四上主题试点，非整册目录；仅覆盖官方公告明确提到的主题。完整目录核实后扩充。"
+  },
+  "strands": [
+    {
+      "id": "core",
+      "name": "已核实主题"
+    }
+  ],
+  "kps": [
+    {
+      "id": "SZ-M4-PERIMETER",
+      "strand": "core",
+      "stage": "G4",
+      "term": "上",
+      "unit": "周长与面积",
+      "name": "周长",
+      "desc": "比较并计算长方形与正方形的周长，区分一周的长度与内部大小。",
+      "method": "先沿边走一圈，再把各边长度相加。",
+      "prereqs": [],
+      "sources": [
+        "https://www.suzhou.gov.cn/szsrmzf/mszx/202608/15cfa67e4d9841128e27d99d4e344ea6.shtml"
+      ]
+    },
+    {
+      "id": "SZ-M4-AREA",
+      "strand": "core",
+      "stage": "G4",
+      "term": "上",
+      "unit": "周长与面积",
+      "name": "面积",
+      "desc": "用面积单位衡量图形内部大小，计算长方形和正方形的面积。",
+      "method": "用一行几个、共有几行解释长乘宽。",
+      "prereqs": [],
+      "sources": [
+        "https://www.suzhou.gov.cn/szsrmzf/mszx/202608/15cfa67e4d9841128e27d99d4e344ea6.shtml"
+      ]
+    },
+    {
+      "id": "SZ-M4-QUANTITY",
+      "strand": "core",
+      "stage": "G4",
+      "term": "上",
+      "unit": "乘法数量关系",
+      "name": "乘法数量关系",
+      "desc": "用单价、数量、总价或速度、时间、路程描述生活中的乘法关系。",
+      "method": "先明确每份量和份数，再解释乘积表示的总量。",
+      "prereqs": [],
+      "sources": [
+        "https://www.suzhou.gov.cn/szsrmzf/mszx/202608/15cfa67e4d9841128e27d99d4e344ea6.shtml"
+      ]
+    },
+    {
+      "id": "SZ-M4-LARGE-NUMBER",
+      "strand": "core",
+      "stage": "G4",
+      "term": "上",
+      "unit": "多位数认识",
+      "name": "多位数认识",
+      "desc": "识别万、亿及其数位，读写多位数并比较大小。",
+      "method": "按数级分组，先比较位数，再从高位逐位比较。",
+      "prereqs": [],
+      "sources": [
+        "https://www.suzhou.gov.cn/szsrmzf/mszx/202608/15cfa67e4d9841128e27d99d4e344ea6.shtml"
+      ]
+    },
+    {
+      "id": "SZ-M4-LARGE-CALC",
+      "strand": "core",
+      "stage": "G4",
+      "term": "上",
+      "unit": "大数运算",
+      "name": "大数运算",
+      "desc": "在多位数计算中保持相同数位对齐，结合估算检查结果是否合理。",
+      "method": "计算前先估计数量级，计算后用逆运算或估算检查。",
+      "prereqs": [],
+      "sources": [
+        "https://www.suzhou.gov.cn/szsrmzf/mszx/202608/15cfa67e4d9841128e27d99d4e344ea6.shtml"
+      ]
+    }
+  ]
+}

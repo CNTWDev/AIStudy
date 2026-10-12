@@ -112,6 +112,21 @@ def _word_quiz(user_id: int, c) -> dict | None:
 # ------------------------------------------------------------------ 判对错、排期
 
 def answer(user_id: int, card_id: int, body: dict) -> dict:
+    # Prepare a possible variant outside the learner transaction: network latency must
+    # not hold the learner lock, and failed AI calls must keep their usage accounting.
+    card = db.one("SELECT * FROM cards WHERE id=? AND user_id=?", card_id, user_id)
+    if card and card["kind"] == "mistake" and card["kp_id"] and not body.get("dont_know"):
+        ex = _extra(card)
+        item = _item(body.get("item_id"))
+        if (item and item["id"] == ex.get("item_id") and not ex.get("passed")
+                and ex.get("streak", 0) >= PASS_STREAK - 1
+                and (body.get("self") == "ok" if itemtypes.of(item).self_rated else itemtypes.check(item, body.get("answer")))):
+            engine.items_for(user_id, card["kp_id"], n=3)
+    return _answer_command(user_id, card_id, body)
+
+
+@db.atomic_user
+def _answer_command(user_id: int, card_id: int, body: dict) -> dict:
     c = db.one("SELECT * FROM cards WHERE id=? AND user_id=?", card_id, user_id)
     if not c:
         return {"error": "没有这张卡"}
@@ -188,12 +203,13 @@ def _pass(user_id: int, c, ex: dict, today: str, fmt: str) -> dict:
 
 
 def _variant(user_id: int, c, ex: dict) -> dict | None:
-    """同一知识点的另一道题（不是原题、不是同一组换数字的题）：题库里没有就请 AI 出（出过的存进题库）。"""
+    """同一知识点的另一道题（不是原题、不是同一组换数字的题）：仅从已准备好的题库选择，AI 准备在事务外完成。"""
     if not c["kp_id"] or not catalog.kp(c["kp_id"]):
         return None
     orig = _item(ex.get("item_id")) or {}
     near = db.one("SELECT near_key FROM items WHERE id=?", orig.get("id")) if orig else None
-    for it in engine.items_for(user_id, c["kp_id"], n=3):
+    for candidate in bank.candidates(user_id, c["kp_id"]):
+        it = bank.row_to_item(candidate)
         r = db.one("SELECT near_key FROM items WHERE id=?", it["id"])
         if it["id"] != orig.get("id") and not (near and near["near_key"] and r and r["near_key"] == near["near_key"]):
             return it

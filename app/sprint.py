@@ -106,6 +106,7 @@ def question(kid: dict, run_id, rng: random.Random | None = None) -> dict:
     return {"item": sources.public(pend["item"])}
 
 
+@db.atomic_user
 def answer(kid: dict, run_id, item_id: str, ans, dont_know=False) -> dict:
     r = _run(kid, run_id)
     st, now = r["state"], time.time()

@@ -5,6 +5,8 @@
 这里负责转换。表结构只由 migrations/ 目录里的迁移脚本维护（见 app/migrate.py）。
 """
 import json
+from contextvars import ContextVar
+from functools import wraps
 import sqlite3
 import threading
 from contextlib import contextmanager
@@ -87,7 +89,7 @@ else:
         try:
             yield c
             c.commit()
-        except Exception:
+        except BaseException:
             c.rollback()
             raise
 
@@ -124,13 +126,58 @@ class Tx:
         if IS_PG:
             self.c.execute(sql)
         else:
-            self.c.executescript(sql)
+            # sqlite.executescript implicitly commits: execute complete statements instead,
+            # keeping migrations inside the surrounding transaction.
+            pending = ""
+            for char in sql:
+                pending += char
+                if char == ";" and sqlite3.complete_statement(pending):
+                    self.c.execute(pending)
+                    pending = ""
+            if pending.strip():
+                self.c.execute(pending)
+
+
+_active_tx: ContextVar = ContextVar("aistudy_transaction", default=None)
 
 
 @contextmanager
-def tx():
+def tx(write=False):
+    """Nested calls share a connection and a transaction; nested failures roll back to a savepoint.
+
+    Learning commands use write=True to serialize SQLite writers before reading state.
+    PostgreSQL commands additionally lock the learner row (atomic_user).
+    """
+    active = _active_tx.get()
+    if active is not None:
+        active.c.execute("SAVEPOINT nested_tx")
+        try:
+            yield active
+        except BaseException:
+            active.c.execute("ROLLBACK TO SAVEPOINT nested_tx")
+            raise
+        finally:
+            active.c.execute("RELEASE SAVEPOINT nested_tx")
+        return
     with _connection() as c:
-        yield Tx(c)
+        if not IS_PG:
+            c.execute("BEGIN IMMEDIATE" if write else "BEGIN")
+        token = _active_tx.set(Tx(c))
+        try:
+            yield _active_tx.get()
+        finally:
+            _active_tx.reset(token)
+
+
+def atomic_user(fn):
+    """A learner command commits all projections together, serialized per learner."""
+    @wraps(fn)
+    def wrapped(user_id, *args, **kwargs):
+        with tx(write=True) as t:
+            if IS_PG:
+                t.one("SELECT id FROM users WHERE id=? FOR UPDATE", user_id["id"] if isinstance(user_id, dict) else user_id)
+            return fn(user_id, *args, **kwargs)
+    return wrapped
 
 
 def q(sql: str, *args) -> list:

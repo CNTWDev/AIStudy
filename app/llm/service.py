@@ -3,6 +3,8 @@ import hashlib
 import json
 import re
 import threading
+import time
+from .validation import validate
 
 from .. import db
 from . import providers  # noqa: F401  注册内置提供方
@@ -105,12 +107,15 @@ def extract_json(text: str):
 def _count_usage(user_id: int | None):
     if not user_id:
         return
-    day = db.today().isoformat()
-    row = db.one("SELECT calls FROM llm_usage WHERE user_id=? AND day=?", user_id, day)
-    if row and row["calls"] >= settings().daily_limit_per_kid:
+    if settings().daily_limit_per_kid <= 0:
         raise LLMError("今天 AI 使用次数已用完，明天再来")
-    db.run("INSERT INTO llm_usage(user_id, day, calls) VALUES(?,?,1) "
-           "ON CONFLICT(user_id, day) DO UPDATE SET calls=llm_usage.calls+1", user_id, day)
+    day = db.today().isoformat()
+    with db.tx(write=True) as t:
+        row = t.one("INSERT INTO llm_usage(user_id,day,calls) VALUES(?,?,1) "
+                    "ON CONFLICT(user_id,day) DO UPDATE SET calls=llm_usage.calls+1 "
+                    "WHERE llm_usage.calls<? RETURNING calls", user_id, day, settings().daily_limit_per_kid)
+        if not row:
+            raise LLMError("今天 AI 使用次数已用完，明天再来")
 
 
 def ask_json(task: str, system: str, user: str, *, user_id=None, effort="low", max_tokens=4000, cache=True, images=None):
@@ -127,13 +132,26 @@ def ask_json(task: str, system: str, user: str, *, user_id=None, effort="low", m
                       effort=(route and route.effort) or effort, model=route.model if route else None,
                       images=list(images or []))
     cache = cache and s.cache and not images
-    key = hashlib.sha256(f"{task}\n{p.cfg.name}\n{req.model or p.cfg.model}\n{system}\n{user}".encode()).hexdigest()
+    key = hashlib.sha256(f"{task}\n{p.cfg.name}\n{req.model or p.cfg.model}\n{req.effort}\n{req.max_tokens}\n{system}\n{user}".encode()).hexdigest()
     if cache:
         row = db.one("SELECT value FROM llm_cache WHERE key=?", key)
         if row:
-            return json.loads(row["value"])
+            return validate(task, json.loads(row["value"]))
+    from ..jobs import check_active
+    check_active()
     _count_usage(user_id)
-    data = extract_json(p.complete(req))
+    started, status, error = time.monotonic(), "failed", ""
+    try:
+        data = validate(task, extract_json(p.complete(req)))
+        check_active()
+        status = "ok"
+    except Exception as exc:
+        error = type(exc).__name__  # do not persist prompts, child text or credentials
+        raise
+    finally:
+        db.run("INSERT INTO llm_calls(user_id,task,provider,model,status,elapsed_ms,input_tokens,output_tokens,error_code,created_at) "
+               "VALUES(?,?,?,?,?,?,?,?,?,?)", user_id, task, p.cfg.name, req.model or p.cfg.model, status,
+               int((time.monotonic() - started) * 1000), req.usage.get("input_tokens"), req.usage.get("output_tokens"), error, db.now())
     if cache:
         db.run("INSERT INTO llm_cache(key, value, created_at) VALUES(?,?,?) "
                "ON CONFLICT(key) DO UPDATE SET value=excluded.value, created_at=excluded.created_at",

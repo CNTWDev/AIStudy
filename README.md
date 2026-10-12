@@ -34,13 +34,15 @@
 - **做题更友好**：每道题都有「🤔 这道题还不会」，不算错，直接看讲解并进错题本；答对有小动画。
 - **摸底诊断**：从孩子当前学段出题，做错了自动往回追前置知识（最多 3 层），找到真正的「断点」。
 - **一步步学一个知识点**：看懂 → 记方法 → 做 3 题（从易到难，有提示）→ 一句话总结；连错两题会提示「退一步」去补前置。
-- **间隔复习**：生词、错题、术语、知识点总结都变成卡片，按 1/2/4/7/15/30 天出现。
+- **间隔复习**：生词、错题、术语、知识点总结都变成卡片，按实际作答、遗忘风险和目标保持率动态安排，定期换题验证。
 - **AI 阅读**：AI 按孩子水平写短文（自动用上要复习的生词），或者粘贴自己的书；点词即查，用生词造句让 AI 点评。
 - **成人备考**：成年人也可以用来考证（例如基金从业资格）。注册时选「自己学」就是自学账号：没有家长，自己在「我的课程」里选课、定每天时长和考试日期；家长也可以给家人开一个年级为「成人」的账号。成人账号的 AI 用成人的口吻讲解，不显示乐园，不先摸底。
   考试日期由学习者自己定（选课时或在「学习进度和考试日期」里），系统按剩下的天数算出每天要学几个考点，按大纲顺序排进「今天」；离考试两周时不再学新内容，改成把还没掌握的高频考点过一遍。孩子的课（如 IGCSE）也可以设考试日期。
 - **家长与管理**：家长账号只查看和管理（看孩子今天的清单、报告和系统发现，安排阅读、更新进度、导入试卷），孩子用自己的账号学习；网站管理员有单独的管理后台：站点设置、数据统计、审批、邀请码、查看每个孩子的情况。
 
-**已内置的教材（6 套，741 个知识点，带前置关系）**
+**当前教材数据：18 个包、2475 个知识点（含 5 个知识点的苏教数学四上试点）**
+
+完整库存以 `python -m app.cli curricula-report` 为准；下表是部分课程示例。苏州补齐范围、核实状态及来源见 [苏州教材计划](docs/SUZHOU_CURRICULA.md)。
 
 | 学科 | 教材 | 学段 |
 |---|---|---|
@@ -75,7 +77,7 @@ curl -fsSL https://raw.githubusercontent.com/CNTWDev/AIStudy/main/install.sh | s
 4. 生成配置 `.env`（随机密钥、数据库地址）和 `config/llm.toml`（AI 配置模板）
 5. 创建 PostgreSQL 数据库和用户
 6. 安装 Python 依赖、执行数据库迁移
-7. 注册开机自启服务 `aistudy`，配置 HTTPS，健康检查，打印访问地址
+7. 注册开机自启服务 `aistudy` 和 `aistudy-worker`，配置 HTTPS，健康检查，打印访问地址
 
 ## 第一次使用
 
@@ -105,7 +107,7 @@ sudo nano /opt/aistudy/config/llm.toml
 服务器在中国大陆或香港时，Claude API 不可用，把 `default` 改成 `"deepseek"` 并填 DeepSeek / 通义千问的 Key。改完：
 
 ```bash
-sudo systemctl restart aistudy
+sudo systemctl restart aistudy aistudy-worker
 sudo /opt/aistudy/install.sh check --llm      # 真实调用一次 AI，确认能用
 ```
 
@@ -175,10 +177,14 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
 cp .env.example .env            # 默认 SQLite，无需安装数据库
 uvicorn app.main:app --reload   # 打开 http://localhost:8000
+# 另开终端运行后台维护（Web 不启动维护循环）
+python -m app.worker
 python -m pytest -q
 ```
 
 ## 设计与扩展
+
+新数据模型、事务、学习闭环和运行方式见 [学习基础架构](docs/LEARNING_FOUNDATION.md)。
 
 见 [docs/DESIGN.md](docs/DESIGN.md)：架构、账号、数据模型、诊断与计划算法、AI 抽象层、怎样加新教材/新学科/新题库/新模型厂商。
 
