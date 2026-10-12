@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block body %}
-<h1>{{ '我的课程' if self_mode else ('编辑' if k else '添加') ~ '孩子' }}</h1>
+<h1>{{ '我的课程' if self_mode else (('编辑' if k else '添加') ~ '孩子') }}</h1>
 {% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
 <form method="post" action="{{ '/me/courses' if self_mode else '/parent/kids/save' }}" class="card">
   {% if k and not self_mode %}<input type="hidden" name="id" value="{{ k.id }}">{% endif %}
@@ -11,7 +11,7 @@
   {% if k %}<label style="display:flex;gap:8px;align-items:center;font-weight:normal"><input type="checkbox" name="disabled" value="1" style="width:auto" {{ 'checked' if k.status == 'disabled' }}> 暂停这个账号（孩子暂时不能登录，学习记录保留）</label>{% endif %}
   {% endif %}
   <div class="row">
-    <div class="grow"><label>年级</label><select name="grade" id="grade">{% for g in GRADES %}<option value="{{ g }}" data-rank="{{ stage_rank(g) }}" {{ 'selected' if k and k.grade == g }}>{{ stage_label(g) }}</option>{% endfor %}</select></div>
+    <div class="grow"><label>年级</label><select name="grade" id="grade">{% for g in GRADES %}<option value="{{ g }}" data-rank="{{ stage_rank(g) }}" {{ 'selected' if (k.grade if k else catalog.default_grade) == g }}>{{ stage_label(g) }}</option>{% endfor %}</select></div>
     <div class="grow"><label>每天学习分钟</label><input type="number" name="daily_minutes" min="15" max="240" value="{{ k.daily_minutes if k else 60 }}"></div>
   </div>
   <p class="muted small" style="margin:4px 0 0">{% if self_mode %}成年人选「成人」：AI 用成人的口吻讲解。{% else %}成人学习者（比如备考基金从业资格）年级选「成人」：AI 用成人的口吻讲解，不显示乐园。成年人也可以自己注册「自己学」的账号，自己选课。{% endif %}</p>
@@ -25,9 +25,10 @@
   <label>学校类型</label>
   <select name="preset" id="preset">
     <option value="">自己逐科选教材</option>
-    {% for pr in presets %}<option value="{{ pr.id }}" data-packs='{{ pr.packs|tojson }}' {{ 'selected' if k and k.preset == pr.id }}>{{ pr.name }}</option>{% endfor %}
+    {% for pr in presets %}<option value="{{ pr.id }}" data-packs='{{ pr.packs|tojson }}' data-start="{{ stage_rank(pr.grades[0]) if pr.grades else 0 }}" data-end="{{ stage_rank(pr.grades[-1]) if pr.grades else 99 }}" {{ 'selected' if k and k.preset == pr.id }}>{{ pr.name }}</option>{% endfor %}
   </select>
-  <p class="muted small" style="margin:4px 0 0">选了学校类型会把下面每门课的教材和方向自动选好，你仍然可以逐科改（比如英语用剑桥教材）。</p>
+  <p class="muted small" style="margin:4px 0 0">选学校方案可预填教材，再按课本逐科核对。这里只列已整理的方案，地区或学制不匹配时请选择“自己逐科选教材”。</p>
+  <p id="preset-feedback" class="small" role="status" aria-live="polite"></p>
   {% endif %}
   {% set cur_method = methods.for_user(k.id).id if k else methods.site_default() %}
   <label>学习方式</label>
@@ -36,20 +37,36 @@
   <h2>学科与教材</h2>
   {% if self_mode %}<p class="muted small">选你要学的课。考试日期选填：填了以后，每天学多少按离考试剩下的天数排，离考试两周时转为冲刺复习。以后也可以在「学习进度和考试日期」里改。</p>
   {% else %}<p class="muted small">每门课选孩子学校用的教材版本就行，学段按上面的年级自动对应。之后在「学校进度」里点到学校正在教的那一课，系统据此往前补漏、往后预习。职业资格考试的课可以直接填考试日期。</p>{% endif %}
+  <details class="picker-help">
+    <summary>不确定是哪一版？按课本这样核对</summary>
+    <ol class="small"><li>看课本封面：学科、年级、上下册。</li><li>翻到版权页：核对出版社、教材版本，以及“六三学制 / 五四学制”。</li><li>国际课程向老师确认课程体系与考试代码。</li></ol>
+    <p class="small muted">名称相同不一定是同一套教材。找不到对应版本时，可先选“暂不安排，确认后再选”，以后再补，不必勉强选相近的版本。</p>
+  </details>
+  <div class="course-grid">
   {% for subj, packs in packs_by_subject.items() %}
   {% set cur = (packs|selectattr('id', 'in', enrolled)|first) %}
-  <div class="card" style="margin:8px 0;padding:10px 12px">
-    <h3 style="margin:0 0 6px">{{ subj }}</h3>
-    <label class="row" style="margin:0;font-weight:400"><input type="radio" name="subj_{{ packs[0].subject }}" value="" style="width:auto" {{ 'checked' if not cur }}> <span class="muted">暂不安排</span></label>
-    {% for p in packs %}
-    <label class="row" style="margin:4px 0 0;font-weight:400"><input type="radio" name="subj_{{ p.subject }}" value="{{ p.id }}" data-start="{{ stage_rank(p.stages[0]) }}" data-end="{{ stage_rank(p.stages[-1]) }}" style="width:auto" {{ 'checked' if cur and cur.id == p.id }}>
-      <span class="grow"><b>{{ p.edition }}</b> <span class="muted small">{{ p.region }}{% if k and stage_rank(p.stages[0]) > stage_rank(k.grade) %} · {{ stage_label(p.stages[0]) }}开始，现在选就是提前预习{% endif %}</span>
-      {% if p.notes %}<div class="small muted">{{ p.notes }}</div>{% endif %}
-      {% if p.tracks %}<select name="track_{{ p.id }}" class="trk" style="margin-top:4px" title="方向">{% for t in p.tracks %}<option value="{{ t.id }}" {{ 'selected' if p.track(tracks.get(p.id)) == t.id }}>{{ t.name }}</option>{% endfor %}</select>{% endif %}
-      {% if self_mode or p.system == 'cert' %}<span class="small muted examd" style="display:flex;gap:6px;align-items:center;margin-top:4px">考试日期 <input type="date" name="exam_{{ p.id }}" value="{{ exams.get(p.id) or '' }}" style="width:auto"></span>{% endif %}</span></label>
+  <section class="course-choice" data-subject="{{ packs[0].subject }}">
+    <label for="course-{{ packs[0].subject }}">{{ subj }}</label>
+    <select id="course-{{ packs[0].subject }}" name="subj_{{ packs[0].subject }}" class="course-select" aria-describedby="course-status-{{ packs[0].subject }}">
+      <option value="" {{ 'selected' if not cur }}>暂不安排，确认后再选</option>
+      {% for p in packs %}{% set guide = catalog.selection_guide(p) %}<option value="{{ p.id }}" data-start="{{ stage_rank(p.stages[0]) }}" data-end="{{ stage_rank(p.stages[-1]) }}" {{ 'selected' if cur and cur.id == p.id }}>{{ guide.name }}</option>{% endfor %}
+    </select>
+    <p class="small picker-status" id="course-status-{{ packs[0].subject }}" role="status" aria-live="polite"></p>
+    {% for p in packs %}{% set guide = catalog.selection_guide(p) %}
+    <div class="course-info" data-pack="{{ p.id }}" {{ 'hidden' if not cur or cur.id != p.id }}>
+      <p class="small picker-match"><b>核对课本：</b>{{ guide.hint }}</p>
+      {% if guide.warning %}<p class="small picker-warning">{{ guide.warning }}</p>{% endif %}
+      {% if p.tracks %}{% set early_exam = p.system == 'cambridge' and 'IGCSE' in p.stages and stage_rank(p.stages[0]) < 9 %}<details class="course-track" data-always-open="{{ '0' if early_exam else '1' }}" {{ 'open' if not early_exam or (k and stage_rank(k.grade) >= 9) }}><summary>{{ 'IGCSE 考试方向（备考时确认）' if p.system == 'cambridge' and 'IGCSE' in p.stages else '课程方向（按需要选择）' }}</summary><label class="small" for="track-{{ p.id }}">{{ '考试方向（请与老师确认）' if not self_mode else '课程 / 考试方向' }}</label><select id="track-{{ p.id }}" name="track_{{ p.id }}" class="trk">{% for t in p.tracks %}<option value="{{ t.id }}" {{ 'selected' if p.track(tracks.get(p.id)) == t.id }}>{{ t.name }}</option>{% endfor %}</select></details>{% endif %}
+      {% if self_mode or p.system == 'cert' %}<label class="small" for="exam-{{ p.id }}">考试日期（选填）</label><input id="exam-{{ p.id }}" type="date" name="exam_{{ p.id }}" value="{{ exams.get(p.id) or '' }}">{% endif %}
+      <details class="course-details"><summary>查看完整名称、适用范围与课程说明</summary>
+        <dl class="small"><dt>完整名称</dt><dd>{{ p.edition }}</dd><dt>适用地区 / 课程</dt><dd>{{ p.region or '请按学校课程核对' }}</dd><dt>已整理学段</dt><dd>{{ p.stages|map('stage_name')|join('、') }}</dd></dl>
+        {% if p.notes %}<p class="small muted">{{ p.notes }}</p>{% endif %}
+      </details>
+    </div>
     {% endfor %}
-  </div>
+  </section>
   {% endfor %}
+  </div>
   <div style="margin-top:16px"><button class="btn">保存</button> <a class="btn ghost" href="{{ '/today' if self_mode else '/parent' }}">取消</a></div>
 </form>
 <script>
@@ -60,23 +77,7 @@ $('#method').onchange = _md; _md();
 const _games = () => { if (!$('#games')) return; const adult = +($('#grade').selectedOptions[0]?.dataset.rank || 0) >= 13;
   $('#games').style.display = adult ? 'none' : ''; $$('#games select').forEach(x => x.disabled = adult); };
 $('#grade').addEventListener('change', _games); _games();
-// 选学校类型 → 预填每门课的教材和方向（这个年级还没开、或已经学完的科目不预选，家长仍可手动选）
-// 考试日期只在选中的那套教材下面显示
-const _exams = () => $$('.examd').forEach(x => { x.style.display = x.closest('label').querySelector('input[type=radio]').checked ? 'flex' : 'none'; });
-$$('input[type=radio][name^=subj_]').forEach(r => r.addEventListener('change', _exams)); _exams();
-if ($('#preset')) $('#preset').onchange = () => {
-  const o = $('#preset').selectedOptions[0]; if (!o || !o.dataset.packs) return;
-  const packs = JSON.parse(o.dataset.packs);
-  const g = +($('#grade').selectedOptions[0]?.dataset.rank || 0);
-  $$('input[type=radio][name^=subj_]').forEach(r => { if (r.value === '') r.checked = true; });
-  for (const [subj, c] of Object.entries(packs)) {
-    const pid = typeof c === 'string' ? c : c.pack;
-    const r = document.querySelector(`input[name="subj_${subj}"][value="${pid}"]`);
-    if (!r || (g && (g < +r.dataset.start || g > +r.dataset.end + 0.5))) continue;  // IGCSE(9.5) 读两年，十年级也算
-    r.checked = true;
-    const t = document.querySelector(`select[name="track_${pid}"]`); if (t && c.track) t.value = c.track;
-  }
-};
 </script>
+<script src="/static/course-picker.js?v={{ ASSET_V }}" defer></script>
 {% if k and not self_mode %}{% include "_account_security.html" %}{% endif %}
 {% endblock %}

@@ -98,6 +98,24 @@ def test_optimistic_concurrency(admin):
     assert version() == expected + 1
 
 
+def test_parent_selection_copy_is_published_with_the_curriculum(admin):
+    client, actor = admin
+    pid = 'math-sujiao-g4-pilot'
+    pack = manager.effective(manager.empty())['packs'][pid]['pack']
+    assert '部分内容' in catalog.selection_guide(catalog.packs[pid])['name']
+    form = {**pack, 'stages': '\n'.join(pack['stages']), 'selection_name': '苏教数学四上（主题练习）',
+            'selection_hint': '请核对课本版权页。', 'selection_warning': '仅有部分内容。'}
+    manager.save(actor, version(), 'pack', form)
+    assert '部分内容' in catalog.selection_guide(catalog.packs[pid])['name']
+    manager.publish(actor, version(), '更新家长核对提示')
+    assert catalog.selection_guide(catalog.packs[pid])['hint'] == '请核对课本版权页。'
+    assert client.get('/admin/curricula/edit/pack/'+pid).status_code == 200
+    before = version()
+    with pytest.raises(ValueError, match='过长'):
+        manager.save(actor, before, 'pack', {**form, 'selection_name': '名' * 45})
+    assert version() == before
+
+
 def test_invalid_cycles_and_import_removal_do_not_save(admin):
     client, actor = admin
     manager.save(actor, version(), 'kp', {**kpform('周长'), 'required': 'SZ-M4-AREA'})

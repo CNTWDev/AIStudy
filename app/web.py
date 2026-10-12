@@ -42,7 +42,7 @@ templates.env.globals["news_today_title"] = news.today_title
 
 _STATIC = config.BASE_DIR / "app" / "static"
 
-templates.env.globals["ASSET_V"] = str(int(max((_STATIC / f).stat().st_mtime for f in ("app.css", "app.js"))))
+templates.env.globals["ASSET_V"] = str(int(max((_STATIC / f).stat().st_mtime for f in ("app.css", "app.js", "course-picker.js"))))
 
 def device_label(ua: str | None) -> str:
     """把浏览器 User-Agent 变成人看得懂的「Chrome · iPad」。"""
@@ -54,6 +54,7 @@ def device_label(ua: str | None) -> str:
     return f"{app_} · {dev}"
 
 templates.env.filters["device"] = device_label
+templates.env.filters["stage_name"] = stage_label
 
 def ui_tone(learner) -> str:
     """界面口吻：上中小学的孩子是 kid（圆体、小伙伴会动）；成人学习者、家长、管理员是 adult（同一套颜色，少一点童趣）。"""
@@ -260,14 +261,19 @@ def _kid_form_packs(form, grade: str, old: dict, grade_changed: bool) -> list[tu
                         catalog.packs[pid].track(form.get(f"track_{pid}"))))
     return out
 
+def course_choices(school_type='', grade=None):
+    order = {subject: i for i, subject in enumerate(('chinese', 'math', 'english', 'science', 'physics', 'chemistry', 'biology', 'history', 'geography', 'economics'))}
+    return dict(sorted(catalog.by_subject(school_type).items(), key=lambda kv:
+                       (0 if is_adult(grade) and any(p.system == 'cert' for p in kv[1]) else 1,
+                        order.get(kv[1][0].subject, 99))))
+
+
 def _kid_form(request: Request, k, self_mode=False, **extra):
     """家长编辑孩子，和自学者编辑「我的课程」共用一张表单（self_mode：不显示邮箱密码、游戏、学校这些家长管的项）。"""
     es = enrollments(k["id"])
     enrolled = {e["pack_id"]: e["stage"] for e in es}
     acct = {} if self_mode else account_ctx(k, f"/parent/kids/{k['id']}/account", force=False)
-    by_subject = catalog.by_subject(k["school_type"] or "")
-    if is_adult(k["grade"]):  # 成人：职业资格考试的课排前面
-        by_subject = dict(sorted(by_subject.items(), key=lambda kv: not any(p.system == "cert" for p in kv[1])))
+    by_subject = course_choices(k["school_type"] or "", k["grade"])
     return render(request, "kid_form.html", k=k, enrolled=enrolled, tracks={e["pack_id"]: e["track"] for e in es},
                   exams={e["pack_id"]: e["exam_date"] for e in es}, self_mode=self_mode,
                   presets=catalog.presets, packs_by_subject=by_subject, **acct, **extra)

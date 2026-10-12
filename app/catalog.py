@@ -83,6 +83,7 @@ class Pack:
     prompt_note: str = ""                             # 给 AI 出题 / 讲解时的额外说明（比如「代码用 Python 3」）
     levels: list = field(default_factory=list)        # course 自己的级别 [{id, label, year}]
     chapters: bool = True                             # 能不能按章报进度；按能力分的（剑桥英语等）写 "progress": "none"
+    selection: dict = field(default_factory=dict)    # 家长选课用的短名称、核对提示
 
     @property
     def lang(self) -> str:
@@ -265,6 +266,7 @@ class Catalog:
             strands=d.get("strands", []), tracks=meta.get("tracks", []), default_track=meta.get("default_track", ""),
             school_types=meta.get("school_types", []), system=system, kind=kind, teach_lang=teach, item_lang=item,
             prompt_note=meta.get("prompt_note", ""), levels=levels, chapters=meta.get("progress") != "none",
+            selection=meta.get("selection") or {},
         )
 
     def _load_meta(self, meta_dir):
@@ -287,6 +289,15 @@ class Catalog:
             SUBJECTS.update({x["id"]: x for x in json.loads(f.read_text(encoding="utf-8")).get("subjects", [])})
         f = meta_dir / "presets.json"
         self.presets = json.loads(f.read_text(encoding="utf-8")).get("presets", []) if f.exists() else []
+        f = meta_dir / "selection.json"
+        self.selection_guides = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+
+    def selection_guide(self, pack):
+        """Presentation copy stays separate from the full curriculum and AI instructions."""
+        guide = {**getattr(self, 'selection_guides', {}).get(pack.id, {}), **pack.selection}
+        name = guide.get('name') or pack.edition
+        return {**guide, 'name': name if len(name) <= 44 else name[:43] + '…',
+                'hint': guide.get('hint') or '核对课本封面、出版社、学制和年级；不确定时可先暂不安排。'}
 
     def _load_links(self, links_dir):
         self.concepts, self.concept_of, self.links, self.link_index = {}, {}, [], {}
