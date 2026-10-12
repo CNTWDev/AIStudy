@@ -85,6 +85,9 @@ def validate_document(doc):
             result = Catalog().load(root, register_meta=False)
         errors = list(result.errors)
         for pid, pack in doc['packs'].items():
+            selection = pack['pack'].get('selection', {})
+            if not isinstance(selection, dict) or any(not isinstance(selection.get(k, ''), str) or len(selection.get(k, '')) > n for k, n in (('name', 44), ('hint', 240), ('warning', 240))):
+                errors.append(f'{pid}: 家长选课名称或提示格式不正确 / 过长')
             if pack['pack']['id'] != pid:
                 errors.append('教材 ID 与数据键不一致')
             strands = [s['id'] for s in pack.get('strands', [])]
@@ -184,6 +187,9 @@ def apply_edit(overrides, doc, action, form):
         if old and (subject != meta['subject'] or system != meta['system']):
             raise ValueError('已有教材的学科和学制不能修改；新版本请新建教材，保留历史学习记录')
         meta.update(subject=subject, system=system, edition=text(form, 'edition', True, 200), region=text(form, 'region', limit=200), notes=text(form, 'notes'))
+        # Older clients can edit a pack without erasing its parent-facing copy.
+        if any('selection_' + k in form for k in ('name', 'hint', 'warning')):
+            meta['selection'] = {k: text(form, 'selection_' + k, limit=n) for k, n in (('name', 44), ('hint', 240), ('warning', 240))}
         meta['stages'] = lines(form.get('stages'))
         if not meta['stages'] or any(stage not in STAGE_RANK for stage in meta['stages']):
             raise ValueError('请选择至少一个有效学段')

@@ -11,6 +11,7 @@ from ..web import (
     _save_learning,
     account_action,
     catalog,
+    course_choices,
     enrollments,
     is_adult,
     kid_brief,
@@ -33,7 +34,7 @@ def parent_home(request: Request):
 def kid_new_page(request: Request):
     auth.require_parent(request)
     return render(request, "kid_form.html", k=None, enrolled={}, tracks={}, exams={}, presets=catalog.presets,
-                  packs_by_subject=catalog.by_subject())
+                  packs_by_subject=course_choices())
 
 
 @router.get("/parent/kids/{kid_id}/edit", response_class=HTMLResponse)

@@ -19,6 +19,12 @@
 {{ field('region','适用地区',entry.get('region')) }}
 <label>覆盖学段（可多选）</label><div class="row" style="flex-wrap:wrap">{% for id,label in stages %}<label class="small" style="display:inline-flex;align-items:center;gap:4px;font-weight:400"><input type="checkbox" style="width:auto" name="stages" value="{{ id }}" {{ 'checked' if id in entry.get('stages',[]) }}>{{ label }}</label>{% endfor %}</div>
 {{ field('notes','教材说明与覆盖边界',entry.get('notes'),area=true) }}
+{% set guide = draft.selection_guide(draft.packs[key]) if not new else {} %}
+<h3>家长选课时看到的内容</h3>
+{{ field('selection_name','简短名称（最多 44 字）',guide.get('name')) }}
+{{ field('selection_hint','课本核对提示（最多 240 字）',guide.get('hint'),area=true) }}
+{{ field('selection_warning','重要覆盖提醒（选填，最多 240 字）',guide.get('warning'),area=true) }}
+<p class="small muted">写家长能在课本上找到的名称、出版社或学制；部分覆盖、六三 / 五四差异应明确说明。完整课程说明在选课页折叠展示。</p>
 {% if new %}{{ field('sources','核实来源链接（每行一个）','',true,true) }}{% endif %}
 {% elif kind == 'kp' %}
 <label>所属教材</label><select name="pack_id" required>{% for pid,p in draft.packs.items() %}<option value="{{ pid }}" {{ 'selected' if pid == pack_id }}>{{ p.edition }}</option>{% endfor %}</select>

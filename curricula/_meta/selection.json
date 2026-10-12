@@ -1,0 +1,76 @@
+{
+  "chn-tongbian": {
+    "name": "统编语文（五四学制 / 高中）",
+    "hint": "小学、初中核对版权页的“五·四学制”；高中核对“普通高中教科书”。",
+    "warning": "义务教育部分按五四学制整理；使用六三学制时，请先核对目录，不能只凭“统编版”认定相同。"
+  },
+  "chn-igcse": {
+    "name": "剑桥 IGCSE 中文",
+    "hint": "向老师确认中文考试代码：0509 第一语言、0523 第二语言或 0547 外语；在下方选择相应方向。"
+  },
+  "eng-shanghai": {
+    "name": "上海英语（五四学制 / 高中）",
+    "hint": "义务教育核对“五·四学制”；高中核对学校使用的沪教版或上外版教材。"
+  },
+  "eng-cambridge": {
+    "name": "剑桥英语（小学 / 初中 / IGCSE）",
+    "hint": "核对学校是否采用 Cambridge Primary / Lower Secondary English。备考 IGCSE 时，向老师确认 0510、0511 或 0500。"
+  },
+  "math-shanghai": {
+    "name": "沪教版数学（五四学制 / 高中）",
+    "hint": "核对课本的“沪教版”与学制。义务教育为五四学制，高中按上海课程整理。"
+  },
+  "math-sujiao-g4-pilot": {
+    "name": "苏教版数学（四上 · 部分内容）",
+    "hint": "核对学校是否使用苏教版四年级上册；版本资料登记的出版社为江苏凤凰教育出版社。",
+    "warning": "目前只覆盖四上已核实的 5 个知识点，不是整册教材，也不覆盖其他年级。"
+  },
+  "math-cambridge": {
+    "name": "剑桥数学（初中 / IGCSE）",
+    "hint": "核对 Cambridge Lower Secondary Mathematics 或 IGCSE 0580；附加数学为 0606，考试方向请与老师确认。"
+  },
+  "phy-shanghai": {
+    "name": "沪科版物理（五四学制 / 高中）",
+    "hint": "核对课本的“沪科版”及五四学制 / 高中版本；苏科版与沪科版名称相近，请核对出版社。"
+  },
+  "phy-cambridge": {
+    "name": "剑桥物理（初中 / IGCSE）",
+    "hint": "核对 Cambridge Lower Secondary Science 或 IGCSE Physics 0625；考试方向请与老师确认。"
+  },
+  "chem-shanghai": {
+    "name": "沪科版化学（五四学制 / 高中）",
+    "hint": "核对课本的“沪科版”与学制，尤其注意六三学制与五四学制的目录差异。"
+  },
+  "chem-cambridge": {
+    "name": "剑桥化学（初中 / IGCSE）",
+    "hint": "核对 Cambridge Lower Secondary Science 或 IGCSE Chemistry 0620；考试方向请与老师确认。"
+  },
+  "bio-shanghai": {
+    "name": "上海生物（五四学制 / 高中）",
+    "hint": "初中核对沪教版、五四学制；高中核对沪科版及学校使用的修订版本。"
+  },
+  "bio-cambridge": {
+    "name": "剑桥生物（初中 / IGCSE）",
+    "hint": "核对 Cambridge Lower Secondary Science 或 IGCSE Biology 0610；考试方向请与老师确认。"
+  },
+  "geo-shanghai": {
+    "name": "中华地图学社地理（上海课程）",
+    "hint": "核对版权页的出版社“中华地图学社”，以及五四学制或高中版本。"
+  },
+  "hist-shanghai": {
+    "name": "统编历史（五四学制 / 高中）",
+    "hint": "初中核对“五·四学制”；高中核对《中外历史纲要》或相应选择性必修册次。"
+  },
+  "sci-shanghai": {
+    "name": "沪科技版科学（五四学制）",
+    "hint": "核对课本的科学学科、出版社及五四学制；其他地区同名《科学》应先核对目录。"
+  },
+  "econ-cambridge": {
+    "name": "剑桥 IGCSE 经济（0455）",
+    "hint": "向老师确认考试代码 0455，以及适用的考试年份。"
+  },
+  "fund-law": {
+    "name": "基金从业资格 · 科目一",
+    "hint": "核对考试或培训课程的科目名称与大纲年份；完整课程名称在详情中。"
+  }
+}
