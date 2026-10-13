@@ -51,6 +51,7 @@ class AnthropicProvider(Provider):
         except anthropic.APIConnectionError as e:
             raise LLMError("连不上 AI 服务，请检查服务器网络") from e
         req.usage.update(input_tokens=resp.usage.input_tokens, output_tokens=resp.usage.output_tokens)
+        req.usage["truncated"] = resp.stop_reason == "max_tokens"
         if resp.stop_reason == "refusal":
             raise LLMError("AI 没有回答这个请求，换个说法试试")
         return "".join(b.text for b in resp.content if b.type == "text")
@@ -102,6 +103,7 @@ class OpenAICompatProvider(Provider):
                 payload = r.json()
                 usage = payload.get("usage") or {}
                 req.usage.update(input_tokens=usage.get("prompt_tokens"), output_tokens=usage.get("completion_tokens"))
+                req.usage["truncated"] = payload["choices"][0].get("finish_reason") == "length"
                 return payload["choices"][0]["message"]["content"]
             except (KeyError, IndexError, ValueError) as e:
                 raise LLMError("AI 返回格式不对，请再试一次") from e

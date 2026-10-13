@@ -312,7 +312,7 @@ def news_write(pick: dict, level: dict, day: str) -> dict:
         f'{discuss}'
         '"questions":[{"q":"..","options":["..","..","..",".."],"answer":0,"explain":"中文解析"}]}'
     )
-    return ask_json("news_write", NEWS_EDITOR + "你也是很会写分级读物的作者。", user, effort="medium", max_tokens=3000, cache=False)
+    return ask_json("news_write", NEWS_EDITOR + "你也是很会写分级读物的作者。", user, effort="medium", max_tokens=6000, cache=False)
 
 
 PAPER_SCHEMA = (

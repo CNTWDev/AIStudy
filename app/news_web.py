@@ -2,9 +2,12 @@
 from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 
+import logging
+
 from . import auth, db, llm, news
 
 router = APIRouter()
+log = logging.getLogger(__name__)
 
 
 def _main():
@@ -24,8 +27,10 @@ def news_today(request: Request, level: str = ""):
     try:
         rid = news.open_for(k)
     except llm.LLMError as e:
-        return m.render(request, "message.html", title="今天的新闻还没写好", status_code=503,
-                        text=f"{e}。可以先读一篇 AI 写的短文，或者去书库读书。", link="/reading")
+        # 孩子看不懂 AI 的报错：换成今天的英文短文，读完一样算完成「英文阅读」（报错写进日志给管理员看）
+        log.warning("news article for user %s failed: %s", k["id"], e)
+        return m.render(request, "message.html", title="今天的新闻还没准备好", status_code=503,
+                        text="先读一篇英文短文吧，读完一样算完成 ✓", link="/reading/today?lang=en", link_label="去读短文 →")
     if not rid:
         return m.render(request, "message.html", title="今天的新闻还没准备好",
                         link="/reading", text="每天早上系统会从新闻网站选一条，写成适合你读的英文短文。现在还没有，可以先读书库里的书，或者让 AI 写一篇短文。")
