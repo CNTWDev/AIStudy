@@ -14,7 +14,9 @@
   <td>{{ b.emoji }} <b>{{ b.title_zh or b.title }}</b>{% if b.title_zh %} <span class="muted">{{ b.title }}</span>{% endif %}<br><span class="muted">{{ b.id }} · {{ b.level or '' }} {{ b.grades|join(' ') }}</span></td>
   <td>{% if b.job %}{{ b.job }}{% elif b.ready %}{{ '✓' if b.ok else '⚠ 孩子看不到' }} {{ b.fetched_at }}<br><span class="muted">{{ b.src.type }}{% if b.src.id %} #{{ b.src.id }}{% endif %}</span>
     {% for x in b.problems %}<div class="muted"{% if x.startswith('!') %} style="color:var(--warn)"{% endif %}>{{ x.lstrip('!') }}</div>{% endfor %}
-    {% if b.outdated %}<div class="muted">旧版排版，重新下载一次就用上新排版</div>{% endif %}{% else %}<span class="muted">没下载（孩子看不到）</span>{% endif %}</td>
+    {% if b.outdated %}<div class="muted">旧版排版，重新下载一次就用上新排版</div>{% endif %}{% else %}<span class="muted">没下载（孩子看不到）</span>{% endif %}
+    {% if b.failed and not b.job %}<div class="muted" style="color:var(--warn)">{{ b.failed.at }} 下载失败（连续 {{ b.failed.tries }} 次）：{{ b.failed.error }}</div>
+      <div class="muted">安装 / 升级时 {{ b.failed.retry_after }} 以后再自动试；点「下载」马上重试，或者上传 txt</div>{% endif %}</td>
   <td>{% if b.ready %}{{ b.n_chapters }} / {{ b.n_pages }}<details><summary>章节</summary>{% for c in b.chapters %}<div>{{ loop.index }}. {{ c }}</div>{% endfor %}</details>{% endif %}</td>
   <td class="nw"><form method="post" action="/admin/library/fetch" style="display:inline"><input type="hidden" name="bid" value="{{ b.id }}"><button class="btn ghost sm">{{ '重新下载' if b.ready else '下载' }}</button></form>
     <form method="post" action="/admin/library/upload" enctype="multipart/form-data" class="row" style="margin-top:4px"><input type="hidden" name="bid" value="{{ b.id }}"><input type="file" name="file" accept=".txt,text/plain" required style="max-width:180px"><button class="btn ghost sm">上传</button></form></td>

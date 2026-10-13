@@ -6,11 +6,14 @@
 - 页码是全书连续编号（从 1 开始），孩子的进度、每天读几页都按页算。
 - 下载到的原文另存一份在 data/library/raw/<id>.txt：整理规则（text.FORMAT）升级后直接用它重新整理，不用重新下载。
 - 整理完会做质量检查（text.check）。有严重问题（下载失败、只拿到网页、正文太短）的书孩子那边不显示，只在管理后台看得到。
+- 下载失败记在 data/library/failed.json（时间、原因、连续失败几次）。安装 / 升级时自动下载会跳过最近失败过的书，
+  隔一段时间再试（1 天、2 天、4 天……最多 30 天）；管理后台点「下载」、命令行指定书或加 --retry 时马上重试。
 """
 import json
 import os
 import threading
 import time
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from .. import config
@@ -19,6 +22,8 @@ from .text import FORMAT, build_book
 
 CATALOG = config.BASE_DIR / "content" / "library.json"
 DATA = Path(os.environ.get("LIBRARY_DIR", config.DATA_DIR / "library"))
+RETRY_MAX_DAYS = 30
+_TIME = "%Y-%m-%d %H:%M"
 
 
 class Library:
@@ -61,6 +66,48 @@ class Library:
         self._cache[bid] = (m, d)
         return d
 
+    # ---------------------------------------------------------------- 下载失败的记录
+    def _failed_path(self) -> Path:
+        return DATA / "failed.json"
+
+    def failures(self) -> dict:
+        try:
+            return json.loads(self._failed_path().read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return {}
+
+    def _set_failure(self, bid: str, error: str | None):
+        """error=None：下载成功了，清掉记录。"""
+        with _fail_lock:
+            f = self.failures()
+            if error is None:
+                if bid not in f:
+                    return
+                f.pop(bid)
+            else:
+                f[bid] = {"at": time.strftime(_TIME), "error": error[:300], "tries": f.get(bid, {}).get("tries", 0) + 1}
+            DATA.mkdir(parents=True, exist_ok=True)
+            tmp = self._failed_path().with_suffix(f".{os.getpid()}.tmp")
+            tmp.write_text(json.dumps(f, ensure_ascii=False, indent=1), encoding="utf-8")
+            tmp.replace(self._failed_path())
+
+    def retry_after(self, bid: str) -> str | None:
+        """上次下载失败：自动重试要等到什么时候（"YYYY-MM-DD HH:MM"）；没失败过返回 None。连续失败越多等得越久。"""
+        x = self.failures().get(bid)
+        if not x:
+            return None
+        try:
+            at = datetime.strptime(x["at"], _TIME)
+        except (KeyError, ValueError):
+            return None
+        days = min(2 ** (max(int(x.get("tries", 1)), 1) - 1), RETRY_MAX_DAYS)
+        return (at + timedelta(days=days)).strftime(_TIME)
+
+    def waiting(self, bid: str) -> bool:
+        """最近失败过、还没到自动重试的时间。"""
+        r = self.retry_after(bid)
+        return bool(r) and r > time.strftime(_TIME)
+
     def ready(self, bid: str) -> bool:
         """下载过（不管好不好）。"""
         return self.path(bid).exists()
@@ -87,7 +134,7 @@ class Library:
         return out
 
     def status(self) -> list[dict]:
-        out = []
+        out, fails = [], self.failures()
         for b in self.books.values():
             t = self.text(b["id"])
             out.append({**b, "ready": bool(t), "n_pages": t["n_pages"] if t else 0,
@@ -95,6 +142,7 @@ class Library:
                         "fetched_at": t.get("fetched_at", "") if t else "", "problems": (t or {}).get("problems", []),
                         "ok": bool(t) and not severe(t), "outdated": bool(t) and t.get("format", 1) < FORMAT,
                         "src": (t or {}).get("source", {}), "job": self.jobs.get(b["id"], ""),
+                        "failed": {**fails[b["id"]], "retry_after": self.retry_after(b["id"])} if b["id"] in fails else None,
                         "chapters": [c["title"] for c in t["chapters"]][:200] if t else []})
         return out
 
@@ -184,23 +232,38 @@ class Library:
             raise FetchError("书单里没有这本书")
         if not b.get("pd", True):
             raise FetchError("这本书还在版权期，不下载原文")
-        raw, src = fetch_raw(b)
-        return self._save(bid, raw, src)
+        try:
+            raw, src = fetch_raw(b)
+            built = self._save(bid, raw, src)
+        except Exception as e:
+            self._set_failure(bid, str(e) or type(e).__name__)
+            raise
+        # 下载到了但内容不对（只拿到网页、正文太短）：也算失败，免得每次安装都再下一遍
+        self._set_failure(bid, "下载到的内容不对：" + "；".join(p.lstrip("!") for p in built["problems"] if p.startswith("!"))
+                          if severe(built) else None)
+        return built
 
     def import_text(self, bid: str, raw: str, note: str = "管理员上传") -> dict:
         if bid not in self.books:
             raise FetchError("书单里没有这本书")
         if not raw.strip():
             raise FetchError("文件是空的")
-        return self._save(bid, raw, {"type": "upload", "note": note,
-                                     "gutenberg": "PROJECT GUTENBERG" in raw[:20000].upper()})
+        built = self._save(bid, raw, {"type": "upload", "note": note,
+                                      "gutenberg": "PROJECT GUTENBERG" in raw[:20000].upper()})
+        self._set_failure(bid, None)
+        return built
 
-    def fetch_all(self, only_missing=True, ids=None, log=print) -> tuple[int, int]:
-        ok = bad = 0
+    def fetch_all(self, only_missing=True, ids=None, log=print, retry=False) -> tuple[int, int, int]:
+        """返回 (成功, 失败, 跳过)。only_missing：只下还没有的、坏了的；最近失败过的先跳过（retry=True 马上重试）。"""
+        ok = bad = skipped = 0
         for bid in ids or list(self.books):
             if only_missing and self.available(bid) and not self.outdated(bid):
                 continue   # 已经好好的；没下载、下载坏了、旧规则整理又没存原文的，都重新下
             if not self.books.get(bid, {}).get("pd", True):
+                continue
+            if only_missing and not retry and self.waiting(bid):
+                skipped += 1
+                log(f"  [SKIP] {bid}：上次失败（{self.failures()[bid]['error'][:60]}），{self.retry_after(bid)} 后再自动试")
                 continue
             try:
                 d = self.fetch(bid)
@@ -209,7 +272,7 @@ class Library:
             except Exception as e:  # noqa: BLE001  一本失败不影响别的
                 bad += 1
                 log(f"  [FAIL] {bid}：{e}")
-        return ok, bad
+        return ok, bad, skipped
 
     def fetch_background(self, ids: list[str]):
         def run():
@@ -221,6 +284,9 @@ class Library:
                 except Exception as e:  # noqa: BLE001
                     self.jobs[bid] = f"失败：{e}"
         threading.Thread(target=run, daemon=True).start()
+
+
+_fail_lock = threading.Lock()
 
 
 def severe(t: dict) -> bool:

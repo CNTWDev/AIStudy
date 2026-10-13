@@ -201,3 +201,44 @@ def test_bad_download_is_hidden_and_old_books_rebuilt():
         t = library.text("en-alice")
         assert t["format"] == T.FORMAT and t["chapters"][0]["title"] == "The Red Kite"
         assert "孩子看不到" not in c.get("/admin/library").text.split("en-alice")[1][:600]
+
+
+def test_failed_download_waits_before_retry(monkeypatch):
+    """下载失败记下来：安装 / 升级时先跳过，等一段时间（越失败越久）再试；--retry 或管理员点下载马上试；成功了清掉记录。"""
+    import time as _time
+
+    import app.library as lib
+    bid = next(b for b, x in library.books.items() if x.get("pd", True) and x["lang"] == "en" and not library.ready(b))
+    calls = []
+
+    def down(book):
+        calls.append(book["id"])
+        raise lib.FetchError("连不上 www.gutenberg.org")
+    monkeypatch.setattr(lib, "fetch_raw", down)
+    assert library.fetch_all(ids=[bid], log=lambda s: None) == (0, 1, 0)
+    f = library.failures()[bid]
+    assert f["tries"] == 1 and "gutenberg" in f["error"] and library.waiting(bid)
+    # 再跑一次安装：跳过，不再下载
+    assert library.fetch_all(ids=[bid], log=lambda s: None) == (0, 0, 1) and calls == [bid]
+    # --retry：马上再试；连续失败 2 次，要等 2 天
+    assert library.fetch_all(ids=[bid], log=lambda s: None, retry=True) == (0, 1, 0) and len(calls) == 2
+    at = _time.strptime(library.failures()[bid]["at"], "%Y-%m-%d %H:%M")
+    due = _time.strptime(library.retry_after(bid), "%Y-%m-%d %H:%M")
+    assert round((_time.mktime(due) - _time.mktime(at)) / 86400) == 2
+    # 等的时间过了：自动再试，这次成功 → 记录清掉
+    data = library.failures()
+    data[bid]["at"] = "2000-01-01 00:00"
+    library._failed_path().write_text(__import__("json").dumps(data), encoding="utf-8")
+    assert not library.waiting(bid)
+    monkeypatch.setattr(lib, "fetch_raw", lambda book: (FAKE_EN, {"type": "gutenberg", "id": 1, "gutenberg": True}))
+    ok, bad, skipped = library.fetch_all(ids=[bid], log=lambda s: None)
+    assert (ok, bad, skipped) == (1, 0, 0) and bid not in library.failures()
+    # 管理后台看得到失败原因和下次自动重试的时间
+    monkeypatch.setattr(lib, "fetch_raw", down)
+    library._set_failure(bid, "连不上 www.gutenberg.org")
+    row = next(x for x in library.status() if x["id"] == bid)
+    assert row["failed"]["tries"] == 1 and row["failed"]["retry_after"]
+    library._set_failure(bid, None)
+    for path in (library.path(bid), library.raw_path(bid)):  # 别让这本假书出现在后面测试的书架上
+        path.unlink(missing_ok=True)
+    library._cache.pop(bid, None)
