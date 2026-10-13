@@ -21,20 +21,20 @@
 {% if a.locked %}
 <div class="ah-lock">🔒 <span>{{ a.locked }}</span>{% if S.need %}<a class="btn sm" href="/today">去做任务</a>{% endif %}</div>
 {% elif S.can_bonus_all %}
-<p class="small muted" style="margin:-4px 0 12px">💡 把今天的任务全部做完，还能多玩 10 分钟；每点亮一个知识点再多 2 分钟。</p>
+<p class="small muted" style="margin:-4px 0 12px">{% if simple %}💡 全做完 +10 分钟 · 点亮 1 个 +2 分钟{% else %}💡 把今天的任务全部做完，还能多玩 10 分钟；每点亮一个知识点再多 2 分钟。{% endif %}</p>
 {% endif %}
 
 <div class="ah-games">
 {% for id, g in a.games.items() %}
 <a class="ah-game{{ ' locked' if a.locked }}" href="/arena/{{ id }}">
   <canvas data-preview="{{ id }}"></canvas>
-  <div class="t"><span class="tag" style="background:{{ g.color }}">{{ g.tag }}</span><b>{{ g.icon }} {{ g.name }}</b><p>{{ g.desc }}</p>
+  <div class="t"><span class="tag" style="background:{{ g.color }}">{{ g.tag }}</span><b>{{ g.icon }} {{ g.name }}</b><p class="for-grownups">{{ g.desc }}</p>
     {% set sg = a.stages.get(id) %}{% if sg %}<p class="ah-stage">🗺️ 打到第 {{ sg.upto }} 关 · ⭐ {{ sg.stars }}/{{ sg.max_stars }}</p>{% endif %}</div>
 </a>
 {% endfor %}
 </div>
 
-<div class="ah-sec"><h2>🧸 我的角色</h2><span class="small muted">点一下换上；灰色的达成贴纸条件就解锁</span></div>
+<div class="ah-sec"><h2>🧸 我的角色</h2><span class="small muted for-grownups">点一下换上；灰色的达成贴纸条件就解锁</span></div>
 <div class="ah-avatars">
 {% for v in a.avatars %}
 <button type="button" class="ah-av{{ ' on' if v.id == a.avatar }}{{ ' lock' if not v.open }}" data-av="{{ v.id }}" {% if not v.open %}title="得到「{{ v.need_name }}」贴纸解锁：{{ v.need_how }}"{% endif %}>
@@ -45,7 +45,7 @@
 
 {# 贴纸墙收起来：游戏卡片才是这一页的主角，贴纸点开再看 #}
 <details class="ah-wallbox">
-  <summary class="ah-sec"><h2>🏅 贴纸墙 <small>{{ a.wall|selectattr('got')|list|length }}/{{ a.wall|length }}</small></h2><span class="small muted">只奖励真的做到的事：答对、坚持、点亮知识点</span></summary>
+  <summary class="ah-sec"><h2>🏅 贴纸墙 <small>{{ a.wall|selectattr('got')|list|length }}/{{ a.wall|length }}</small></h2><span class="small muted for-grownups">只奖励真的做到的事：答对、坚持、点亮知识点</span></summary>
 <div class="ah-wall">
 {% for s in a.wall %}<div class="ah-st{{ ' got' if s.got }}" title="{{ s.how }}"><span class="i">{{ s.icon }}</span><b>{{ s.name }}</b><small>{{ s.at if s.got else s.how }}</small></div>{% endfor %}
 </div>

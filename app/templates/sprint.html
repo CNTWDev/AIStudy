@@ -13,7 +13,7 @@
   <div class="card sp-intro">
     <div class="sp-big">🔒</div>
     <h2>先做完今天的任务</h2>
-    <p class="muted">还差 <b>{{ left }}</b> 项。做完今天全部任务，就能来这里冲刺：题目不限量，连对倍数越来越高。</p>
+    <p class="muted">还差 <b>{{ left }}</b> 项{% if simple %}就能冲刺 ⚡{% else %}。做完今天全部任务，就能来这里冲刺：题目不限量，连对倍数越来越高。{% endif %}</p>
     <a class="btn lg" href="/today">回到今天的任务 →</a>
   </div>
   {% else %}

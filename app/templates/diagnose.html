@@ -3,9 +3,9 @@
 <a href="/subjects" class="small">← 学科</a>
 <h1>{{ pack.subject_name }} 小测：看看你会哪些</h1>
 <div class="card" id="intro">
-  <p>从 <b>{{ stage_label(stage) }}</b> 最重要的内容开始，每样 1 道题。<br>
+  <p class="for-grownups">从 <b>{{ stage_label(stage) }}</b> 最重要的内容开始，每样 1 道题。<br>
   做错了不要紧：会接着问一两道更基础的题，找到你是从哪一步开始不会的，从那里补起最省力。</p>
-  <p class="muted small">大约 10–15 分钟，最多 18 题。这不是考试，不打分。不会就选「不会」，别猜：测得越真，后面的题越合你的水平。</p>
+  <p class="muted small">{% if simple %}⏱ 10 分钟 · 不打分 · 不会就选「不会」🙂{% else %}大约 10–15 分钟，最多 18 题。这不是考试，不打分。不会就选「不会」，别猜：测得越真，后面的题越合你的水平。{% endif %}</p>
   <div class="row">
     <button class="btn" id="go">开始小测</button>
     {% if running %}<button class="btn ghost" id="resume" data-sid="{{ running.id }}">继续上次</button>{% endif %}
@@ -28,7 +28,7 @@ async function next() {
   try { r = await api(`/api/diag/${sid}/next`); } catch (e) { $('#box').innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn" onclick="next()">重试</button>`; return; }
   if (r.done) { location.href = r.report; return; }
   $('#prog').textContent = `第 ${r.n} 题` + (r.depth ? ` · 往回找第 ${r.depth} 步` : '');
-  const head = `<div class="small muted">${esc(r.kp.stage)} · ${esc(r.kp.name)}${r.kp.name_en ? ' · ' + esc(r.kp.name_en) : ''}</div>` +
+  const head = `<div class="small muted">${esc(r.kp.stage)} · ${esc(r.kp.name)}${r.kp.name_en && !isSimple() ? ' · ' + esc(r.kp.name_en) : ''}</div>` +
     (r.from ? `<div class="hint small" style="margin:6px 0">刚才「${esc(r.from)}」没做对，看看是不是这个基础没打牢。</div>` : '');
   if (r.item) {
     $('#box').innerHTML = head + '<div id="q"></div>';

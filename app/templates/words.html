@@ -15,7 +15,7 @@
 {% if s.fb.better %}<div class="small muted">示范：{{ s.fb.better }}</div>{% endif %}</div>
 {% else %}<div class="empty card"><div class="e">✍️</div><b>还没有造句</b>在生词本里给单词造个句子，{{ ASSISTANT }}会帮你看看。</div>{% endfor %}
 {% elif kind == 'mistake' %}
-<p class="muted small">做错的题、点了「这道题还不会」的题都在这里，到时间会叫你回来重做：隔天做对 2 次，换一道同类的新题，也做对就过关；过关 3 周后再回头看一眼，还会就真的掌握了。</p>
+<p class="muted small for-grownups">做错的题、点了「这道题还不会」的题都在这里，到时间会叫你回来重做：隔天做对 2 次，换一道同类的新题，也做对就过关；过关 3 周后再回头看一眼，还会就真的掌握了。</p>
 {% set td = today_iso %}
 {% for c in cards %}
 {% set kp = catalog.kp(c.kp_id) if c.kp_id else None %}

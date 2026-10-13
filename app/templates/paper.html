@@ -12,9 +12,9 @@
   {% if images %}<div class="small">原卷照片：{% for im in images %}<a href="/papers/{{ p.id }}/img/{{ im }}" target="_blank">第 {{ loop.index }} 张</a> {% endfor %}</div>{% endif %}
   {% if p.bank_paper_id %}
   <p class="small" style="margin-bottom:0">模拟考：一道一道做下去，不会的点「🤔 这道题还不会」，别猜。{% if bp_minutes %}建议 {{ bp_minutes }} 分钟内做完，已用 <b id="mclock">0:00</b>。{% endif %}
-    做完看结果，重要的是认真做完，分数只是参考。</p>
+    <span class="for-grownups">做完看结果，重要的是认真做完，分数只是参考。</span></p>
   {% else %}
-  <p class="small" style="margin-bottom:0">把每道题在线再做一遍：会的很快过，不会的点「🤔 这道题还不会」。AI 给的答案偶尔会错，觉得不对就点「答案有问题」，这题不算分。</p>{% endif %}
+  <p class="small" style="margin-bottom:0">{% if simple %}再做一遍，不会就点「🤔 这道题还不会」。{% else %}把每道题在线再做一遍：会的很快过，不会的点「🤔 这道题还不会」。AI 给的答案偶尔会错，觉得不对就点「答案有问题」，这题不算分。{% endif %}</p>{% endif %}
   {% if wrong %}<label class="small" style="font-weight:400;margin-top:8px"><input type="checkbox" id="onlywrong"> 只做原卷做错的 {{ wrong|length }} 题</label>{% endif %}
   <div class="daybar" style="margin-top:10px"><span id="pbar"></span></div>
 </div>

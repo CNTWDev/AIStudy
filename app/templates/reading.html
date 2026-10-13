@@ -10,10 +10,10 @@
 {% if news.glossary %}<details class="card small" style="margin-bottom:10px"><summary>🔑 先看看这 {{ news.glossary|length }} 个关键词（点词看详细解释）</summary>
 <div class="chips">{% for g in news.glossary %}<button type="button" class="chip gl" data-w="{{ g.w }}">{{ g.w }}<span class="sub">{{ g.zh }}</span></button>{% endfor %}</div></details>{% endif %}
 {% elif r.source and r.source.startswith('web:') %}<p class="small muted">来自 <a href="{{ r.source[4:] }}" target="_blank" rel="noopener noreferrer">{{ r.source[4:].split('/')[2] if r.source[4:].count('/') >= 2 else r.source[4:] }}</a>（只供自己学习阅读）</p>{% endif %}
-<p class="muted small" id="lookhint">{{ '点一下不懂的单词就能查。' if r.lang == 'en' else '用手指长按/鼠标选中不懂的字词就能查；点一个句子可以问「这句什么意思」。' }} 已查 <span id="nlook">{{ looked|length }}</span> 个。</p>
+<p class="muted small" id="lookhint">{{ '👆 点单词就能查。' if simple and r.lang == 'en' else ('👆 选中字词就能查。' if simple else ('点一下不懂的单词就能查。' if r.lang == 'en' else '用手指长按/鼠标选中不懂的字词就能查；点一个句子可以问「这句什么意思」。')) }} 已查 <span id="nlook">{{ looked|length }}</span> 个。</p>
 {% set can_listen = r.lang == 'en' and questions and done_views is none %}
 {% if can_listen %}<div class="card" id="lcard" hidden><h3 style="margin-top:0">🎧 先听后读</h3>
-<p class="small muted">只听，不看原文。听完做下面的小题，交卷后原文会打开，对照着找找哪里没听出来。</p></div>{% endif %}
+<p class="small muted">{% if simple %}🎧 先听，再做题，然后看原文。{% else %}只听，不看原文。听完做下面的小题，交卷后原文会打开，对照着找找哪里没听出来。{% endif %}</p></div>{% endif %}
 <div id="listenhere"></div>
 {% if can_listen %}<p class="small" id="ltoggle" style="margin:-4px 0 8px"><button class="linkbtn" id="lfirst" type="button">🎧 换成先听后读（练听力）</button></p>{% endif %}
 <div class="card reader" id="reader" lang="{{ 'en' if r.lang == 'en' else 'zh-CN' }}">{% for p in paras %}<p>{{ p }}</p>{% endfor %}</div>
@@ -33,7 +33,7 @@
 </div>{% endif %}
 {% if news and (news.discuss or news.links) %}<div class="card">
 {% if news.discuss %}<h3 style="margin-top:0">🗣️ 说一说</h3><p><b>{{ news.discuss.q }}</b></p>{% if news.discuss.zh %}<p class="small muted">{{ news.discuss.zh }}</p>{% endif %}
-<p class="small muted">用英文对着家长说两三分钟，或者写三五句话。练的正是口语考试里的「说观点、给理由」。</p>{% endif %}
+<p class="small muted for-grownups">用英文对着家长说两三分钟，或者写三五句话。练的正是口语考试里的「说观点、给理由」。</p>{% endif %}
 {% if news.links %}<h3>📘 和课本的联系</h3>{% for x in news.links %}<p class="small">• <b>{{ x.subject }}</b>：{{ x.point }}</p>{% endfor %}{% endif %}
 </div>{% endif %}
 {% if news and news.free and news.pick %}<form method="post" action="/reading/url" class="row small" style="margin-bottom:8px"><input type="hidden" name="url" value="{{ news.pick.url }}"><input type="hidden" name="lang" value="en">

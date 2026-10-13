@@ -5,7 +5,7 @@
 {% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
 {% if adult %}<p class="muted small">设好考试日期，系统按剩下的天数算出每天要学几个考点，按大纲顺序排进「今天」；离考试两周时不再学新内容，改成把还没掌握的高频考点过一遍。
 已经自己看过书的章，在下面勾上「学过」。</p>
-{% else %}<p class="muted small">不用天天报，一周看一眼就行：点一下现在学到哪一章。这一章里练会了一个，会自动换下一个；导入的考试卷考到了后面的内容，进度也会自动往前走。
+{% elif simple %}<p class="muted small">👇 点一下学校学到哪一章就行</p>{% else %}<p class="muted small">不用天天报，一周看一眼就行：点一下现在学到哪一章。这一章里练会了一个，会自动换下一个；导入的考试卷考到了后面的内容，进度也会自动往前走。
 学校进度只是参考：主要还是看你哪里还不熟、哪块基础没打牢来安排。</p>{% endif %}
 
 {% set ns = namespace(first=(rows|selectattr('stale')|map(attribute='pack.id')|first) or (rows[0].pack.id if rows else None)) %}
@@ -13,7 +13,7 @@
 {% set pid = v.pack.id %}
 <details class="card" id="p-{{ pid }}" {{ 'open' if (open_pack == pid) or (not open_pack and pid == ns.first) }}>
   <summary class="row">
-    <div class="grow"><b>{{ v.pack.subject_name }}</b> <span class="muted small">{{ v.pack.edition }} · {{ stage_label(v.stage) }}</span></div>
+    <div class="grow"><b>{{ v.pack.subject_name }}</b> <span class="muted small"><span class="for-grownups">{{ v.pack.edition }} · </span>{{ stage_label(v.stage) }}</span></div>
     {% if v.exam and v.exam.days_left >= 0 %}<span class="badge">离考试 {{ v.exam.days_left }} 天</span>
     {% elif v.pack.system == 'cert' and not v.exam_date %}<span class="badge warn">还没设考试日期</span>
     {% elif v.stale and v.pack.system != 'cert' %}<span class="badge warn">{{ '还没设置' if not v.updated else '该更新了' }}</span>
@@ -23,31 +23,32 @@
   {% if v.exam %}<div class="small" style="margin-bottom:6px">{% if v.exam.phase == 'learn' %}还剩 {{ v.exam.todo|length }} 个考点没学，每天学 {{ v.exam.per_day }} 个，离考试两周时学完。
     {% elif v.exam.phase == 'sprint' %}考前冲刺：已学 {{ v.exam.learned }} / {{ v.exam.total }}，已掌握 {{ v.exam.mastered }} 个，每天把还没掌握的高频考点过一遍。
     {% else %}考试日期已过，可以改成下一次的考试日期。{% endif %}</div>{% endif %}
-  <div class="muted small">{{ '已学' if adult else '学校已学' }} {{ v.learned|length }} / {{ v.total }} 个知识点
+  <div class="muted small for-grownups">{{ '已学' if adult else '学校已学' }} {{ v.learned|length }} / {{ v.total }} 个知识点
     {% if v.current %} · 正在学 <a href="/learn/{{ v.current.id }}">{{ v.current.name }}</a>{% endif %}
     {% if v.next %} · 接下来 <a href="/learn/{{ v.next.id }}?task=preview">{{ v.next.name }}</a>{% endif %}
     · <a href="/map/{{ pid }}">知识地图</a></div>
 
   <form method="post" action="/progress/{{ pid }}" class="prog" style="margin-top:12px">
-    <div class="row">
+    {# 孩子端只点章节；考试日期和年级照样随表单提交（藏起来，不清空） #}
+    <div class="row for-grownups">
       <div><label>考试日期{% if v.pack.system != 'cert' %}（选填）{% endif %}</label><input type="date" name="exam_date" value="{{ v.exam_date or '' }}"></div>
       <div><label>{{ '学段' if adult else '年级 / 学段' }}</label>
         <select name="stage">{% for st in v.pack.stages %}<option value="{{ st }}" {{ 'selected' if st == v.stage }}>{{ stage_label(st) }}</option>{% endfor %}</select></div>
     </div>
     {% if v.chapters %}
-    <div class="small" style="margin:12px 0 4px"><b>学到哪一章了？</b> <span class="muted">点「正在学」，前面的章自动勾上「学过」</span></div>
+    <div class="small" style="margin:12px 0 4px"><b>学到哪一章了？</b> <span class="muted for-grownups">点「正在学」，前面的章自动勾上「学过」</span></div>
     <div class="chlist">
       {% for ch in v.chapters %}
       <div class="chrow {{ 'cur' if ch.current }}">
         <label class="grow"><input type="checkbox" name="done_ch" value="{{ ch.key }}" {{ 'checked' if ch.done and not ch.current }}> {{ ch.name }}
-          <span class="muted small">· {{ ch.kps|length }} 个知识点</span></label>
+          <span class="muted small for-grownups">· {{ ch.kps|length }} 个知识点</span></label>
         <label class="small"><input type="radio" name="chapter" value="{{ ch.key }}" {{ 'checked' if ch.current }}> 正在学</label>
       </div>
       {% endfor %}
       <label class="chrow small muted"><span class="grow"></span><input type="radio" name="chapter" value="" {{ 'checked' if not v.current }}> 不确定 / 放假中</label>
     </div>
     {% else %}
-    <p class="muted small" style="margin-top:10px">这门课是按能力分的（听说读写等），没有章节，不用报进度：会按你平时做题的情况来安排。</p>
+    <p class="muted small for-grownups" style="margin-top:10px">这门课是按能力分的（听说读写等），没有章节，不用报进度：会按你平时做题的情况来安排。</p>
     {% endif %}
     <button class="btn" style="margin-top:10px">保存进度</button>
   </form>

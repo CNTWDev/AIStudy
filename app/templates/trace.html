@@ -2,7 +2,7 @@
 {% block body %}
 <a href="{{ back }}" class="small">← 回到「{{ kp.name }}」</a>
 <h1>🔍 找找根在哪</h1>
-<p class="muted small">「{{ kp.name }}」卡住了，不要紧。最多 {{ max_steps }} 道小题，看看是哪一块基础没打牢。凭第一感觉答，不会就点「不会」。</p>
+<p class="muted small">{% if simple %}不要紧！最多 {{ max_steps }} 道小题，凭感觉答 🙂{% else %}「{{ kp.name }}」卡住了，不要紧。最多 {{ max_steps }} 道小题，看看是哪一块基础没打牢。凭第一感觉答，不会就点「不会」。{% endif %}</p>
 <div class="tdots" id="dots"></div>
 <div class="tchain" id="chain"></div>
 <div id="tbox" class="card"><span class="loading">正在找</span></div>

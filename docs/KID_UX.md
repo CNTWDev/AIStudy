@@ -28,14 +28,49 @@
 - Removed explanatory footnotes (dashed-line legend, map explanation, accuracy rule) from the kid view.
 - Result on a phone: ~3078px → ~1770px tall, ~880 → ~340 characters.
 
+## How it works (for every kid page)
+
+- `simple` (template variable) / `body[data-simple]`: true only when a school-age kid is looking at their own page
+  (not a parent viewing as the kid, not an adult learner). Set in `app/web.py::render`.
+- Put explanations for grown-ups in an element with class `for-grownups`: it stays in the HTML (parents,
+  adult learners and tests still see it) but is hidden for kids. For a shorter kid line use
+  `{% if simple %}short{% else %}long{% endif %}`.
+- In JS use `isSimple()` (`app/static/app.js`) for answer feedback, toasts and pop-ups.
+- Secondary sections fold into `<details class="quiet-box"><summary class="quiet-h">…</summary>`.
+- `tests/test_today_kidtext.py` measures the text a kid actually sees on each page and fails when it goes over budget.
+  If a page goes over, cut words before raising the budget.
+
+## Done: all kid pages
+
+Measured on a new Grade-3 account (characters a kid sees in the page body, phone width):
+
+| Page | Before | After |
+|---|---|---|
+| Today | 877 | 330 |
+| Learn a topic | 427 | 177 |
+| Knowledge map | 729 | 278 |
+| Subjects | 188 | 103 |
+| Progress (school chapter) | 596 | 296 |
+| Settings | 463 | 142 |
+| Browser plug-in | 549 | 43 |
+| Playground | 333 | 209 |
+| Reading / books / records / papers / mocks / warm-up / review / placement | 1,868 | 1,157 |
+| **Total (21 pages)** | **~6,030** | **~2,735** |
+
+What changed:
+- Intro paragraphs that explain rules are hidden or replaced by a one-line kid version with an icon.
+- English subtitles, textbook edition names and knowledge-point counts are hidden on kid pages.
+- Learn page: "why it's useful" and the prerequisites/next topics are folded; the result shows ⭐⭐☆ instead of a sentence.
+- Answer feedback and pop-ups use one short line ("📒 记下了，过几天再练").
+- Settings: device list, plug-in and AI status are folded under "⚙️ 更多"; the plug-in page tells kids to ask a parent.
+- Records: the long tables are folded under "📚 更多记录".
+
 ## Next steps (proposed, in priority order)
 
 | # | Page | Change |
 |---|------|--------|
-| 1 | Practice / warmup / review | Drop the intro paragraph under the title; hide the focus timer + "ghost" race behind a small icon for G1–G4; big answer buttons, auto-advance after correct. |
-| 2 | Global | A "kid density" switch in `base.html` (`data-tone="kid"` already exists) so templates can use one `kid_hint()` macro that renders nothing for kids. Audit all kid templates against the text budget. |
-| 3 | Subjects | Each subject = one big colorful tile with a ring progress; move "导入试卷 / 模拟考 / 学校学到哪了" to the parent side. |
+| 1 | Practice | Big answer buttons, auto-advance after a correct answer; hide the focus timer for G1–G2. |
+| 3 | Subjects | Each subject = one big colorful tile with a ring progress. |
 | 4 | Feedback | Replace "+1 ⭐ 完成一项！" toasts with a star animation into the header counter; mascot cheers / encourages. |
 | 5 | Audio | 🔊 on question stems and mascot hints for G1–G3 (reuse `app/tts`). |
 | 6 | First-run tips | One-time coach marks ("点这里开始") instead of permanent helper text. |
-| 7 | Measure | Track per-page character count in a smoke test so the text does not grow back. |

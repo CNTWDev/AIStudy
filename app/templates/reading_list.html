@@ -5,16 +5,16 @@
 <a class="card today-read" href="/reading/{{ today_r.id }}">
   <span class="tr-e">{{ '📖' if not today_r.finished_at else '✅' }}</span>
   <span class="grow"><b>{{ '接着读今天这篇' if not today_r.finished_at else '今天已经读完' }}：{{ today_r.title }}</b>
-    <span class="small muted">{{ '每天读一篇就够，读完做几道小题就打卡' if not today_r.finished_at else '想多读可以在下面再写一篇，或者去书库读名著' }}</span></span>
+    <span class="small muted for-grownups">{{ '每天读一篇就够，读完做几道小题就打卡' if not today_r.finished_at else '想多读可以在下面再写一篇，或者去书库读名著' }}</span></span>
   <span class="btn {{ '' if not today_r.finished_at else 'ghost' }}">{{ '去读 →' if not today_r.finished_at else '看看' }}</span>
 </a>
 {% elif daily %}
-<p class="lead" style="margin-top:6px">今天还没读。点下面的「✨ 生成短文」，AI 按你的水平写一篇（话题不选也行）；读完做几道小题就完成。</p>
+<p class="lead" style="margin-top:6px">{% if simple %}今天还没读，点「✨ 生成短文」开始 👇{% else %}今天还没读。点下面的「✨ 生成短文」，AI 按你的水平写一篇（话题不选也行）；读完做几道小题就完成。{% endif %}</p>
 {% endif %}
 {% set nt = news_today_title(user) if user and user.role == 'kid' and lang == 'en' else None %}
-{% if nt or not daily %}<a class="tile" href="/news" style="margin:10px 0"><span class="e">📰</span><span><b>今日新闻{% if nt %}：{{ nt }}{% endif %}</b><span>每天从世界各地的新闻里选一条最值得知道的，按你的水平写成英文短文；不懂的词点一下就查</span></span></a>{% endif %}
-{% if not daily %}<a class="tile" href="/books" style="margin:10px 0"><span class="e">📚</span><span><b>书库：读名著原文</b><span>《爱丽丝》《绿野仙踪》《西游记》……一页一页读，不认识的词点一下，读累了点 ▶ 听</span></span></a>
-<p class="lead">大量读是提分的根本。读的时候<b>点一下不懂的词</b>就能查，觉得有用就收藏，收藏的词会自动进入复习。</p>
+{% if nt or not daily %}<a class="tile" href="/news" style="margin:10px 0"><span class="e">📰</span><span><b>今日新闻{% if nt %}：{{ nt }}{% endif %}</b><span class="for-grownups">每天从世界各地的新闻里选一条最值得知道的，按你的水平写成英文短文；不懂的词点一下就查</span></span></a>{% endif %}
+{% if not daily %}<a class="tile" href="/books" style="margin:10px 0"><span class="e">📚</span><span><b>书库：读名著原文</b><span class="for-grownups">《爱丽丝》《绿野仙踪》《西游记》……一页一页读，不认识的词点一下，读累了点 ▶ 听</span></span></a>
+<p class="lead for-grownups">大量读是提分的根本。读的时候<b>点一下不懂的词</b>就能查，觉得有用就收藏，收藏的词会自动进入复习。</p>
 {% endif %}
 
 <div class="card">
@@ -46,13 +46,13 @@
       {% for l in ('en', 'zh') %}{% for c in (cross or {}).get(l, []) %}<button type="button" class="chip" data-lang="{{ l }}" data-topic="{{ c.topic }}" title="用{{ '英文' if l == 'en' else '中文' }}读读{{ c.subject }}课学过的内容">🔗 {{ c.kp.name }}<span class="sub">{{ c.subject }}</span></button>{% endfor %}{% endfor %}
       {% for t in ['🦖 恐龙', '🚀 太空', '⚽ 足球', '🐼 动物', '🧪 科学小实验', '🌍 环保', '🎨 艺术家', '🕵️ 侦探故事'] %}<button type="button" class="chip" data-topic="{{ t[2:] }}">{{ t }}</button>{% endfor %}
     </div>
-    <p class="field-tip">💡 英文短文会自动用上你最近要复习的生词，读着读着就记住了。</p>
+    <p class="field-tip for-grownups">💡 英文短文会自动用上你最近要复习的生词，读着读着就记住了。</p>
     <button class="btn lg block" style="margin-top:14px" data-busy="正在写，大约半分钟…">✨ 生成短文</button>
   </form>
 
   {# 2. 把别的网站上的文章放进阅读器 #}
   <form class="tabpane" data-pane="url" method="post" action="/reading/url" id="urlform" {{ '' if url_error else 'hidden' }} novalidate>
-    <p class="muted small" style="margin:0 0 10px">在别的网站看到想读的文章？把链接贴进来，正文会放进这里的阅读器，同样能点词查、能收藏。</p>
+    <p class="muted small for-grownups" style="margin:0 0 10px">在别的网站看到想读的文章？把链接贴进来，正文会放进这里的阅读器，同样能点词查、能收藏。</p>
     <div class="ig">
       <span class="ig-ico">🔗</span>
       <input type="text" name="url" id="url" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" value="{{ url or '' }}" placeholder="https://…" aria-label="文章链接">
@@ -60,7 +60,7 @@
       <button class="btn" data-busy="正在打开…">打开</button>
     </div>
     <div class="err" id="urlerr" {{ '' if url_error else 'hidden' }}>{{ url_error or '' }}</div>
-    <ul class="small muted" style="margin:12px 0 0;padding-left:20px;line-height:1.8">
+    <ul class="small muted for-grownups" style="margin:12px 0 0;padding-left:20px;line-height:1.8">
       <li>适合：新闻、科普、百科、故事这类以文字为主的网页。</li>
       <li>要登录、要付费、视频页打不开时，可以把文字复制下来，用「贴课文」。</li>
     </ul>

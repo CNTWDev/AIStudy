@@ -19,7 +19,7 @@
 <div class="cols">
 {% for p in packs %}{% set s = p.sum %}
 <div class="card subj">
-  <div class="top">{{ ui.subj_ico(p.pack.subject, 38) }}<div class="grow"><b>{{ p.pack.subject_name }}</b><div class="ed">{{ p.pack.edition }}</div></div>{% if not report_for %}<a class="small" href="/map/{{ p.pack.id }}">地图 →</a>{% endif %}</div>
+  <div class="top">{{ ui.subj_ico(p.pack.subject, 38) }}<div class="grow"><b>{{ p.pack.subject_name }}</b><div class="ed for-grownups">{{ p.pack.edition }}</div></div>{% if not report_for %}<a class="small" href="/map/{{ p.pack.id }}">地图 →</a>{% endif %}</div>
   {{ ui.mastery(s) }}
 </div>
 {% endfor %}
@@ -35,6 +35,7 @@
   <span class="tiny faint" style="white-space:nowrap">{{ d.minutes }} 分钟</span></div>
 {% if loop.last and loop.length > 7 %}</details>{% endif %}
 {% endfor %}</div>{% endif %}
+{% if simple %}<details class="quiet-box"><summary class="quiet-h">📚 更多记录</summary>{% endif %}
 {% if found or solved %}<h2>🔍 {{ '系统发现' if report_for else ASSISTANT ~ '发现' }}</h2>
 {% for f in found %}<div class="finding sev{{ f.severity }}"><b>{{ f.title }}</b> <span class="muted small">{{ f.created_at[:10] }} 起</span><div class="small muted">{{ f.detail }}</div></div>{% endfor %}
 {% if solved %}<p class="small muted">{{ '最近已解决' if report_for else '最近搞定了' }}：{% for f in solved %}{{ f.title }}{{ '、' if not loop.last }}{% endfor %}</p>{% endif %}
@@ -57,4 +58,5 @@
 {% if asks %}<h2>最近问{{ ASSISTANT }}的问题</h2>
 <div class="tw"><table>{% for a in asks %}<tr class="small"><td class="nw">{{ a.created_at[5:16].replace('T', ' ') }}</td><td class="tx">{{ a.text }}</td><td class="muted">{{ a.page }}</td></tr>{% endfor %}</table></div>{% endif %}
 {% if lookups %}<h2>最近查的词</h2><p>{% for l in lookups %}<span class="pill">{{ l.query }}</span> {% endfor %}</p>{% endif %}
+{% if simple %}</details>{% endif %}
 {% endblock %}

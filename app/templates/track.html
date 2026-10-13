@@ -7,7 +7,7 @@
   {% if t.total_units %}<div class="daybar"><span style="width:{{ 100 * t.position / t.total_units }}%"></span></div>{% endif %}
   <h2 style="margin:8px 0">今天读：{{ seg.label }}</h2>
   {% for n in seg.names %}<div>{{ n }}</div>{% endfor %}
-  <p class="muted small">大约 {{ t.daily_minutes }} 分钟。{% if book.edition_tip %}{{ book.edition_tip }}。{% endif %}读的时候遇到不认识的字词，先猜一猜，读完再查。</p>
+  <p class="muted small">⏱ 大约 {{ t.daily_minutes }} 分钟。<span class="for-grownups">{% if book.edition_tip %}{{ book.edition_tip }}。{% endif %}读的时候遇到不认识的字词，先猜一猜，读完再查。</span></p>
   <div class="row"><button class="btn" id="timer">开始计时</button><span id="clock" style="font-size:22px;font-variant-numeric:tabular-nums">00:00</span></div>
 </div>
 <div class="card">

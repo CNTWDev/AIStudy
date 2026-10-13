@@ -3,47 +3,49 @@
 {% set st = me.status if me else 'unknown' %}
 <a href="/map/{{ pack.id }}" class="small">← {{ pack.subject_name }}知识地图</a>
 <h1>{{ kp.name }}</h1>
-<p class="muted small">{% if kp.name_en %}{{ kp.name_en }} · {% endif %}{{ stage_label(kp.stage) }} · {{ strand }} {% if kp.hot %}· <span style="color:var(--warn)">考试常考</span>{% endif %}
+<p class="muted small"><span class="for-grownups">{% if kp.name_en %}{{ kp.name_en }} · {% endif %}</span>{{ stage_label(kp.stage) }}<span class="for-grownups"> · {{ strand }}</span> {% if kp.hot %}· <span style="color:var(--warn)">考试常考</span>{% endif %}
  · <span class="pill st-{{ st }}">{{ STATUS_LABEL[st] }}</span></p>
 
 {% if ev %}<div class="evline small">
   <span title="根据你每次作答估算的：蒙对、粗心都考虑进去了">🎯 把握 <b>{{ ev.p }}%</b></span>
-  {% if ev.recall is not none %}<span title="隔得越久越容易忘，这是估计的">🧠 估计还记得 <b>{{ ev.recall }}%</b></span>{% endif %}
-  <span>✅ 答对过 {{ ev['items'] }} 道不同的题 · {{ ev.days }} 天 · {{ ev.fmts }} 种题型</span>
-  {% if ev.missing %}<span class="muted">还差：{{ ev.missing|join('，') }}</span>{% elif ev.next %}<span class="muted">约 {{ ev.next }} 天后再来看一眼</span>{% endif %}
+  {% if ev.recall is not none %}<span class="for-grownups" title="隔得越久越容易忘，这是估计的">🧠 估计还记得 <b>{{ ev.recall }}%</b></span>{% endif %}
+  <span class="for-grownups">✅ 答对过 {{ ev['items'] }} 道不同的题 · {{ ev.days }} 天 · {{ ev.fmts }} 种题型</span>
+  {% if ev.missing %}<span class="muted for-grownups">还差：{{ ev.missing|join('，') }}</span>{% elif ev.next %}<span class="muted for-grownups">约 {{ ev.next }} 天后再来看一眼</span>{% endif %}
 </div>{% endif %}
 
 {% set weak_pre = pre|selectattr('strength','equalto','必须')|rejectattr('m')|list + pre|selectattr('strength','equalto','必须')|selectattr('m')|selectattr('m.status','equalto','weak')|list %}
 {% if weak_pre %}
-<div class="hint">🧱 先打地基：这个知识点要用到 {% for p in weak_pre %}<a href="/learn/{{ p.id }}">{{ p.name }}</a>{{ '、' if not loop.last }}{% endfor %}。如果下面的题做不出来，先去补它。</div>
+<div class="hint">🧱 {{ '先补：' if simple else '先打地基：这个知识点要用到 ' }}{% for p in weak_pre %}<a href="/learn/{{ p.id }}">{{ p.name }}</a>{{ '、' if not loop.last }}{% endfor %}{% if not simple %}。如果下面的题做不出来，先去补它。{% endif %}</div>
 {% endif %}
 
 <ol class="steps">
   <li><b>看懂它</b><div>{{ kp.desc }}</div>
-    {% if kp.terms %}<div class="small" style="margin-top:4px">关键词：{% for t in kp.terms %}<span class="pill">{{ t }}</span> {% endfor %}</div>{% endif %}
-    {% if not readonly %}<div id="teach" style="margin-top:8px"><button class="btn ghost sm" id="teachbtn">{{ ASSISTANT_ICON }} 让{{ ASSISTANT }}一步步讲给我听</button></div>{% endif %}</li>
-  <li id="ctxli" style="display:none"><b>它从哪来、用在哪</b><div id="ctx" class="ctxbox"></div></li>
+    {% if kp.terms %}<div class="small" style="margin-top:4px">{{ '🔑 ' if simple else '关键词：' }}{% for t in kp.terms %}<span class="pill">{{ t }}</span> {% endfor %}</div>{% endif %}
+    {% if not readonly %}<div id="teach" style="margin-top:8px"><button class="btn ghost sm" id="teachbtn">{{ ASSISTANT_ICON }} {{ '讲给我听' if simple else '让' ~ ASSISTANT ~ '一步步讲给我听' }}</button></div>{% endif %}</li>
+  <li id="ctxli" style="display:none">{% if simple %}<details><summary><b>🌍 学它有什么用？</b></summary><div id="ctx" class="ctxbox"></div></details>{% else %}<b>它从哪来、用在哪</b><div id="ctx" class="ctxbox"></div>{% endif %}</li>
   <li><b>记住方法</b><div>{{ kp.method }}</div></li>
   {% if bridges %}<li><b>🔗 和别的学科连起来</b>
     {% for b in bridges %}<div class="bridge small">{% if b.mine %}<a href="/learn/{{ b.kp.id }}">{{ b.kp.name }}</a>{% else %}{{ b.kp.name }}{% endif %}
       <span class="muted">{{ b.subject }} · {{ b.label }}{% if b.note %}：{{ b.note }}{% endif %}{% if b.type == 'same' %}（{{ b.edition }}）{% endif %}</span>
       {% if b.status in ('mastered', 'learning') %}<span class="pill st-{{ b.status }}">{{ STATUS_LABEL[b.status] }}</span>{% endif %}</div>{% endfor %}</li>{% endif %}
   {% if readonly %}<li><b>做题和总结</b><div class="muted small">孩子用自己的账号登录后在这里练习。</div></li>{% else %}
-  <li><b>动手做 3 题</b> <span class="muted small">从简单的开始；错了会自动进错题本</span>
+  <li><b>动手做 3 题</b> <span class="muted small for-grownups">从简单的开始；错了会自动进错题本</span>
     <div id="items" class="card" style="margin-top:8px"><button class="btn" id="start">开始做题</button></div></li>
-  <li><b>用一句话总结</b> <span class="muted small">（会变成复习卡片）</span>
-    <textarea id="summary" style="min-height:60px" placeholder="用自己的话说：这个知识点就是……"></textarea>
+  <li><b>用一句话总结</b> <span class="muted small for-grownups">（会变成复习卡片）</span>
+    <textarea id="summary" style="min-height:60px" placeholder="{{ '这个知识点就是……' if simple else '用自己的话说：这个知识点就是……' }}"></textarea>
     <div class="row" style="margin-top:8px"><button class="btn" id="finish">完成这一项</button></div></li>{% endif %}
 </ol>
 
+{% if simple %}<details class="kp-around"><summary class="quiet-h">🧭 前后的知识点</summary>{% endif %}
 <div class="grid">
   <div class="card"><div class="card-h"><span class="ico">⬅️</span><h3>往回：要先会的</h3></div>
-    {% for p in pre %}{% set s2 = p.m.status if p.m else 'unknown' %}<a class="kp" href="/learn/{{ p.id }}"><span class="n">{{ p.name }} <span class="muted small">{{ stage_label(p.stage) }} · {{ p.strength }}</span></span><span class="pill st-{{ s2 }}">{{ STATUS_LABEL[s2] }}</span></a>
+    {% for p in pre %}{% set s2 = p.m.status if p.m else 'unknown' %}<a class="kp" href="/learn/{{ p.id }}"><span class="n">{{ p.name }} <span class="muted small">{{ stage_label(p.stage) }}<span class="for-grownups"> · {{ p.strength }}</span></span></span><span class="pill st-{{ s2 }}">{{ STATUS_LABEL[s2] }}</span></a>
     {% else %}<p class="muted small">这是起点，不用先会别的。</p>{% endfor %}</div>
   <div class="card"><div class="card-h"><span class="ico">➡️</span><h3>往前：学会后可以学</h3></div>
     {% for p in post %}{% set s2 = p.m.status if p.m else 'unknown' %}<a class="kp" href="/learn/{{ p.id }}"><span class="n">{{ p.name }} <span class="muted small">{{ stage_label(p.stage) }}</span></span><span class="pill st-{{ s2 }}">{{ STATUS_LABEL[s2] }}</span></a>
     {% else %}<p class="muted small">后面暂时没有了。</p>{% endfor %}</div>
 </div>
+{% if simple %}</details>{% endif %}
 {% if not readonly %}<script>
 const KP = {{ kp.id|tojson }}, TASK = {{ task|tojson }};
 window.ASK_CTX = {kp: KP};
@@ -72,17 +74,17 @@ async function loadItems() {
 }
 function show() {
   if (idx >= items.length) {
-    $('#items').innerHTML = `<p><b>做完了：${right}/${items.length} 正确。</b> ${right === items.length ? '太棒了 🎉' : '每做一题都算数，继续加油！'}</p>` +
+    $('#items').innerHTML = `<p class="done-score"><b>${'⭐'.repeat(right)}${'☆'.repeat(items.length - right)} ${right}/${items.length}</b> ${right === items.length ? '太棒了 🎉' : '继续加油！💪'}</p>` +
       (CTX && CTX.next ? `<div class="hint">🚀 ${esc(CTX.next)}</div>` : '') +
-      `<div class="row"><button class="btn" onclick="$('#finish').scrollIntoView({behavior:'smooth',block:'center'});$('#summary').focus()">写一句总结，完成这一项 ↓</button><button class="btn ghost sm" onclick="loadItems()">再来 3 题</button></div>`; Run.finish(); return;
+      `<div class="row"><button class="btn" onclick="$('#finish').scrollIntoView({behavior:'smooth',block:'center'});$('#summary').focus()">写一句总结 ↓</button><button class="btn ghost sm" onclick="loadItems()">再来 3 题</button></div>`; Run.finish(); return;
   }
   const it = items[idx];
   const box = document.createElement('div');
   // 穿插的「以前学过的」题：记在它自己的知识点上，答完顺便摸清过去
   const p = it.probe, kp = p ? p.kp : KP;
   const base = extra => Object.assign({item_id: it.id, kp_id: kp, request_id: it.request_id}, p ? {mode: 'probe', probe: {depth: p.depth, from: p.from}} : {}, extra);
-  $('#items').innerHTML = (p ? `<div class="probe-tag">🔀 穿插一道以前学过的：${esc(p.name)}</div>` : '') +
-    `<div class="muted small">第 ${idx + 1}/${items.length} 题 · 难度 ${'★'.repeat(it.difficulty || 1)}</div>`;
+  $('#items').innerHTML = (p ? `<div class="probe-tag">🔀 以前学过的<span class="for-grownups">：${esc(p.name)}</span></div>` : '') +
+    `<div class="muted small">第 ${idx + 1}/${items.length} 题<span class="for-grownups"> · 难度 ${'★'.repeat(it.difficulty || 1)}</span></div>`;
   $('#items').appendChild(box);
   renderItem(box, it, {
     submit: (answer, self, ms) => { lastAnswer = answer; return api('/api/answer', base(self ? {self, ms} : {answer, ms})); },
@@ -98,7 +100,7 @@ function show() {
       // 今天第二次卡在这个点（或点了「还不会」）：当场追根，几道小题找出是哪块基础没打牢（app/trace.py）
       if (res.trace) {
         const tb = document.createElement('div'); tb.className = 'hint tracebtn';
-        tb.innerHTML = `🔍 卡住了？找找根在哪：最多 4 道小题，看看是哪块基础没打牢。<div class="row" style="margin-top:6px"><button class="btn sm">开始找</button></div>`;
+        tb.innerHTML = `🔍 卡住了？<span class="for-grownups">找找根在哪：最多 4 道小题，看看是哪块基础没打牢。</span><div class="row" style="margin-top:6px"><button class="btn sm">找找原因</button></div>`;
         tb.querySelector('.btn').onclick = async () => {
           const r = await api('/api/trace/start', {kp_id: KP, item_id: it.id, answer: res.dont_know ? null : lastAnswer});
           location.href = `/trace/${r.id}?back=` + encodeURIComponent(location.pathname + location.search);
@@ -114,7 +116,7 @@ let CTX = null;
 api('/api/context/' + KP).then(c => {
   if (!c || !c.story) return; CTX = c;
   $('#ctx').innerHTML = `<p>📖 ${esc(c.story)}</p>` + ((c.uses || []).length ? `<p>🔧 ${c.uses.map(esc).join('<br>🔧 ')}</p>` : '') +
-    (c.fun ? `<p class="small muted">💡 你知道吗？${esc(c.fun)}</p>` : '');
+    (c.fun ? `<p class="small muted">💡 ${esc(c.fun)}</p>` : '');
   $('#ctxli').style.display = '';
 }).catch(() => {});
 $('#finish').onclick = async () => {

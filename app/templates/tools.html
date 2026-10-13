@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block body %}
 <h1>划词查词小工具</h1>
+{% if simple %}<div class="card"><p style="margin:0">🧩 在别的网站上也能点词就查。<br>请爸爸妈妈帮你装一下 👇</p></div>
+<details class="quiet-box"><summary class="quiet-h">给家长看的安装步骤</summary>{% endif %}
 <p class="muted">装在电脑的 Chrome / Edge 浏览器上。孩子在任何网页上选中不认识的英文单词（或中文词），
 旁边会出现「🔍 查」，也可以右键「用 beejoy 查」：显示音标、发音、意思、近义词和例句，点「⭐ 加入单词本」，
 这个词就会出现在每天的「单词」任务里，按 1/2/4/7 天自动复习。</p>
@@ -62,4 +64,5 @@
     <li>查词需要服务器配置好 AI（家长在 <code>config/llm.toml</code> 里填密钥）。</li>
   </ul>
 </div>
+{% if simple %}</details>{% endif %}
 {% endblock %}

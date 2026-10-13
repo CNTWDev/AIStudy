@@ -631,3 +631,7 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .quiet-box>summary::after{order:2}
 .quiet-box>summary::before{content:"▸";order:3;font-size:18px;transition:transform .2s}
 .quiet-box[open]>summary::before{transform:rotate(90deg)}
+/* 孩子端少字（data-simple）：说明文字只给家长和成人学习者看，孩子看到的是图标、数字和按钮 */
+[data-simple] .for-grownups{display:none!important}
+[data-simple] .runbar .rpb{display:none}
+.done-score b{font-size:20px;letter-spacing:1px}

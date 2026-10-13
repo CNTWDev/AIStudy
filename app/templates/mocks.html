@@ -2,7 +2,7 @@
 {% block body %}
 <a href="/subjects" class="small">← 学科</a>
 <h1>模拟考</h1>
-<p class="muted small">整套的真题、名校卷、名师卷，都由管理员核对过。像真的考试一样，找一段完整的时间一口气做完；
+{% if simple %}<p class="muted small">📝 找一段完整的时间，一口气做完一整套。</p>{% endif %}<p class="muted small for-grownups">整套的真题、名校卷、名师卷，都由管理员核对过。像真的考试一样，找一段完整的时间一口气做完；
 做完看结果：哪些考点真的不会、哪些是粗心、要往回补什么。分数不重要，认真、专注地做完一整套才是这次的收获。</p>
 {% if packs|length > 1 %}<div class="row small">
   <a class="pill {{ 'st-mastered' if not pack }}" href="/mocks">全部</a>
