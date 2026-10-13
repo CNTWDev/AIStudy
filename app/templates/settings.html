@@ -7,7 +7,7 @@
 {% if user.role != 'admin' %}
 <form class="card" method="post" action="/settings/mascot" id="mascot">
   <h3>{{ '选一个陪你学习的小伙伴' if tone == 'kid' else '我的图标' }}</h3>
-  <p class="muted small" style="margin:-4px 0 0">{{ '选好以后，网站左上角和浏览器标签上都是它。随时可以换。' if tone == 'kid' else '显示在网站左上角和浏览器标签上，随时可以换。' }}</p>
+  <p class="muted small for-grownups" style="margin:-4px 0 0">{{ '选好以后，网站左上角和浏览器标签上都是它。随时可以换。' if tone == 'kid' else '显示在网站左上角和浏览器标签上，随时可以换。' }}</p>
   {% set cur = mascot_of(user) %}
   <div class="mascots">
   {% for id, (name, desc) in MASCOTS.items() %}
@@ -21,7 +21,7 @@
 <form class="card" method="post" action="/settings/profile">
   <h3>基本信息</h3>
   {% if user.role == 'kid' and not is_self_learner(user) %}
-  <p>{{ user.name }} · {{ user.email }}</p><p class="muted small">名字和邮箱由家长修改。</p>
+  <p>{{ user.name }} · {{ user.email }}</p><p class="muted small for-grownups">名字和邮箱由家长修改。</p>
   {% else %}
   <label>称呼</label><input type="text" name="name" value="{{ user.name }}" required>
   <label>登录邮箱</label><input type="email" name="email" value="{{ user.email }}" required>
@@ -33,8 +33,9 @@
   <label>旧密码</label><input type="password" name="old" required autocomplete="current-password">
   <label>新密码（至少 6 位）</label><input type="password" name="new" required minlength="6" autocomplete="new-password">
   <div style="margin-top:12px"><button class="btn">保存</button></div>
-  <p class="muted small">改密码后，其他设备上的登录会自动退出。</p>
+  <p class="muted small for-grownups">改密码后，其他设备上的登录会自动退出。</p>
 </form>
+{% if simple %}<details class="quiet-box"><summary class="quiet-h">⚙️ 更多</summary>{% endif %}
 <div class="card">
   <h3>登录中的设备</h3>
   {% for s in sessions %}
@@ -51,6 +52,8 @@
 {% if user.role != 'admin' %}<div class="card"><h3 style="margin-top:0">在别的网站上查词（可选）</h3>
   <p class="muted small">在本网站里选中任何文字就能查词、翻译、加入复习，不用装任何东西。想在别的网站（比如学校网页）上也这样用，可以装浏览器插件。</p>
   <a class="btn ghost sm" href="/tools">浏览器插件</a></div>{% endif %}
-<div class="card"><p class="muted small">AI 功能：{{ '已开启' if llm_enabled() else '未配置（查词、讲解、AI 出题、AI 写短文暂不可用）' }}</p>
-<a class="btn ghost" href="/logout">退出登录</a></div>
+{% if simple %}</details>
+<div class="card"><a class="btn ghost" href="/logout">退出登录</a></div>
+{% else %}<div class="card"><p class="muted small">AI 功能：{{ '已开启' if llm_enabled() else '未配置（查词、讲解、AI 出题、AI 写短文暂不可用）' }}</p>
+<a class="btn ghost" href="/logout">退出登录</a></div>{% endif %}
 {% endblock %}

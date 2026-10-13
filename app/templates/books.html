@@ -2,7 +2,7 @@
 {% block body %}
 <a href="/reading" class="small">← 阅读</a>
 <div class="ph"><h1>📚 书库</h1></div>
-<p class="lead">真正的名著原文。一次只读一页，不认识的词点一下就查，读累了可以点 ▶ 听。</p>
+<p class="lead">{% if simple %}一次读一页 · 点词就查 · ▶ 可以听{% else %}真正的名著原文。一次只读一页，不认识的词点一下就查，读累了可以点 ▶ 听。{% endif %}</p>
 {% if reading %}
 <h2>在读</h2>
 <div class="shelf">{% for b in reading %}

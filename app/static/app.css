@@ -625,3 +625,13 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .course-details dd{margin:2px 0 10px}.course-details p{line-height:1.7}
 @media(min-width:900px){.course-grid{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}}
 .course-track{margin:10px 0}.course-track>summary{cursor:pointer;color:var(--muted);font-size:13px}
+/* 今天页「看看我的进步」：孩子端默认收起，页面只留今天要做的事 */
+.quiet-box>summary{cursor:pointer;list-style:none;user-select:none}
+.quiet-box>summary::-webkit-details-marker{display:none}
+.quiet-box>summary::after{order:2}
+.quiet-box>summary::before{content:"▸";order:3;font-size:18px;transition:transform .2s}
+.quiet-box[open]>summary::before{transform:rotate(90deg)}
+/* 孩子端少字（data-simple）：说明文字只给家长和成人学习者看，孩子看到的是图标、数字和按钮 */
+[data-simple] .for-grownups{display:none!important}
+[data-simple] .runbar .rpb{display:none}
+.done-score b{font-size:20px;letter-spacing:1px}

@@ -78,6 +78,8 @@ def render(request: Request, name: str, status_code: int = 200, **ctx):
     base = {"user": user, "kid": kid, "readonly": bool(user and user["role"] != "kid"),
             "SITE": sitecfg.get("site_name"), "ASSISTANT": sitecfg.get("assistant_name"),
             "ASSISTANT_ICON": sitecfg.get("assistant_icon"), "tone": ui_tone(kid or user)}
+    # simple：孩子自己在看（不是家长、不是成人学习者）——少字多图，说明文字只给家长看（docs/KID_UX.md）
+    base["simple"] = bool(user and user["role"] == "kid" and base["tone"] == "kid")
     return templates.TemplateResponse(request, name, {**base, **ctx}, status_code=status_code)
 
 def _flow_here(request: Request, kid) -> dict | None:

@@ -190,7 +190,7 @@ function renderItem(box, item, opts) {
       const res = await opts.submit(answer, undefined, Date.now() - t0);
       if (res.reveal) {
         $('.fbbox', box).innerHTML = `<div class="fb dk">` + qAns({answer: res.answer, points: res.points}).replace('<dt>答案</dt>', '<dt>参考答案</dt>') +
-          `<div class="row" style="margin-top:10px"><span>对照要点，你答到了吗？</span><button class="btn sm selfok">基本答到</button><button class="btn ghost sm selfno">还差一些</button></div></div>`;
+          `<div class="row" style="margin-top:10px"><span>${isSimple() ? '你答到了吗？' : '对照要点，你答到了吗？'}</span><button class="btn sm selfok">基本答到</button><button class="btn ghost sm selfno">还差一些</button></div></div>`;
         btn.remove();
         const go = async v => {
           const r2 = await opts.submit(answer, v, Date.now() - t0);
@@ -226,19 +226,21 @@ function flagRow(box, item) {
   box.appendChild(row);
 }
 const PRAISE = ['✅ 对了！', '✅ 漂亮！', '✅ 答对了，继续！', '✅ 很稳！', '✅ 就是这样！'];
+/* 孩子端少字（body[data-simple]，见 docs/KID_UX.md）：反馈、弹窗只留一句话 */
+const isSimple = () => !!(document.body && document.body.dataset.simple);
 /* 判完以后的反馈：先一句结论，再是带答案的几栏（同 qAns）。o.choice：选择题的答案已经标在选项上，不再重复；o.mine：自己写的答案 */
 function feedback(res, o) {
   o = o || {};
   if (res.dont_know) {
-    return `<div class="fb dk pop"><div class="fb-v">📌 没关系，知道自己哪里不会就是进步。先看懂它：</div>` +
+    return `<div class="fb dk pop"><div class="fb-v">${isSimple() ? '📌 没关系，先看懂它：' : '📌 没关系，知道自己哪里不会就是进步。先看懂它：'}</div>` +
       qAns({answer: res.answer, explain: res.explain, points: res.points, transcript: res.transcript}) +
-      `<div class="fb-note">已放进错题本，过几天再练一次就会了。</div></div>`;
+      `<div class="fb-note">${isSimple() ? '📒 记下了，过几天再练' : '已放进错题本，过几天再练一次就会了。'}</div></div>`;
   }
   if (res.correct === undefined) return '';
   const wrongAns = res.correct ? '' : res.answer;
   return `<div class="fb ${res.correct ? 'ok' : 'no'} pop"><div class="fb-v">${res.correct ? PRAISE[Math.floor(Math.random() * PRAISE.length)] : '❌ 差一点！'}</div>` +
     qAns({answer: (o.choice && res.answer_index != null) ? '' : wrongAns, mine: res.correct ? '' : o.mine, explain: res.explain, points: res.correct ? [] : res.points, transcript: res.transcript}) +
-    (res.correct || res.redo ? '' : `<div class="fb-note">已放进错题本，过几天会再出现。做错也算练过，继续！</div>`) + `</div>`;
+    (res.correct || res.redo ? '' : `<div class="fb-note">${isSimple() ? '📒 记下了，过几天再练' : '已放进错题本，过几天会再出现。做错也算练过，继续！'}</div>`) + `</div>`;
 }
 
 /* ---------- 即时反馈：小动画 ---------- */
@@ -275,12 +277,12 @@ const Flow = {
     $$('.flow-sheet,.flow-pill').forEach(x => x.remove());
     const nx = st.next, sec = st.section;
     const head = st.all_done ? '🎉 今天的任务全部完成！' : sec ? `🎉 第 ${sec.n} 节完成！` : st.just ? '✓ 完成一项 +1 ⭐' : '👉 接着做今天的任务';
-    const sub = st.all_done ? '坚持比做对更重要，今天你做到了。' : sec ? (sec.base ? '第 1 节做完了，今天的连续天数保住啦。' : `又亮了一格，还剩 ${sec.left} 节。`) : '';
+    const sub = st.all_done ? (isSimple() ? '' : '坚持比做对更重要，今天你做到了。') : sec ? (sec.base ? (isSimple() ? '🛡️ 连续天数保住啦' : '第 1 节做完了，今天的连续天数保住啦。') : `又亮了一格，还剩 ${sec.left} 节。`) : '';
     const m = document.createElement('div'); m.className = 'flow-sheet'; m.setAttribute('role', 'dialog');
     m.innerHTML = `<div class="fs-card"><button type="button" class="fs-x" aria-label="先看看这页" title="先看看这页">✕</button>
       <div class="fs-h"><b>${head}</b>${sub ? `<span>${sub}</span>` : ''}</div>
       <div class="fs-prog"><span>今天 ${st.done}/${st.total}</span><i><b style="width:${Math.round(100 * st.done / st.total)}%"></b></i></div>
-      ${nx ? `<a class="fs-next" href="${esc(nx.url)}"><span class="fs-k">下一项 · 第 ${nx.n} 项${nx.minutes ? ' · 约 ' + nx.minutes + ' 分钟' : ''}</span><b>${esc(nx.title)}</b>${nx.why ? `<span class="fs-why">${esc(nx.why)}</span>` : ''}<span class="btn lg block fs-go">继续 →</span></a>`
+      ${nx ? `<a class="fs-next" href="${esc(nx.url)}"><span class="fs-k">下一项 · 第 ${nx.n} 项${nx.minutes ? ' · 约 ' + nx.minutes + ' 分钟' : ''}</span><b>${esc(nx.title)}</b>${nx.why && !isSimple() ? `<span class="fs-why">${esc(nx.why)}</span>` : ''}<span class="btn lg block fs-go">继续 →</span></a>`
         : `<div class="fs-end"><a class="btn lg" href="/sprint">⚡ 还想做？来冲刺</a><a class="btn soft lg" href="/arena">🎮 去乐园</a></div>`}
       <div class="fs-alt">${sec && nx ? '<button type="button" class="linkbtn fs-rest">☕ 休息 3 分钟</button>' : ''}<a class="linkbtn" href="/today${st.all_done ? '#daylog' : ''}">${st.all_done ? '📝 写一句一日记录' : '回到今天'}</a></div></div>`;
     document.body.appendChild(m);
@@ -520,10 +522,10 @@ const Combo = {
 /* 答题结果里带 lit：第一次掌握这个知识点 → 点亮 */
 function celebrate(res, el) {
   if (res && res.lit) {
-    toast(`🌟 点亮新知识点：${res.lit.name}（今天第 ${res.lit.today} 个）`, 2400);
+    toast(`🌟 点亮：${res.lit.name}`, 2400);
     confetti();
   } else if (res && res.probe && res.probe.inferred) {
-    toast(`🗺️ 地图又亮了一块：顺带确认了 ${res.probe.inferred + 1} 个知识点`, 2000);
+    toast(`🗺️ 地图亮了 ${res.probe.inferred + 1} 块`, 2000);
   }
 }
 
@@ -583,7 +585,7 @@ const Run = {
         const d = Math.round((Run.ghost * Run.right - Run.active) / 1000);
         $('.rg', el).textContent = d >= 0 ? `比上周的我快 ${d} 秒 👟` : `上周的我领先 ${-d} 秒`;
       } else $('.rg', el).textContent = '👻 上周的我在跑';
-    } else { g.style.display = 'none'; $('.rg', el).textContent = Run.pb && Run.pb.runs ? '' : '第一次：先立个纪录'; }
+    } else { g.style.display = 'none'; $('.rg', el).textContent = Run.pb && Run.pb.runs ? '' : (isSimple() ? '' : '第一次：先立个纪录'); }
   },
   async finish(extra) {
     if (!Run.on || Run.saved) return null;

@@ -2,7 +2,7 @@
 {% block body %}
 <a href="/subjects" class="small">← 学科</a>
 <h1>试卷订正</h1>
-<p class="muted small">学校的测验、月考、作业单拍照传上来：AI 会把卷子拆成一道道题、对上知识点、读出老师批改的对错。
+{% if simple %}<p class="muted small">📷 拍下学校的试卷，AI 帮你找出要补的地方。</p>{% endif %}<p class="muted small for-grownups">学校的测验、月考、作业单拍照传上来：AI 会把卷子拆成一道道题、对上知识点、读出老师批改的对错。
 判错的题自动进错题本；再在线把卷子做一遍，最后看看：哪些是真的不会、哪些是粗心、要往回补哪些基础。</p>
 
 {% if not llm_on %}<div class="hint">服务器还没有配置 AI，暂时不能解析试卷（家长在 config/llm.toml 里填密钥后就能用）。</div>{% endif %}
