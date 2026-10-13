@@ -717,11 +717,8 @@ def today_plan(user_id: int, rebuild=False) -> dict:
     return {"day": day, "plan": plan, "minutes": row["minutes"], "checked_in": row["checked_in"], "reflection": row["reflection"]}
 
 
-# 只有可能在线下完成的任务（读纸质书）才能手动打勾；其余任务做完自动打勾。
-MANUAL_DONE = {"read_en", "read_zh"}
-
-
-def mark_task(user_id: int, task_id: str, done=True, manual=False) -> bool:
+# 任务都要在网站上真做完才打勾（没有「手动打勾」）：阅读在网站上读够自动完成
+def mark_task(user_id: int, task_id: str, done=True) -> bool:
     day = db.today().isoformat()
     row = db.one("SELECT plan FROM days WHERE user_id=? AND day=?", user_id, day)
     if not row:
@@ -729,7 +726,7 @@ def mark_task(user_id: int, task_id: str, done=True, manual=False) -> bool:
     plan = db.jload(row["plan"], [])
     hit = False
     for t in plan:
-        if t["id"] == task_id and not (manual and t.get("type") not in MANUAL_DONE):
+        if t["id"] == task_id:
             t["done"] = done
             hit = True
     db.run("UPDATE days SET plan=? WHERE user_id=? AND day=?", db.jdump(plan), user_id, day)
