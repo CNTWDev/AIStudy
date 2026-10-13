@@ -104,6 +104,24 @@ def extract_json(text: str):
     raise LLMError("AI 返回格式不对，请再试一次")
 
 
+MAX_RETRY_TOKENS = 16000
+
+
+def _complete_json(p, req: ChatRequest):
+    """调用一次并解析 JSON。回答写到一半被长度上限截断、或 JSON 坏了：放宽长度再试一次。"""
+    try:
+        return extract_json(p.complete(req))
+    except LLMError:
+        truncated = req.usage.get("truncated")
+        req.max_tokens = min(max(req.max_tokens * 2, 4000), MAX_RETRY_TOKENS)
+        try:
+            return extract_json(p.complete(req))
+        except LLMError:
+            if truncated and req.usage.get("truncated"):
+                raise LLMError("AI 写得太长被截断了，请稍后再试") from None
+            raise
+
+
 def _count_usage(user_id: int | None):
     if not user_id:
         return
@@ -142,7 +160,7 @@ def ask_json(task: str, system: str, user: str, *, user_id=None, effort="low", m
     _count_usage(user_id)
     started, status, error = time.monotonic(), "failed", ""
     try:
-        data = validate(task, extract_json(p.complete(req)))
+        data = validate(task, _complete_json(p, req))
         check_active()
         status = "ok"
     except Exception as exc:

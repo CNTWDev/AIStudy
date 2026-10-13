@@ -130,3 +130,44 @@ def test_no_news_yet(monkeypatch):
     monkeypatch.setattr(news, "latest_pick", lambda band: None)
     assert news.today_title({"grade": "G8", "settings": "{}"}) is None
 
+
+
+def test_news_failure_sends_kid_to_short_article(monkeypatch):
+    """新闻没写出来（AI 出错）：孩子看到的不是 AI 的报错，而是去读今天的英文短文（读完一样算完成英文阅读）。"""
+    from app import llm
+
+    def broken(user):
+        raise llm.LLMError("AI 返回格式不对，请再试一次")
+    monkeypatch.setattr(news, "open_for", broken)
+    with TestClient(__import__("app.main", fromlist=["app"]).app) as c:
+        c.post("/login", data={"email": "newsk3@x.com", "password": "secret1"})
+        r = c.get("/news")
+        assert r.status_code == 503 and "格式不对" not in r.text and "AI" not in r.text.split("<main")[1].split("</main>")[0]
+        assert 'href="/reading/today?lang=en"' in r.text and "去读短文" in r.text
+        c.get("/logout")
+
+
+def test_cut_off_json_is_retried_with_more_room():
+    """AI 的回答写到一半被长度上限截断：放宽长度再要一次；两次都截断给一句看得懂的错误。"""
+    import pytest
+
+    from app.llm import service
+    from app.llm.base import ChatRequest, LLMError
+
+    class Fake:
+        def __init__(self, replies):
+            self.replies, self.limits = list(replies), []
+
+        def complete(self, req):
+            self.limits.append(req.max_tokens)
+            text, cut = self.replies.pop(0)
+            req.usage["truncated"] = cut
+            return text
+
+    p = Fake([('{"title": "Frogs", "body": "A tiny fr', True), ('{"title": "Frogs", "body": "A tiny frog."}', False)])
+    assert service._complete_json(p, ChatRequest(task="news_write", system="", user="", max_tokens=3000)) == {"title": "Frogs", "body": "A tiny frog."}
+    assert p.limits == [3000, 6000]
+    p = Fake([('{"body": "A ti', True), ('{"body": "A tiny fr', True)])
+    with pytest.raises(LLMError, match="截断"):
+        service._complete_json(p, ChatRequest(task="news_write", system="", user="", max_tokens=12000))
+    assert p.limits == [12000, service.MAX_RETRY_TOKENS]
