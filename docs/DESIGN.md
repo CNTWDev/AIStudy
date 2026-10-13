@@ -532,7 +532,7 @@ FastAPI 应用（app/main.py）
   `O_EXCL` 抢占保证多进程也只生成一次。每种语言固定一个声音（不让用户选，命中率才高），语速按用途（单词 / 句子 / 阅读）在 `config/tts.toml` 配。
   没开或某语言没配声音时，前端（`Speak`）退回浏览器自带的朗读。网站这边的胶水在 `app/tts_web.py`。
 - **书库** `app/library/`：书单 `content/library.json`（只有公有领域的书放原文，其余只列书名）。服务器从古腾堡 / 维基文库下载原文
-  （`python -m app.cli library fetch`，安装升级时自动跑；管理后台也能下载或上传 txt），去掉头尾、切章、按字数分页，存 `data/library/<id>.json`。
+  （`python -m app.cli library fetch`，安装升级时自动跑；下载失败记在 `data/library/failed.json`，之后的安装升级先跳过，按 1、2、4…最多 30 天再自动试，`--retry` 或管理后台点下载马上重试；管理后台也能上传 txt），去掉头尾、切章、按字数分页，存 `data/library/<id>.json`。
   孩子按页读（`book_progress`、`book_days`），每章第一页显示 AI 写的导读（上回说到、关键词、带着问题读），章末两道小题 + 一句话，答对得书签；
   导读存在 `contents`（kind=`book_guide`），所有孩子共用。家长在「阅读与单词」里选书库的书（`tracks.ref = lib:<id>`，按页算）和「每天听书」，
   读够页数 / 听够分钟自动打勾。

@@ -366,7 +366,7 @@ backup_db() {
 migrate_db() {
   step "迁移数据库"
   run_cli migrate | sed 's/^/  /'
-  step "书库：下载还没有的公版名著原文（失败不影响安装，之后可在管理后台重试）"
+  step "书库：下载还没有的公版名著原文（最近失败过的先跳过，过几天再自动试；失败不影响安装，可在管理后台马上重试）"
   (cd "$APP_DIR" && timeout 900 runuser -u "$SERVICE_USER" -- "$VENV/bin/python" -m app.cli library fetch) 2>&1 | sed 's/^/  /' \
     || warn "书库下载没完成，稍后在「管理 → 书库」里点「下载所有还没有的」"
 }
