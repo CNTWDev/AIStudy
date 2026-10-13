@@ -75,7 +75,6 @@
       <a class="t" href="{{ x.url }}">{{ x.title }}</a>
       {% if readonly %}<div class="why">{{ x.why }} <span class="mins">· 约 {{ x.minutes }} 分钟</span></div>{% else %}<div class="why"><span class="mins">⏱ {{ x.minutes }} 分钟</span></div>{% endif %}
     </div>
-    {% if not readonly and not x.done and x.type in manual_done %}<span class="stepacts"><button class="btn soft sm chk" title="在纸质书上读完了，直接打勾">📖 在书上读完了</button></span>{% endif %}
   </div>
   {% else %}<div class="empty"><div class="e">🌤️</div><b>今天还没有安排</b></div>{% endfor %}
   </div>
@@ -213,10 +212,6 @@ if (just) {
   {% if total and done == total %}confetti();{% else %}cheer($('.step.next') || document.body);{% endif %}
 }
 setTimeout(() => $$('.explore .bar span').forEach(b => b.style.width = b.dataset.w + '%'), 150);
-$$('.step .chk').forEach(b => b.onclick = async () => {
-  await api('/api/plan/task', {id: b.closest('.step').dataset.id, done: true});
-  sessionStorage.setItem('justDone', b.closest('.step').dataset.type); location.reload();
-});
 $('#rebuild').onclick = async () => { await api('/api/plan/rebuild', {}); location.reload(); };
 let mood = {{ rec.mood|tojson }};
 async function checkin(msg) {

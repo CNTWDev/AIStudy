@@ -91,7 +91,7 @@ def today(request: Request):
     play = arena.status(k)
     exams = [x for x in (engine.exam_view(k["id"], e, m) for e in enrollments(k["id"])) if x and x["days_left"] >= 0]
     day = streak.today_state(k, t["plan"], t["minutes"], sprint.points_today(k["id"]))
-    return render(request, "today.html", manual_done=engine.MANUAL_DONE, t=t, play=play, day=day, settled=settled, exams=exams,
+    return render(request, "today.html", t=t, play=play, day=day, settled=settled, exams=exams,
                   goals=streak.GOALS, sprint_best=sprint.best_day(k["id"]), play_locked=arena.locked_reason(play),
                   due=len(engine.due_cards(k["id"], 99)), progress_ask=engine.progress_prompt(k), streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
                   stars=engine.total_stars(k["id"]), rec=rec, auto=engine.day_summary(rec),
@@ -120,14 +120,6 @@ def flow_get(request: Request, current: str = ""):
 def plan_rebuild(request: Request):
     k = kid_or_redirect(request)
     return engine.today_plan(k["id"], rebuild=True)
-
-
-@router.post("/api/plan/task")
-def plan_task(request: Request, body: dict = Body(...)):
-    k = kid_or_redirect(request)
-    if not engine.mark_task(k["id"], body["id"], bool(body.get("done", True)), manual=True):
-        raise HTTPException(400, "这一项做完会自动打勾")
-    return {"ok": True}
 
 
 @router.post("/api/plan/task-done")
