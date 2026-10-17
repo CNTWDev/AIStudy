@@ -12,7 +12,7 @@ import json
 import logging
 
 from .base import KINDS, FigError, Kind, register
-from . import plane, solid, graph, chart, clock, scale, circuit, photo  # noqa: F401  各种图在 import 时登记
+from . import plane, solid, graph, chart, clock, scale, circuit, lab, photo  # noqa: F401  各种图在 import 时登记
 
 log = logging.getLogger(__name__)
 

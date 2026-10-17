@@ -36,7 +36,11 @@ SAMPLES = {
     "ruler": {"kind": "scale", "tool": "ruler", "min": 0, "max": 6, "from": 1, "to": 4.35, "unit": "cm"},
     "circuit": {"kind": "circuit", "loop": ["cell", "switch:S", {"parallel": [["lamp:L1"], ["lamp:L2", "ammeter:A2"]]}, "ammeter:A1"],
                 "meters": [{"type": "voltmeter", "label": "V", "across": "L1"}]},
+    "lab": {"kind": "lab", "setup": "gas_heat", "collect": "water", "labels": {"lamp": "a", "trough": "b"}},
+    "distillation": {"kind": "lab", "setup": "distillation", "labels": {"condenser": "A", "water_in": "B"}},
 }
+for _s in ("gas_flask", "filtration", "evaporation", "titration", "electrolysis", "chromatography"):
+    SAMPLES[_s] = {"kind": "lab", "setup": _s}
 
 
 @pytest.mark.parametrize("name", list(SAMPLES))
@@ -60,6 +64,10 @@ def test_each_kind_draws(name):
     {"kind": "chart", "categories": ["a", "b"], "series": [{"values": [1]}]},
     {"kind": "circuit", "loop": ["cell", "lamp:L1"], "meters": [{"type": "voltmeter", "across": "L9"}]},
     {"kind": "circuit", "loop": ["cell", "toaster"]},
+    {"kind": "lab", "setup": "spaceship"},
+    {"kind": "lab", "setup": "filtration", "labels": {"burette": "a"}},              # 过滤装置里没有滴定管
+    {"kind": "lab", "setup": "gas_heat", "collect": "up", "labels": {"trough": "a"}},  # 向上排空气法没有水槽
+    {"kind": "lab", "setup": "gas_flask", "collect": "sideways"},
 ])
 def test_bad_figures_rejected(bad):
     assert figures.normalize(bad) is None
@@ -74,6 +82,7 @@ def test_prompt_only_for_subjects_that_draw():
     assert "circuit" in figures.prompt_for("physics") and "clock" not in figures.prompt_for("physics")
     assert "clock" in figures.prompt_for("math") and "solid" in figures.prompt_for("math")
     assert figures.prompt_for("english") == "" and not any(k.id == "photo" for k in figures.drawable_for("math"))
+    assert "distillation" in figures.prompt_for("chemistry") and "lab " not in figures.prompt_for("math")
 
 
 def test_item_with_figure():
