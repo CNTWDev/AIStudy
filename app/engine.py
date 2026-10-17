@@ -162,7 +162,8 @@ def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="", exclu
             have = {p["id"] for p in picked} | bank.flagged_by(user_id) | exclude
             saved = [it for it in save_items(kp_id, new, purpose=purpose, grade=grade, meta=bank.gen_meta("items", purpose=purpose))
                      if it["id"] not in have]
-            picked += saved[: n - len(picked)]
+            # 题目内容和别的知识点的题一样时，存的是那道旧题：这次也记在正在学的知识点上
+            picked += [{**it, "kp_id": kp_id} for it in saved[: n - len(picked)]]
         except llm.LLMError:
             pass
     return picked[:n]

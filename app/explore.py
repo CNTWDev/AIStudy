@@ -118,13 +118,14 @@ def _near(kp_id: str, depth: int = 3) -> list[tuple[dict, int]]:
     return out
 
 
-def candidates(user_id: int, mastery: dict | None = None, near_kp: str | None = None) -> list[dict]:
+def candidates(user_id: int, mastery: dict | None = None, near_kp: str | None = None, only_near: bool = False) -> list[dict]:
     """按信息量排序的摸底 / 校正候选。每项：{kp, reason, depth, from}。
 
     「以前学过的」不只是测一次就完：没测过的要摸底，只是推断会的要确认，学会很久的按遗忘规律要复查。
     挑哪个讲相关性——和正在学的、今天要学的、学校正在教的有关的旧知识排前面；
     再讲覆盖面——哪个学科的哪一块、哪个年级摸得最少，就往那里多放一点，慢慢把过去整个过一遍。
-    near_kp：在学某个知识点时，优先它没测过 / 没确认的前置。"""
+    near_kp：在学某个知识点时，优先它没测过 / 没确认的前置。
+    only_near：只要 near_kp 的前置（学某个知识点时穿插的那道「以前学的」必须和它有关，不能是别的学科随便一道）。"""
     mastery = engine.get_mastery(user_id) if mastery is None else mastery
     unknown = lambda k: mastery.get(k, {}).get("status") in (None, "unknown")  # noqa: E731
     guessed = lambda k: mastery.get(k, {}).get("source") == "inferred" and mastery[k].get("status") != "weak"  # noqa: E731
@@ -143,6 +144,12 @@ def candidates(user_id: int, mastery: dict | None = None, near_kp: str | None = 
         for p, d in _near(near_kp):
             if guessed(p["id"]):
                 add(p["id"], f"「{catalog.kps[near_kp]['name']}」要用到它，确认一下真的会", d, near_kp)
+        if only_near:
+            near = {p["id"] for p, _ in _near(near_kp)}
+            for v in evidence.due_checks(user_id, mastery, limit=200):  # 会过、按遗忘规律快忘了的前置
+                if v["kp_id"] in near:
+                    add(v["kp_id"], f"「{catalog.kps[near_kp]['name']}」要用到它，好久没碰了", 1, near_kp)
+            return out
     # 之前答错留下的「往回追」队列
     for q in _queued(user_id):
         if unknown(q["kp_id"]) or guessed(q["kp_id"]):
@@ -216,11 +223,12 @@ def candidates(user_id: int, mastery: dict | None = None, near_kp: str | None = 
     return out
 
 
-def pick(user_id: int, n: int, grade: str, near_kp: str | None = None, exclude: set | None = None) -> list[dict]:
+def pick(user_id: int, n: int, grade: str, near_kp: str | None = None, exclude: set | None = None,
+         only_near: bool = False) -> list[dict]:
     """取 n 道摸底题（知识点题）。返回题目字典，带 probe 信息。"""
     out, tries = [], 0
     exclude = exclude or set()
-    for c in candidates(user_id, near_kp=near_kp):
+    for c in candidates(user_id, near_kp=near_kp, only_near=only_near):
         if len(out) >= n or tries >= 2 * n + 1:  # 没现成题时每次都要 AI 出题，最多试几次，别拖慢页面
             break
         if c["kp"] in exclude:
