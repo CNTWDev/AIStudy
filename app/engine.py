@@ -153,7 +153,10 @@ def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="", exclu
         seen.add(r["near_key"])
         uniq.append(r)
     picked = [{**bank.row_to_item(r), "kp_id": kp_id} for r in uniq[:n]]  # 共用的题，这次记在正在学的知识点上
-    if len(picked) < n and llm.enabled():
+    lack_figs = purpose in ("practice", "preview") and _lacks_figs(kp_id, rows)
+    if lack_figs:  # 要看图的知识点题库里还一道带图的都没有（多是有配图以前出的老题）：带图的新题排在前面
+        picked = []
+    if (len(picked) < n or lack_figs) and llm.enabled():
         grade = grade or catalog.default_grade
         kp = catalog.kp(kp_id)
         pack = catalog.packs[catalog.kp_pack[kp_id]]
@@ -162,10 +165,32 @@ def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="", exclu
             have = {p["id"] for p in picked} | bank.flagged_by(user_id) | exclude
             saved = [it for it in save_items(kp_id, new, purpose=purpose, grade=grade, meta=bank.gen_meta("items", purpose=purpose))
                      if it["id"] not in have]
-            picked += saved[: n - len(picked)]
+            # 题目内容和别的知识点的题一样时，存的是那道旧题：这次也记在正在学的知识点上
+            if lack_figs:
+                saved.sort(key=lambda it: not it.get("fig"))
+            picked += [{**it, "kp_id": kp_id} for it in saved[: n - len(picked)]]
         except llm.LLMError:
             pass
+    if len(picked) < n:  # AI 没出成：老题照用
+        have = {p["id"] for p in picked}
+        picked += [{**bank.row_to_item(r), "kp_id": kp_id} for r in uniq if r["id"] not in have][: n - len(picked)]
     return picked[:n]
+
+
+def _lacks_figs(kp_id: str, rows) -> bool:
+    """要看图的知识点（见 figures.wanted_for），题库里一道带图的都没有，也没用要求配图的提示词出过题：该补一批带图的题。
+    只补一次——要求配图后 AI 仍然没给图（或图对不上被丢掉），就不再反复请 AI。"""
+    from . import figures
+    kp = catalog.kp(kp_id)
+    if not kp or not figures.wanted_for(kp, catalog.packs[catalog.kp_pack[kp_id]].subject):
+        return False
+    for r in rows:
+        if db.jload(r["data"], {}).get("fig") or (db.jload(r["gen_meta"], {}) or {}).get("prompt_v", 0) >= FIG_PROMPT_V:
+            return False
+    return True
+
+
+FIG_PROMPT_V = 6  # 出题提示词从这一版起，要看图的知识点要求至少一半带图（llm.PROMPT_VERSION["items"]）
 
 
 def _combine_items(user_id: int, kp_id: str, n: int, grade: str, exclude: set, uses: list[str]) -> list[dict]:

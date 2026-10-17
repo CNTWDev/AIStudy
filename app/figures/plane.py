@@ -64,6 +64,9 @@ def check_facts(checks, at, dist=math.dist, angle=angle_at) -> list:
 class Plane(Kind):
     id, label = "plane", "平面图"
     subjects = ("math", "physics", "science", "chemistry")
+    cues = ("三角", "四边形", "平行四边形", "梯形", "圆", "角度", "角的", "垂直", "平行线", "对称", "平移", "旋转", "周长", "面积", "勾股", "相似", "全等",
+            "反射", "折射", "平面镜", "透镜", "受力", "力的示意", "杠杆", "滑轮", "斜面", "triangle", "angle", "circle", "polygon",
+            "reflection", "refraction", "lens", "force diagram", "lever", "moment", "pulley")
     prompt = (
         'plane 平面图（几何、方格图形、受力图、光路图）：{"kind":"plane","grid":false,"axes":false,'
         '"points":{"A":[0,0],"B":[4,0],"C":[4,3]},"shapes":[{"type":"polygon","points":["A","B","C"]},'

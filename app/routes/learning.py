@@ -267,9 +267,10 @@ def api_practice(request: Request, kp_id: str, n: int = 3, purpose: str = "pract
         raise HTTPException(404)
     purpose = purpose if purpose in ("practice", "preview") else "practice"
     items = engine.items_for(k["id"], kp_id, n=min(n, 5), purpose=purpose, grade=k["grade"])
-    # 穿插一道「以前学过的」：优先这个知识点没测过 / 只是推断会的前置（预习新内容时更要先看地基稳不稳），答完顺便摸清过去
+    # 穿插一道「以前学过的」：只出这个知识点要用到、还没测过 / 只是推断会 / 快忘了的前置（预习新内容时更要先看地基稳不稳）；
+    # 前置都稳了就不穿插——学某个知识点时做的题都要和它有关，铺开摸底交给热身和每科练习
     if len(items) >= 2:
-        probe = explore.pick(k["id"], 1, k["grade"], near_kp=kp_id, exclude={kp_id})
+        probe = explore.pick(k["id"], 1, k["grade"], near_kp=kp_id, exclude={kp_id}, only_near=True)
         if probe:
             items.insert(1, probe[0])
     import uuid

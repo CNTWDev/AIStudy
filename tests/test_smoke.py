@@ -79,8 +79,8 @@ def test_full_flow(monkeypatch):
         assert "correct" in res
         items = c.get("/api/practice/ENG-VOC-01?n=3").json()["items"]  # 无种子题 → mock AI
         assert len([i for i in items if not i.get("probe")]) == 3
-        # 练习里穿插一道「以前学过的」摸底题（第 2 题），记在它自己的知识点上
-        assert len(items) == 4 and items[1]["probe"]["kp"] != "ENG-VOC-01", items[1]
+        # 学一个知识点时穿插的「以前学过的」只能是它的前置；这个点没有前置，就不穿插别的学科的题
+        assert len(items) == 3 and all(i["kp_id"] == "ENG-VOC-01" for i in items), items
 
         # 复习卡片（错题 + 术语）
         due = c.get("/api/review/due").json()["cards"]

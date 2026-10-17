@@ -87,6 +87,7 @@ def _dot(a, b):
 class Solid(Kind):
     id, label = "solid", "立体图形"
     subjects = ("math",)
+    cues = ("立体", "长方体", "正方体", "圆柱", "圆锥", "棱柱", "棱锥", "球", "体积", "表面积", "三视图", "展开图", "cuboid", "cube", "prism", "cylinder", "cone", "pyramid", "volume", "surface area")
     prompt = (
         'solid 立体图形：{"kind":"solid","shape":"cube|cuboid|prism|pyramid|cylinder|cone|sphere","a":2,'
         '"points":{"M":{"mid":["A","B"]},"N":{"on":["A","C1"],"t":0.5}},"segments":[["A","C1"],["M","D1"]],'

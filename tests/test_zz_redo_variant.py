@@ -42,6 +42,9 @@ def test_redo_answer_does_not_wait_for_ai(monkeypatch):
         for r in bank.candidates(kid, KP):
             if r["id"] != it["id"]:
                 engine.record_attempt(kid, bank.row_to_item(r), KP, "practice", True)
+        # 题库里有一道同一知识点、骨架不同的题（不靠前面的测试留下了哪些 mock 题）
+        engine.save_items(KP, [{"type": "num", "q": "A lamp draws 0.5 A for 120 s. How much charge flows, in C?", "answer": 60,
+                                "difficulty": 2}])
         cid = _card(kid, it)
         calls = []
         real = llm.generate_items

@@ -12,11 +12,11 @@ import json
 import logging
 
 from .base import KINDS, FigError, Kind, register
-from . import plane, solid, graph, chart, clock, scale, circuit, photo  # noqa: F401  各种图在 import 时登记
+from . import plane, solid, graph, chart, clock, scale, circuit, lab, photo  # noqa: F401  各种图在 import 时登记
 
 log = logging.getLogger(__name__)
 
-__all__ = ["KINDS", "FigError", "Kind", "register", "normalize", "present", "describe", "prompt_for", "drawable_for"]
+__all__ = ["KINDS", "FigError", "Kind", "register", "normalize", "present", "describe", "prompt_for", "drawable_for", "wanted_for"]
 
 
 def normalize(raw) -> dict | None:
@@ -74,6 +74,12 @@ def describe(fig) -> str:
 
 def drawable_for(subject: str) -> list[Kind]:
     return [k for k in KINDS.values() if k.drawn and subject in k.subjects]
+
+
+def wanted_for(kp: dict, subject: str) -> list[Kind]:
+    """这个知识点的题通常要看哪些图（按各种图的 cues 对知识点的名称、说明、关键词）。没有返回 []。"""
+    text = " ".join([kp.get("name", ""), kp.get("name_en", ""), kp.get("desc", ""), *kp.get("terms", [])]).lower()
+    return [k for k in drawable_for(subject) if any(c.lower() in text for c in k.cues)]
 
 
 def prompt_for(subject: str) -> str:

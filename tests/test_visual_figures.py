@@ -36,7 +36,11 @@ SAMPLES = {
     "ruler": {"kind": "scale", "tool": "ruler", "min": 0, "max": 6, "from": 1, "to": 4.35, "unit": "cm"},
     "circuit": {"kind": "circuit", "loop": ["cell", "switch:S", {"parallel": [["lamp:L1"], ["lamp:L2", "ammeter:A2"]]}, "ammeter:A1"],
                 "meters": [{"type": "voltmeter", "label": "V", "across": "L1"}]},
+    "lab": {"kind": "lab", "setup": "gas_heat", "collect": "water", "labels": {"lamp": "a", "trough": "b"}},
+    "distillation": {"kind": "lab", "setup": "distillation", "labels": {"condenser": "A", "water_in": "B"}},
 }
+for _s in ("gas_flask", "filtration", "evaporation", "titration", "electrolysis", "chromatography"):
+    SAMPLES[_s] = {"kind": "lab", "setup": _s}
 
 
 @pytest.mark.parametrize("name", list(SAMPLES))
@@ -60,6 +64,10 @@ def test_each_kind_draws(name):
     {"kind": "chart", "categories": ["a", "b"], "series": [{"values": [1]}]},
     {"kind": "circuit", "loop": ["cell", "lamp:L1"], "meters": [{"type": "voltmeter", "across": "L9"}]},
     {"kind": "circuit", "loop": ["cell", "toaster"]},
+    {"kind": "lab", "setup": "spaceship"},
+    {"kind": "lab", "setup": "filtration", "labels": {"burette": "a"}},              # 过滤装置里没有滴定管
+    {"kind": "lab", "setup": "gas_heat", "collect": "up", "labels": {"trough": "a"}},  # 向上排空气法没有水槽
+    {"kind": "lab", "setup": "gas_flask", "collect": "sideways"},
 ])
 def test_bad_figures_rejected(bad):
     assert figures.normalize(bad) is None
@@ -74,6 +82,7 @@ def test_prompt_only_for_subjects_that_draw():
     assert "circuit" in figures.prompt_for("physics") and "clock" not in figures.prompt_for("physics")
     assert "clock" in figures.prompt_for("math") and "solid" in figures.prompt_for("math")
     assert figures.prompt_for("english") == "" and not any(k.id == "photo" for k in figures.drawable_for("math"))
+    assert "distillation" in figures.prompt_for("chemistry") and "lab " not in figures.prompt_for("math")
 
 
 def test_item_with_figure():
@@ -123,6 +132,36 @@ def test_ai_items_keep_good_figures(monkeypatch):
     # 原题有图、改编题画不出图：不改编
     assert tasks.make_variant(items[0], kp, pack, "G8") is None
     assert "改编题也必须带 fig" in seen["variant"]
+    # 要看图的知识点（电路）：要求一组题里至少一半带图；不用看图的知识点不要求
+    assert "至少一半要带 fig" in seen["items"] and "电路图" in tasks._figs_note(kp, pack)
+    plain = next(k for k in catalog.kps.values() if k["pack"] == "math-shanghai" and "口算" in k["name"])
+    assert tasks._figs_note(plain, catalog.packs["math-shanghai"]) == ""
+
+
+def test_items_for_tops_up_figures_once(monkeypatch):
+    """要看图的知识点，题库里只有不带图的老题：补出一批带图的题、带图的排前面；补过一次就不再反复请 AI。"""
+    from app import engine, llm
+    with TestClient(app) as c:
+        _setup(c)
+        kid = db.one("SELECT id FROM users WHERE email='figk1@x.com'")["id"]
+        kp = "MSH-NUM-31"   # 正数和负数初步：要看数轴
+        assert figures.wanted_for(catalog.kps[kp], "math")
+        bank.save_items(kp, [{"type": "num", "q": f"老题 {i}：-3 + 5 = ?", "answer": 2, "difficulty": 1} for i in range(4)])
+        db.run("UPDATE items SET gen_meta=? WHERE id IN (SELECT item_id FROM item_kps WHERE kp_id=?)", "{}", kp)
+        calls = []
+        line = {"kind": "graph", "x": {"min": -5, "max": 5, "step": 1}, "marks": [{"at": [-3, 0], "label": "A"}], "alt": "数轴"}
+
+        def gen(kp_, pack, grade, n=3, **kw):
+            calls.append(1)
+            fig = figures.normalize(line)
+            return [{"type": "num", "q": f"如图，点 A 表示的数是多少？#{len(calls)}", "answer": -3, "fig": fig, "difficulty": 1},
+                    {"type": "num", "q": f"-2 比 -5 大多少？#{len(calls)}", "answer": 3, "difficulty": 1}]
+        monkeypatch.setattr(llm, "enabled", lambda: True)
+        monkeypatch.setattr(llm, "generate_items", gen)
+        items = engine.items_for(kid, kp, n=3, grade="G5")
+        assert calls and items[0].get("fig") and len(items) == 3
+        engine.items_for(kid, kp, n=3, grade="G5")
+        assert len(calls) == 1
 
 
 def test_prepare_page_turns_photo_upright():

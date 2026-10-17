@@ -156,3 +156,16 @@ def test_calibration_candidates():
         assert any("今天要学的" in r for r in reasons)
         cov = explore.coverage(kid)
         assert cov and cov[0]["stages"] and sum(g["total"] for g in cov[0]["stages"]) == cov[0]["total"]
+
+
+def test_learn_probe_only_near():
+    """学某个知识点时穿插的「以前学的」只能是它的前置：前置都确认会了就不穿插，不能随手拿一道别的学科的题。"""
+    with TestClient(app):
+        kid = db.one("SELECT id FROM users WHERE email='trk@x.com'")["id"]
+        near = {p["id"] for p, _ in explore._near(KP)}
+        assert all(x["kp"] in near for x in explore.candidates(kid, near_kp=KP, only_near=True))
+        for k in near:  # 前置都真会了（不是推断的）
+            engine.set_mastery(kid, k, 0.95, "mastered", "practice")
+        assert explore.candidates(kid, near_kp=KP, only_near=True) == []
+        # 不限定时仍会铺开到别的知识点（热身、每科练习用）
+        assert any(x["kp"] not in near for x in explore.candidates(kid, near_kp=KP))
