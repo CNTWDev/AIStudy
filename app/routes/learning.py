@@ -512,7 +512,9 @@ def review_due(request: Request, group: str = ""):
     k = kid_or_redirect(request)
     cards = []
     limit = 8 if group == "mistakes" else 60
-    for c in engine.due_cards(k["id"], limit, group or None):
+    due = engine.due_cards(k["id"], limit, group or None)
+    recall.prepare_variants(k["id"], due)  # 快要换变式题的错题：后台先把题出好，提交时不用等
+    for c in due:
         d = dict(c)
         d["extra"] = db.jload(c["extra"], {})
         d["kp_name"] = (catalog.kp(c["kp_id"]) or {}).get("name", "") if c["kp_id"] else ""

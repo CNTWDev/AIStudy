@@ -8,11 +8,13 @@
 - 知识点卡（kp）：从题库里取一道这个知识点的题来做。
 - 实在出不了题的（意思还没查到的词、老的错题找不到原题、题库里没题的知识点）才退回自评。
 """
+import logging
 import random
 import re
+import threading
 from datetime import timedelta
 
-from . import bank, db, engine, itemtypes
+from . import bank, db, engine, itemtypes, llm
 from .catalog import catalog
 
 WORD_KINDS = ("word", "phrase", "term")
@@ -24,6 +26,7 @@ PASSED_DUE = "9999-12-31"
 RECHECK_DAYS = 21      # 过关后隔多久回头看一眼
 _LATIN = re.compile(r"[A-Za-z][A-Za-z '\-.]*")
 _NO_MEANING = "（意思还没查到"
+log = logging.getLogger(__name__)
 
 
 def _extra(c) -> dict:
@@ -112,17 +115,65 @@ def _word_quiz(user_id: int, c) -> dict | None:
 # ------------------------------------------------------------------ 判对错、排期
 
 def answer(user_id: int, card_id: int, body: dict) -> dict:
-    # Prepare a possible variant outside the learner transaction: network latency must
-    # not hold the learner lock, and failed AI calls must keep their usage accounting.
+    # A variant may be needed after this answer. It is normally prepared in the background when the
+    # card is shown (prepare_variants); only fall back to preparing it here, outside the learner
+    # transaction, when that did not happen. Network latency must not hold the learner lock.
     card = db.one("SELECT * FROM cards WHERE id=? AND user_id=?", card_id, user_id)
-    if card and card["kind"] == "mistake" and card["kp_id"] and not body.get("dont_know"):
-        ex = _extra(card)
+    if card and _wants_variant(card) and not body.get("dont_know"):
         item = _item(body.get("item_id"))
-        if (item and item["id"] == ex.get("item_id") and not ex.get("passed")
-                and ex.get("streak", 0) >= PASS_STREAK - 1
+        if (item and item["id"] == _extra(card).get("item_id")
                 and (body.get("self") == "ok" if itemtypes.of(item).self_rated else itemtypes.check(item, body.get("answer")))):
-            engine.items_for(user_id, card["kp_id"], n=3)
+            t = _prep.get(card_id)
+            if t:
+                t.join(timeout=90)  # 后台还在出题：等它，不重复出
+            else:
+                _ensure_variant(user_id, card)
     return _answer_command(user_id, card_id, body)
+
+
+# ------------------------------------------------------------------ 变式题提前准备
+
+_prep: dict[int, threading.Thread] = {}
+_prep_lock = threading.Lock()
+
+
+def _wants_variant(c) -> bool:
+    """这张错题卡再做对一次就要换变式题了。"""
+    if c["kind"] != "mistake" or not c["kp_id"]:
+        return False
+    ex = _extra(c)
+    return not ex.get("passed") and not ex.get("variant") and ex.get("streak", 0) >= PASS_STREAK - 1
+
+
+def _ensure_variant(user_id: int, c) -> None:
+    """题库里还没有能当变式题的，才请 AI 出题（存进题库，以后复用）。已经有了就什么都不做。"""
+    if _variant(user_id, c, _extra(c)) is None and llm.enabled():
+        engine.items_for(user_id, c["kp_id"], n=3)
+
+
+def prepare_variants(user_id: int, cards) -> None:
+    """打开错题重做时，后台为快要换变式题的卡把题准备好：孩子提交答案时不用再等 AI 现场出题。"""
+    for c in cards:
+        if not _wants_variant(c) or _variant(user_id, c, _extra(c)) is not None or not llm.enabled():
+            continue
+        with _prep_lock:
+            if c["id"] in _prep:
+                continue
+            t = threading.Thread(target=_prep_run, args=(user_id, c), name=f"variant-{c['id']}", daemon=True)
+            _prep[c["id"]] = t
+        t.start()
+
+
+def _prep_run(user_id: int, c) -> None:
+    try:
+        _ensure_variant(user_id, c)
+    except Exception:  # noqa: BLE001  后台准备失败不影响做题：提交时没有变式题就照常往下走
+        log.exception("variant prep failed: card %s", c["id"])
+    finally:
+        with _prep_lock:
+            _prep.pop(c["id"], None)
+        if not db.IS_PG:
+            db.close()
 
 
 @db.atomic_user
