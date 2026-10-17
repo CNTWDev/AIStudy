@@ -10,6 +10,7 @@ from .svg import Svg
 class Clock(Kind):
     id, label = "clock", "钟面"
     subjects = ("math",)
+    cues = ("钟面", "钟表", "时刻", "几时几分", "clock", "o'clock")
     prompt = 'clock 钟面：{"kind":"clock","time":"3:45","numbers":true}（time 用 12 小时制 时:分，可带 :秒；numbers:false 不写数字）。'
 
     def normalize(self, spec):

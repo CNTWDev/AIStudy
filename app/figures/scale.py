@@ -9,6 +9,7 @@ TOOLS = ("ruler", "cylinder", "thermometer")
 class Scale(Kind):
     id, label = "scale", "刻度读数"
     subjects = ("math", "physics", "science", "chemistry")
+    cues = ("刻度", "读数", "量筒", "温度计", "刻度尺", "测力计", "电流表", "电压表", "measuring cylinder", "thermometer", "ruler", "ammeter", "voltmeter")
     prompt = (
         'scale 刻度读数：{"kind":"scale","tool":"ruler","min":0,"max":6,"major":1,"minor":10,"unit":"cm",'
         '"from":1.0,"to":4.35,"object":"铅笔"}；量筒 {"tool":"cylinder","min":0,"max":50,"major":10,"minor":5,"unit":"mL","value":32}；'

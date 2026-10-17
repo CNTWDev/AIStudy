@@ -9,6 +9,7 @@ from .svg import Svg
 class Chart(Kind):
     id, label = "chart", "统计图"
     subjects = ("math", "science", "geography", "biology", "economics")
+    cues = ("统计", "条形图", "折线图", "扇形图", "柱状图", "频数", "直方图", "bar chart", "pie chart", "histogram", "frequency")
     prompt = (
         'chart 统计图：{"kind":"chart","style":"bar|line","title":"三年级各班借书数量","y_label":"本",'
         '"categories":["一班","二班","三班"],"series":[{"name":"上学期","values":[30,45,25]}],"step":10}。'

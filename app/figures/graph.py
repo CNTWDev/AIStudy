@@ -54,6 +54,8 @@ def _fmt(v: float) -> str:
 class Graph(Kind):
     id, label = "graph", "坐标图像"
     subjects = ("math", "physics", "science", "chemistry", "biology", "geography", "economics")
+    cues = ("函数", "图像", "数轴", "坐标", "速度-时间", "路程-时间", "s-t", "v-t", "number line", "graph", "coordinate", "gradient",
+            "distance-time", "speed-time", "velocity-time")
     prompt = (
         'graph 坐标图像 / 数轴：{"kind":"graph","x":{"label":"t / s","min":0,"max":10,"step":2},'
         '"y":{"label":"s / m","min":0,"max":50,"step":10},"grid":true,'

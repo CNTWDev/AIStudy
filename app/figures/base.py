@@ -5,6 +5,7 @@
 - svg(spec)：按说明画成 SVG（矢量图，线条用 currentColor，深色模式自动变色）。
 - describe(spec)：给 AI 校对 / 改编用的文字版（默认就是画图说明本身，坐标都在里面）。
 - prompt：告诉 AI 这种图怎么写（只给 subjects 里的学科看，免得提示词太长）。
+- cues：知识点的名称 / 说明 / 关键词里出现这些词，这个知识点的题通常要看这种图（出题时要求多配图）。
 """
 import json
 import math
@@ -24,6 +25,7 @@ class Kind:
     id = ""
     label = ""
     subjects: tuple = ()   # 哪些学科的出题提示词里带上它（subjects.json 的 id）
+    cues: tuple = ()       # 知识点里出现这些词：这个点的题通常要看这种图
     drawn = True           # 程序按说明画出来的图；原卷裁图是 False
     prompt = ""
 

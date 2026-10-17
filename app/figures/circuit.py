@@ -162,6 +162,7 @@ def _row(g, blocks, y, W, below):
 class Circuit(Kind):
     id, label = "circuit", "电路图"
     subjects = ("physics", "science")
+    cues = ("电路", "串联", "并联", "电流", "电压", "电阻", "欧姆", "circuit", "series", "parallel", "current", "resistance")
     prompt = (
         'circuit 电路图：{"kind":"circuit","loop":["cell","switch:S",{"parallel":[["lamp:L1"],["lamp:L2","ammeter:A2"]]},"ammeter:A1"],'
         '"meters":[{"type":"voltmeter","label":"V","across":"L1"}]}。loop 按电流走一圈的顺序写，"种类:名字"；'

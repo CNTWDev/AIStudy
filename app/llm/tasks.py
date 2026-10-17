@@ -39,7 +39,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 5, "teach": 3, "context": 2, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 3, "context": 2, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -96,6 +96,16 @@ def _fig_text(item: dict) -> str:
             + (f"\n{audio.describe(item['audio'])}" if item.get("audio") else ""))
 
 
+def _figs_note(kp: dict, pack) -> str:
+    """这个知识点的题通常要看图（几何、函数图像、电路、刻度……）：要求一组题里至少一半带图，不然孩子总看不到图。"""
+    from .. import figures
+    kinds = figures.wanted_for(kp, pack.subject)
+    if not kinds:
+        return ""
+    return (f"\n这个知识点的题通常要看图（{'、'.join(k.label for k in kinds)}）：这组题里至少一半要带 fig，"
+            "像课本和试卷上那样「如图……」，让孩子看图做题。")
+
+
 def _traps_note(kp: dict) -> str:
     """追根用：选择题的错误选项尽量设计成典型错误，并标出「选它说明哪个前置没懂」（见 app/trace.py）。"""
     from ..catalog import catalog
@@ -123,7 +133,7 @@ def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=
         f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n"
         f"诊断思路参考：{kp.get('probe','')}\n关键词：{', '.join(kp.get('terms', []))}\n\n"
         f"{purpose_txt}\n优先用 mcq/num/fill（能自动判分），short 最多 1 道。不要照搬教材原文。"
-        f"答案必须正确且唯一，请自己检查一遍。\n输出格式：{_item_schema(pack, kp)}{_traps_note(kp)}"
+        f"答案必须正确且唯一，请自己检查一遍。\n输出格式：{_item_schema(pack, kp)}{_traps_note(kp)}{_figs_note(kp, pack)}"
     )
     data = ask_json("items", _tutor(grade) + "你也是严谨的出题人。", user, user_id=user_id, effort="medium", cache=False)
     return _normalized(data.get("items", []) if isinstance(data, dict) else data)
