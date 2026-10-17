@@ -9,6 +9,8 @@
   不能换东西，没有抽奖，也没有排行榜，只跟自己比（最高的一天是个人纪录）。
 - 作答照常记进学习记录（mode = sprint），作为掌握度证据记 0.75（四选一短题，比正式练习轻一点）。
 - 连续冲了 20 分钟提醒休息眼睛；今天一共学满 90 分钟时也提醒一次。冲多少都不影响明天的任务量。
+- 快练（drill）：今天任务里的「⚡ 快练 5 分钟」用同一套玩法，不用等任务做完；答满 5 分钟（至少 8 题）这一项就完成，
+  可以接着冲。基本功（口算、单词、术语、公式和单位）练到不用想，靠的就是这种又快又多的反复。
 """
 import random
 import time
@@ -25,6 +27,8 @@ PENDING_KEEP_S = 90
 REST_AFTER_S = 20 * 60
 LONG_DAY_MIN = 90
 POINTS_PER_STAR = 10
+DRILL_S = 5 * 60     # 快练：答满 5 分钟
+DRILL_MIN_N = 8
 
 
 class SprintError(Exception):
@@ -82,17 +86,17 @@ def _save(run_id: int, st: dict, **cols):
     db.run(f"UPDATE sprint_runs SET data=?{', ' + sets if sets else ''} WHERE id=?", db.jdump(st), *cols.values(), run_id)
 
 
-def start(kid: dict) -> dict:
+def start(kid: dict, drill: bool = False) -> dict:
     ok, left = is_open(kid)
-    if not ok:
+    if not ok and not drill:
         raise SprintError(f"先做完今天的任务（还差 {left} 项），就能开始冲刺！", 403)
     day = db.today().isoformat()
     for r in db.q("SELECT id FROM sprint_runs WHERE user_id=? AND ended_at IS NULL", kid["id"]):
         db.run("UPDATE sprint_runs SET ended_at=? WHERE id=?", db.now(), r["id"])
     rid = db.insert("INSERT INTO sprint_runs(user_id, day, started_at, data) VALUES(?,?,?,?)",
-                    kid["id"], day, db.now(), db.jdump({"heat": 0, "t0": time.time()}))
+                    kid["id"], day, db.now(), db.jdump({"heat": 0, "t0": time.time(), "drill": bool(drill)}))
     return {"run_id": rid, "points_today": points_today(kid["id"]), "best": best_day(kid["id"], day),
-            "tier_at": TIER_AT}
+            "tier_at": TIER_AT, "drill_s": DRILL_S if drill else 0}
 
 
 def question(kid: dict, run_id, rng: random.Random | None = None) -> dict:
@@ -148,6 +152,11 @@ def answer(kid: dict, run_id, item_id: str, ans, dont_know=False) -> dict:
         mins = (db.one("SELECT minutes FROM days WHERE user_id=? AND day=?", kid["id"], db.today().isoformat()) or {}).get("minutes") or 0
         if mins >= LONG_DAY_MIN:
             st["long_day"] = long_day = True
+    drill_done = None
+    if st.get("drill") and not st.get("drill_done") and now - st.get("t0", now) >= DRILL_S and answered >= DRILL_MIN_N:
+        st["drill_done"] = True
+        hit = engine.mark_task_by(kid["id"], type="drill")
+        drill_done = engine.flow_state(kid["id"], (hit or [None])[0])
     _save(r["id"], st, points=points, answered=answered, right_n=right_n, best_tier=best_tier)
     today = points_today(kid["id"])
     nxt = next((t for t in TIER_AT if t > heat), None)
@@ -155,7 +164,7 @@ def answer(kid: dict, run_id, item_id: str, ans, dont_know=False) -> dict:
             "explain": it.get("explain", ""), "gain": gain, "tier": tier, "tier_up": tier > before,
             "tier_down": tier < before, "why": why, "heat": heat, "to_next": (nxt - heat) if nxt else 0,
             "points": points, "points_today": today, "stars_today": today // POINTS_PER_STAR,
-            "rest": rest, "long_day": long_day, "freeze_ms": 0}
+            "rest": rest, "long_day": long_day, "freeze_ms": 0, "drill_done": drill_done}
 
 
 def end(kid: dict, run_id) -> dict:

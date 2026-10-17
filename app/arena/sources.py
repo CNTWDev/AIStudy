@@ -111,7 +111,7 @@ MATH_PACK = "math-shanghai"
 
 
 class MathSource(Source):
-    id, name, icon, desc = "math", "数学口算", "🔢", "口算和短计算，数字现场生成"
+    id, name, icon, desc = "math", "口算和公式", "🔢", "口算、短计算、单位换算和代公式，数字现场生成"
 
     def _rank(self, ctx: Ctx) -> float:
         e = next((e for e in ctx.packs if e["pack_id"] == MATH_PACK), None)
@@ -120,12 +120,20 @@ class MathSource(Source):
 
     def pool(self, ctx: Ctx, target: float) -> list[tuple[str, float]]:
         rank = self._rank(ctx)
+        enrolled = {e["pack_id"] for e in ctx.packs}
         out = []
         for fam, (kp_id, _, _) in quickgen.FAMILIES.items():
             kp = catalog.kps.get(kp_id)
-            if not kp or stage_rank(kp["stage"]) > rank:
+            if not kp:
                 continue
-            r = stage_rank(kp["stage"])
+            if kp["pack"] != MATH_PACK:   # 别的学科的基本功（物理的单位、公式）：只给报了那门课的孩子，按正在学的算
+                if kp["pack"] not in enrolled:
+                    continue
+                r = rank
+            elif stage_rank(kp["stage"]) > rank:
+                continue
+            else:
+                r = stage_rank(kp["stage"])
             w = _status_weight(ctx, kp_id, r < rank)
             theta, _ = kp_ability(ctx, kp_id, rank)
             # 这个知识点最合适的一级也离目标很远（太难或太简单）：少出，换别的知识点
@@ -134,8 +142,9 @@ class MathSource(Source):
         return out or [(quickgen.FAMILIES["add10"][0], 1.0)]
 
     def weight(self, kid, ctx):
-        maths = {"math"} & ctx.subjects
-        if ctx.rank > 9:      # 高中生做小学口算没意思
+        # 数学是理科的地基（见 _meta/ladder.json）：学物理、化学、科学、经济的孩子，口算和公式也多出一些
+        maths = {"math", "physics", "chemistry", "science", "economics"} & ctx.subjects
+        if ctx.rank > 9 and "physics" not in ctx.subjects:      # 高中生做小学口算没意思
             return 0.15
         return 1.0 if maths else 0.4
 

@@ -144,6 +144,8 @@ class Catalog:
         self.systems: list[dict] = []
         self.stages: list[dict] = []
         self.presets: list[dict] = []
+        self.calendar: dict = {}
+        self.ladder: dict = {}
         self.errors: list[str] = []           # 加载时发现的问题（check 命令会列出来）
         self.default_grade = "G3"             # 新建孩子时的默认年级（_meta/stages.json 的 default_grade）
 
@@ -291,6 +293,10 @@ class Catalog:
         self.presets = json.loads(f.read_text(encoding="utf-8")).get("presets", []) if f.exists() else []
         f = meta_dir / "selection.json"
         self.selection_guides = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+        f = meta_dir / "calendar.json"   # 校历：按日期推演学校进度（app/schoolyear.py）
+        self.calendar = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+        f = meta_dir / "ladder.json"     # 地基：往回一直到一年级（app/ladder.py）
+        self.ladder = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
 
     def selection_guide(self, pack):
         """Presentation copy stays separate from the full curriculum and AI instructions."""

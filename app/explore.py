@@ -5,6 +5,9 @@
   和学校正在学的内容有关的、高频考点优先。
 - 答对：这个点记为掌握，它的必须前置（未测过的）标为「推断掌握」。
 - 答错 / 还不会：这个点记为薄弱，进错题本；它的必须前置排进队列，之后几天接着测（最多往回 3 层）。
+- 往回找跟着需要走，不一刀切：铺开摸底只在最近两个学年里铺；更早的、别的教材里的（地基，见 app/ladder.py），
+  只在和正在学的、今天要学的有关时才测，或者答错以后沿前置一层层往回追到。初二的物理学到密度，
+  才会去摸小学的分数除法和体积单位；那些都会，就不往下追。
 - 英语：再穿插以前学段的核心词闪测（四选一），不认识的词自动加进单词复习，并估算词汇量。
 
 摸清了多少（覆盖度）、今天点亮了几个知识点、前方要学什么，也在这里算。
@@ -12,11 +15,12 @@
 import random
 from datetime import timedelta
 
-from . import db, engine, evidence
+from . import db, engine, evidence, ladder
 from .catalog import catalog, stage_label, stage_rank
 
 MAX_DEPTH = 3
 RECENT_DAYS = 7  # 测过的点一周内不再抽到
+BREADTH_YEARS = 2  # 「铺开摸底」只在最近两个学年里铺，更早的跟着新知识往回找（见 candidates）
 
 
 # ------------------------------------------------------------------ 范围与覆盖度
@@ -25,8 +29,17 @@ def _enrolls(user_id: int):
     return [e for e in db.q("SELECT * FROM enrollments WHERE user_id=? AND active=1", user_id) if e["pack_id"] in catalog.packs]
 
 
+def _with_foundations(user_id: int, enrolls: list) -> list:
+    """报名的课，加上它们的地基（最远能找到一年级、跨教材；只在和正在学的有关时才用，见 app/ladder.py）。"""
+    user = db.one("SELECT grade FROM users WHERE id=?", user_id) or {}
+    return list(enrolls) + ladder.foundations(dict(user), enrolls)
+
+
 def past_range(user_id: int, e, taught: set | None = None) -> list[str]:
-    """「以前学过」的知识点：当前学段之前的，加上本学段学校已经教过的。"""
+    """「以前学过」的知识点：当前学段之前的，加上本学段学校已经教过的。地基（e 带 upto）：学段比 upto 低的，
+    同一概念在报名的教材里已经有的不重复算。"""
+    if e.get("foundation"):
+        return ladder.range_of(e, ladder.enrolled_concepts(_enrolls(user_id)))
     taught = engine.taught_set(user_id) if taught is None else taught
     cur = stage_rank(e["stage"])
     return [k for k in catalog.ids_for(e["pack_id"], e["track"])
@@ -38,7 +51,7 @@ def coverage(user_id: int, mastery: dict | None = None) -> list[dict]:
     mastery = engine.get_mastery(user_id) if mastery is None else mastery
     taught = engine.taught_set(user_id)
     out = []
-    for e in _enrolls(user_id):
+    for e in _enrolls(user_id):   # 地基不算进覆盖度：它只在跟着新知识往回找时才去摸（见 candidates），不需要摸全
         rng = past_range(user_id, e, taught)
         if not rng:
             continue
@@ -52,7 +65,8 @@ def coverage(user_id: int, mastery: dict | None = None) -> list[dict]:
             g["known"] += m.get("status") not in (None, "unknown")
             g["inferred"] += m.get("source") == "inferred"
             g["weak"] += m.get("status") == "weak"
-        out.append({"pack": catalog.packs[e["pack_id"]], "total": len(rng), "known": known,
+        pack = catalog.packs[e["pack_id"]]
+        out.append({"pack": pack, "name": pack.subject_name, "total": len(rng), "known": known,
                     "inferred": sum(1 for m in st if m.get("source") == "inferred"),
                     "weak": sum(1 for m in st if m.get("status") == "weak"),
                     "pct": round(100 * known / len(rng)),
@@ -140,11 +154,16 @@ def candidates(user_id: int, mastery: dict | None = None, near_kp: str | None = 
         for p, _ in _near(k):
             today_near.setdefault(p["id"], catalog.kps[k]["name"])
     scored = []
-    for e in _enrolls(user_id):
+    enrolls = _enrolls(user_id)
+    grade = stage_rank((db.one("SELECT grade FROM users WHERE id=?", user_id) or {}).get("grade") or "")
+    # 学校正在学的（每门课）要用到的旧知识：地基里的内容只有和它们（或今天要学的）有关才拿来测
+    school_near = {p["id"] for e in enrolls if e["progress_kp"] and catalog.kp(e["progress_kp"]) for p, _ in _near(e["progress_kp"])}
+    for e in _with_foundations(user_id, enrolls):
         rng = past_range(user_id, e, taught)
         rset = set(rng)
         cur = catalog.kp(e["progress_kp"]) if e["progress_kp"] else None
-        near = {p["id"] for p, _ in _near(cur["id"])} if cur else set()
+        near = ({p["id"] for p, _ in _near(cur["id"])} if cur else set()) | school_near
+        top = grade if grade < 99 else stage_rank(e["stage"]) if e.get("stage") else 99
         # 覆盖面：每一块（知识线 strand）、每个学段摸清了多少，摸得少的地方加分
         cells: dict[tuple, list] = {}
         for k in rng:
@@ -157,6 +176,10 @@ def candidates(user_id: int, mastery: dict | None = None, near_kp: str | None = 
             kp = catalog.kps[k]
             spread = 1.5 * gap[("s", kp.get("strand"))] + 1.5 * gap[("g", kp["stage"])]
             rel = 4 if k in near else 3 if k in today_near else 0
+            # 铺开摸底只在最近两个学年里铺；更早的（地基、低年级）只在和正在学的、今天要学的有关时才测，
+            # 或者是答错以后沿前置一层层往回追到的（_queued，上面已经排在最前）
+            if rel == 0 and (e.get("foundation") or stage_rank(kp["stage"]) < top - BREADTH_YEARS):
+                continue
             hot = 2 if kp.get("hot") else 0
             if unknown(k):
                 # 答对能推断的未测前置越多越值得测；被越多旧知识点依赖越基础

@@ -2,10 +2,10 @@
 {% block title %}冲刺 · {{ SITE }}{% endblock %}
 {% block body %}
 <link rel="stylesheet" href="/static/play/play.css">
-<div id="sp" class="sp" data-info='{{ {"open": open, "today": today_points, "best": best, "tier_at": tier_at, "goal_name": goal.goal_name, "goal_need": goal.goal_need or 0}|tojson }}'>
+<div id="sp" class="sp" data-info='{{ {"open": open, "drill": drill, "drill_min": drill_min, "today": today_points, "best": best, "tier_at": tier_at, "goal_name": goal.goal_name, "goal_need": goal.goal_need or 0}|tojson }}'>
   <div class="sp-top">
     <a class="btn ghost sm" href="/today">‹ 今天</a>
-    <b class="grow">⚡ 冲刺</b>
+    <b class="grow">⚡ {{ '快练' if drill else '冲刺' }}</b>
     <span class="sp-pts" title="今天的冲刺分">今天 <b id="sp-today">{{ today_points }}</b> 分 · ⭐ <b id="sp-stars">{{ today_points // 10 }}</b></span>
   </div>
 
@@ -19,7 +19,9 @@
   {% else %}
   <div class="card sp-intro" id="sp-start">
     <div class="sp-big">⚡</div>
-    <h2>今天的任务做完了，还想继续？</h2>
+    {% if drill %}<h2>快练 {{ drill_min }} 分钟</h2>
+    <p class="muted">{% if simple %}口算、单词，越快越准越好！{% else %}口算、单词、术语、公式和单位这类短题，又快又准地反复练，练到不用想。{% endif %}答满 {{ drill_min }} 分钟这一项就完成，想多冲也可以接着冲。</p>
+    {% else %}<h2>今天的任务做完了，还想继续？</h2>{% endif %}
     <ul class="sp-rules">
       <li>题目不限量，都按你的水平出，答对七八成正好。</li>
       <li>连对 <b>{{ tier_at[1] }}</b> 题升到 <b class="x2">×2</b>，再连对 <b>{{ tier_at[2] - tier_at[1] }}</b> 题升到 <b class="x3">×3</b>。每答对一题得「当前倍数」分。</li>
@@ -27,7 +29,7 @@
       <li>每 10 分换 1 颗 ⭐，每 20 分乐园多玩 1 分钟（今天最多多 10 分钟）。</li>
     </ul>
     {% if best %}<p class="small muted">你的个人纪录：一天冲了 <b>{{ best }}</b> 分。</p>{% endif %}
-    <button type="button" class="btn lg block" id="sp-go">开始冲刺！</button>
+    <button type="button" class="btn lg block" id="sp-go">{{ '开始快练！' if drill else '开始冲刺！' }}</button>
   </div>
 
   <div class="sp-run" id="sp-run" hidden>
@@ -36,6 +38,7 @@
       <div class="grow">
         <div class="sp-heat"><i id="sp-heat"></i><span class="m m2" style="left:{{ 100 * tier_at[1] / tier_at[2] }}%">×2</span><span class="m m3">×3</span></div>
         <div class="small muted" id="sp-next">再连对 {{ tier_at[1] }} 题升到 ×2</div>
+        {% if drill %}<div class="small" id="sp-clock"></div>{% endif %}
       </div>
       <div class="sp-run-pts"><b id="sp-pts">0</b><span>这次</span></div>
     </div>
@@ -48,5 +51,5 @@
 </div>
 <script src="/static/play/engine.js"></script>
 <script src="/static/play/quiz.js"></script>
-<script src="/static/play/sprint.js"></script>
+<script src="/static/play/sprint.js?v={{ ASSET_V }}"></script>
 {% endblock %}

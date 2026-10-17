@@ -125,10 +125,15 @@ _item_row_to_dict = bank.row_to_item
 save_items = bank.save_items
 
 
-def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="") -> list[dict]:
+def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="", exclude=None, uses=None) -> list[dict]:
     """取题：先用题库里的（这个知识点的，加上别的教材里同一概念的），优先没做过的、卷库真题优先、难度从低到高；
-    不够且配置了 AI 时现场出题，存进题库，以后别的孩子也能用。"""
-    rows = bank.candidates(user_id, kp_id)
+    不够且配置了 AI 时现场出题，存进题库，以后别的孩子也能用。
+    exclude：这次已经出过的题（混合练习里同一个知识点出好几次，不重复）。
+    purpose="combine"：融合题——一道题同时要用到这个知识点和 uses 里的旧知识（见 app/mix.py），题挂在几个知识点上。"""
+    exclude = set(exclude or ())
+    if purpose == "combine":
+        return _combine_items(user_id, kp_id, n, grade, exclude, uses or [])
+    rows = [r for r in bank.candidates(user_id, kp_id) if r["id"] not in exclude]
     fresh = [r for r in rows if r["done"] == 0 and not r["gdone"]]
     # 同型组里做过别的题（换了数字的同一道题）：排在新题后面；做错过的那组，先出同组没做过的，再出原题
     twins = [r for r in rows if r["done"] == 0 and r["gdone"]]
@@ -154,10 +159,31 @@ def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="") -> li
         pack = catalog.packs[catalog.kp_pack[kp_id]]
         try:
             new = llm.generate_items(kp, pack, grade, n=max(3, n - len(picked)), purpose=purpose, user_id=user_id)
-            have = {p["id"] for p in picked} | bank.flagged_by(user_id)
+            have = {p["id"] for p in picked} | bank.flagged_by(user_id) | exclude
             saved = [it for it in save_items(kp_id, new, purpose=purpose, grade=grade, meta=bank.gen_meta("items", purpose=purpose))
                      if it["id"] not in have]
             picked += saved[: n - len(picked)]
+        except llm.LLMError:
+            pass
+    return picked[:n]
+
+
+def _combine_items(user_id: int, kp_id: str, n: int, grade: str, exclude: set, uses: list[str]) -> list[dict]:
+    """融合题：题库里这个知识点、还没做过的融合题先用；没有就请 AI 出（存进题库，挂在几个知识点上）。"""
+    rows = [r for r in bank.candidates(user_id, kp_id)
+            if r["purpose"] == "combine" and r["kp_id"] == kp_id and r["id"] not in exclude and not r["done"]]
+    picked = [{**bank.row_to_item(r), "kp_id": kp_id} for r in rows[:n]]
+    uses = [k for k in uses if catalog.kp(k) and k != kp_id][:2]
+    if len(picked) < n and uses and llm.enabled():
+        kp = catalog.kp(kp_id)
+        pack = catalog.packs[catalog.kp_pack[kp_id]]
+        try:
+            new = llm.generate_items(kp, pack, grade or catalog.default_grade, n=1, purpose="combine", user_id=user_id,
+                                     uses=[catalog.kp(k) for k in uses])
+            for it in new:  # AI 没标就按要求的算：这道题用到了这几个旧知识点
+                it["kp_ids"] = [k for k in (it.get("kp_ids") or uses) if catalog.kp(k)] or uses
+            saved = save_items(kp_id, new, purpose="combine", grade=grade, meta=bank.gen_meta("items", purpose="combine"))
+            picked += [it for it in saved if it["id"] not in exclude][: n - len(picked)]
         except llm.LLMError:
             pass
     return picked[:n]
@@ -447,7 +473,8 @@ def frontier(user_id: int, pack_id: str, stage: str, mastery: dict) -> list[dict
 
 # ------------------------------------------------------------------ 课程进度（学校学到哪了）
 
-PROGRESS_STALE_DAYS = 7   # 最多一周问一次「这周学校学了啥」（不是每天的任务，可以跳过）
+PROGRESS_STALE_DAYS = 7   # 最多一周问一次「这周学校学了啥」（不是每天的任务，可以跳过；有校历的课不问孩子）
+CONFIRM_DAYS = 30         # 按校历推演的课：家长一个月核对一次
 
 
 def taught_set(user_id: int) -> set[str]:
@@ -477,8 +504,14 @@ def set_progress(user_id: int, pack_id: str, current_kp: str | None, taught: lis
 
 
 def set_progress_chapters(user_id: int, pack_id: str, current: str | None, done: list[str], stage: str | None = None) -> None:
-    """按章报进度：current = 正在学的那一章，done = 学过的章。正在学的知识点 = 这一章里第一个还没掌握的。"""
-    e = db.one("SELECT stage, track FROM enrollments WHERE user_id=? AND pack_id=?", user_id, pack_id)
+    """按章报进度：current = 正在学的那一章，done = 学过的章。正在学的知识点 = 这一章里第一个还没掌握的。
+    有校历的课：存成「比校历估计的快 / 慢几章」，以后照样按日期往前走（见 app/schoolyear.py）。"""
+    from . import schoolyear
+    e = db.one("SELECT * FROM enrollments WHERE user_id=? AND pack_id=?", user_id, pack_id)
+    u = db.one("SELECT * FROM users WHERE id=?", user_id)
+    if e and u and (not stage or stage == e["stage"]) and schoolyear.estimate(dict(u), dict(e)):
+        schoolyear.correct(user_id, pack_id, chapter=current or "")
+        return
     chs = catalog.chapters(pack_id, stage or e["stage"], e["track"])
     done_set = set(done or [])
     taught = [k for ch in chs if ch["key"] in done_set for k in ch["kps"]]
@@ -501,7 +534,12 @@ def mark_taught(user_id: int, kp_ids) -> None:
 def advance_progress(user_id: int, e, mastery: dict, taught: set) -> str | None:
     """进度自动往前走，不用孩子天天报：
     - 正在学的知识点掌握了 → 换成这一章里下一个还没掌握的；
-    - 后面的章里已经有学校教过的内容（比如导入的考试卷考到了）→ 正在学的章往后挪到那一章。"""
+    - 后面的章里已经有学校教过的内容（比如导入的考试卷考到了）→ 正在学的章往后挪到那一章。
+    有校历的课由 schoolyear.sync 按日期推演（每天排计划前算一次），这里直接用它的结果。"""
+    from . import schoolyear
+    u = db.one("SELECT grade FROM users WHERE id=?", user_id)
+    if u and schoolyear.estimate(dict(u), dict(e)):
+        return e["progress_kp"]
     cur = e["progress_kp"]
     chs = catalog.chapters(e["pack_id"], e["stage"], e["track"])
     if not cur or not chs:
@@ -527,10 +565,13 @@ def progress_prompt(user: dict) -> list[str]:
     snooze = (db.jload(user.get("settings"), {}) or {}).get("progress_snooze", "")
     if snooze and snooze > (db.today() - timedelta(days=PROGRESS_STALE_DAYS)).isoformat():
         return []
+    from . import schoolyear
     out = []
     for e in db.q("SELECT * FROM enrollments WHERE user_id=?", user["id"]):
         pack = catalog.packs.get(e["pack_id"])
         if not pack or not pack.chapters or pack.system == "cert" or not catalog.chapters(pack.id, e["stage"], e["track"]):
+            continue
+        if schoolyear.calendar_for(pack):   # 按校历自动推演，不用孩子报（家长在「学校学到哪了」核对）
             continue
         if not e["progress_at"] or e["progress_at"] < (db.today() - timedelta(days=PROGRESS_STALE_DAYS)).isoformat():
             out.append(pack.subject_name)
@@ -552,7 +593,12 @@ def progress_view(user_id: int, e) -> dict:
     cur = e["stage"]
     learned = [k for k in ids if stage_rank(catalog.kps[k]["stage"]) < stage_rank(cur) or k in taught]
     stale = not e["progress_at"] or e["progress_at"] < (db.today() - timedelta(days=PROGRESS_STALE_DAYS)).isoformat()
-    return {"pack": pack, "stage": cur, "current": catalog.kp(e["progress_kp"]) if e["progress_kp"] else None,
+    from . import schoolyear
+    u = db.one("SELECT * FROM users WHERE id=?", user_id)
+    est = schoolyear.estimate(dict(u), dict(e), manual=None) if u else None
+    if est:   # 按校历推演：一个月没核对才提醒家长看一眼
+        stale = not e["progress_at"] or e["progress_at"] < (db.today() - timedelta(days=CONFIRM_DAYS)).isoformat()
+    return {"pack": pack, "estimate": est, "stage": cur, "current": catalog.kp(e["progress_kp"]) if e["progress_kp"] else None,
             "learned": learned, "taught_here": [k for k in ids if catalog.kps[k]["stage"] == cur and k in taught],
             "stage_kps": [catalog.kps[k] for k in ids if catalog.kps[k]["stage"] == cur], "track": pack.track_name(e["track"]),
             "updated": e["progress_at"], "stale": stale, "chapters": _chapter_rows(e, taught)}

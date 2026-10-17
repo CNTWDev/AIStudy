@@ -145,7 +145,7 @@
 <div class="card explore">
   <div class="card-h"><h3>🗺️ 我的学习地图{% if readonly %} <span class="muted small">以前学过的，已经确认了多少</span>{% endif %}</h3></div>
   {% for c in cov %}
-  <div class="row small"><span class="grow">{{ c.pack.subject_name }}</span><span class="muted">{{ c.known }}/{{ c.total }} · {{ c.pct }}%{% if c.weak %} · {{ c.weak }} 个还不稳{% endif %}</span></div>
+  <div class="row small"><span class="grow">{{ c.name }}</span><span class="muted">{{ c.known }}/{{ c.total }} · {{ c.pct }}%{% if c.weak %} · {{ c.weak }} 个还不稳{% endif %}</span></div>
   <div class="bar"><span data-w="{{ c.pct }}" style="width:{{ c.pct if readonly else 0 }}%"></span></div>
   {% endfor %}
   {% if vocab.estimate %}<p class="small" style="margin:4px 0">🔤 估计你认识约 <b>{{ vocab.estimate }}</b> 个常用英语单词（已经试过 {{ vocab.tested }} 个，试得越多越准）</p>{% endif %}

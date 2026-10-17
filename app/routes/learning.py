@@ -3,7 +3,7 @@ from ..content import content
 from fastapi import APIRouter
 from fastapi import Body, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from .. import arena, auth, bank, db, engine, evidence, explore, insights, itemtypes, llm, recall, records, sitecfg, sprint, streak, trace
+from .. import arena, auth, bank, db, engine, evidence, explore, insights, itemtypes, llm, mix, recall, records, sitecfg, sprint, streak, trace
 from datetime import date
 from ..web import (
     GRADES,
@@ -128,6 +128,8 @@ def plan_task_done(request: Request, body: dict = Body(...)):
     match = {"type": body.get("type")}
     if body.get("kp"):
         match["kp"] = body["kp"]
+    if body.get("pack"):
+        match["pack"] = body["pack"]
     hit = engine.mark_task_by(k["id"], **match)
     cur = (hit or [None])[0] or body.get("current")
     return {"ok": True, "stars": engine.total_stars(k["id"]), "flow": engine.flow_state(k["id"], cur)}
@@ -340,6 +342,49 @@ def api_context(request: Request, kp_id: str):
         return bank.context(kp, k["grade"], user_id=k["id"])
     except llm.LLMError:
         return {}
+
+
+# ------------------------------------------------------------------ 每门课一组混合练习（app/mix.py）
+
+def _mix_task(k, pack_id: str) -> dict | None:
+    return next((t for t in engine.today_plan(k["id"])["plan"] if t.get("type") == "mix" and t.get("pack") == pack_id), None)
+
+
+@router.get("/practice/{pack_id}", response_class=HTMLResponse)
+def mix_page(request: Request, pack_id: str):
+    k = kid_or_redirect(request)
+    if pack_id not in {e["pack_id"] for e in enrollments(k["id"])}:
+        raise HTTPException(404, "没有报这门课")
+    t = _mix_task(k, pack_id)
+    n = (t or {}).get("n") or mix.size_for(15, k["grade"])
+    s = mix.get_or_create(k["id"], pack_id, n)
+    slots = db.jload(s["slots"], [])
+    return render(request, "mix.html", pack=catalog.packs[pack_id], set_id=s["id"], total=len(slots),
+                  parts=mix.summary(slots), done=bool(s["done_at"]), answered=s["answered"], right=s["right_n"],
+                  started=s["pos"] > 0)
+
+
+@router.get("/api/mix/{set_id}/next")
+def mix_next(request: Request, set_id: int, k_: int = 4):
+    k = kid_or_redirect(request)
+    r = mix.next_items(k["id"], set_id, k["grade"], k=min(max(k_, 1), 6))
+    import uuid
+    r["items"] = [{**_public_item(i), "request_id": uuid.uuid4().hex} for i in r["items"]]
+    return r
+
+
+@router.post("/api/mix/{set_id}/tick")
+def mix_tick(request: Request, set_id: int, body: dict = Body(...)):
+    k = kid_or_redirect(request)
+    return mix.tick(k["id"], set_id, str(body.get("kp") or ""), str(body.get("role") or ""), bool(body.get("correct")))
+
+
+@router.post("/api/mix/{set_id}/done")
+def mix_done(request: Request, set_id: int):
+    k = kid_or_redirect(request)
+    r = mix.finish(k["id"], set_id)
+    hit = engine.mark_task_by(k["id"], type="mix", pack=r.get("pack")) if r else []
+    return {**r, "flow": engine.flow_state(k["id"], (hit or [None])[0])}
 
 
 @router.get("/warmup", response_class=HTMLResponse)

@@ -496,6 +496,38 @@ FastAPI 应用（app/main.py）
 - 一种口吻照顾两个年龄：平实、短句、像学长学姐，不用「小朋友」、叠词和一串感叹号。AI 生成的内容按年龄换口吻（`app/llm/tasks.py` 里的 `VOICE_PRIMARY` 和 `VOICE_TEEN`）。
 - 家长页和管理后台用准确的成人用语。家长和孩子共用的页面（比如记录页）用 `report_for` 区分。
 
+### 5.23 学校进度按校历推演 + 每门课一组混合练习 + 跟着新知识往回找
+
+家长的反馈：孩子从来不主动报学到哪了；每天做的题差不多，总围着「正在学的 + 做错的」。原因在代码里：学新知识的任务每个只有 3 题、被每天时长截到两三个；进度不报就停在原地；以前的知识测对一次就不再出；往回只在报名的那几本教材里找。讨论稿：项目文件 `aistudy/docs/进度推演与每日练习-讨论稿.md`。
+
+**学校进度按校历推演**（`app/schoolyear.py`，校历 `curricula/_meta/calendar.json`）
+- 校历写「月-日」每年通用：上海两学期（9/1–1/20、2/16–6/30，国庆等不上新课，每学期最后两周复习），国际学校三学期。学制决定用哪份。
+- 这一学段的章按上新课的天数铺开、每个知识点占一样的天数：分上下册的第一学期铺上册、第二学期铺下册；不分册的整学年铺；两年的课程（学段 year 是 x.5，如 IGCSE）按孩子的年级算第几年。大章里也按日期往前走到具体知识点。
+- 推演到的位置之前的内容写进 `kp_taught`（`source = inferred`，每天排计划前重算）；孩子 / 家长报的、试卷考到的是 `manual`，考到了后面的内容，进度至少到那里。
+- 家长在「学校学到哪了」点「对 / 学校快一章 / 慢一章」或直接点章：存成偏移量（`enrollments.progress_shift`，只在这一学期有效），以后照样按日期往前走。一个月没核对，家长页提示一次。孩子端不再问「这周学校学了啥」。
+- 寒暑假、复习周不推新课。
+
+**每门课一组混合练习**（`app/mix.py`，任务类型 `mix`，页面 `/practice/<pack>`）
+- 今天页每门课一张「XX 练习 N 题」，取代原来一个知识点一张卡的「跟上学校 / 回顾 / 预习」。题量 = 排完其它任务后剩下的时间平分（每题约 1 分钟，三年级以下 0.8 分钟），每门课至少 10 分钟；时间不够时排在后面的课被截掉，所以每天换一门打头。
+- 一组的成分（比例在学习方式 `profiles.toml` 的 `mix` 里调，默认 新 30 / 近期 20 / 往回 30 / 换问法 10 / 预习 10）：
+  - 新：推演到的正在学的知识点，分散着出 3～5 次，最后一次是**融合题**；
+  - 近期：最近 3 周练过还不稳的，和按遗忘规律到期的；
+  - 往回：先是新内容要用到的旧知识，再在最近两个学年里铺开，会了的按遗忘规律长间隔回来；
+  - 换问法：答对过但只用过一种题型的、从别的教材推断来的（掌握标准本来就要两种题型，见 `methods/mastery.py`）；
+  - 预习：学校下一步要学的，两道入门题。
+- 往回最多占一半；往回的比例跟着最近两周摸底题的正确率调（≥85% 少出，<60% 多出，`past_factor`）。
+- 一组里做错的（摸底题除外）过几题换一道同类的再来，同一个点最多两次（连续重学，Rawson & Dunlosky 2011）。
+- 新内容第一次出现时可以点「先看看怎么做」看讲解（和知识点页同一份讲解）。
+
+**跟着新知识往回找，不一刀切**（`app/ladder.py`，规则 `curricula/_meta/ladder.json`；`explore.candidates`）
+- 地基 = 能往回找到哪里的边界：报名教材里更低的学段，加上 `base_packs`（教材从中途开始时，用基础教材补齐更低的学段）和 `builds_on`（物理用到科学、数学）找到的别的教材，到孩子的年级为止。对所有孩子同一套规则。
+- 但不是要全部摸一遍：铺开摸底只在最近两个学年里铺；更早的、地基里的，只有是正在学的 / 今天要学的知识点的前置或要用到的，或者答错以后沿前置一层层往回追到的，才出题。一组里这类更早的题最多 3 道。
+- 依据：学新知识前先激活要用到的旧知识（Ausubel 1968：影响学习最重要的是学生已经知道什么）；知识空间理论（Doignon & Falmagne，ALEKS 的做法）——先测高层的，答对就推断它的前置也会，答错才往下追，用最少的题摸清；认知负荷（Sweller 1988）——一道题里旧知识太多、一组里补洞太多都会挤掉新知识，所以设上限。
+
+**融合题**（`engine.items_for(purpose="combine")`、`llm.generate_items(purpose="combine")`）：一道题同时要用到新知识点和一两个旧知识点（AI 出、标 `kp_ids`，存进题库复用）。做对：旧知识点各记半条「会」的证据；做错：说不清是哪块没会，不扣旧知识点，把它们排进往回追的队列。
+
+**快练进主线**（`src_drill`、`sprint.start(drill=True)`）：每天固定的「⚡ 快练 5 分钟」，用冲刺的玩法（连对加倍），不用等任务做完；答满 5 分钟且至少 8 题这一项就完成。题源：口算（沪教版一到六年级）、单词和术语、学过的知识点短选择题，以及报了剑桥物理的孩子的单位换算和代公式（`quickgen` 的 si / speed / density / weight / pressure，题干英文）。每种题按孩子的水平出（目标答对率约 80%），练的是又快又准（流畅性）。
+
 ## 6. AI 抽象层与使用原则
 
 - **配置和代码分离**：提供方、模型、密钥、每日上限、按任务路由都在 `config/llm.toml`（模板 `config/llm.example.toml`），改完重启服务生效，不用改代码。值可以写成 `"${环境变量}"`。
@@ -514,7 +546,7 @@ FastAPI 应用（app/main.py）
 
 ## 7. 数据表
 
-`users`（家长/孩子；`settings.method` 是学习方式）· `enrollments`（孩子选的教材包和当前学段）· `events`（学习事件：所有学习证据，掌握度按它重放）· `mastery`（掌握度，带模型指纹）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· 乐园：`arena_ability` / `arena_calib` / `arena_matches` / `arena_answers` / `arena_ledger` / `arena_awards`（贴纸）/ `arena_levels`（闯关）· `traces`（追根：每次测了什么、根在哪）· `streak_freezes`（补签卡）· `sprint_runs`（冲刺）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
+`users`（家长/孩子；`settings.method` 是学习方式）· `enrollments`（孩子选的教材包和当前学段）· `events`（学习事件：所有学习证据，掌握度按它重放）· `mastery`（掌握度，带模型指纹）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· 乐园：`arena_ability` / `arena_calib` / `arena_matches` / `arena_answers` / `arena_ledger` / `arena_awards`（贴纸）/ `arena_levels`（闯关）· `traces`（追根：每次测了什么、根在哪）· `streak_freezes`（补签卡）· `sprint_runs`（冲刺）· `mix_sets`（每门课每天一组混合练习）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
 
 ## 8. 后续路线
 

@@ -9,7 +9,7 @@
 """
 from datetime import timedelta
 
-from . import bankpapers, db, engine, evidence, explore, insights, trace
+from . import bankpapers, db, engine, evidence, explore, insights, mix, schoolyear, trace
 from .catalog import catalog, stage_rank
 
 
@@ -313,6 +313,42 @@ def src_preview(c: Ctx) -> list[dict]:
     return c.per_pack["preview"]
 
 
+MIX_MIN_MINUTES = 10
+
+
+def src_mix(c: Ctx) -> list[dict]:
+    """每门课一组混合练习：新的、近期的、以前的（跟着今天学的往回找）、换问法、预习混着出（见 app/mix.py）。
+    先按最少 10 分钟排；排完整天的计划后，把剩下的时间分给它们（build_plan 里的 fill）。"""
+    out = []
+    done_today = {r["pack_id"]: r for r in db.q("SELECT pack_id, slots, done_at FROM mix_sets WHERE user_id=? AND day=?",
+                                                c.user_id, db.today().isoformat())}
+    # 时间不够时排在后面的会被截掉：每天换一门打头，几门课轮着来
+    k = c.day_seed % len(c.enrolls) if c.enrolls else 0
+    for i, e in enumerate(c.enrolls[k:] + c.enrolls[:k]):
+        pack = catalog.packs[e["pack_id"]]
+        if pack.system == "cert" and not e["exam_date"]:   # 考证的课先设考试日期（src_exam_date）
+            continue
+        n = mix.size_for(MIX_MIN_MINUTES, c.user["grade"])
+        made = done_today.get(pack.id)
+        if made:   # 今天已经开始做了：题数以那一组为准
+            n = len(db.jload(made["slots"], [])) or n
+        out.append({"type": "mix", "pack": pack.id, "title": f"{pack.subject_name}练习 {n} 题", "n": n,
+                    "why": "今天学的、最近学的、以前学的混着练；做错的过几题还会再来一道",
+                    "minutes": round(n * mix.minutes_per_item(c.user["grade"])), "url": f"/practice/{pack.id}",
+                    "keep": i == 0, "fill": not made})
+    return out
+
+
+def src_drill(c: Ctx) -> list[dict]:
+    """快练 5 分钟：口算、单词、术语、公式和单位这类短题，限时、连对加倍（冲刺的玩法，见 app/sprint.py）。
+    求又快又准：基本功练到不用想。成人学习者不排。"""
+    from .catalog import is_adult
+    if is_adult(c.user["grade"]) or not c.enrolls:
+        return []
+    return [{"type": "drill", "title": "⚡ 快练 5 分钟", "why": "口算、单词、术语这类短题，越快越准越好；连对倍数会越来越高",
+             "minutes": 5, "url": "/sprint?drill=1"}]
+
+
 def src_review(c: Ctx) -> list[dict]:
     n = len(engine.due_cards(c.user_id, 100, "other"))
     return [{"type": "review", "title": f"复习卡片 {n} 张", "why": "学过的隔几天看一眼，就不容易忘",
@@ -321,7 +357,8 @@ def src_review(c: Ctx) -> list[dict]:
 
 SOURCES = {"progress": src_progress, "exam_date": src_exam_date, "warmup": src_warmup, "words": src_words, "mistakes": src_mistakes,
            "reading": src_reading, "exam": src_exam, "sync": src_sync, "top": src_top, "paper": src_paper, "diagnose": src_diagnose,
-           "weak": src_weak, "backfill": src_backfill, "check": src_check, "preview": src_preview, "review": src_review}
+           "weak": src_weak, "backfill": src_backfill, "check": src_check, "preview": src_preview, "review": src_review,
+           "mix": src_mix, "drill": src_drill}
 DEFAULT_LIMITS = {"sync": 2, "top": 1, "paper": 1, "diagnose": 1, "check": 2, "preview": 1}
 
 
@@ -348,6 +385,7 @@ def _take(c: Ctx, kind: str) -> list[dict]:
 
 
 def build_plan(user_id: int) -> list[dict]:
+    schoolyear.sync(user_id)   # 先按今天的日期推演学校进度（孩子不用报）
     c = Ctx(user_id)
     fixed = [t for kind in c.policy.get("fixed", []) for t in _take(c, kind)]
     # 今天追根找到的结论（先补根、再回来打）：不管哪种学习方式都排在学知识点的任务最前面
@@ -374,4 +412,22 @@ def build_plan(user_id: int) -> list[dict]:
         out.append(t)
         if part != "tail":  # tail 的时间开头已经算进去了
             used += t["minutes"]
+    _fill(c, out, budget - used)
     return out
+
+
+def _fill(c: Ctx, plan: list[dict], left: float) -> None:
+    """排完以后还剩的时间，平分给还没开始的混合练习：每天练多少由家长设的每天时长决定。"""
+    fills = [t for t in plan if t.get("fill")]
+    if not fills or left <= 0:
+        for t in plan:
+            t.pop("fill", None)
+        return
+    per = mix.minutes_per_item(c.user["grade"])
+    share = left / len(fills)
+    for t in fills:
+        n = mix.size_for(t["minutes"] + share, c.user["grade"])
+        name = t["title"].rsplit("练习", 1)[0]
+        t.update(n=n, title=f"{name}练习 {n} 题", minutes=round(n * per))
+    for t in plan:
+        t.pop("fill", None)

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/today" class="small">← 今天</a>
+<h1>{{ pack.subject_name }}练习</h1>
+<p class="muted small">{% if simple %}新的旧的混着练，错了的过一会儿还会再来 👍{% else %}今天学的、最近学的、以前学的混在一起练，有的还会换个问法再问一次。做错的题过几题会换一道同类的再来，这次做对就好。{% endif %}</p>
+<p class="small for-grownups mixparts">这一组 {{ total }} 题：{% for r, n in parts.items() if n %}<span class="pill mixrole-{{ r }}">{{ {'new':'新学的','recent':'最近学的','past':'以前学过的','cross':'换个问法','preview':'预习'}[r] }} {{ n }}</span> {% endfor %}</p>
+<div class="daybar"><span id="mbar" style="width:0%"></span></div>
+<div id="mbox" class="card"><span class="loading">正在准备题目</span></div>
+<script>
+const SET = {{ set_id }}, KIDS_DONE = {{ 'true' if done else 'false' }};
+let queue = [], total = {{ total }}, answered = {{ answered }}, right = {{ right }}, ended = false, loading = null, serverDone = false, seenNew = new Set();
+function bar() { $('#mbar').style.width = (total ? Math.min(100, 100 * answered / total) : 0) + '%'; }
+async function fetchMore() {
+  if (serverDone || loading) return loading;
+  loading = api(`/api/mix/${SET}/next?k_=4`).then(r => { queue.push(...r.items); total = Math.max(total, r.total); serverDone = r.done; loading = null; })
+    .catch(e => { loading = null; throw e; });
+  return loading;
+}
+async function load() {
+  if (KIDS_DONE) return finish(true);
+  try {
+    await fetchMore();
+    if (!queue.length && serverDone) { $('#mbox').innerHTML = '<p>这门课今天没有要练的题了，直接开始下一项吧。</p>'; return finish(true); }
+    Run.start('mix', {total, mount: $('#mbox')});
+    show();
+  } catch (e) { $('#mbox').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+}
+function tagHtml(t) {
+  const role = t.role === 'again' ? '🔁 ' + esc(t.label) : t.role === 'new' ? '✨ ' + esc(t.label) : t.role === 'past' ? '🔀 ' + esc(t.label)
+    : t.role === 'preview' ? '👀 ' + esc(t.label) : t.role === 'cross' ? '🔄 ' + esc(t.label) : '🧠 ' + esc(t.label);
+  const where = t.role === 'past' ? ` · ${esc(t.subject)}${t.stage_label ? ' ' + esc(t.stage_label) : ''}` : '';
+  return `<div class="probe-tag mixtag-${t.role}">${role}<span class="for-grownups">${where}：${esc(t.name)}</span>${t.combine ? ' <span class="pill">🔗 融合题：要用到以前学的</span>' : ''}</div>`;
+}
+function teachBtn(box, kp) {
+  const d = document.createElement('div'); d.className = 'small'; d.style.margin = '4px 0 8px';
+  d.innerHTML = `<button class="btn ghost sm">📘 先看看怎么做</button>`;
+  d.querySelector('button').onclick = async () => {
+    d.innerHTML = '<span class="loading">正在准备讲解</span>';
+    try {
+      const t = await api('/api/teach/' + kp);
+      d.innerHTML = '<div class="card" style="margin:0">' + (t.steps || []).map((s, i) => `<p><b>${i + 1}. ${esc(s.title)}</b><br>${esc(s.text)}</p>`).join('') +
+        (t.example ? `<p><b>例子：</b>${esc(t.example.q)}<br><span class="muted">→ ${esc(t.example.a)}</span></p>` : '') +
+        (t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '') + '</div>';
+    } catch (e) { d.innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+  };
+  box.appendChild(d);
+}
+async function show() {
+  bar();
+  if (!queue.length) {
+    if (!serverDone) {
+      $('#mbox').innerHTML = '<span class="loading">正在准备下一题</span>';
+      try { await fetchMore(); } catch (e) { $('#mbox').innerHTML = `<div class="err">${esc(e.message)}</div>`; return; }
+      return show();
+    }
+    return finish(false);
+  }
+  if (queue.length <= 2) fetchMore().catch(() => {});
+  const it = queue.shift(), t = it.mix;
+  const box = document.createElement('div');
+  $('#mbox').innerHTML = tagHtml(t) + `<div class="muted small">第 ${answered + 1}/${total} 题</div>`;
+  if ((t.role === 'new' || t.role === 'preview') && !seenNew.has(t.kp)) { seenNew.add(t.kp); teachBtn($('#mbox'), t.kp); }
+  $('#mbox').appendChild(box);
+  const base = extra => Object.assign({item_id: it.id, kp_id: t.kp, request_id: it.request_id, mode: t.mode},
+    t.probe ? {probe: {depth: t.probe.depth, from: t.probe.from}} : {}, extra);
+  let lastAnswer = null;
+  renderItem(box, it, {
+    submit: (answer, self, ms) => { lastAnswer = answer; return api('/api/answer', base(self ? {self, ms} : {answer, ms})); },
+    dontKnow: () => api('/api/answer', base({dont_know: true})),
+    onDone: async res => {
+      answered++; if (res.correct) right++;
+      Run.hit(!!res.correct); Combo.hit(!!res.correct, box); celebrate(res, box);
+      let again = false;
+      try { const r = await api(`/api/mix/${SET}/tick`, {kp: t.kp, role: t.role, correct: !!res.correct}); again = r.again; if (r.total) total = Math.max(total, r.total); if (again) serverDone = false; } catch (e) {}
+      bar();
+      const nx = document.createElement('div'); nx.className = 'row'; nx.style.marginTop = '10px';
+      nx.innerHTML = `<button class="btn">${!queue.length && serverDone ? '完成练习' : '下一题 →'}</button>`;
+      nx.querySelector('.btn').onclick = () => show();
+      if (again) box.insertAdjacentHTML('beforeend', '<div class="small muted" style="margin-top:6px">🔁 过几题会换一道同类的再来，到时候再试一次。</div>');
+      box.appendChild(nx);
+      if (res.trace) {
+        const tb = document.createElement('div'); tb.className = 'hint tracebtn';
+        tb.innerHTML = `🔍 卡住了？<span class="for-grownups">找找根在哪：最多 4 道小题，看看是哪块基础没打牢。</span><div class="row" style="margin-top:6px"><button class="btn sm">找找原因</button></div>`;
+        tb.querySelector('.btn').onclick = async () => {
+          const r = await api('/api/trace/start', {kp_id: t.kp, item_id: it.id, answer: res.dont_know ? null : lastAnswer});
+          location.href = `/trace/${r.id}?back=` + encodeURIComponent(location.pathname);
+        };
+        box.appendChild(tb);
+      }
+    },
+  });
+}
+async function finish(already) {
+  if (ended) return; ended = true;
+  bar();
+  $('#mbox').innerHTML = `<p class="pop" style="font-size:20px"><b>练完了：${right}/${answered}</b> ${answered && right === answered ? '全对 🎉' : '👍'}</p>` +
+    `<p class="small muted">${isSimple() ? '' : '做错的已经记下来，明天的练习和错题重做里还会再见到。'}</p>`;
+  if (!already) Run.finish();
+  try { const r = await api(`/api/mix/${SET}/done`, {}); if (!already && r.flow && r.flow.total) return Flow.done(r.flow); } catch (e) {}
+  $('#mbox').insertAdjacentHTML('beforeend', '<div class="row"><a class="btn" href="/go">继续今天的任务 →</a></div>');
+}
+load();
+</script>
+{% endblock %}

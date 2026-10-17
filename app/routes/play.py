@@ -53,17 +53,17 @@ def arena_end(request: Request, match_id: int, body: dict = Body(...)):
 
 
 @router.get("/sprint", response_class=HTMLResponse)
-def sprint_page(request: Request):
+def sprint_page(request: Request, drill: int = 0):
     k = kid_or_redirect(request)
     ok, left = sprint.is_open(k)
-    return render(request, "sprint.html", open=ok, left=left, today_points=sprint.points_today(k["id"]),
+    return render(request, "sprint.html", open=ok or bool(drill), left=left, drill=bool(drill), drill_min=sprint.DRILL_S // 60, today_points=sprint.points_today(k["id"]),
                   best=sprint.best_day(k["id"], db.today().isoformat()), tier_at=sprint.TIER_AT,
                   goal=streak.today_state(k, engine.today_plan(k["id"])["plan"], 0, sprint.points_today(k["id"])))
 
 
 @router.post("/api/sprint/start")
-def sprint_start(request: Request):
-    return sprint.start(kid_or_redirect(request))
+def sprint_start(request: Request, body: dict = Body(default={})):
+    return sprint.start(kid_or_redirect(request), drill=bool((body or {}).get("drill")))
 
 
 @router.get("/api/sprint/{run_id}/q")

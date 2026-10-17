@@ -14,7 +14,8 @@
 
   async function start() {
     Play.sfx.unlock(); Play.sfx.play('go');
-    try { run = await api('/api/sprint/start', {}); } catch (e) { toast(e.message); return; }
+    try { run = await api('/api/sprint/start', {drill: !!D.drill}); } catch (e) { toast(e.message); return; }
+    if (D.drill && run.drill_s) startClock(run.drill_s);
     $s('#sp-start').hidden = true; $s('#sp-end').hidden = true; $s('#sp-run').hidden = false;
     $s('#sp-dock').innerHTML = '';
     lastTier = 1; setTier(1, 0); $s('#sp-pts').textContent = '0';
@@ -27,7 +28,29 @@
     quiz.load();
   }
 
+  // 快练：倒计时到了、题数也够了，这一项就完成（服务器判，r.drill_done 带着「下一项」）
+  let clock = null;
+  function startClock(sec) {
+    const el = $s('#sp-clock'), t0 = Date.now();
+    clearInterval(clock);
+    clock = setInterval(() => {
+      const left = Math.max(0, sec - Math.round((Date.now() - t0) / 1000));
+      if (el) el.textContent = left ? `⏱ 还剩 ${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}` : '⏱ 时间到！答完这题就完成了';
+      if (!left) clearInterval(clock);
+    }, 1000);
+  }
+  function drillDone(flow) {
+    D.drill = false;
+    const m = document.createElement('div'); m.className = 'sec-pop';
+    m.innerHTML = `<div class="sec-card"><div class="big">⚡</div><b>快练完成！</b><p class="muted">今天的这一项完成了。想多冲一会儿也可以。</p>
+      <button type="button" class="btn lg block" data-a="next">下一项 →</button><button type="button" class="btn ghost block" data-a="go">再冲一会儿</button></div>`;
+    document.body.appendChild(m);
+    m.querySelector('[data-a=next]').onclick = async () => { m.remove(); await stop(true); if (flow && flow.total) Flow.done(flow); else location.href = '/today'; };
+    m.querySelector('[data-a=go]').onclick = () => m.remove();
+  }
+
   function onAnswer(r) {
+    if (r.drill_done) drillDone(r.drill_done);
     today = r.points_today;
     $s('#sp-pts').textContent = r.points;
     $s('#sp-today').textContent = r.points_today;
@@ -69,12 +92,14 @@
     const g = m.querySelector('[data-a=go]'); if (g) g.onclick = () => m.remove();
   }
 
-  async function stop() {
+  async function stop(quiet) {
     if (!run) return;
+    clearInterval(clock);
     const id = run.run_id; run = null;
     if (quiz) quiz.stop();
     let r;
     try { r = await api(`/api/sprint/${id}/end`, {}); } catch (e) { toast(e.message); return; }
+    if (quiet === true) return;
     $s('#sp-run').hidden = true;
     const end = $s('#sp-end'); end.hidden = false;
     end.innerHTML = `<div class="sp-big">${r.new_best ? '🏅' : '⚡'}</div>

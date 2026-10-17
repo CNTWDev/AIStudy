@@ -66,6 +66,8 @@ def _answer(user_id, body):
     status = engine.record_attempt(user_id, it, kp_id, mode, bool(correct), body.get("answer", body.get("self", "")),
                                    ms=body.get("ms"))
     out = {"correct": bool(correct), **itemtypes.reveal(it), "status": status, "status_label": engine.STATUS_LABEL[status]}
+    if row["purpose"] == "combine" and mode in ("practice", "preview"):
+        _combine_evidence(user_id, it, kp_id, bool(correct))
     if mode == "probe":
         pr = body.get("probe") or {}
         out["probe"] = explore.after_probe(user_id, kp_id, bool(correct), int(pr.get("depth") or 0), pr.get("from") or "")
@@ -75,3 +77,18 @@ def _answer(user_id, body):
         out["lit"] = {"kp": kp_id, "name": catalog.kp(kp_id)["name"], "today": len(explore.lit_today(user_id))}
     return out
 
+
+
+COMBINE_WEIGHT = 0.5
+
+
+def _combine_evidence(user_id: int, it: dict, kp_id: str, correct: bool) -> None:
+    """融合题（新知识里带着旧知识，见 app/mix.py）：做对了，用到的旧知识点各记半条「会」的证据；
+    做错了说不清是哪块没会，不扣旧知识点的分，把它们排进「往回追」队列，之后的热身和往回题里单独测。"""
+    uses = [k for k in (it.get("kp_ids") or []) if k != kp_id and catalog.kp(k)]
+    for k in uses:
+        if correct:
+            engine.update_mastery(user_id, k, True, weight=COMBINE_WEIGHT, source="practice", item=it)
+        elif not db.one("SELECT id FROM probes WHERE user_id=? AND kind='kp' AND kp_id=? AND status='queued'", user_id, k):
+            db.run("INSERT INTO probes(user_id,kind,kp_id,reason,from_kp,depth,priority,created_at) VALUES(?,'kp',?,?,?,1,8,?)",
+                   user_id, k, f"「{catalog.kp(kp_id)['name']}」的融合题没做对，查查这块旧知识", kp_id, db.now())
