@@ -740,3 +740,120 @@ const Beat = {
   },
 };
 document.addEventListener('DOMContentLoaded', Beat.init);
+
+/* ---------- 图表上的数：鼠标放上去 / 手指点一下，看那一天的具体数 ----------
+   · 带 data-tip 的格子、柱子（学习日历、这一周、热力图、后台近 14 天）：悬停显示；手指点第一下显示，再点一下才打开那一天
+   · 正确率曲线（.tplot[data-trend]，数据在里面的 JSON）：鼠标在图上移动 / 手指左右划，吸到最近的一天，竖线标出来
+   · 键盘：Tab 到点或格子上同样显示 */
+const ChartTip = (() => {
+  let box = null, cur = null, touch = false;
+  const WD = '日一二三四五六';
+  function tipBox() {
+    if (!box) { box = document.createElement('div'); box.className = 'ctip'; box.setAttribute('role', 'status'); box.hidden = true; document.body.appendChild(box); }
+    return box;
+  }
+  /* at = 图上要指着的那一点（屏幕坐标）；没有就指着元素的上沿中间 */
+  function show(owner, html, at) {
+    const b = tipBox(); b.style.left = b.style.top = '0px'; b.innerHTML = html; b.hidden = false; cur = owner;
+    const r = owner.getBoundingClientRect();
+    const x0 = at ? at.x : r.left + r.width / 2, top = at ? at.y : r.top, bottom = at ? at.y : r.bottom;
+    const w = b.offsetWidth, h = b.offsetHeight, vw = document.documentElement.clientWidth;
+    const y = top - h - 12 >= 6 ? top - h - 12 : bottom + 14;
+    b.style.left = Math.round(Math.min(Math.max(6, x0 - w / 2), vw - w - 6)) + 'px';
+    b.style.top = Math.round(y) + 'px';
+  }
+  function hide() {
+    if (box) box.hidden = true;
+    if (cur && cur.matches('.tplot')) clearTrend(cur);
+    if (cur) cur.classList.remove('tip-on');
+    cur = null;
+  }
+  function plain(t, linked) {
+    const [head, ...rest] = String(t).split('\n');
+    return `<b>${esc(head)}</b>${rest.map(l => `<span>${esc(l)}</span>`).join('')}` +
+      (linked && touch ? '<em>再点一下，看这一天 →</em>' : '');
+  }
+
+  /* 正确率曲线 */
+  function days(plot) {
+    if (!plot._days) { try { plot._days = JSON.parse(plot.querySelector('script[type="application/json"]').textContent); } catch (e) { plot._days = []; } }
+    return plot._days;
+  }
+  function nearest(plot, clientX) {
+    const ds = days(plot); if (!ds.length) return -1;
+    const r = plot.getBoundingClientRect(), px = 100 * (clientX - r.left) / Math.max(1, r.width);
+    let bi = 0; ds.forEach((d, i) => { if (Math.abs(d.x - px) < Math.abs(ds[bi].x - px)) bi = i; });
+    return bi;
+  }
+  function trendHtml(plot, d) {
+    const dt = new Date(d.d + 'T00:00:00'), min = +plot.dataset.min || 5;
+    const head = `${dt.getMonth() + 1}/${dt.getDate()} 周${WD[dt.getDay()]}`;
+    const body = d.n
+      ? `<span>做了 ${d.n} 题，对 ${d.ok} 题</span><span class="big">正确率 ${d.acc}%${d.n < min ? ' <small>题少，参考就好</small>' : ''}</span>`
+      : '<span class="muted">这天没做题</span>';
+    const avg = d.avg == null ? '' : `<span>近 7 天平均 ${d.avg}%</span>`;
+    const go = plot.hasAttribute('data-link') && d.n && touch ? '<em>再点一下，看这一天 →</em>' : '';
+    return `<b>${head}</b>${body}${avg}${go}`;
+  }
+  function clearTrend(plot) { plot._i = -1; plot.querySelectorAll('.tg,.th,.ta').forEach(e => { e.hidden = true; }); plot.querySelectorAll('.pt.on').forEach(e => e.classList.remove('on')); }
+  function showTrend(plot, i) {
+    const d = days(plot)[i]; if (!d) return;
+    if (cur && cur !== plot) hide();
+    plot._i = i;
+    const g = plot.querySelector('.tg'), h = plot.querySelector('.th'), a = plot.querySelector('.ta');
+    g.hidden = false; g.style.left = d.x + '%';
+    h.hidden = d.y == null; if (d.y != null) { h.style.left = d.x + '%'; h.style.top = d.y + '%'; }
+    a.hidden = d.ya == null; if (d.ya != null) { a.style.left = d.x + '%'; a.style.top = d.ya + '%'; }
+    plot.querySelectorAll('.pt').forEach(p => p.classList.toggle('on', p.dataset.day === d.d));
+    const r = plot.getBoundingClientRect(), yy = d.y != null ? d.y : (d.ya != null ? d.ya : 0);
+    show(plot, trendHtml(plot, d), {x: r.left + r.width * d.x / 100, y: r.top + r.height * yy / 100});
+  }
+  function openDay(plot, i) { const d = days(plot)[i]; if (d && d.n && plot.hasAttribute('data-link')) location.href = '/day/' + d.d; }
+
+  document.addEventListener('pointerdown', e => {
+    touch = e.pointerType !== 'mouse';
+    const plot = e.target.closest && e.target.closest('.tplot[data-trend]');
+    if (plot) { plot._prev = cur === plot ? plot._i : -1; showTrend(plot, nearest(plot, e.clientX)); }
+    else if (cur && !(box && box.contains(e.target)) && !(e.target.closest && e.target.closest('[data-tip]') === cur)) hide();
+  }, true);
+  document.addEventListener('pointermove', e => {
+    const plot = e.target.closest && e.target.closest('.tplot[data-trend]');
+    if (plot && (e.pointerType === 'mouse' || e.buttons || e.pressure)) {
+      const i = nearest(plot, e.clientX); if (i !== plot._i || cur !== plot) showTrend(plot, i);
+    }
+  });
+  document.addEventListener('pointerover', e => {
+    if (e.pointerType !== 'mouse') return;
+    const t = e.target.closest && e.target.closest('[data-tip]');
+    if (t && t !== cur) { hide(); t.classList.add('tip-on'); show(t, plain(t.dataset.tip, false)); }
+  });
+  document.addEventListener('pointerout', e => {
+    if (e.pointerType !== 'mouse' || !cur) return;
+    const to = e.relatedTarget;
+    if (cur.matches('.tplot') ? !(to && cur.contains(to)) : (e.target.closest('[data-tip]') === cur && !(to && cur.contains(to)))) hide();
+  });
+  document.addEventListener('click', e => {
+    if (!e.detail) return;   // 键盘回车：照常打开链接
+    const plot = e.target.closest && e.target.closest('.tplot[data-trend]');
+    if (plot) {
+      e.preventDefault();
+      if (!touch || plot._prev === plot._i) openDay(plot, plot._i);
+      return;
+    }
+    const t = e.target.closest && e.target.closest('[data-tip]');
+    if (t && touch) {
+      const linked = t.matches('a[href]');
+      if (cur !== t || !linked) { e.preventDefault(); hide(); t.classList.add('tip-on'); show(t, plain(t.dataset.tip, linked)); }
+    }
+  });
+  document.addEventListener('focusin', e => {
+    const pt = e.target.closest && e.target.closest('.tplot[data-trend] .pt');
+    if (pt) { const plot = pt.closest('.tplot'); showTrend(plot, days(plot).findIndex(d => d.d === pt.dataset.day)); return; }
+    const t = e.target.closest && e.target.closest('[data-tip]');
+    if (t && t !== cur && e.target.matches(':focus-visible')) { hide(); t.classList.add('tip-on'); show(t, plain(t.dataset.tip, false)); }
+  });
+  document.addEventListener('focusout', e => { if (cur && cur.contains(e.target) && !(e.relatedTarget && cur.contains(e.relatedTarget))) hide(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') hide(); });
+  window.addEventListener('scroll', () => { if (cur) hide(); }, {passive: true});
+  return {hide};
+})();

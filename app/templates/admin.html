@@ -84,7 +84,7 @@
 <div class="card">
   <h3 style="margin-top:0">近 14 天</h3>
   {% set mx = [daily|map(attribute='minutes')|max, 1]|max %}
-  <div class="mini-bars" style="height:80px">{% for d in daily %}<div style="height:{{ 100 * d.minutes / mx }}%" title="{{ d.day }}：{{ d.minutes }} 分钟"></div>{% endfor %}</div>
+  <div class="mini-bars" style="height:80px">{% for d in daily %}<div style="height:{{ 100 * d.minutes / mx }}%" tabindex="0" data-tip="{{ d.day[5:] }}&#10;学习 {{ d.minutes }} 分钟 · 在学孩子 {{ d.kids }}&#10;做题 {{ d.attempts }} · 提问 {{ d.asks }} · AI 调用 {{ d.ai }}" aria-label="{{ d.day }}：学习 {{ d.minutes }} 分钟，做题 {{ d.attempts }}"></div>{% endfor %}</div>
   <div class="tw"><table class="small nums"><tr><th>日期</th><th>在学孩子</th><th>学习分钟</th><th>做题</th><th>提问</th><th>AI 调用</th></tr>
   {% for d in daily|reverse %}<tr><td>{{ d.day[5:] }}</td><td>{{ d.kids }}</td><td>{{ d.minutes }}</td><td>{{ d.attempts }}</td><td>{{ d.asks }}</td><td>{{ d.ai }}</td></tr>{% endfor %}</table></div>
 </div>

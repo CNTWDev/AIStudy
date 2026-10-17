@@ -1,13 +1,15 @@
 {# 每天的做题正确率曲线：tr 来自 records.accuracy_trend()。点 = 那一天，粗线 = 近 7 天合起来的平均。
-   坐标是百分比：图随宽度铺开，手机上字不会缩小。 #}
+   坐标是百分比：图随宽度铺开，手机上字不会缩小。鼠标移到图上 / 手指点一下（或左右划），显示离得最近那一天的具体数（app.js ChartTip）。 #}
 {% macro plot(s, tr, link=True, mini=False) %}
-<div class="tplot {{ 'mini' if mini }}">
+<div class="tplot {{ 'mini' if mini }}" data-trend {{ 'data-link' if link }} data-min="{{ tr.min }}">
   {% if not mini %}{% for g in s.grid %}<div class="gl {{ 'g80' if g.v == 80 }}" style="top:{{ g.y }}%"><span>{{ g.v }}%</span></div>{% endfor %}
   {% else %}{% for g in s.grid if g.v == 80 %}<div class="gl g80" style="top:{{ g.y }}%"></div>{% endfor %}{% endif %}
   <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">{% for a in s.avg %}<polyline points="{{ a }}" vector-effect="non-scaling-stroke"/>{% endfor %}</svg>
   {% for p in s.pts %}{% set tip = p.day[5:] ~ '：做了 ' ~ p.n ~ ' 题，对 ' ~ p.ok ~ ' 题，正确率 ' ~ p.acc ~ '%' ~ ('（题少，参考就好）' if p.few else '') %}
-  <{{ 'a href="/day/' ~ p.day ~ '"' if link else 'span' }} class="pt {{ 'few' if p.few }}" style="left:{{ p.x }}%;top:{{ p.y }}%" title="{{ tip }}" aria-label="{{ tip }}"></{{ 'a' if link else 'span' }}>{% endfor %}
+  <{{ 'a href="/day/' ~ p.day ~ '"' if link else 'span' }} class="pt {{ 'few' if p.few }}" style="left:{{ p.x }}%;top:{{ p.y }}%" data-day="{{ p.day }}" aria-label="{{ tip }}"></{{ 'a' if link else 'span' }}>{% endfor %}
   {% if not mini %}{% for lb in tr.labels %}<span class="xl" style="left:{{ lb.x }}%">{{ lb.text }}</span>{% endfor %}{% endif %}
+  <i class="tg" hidden></i><i class="th" hidden></i><i class="ta" hidden></i>
+  <script type="application/json">{{ s.days|tojson }}</script>
 </div>
 {% endmacro %}
 

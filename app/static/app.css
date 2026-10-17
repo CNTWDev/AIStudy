@@ -636,3 +636,17 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 [data-simple] .for-grownups{display:none!important}
 [data-simple] .runbar .rpb{display:none}
 .done-score b{font-size:20px;letter-spacing:1px}
+/* 图表上的数：悬停 / 点按时的小提示（app.js ChartTip） */
+.ctip{position:fixed;z-index:80;max-width:min(260px,calc(100vw - 12px));padding:8px 11px;border-radius:12px;background:var(--ink);color:var(--card);font-size:13px;line-height:1.5;box-shadow:0 6px 20px rgba(0,0,0,.18);pointer-events:none;font-variant-numeric:tabular-nums}
+.ctip b{display:block;font-weight:700}.ctip span{display:block}.ctip .big{font-size:15px;font-weight:700}.ctip small{font-weight:400;opacity:.75}.ctip .muted{opacity:.7;color:inherit}
+.ctip em{display:block;font-style:normal;font-size:12px;opacity:.75;margin-top:2px}
+.tplot[data-trend]{touch-action:pan-y;cursor:crosshair;-webkit-tap-highlight-color:transparent}
+.tplot .tg{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed color-mix(in srgb,var(--ink) 35%,transparent);pointer-events:none}
+.tplot .th,.tplot .ta{position:absolute;border-radius:50%;pointer-events:none}
+.tplot .th{width:14px;height:14px;margin:-7px 0 0 -7px;box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--brand-ink);background:var(--brand)}
+.tplot .ta{width:8px;height:8px;margin:-4px 0 0 -4px;background:var(--brand-ink);box-shadow:0 0 0 2px var(--card)}
+.tplot.mini .th{width:10px;height:10px;margin:-5px 0 0 -5px}
+.tplot .pt.on{z-index:1}
+.mini-bars div{cursor:default;transition:opacity .15s}.mini-bars:hover div{opacity:.45}.mini-bars div.tip-on,.mini-bars div:focus-visible{opacity:1;outline:none}
+.week .col.tip-on .track{box-shadow:0 0 0 2px var(--brand-ink)}
+.calendar .d.tip-on,.heat a.tip-on{outline:2px solid var(--brand-ink);outline-offset:1px}
