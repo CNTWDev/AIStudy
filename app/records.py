@@ -179,7 +179,12 @@ def _series(days: list[str], by_day: dict[str, list[int]]) -> dict:
         avg.append(" ".join(seg))
     grid = [{"v": v, "y": y(v)} for v in sorted({lo, 80, 100} | ({50} if lo < 50 else set()))]
     n = sum(p["n"] for p in pts)
-    return {"pts": pts, "avg": avg, "grid": grid, "n": n, "acc": _acc(n, sum(p["ok"] for p in pts))}
+    # 每一天（包括没做题的日子）的数，给鼠标悬停 / 手指点按时显示那一天的具体情况
+    days_out = [{"d": d, "n": n_, "ok": ok, "acc": _acc(n_, ok) if n_ else None, "x": x(i),
+                 "y": y(_acc(n_, ok)) if n_ else None,
+                 "avg": None if rolling[i] is None else round(rolling[i]),
+                 "ya": None if rolling[i] is None else y(rolling[i])} for i, d, n_, ok in daily]
+    return {"pts": pts, "avg": avg, "grid": grid, "n": n, "acc": _acc(n, sum(p["ok"] for p in pts)), "days": days_out}
 
 
 def accuracy_trend(user_id: int, days: int = 30) -> dict | None:

@@ -10,8 +10,8 @@
   {% for w in '一二三四五六日' %}<div class="wh">{{ w }}</div>{% endfor %}
   {% for d in cal %}
   {% set tip = d.day ~ (' · 今天' if d.today else '') ~ ('' if d.future else '：学了 ' ~ d.minutes ~ ' 分钟' ~ ('，已打卡' if d.checked else '') ~ ('，用补签卡保住了连续天数' if d.frozen else '')) %}
-  {% if d.future %}<span class="d future" title="{{ d.day }}">{{ d.dn }}</span>
-  {% else %}<{{ 'a href="/day/' ~ d.day ~ '"' if link else 'span' }} class="d l{{ d.level }} {{ 'today' if d.today }}" title="{{ tip }}" aria-label="{{ tip }}">
+  {% if d.future %}<span class="d future">{{ d.dn }}</span>
+  {% else %}<{{ 'a href="/day/' ~ d.day ~ '"' if link else 'span' }} class="d l{{ d.level }} {{ 'today' if d.today }}" data-tip="{{ tip }}" aria-label="{{ tip }}" {{ 'tabindex="0"' if not link }}>
     {{ d.dn if d.dn != 1 else d.month ~ '月' }}{% if d.minutes %}<span class="m">{{ d.minutes }}′</span>{% endif %}{% if d.checked %}<span class="ck">✓</span>{% endif %}{% if d.frozen %}<span class="fz" aria-hidden="true">🧊</span>{% endif %}
   </{{ 'a' if link else 'span' }}>{% endif %}
   {% endfor %}
@@ -24,7 +24,7 @@
 {% set mx = [days|map(attribute='minutes')|max, goal or 0, 1]|max * 1.15 %}
 <div class="week">
   {% for d in days %}
-  <{{ 'a href="/day/' ~ d.day ~ '"' if link and not d.future else 'div' }} class="col {{ 'today' if d.today }} {{ 'future' if d.future }}" title="{{ d.day }}{{ '' if d.future else '：' ~ d.minutes ~ ' 分钟' }}">
+  <{{ 'a href="/day/' ~ d.day ~ '"' if link and not d.future else 'div' }} class="col {{ 'today' if d.today }} {{ 'future' if d.future }}" {% if not d.future %}data-tip="{{ d.day[5:] }} 周{{ d.wd }}{{ ' · 今天' if d.today }}&#10;学了 {{ d.minutes }} 分钟{% if goal %}（目标 {{ goal }}{{ '，达到了 ✓' if d.minutes >= goal else '，还差 ' ~ (goal - d.minutes) }}）{% endif %}"{% endif %}>
     <span class="v">{{ d.minutes if d.minutes else ('·' if not d.future else '') }}</span>
     <span class="track">{% if goal %}<i class="goal" style="bottom:{{ 100 * goal / mx }}%"></i>{% endif %}<i class="fill {{ 'hit' if goal and d.minutes >= goal }}" style="height:{{ 100 * d.minutes / mx }}%"></i></span>
     <span class="wd">{{ d.wd }}</span>
@@ -39,8 +39,8 @@
   <span class="ml"></span>{% for w in '一二三四五六日' %}<span class="wl">{{ w if w in '一三五日' else '' }}</span>{% endfor %}
   {% for d in cal %}
   {% if d.wi == 0 %}<span class="ml">{{ d.month ~ '月' if loop.first or d.dn <= 7 else '' }}</span>{% endif %}
-  {% if d.future %}<span class="c future" title="{{ d.day }}"></span>
-  {% else %}<a href="/day/{{ d.day }}" class="l{{ d.level }} {{ 'today' if d.today }}" title="{{ d.day }}：{{ d.minutes }} 分钟{{ '，已打卡' if d.checked }}{{ '，完成 ' ~ d.done ~ '/' ~ d.total if d.total }}"></a>{% endif %}
+  {% if d.future %}<span class="c future"></span>
+  {% else %}{% set tip = d.day ~ (' · 今天' if d.today else '') ~ '\n学了 ' ~ d.minutes ~ ' 分钟' ~ ('，已打卡' if d.checked else '') ~ ('\n任务完成 ' ~ d.done ~ '/' ~ d.total if d.total else '') %}<a href="/day/{{ d.day }}" class="l{{ d.level }} {{ 'today' if d.today }}" data-tip="{{ tip }}" aria-label="{{ tip|replace('\n', '，') }}"></a>{% endif %}
   {% endfor %}
 </div>
 {{ legend(False) }}

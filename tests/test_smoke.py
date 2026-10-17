@@ -788,6 +788,9 @@ def test_accuracy_trend():
     al = tr["series"][0]
     assert al["key"] == "all" and al["n"] == 33 and [p["acc"] for p in al["pts"]] == [60, 90, 70, 100]
     assert al["pts"][-1]["few"] and not al["pts"][0]["few"]
+    # 每一天都有数（没做题的日子 n=0），给悬停 / 点按显示
+    assert len(al["days"]) == 30 and al["days"][-1]["n"] == 3 and al["days"][-1]["acc"] == 100
+    assert al["days"][-4]["n"] == 0 and al["days"][-4]["acc"] is None and al["days"][-1]["avg"] == 83
     assert al["now"] == {"n": 23, "acc": 83} and al["prev"] == {"n": 10, "acc": 60}
     assert {s["name"] for s in tr["series"]} >= {"全部"} and len(tr["series"]) == 3   # 英语、数学各一条
     assert "高 👍" in records.trend_words(al)
@@ -796,6 +799,7 @@ def test_accuracy_trend():
         c.post("/login", data={"email": "b2@x.com", "password": "kidpass1"})
         page = c.get("/records").text
         assert "每天的正确率" in page and 'href="/day/' in page and "acc-subj" in page
+        assert "data-trend" in page and '"avg":' in page and "data-tip=" in page   # 曲线和热力图都能悬停 / 点按看那一天
         c.get("/logout")
         c.post("/login", data={"email": "p2@x.com", "password": "secret1"})
         assert "最近 7 天正确率 83%" in c.get("/parent").text
