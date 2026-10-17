@@ -40,11 +40,13 @@
     <div class="muted small">已掌握 {{ s.mastered }} · 学习中 {{ s.learning }} · 薄弱 {{ s.weak }} · 未测 {{ s.unknown }}（共 {{ s.total }}）</div>
   </div>
   {% endfor %}
-  {% if k.cov %}<p class="small" style="margin:6px 0">🗺️ 以前学过的内容已摸清：{% for c in k.cov %}{{ c.pack.subject_name }} {{ c.pct }}%（{{ c.known }}/{{ c.total }}）{{ '，' if not loop.last }}{% endfor %}
+  {% if k.school %}<p class="small" style="margin:6px 0">📅 学校大概学到（按校历估计）：{% for sp in k.school %}{{ sp.subject }}「{{ sp.where }}」{{ '，' if not loop.last }}{% endfor %}
+    · <a href="/parent/as/{{ k.u.id }}?next=/progress">{{ '该核对了 →' if k.school|selectattr('check')|list else '核对 / 调整 →' }}</a></p>{% endif %}
+  {% if k.cov %}<p class="small" style="margin:6px 0">🗺️ 以前学过的内容已摸清：{% for c in k.cov %}{{ c.name }} {{ c.pct }}%（{{ c.known }}/{{ c.total }}）{{ '，' if not loop.last }}{% endfor %}
     {% if k.vocab.estimate %} · 英语核心词约 {{ k.vocab.estimate }} 个{% endif %}
-    <br><span class="muted">系统每天在热身和练习里穿插几道以前的题（优先和正在学的有关的，再往摸得少的年级和板块铺开），推断会的也会回头确认，不用专门考试。</span></p>
+    <br><span class="muted">系统每天在热身和每门课的混合练习里穿插以前的题，一直往回到一年级、跨学科（物理会摸到小学的数学和科学，带「地基」的就是）：优先和正在学的有关的，再往摸得少的年级和板块铺开，推断会的也会回头确认，不用专门考试。</span></p>
   <details class="small covd"><summary>按年级看摸清了多少</summary>
-    {% for c in k.cov %}<div style="margin:6px 0"><b>{{ c.pack.subject_name }}</b>
+    {% for c in k.cov %}<div style="margin:6px 0"><b>{{ c.name }}</b>
       {% for g in c.stages %}<div class="row"><span style="min-width:5.5em">{{ g.label }}</span><span class="bar grow" style="margin:0"><span style="width:{{ g.pct }}%"></span></span>
         <span class="muted nw">{{ g.known }}/{{ g.total }}{% if g.inferred %} · 推断 {{ g.inferred }}{% endif %}{% if g.weak %} · <span style="color:var(--warn)">薄弱 {{ g.weak }}</span>{% endif %}</span></div>{% endfor %}</div>{% endfor %}
   </details>{% endif %}

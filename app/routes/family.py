@@ -187,7 +187,9 @@ def parent_as(request: Request, kid_id: int, next: str = "/today"):
 
 @router.get("/progress", response_class=HTMLResponse)
 def progress_page(request: Request, pack: str = "", msg: str = ""):
+    from .. import schoolyear
     k = kid_or_redirect(request, manage=True)
+    schoolyear.sync(k["id"])   # 按今天的日期推演一遍（孩子不用报）
     m = engine.get_mastery(k["id"])
     rows = []
     for e in enrollments(k["id"]):
@@ -214,7 +216,12 @@ async def progress_save(request: Request, pack_id: str):
         raise HTTPException(400, "考试日期格式不对")
     stage = f.get("stage") or None
     old = engine.enrollment_stage(k["id"], pack_id)
-    if stage and stage != old:
+    adjust = f.get("adjust") or ""
+    if adjust in ("ok", "+1", "-1"):   # 按校历推演的进度：对 / 学校快一章 / 慢一章（只在这一学期有效）
+        from .. import schoolyear
+        schoolyear.correct(k["id"], pack_id, confirm=adjust == "ok", delta=0 if adjust == "ok" else int(adjust))
+        msg = "好的，进度就按这个走" if adjust == "ok" else "已调整，以后按调整后的进度接着往前走"
+    elif stage and stage != old:
         # 只换学段：先保存学段，再回到页面勾选新学段学过的内容
         engine.set_progress(k["id"], pack_id, None, None, stage)
         msg = f"已切换到 {stage_label(stage)}，请勾选这个学段学校已经学过的内容"

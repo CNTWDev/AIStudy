@@ -1,0 +1,23 @@
+{
+ "_doc": "学习的「地基」：初中的课建在小学的课上，小学的课建在更早的小学内容上。孩子是半路开始用系统的，以前学过的内容没有记录，系统要一边学新的，一边把地基一点点摸清、补上（见 docs/DESIGN.md 5.17）。地基 = 孩子报名的每门课里比现在低的学段，加上下面两条找出来的、别的教材里比孩子年级低的内容：base_packs：一门学科从一年级开始的那套教材（孩子的教材是从中途开始的，比如剑桥数学从六年级开始，更低的学段就用这里的教材补齐）；builds_on：一门学科要用到哪些学科（物理用到科学和数学；孩子没报那门学科时，就用 base_packs 里的教材，一直往回到一年级）。同一个概念在孩子报名的教材里已经有了的（_links 的 concepts），不重复算。只对学校学制（中国、剑桥、IB……）的课生效；职业资格考试和自定课程没有地基。",
+ "builds_on": {
+  "physics": ["science", "math"],
+  "chemistry": ["science", "math"],
+  "biology": ["science"],
+  "science": ["math"],
+  "economics": ["math"],
+  "geography": ["science"]
+ },
+ "base_packs": {
+  "math": "math-shanghai",
+  "science": "sci-shanghai",
+  "english": "eng-shanghai",
+  "chinese": "chn-tongbian",
+  "physics": "phy-shanghai",
+  "chemistry": "chem-shanghai",
+  "biology": "bio-shanghai",
+  "history": "hist-shanghai",
+  "geography": "geo-shanghai"
+ },
+ "systems": ["cn", "cambridge", "alevel", "ib", "us"]
+}

@@ -5,7 +5,7 @@
 {% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
 {% if adult %}<p class="muted small">设好考试日期，系统按剩下的天数算出每天要学几个考点，按大纲顺序排进「今天」；离考试两周时不再学新内容，改成把还没掌握的高频考点过一遍。
 已经自己看过书的章，在下面勾上「学过」。</p>
-{% elif simple %}<p class="muted small">👇 点一下学校学到哪一章就行</p>{% else %}<p class="muted small">不用天天报，一周看一眼就行：点一下现在学到哪一章。这一章里练会了一个，会自动换下一个；导入的考试卷考到了后面的内容，进度也会自动往前走。
+{% elif simple %}<p class="muted small">会按日期自己往前走，不用你报 👍</p>{% else %}<p class="muted small">不用报进度：按校历（开学、放假、复习周）估计学校大概学到哪一章，每天自己往前走。估计得不对，点一下「学校快一章 / 慢一章」或直接点学到哪一章，以后就按纠正后的接着走（换学期重新估）。导入的考试卷考到了后面的内容，进度也会自动往前走。
 学校进度只是参考：主要还是看你哪里还不熟、哪块基础没打牢来安排。</p>{% endif %}
 
 {% set ns = namespace(first=(rows|selectattr('stale')|map(attribute='pack.id')|first) or (rows[0].pack.id if rows else None)) %}
@@ -16,8 +16,9 @@
     <div class="grow"><b>{{ v.pack.subject_name }}</b> <span class="muted small"><span class="for-grownups">{{ v.pack.edition }} · </span>{{ stage_label(v.stage) }}</span></div>
     {% if v.exam and v.exam.days_left >= 0 %}<span class="badge">离考试 {{ v.exam.days_left }} 天</span>
     {% elif v.pack.system == 'cert' and not v.exam_date %}<span class="badge warn">还没设考试日期</span>
-    {% elif v.stale and v.pack.system != 'cert' %}<span class="badge warn">{{ '还没设置' if not v.updated else '该更新了' }}</span>
-    {% else %}<span class="muted small">{{ v.updated[:10] }} 更新</span>{% endif %}
+    {% elif v.estimate %}<span class="muted small">📅 按校历估计{% if v.stale %}<span class="for-grownups"> · <span style="color:var(--warn)">该核对了</span></span>{% endif %}</span>
+    {% elif v.stale and v.pack.system != 'cert' and v.chapters %}<span class="badge warn">{{ '还没设置' if not v.updated else '该更新了' }}</span>
+    {% elif v.updated %}<span class="muted small">{{ v.updated[:10] }} 更新</span>{% endif %}
   </summary>
   <div class="bar" style="margin:10px 0"><span style="width:{{ 100 * v.learned|length / (v.total or 1) }}%;background:var(--learn)"></span></div>
   {% if v.exam %}<div class="small" style="margin-bottom:6px">{% if v.exam.phase == 'learn' %}还剩 {{ v.exam.todo|length }} 个考点没学，每天学 {{ v.exam.per_day }} 个，离考试两周时学完。
@@ -28,6 +29,15 @@
     {% if v.next %} · 接下来 <a href="/learn/{{ v.next.id }}?task=preview">{{ v.next.name }}</a>{% endif %}
     · <a href="/map/{{ pid }}">知识地图</a></div>
 
+  {% if v.estimate %}{% set es = v.estimate %}
+  <div class="hint estline" style="margin-top:10px">📅 {{ es.calendar }} · {{ es.term_name }}：{% if es.current %}学校现在大概在学<b>「{{ es.current.name }}」</b>{% elif es.phase == 'vacation' %}放假中，不学新课：练以前学过的，预习下学期{% elif es.phase == 'review' %}期末复习周，不学新课{% else %}这一学段的内容都学完了{% endif %}
+    {% if es.shift %}<span class="muted small">（比校历估计{{ '快' if es.shift > 0 else '慢' }} {{ es.shift|abs }} 章，家长调过）</span>{% endif %}
+    <form method="post" action="/progress/{{ pid }}" class="row for-grownups" style="margin-top:8px;gap:6px">
+      <button class="btn sm" name="adjust" value="ok">对</button>
+      <button class="btn ghost sm" name="adjust" value="+1">学校快一章</button>
+      <button class="btn ghost sm" name="adjust" value="-1">学校慢一章</button>
+    </form></div>
+  {% endif %}
   <form method="post" action="/progress/{{ pid }}" class="prog" style="margin-top:12px">
     {# 孩子端只点章节；考试日期和年级照样随表单提交（藏起来，不清空） #}
     <div class="row for-grownups">

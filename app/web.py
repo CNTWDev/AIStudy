@@ -175,7 +175,22 @@ def kid_brief(k) -> dict:
             "weak": [catalog.kp(w["kp_id"]) for w in weak[:5]], "weak_n": len(weak),
             "due": len(engine.due_cards(k["id"], 500)), "weekly": records.weekly(k["id"]),
             "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='word'", k["id"])["n"],
-            "arena": arena.parent_summary(k), "trend": records.accuracy_trend(k["id"], 14)}
+            "arena": arena.parent_summary(k), "trend": records.accuracy_trend(k["id"], 14), "school": _school_progress(k)}
+
+
+def _school_progress(k) -> list[dict]:
+    """家长页：每门课按校历估计学校学到哪了，一个月没核对的标出来。"""
+    from . import schoolyear
+    out = []
+    confirm_before = (db.today() - timedelta(days=engine.CONFIRM_DAYS)).isoformat()
+    for e in enrollments(k["id"]):
+        est = schoolyear.estimate(dict(k), dict(e))
+        if est:
+            out.append({"subject": catalog.packs[e["pack_id"]].subject_name, "pack": e["pack_id"],
+                        "where": est["current"]["name"] if est["current"] else ("放假中" if est["phase"] == "vacation" else
+                                                                                "复习周" if est["phase"] == "review" else "本学段学完"),
+                        "check": not e["progress_at"] or e["progress_at"] < confirm_before})
+    return out
 
 ADMIN_TABS = [("overview", "概览"), ("stats", "数据统计"), ("families", "家庭与孩子"), ("invites", "邀请码"),
               ("tree", "邀请关系"), ("curricula", "教材与知识点"), ("bank", "题库"), ("papers", "卷库"), ("arena", "游戏公平"), ("log", "安全日志"), ("system", "站点设置")]

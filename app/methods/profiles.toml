@@ -12,6 +12,10 @@
 #   tail   每天都有的任务，排在最后（默认是阅读：大量输入，放松收尾），同样不受时间预算限制
 #   flex   学知识点的任务，按顺序排，超出每天可用时间就截掉；"a+b" 表示两类交替穿插（交错练习）
 #   limits 每类最多几个（weak 是每个学科最多几个）
+#   mix    每门课一组混合练习（任务类型 mix，见 app/mix.py）里各成分的比例：
+#          new 学校正在学的 / recent 最近学的、按遗忘规律该复习的 / past 以前学过的（往回一直到一年级、跨教材跨学科）/
+#          cross 换个问法交叉校验 / preview 预习。题量按每天时长自动算（排完其它任务剩下的时间都给它）
+#   drill  「快练 5 分钟」：口算、单词、术语、公式单位，限时连对加倍
 #   prefer_hot  高频考点排前面
 #   exam / exam_date  设了考试日期的课按剩余天数排新内容（最后两周冲刺高频考点）；职业资格考试的课没设日期时提醒设一个
 # 可用的任务类型见 app/plan.py 的 SOURCES。
@@ -25,10 +29,11 @@ basis = "Roediger & Karpicke 2006（检索练习）；Cepeda 等 2006（间隔�
 mastery = { model = "bkt" }
 memory = { model = "fsrs", target_r = 0.85 }
 [profiles.balanced.plan]
-fixed = ["exam_date", "warmup", "mistakes", "words"]
-flex = ["sync", "top", "paper", "diagnose", "exam", "weak+backfill", "check", "preview", "review"]
+fixed = ["exam_date", "warmup", "mistakes", "words", "drill"]
+flex = ["top", "paper", "diagnose", "exam", "mix", "weak+backfill", "review"]
 tail = ["reading"]
-limits = { sync = 2, top = 1, paper = 1, diagnose = 1, weak = 3, check = 2, preview = 1 }
+limits = { top = 1, paper = 1, diagnose = 1, weak = 1, preview = 1 }
+mix = { new = 0.3, recent = 0.2, past = 0.3, cross = 0.1, preview = 0.1 }
 
 [profiles.mastery]
 name = "先学牢再往前"
@@ -37,10 +42,11 @@ basis = "Bloom 1968 / Guskey 2007（掌握学习）；Kulik 等 1990（掌握学
 mastery = { model = "bkt", master_p = 0.9, min_days = 3 }
 memory = { model = "fsrs", target_r = 0.9 }
 [profiles.mastery.plan]
-fixed = ["exam_date", "warmup", "mistakes", "words"]
-flex = ["sync", "top", "paper", "diagnose", "exam", "backfill", "weak", "check", "review"]
+fixed = ["exam_date", "warmup", "mistakes", "words", "drill"]
+flex = ["top", "paper", "diagnose", "exam", "backfill", "mix", "weak", "review"]
 tail = ["reading"]
-limits = { sync = 2, top = 1, paper = 1, diagnose = 1, weak = 3, check = 3, preview = 0 }
+limits = { top = 1, paper = 1, diagnose = 1, weak = 1, preview = 0 }
+mix = { new = 0.25, recent = 0.25, past = 0.4, cross = 0.1, preview = 0 }
 
 [profiles.exam]
 name = "考前冲刺"
@@ -49,8 +55,9 @@ basis = "Agarwal 等 2021（检索练习对考试成绩的综述）；Cepeda 等
 mastery = { model = "bkt" }
 memory = { model = "fsrs", target_r = 0.9 }
 [profiles.exam.plan]
-fixed = ["exam_date", "mistakes", "words"]
-flex = ["top", "exam", "paper", "weak+backfill", "check", "review"]
+fixed = ["exam_date", "mistakes", "words", "drill"]
+flex = ["top", "exam", "paper", "mix", "weak+backfill", "review"]
 tail = ["reading"]
-limits = { top = 1, paper = 1, weak = 4, check = 3, preview = 0 }
+limits = { top = 1, paper = 1, weak = 2, preview = 0 }
+mix = { new = 0.2, recent = 0.4, past = 0.3, cross = 0.1, preview = 0 }
 prefer_hot = true

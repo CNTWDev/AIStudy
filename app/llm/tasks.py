@@ -39,7 +39,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 4, "teach": 3, "context": 2, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 5, "teach": 3, "context": 2, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -107,11 +107,17 @@ def _traps_note(kp: dict) -> str:
             + "；".join(f"{p['id']}={p['name']}" for p in pre))
 
 
-def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=None) -> list[dict]:
+def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=None, uses=None) -> list[dict]:
+    uses = uses or []
     purpose_txt = {
         "practice": f"生成 {n} 道练习题，难度从易到难（1,2,3）。",
         "diagnose": "生成 1 道诊断题，只测这一个知识点的核心，难度 2，最好是选择题或填空题，便于自动判分。",
         "preview": f"生成 {n} 道预习用的入门题，难度都为 1，题干尽量短，并在 hint 里给出思路。",
+        # 融合题：新知识里带着旧知识（以前学过的、更低年级的、别的学科的），一道题把它们串起来练
+        "combine": (f"生成 {n} 道融合题，难度 2：做这道题必须用到上面这个知识点，同时也必须用到下面这些以前学过的知识点"
+                    "（缺了哪一个都做不出来），但题目要自然，像一道真实的应用题，不要把几道小题硬拼在一起。"
+                    "在题目里写 \"kp_ids\": [这道题真正用到的旧知识点 id]。以前学过的知识点：\n"
+                    + "；".join(f"{u['id']}={u['name']}（{u.get('desc', '')[:60]}）" for u in uses)),
     }[purpose]
     user = (
         f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n"

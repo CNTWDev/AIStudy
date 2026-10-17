@@ -315,11 +315,14 @@ def test_approval_and_admin(monkeypatch):
         assert c.get("/admin").status_code == 403
 
 
-def test_daily_tasks_progress_and_tools():
+def test_daily_tasks_progress_and_tools(monkeypatch):
     import io
     import zipfile
 
-    from app import db
+    from datetime import date
+
+    from app import db, schoolyear
+    monkeypatch.setattr(schoolyear, "today", lambda: date(2026, 10, 17))   # 学校进度按校历推演：固定在第一学期上课期间
     with TestClient(app) as c:
         kid_b = db.one("SELECT id FROM users WHERE email='b@x.com'")["id"]
         # 家长给弟弟安排：西游记每天 1 回、英文分级读物、每天 5 个新词
@@ -335,7 +338,7 @@ def test_daily_tasks_progress_and_tools():
         plan = c.post("/api/plan/rebuild").json()["plan"]
         types = [t["type"] for t in plan]
         assert "progress" not in types  # 学校进度不再是每天的任务
-        assert "这周学校学了啥" in c.get("/today").text  # 改成今天页上方的提示，可以跳过
+        assert "这周学校学了啥" not in c.get("/today").text  # 有校历的课按日期推演，不再问孩子
         assert {"words", "read_zh", "read_en"} <= set(types), types
         assert "第 1 回" in c.get("/today").text or "第1回" in c.get("/today").text
         assert len(c.get("/api/review/due?group=words").json()["cards"]) >= 5
@@ -346,31 +349,44 @@ def test_daily_tasks_progress_and_tools():
         assert not next(t for t in engine.plan_of_today(kid_b) if t["id"] == read_t["id"])["done"]
         assert "在书上读完了" not in c.get("/today").text
 
+        def math_taught():   # 别的课（英语、语文……）也按校历推演了学过的，这里只看数学
+            return {x["kp_id"] for x in db.q("SELECT kp_id FROM kp_taught WHERE user_id=?", kid_b) if x["kp_id"].startswith("MSH-")}
+
         # 更新学校进度（按章）：口算学过了，正在学乘法 → 正在学的知识点 = 乘法这一章里第一个
-        assert "学到哪一章了" in c.get("/progress").text
+        # （有校历的课：家长点的章存成「比校历快 / 慢几章」，以后照样按日期往前走）
+        assert "学到哪一章了" in c.get("/progress").text and "按校历" in c.get("/progress").text
         r = c.post("/progress/math-shanghai", data={"stage": "G3", "chapter": "乘法", "done_ch": ["口算与估算"]})
         assert "进度已更新" in r.text
         e = db.one("SELECT * FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)
-        assert e["progress_kp"] == "MSH-NUM-17"
-        assert {x["kp_id"] for x in db.q("SELECT kp_id FROM kp_taught WHERE user_id=?", kid_b)} == {"MSH-NUM-16", "MSH-NUM-17"}
-        # 正在学的知识点掌握了 → 自动换成这一章的下一个
+        # 和校历估计的同一章：照日期推到这一章的第二个（10 月中旬）
+        assert e["progress_kp"] == "MSH-NUM-20"
+        assert math_taught() == {"MSH-NUM-16", "MSH-NUM-17", "MSH-NUM-20"}
+        # 家长说学校慢一章 / 快一章：存成偏移，换到那一章的开头
+        assert "已调整" in c.post("/progress/math-shanghai", data={"adjust": "-1"}).text
+        assert db.one("SELECT progress_kp FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["progress_kp"] == "MSH-NUM-16"
+        assert math_taught() == {"MSH-NUM-16"}
+        # 正在学的知识点掌握了 → 换成这一章的下一个；这一章都会了就不排新的（下一章留给预习）
         db.run("INSERT INTO mastery(user_id,kp_id,score,status) VALUES(?,?,?,?) ON CONFLICT(user_id,kp_id) DO UPDATE SET "
-               "status='mastered'", kid_b, "MSH-NUM-17", 0.95, "mastered")
+               "status='mastered'", kid_b, "MSH-NUM-16", 0.95, "mastered")
         c.post("/api/plan/rebuild")
+        assert db.one("SELECT progress_kp FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["progress_kp"] is None
+        db.run("DELETE FROM mastery WHERE user_id=? AND kp_id='MSH-NUM-16'", kid_b)
+        c.post("/progress/math-shanghai", data={"adjust": "+1"})   # 又回到校历估计的位置
         assert db.one("SELECT progress_kp FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["progress_kp"] == "MSH-NUM-20"
-        db.run("DELETE FROM mastery WHERE user_id=? AND kp_id='MSH-NUM-17'", kid_b)
         # 旧的按知识点报进度（老页面 / 接口）也还能用
         r = c.post("/progress/math-shanghai", data={"stage": "G3", "current": "MSH-NUM-20",
                                                    "taught": ["MSH-NUM-16", "MSH-NUM-17"]})
         assert "进度已更新" in r.text
         e = db.one("SELECT * FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)
         assert e["progress_kp"] == "MSH-NUM-20"
-        taught = {x["kp_id"] for x in db.q("SELECT kp_id FROM kp_taught WHERE user_id=?", kid_b)}
-        assert taught == {"MSH-NUM-16", "MSH-NUM-17", "MSH-NUM-20"}
+        assert math_taught() == {"MSH-NUM-16", "MSH-NUM-17", "MSH-NUM-20"}
         plan = c.post("/api/plan/rebuild").json()["plan"]
         assert c.post("/api/progress/snooze").json()["ok"]  # 这周跳过：一周内不再提示
         assert "这周学校学了啥" not in c.get("/today").text
-        assert any(t["type"] == "sync" and "两位数乘两位数" in t["title"] for t in plan), plan
+        # 正在学的不再是单独的任务：在每门课的混合练习里，作为「新学的」出好几次（每天 60 分钟排不下所有课：几门课轮着打头）
+        assert any(t["type"] == "mix" for t in plan), [(t["type"], t.get("pack"), t["minutes"]) for t in plan]
+        from app import mix
+        assert [s["kp"] for s in mix.build(kid_b, "math-shanghai", 12) if s["role"] == "new"].count("MSH-NUM-20") >= 2
         # 再次只改学段：清空正在学，保留勾选
         c.post("/progress/math-shanghai", data={"stage": "G4"})
         assert db.one("SELECT stage FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["stage"] == "G4"

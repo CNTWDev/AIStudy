@@ -277,6 +277,82 @@ def area(r, lv):
     return _num(f"长方形长 {a} 米、宽 {b} 米，面积是多少平方米？", a * b, "长方形面积 = 长 × 宽", "平方米")
 
 
+# ------------------------------------------------------------------ 物理基本功：单位换算、代公式（剑桥 / IGCSE 物理，题干用英文）
+# 物理是用英语教的：题干用英文，练的是「看懂英文题 + 单位 + 公式变形」这几样基本功，讲解用中文。
+
+_SI = [("km", "m", 1000), ("kg", "g", 1000), ("m", "cm", 100), ("m", "mm", 1000), ("s", "ms", 1000),
+       ("A", "mA", 1000), ("kPa", "Pa", 1000), ("kJ", "J", 1000), ("h", "min", 60), ("min", "s", 60)]
+
+
+def si(r, lv):
+    big, small, k = r.choice(_SI[: [2, 4, 7, 10, 10][lv - 1]])
+    if lv == 5 and r.random() < 0.5:   # 面积、体积：倍数要平方、立方
+        a, cub = r.choice([(2, "²"), (3, "³")])
+        n = r.choice([1, 2, 3, 5, 8])
+        return _num(f"{n} m{cub} = ? cm{cub}", n * 100 ** a, f"1 m = 100 cm，所以 1 m{cub} = 100{'²' if a == 2 else '³'} = {100 ** a} cm{cub}")
+    x = r.choice([1, 2, 3, 4, 5, 6, 8, 12, 25]) * ([1, 1, 1, 10, 10][lv - 1]) / ([1, 1, 2, 2, 4][lv - 1] if lv > 2 else 1)
+    if r.random() < 0.5:
+        return _num(f"{_fmt_dec(x)} {big} = ? {small}", round(x * k, 6), f"1 {big} = {k} {small}，所以乘以 {k}")
+    y = x * k
+    return _num(f"{_fmt_dec(y)} {small} = ? {big}", round(x, 6), f"1 {big} = {k} {small}，所以除以 {k}")
+
+
+def speed(r, lv):
+    v, t = r.randint(2, [10, 20, 30, 30, 30][lv - 1]), r.randint(2, [10, 20, 60, 60, 60][lv - 1])
+    s = v * t
+    if lv == 1 or (lv == 2 and r.random() < 0.5):
+        return _num(f"A cyclist travels {s} m in {t} s. Average speed = ? m/s", v, "速度 v = s ÷ t（路程 ÷ 时间）", "m/s")
+    if lv <= 3:
+        if r.random() < 0.5:
+            return _num(f"A car moves at {v} m/s for {t} s. Distance = ? m", s, "s = v × t", "m")
+        return _num(f"A runner covers {s} m at {v} m/s. Time = ? s", t, "t = s ÷ v", "s")
+    kmh = r.choice([18, 36, 54, 72, 90, 108])
+    if lv == 4 or r.random() < 0.5:
+        return _num(f"{kmh} km/h = ? m/s", kmh / 3.6, "1 m/s = 3.6 km/h，所以 km/h ÷ 3.6 = m/s", "m/s")
+    mins = r.choice([2, 3, 4, 5])
+    km = r.choice([1.2, 1.8, 2.4, 3, 3.6]) * mins / 2
+    return _num(f"A train travels {_fmt_dec(km)} km in {mins} min. Average speed = ? m/s", round(km * 1000 / (mins * 60), 6),
+                f"先换成国际单位：{_fmt_dec(km)} km = {_fmt_dec(km * 1000)} m，{mins} min = {mins * 60} s，再用 v = s ÷ t", "m/s")
+
+
+def density(r, lv):
+    rho = r.choice([0.8, 1, 2, 2.5, 4, 5, 8, 10]) if lv > 2 else r.choice([1, 2, 4, 5, 8])
+    v = r.choice([2, 4, 5, 10, 20, 25, 50])
+    m = rho * v
+    if lv <= 2:
+        return _num(f"An object has mass {_fmt_dec(m)} g and volume {v} cm³. Density = ? g/cm³", rho, "密度 ρ = m ÷ V", "g/cm³")
+    if lv <= 4:
+        if r.random() < 0.5:
+            return _num(f"A block has density {_fmt_dec(rho)} g/cm³ and volume {v} cm³. Mass = ? g", round(m, 6), "m = ρ × V", "g")
+        return _num(f"A liquid has density {_fmt_dec(rho)} g/cm³. What volume has a mass of {_fmt_dec(m)} g? (cm³)", v, "V = m ÷ ρ", "cm³")
+    return _num(f"{_fmt_dec(rho)} g/cm³ = ? kg/m³", round(rho * 1000, 6), "1 g/cm³ = 1000 kg/m³", "kg/m³")
+
+
+def weight(r, lv):
+    m = r.choice([0.5, 1, 2, 3, 5, 8, 10, 20, 40, 60]) if lv > 1 else r.randint(1, 10)
+    if lv <= 2:
+        return _num(f"Take g = 10 N/kg. An object of mass {_fmt_dec(m)} kg has weight = ? N", round(m * 10, 6), "重力 W = m × g", "N")
+    if lv <= 4:
+        return _num(f"Take g = 10 N/kg. An object weighs {_fmt_dec(m * 10)} N. Its mass = ? kg", m, "m = W ÷ g", "kg")
+    grams = r.choice([200, 250, 500, 800, 1500])
+    return _num(f"Take g = 10 N/kg. A bag of apples has mass {grams} g. Its weight = ? N", grams / 1000 * 10,
+                f"先把 {grams} g 换成 {_fmt_dec(grams / 1000)} kg，再用 W = m × g", "N")
+
+
+def pressure(r, lv):
+    a = r.choice([0.5, 1, 2, 4, 5]) if lv > 1 else r.choice([1, 2, 4, 5])
+    p = r.choice([10, 20, 50, 100, 200, 500])
+    f = p * a
+    if lv <= 2:
+        return _num(f"A force of {_fmt_dec(f)} N acts on an area of {_fmt_dec(a)} m². Pressure = ? Pa", p, "压强 p = F ÷ A", "Pa")
+    if lv <= 4:
+        return _num(f"A pressure of {p} Pa acts on {_fmt_dec(a)} m². Force = ? N", round(f, 6), "F = p × A", "N")
+    cm2 = r.choice([10, 20, 50, 100])
+    fn = r.choice([1, 2, 5, 10])
+    return _num(f"A force of {fn} N acts on {cm2} cm². Pressure = ? Pa", round(fn / (cm2 / 10000), 6),
+                f"先把面积换成 m²：{cm2} cm² = {_fmt_dec(cm2 / 10000)} m²，再用 p = F ÷ A", "Pa")
+
+
 # 题族 → (知识点, 生成函数, 名字)
 FAMILIES: dict[str, tuple[str, callable, str]] = {
     "add10": ("MSH-NUM-02", add10, "10以内加减"),
@@ -303,6 +379,12 @@ FAMILIES: dict[str, tuple[str, callable, str]] = {
     "percent": ("MSH-APP-08", percent, "百分数"),
     "perimeter": ("MSH-GEO-09", perimeter, "周长"),
     "area": ("MSH-GEO-10", area, "面积"),
+    # 物理基本功（知识点在剑桥物理里，只给报了这门课的孩子出，见 arena/sources.py 的 MathSource）
+    "si": ("MATH-PRE-SI", si, "单位换算"),
+    "speed": ("PHY-IG-1.2-01", speed, "速度公式"),
+    "density": ("PHY-IG-1.4-01", density, "密度公式"),
+    "weight": ("PHY-IG-1.3-01", weight, "重力 W = mg"),
+    "pressure": ("PHY-IG-1.8-01", pressure, "压强公式"),
 }
 BY_KP: dict[str, str] = {kp: fam for fam, (kp, _, _) in FAMILIES.items()}
 
