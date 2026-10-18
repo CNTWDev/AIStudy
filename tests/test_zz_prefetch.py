@@ -6,7 +6,14 @@ from app import db, engine, mix, prefetch
 from app.catalog import catalog
 from app.main import app
 
+import pytest
+
 from test_zz_mix import _setup
+
+
+@pytest.fixture(autouse=True)
+def _inline(monkeypatch):
+    monkeypatch.setattr(prefetch, "MODE", "inline")   # 后台备题在当前线程跑完，结果确定
 
 
 def _calls(task="items"):
@@ -26,29 +33,32 @@ def test_items_for_without_ai(monkeypatch):
         assert not prefetch.ensure(kid, kp, 3)        # 够了：什么都不做
 
 
-def test_morning_prefetch(monkeypatch):
+def test_prepare_next_only(monkeypatch):
+    """只备下一项，不整天一次备好；做完一项后备再下一项。"""
     with TestClient(app) as c:
-        kid = _setup(c, monkeypatch, "pf2@x.com", grade="G3", subj={"subj_math": "math-shanghai"})
-        monkeypatch.setattr(prefetch, "HOUR", 0)
-        assert kid in [k["id"] for k in prefetch.kids()]          # 刚加进来的孩子也备
-        monkeypatch.setattr(prefetch, "kids", lambda: [{"id": kid}])  # 别的测试留下的孩子不管
-        db.run("DELETE FROM jobs WHERE name=?", prefetch.JOB)
-        r = prefetch.run_daily()
-        assert r["done"] and r["kids"] >= 1, r
-        assert prefetch.run_daily()["skipped"]       # 一天一次
-        q = "SELECT * FROM mix_sets WHERE user_id=? AND pack_id='math-shanghai' AND day=?"
-        s = db.one(q, kid, db.today().isoformat())
-        assert s and s["pos"] == 0                      # 题单建好了，还没开始做
-        # 早上建好、还没开始做的那组不算「已经开始」：计划重排时题数照常按时间分
+        kid = _setup(c, monkeypatch, "pf2@x.com", grade="G3", subj={"subj_math": "math-shanghai", "subj_english": "eng-shanghai"})
         plan = c.post("/api/plan/rebuild").json()["plan"]
-        n = next(t for t in plan if t["type"] == "mix" and t["pack"] == "math-shanghai")["n"]
-        # 孩子打开练习：题数跟今天的计划一致；题都是现成的，不用现场请 AI
-        c.get("/practice/math-shanghai")
-        s = db.one(q, kid, db.today().isoformat())
-        assert len(db.jload(s["slots"], [])) == n
+        got = []
+        real = prefetch.prepare_task
+        monkeypatch.setattr(prefetch, "prepare_task", lambda uid, t: (got.append(t["id"]), real(uid, t)))
+        assert c.get("/today").status_code == 200
+        first = engine.next_task(engine.plan_of_today(kid))
+        assert got == [first["id"]]                   # 打开今天页：只备第一项没做的
+        mixes = [t for t in plan if t["type"] == "mix"]
+        # 做完前一项：flow_state 给出下一项时就备它
+        got.clear()
+        nxt = engine.flow_state(kid, mixes[0]["id"])["next"]
+        assert got == [nxt["id"]]
+        # 下一项是混合练习时：题单建好了，前几道题库里就有，打开不用现场请 AI
+        t = next(x for x in engine.plan_of_today(kid) if x["id"] == mixes[-1]["id"])
+        prefetch.prepare_task(kid, t)
+        s = db.one("SELECT * FROM mix_sets WHERE user_id=? AND pack_id=? AND day=?", kid, t["pack"], db.today().isoformat())
+        assert s and s["pos"] == 0
+        for sl in db.jload(s["slots"], [])[:prefetch.LOOKAHEAD]:
+            assert engine.items_for(kid, sl["kp"], n=1, purpose=sl.get("purpose", "practice"), uses=sl.get("uses"), ai=False)
         before = _calls()
-        got = c.get(f"/api/mix/{s['id']}/next?k_=4").json()["items"]
-        assert got and _calls() == before
+        assert c.get(f"/api/mix/{s['id']}/next?k_=2").json()["items"]
+        assert _calls() >= before   # 取题后会在后台（测试里同步）备后面几道
 
 
 def test_mix_defers_missing(monkeypatch):
@@ -69,7 +79,7 @@ def test_mix_defers_missing(monkeypatch):
         monkeypatch.setattr(prefetch, "kick", lambda *a, **k: kicked.append(a[1]))
         got = mix.next_items(kid, s["id"], "G3", k=2)
         assert got["items"] and all(i["kp_id"] != empty for i in got["items"])
-        assert kicked == [empty]
+        assert kicked[0] == empty            # 没题的那道先交给后台；后面几道也顺带往前备
         moved = db.jload(db.one("SELECT slots FROM mix_sets WHERE id=?", s["id"])["slots"], [])
         assert any(x["kp"] == empty and x.get("deferred") for x in moved)
 
