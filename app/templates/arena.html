@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}乐园 · {{ SITE }}{% endblock %}
 {% block body %}
-<link rel="stylesheet" href="/static/play/play.css">
+<link rel="stylesheet" href="/static/play/play.css?v={{ ASSET_V }}">
 {% set S = a.status %}
 <div class="ah-hero">
   <canvas id="ah-me" data-avatar="{{ a.avatar }}" title="换个角色" role="button" tabindex="0"></canvas>
@@ -19,17 +19,19 @@
   </div>
 </div>
 {% if a.locked %}
-<div class="ah-lock">🔒 <span>{{ a.locked }}</span>{% if S.need %}<a class="btn sm" href="/today">去做任务</a>{% endif %}</div>
+<div class="ah-lock{{ ' shake' if request.query_params.get('locked') }}" id="ah-lock">🔒 <span>{{ a.locked }}</span>{% if S.need %}<a class="btn sm" href="/today">去做任务</a>{% endif %}</div>
 {% elif S.can_bonus_all %}
 <p class="small muted" style="margin:-4px 0 12px">{% if simple %}💡 全做完 +10 分钟 · 点亮 1 个 +2 分钟{% else %}💡 把今天的任务全部做完，还能多玩 10 分钟；每点亮一个知识点再多 2 分钟。{% endif %}</p>
 {% endif %}
 
 {% for inv in invites %}
-<a class="ah-invite" href="/arena/{{ inv.game }}"><span class="i">{{ inv.icon }}</span><span class="grow"><b>{{ inv.host.name }}</b> 开了「{{ inv.name }}」的房间，在等你一起玩！</span><span class="btn sm">去加入</span></a>
+<a class="ah-invite" {% if a.locked %}role="button" data-locked{% else %}href="/arena/{{ inv.game }}"{% endif %}><span class="i">{{ inv.icon }}</span><span class="grow"><b>{{ inv.host.name }}</b> 开了「{{ inv.name }}」的房间，在等你一起玩！</span><span class="btn sm">去加入</span></a>
 {% endfor %}
 <div class="ah-games">
 {% for g in a.games %}{% set id = g.id %}
-<a class="ah-game{{ ' locked' if a.locked }}" href="/arena/{{ id }}">
+{# 还不能玩：卡片点不进去，点了提示上面为什么 #}
+<a class="ah-game{{ ' locked' if a.locked }}" {% if a.locked %}role="button" data-locked{% else %}href="/arena/{{ id }}"{% endif %}>
+  {% if a.locked %}<span class="ah-lockbadge">🔒 {{ '先做任务' if S.need else '还不能玩' }}</span>{% endif %}
   <canvas data-preview="{{ id }}"></canvas>
   <div class="t"><span class="tag" style="background:{{ g.color }}">{{ g.tag }}</span><b>{{ g.icon }} {{ g.name }}</b><p class="for-grownups">{{ g.desc }}</p>
     {% set sg = a.stages.get(id) %}{% if sg %}<p class="ah-stage">🗺️ 打到第 {{ sg.upto }} 关 · ⭐ {{ sg.stars }}/{{ sg.max_stars }}</p>{% endif %}</div>
@@ -63,7 +65,14 @@
   </div>
 </details>
 {% if a.new_stickers %}<script>window.NEW_STICKERS = {{ a.new_stickers|tojson }};</script>{% endif %}
-<script src="/static/play/engine.js"></script>
-<script src="/static/play/art.js"></script>
-<script src="/static/play/hub.js"></script>
+<script src="/static/play/engine.js?v={{ ASSET_V }}"></script>
+<script src="/static/play/art.js?v={{ ASSET_V }}"></script>
+<script src="/static/play/hub.js?v={{ ASSET_V }}"></script>
+<script>
+document.querySelectorAll('[data-locked]').forEach(el => el.onclick = () => {
+  const b = document.getElementById('ah-lock'); if (!b) return;
+  b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
+  b.scrollIntoView({behavior: 'smooth', block: 'center'});
+});
+</script>
 {% endblock %}

@@ -243,6 +243,12 @@ def my_room(kid: dict, game: str):
     return r["id"]
 
 
+def playing(room_id) -> bool:
+    """这个房间里有一局正在玩（游戏没解锁时也让接着玩完这一局，比如刷新了）。"""
+    r = db.one("SELECT session_id FROM game_rooms WHERE id=?", room_id) if room_id else None
+    return bool(r and r["session_id"] and sessions.live(r["session_id"]))
+
+
 def lobby(kid: dict, game: str) -> dict:
     """进一款联网游戏时看到的：家里的小伙伴、谁开了房间在等我、和每个小伙伴一起打到哪了。"""
     g = get(game)
