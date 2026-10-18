@@ -35,7 +35,7 @@ def _play(c, rid, n=None, answers=0):
     """开一局（房主开局）+ 我的答题对局，答对几题。返回 (这一局, 对局 id)。"""
     room = c.post(f"/api/rooms/{rid}/start", json={**DEV, "n": n}).json()
     play = room["play"]
-    mid = c.post("/api/arena/start", json={"game": "stickman", "src": "math", "session": play["session"]}).json()["match_id"]
+    mid = c.post("/api/arena/start", json={"game": "stickman", "session": play["session"]}).json()["match_id"]
     for _ in range(answers):
         q = c.get(f"/api/arena/{mid}/q").json()["item"]
         it = db.jload(db.one("SELECT data FROM arena_matches WHERE id=?", mid)["data"], {})["pending"]["item"]

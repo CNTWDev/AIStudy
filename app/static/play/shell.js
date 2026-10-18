@@ -38,7 +38,7 @@
     const quizMode = def.quiz || 'modal';
     const device = deviceId();
     const sh = {root, def, data, canvas: $('canvas'), hud: $('.pl-hud'), ctrl: $('.pl-ctrl'), dock: $('.pl-dock'),
-                match: null, quiz: null, over: true, src: storeGet('play.src') || 'mix'};
+                match: null, quiz: null, over: true};
     const panel = $('.pl-start .pl-panel'), over = $('.pl-start'), endEl = $('.pl-end'), stageEl = $('.pl-stage');
     sh.toast = (t, k) => Play.ui.toast($('.pl-toast'), t, k);
     sh.finish = finish;
@@ -46,8 +46,6 @@
     if (quizMode === 'dock') root.classList.add('has-dock');
     Play.ui.soundButtons(root, def.tempo);
     if (def.input) Play.input.init(def.input);
-    const srcs = data.sources || [];
-    if (!srcs.find(s => s.id === sh.src)) sh.src = srcs.length ? srcs[0].id : 'mix';
 
     let lobby = data.lobby, room = null, net = null, state = 'lobby', page = -1, poll = 0, gone = false;
     let ctx = null, cur = null, match = null, quiz = null, t0 = 0, myDeaths = 0, peerDeaths = 0, byeTimer = 0, saveTimer = 0, resuming = false;
@@ -261,8 +259,6 @@
       over.classList.toggle('has-map', !!prog);
       const lv = lvAt(room.level);
       if (lv && lv.tip) h += `<p class="mp-tip">💡 ${esc(lv.tip)}</p>`;
-      if (srcs.length > 1) h += `<div class="pl-srcs"><div class="pl-label">${multi ? '我出什么题？' : '出什么题？'}</div>${srcs.map(s =>
-        `<button type="button" class="pl-src${s.id === sh.src ? ' on' : ''}" data-src="${s.id}" title="${esc(s.desc)}"><span>${s.icon}</span>${esc(s.name)}</button>`).join('')}</div>`;
       if (room.host) h += `<button type="button" class="btn lg block pl-go mp-start">${LV.length ? `开始第 ${room.level} 关！` : '开始！'}<small>（今天还能玩 ${Math.floor((data.left || 0) / 60)} 分钟）</small></button>`;
       else h += `<p class="mp-note">等 <b>${esc(nameOf(room.members.find(m => m.host).id))}</b> 选关、点开始。</p>`;
       h += `<p class="pl-locked">${locked ? esc(multi ? `${locked.name}：${locked.locked}` : locked.locked) : ''}</p>`;
@@ -275,10 +271,6 @@
       if (sw) sw.onclick = () => act(roomApi('role'));
       panel.querySelectorAll('.pm-arr').forEach(b => b.onclick = () => { page += +b.dataset.d; Play.sfx.play('click'); showRoom(); });
       if (room.host) panel.querySelectorAll('.pm-lv:not(.lock)').forEach(b => b.onclick = () => { Play.sfx.play('click'); act(roomApi('level', {n: +b.dataset.n})); });
-      panel.querySelectorAll('.pl-src').forEach(b => b.onclick = () => {
-        sh.src = b.dataset.src; storeSet('play.src', sh.src); Play.sfx.play('click');
-        panel.querySelectorAll('.pl-src').forEach(x => x.classList.toggle('on', x === b));
-      });
       const go = panel.querySelector('.mp-start');
       if (go) go.onclick = () => startNew(room.level);
       const lb = panel.querySelector('.mp-leave');
@@ -323,7 +315,7 @@
     async function startLevel(play, resume, joining) {
       if (cur || gone || state === 'take') return;
       Play.sfx.unlock();
-      try { match = await api('/api/arena/start', {game: G.id, src: sh.src, session: play.session, resume: resume && resume.match}); }
+      try { match = await api('/api/arena/start', {game: G.id, session: play.session, resume: resume && resume.match}); }
       catch (e) { sh.toast(e.message, 'warn'); if (net) net.send({t: 'cant', why: e.message}); if (!joining) showRoom(); return; }
       cur = play; previewN = play.n || 1; state = 'play'; over.hidden = true; endEl.hidden = true;
       sh.match = match;
@@ -569,6 +561,4 @@
     if (!id) { id = Math.random().toString(36).slice(2, 12); try { sessionStorage.setItem('play.device', id); } catch (e) { /* 隐私模式 */ } }
     return id;
   }
-  function storeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-  function storeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* 隐私模式 */ } }
 })();

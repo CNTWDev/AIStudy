@@ -36,8 +36,7 @@ def arena_game(request: Request, game: str):
 
 @router.post("/api/arena/start")
 def arena_start(request: Request, body: dict = Body(...)):
-    return arena.start(kid_or_redirect(request), str(body.get("game") or ""), str(body.get("src") or "mix"), body.get("session"),
-                       body.get("resume"))
+    return arena.start(kid_or_redirect(request), str(body.get("game") or ""), body.get("session"), body.get("resume"))
 
 
 @router.post("/api/arena/avatar")

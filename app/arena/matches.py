@@ -51,8 +51,8 @@ def ghost(kid_id: int) -> dict | None:
     return None
 
 
-def start(kid: dict, game: str, src: str = "mix", session=None, resume=None) -> dict:
-    """我自己的一局答题（每个孩子各一局，题按自己的水平出）。session：房间里正在玩的那一局（sessions.py），对局挂在它下面。
+def start(kid: dict, game: str, session=None, resume=None) -> dict:
+    """我自己的一局答题（每个孩子各一局，题按自己的学习情况出，见 sources.pick）。session：房间里正在玩的那一局（sessions.py），对局挂在它下面。
     resume：刷新、换设备回到这一局时，接着用原来的对局（还开着的话）。"""
     g = get(game)
     st = status(kid)
@@ -69,15 +69,12 @@ def start(kid: dict, game: str, src: str = "mix", session=None, resume=None) -> 
         old = db.one("SELECT id, data FROM arena_matches WHERE id=? AND user_id=? AND session_id=? AND ended_at IS NULL", resume, kid["id"], sid) \
             if resume else None
         if old:
-            return {"match_id": old["id"], "seconds_left": st["left"], "src": (db.jload(old["data"], {}) or {}).get("src", "mix"),
-                    "avatar": awards.avatar(kid), "ghost": ghost(kid["id"]) if game == "race" else None, "target": g.target}
+            return {"match_id": old["id"], "seconds_left": st["left"], "avatar": awards.avatar(kid), "ghost": ghost(kid["id"]) if game == "race" else None, "target": g.target}
     for m in db.q("SELECT id, game, started_at FROM arena_matches WHERE user_id=? AND ended_at IS NULL", kid["id"]):
         _close(m["id"], m["started_at"], "quit", {}, GAMES[m["game"]].max_seconds if m["game"] in GAMES else 600)
-    avail = {s["id"] for s in sources.available(kid)}
-    src = src if src in avail else "mix"
     mid = db.insert("INSERT INTO arena_matches(user_id, game, mode, started_at, data, session_id) VALUES(?,?,?,?,?,?)",
-                    kid["id"], game, "solo" if not g.multi else "team", db.now(), db.jdump({"streak": 0, "fast_wrongs": 0, "src": src}), sid)
-    return {"match_id": mid, "seconds_left": st["left"], "src": src, "avatar": awards.avatar(kid),
+                    kid["id"], game, "solo" if not g.multi else "team", db.now(), db.jdump({"streak": 0, "fast_wrongs": 0}), sid)
+    return {"match_id": mid, "seconds_left": st["left"], "avatar": awards.avatar(kid),
             "ghost": ghost(kid["id"]) if game == "race" else None, "target": g.target}
 
 
@@ -88,7 +85,7 @@ def question(kid: dict, match_id, rng: random.Random | None = None) -> dict:
         raise ArenaError("冷冻中，等一下再答", 423, freeze_ms=int((st["freeze_until"] - now) * 1000))
     pend = st.get("pending")
     if not pend or now - pend["issued"] > rules.PENDING_KEEP_S:
-        it = sources.pick(kid, st.get("src") or "mix", get(m["game"]).target, rng or random.Random())
+        it = sources.pick(kid, get(m["game"]).target, rng or random.Random())
         pend = {"item": it, "issued": now}
         st["pending"] = pend
         _save_state(m["id"], st)
@@ -237,7 +234,7 @@ def hub(kid: dict) -> dict:
     st = status(kid)
     return {"games": [g.card() for g in GAMES.values()], "status": st, "locked": rules.locked_reason(st), "level": awards.level(kid["id"]),
             "avatar": awards.avatar(kid), "avatars": awards.avatars(kid["id"]), "wall": awards.wall(kid["id"]),
-            "new_stickers": new, "sources": sources.available(kid), "week": _week(kid["id"]),
+            "new_stickers": new, "week": _week(kid["id"]),
             "ghost": ghost(kid["id"]),
             "stages": {g.id: progress.progress(g, str(kid["id"])) for g in GAMES.values() if g.levels and not g.multi}}
 
