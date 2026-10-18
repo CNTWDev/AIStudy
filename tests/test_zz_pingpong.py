@@ -15,7 +15,7 @@ def _login(c, email):
 
 def test_registered():
     g = games.get("pingpong")
-    assert g.multi and g.players == (2, 2) and not g.levels and g.freeze is False and "pingpong" in arena.GAMES
+    assert g.multi and g.players == (2, 2) and not g.total and g.freeze is False and "pingpong" in arena.GAMES
     rep = g.clean({}, {"winner": "7", "won": 9, "lost": -1, "seconds": 30})
     assert rep["winner"] == 7 and rep["won"] == 2 and rep["lost"] == 0
 

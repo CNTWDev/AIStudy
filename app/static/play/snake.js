@@ -1,7 +1,8 @@
 /* 贪吃蛇大作战（合作长大，2～4 个人各用一台设备）。关卡在 app/arena/games/levels/snake/，格式见 app/arena/games/snake.py。
    - 自己的蛇自己的设备算（转弯、冲刺、吃豆子、撞墙 / 撞电脑蛇），每秒发 15 次蛇头位置和长度，队友那边按蛇头轨迹画出身体；
    - 豆子和电脑蛇由开房间的设备算：豆子被吃了补新的（'food'），电脑蛇每秒发 10 次（'ai'）；
-   - 大家的蛇加起来够长，开房间的设备报过关；时间到了还不够长就差一点（外壳 shell.js 结算）。
+   - 石头（lv.rocks）撞上就倒下；「收集金星」的关（lv.gold）谁吃到金星告诉开房间的设备（'gold'），它再告诉大家还剩哪些。
+   - 大家的蛇加起来够长（有金星的关还要金星全吃到），开房间的设备报过关；时间到了还不够长就差一点（外壳 shell.js 结算）。
    - 倒下答题复活后长度不变（像贪吃蛇大作战的「复活」），所以倒下不掉豆子；代价是答题这段时间少一条蛇在长。
    - 刷新 / 换设备：存档里有自己的蛇（位置、方向、长度）和豆子、电脑蛇，接着玩。 */
 (function () {
@@ -21,7 +22,7 @@
     volcano: {out: '#3a1d1d', field: '#5b2b25', grid: 'rgba(255,160,90,.08)', sparkle: '#ffb36b'},
   };
   let sh, mp, loop, fx, lv = null, t = 0, ended = true, clockT = 0, snapT = 0;
-  let me = null, peers = new Map(), foods = new Map(), ais = [], foodN = 0, rng = Math.random, pointer = null, cam = {x: 0, y: 0};
+  let gold = new Set(), me = null, peers = new Map(), foods = new Map(), ais = [], foodN = 0, rng = Math.random, pointer = null, cam = {x: 0, y: 0};
 
   // ---------------------------------------------------------------- 蛇（自己的、队友的、电脑的都用这个）
   function snake(x, y, a, len, colors) { return {x, y, a, len, path: [{x, y}], colors, alive: true, boost: false}; }
@@ -65,7 +66,7 @@
     if (clockT <= 0) {
       clockT = 0.25;
       const left = Math.max(0, lv.time - mp.elapsed());
-      sh.hudClock(`⏱ ${Math.ceil(left)} · 🐍 ${teamLen()}/${lv.target}`);
+      sh.hudClock(`⏱ ${Math.ceil(left)} · 🐍 ${teamLen()}/${lv.target}${goldAll() ? ` · ⭐ ${goldAll() - gold.size}/${goldAll()}` : ''}`);
     }
   }
   const team = () => [me, ...peers.values()].filter(Boolean);
@@ -88,6 +89,16 @@
     const [W, H] = lv.size;
     if (nx < HEAD_R || ny < HEAD_R || nx > W - HEAD_R || ny > H - HEAD_R) return die('撞到墙了！');
     if (!(me.inv > 0)) for (const a of ais) if (a.alive && hitsBody(nx, ny, a, 0)) return die('撞到电脑蛇了！');   // 刚复活的 2 秒不会撞
+    if (inRock(nx, ny, HEAD_R - 3)) return die('撞到石头了！');
+    for (const i of gold) {
+      const [gx, gy] = lv.gold[i];
+      if (Math.hypot(gx - nx, gy - ny) < HEAD_R + 16) {
+        gold.delete(i); me.len += 5; Play.sfx.play('star');
+        fx.burst(gx, gy, {n: 18, colors: ['#ffd23f', '#fff'], speed: 220, size: 5, grav: 0, shape: 'star'});
+        mp.toast(gold.size ? `⭐ 吃到金星！还差 ${gold.size} 颗` : '⭐ 金星全吃到了！', 'good');
+        if (mp.host) hostGold(); else mp.net.send({t: 'gold', i});
+      }
+    }
     // 吃豆子
     const eaten = [];
     for (const [id, f] of foods) if (Math.hypot(f.x - nx, f.y - ny) < HEAD_R + 6 + f.v) { eaten.push(id); me.len += f.v; }
@@ -117,19 +128,25 @@
     for (let k = 0; k < 12; k++) {
       const x = W * (0.25 + Math.random() * 0.5), y = H * (0.25 + Math.random() * 0.5);
       const far = Math.min(1e9, ...ais.filter(a => a.alive).map(a => Math.hypot(a.x - x, a.y - y)));
+      if (inRock(x, y, 90)) continue;
       if (!best || far > best.far) best = {x, y, far};
     }
     return best;
   }
   function respawn() {
-    const p = safeSpot(), [W, H] = lv.size;
+    const p = safeSpot() || {x: lv.size[0] / 2, y: lv.size[1] / 2}, [W, H] = lv.size;
     me.len = Math.max(START_LEN, me.len || 0);
     coil(me, p.x, p.y, Math.atan2(H / 2 - p.y, W / 2 - p.x));
     Object.assign(me, {alive: true, inv: 2});
   }
 
+  const rocks = () => (lv && lv.rocks) || [];
+  const inRock = (x, y, pad) => rocks().some(([rx, ry, r]) => Math.hypot(rx - x, ry - y) < r + pad);
+  const goldAll = () => ((lv && lv.gold) || []).length;
+  function hostGold() { mp.net.send({t: 'gold', left: [...gold]}); }
   function loadWorld(w) {   // 重连：换成存档 / 队友那里的豆子和电脑蛇
     if (!w) return;
+    if (w.gl) gold = new Set(w.gl.filter(i => i < goldAll()));
     foods = new Map();
     for (const [id, x, y, v, c] of w.f || []) foods.set(id, {id, x, y, v, c});
     foodN = Math.max(w.n || 0, ...[...foods.keys()].map(k => k + 1), foodN);
@@ -143,6 +160,7 @@
   // ---------------------------------------------------------------- 开房间的设备：豆子、电脑蛇、过关
   function addFood(x, y, v) {
     const [W, H] = lv.size, id = ++foodN;
+    if (x == null) for (let k = 0; k < 8; k++) { x = 30 + rng() * (W - 60); y = 30 + rng() * (H - 60); if (!inRock(x, y, 12)) break; }
     const f = {id, x: Math.max(20, Math.min(W - 20, x ?? 30 + rng() * (W - 60))), y: Math.max(20, Math.min(H - 20, y ?? 30 + rng() * (H - 60))),
                v: v || (rng() < 0.15 ? 3 : rng() < 0.4 ? 2 : 1), c: Math.floor(rng() * FOOD_COLORS.length)};
     foods.set(id, f); return f;
@@ -162,7 +180,7 @@
     const [W, H] = lv.size;
     for (let k = 0; k < 20; k++) {
       const x = 60 + rng() * (W - 120), y = 60 + rng() * (H - 120);
-      const far = team().every(s => !s.alive || Math.hypot(s.x - x, s.y - y) > 350);
+      const far = team().every(s => !s.alive || Math.hypot(s.x - x, s.y - y) > 350) && !inRock(x, y, 60);
       if (far || k === 19) { Object.assign(a, {x, y, a: rng() * Math.PI * 2, len: lv.ai_len, path: [{x, y}], alive: true, think: 0}); return; }
     }
   }
@@ -188,10 +206,18 @@
       }
       const m = 90;   // 离墙太近：朝场地中间转
       if (a.x < m || a.y < m || a.x > W - m || a.y > H - m) a.want = Math.atan2(H / 2 - a.y, W / 2 - a.x);
+      for (const [rx, ry, r] of rocks()) {   // 前面有石头：往旁边绕
+        const ax = a.x + Math.cos(a.a) * (r + 50), ay = a.y + Math.sin(a.a) * (r + 50);
+        if (Math.hypot(rx - ax, ry - ay) < r + 30) { a.want = Math.atan2(a.y - ry, a.x - rx) + (a.id % 2 ? 1.2 : -1.2); break; }
+      }
       let d = a.want - a.a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
       a.a += Math.sign(d) * Math.min(Math.abs(d), TURN * 0.8 * dt);
       const sp = SPEED * lv.ai_speed;
-      const nx = Math.max(12, Math.min(W - 12, a.x + Math.cos(a.a) * sp * dt)), ny = Math.max(12, Math.min(H - 12, a.y + Math.sin(a.a) * sp * dt));
+      let nx = Math.max(12, Math.min(W - 12, a.x + Math.cos(a.a) * sp * dt)), ny = Math.max(12, Math.min(H - 12, a.y + Math.sin(a.a) * sp * dt));
+      for (const [rx, ry, r] of rocks()) {   // 电脑蛇不穿过石头：贴着石头边滑过去
+        const dd = Math.hypot(nx - rx, ny - ry);
+        if (dd < r + 10) { nx = rx + (nx - rx) / (dd || 1) * (r + 10); ny = ry + (ny - ry) / (dd || 1) * (r + 10); }
+      }
       grow(a, nx, ny);
       // 电脑蛇的头撞到玩家身上：散成豆子
       if (team().some(q => hitsBody(nx, ny, q, 0)) || ais.some(o => o !== a && o.alive && hitsBody(nx, ny, o, 0))) aiDie(a);
@@ -204,8 +230,11 @@
     snapT -= dt;
     if (snapT <= 0) { snapT = 0.1; mp.net.send({t: 'ai', s: ais.map(a => [a.id, Math.round(a.x), Math.round(a.y), a.len, a.alive ? 1 : 0])}); }
     if (ended) return;
-    if (teamLen() >= lv.target) { ended = true; Play.sfx.play('win'); mp.finish('win', {score: teamLen()}); }
-    else if (mp.elapsed() >= lv.time) { ended = true; mp.finish('lose', {why: `时间到了！我们一共长到 ${teamLen()}，目标是 ${lv.target}，再试一次！`}); }
+    if (teamLen() >= lv.target && !gold.size) { ended = true; Play.sfx.play('win'); mp.finish('win', {score: teamLen()}); }
+    else if (mp.elapsed() >= lv.time) {
+      ended = true;
+      mp.finish('lose', {why: teamLen() >= lv.target ? `时间到了！还差 ${gold.size} 颗金星没吃到，再试一次！` : `时间到了！我们一共长到 ${teamLen()}，目标是 ${lv.target}，再试一次！`});
+    }
   }
   function aiDie(a) {
     a.alive = false; a.back = 4;
@@ -237,6 +266,17 @@
     for (let y = 0; y <= H; y += 60) { c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke(); }
     if (sc.sparkle) { c.fillStyle = sc.sparkle; for (let i = 0; i < 80; i++) { c.globalAlpha = 0.3 + 0.5 * Math.abs(Math.sin(t + i)); c.fillRect((i * 337) % W, (i * 211) % H, 2, 2); } c.globalAlpha = 1; }
     c.strokeStyle = '#ff6b6b'; c.lineWidth = 8; c.strokeRect(0, 0, W, H);
+    for (const [rx, ry, r] of rocks()) {
+      c.fillStyle = 'rgba(0,0,0,.18)'; c.beginPath(); c.ellipse(rx + 6, ry + 8, r, r * 0.9, 0, 0, 7); c.fill();
+      c.fillStyle = '#8a8178'; c.beginPath(); c.arc(rx, ry, r, 0, 7); c.fill();
+      c.fillStyle = '#a99f94'; c.beginPath(); c.arc(rx - r * 0.2, ry - r * 0.25, r * 0.7, 0, 7); c.fill();
+      c.fillStyle = 'rgba(255,255,255,.35)'; c.beginPath(); c.ellipse(rx - r * 0.35, ry - r * 0.45, r * 0.25, r * 0.14, -0.5, 0, 7); c.fill();
+    }
+    for (const i of gold) {
+      const [gx, gy] = lv.gold[i], s = 1 + Math.sin(t * 4 + i) * 0.12;
+      c.fillStyle = 'rgba(255,210,63,.35)'; c.beginPath(); c.arc(gx, gy, 26 * s, 0, 7); c.fill();
+      star5(c, gx, gy, 20 * s); c.fillStyle = '#ffc21a'; c.fill(); c.strokeStyle = '#d98a00'; c.lineWidth = 3; c.stroke();
+    }
     for (const f of foods.values()) {
       const r = 3 + f.v * 1.6 + Math.sin(t * 4 + f.id) * 0.8;
       c.fillStyle = FOOD_COLORS[f.c] || '#ffd23f'; c.globalAlpha = 0.35; c.beginPath(); c.arc(f.x, f.y, r + 4, 0, 7); c.fill();
@@ -273,6 +313,11 @@
       c.fillStyle = mine ? '#2b2340' : '#fff'; c.fillText(name, hx, ny);
     }
   }
+  function star5(c, x, y, r) {   // 五角星
+    c.beginPath();
+    for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+    c.closePath();
+  }
   function bubbleQ(c, x, y) {
     c.fillStyle = '#fff'; c.strokeStyle = '#2b2340'; c.lineWidth = 3;
     c.beginPath(); c.arc(x, y + Math.sin(t * 4) * 3, 16, 0, 7); c.fill(); c.stroke();
@@ -282,6 +327,8 @@
     const mw = 120, mh = mw * H / W, x0 = st.W - mw - 10, y0 = st.H - mh - 10;
     c.fillStyle = 'rgba(43,35,64,.55)'; Play.roundRect(c, x0 - 3, y0 - 3, mw + 6, mh + 6, 8); c.fill();
     const dot = (s, col, r) => { if (s && s.alive) { c.fillStyle = col; c.beginPath(); c.arc(x0 + s.x / W * mw, y0 + s.y / H * mh, r, 0, 7); c.fill(); } };
+    for (const [rx, ry, r] of rocks()) { c.fillStyle = 'rgba(200,190,180,.8)'; c.beginPath(); c.arc(x0 + rx / W * mw, y0 + ry / H * mh, Math.max(1.5, r / W * mw), 0, 7); c.fill(); }
+    for (const i of gold) { c.fillStyle = '#ffd23f'; c.beginPath(); c.arc(x0 + lv.gold[i][0] / W * mw, y0 + lv.gold[i][1] / H * mh, 3, 0, 7); c.fill(); }
     for (const a of ais) dot(a, a.colors[0], 2.5);
     if (mp) for (const q of peers.values()) dot(q, q.colors[0], 4);
     if (me && mp) dot(me, '#fff', 4.5);
@@ -308,7 +355,8 @@
     quiz: 'revive', tempo: 126,
     rules: ['2～4 条小蛇是一队，一起<b>吃豆子长大</b>，大家加起来够长就过关（人多目标也长）。',
             '← → 转弯，按住空格冲刺（会变短一点）；手机、平板：手指按住往哪拖就往哪游。',
-            '撞到墙、撞到电脑蛇就倒下：答题复活。电脑蛇的头撞到你们身上，它就散成一地豆子！',
+            '撞到墙、石头、电脑蛇就倒下：答题复活。电脑蛇的头撞到你们身上，它就散成一地豆子！',
+            '有的关有任务：场上的 ⭐ 金星要全吃到才过关（小地图上的黄点）。',
             '答错多欠一道（最多欠 3 道）；「这题不会」不加。队友的小蛇互相穿过去不会撞。',
             '有时间限制；在目标时间内过关、倒下次数少，还能多拿星星。'],
     keys: '电脑键盘：← → 或 A D 转弯，空格 冲刺；也可以按住鼠标往哪拖就往哪游',
@@ -317,7 +365,7 @@
     preview(s, l) {
       sh = s; fx = fx || new Play.FX();
       if (!ended) return;
-      lv = l; me = null; peers = new Map(); ais = []; foods = new Map(); mp = null;
+      lv = l; me = null; peers = new Map(); ais = []; foods = new Map(); mp = null; gold = new Set((l.gold || []).map((_, i) => i));
       const r = MpNet.rng(7);
       for (let i = 0; i < 40; i++) foods.set(i, {id: i, x: r() * l.size[0], y: r() * l.size[1], v: 1 + Math.floor(r() * 3), c: i % 6});
       cam = {x: l.size[0] / 2, y: l.size[1] / 2};
@@ -326,6 +374,7 @@
     },
     begin(ctx) {
       mp = ctx; sh = ctx.sh; fx = new Play.FX(); lv = ctx.level; t = 0; clockT = 0; snapT = 0; ended = false; foodN = 0;
+      gold = new Set((lv.gold || []).map((_, i) => i));
       if (!pointerReady) { pointerSetup(sh.canvas); pointerReady = true; }
       rng = MpNet.rng(ctx.seed);
       const [W, H] = lv.size;
@@ -350,7 +399,11 @@
       cam = {x: me.x, y: me.y};
       if (lv.tip) mp.toast(lv.tip.split('。')[0], 'good');
       const net = ctx.net;
-      net.off('s', 'food', 'ai', 'eat', 'drop');
+      net.off('s', 'food', 'ai', 'eat', 'drop', 'gold');
+      net.on('gold', m => {
+        if (mp.host) { if (gold.delete(m.i)) hostGold(); return; }
+        if (m.left) gold = new Set(m.left);
+      });
       net.on('s', m => {
         const peer = peers.get(m.from); if (!peer) return;
         if (m.d) { if (peer.alive) { peer.alive = false; peer.path = []; } peer.x = m.x; peer.y = m.y; return; }
@@ -381,13 +434,13 @@
     },
     onRevive() { if (me) { respawn(); Play.sfx.play('power'); } },
     save: () => me && {x: Math.round(me.x), y: Math.round(me.y), a: +me.a.toFixed(2), len: me.len, alive: me.alive ? 1 : 0},
-    saveWorld: () => ({f: [...foods.values()].map(pack), n: foodN, ai: ais.map(a => [Math.round(a.x), Math.round(a.y), a.len, a.alive ? 1 : 0])}),
+    saveWorld: () => ({f: [...foods.values()].map(pack), n: foodN, gl: [...gold], ai: ais.map(a => [Math.round(a.x), Math.round(a.y), a.len, a.alive ? 1 : 0])}),
     peerView: id => { const peer = peers.get(id); return peer && {x: Math.round(peer.x), y: Math.round(peer.y), a: +(peer.a || 0).toFixed(2), len: peer.len, alive: peer.alive ? 1 : 0}; },
     loadMe(v) {
       if (!me || !v || !me.alive || !v.alive) return;
       me.len = Math.max(MIN_LEN, v.len | 0 || me.len); coil(me, v.x, v.y, v.a || 0); me.inv = 2;
     },
-    loadWorld(w) { loadWorld(w); if (mp && mp.host) mp.net.send({t: 'food', all: [...foods.values()].map(pack)}); },
+    loadWorld(w) { loadWorld(w); if (mp && mp.host) { mp.net.send({t: 'food', all: [...foods.values()].map(pack)}); hostGold(); } },
     end() { ended = true; pointer = null; if (loop) loop.stop(); if (mp) mp.net.stopStreams(); },
   });
 })();

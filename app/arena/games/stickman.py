@@ -33,7 +33,7 @@ class Stickman(Game):
     )
 
     @cached_property
-    def levels(self) -> tuple:
+    def handmade(self) -> tuple:
         return tuple({"n": n, "name": f"第 {n} 关", "boss": n % self.per_world == 0}
                      for n in range(1, len(self.worlds) * self.per_world + 1))
 
@@ -43,7 +43,7 @@ class Stickman(Game):
     def params(self, n: int, worlds_done: int) -> dict:
         """第 n 关（1 起）的参数。t 从 0 到 1：第 1 关最弱，第 30 关最强。"""
         w, k = divmod(n - 1, self.per_world)
-        t = (n - 1) / (len(self.levels) - 1)
+        t = (n - 1) / (self.total - 1)
         boss = k == self.per_world - 1
         weapon = ["fist", "stick", "stick", "sword", "sword"][w]
         return {

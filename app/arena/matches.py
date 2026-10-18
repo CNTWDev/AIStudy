@@ -138,10 +138,23 @@ def answer(kid: dict, match_id, item_id: str, ans, dont_know=False, rng: random.
     return out
 
 
+def pause(kid: dict, match_id, on: bool) -> dict:
+    """游戏暂停 / 继续（谁暂停都一样，每个人记自己这一局）：暂停的时间不算今天玩游戏的时间。"""
+    m = _match(kid, match_id)
+    st, now = m["state"], time.time()
+    if on and not st.get("paused_at"):
+        st["paused_at"] = now
+    elif not on and st.get("paused_at"):
+        st["paused_s"] = round(st.get("paused_s", 0) + now - st.pop("paused_at"), 1)
+    _save_state(m["id"], st)
+    return {"ok": True, "paused": bool(st.get("paused_at"))}
+
+
 def _close(match_id: int, started_at: str, result: str, stats: dict, cap: int = 600) -> int:
-    secs = int(min(cap, max(0, (rules._ts(db.now()) - rules._ts(started_at)).total_seconds())))
     row = db.one("SELECT data FROM arena_matches WHERE id=?", match_id)
     st = db.jload(row["data"], {}) if row else {}
+    secs = int(min(cap, max(0, (rules._ts(db.now()) - rules._ts(started_at)).total_seconds() - rules.paused_seconds(st))))
+    st.pop("paused_at", None)
     st.pop("pending", None)
     st["client"] = stats
     db.run("UPDATE arena_matches SET ended_at=?, seconds=?, result=?, data=? WHERE id=?",
@@ -232,7 +245,7 @@ def hub(kid: dict) -> dict:
             "avatar": awards.avatar(kid), "avatars": awards.avatars(kid["id"]), "wall": awards.wall(kid["id"]),
             "new_stickers": new, "week": _week(kid["id"]),
             "ghost": ghost(kid["id"]),
-            "stages": {g.id: progress.progress(g, str(kid["id"])) for g in GAMES.values() if g.levels and not g.multi}}
+            "stages": {g.id: progress.progress(g, str(kid["id"])) for g in GAMES.values() if g.total and not g.multi}}
 
 
 def parent_summary(kid: dict) -> dict:

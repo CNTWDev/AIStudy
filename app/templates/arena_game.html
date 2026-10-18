@@ -12,7 +12,7 @@
     <a href="/arena" class="pl-back" aria-label="回乐园">‹</a>
     <b class="pl-name">{{ g.icon }} {{ g.name }}</b>
     <span class="pl-chip">{% if g.multi %}{{ g.players[1] }} 人联网{% else %}Lv.{{ a.level.level }}{% endif %}</span>
-    <button type="button" class="pl-icon" data-music aria-label="背景音乐">🎵</button><button type="button" class="pl-icon" data-sfx aria-label="音效">🔊</button>
+    <button type="button" class="pl-icon" data-pause aria-label="暂停" title="暂停" hidden>⏸</button><button type="button" class="pl-icon" data-music aria-label="背景音乐">🎵</button><button type="button" class="pl-icon" data-sfx aria-label="音效">🔊</button>
   </div>
   <div class="pl-stage">
     <canvas aria-label="{{ g.name }}"></canvas>
@@ -20,6 +20,7 @@
     <div class="pl-toast" aria-live="polite"></div>
     <div class="pl-cd" hidden></div>
     <div class="pl-over pl-start"><div class="pl-panel"></div></div>
+    <div class="pl-over pl-paused" hidden><div class="pl-panel"></div></div>
     <div class="pl-over pl-end" hidden><div class="pl-panel"><div class="pl-sum"></div><div class="pl-row"></div></div></div>
   </div>
   <div class="pl-ctrl"></div>

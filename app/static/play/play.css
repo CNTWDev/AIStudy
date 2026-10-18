@@ -234,3 +234,4 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 .ah-wallbox>summary h2::after{content:" ›";color:var(--faint);display:inline-block;transition:transform .2s}.ah-wallbox[open]>summary h2::after{transform:rotate(90deg)}
 .ah-wallbox>summary h2 small{font-size:14px;color:var(--muted);font-weight:600}
 .ah-sec h2{white-space:nowrap}
+.pl-paused{position:fixed;z-index:55;background:rgba(43,35,64,.6)}

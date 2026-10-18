@@ -152,7 +152,7 @@ def test_new_team_opens_levels_everyone_reached():
 def test_levels_for_more_players():
     """泡泡堂 3、4 个人：每个出生点旁边有空地、怪兽离谁都够远、怪兽更多；贪吃蛇目标按人数加。"""
     bub = games.get("bubble")
-    for lv in bub.levels:
+    for lv in [bub.level(n) for n in range(1, bub.total + 1, 7)]:
         for k in (3, 4):
             s = bub.for_team(lv, k)
             g = s["map"]

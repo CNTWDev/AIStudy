@@ -4,7 +4,7 @@
 加一款游戏：
 1. 在这个目录写 <id>.py：一个 Game 子类，@register 登记，在下面 import；
 2. 有关卡的话放 levels/<id>/NN.json，一关一个文件（check 检查格式）；后面更难的关卡可以不手做：
-   写 count（一共几关）和 make(n, rng)，手做的之后由程序按关数生成（种子固定，每次生成的都一样）；
+   写 count（一共几关）、make(n, rng) 和 title(n)，手做的之后用到哪关才按关数生成哪关（种子固定，每次生成的都一样）；
    关卡要按进度算的（火柴人大战）就改写 stage；
 3. 前端写 app/static/play/<id>.js，用 PlayShell（shell.js）只写玩法；开局要按队伍现算的参数（对战的让球）写 team_setup。
 """
@@ -42,7 +42,7 @@ class Game:
     stars: tuple = ()             # 三颗星：(key, 文字)；第一颗总是「过关」
     worlds: tuple = ()            # (世界名, 场景[, 打通后解锁 (id, 图标, 名字, 说明)])，每 per_world 关一个世界
     per_world = 4
-    count = 0                     # 一共几关：比 levels/<id>/ 里手做的多出来的，由 make 生成
+    count = 0                     # 一共几关（算上手做的）：比 levels/<id>/ 里手做的多出来的，由 make 生成
     record = "seconds"            # 每关的纪录比什么：seconds（越短越好）、score（越高越好）、""（只比星星）
     css = False                   # 有没有自己的样式表 app/static/play/<id>.css
 
@@ -50,23 +50,33 @@ class Game:
     def multi(self) -> bool:
         return self.players[1] > 1
 
-    # ---- 关卡
+    # ---- 关卡：手做的在 levels/<id>/，之后的用到哪一关才生成哪一关（关卡可以有上千关，不一次全算出来）
     @cached_property
-    def levels(self) -> tuple:
-        out = [(p.name, json.loads(p.read_text(encoding="utf-8"))) for p in sorted((LEVELS_DIR / self.id).glob("*.json"))]
-        out += [(f"第 {n} 关（生成）", self.make(n, random.Random(f"{self.id}:{n}"))) for n in range(len(out) + 1, self.count + 1)]
-        for name, lv in out:
-            if not lv.get("name") or not lv.get("par"):
-                raise ValueError(f"{self.id}/{name}: 要有 name 和 par")
-            self.check(lv, name)
-        out = [lv for _, lv in out]
-        for i, lv in enumerate(out, 1):
-            lv["n"] = i
+    def handmade(self) -> tuple:
+        out = []
+        for i, p in enumerate(sorted((LEVELS_DIR / self.id).glob("*.json")), 1):
+            out.append(self._checked(json.loads(p.read_text(encoding="utf-8")), i, p.name))
         return tuple(out)
 
+    @property
+    def total(self) -> int:
+        """一共几关（没有关卡的游戏是 0）。"""
+        return max(len(self.handmade), self.count)
+
+    def _checked(self, lv: dict, n: int, name: str) -> dict:
+        if not lv.get("name") or not lv.get("par"):
+            raise ValueError(f"{self.id}/{name}: 要有 name 和 par")
+        self.check(lv, name)
+        lv["n"] = n
+        return lv
+
     def make(self, n: int, rng: random.Random) -> dict:
-        """生成第 n 关（手做的关卡之后）：越往后越难。rng 的种子按游戏和关数固定。"""
+        """生成第 n 关（手做的关卡之后）：越往后越难。rng 的种子按游戏和关数固定，每次生成的都一样。"""
         raise NotImplementedError
+
+    def title(self, n: int) -> str:
+        """第 n 关的名字（地图上用，不用生成整关）。生成的关卡要改写它，和 make 里的名字一样。"""
+        return self.level(n)["name"]
 
     def check(self, lv: dict, name: str) -> None:
         """检查一关的数据对不对（不对就报错，启动和测试时都会查）。"""
@@ -76,19 +86,35 @@ class Game:
             n = int(n)
         except (TypeError, ValueError):
             raise ArenaError("没有这一关", 404)
-        if not 1 <= n <= len(self.levels):
+        if not 1 <= n <= self.total:
             raise ArenaError("没有这一关", 404)
-        return self.levels[n - 1]
+        if n <= len(self.handmade):
+            return self.handmade[n - 1]
+        cache = self.__dict__.setdefault("_made", {})
+        if n not in cache:
+            if len(cache) > 512:   # 只留最近用到的
+                cache.clear()
+            cache[n] = self._checked(self.make(n, random.Random(f"{self.id}:{n}")), n, f"第 {n} 关（生成）")
+        return cache[n]
 
     def world_of(self, n: int) -> dict:
+        """第 n 关在第几个世界。世界的场景按 worlds 一轮一轮用下去，第二轮起名字后面加上第几轮（糖果小镇 2）；
+        登记的解锁只在第一轮。"""
         if not self.worlds:
-            return {"n": 1, "name": "", "scene": ""}
-        i = min(len(self.worlds) - 1, (n - 1) // self.per_world)
-        return {"n": i + 1, "name": self.worlds[i][0], "scene": self.worlds[i][1]}
+            return {"n": 1, "name": "", "scene": "", "unlock": None}
+        i = (n - 1) // self.per_world
+        w = self.worlds[i % len(self.worlds)]
+        rnd = i // len(self.worlds) + 1
+        unlock = {"id": w[2][0], "icon": w[2][1], "name": w[2][2], "how": w[2][3]} if len(w) > 2 and rnd == 1 else None
+        return {"n": i + 1, "name": w[0] if rnd == 1 else f"{w[0]} {rnd}", "scene": w[1], "unlock": unlock}
+
+    @property
+    def world_count(self) -> int:
+        return -(-self.total // self.per_world) if self.worlds else (1 if self.total else 0)
 
     def stage(self, n, prog: dict) -> dict:
         """开局时发给前端的这一关（prog：这支队伍的进度，有的游戏按它调整关卡）。没有关卡的游戏是 {}。"""
-        if not self.levels:
+        if not self.total:
             return {}
         lv = self.level(n)
         return {**lv, "world": self.world_of(lv["n"])}
@@ -101,10 +127,6 @@ class Game:
     def team_setup(self, team: str) -> dict:
         """开局时按这支队伍现算、发给前端的参数（并进 stage，没有关卡的游戏也有，比如对战游戏的让球）。team：队伍键。"""
         return {}
-
-    def public_levels(self) -> list[dict]:
-        """大厅和地图上用的关卡（联网游戏的预览要整关数据）。"""
-        return [{**lv, "world": self.world_of(lv["n"])} for lv in self.levels]
 
     # ---- 一关结束
     def clean(self, lv: dict, rep: dict) -> dict:
@@ -134,10 +156,10 @@ class Game:
                 "multi": self.multi}
 
     def describe(self) -> dict:
-        """游戏页面要知道的：几个人、角色、星星、关卡。"""
+        """游戏页面要知道的：几个人、角色、星星、一共几关（关卡数据跟着房间走：room_info 的 preview、开局的 stage）。"""
         return {**self.card(), "players": list(self.players), "record": self.record, "per_world": self.per_world,
                 "roles": [{"id": k, "name": v[0], "icon": v[1]} for k, v in self.roles.items()],   # 列表：保持顺序
-                "stars": [{"key": k, "label": t} for k, t in self.stars], "levels": self.public_levels()}
+                "stars": [{"key": k, "label": t} for k, t in self.stars], "total": self.total}
 
 
 from . import bubble, defense, duo, pingpong, race, snake, stickman  # noqa: E402,F401  （登记游戏；首页按这个顺序）

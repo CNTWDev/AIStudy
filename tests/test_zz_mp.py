@@ -13,51 +13,66 @@ from app.main import app
 
 # ------------------------------------------------------------------ 关卡
 
+def _all(g):
+    return [g.level(n) for n in range(1, g.total + 1)]
+
+
 def test_levels_load():
     for gid in ("duo", "bubble", "snake"):
         g = games.get(gid)
-        assert len(g.levels) >= 8, gid
+        assert g.total >= 16, gid
         assert gid in arena.GAMES and g.multi and g.players == ((2, 2) if gid == "duo" else (2, 4)) and g.freeze is False
-        assert [lv["n"] for lv in g.levels] == list(range(1, len(g.levels) + 1))
+        assert [lv["n"] for lv in _all(g)] == list(range(1, g.total + 1))
+        assert [g.title(n) for n in range(1, g.total + 1)] == [lv["name"] for lv in _all(g)]   # 地图上的名字不用生成整关
         assert g.stars[0][0] == "clear" and len(g.stars) == 3
 
 
 def test_duo_levels_solvable():
-    """双人闯关每一关：两个人轮流走、踩按钮、推拉杆、坐升降台，能一起走到门口，每颗宝石都拿得到（tests/duo_solver.py）；
+    """双人闯关手做的每一关：两个人轮流走、踩按钮、推拉杆、坐升降台，能一起走到门口，每颗宝石都拿得到（tests/duo_solver.py）；
     越往后越要配合：最后一个世界的关比第一个世界的步数多、换人次数多。"""
     from duo_solver import solve
-    res = [solve(lv) for lv in games.get("duo").levels]
-    for lv, r in zip(games.get("duo").levels, res):
+    hand = games.get("duo").handmade
+    res = [solve(lv) for lv in hand]
+    for lv, r in zip(hand, res):
         assert r["ok"] and r["gems_ok"], (lv["n"], lv["name"], r)
     first, last = res[:4], res[-4:]
     assert min(r["steps"] for r in last) > max(r["steps"] for r in first)
     assert min(r["switches"] for r in last) > max(r["switches"] for r in first)
-    assert len({tuple(lv["map"]) for lv in games.get("duo").levels}) == len(res)   # 没有重复的地图
+    assert len({tuple(lv["map"]) for lv in hand}) == len(res)   # 没有重复的地图
 
 
 def test_generated_levels():
-    """泡泡堂、贪吃蛇：手做的关卡后面由程序生成，每次生成的一样，越往后越难。"""
+    """泡泡堂、贪吃蛇：手做的关卡后面由程序生成到 1000 关，用到哪关才生成哪关，每次生成的一样，越往后越难；
+    一个世界 4 关，场景一轮一轮用下去，同一个世界里关名不重复。"""
     for gid in ("bubble", "snake"):
         g = games.get(gid)
-        assert len(g.levels) == g.count == 24 == len(g.worlds) * g.per_world   # 一个世界 4 关，每个世界都有场景
+        assert g.total == g.count == 1000 and g.world_count == 250
         again = type(g)()
-        assert [lv.get("map") or lv.get("size") for lv in again.levels] == [lv.get("map") or lv.get("size") for lv in g.levels]
-        assert len({lv["name"] for lv in g.levels}) == 24
-    bub = games.get("bubble").levels
-    assert bub[-1]["monsters"] > bub[8]["monsters"] >= bub[7]["monsters"]
-    snk = games.get("snake").levels
-    assert all(a["target"] < b["target"] and a["ai_aggr"] <= b["ai_aggr"] for a, b in zip(snk, snk[1:]))
+        for n in (9, 77, 500, 1000):
+            assert again.level(n) == g.level(n)
+        for w in range(1, 251):
+            assert len({g.title(n) for n in range(w * 4 - 3, w * 4 + 1)}) == 4
+        assert g.world_of(25) == {**g.world_of(1), "n": 7, "name": g.worlds[0][0] + " 2"}
+    avg = lambda xs: sum(xs) / len(xs)
+    bub = _all(games.get("bubble"))
+    assert avg([lv["monsters"] for lv in bub[900:]]) > avg([lv["monsters"] for lv in bub[100:200]]) > avg([lv["monsters"] for lv in bub[8:40]])
+    assert bub[999]["mspeed"] > bub[99]["mspeed"] > 1
+    assert any(lv["stars"] for lv in bub) and any("k" in "".join(lv["map"]) for lv in bub)
+    snk = _all(games.get("snake"))
+    for key in ("target", "ai_aggr", "ai_speed"):
+        assert avg([lv[key] for lv in snk[900:]]) > avg([lv[key] for lv in snk[100:200]]) > avg([lv[key] for lv in snk[8:40]]), key
+    assert any(lv.get("gold") for lv in snk) and len(snk[999]["rocks"]) > len(snk[99]["rocks"])
 
 
 def test_bubble_levels_starts_are_safe():
     """泡泡堂：出生点旁边留了空地（能放第一个泡泡再躲开），怪兽离出生点够远。"""
-    for lv in games.get("bubble").levels:
+    for lv in _all(games.get("bubble")):
         g = lv["map"]
         for ch in "12":
             r, c = next((r, row.index(ch)) for r, row in enumerate(g) if ch in row)
             free = [(r + dr, c + dc) for dr, dc in ((0, 1), (0, -1), (1, 0), (-1, 0)) if g[r + dr][c + dc] == "."]
             assert len(free) >= 2, (lv["name"], ch)
-            mons = [(rr, cc) for rr, row in enumerate(g) for cc, x in enumerate(row) if x in "sbg"]
+            mons = [(rr, cc) for rr, row in enumerate(g) for cc, x in enumerate(row) if x in "sbgk"]
             assert min(abs(rr - r) + abs(cc - c) for rr, cc in mons) >= 6, (lv["name"], ch)
 
 
@@ -141,7 +156,7 @@ def test_rooms_and_finish():
         assert r2["stars"] == 3 and r2["new_best"] and r2["prev_best"] == par + 5
         prog = progress.progress(games.get("duo"), progress.team_key((b, a)))   # 谁先谁后都是同一队
         assert prog["levels"][0]["stars"] == 3 and prog["levels"][0]["best"] == par - 5 and prog["upto"] == 2
-        assert len(prog["worlds"]) == 4
+        assert prog["worlds_total"] == games.get("duo").world_count and prog["world"]["n"] == 1 and len(prog["levels"]) == 4
         # 没过关也记一局，不扣星星
         play = _start(c, rid, 2)
         assert _finish(c, rid, play, "lose", seconds=40).json()["stars"] == 0
@@ -207,6 +222,18 @@ def test_team_milestones():
         assert "mp_quiz" in keys(r) and "mp_streak3" not in keys(r)   # 第 1 关倒下过：还不算三连
         r = _finish(c, rid, _start(c, rid, 4, B), dev=B, seconds=30).json()
         assert {"mp_streak3", "mp_world"} <= keys(r) and r["world"]["done"]
+        # 一路往后打：已经一起打通 48 关（第 5～52 关），再过第 53 关就是 50 关；地图翻到哪个世界只发那个世界的关
+        team = progress.team_key((a, b))
+        for n in range(5, 53):
+            db.run("INSERT INTO game_runs(game, team, level, stars, best, plays, wins, cleared_at, updated_at) VALUES(?,?,?,?,?,?,?,?,?)",
+                   "snake", team, n, 1, 30, 1, 1, db.now(), db.now())
+        r = _finish(c, rid, _start(c, rid, 53, B), dev=B, seconds=30).json()
+        assert "mp_lv50" in keys(r) and r["world"] == {"name": "星空 3", "n": 14, "left": 3, "done": False} and r["next"] == 54
+        assert r["world"]["n"] == r["progress"]["world"]["n"] and [lv["n"] for lv in r["progress"]["levels"]] == [53, 54, 55, 56]
+        info = c.get(f"/api/rooms/{rid}").json()
+        assert info["level"] == 54 and info["progress"]["world"]["n"] == 14 and info["preview"]["n"] == 54 and info["progress"]["upto"] == 54
+        page = c.get(f"/api/rooms/{rid}?world=200").json()["progress"]
+        assert page["world"]["n"] == 200 and [lv["open"] for lv in page["levels"]] == [False] * 4 and page["worlds_done"] == 13
 
 
 def test_devices():
@@ -327,3 +354,29 @@ def test_save_and_resume():
         play = _start(c, rid, 1)
         c.post(f"/api/rooms/{rid}/save", json={**A, "session": play["session"], "end": 1})
         assert c.get(f"/api/rooms/{rid}").json()["play"] is None
+
+
+def test_pause_not_counted():
+    """暂停：暂停的时间不算今天玩游戏的时间（每个人记在自己的对局上）；暂停中途的对局也一样。"""
+    import time
+    from app.arena import rules
+    with TestClient(app) as c:
+        _, a, b = _family("p")
+        _login(c, "mp-a-p@x.com")
+        rid = c.post("/api/rooms", json={**A, "game": "snake"}).json()["id"]
+        _login(c, "mp-b-p@x.com")
+        c.post(f"/api/rooms/{rid}/enter", json=B)
+        _login(c, "mp-a-p@x.com")
+        play = _start(c, rid)
+        m = c.post("/api/arena/start", json={"game": "snake", "session": play["session"]}).json()["match_id"]
+        row = db.one("SELECT started_at FROM arena_matches WHERE id=?", m)
+        from datetime import datetime, timedelta
+        db.run("UPDATE arena_matches SET started_at=? WHERE id=?", (datetime.fromisoformat(row["started_at"]) - timedelta(seconds=300)).isoformat(), m)
+        assert 290 <= rules.seconds_today(a) <= 310
+        assert c.post(f"/api/arena/{m}/pause", json={"on": True}).json()["paused"]
+        st = db.jload(db.one("SELECT data FROM arena_matches WHERE id=?", m)["data"], {})
+        st["paused_at"] -= 200   # 已经暂停了 200 秒
+        db.run("UPDATE arena_matches SET data=? WHERE id=?", db.jdump(st), m)
+        assert 90 <= rules.seconds_today(a) <= 110
+        assert not c.post(f"/api/arena/{m}/pause", json={"on": False}).json()["paused"]
+        assert 90 <= c.post(f"/api/arena/{m}/end", json={"result": "quit"}).json()["seconds"] <= 110
