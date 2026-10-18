@@ -4,6 +4,7 @@
   经验值只在一局里当能量、换装备用，不攒成可以买东西的「积分」，也不进学习打卡。
 - 答错冷冻 5 秒；3 秒内连续瞎答，冷冻逐级加长（5 → 8 → 12 秒）。
 - 每天能玩多久：家长设基础时长；孩子今天的任务全部做完、点亮新知识点，再奖励几分钟（学习换游戏时间）。
+  也可以选「不限时」：不封顶、不倒计时，只看「什么时候可以玩」。
 - 什么时候能玩：家长选「随时」「做完一半任务」或「做完全部任务」（默认做完一半；今天没有任务就随时能玩）。
 """
 import random
@@ -13,7 +14,9 @@ from .. import db, explore
 from ..catalog import is_adult
 
 DEFAULT_GAME_MINUTES = 20
-GAME_MINUTE_CHOICES = (0, 10, 20, 30, 45, 60)
+UNLIMITED = -1            # 家长选「不限时」：存成 -1
+GAME_MINUTE_CHOICES = (0, 10, 20, 30, 45, 60, UNLIMITED)
+UNLIMITED_SECONDS = 24 * 3600   # 不限时的孩子，「还剩多少秒」按一整天算，各游戏照常用自己的单局上限
 UNLOCK_CHOICES = {"free": "随时都能玩", "half": "做完今天一半的任务后才能玩", "all": "做完今天全部任务后才能玩"}
 DEFAULT_UNLOCK = "half"
 BONUS_ALL_DONE = 10       # 今天的任务全部做完：多玩 10 分钟
@@ -37,10 +40,11 @@ def _settings(kid: dict) -> dict:
 
 
 def game_minutes(kid: dict) -> int:
-    """每天能玩几分钟。成人学习者默认不玩（不显示乐园），家长明确设置过的以设置为准。"""
+    """每天能玩几分钟（UNLIMITED = 不限时）。成人学习者默认不玩（不显示乐园），家长明确设置过的以设置为准。"""
     default = 0 if is_adult(kid.get("grade")) else DEFAULT_GAME_MINUTES
     try:
-        return int(_settings(kid).get("game_minutes", default))
+        m = int(_settings(kid).get("game_minutes", default))
+        return m if m >= 0 else UNLIMITED
     except (TypeError, ValueError):
         return default
 
@@ -62,7 +66,11 @@ def set_game_minutes(kid_id: int, minutes) -> None:
         minutes = int(minutes)
     except (TypeError, ValueError):
         return
-    _save_setting(kid_id, "game_minutes", min(GAME_MINUTE_CHOICES, key=lambda m: abs(m - minutes)))
+    if minutes < 0:
+        minutes = UNLIMITED
+    else:
+        minutes = min((m for m in GAME_MINUTE_CHOICES if m >= 0), key=lambda m: abs(m - minutes))
+    _save_setting(kid_id, "game_minutes", minutes)
 
 
 def set_game_unlock(kid_id: int, rule) -> None:
@@ -102,8 +110,10 @@ def sprint_points(kid_id: int) -> int:
 
 
 def status(kid: dict, max_seconds: dict | None = None) -> dict:
-    """今天的游戏状态：基础时长 + 学习奖励、用了多少、还剩多少、是否解锁（还差几项任务）。"""
+    """今天的游戏状态：基础时长 + 学习奖励、用了多少、还剩多少、是否解锁（还差几项任务）。
+    不限时：unlimited=True，不算奖励时间，left 固定是一整天（不倒计时），base 仍为真值表示能玩。"""
     base = game_minutes(kid)
+    unlimited = base == UNLIMITED
     done, total = _tasks_today(kid["id"])
     rule = game_unlock(kid)
     need = 0
@@ -112,17 +122,21 @@ def status(kid: dict, max_seconds: dict | None = None) -> dict:
             need = max(0, (total + 1) // 2 - done)
         elif rule == "all":
             need = max(0, total - done)
-    lit = len(explore.lit_today(kid["id"])) if base else 0
-    bonus_all = BONUS_ALL_DONE if base and total and done >= total else 0
-    bonus_lit = min(BONUS_LIT_MAX, lit * BONUS_PER_LIT) if base else 0
-    bonus_sprint = min(BONUS_SPRINT_MAX, sprint_points(kid["id"]) // BONUS_SPRINT_PER) if base else 0
-    minutes = base + bonus_all + bonus_lit + bonus_sprint
+    timed = base and not unlimited
+    lit = len(explore.lit_today(kid["id"])) if timed else 0
+    bonus_all = BONUS_ALL_DONE if timed and total and done >= total else 0
+    bonus_lit = min(BONUS_LIT_MAX, lit * BONUS_PER_LIT) if timed else 0
+    bonus_sprint = min(BONUS_SPRINT_MAX, sprint_points(kid["id"]) // BONUS_SPRINT_PER) if timed else 0
     used = seconds_today(kid["id"], max_seconds)
-    left = max(0, minutes * 60 - used)
+    if unlimited:
+        minutes, left = None, UNLIMITED_SECONDS
+    else:
+        minutes = base + bonus_all + bonus_lit + bonus_sprint
+        left = max(0, minutes * 60 - used)
     return {"base": base, "bonus_all": bonus_all, "bonus_lit": bonus_lit, "bonus_sprint": bonus_sprint, "lit": lit, "minutes": minutes,
             "used": used, "left": left, "rule": rule, "rule_name": UNLOCK_CHOICES[rule], "need": need,
-            "done": done, "total": total, "unlocked": base > 0 and need == 0,
-            "can_bonus_all": bool(base and total and done < total)}
+            "done": done, "total": total, "unlocked": base != 0 and need == 0,
+            "unlimited": unlimited, "can_bonus_all": bool(timed and total and done < total)}
 
 
 def locked_reason(st: dict) -> str:
