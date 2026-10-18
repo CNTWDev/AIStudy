@@ -12,7 +12,7 @@
           {"k":"lift","x","y","w","to","id"}  升降台：平时在第 y 行，id 打开时升到第 to 行
   par     三星目标秒数；tip 开局提示
 """
-from .base import MpGame, register
+from . import Game, register
 
 COLS, ROWS = 32, 15
 TILES = set("#.FWGfw12DE")
@@ -20,8 +20,10 @@ KINDS = {"btn", "lever", "gate", "bridge", "lift"}
 
 
 @register
-class Duo(MpGame):
-    id = "duo"
+class Duo(Game):
+    id, name, icon, color, tag = "duo", "双人闯关", "🔥", "#e0582b", "联网合作"
+    desc = "一个当小火苗、一个当小水滴，按按钮、坐升降台，互相帮忙一起走到门口。"
+    players, freeze, max_seconds = (2, 2), False, 900   # 谁倒下谁答题：答错不冷冻，改成「多欠一道题」
     roles = {"fire": ("小火苗", "🔥"), "water": ("小水滴", "💧")}
     stars = (("clear", "一起过关"), ("gems", "宝石全拿到"), ("time", "进入目标时间"))
     worlds = (("森林神殿", "forest"), ("水晶洞穴", "cave"), ("火山之巅", "lava"))
@@ -50,5 +52,5 @@ class Duo(MpGame):
         out["score"] = out["gems"]
         return out
 
-    def checks(self, lv, rep):
+    def checks(self, lv, rep, focus):
         return {"clear": True, "gems": rep["gems"] >= lv["gems"], "time": rep["seconds"] <= lv["par"]}

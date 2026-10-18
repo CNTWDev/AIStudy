@@ -45,7 +45,7 @@ def test_fraction_answers_accept_equivalent_forms():
 def test_adaptive_difficulty_gives_everyone_the_same_chance():
     """模拟三个真实水平差很多的孩子（都在一个题族 1–5 级覆盖的范围内）：按水平出题后，大家的答对率都接近目标（75%），
     经验值期望相同。超出范围的孩子（这个知识点最简单的一级也太难）由 arena.kp_pool 少出这个知识点、换别的知识点。"""
-    target = arena.GAMES["stickman"]["target"]
+    target = arena.GAMES["stickman"].target
     rng = random.Random(42)
     accs = []
     for true in (-0.8, 0.4, 2.0):           # 弱、中、强

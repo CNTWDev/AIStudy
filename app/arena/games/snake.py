@@ -10,14 +10,16 @@
   ai     电脑蛇几条    ai_len 电脑蛇多长    ai_speed 电脑蛇速度（小蛇是 1）    ai_aggr 电脑蛇多爱拦路（0–1）
   food   场上同时有多少豆子；tip 开局提示
 """
-from .base import MpGame, register
+from . import Game, register
 
 FIELDS = ("size", "target", "time", "ai", "ai_len", "ai_speed", "ai_aggr", "food")
 
 
 @register
-class Snake(MpGame):
-    id = "snake"
+class Snake(Game):
+    id, name, icon, color, tag = "snake", "贪吃蛇大作战", "🐍", "#3aa860", "联网合作"
+    desc = "两条小蛇一起吃豆子长大，躲开电脑蛇，让它们撞到你们身上，两条蛇加起来够长就过关。"
+    players, freeze, max_seconds = (2, 2), False, 900   # 谁倒下谁答题：答错不冷冻，改成「多欠一道题」
     roles = {"green": ("小绿", "🟢"), "pink": ("小粉", "🩷")}
     stars = (("clear", "一起长到目标长度"), ("time", "进入目标时间"), ("safe", "倒下不超过 1 次"))
     worlds = (("草地", "day"), ("星空", "night"))
@@ -34,5 +36,5 @@ class Snake(MpGame):
         out["score"] = min(out["score"], 10_000)
         return out
 
-    def checks(self, lv, rep):
+    def checks(self, lv, rep, focus):
         return {"clear": True, "time": rep["seconds"] <= lv["par"], "safe": rep["deaths"] <= 1}

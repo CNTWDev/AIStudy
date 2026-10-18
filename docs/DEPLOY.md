@@ -64,7 +64,7 @@ sudo /opt/aistudy/install.sh install            # 可加 --domain / --mirror cn
 
 ### 自己用 Nginx（宝塔等）反向代理：WebSocket 要单独配
 
-乐园里的联网游戏（双人闯关、泡泡堂、贪吃蛇）走 WebSocket（`/ws/mp/房间号`）。Caddy 默认就转发，**Nginx 不会**，要在站点配置里加
+乐园里的联网游戏（双人闯关、泡泡堂、贪吃蛇）走 WebSocket（`/ws/room/房间号`）。Caddy 默认就转发，**Nginx 不会**，要在站点配置里加
 [`deploy/nginx-websocket.conf`](../deploy/nginx-websocket.conf) 这一段（`proxy_http_version 1.1` + `Upgrade` / `Connection` 头 + 长一点的
 `proxy_read_timeout`）。开了宝塔防火墙的，把 `/ws/` 加进 URL 白名单。
 
@@ -72,7 +72,7 @@ sudo /opt/aistudy/install.sh install            # 可加 --domain / --mirror cn
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" -H "Connection: Upgrade" -H "Upgrade: websocket" \
-     -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" https://你的域名/ws/mp/1
+     -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" https://你的域名/ws/room/1
 ```
 
 `403`（没登录被拒）说明已经通了；`404` / `400` 说明 Nginx 还没转发 WebSocket。孩子那边连不上时，游戏里会提示「连不上联网服务」。

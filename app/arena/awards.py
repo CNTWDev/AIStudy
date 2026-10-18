@@ -113,19 +113,11 @@ def learning_keys(kid_id: int) -> list[str]:
     return keys
 
 
-def after_match(kid_id: int, game: str, result: str, st: dict, stats: dict, status: dict, focus: dict | None = None) -> list[dict]:
-    keys = ["hello"]
+def after_match(kid_id: int, game_keys: list[str], st: dict, status: dict, focus: dict | None = None) -> list[dict]:
+    """一局答题结束：答题相关的贴纸在这里判断；game_keys 是游戏自己按玩法给的（games/<游戏>.py 的 match_stickers）。"""
+    keys = ["hello"] + list(game_keys)
     if focus and focus["index"] is not None and focus["answered"] >= 8 and focus["index"] >= 120:
         keys.append("focus")
-    if game == "stickman" and result == "win":
-        keys.append("first_win")
-    if game == "race" and result == "win":
-        keys.append("race_win")
-    if game == "defense":
-        if (stats.get("wave") or 0) >= 5:
-            keys.append("guard5")
-        if stats.get("boss"):
-            keys.append("boss")
     best = st.get("best_streak", 0)
     keys += [k for k, n in (("streak5", 5), ("streak10", 10)) if best >= n]
     answered, right = st.get("answered", 0), st.get("right", 0)

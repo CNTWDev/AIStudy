@@ -8,7 +8,7 @@ from datetime import timedelta
 
 from .. import db, quickgen
 from ..catalog import catalog, stage_rank
-from .matches import GAMES
+from .games import GAMES
 
 BANDS = ((0.25, "掌握 0–25%"), (0.5, "掌握 25–50%"), (0.75, "掌握 50–75%"), (1.01, "掌握 75–100%"))
 
@@ -69,5 +69,5 @@ def fairness(days: int = 30) -> dict:
                      "win_rate": round(100 * g["wins"] / g["matches"]) if g["matches"] else None})
     cal = [{**dict(r), "name": _family_name(r["family"])}
            for r in db.q("SELECT family, level, b, n FROM arena_calib ORDER BY family, level")]
-    return {"days": days, "target": round(GAMES["stickman"]["target"] * 100), "rows": rows, "calib": cal,
-            "games": {g: round(v["target"] * 100) for g, v in GAMES.items()}}
+    return {"days": days, "target": round(GAMES["stickman"].target * 100), "rows": rows, "calib": cal,
+            "games": {g: round(v.target * 100) for g, v in GAMES.items()}}

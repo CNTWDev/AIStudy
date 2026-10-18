@@ -512,7 +512,7 @@
 
   // ---------------------------------------------------------------- 外壳
   PlayShell.init({
-    game: 'defense', dock: true, tempo: 120,
+    quiz: 'dock', tempo: 120,
     rules: [
       '小怪兽一波波来攻城堡啦！<b>答对一题</b>，城墙上的你就放出一颗<b>星星魔法</b>。',
       '连对越多星星越强；<b>连对 3 题</b>召唤「<b>流星雨</b>」，砸中全场怪兽！',
@@ -532,8 +532,8 @@
       document.addEventListener('visibilitychange', () => { if (!document.hidden) loop.resume(); });
       loop.start();
     },
-    begin(match, q, shell) {
-      quiz = q; sh.avatar = match.avatar || sh.avatar;
+    begin(c) {
+      const match = c.match; quiz = c.quiz; sh.avatar = match.avatar || sh.avatar;
       fx = new Play.FX();
       layout();
       S = newState('play');
