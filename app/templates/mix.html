@@ -8,7 +8,7 @@
 <div id="mbox" class="card"><span class="loading">正在准备题目</span></div>
 <script>
 const SET = {{ set_id }}, KIDS_DONE = {{ 'true' if done else 'false' }};
-let queue = [], total = {{ total }}, answered = {{ answered }}, right = {{ right }}, ended = false, loading = null, serverDone = false, seenNew = new Set();
+let queue = [], total = {{ total }}, answered = {{ answered }}, right = {{ right }}, ended = false, loading = null, serverDone = false, seenNew = new Set(), lastKp = "";
 function bar() { $('#mbar').style.width = (total ? Math.min(100, 100 * answered / total) : 0) + '%'; }
 async function fetchMore() {
   if (serverDone || loading) return loading;
@@ -19,7 +19,7 @@ async function fetchMore() {
 async function load() {
   if (KIDS_DONE) return finish(true);
   try {
-    await fetchMore();
+    await waitWith($('#mbox'), fetchMore());
     if (!queue.length && serverDone) { $('#mbox').innerHTML = '<p>这门课今天没有要练的题了，直接开始下一项吧。</p>'; return finish(true); }
     Run.start('mix', {total, mount: $('#mbox')});
     show();
@@ -50,13 +50,14 @@ async function show() {
   if (!queue.length) {
     if (!serverDone) {
       $('#mbox').innerHTML = '<span class="loading">正在准备下一题</span>';
-      try { await fetchMore(); } catch (e) { $('#mbox').innerHTML = `<div class="err">${esc(e.message)}</div>`; return; }
+      try { await waitWith($('#mbox'), fetchMore(), lastKp); } catch (e) { $('#mbox').innerHTML = `<div class="err">${esc(e.message)}</div>`; return; }
       return show();
     }
     return finish(false);
   }
   if (queue.length <= 2) fetchMore().catch(() => {});
   const it = queue.shift(), t = it.mix;
+  lastKp = t.kp;
   const box = document.createElement('div');
   $('#mbox').innerHTML = tagHtml(t) + `<div class="muted small">第 ${answered + 1}/${total} 题</div>`;
   if ((t.role === 'new' || t.role === 'preview') && !seenNew.has(t.kp)) { seenNew.add(t.kp); teachBtn($('#mbox'), t.kp); }

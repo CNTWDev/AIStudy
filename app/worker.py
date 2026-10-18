@@ -5,7 +5,7 @@ import sys
 import threading
 import time
 
-from . import bank, bankflow, config, curriculum_admin, db, engine, evidence, news
+from . import bank, bankflow, config, curriculum_admin, db, engine, evidence, news, prefetch
 from .catalog import catalog
 from .content import content
 from .methods import methods
@@ -25,12 +25,14 @@ def main(once=False):
     engine.load_seed_items(config.SEED_DIR)
     bank.sync()
     evidence.ensure_current()
-    next_bank = next_news = 0.0
+    next_bank = next_news = next_prefetch = 0.0
     try:
         while not stopped.is_set():
             curriculum_admin.refresh()
             now = time.monotonic()
-            for name, run, due in [('bank', bankflow.run_once, next_bank), ('news', news.run_daily, next_news)]:
+            # 新闻先跑（同一个钟点），再按每个孩子今天的清单备题
+            for name, run, due in [('bank', bankflow.run_once, next_bank), ('news', news.run_daily, next_news),
+                                   ('prefetch', prefetch.run_daily, next_prefetch)]:
                 if now < due or stopped.is_set():
                     continue
                 try:
@@ -39,8 +41,10 @@ def main(once=False):
                     log.exception('%s failed; retry on next scheduled run', name)
                 if name == 'bank':
                     next_bank = now + bankflow.INTERVAL
-                else:
+                elif name == 'news':
                     next_news = now + 20 * 60
+                else:
+                    next_prefetch = now + 10 * 60
             if once:
                 break
             stopped.wait(30)

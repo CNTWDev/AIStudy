@@ -164,7 +164,8 @@ function renderItem(box, item, opts) {
     if (W === 'choice') qMark(box, res.answer_index, res.dont_know ? null : chosen);
     flagRow(box, item); _done && _done(res);
   };
-  const t0 = Date.now();  // 做题用时：系统用它发现「会做但很慢」
+  const t0 = Date.now(), a0 = Away.now();  // 做题用时：系统用它发现「会做但很慢」；切到别的页面的时间不算
+  const took = () => Date.now() - t0 - (Away.now() - a0);
   $$('.opt', box).forEach(b => b.onclick = () => { $$('.opt', box).forEach(x => x.classList.remove('sel')); b.classList.add('sel'); chosen = b.dataset.i; });
   const hb = $('.hintbtn', box);
   if (hb) hb.onclick = () => { $('.hintbox', box).innerHTML = `<div class="hint" style="margin-top:8px">💡 ${esc(item.hint)}</div>`; hb.remove(); };
@@ -187,13 +188,13 @@ function renderItem(box, item, opts) {
     if (W === 'choice' && chosen === null) { alert('先选一个答案'); return; }
     btn.disabled = true;
     try {
-      const res = await opts.submit(answer, undefined, Date.now() - t0);
+      const res = await opts.submit(answer, undefined, took());
       if (res.reveal) {
         $('.fbbox', box).innerHTML = `<div class="fb dk">` + qAns({answer: res.answer, points: res.points}).replace('<dt>答案</dt>', '<dt>参考答案</dt>') +
           `<div class="row" style="margin-top:10px"><span>${isSimple() ? '你答到了吗？' : '对照要点，你答到了吗？'}</span><button class="btn sm selfok">基本答到</button><button class="btn ghost sm selfno">还差一些</button></div></div>`;
         btn.remove();
         const go = async v => {
-          const r2 = await opts.submit(answer, v, Date.now() - t0);
+          const r2 = await opts.submit(answer, v, took());
           $('.selfok', box).closest('.row').remove();
           $('.fbbox', box).insertAdjacentHTML('beforeend', feedback({...r2, answer: '', points: []}, {}));
           opts.onDone && opts.onDone(r2);
@@ -710,6 +711,63 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keyup', e => { if (e.shiftKey) later(); });
   document.addEventListener('selectionchange', () => { if (!(getSelection() || '').toString().trim()) SelMenu.hide(); });
 });
+
+/* 页面切到后台（换标签页、切别的应用）累计了多久：做题用时要扣掉这段 */
+const Away = {ms: 0, since: document.hidden ? Date.now() : 0};
+Away.now = () => Away.ms + (Away.since ? Date.now() - Away.since : 0);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) Away.since = Date.now();
+  else if (Away.since) { Away.ms += Date.now() - Away.since; Away.since = 0; }
+});
+
+/* 等题时不干等（app/prefetch.py）：题大多提前备好了；真要等，超过 1 秒就在 box 里放一张今天要复习的单词小卡
+   （看意思四选一，答了照常算复习），没有单词就放这个知识点「记住」的那一句。题好了，小卡下面出现「题来了 →」，孩子点了才换，不硬切。
+   用法：const r = await waitWith(box, api(...), kp)；box 里原来的内容（「正在准备题目」）在等待期间会被换掉。 */
+async function waitWith(box, promise, kp) {
+  let ready = false, shown = false, go = null, card = null;
+  const skip = [];
+  const tail = () => $('.fillnext', box);
+  const showNext = () => {
+    const t = tail(); if (!t) return;
+    t.innerHTML = `<div class="row" style="justify-content:center;margin-top:10px"><button class="btn">题来了 →</button></div>`;
+    $('.btn', t).onclick = () => go && go();
+  };
+  const fill = async () => {
+    if (ready) return;
+    let f = null;
+    try { f = await api('/api/filler?' + new URLSearchParams({kp: kp || '', skip: skip.join(',')})); } catch (e) { return; }
+    if (ready) { if (shown) showNext(); return; }  // 取小卡的工夫题已经好了：不再换新卡
+    if (!f || (!f.card && !f.remember)) { if (shown && tail()) tail().innerHTML = '<p class="loading small" style="text-align:center">题马上就来</p>'; return; }
+    shown = true;
+    if (f.card) {
+      card = f.card; skip.push(f.card);
+      const q = f.quiz;
+      box.innerHTML = `<div class="fillcard"><div class="muted small">等题的工夫，复习一个${f.kind === 'term' ? '术语' : '单词'}</div>` +
+        `<div class="face">${esc(q.q)}${q.hint ? `<div class="muted small">${esc(q.hint)}</div>` : ''}</div>` +
+        q.options.map(o => `<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join('') +
+        `<div class="fbbox"></div><div class="fillnext">${ready ? '' : '<p class="loading small" style="text-align:center">题在准备</p>'}</div></div>`;
+      $$('.opt', box).forEach(b => b.onclick = async () => {
+        $$('.opt', box).forEach(x => x.disabled = true);
+        let res = {};
+        try { res = await api(`/api/review/${card}/answer`, {answer: b.dataset.v, mode: 'choice'}); } catch (e) { /* 小卡答不上也不耽误做题 */ }
+        $$('.opt', box).forEach(x => { if (x.dataset.v === res.answer) x.classList.add('right'); else if (x === b && !res.correct) x.classList.add('wrong'); });
+        $('.fbbox', box).innerHTML = res.answer ? `<div class="fb ${res.correct ? 'ok' : 'no'} pop">${res.correct ? '✅ 对了！' : '正确答案是 <b>' + esc(res.answer) + '</b>'}</div>` : '';
+        if (/^[A-Za-z]/.test(res.answer || '')) say(res.answer);
+        if (ready) showNext(); else setTimeout(fill, 1200);  // 题还没好：再来一张
+      });
+    } else {
+      box.innerHTML = `<div class="fillcard"><div class="muted small">等题的工夫，先记一记</div><div class="hint">📌 ${esc(f.remember)}</div>` +
+        `<div class="fillnext">${ready ? '' : '<p class="loading small" style="text-align:center">题在准备</p>'}</div></div>`;
+      if (ready) showNext();
+    }
+  };
+  const timer = setTimeout(fill, 1000);
+  let r;
+  try { r = await promise; } finally { ready = true; clearTimeout(timer); }
+  if (!shown) return r;
+  // 小卡在屏幕上：下面出「题来了 →」，孩子可以答完这张再点，也可以直接去做题
+  return new Promise(res => { go = () => res(r); showNext(); });
+}
 
 /* 学习时长自动记录：页面在前台、最近有操作（读文章时放宽到 3 分钟）才计时；每 30 秒报一次，离开页面时用 sendBeacon 补报。
    只有孩子自己的账号计时，家长查看不算。 */

@@ -65,7 +65,7 @@ $('#teachbtn').onclick = async () => {
 async function loadItems() {
   $('#items').innerHTML = '<span class="loading">正在准备题目</span>';
   try {
-    const r = await api(`/api/practice/${KP}?n=3&purpose=${TASK === 'preview' ? 'preview' : 'practice'}`);
+    const r = await waitWith($('#items'), api(`/api/practice/${KP}?n=3&purpose=${TASK === 'preview' ? 'preview' : 'practice'}`), KP);
     items = r.items; idx = 0; right = 0;
     if (items.length) Run.start('practice', {total: items.length, mount: $('#items')});
     if (!items.length) { $('#items').innerHTML = '<p>' + (r.llm ? '题目还没准备好，等一会儿再试试。' : '这个知识点还没有题。') + '</p><p class="muted small">可以先按上面的方法自己练一练。</p>'; return; }

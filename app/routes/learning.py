@@ -3,7 +3,7 @@ from ..content import content
 from fastapi import APIRouter
 from fastapi import Body, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from .. import arena, auth, bank, db, engine, evidence, explore, insights, itemtypes, llm, mix, recall, records, sitecfg, sprint, streak, trace
+from .. import arena, auth, bank, db, engine, evidence, explore, insights, itemtypes, llm, mix, prefetch, recall, records, sitecfg, sprint, streak, trace
 from datetime import date
 from ..web import (
     GRADES,
@@ -244,6 +244,8 @@ def learn(request: Request, kp_id: str, task: str = "practice"):
     post = [{**s, "m": m.get(s["id"])} for s in catalog.successors(kp_id)]
     pack = catalog.packs[kp["pack"]]
     vocab = db.q("SELECT front, back FROM cards WHERE user_id=? AND kp_id=? AND kind='term'", k["id"], kp_id)
+    if auth.current_user(request)["role"] == "kid":  # 孩子看讲解的工夫，后台把练习题和讲解备好，点「开始练习」不用等
+        prefetch.kick(k["id"], kp_id, n=3, purpose="preview" if task == "preview" else "practice", grade=k["grade"], teach=True)
     return render(request, "learn.html", kp=kp, pack=pack, pre=pre, post=post, me=m.get(kp_id), task=task, ev=evidence.explain(k['id'], m.get(kp_id)),
                   strand=catalog.strand_name(pack.id, kp["strand"]), vocab=vocab, bridges=engine.bridges(k["id"], kp_id, m))
 
@@ -257,6 +259,7 @@ def api_teach(request: Request, kp_id: str):
     # 讲解本身存在题库里大家共用；「你在别的学科学过……」是每个孩子自己的，现场拼上（来自人工写的关联说明）
     bridge = [{"subject": b["subject"], "name": b["kp"]["name"], "label": b["label"], "note": b["note"]}
               for b in engine.bridges(k["id"], kp_id) if b["status"] in ("mastered", "learning")][:3]
+    prefetch.wait(k["id"], kp_id, "teach")
     return {**bank.teach(kp, k["grade"], user_id=k["id"]), "bridge": bridge}
 
 
@@ -266,11 +269,12 @@ def api_practice(request: Request, kp_id: str, n: int = 3, purpose: str = "pract
     if not catalog.kp(kp_id):
         raise HTTPException(404)
     purpose = purpose if purpose in ("practice", "preview") else "practice"
+    prefetch.wait(k["id"], kp_id, purpose)  # 打开学习页时后台已经在出：等它，不重复出
     items = engine.items_for(k["id"], kp_id, n=min(n, 5), purpose=purpose, grade=k["grade"])
     # 穿插一道「以前学过的」：只出这个知识点要用到、还没测过 / 只是推断会 / 快忘了的前置（预习新内容时更要先看地基稳不稳）；
     # 前置都稳了就不穿插——学某个知识点时做的题都要和它有关，铺开摸底交给热身和每科练习
     if len(items) >= 2:
-        probe = explore.pick(k["id"], 1, k["grade"], near_kp=kp_id, exclude={kp_id}, only_near=True)
+        probe = explore.pick(k["id"], 1, k["grade"], near_kp=kp_id, exclude={kp_id}, only_near=True, wait=False)
         if probe:
             items.insert(1, probe[0])
     import uuid
@@ -576,6 +580,26 @@ def review_card(request: Request, card_id: int, body: dict = Body(...)):
     r = engine.review_card(k["id"], card_id, body.get("grade", "good"))
     _review_tasks_done(k["id"])
     return r or {}
+
+
+@router.get("/api/filler")
+def api_filler(request: Request, kp: str = "", skip: str = ""):
+    """等题时的小卡（app/prefetch.py）：今天到期要复习的一个单词，看意思四选一，答了照常算复习（/api/review/<id>/answer）；
+    没有到期的单词，就给这个知识点讲解里「记住」的那一句（库里有才给，不请 AI）。都没有返回 {}，前端照常显示「正在准备」。"""
+    k = kid_or_redirect(request)
+    skipped = {int(x) for x in skip.split(",") if x.isdigit()}
+    for c in engine.due_cards(k["id"], 40):
+        if c["kind"] in recall.WORD_KINDS and c["id"] not in skipped:
+            q = recall.quiz(k["id"], c)
+            if q.get("mode") == "choice":
+                return {"card": c["id"], "kind": c["kind"], "quiz": q}
+    if catalog.kp(kp):
+        t = db.one("SELECT body FROM contents WHERE kind='teach' AND status='active' AND kp_id=? "
+                   "ORDER BY CASE WHEN grade=? THEN 0 ELSE 1 END, id LIMIT 1", kp, k["grade"])
+        rem = (db.jload(t["body"], {}) or {}).get("remember") if t else ""
+        if rem:
+            return {"remember": rem, "name": catalog.kp(kp)["name"]}
+    return {}
 
 
 @router.post("/api/review/{card_id}/answer")
