@@ -665,3 +665,87 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .bd-strip .i{font-size:26px;animation:bdbob 1.6s ease-in-out infinite}.bd-strip .go{margin-left:auto;font-weight:900;white-space:nowrap}
 @media (prefers-color-scheme:dark){.bd-strip{background:linear-gradient(135deg,#4a3d12,#3a2540);color:#fff3c4}}
 @keyframes bdbob{50%{transform:translateY(-5px) rotate(-6deg)}}
+
+/* ===== 孩子风格（body[data-skin=kid]，见 docs/DESIGN.md 5.30） =====
+   和乐园答题卡同一种样子：能按的东西有一圈深色描边、底下一道实心「厚度」，按下去会沉一下；装东西的卡片只有浅色厚边，不抢眼。
+   动画只用在「我做了什么」之后（按下、答对、答错、做完），读题、想题的时候页面不动。成人学习者、家长、管理员不加这一层；游戏页有自己的样子。 */
+[data-skin=kid]{--k-ink:#3b2c1c;--k-edge:2.5px;--k-drop:0 4px 0 var(--k-ink);--k-drop-sm:0 3px 0 var(--k-ink);--k-press:0 1px 0 var(--k-ink);
+--k-card-edge:#eadcbf;--k-card-drop:0 5px 0 #eadcbf;--mint:#23a872;--mint-2:#dcf5ea;--radius:24px;--r-sm:16px}
+@media (prefers-color-scheme:dark){[data-skin=kid]{--k-ink:#6b5b43;--k-card-edge:#3a3227;--k-card-drop:0 5px 0 #0d0b08;--mint:#4ade80;--mint-2:#173022}}
+/* 字：标题、数字、按钮用圆体，粗一点 */
+[data-skin=kid] :is(h1,h2,h3,.btn,.num-big,.qc-key,.step .num,.flb-prog,.fb-v,.toast,.nx-t,.sec-card>b,.fs-h b){font-family:var(--f-round),-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+[data-skin=kid] h1{font-size:28px;font-weight:800}[data-skin=kid] h2{font-weight:800}
+/* 卡片：浅色厚边（像一块厚纸板），可点的卡片按下会沉 */
+[data-skin=kid] :is(.card,.tile,.quick a,.goal-card,.flowbar,.course-choice){border:2px solid var(--k-card-edge);box-shadow:var(--k-card-drop)}
+[data-skin=kid] :is(a.card,.card.link,.tile,.quick a,.subj):active{transform:translateY(3px);box-shadow:0 2px 0 var(--k-card-edge)}
+[data-skin=kid] :is(a.card,.card.link,.tile,.subj):hover{border-color:var(--brand-3);box-shadow:var(--k-card-drop)}
+[data-skin=kid] .quiet>.card,[data-skin=kid] .quiet-tiles .tile{box-shadow:none}
+/* 正在做的那一件事（今天页的「下一项」、正在答的题、做完弹出的小卡）：深色描边，和乐园答题卡一样，一眼看到 */
+[data-skin=kid] :is(.hero.focus,.card:has(.q.qc),.fs-card,.sec-card){border:var(--k-edge) solid var(--k-ink);box-shadow:0 6px 0 var(--k-ink)}
+[data-skin=kid] .hero.focus.alldone{border-color:var(--k-ink);background:linear-gradient(135deg,var(--mint-2),var(--card) 70%)}
+/* 按钮：主按钮蜂蜜色实心、深色描边；次按钮（soft）白底浅色厚边；再次一级（ghost）不描边。一页只有一个深色描边的实心按钮 */
+[data-skin=kid] .btn{border:var(--k-edge) solid var(--k-ink);box-shadow:var(--k-drop);font-weight:800;border-radius:16px;transition:background .15s,transform .06s,box-shadow .06s}
+[data-skin=kid] .btn:hover{border-color:var(--k-ink)}
+[data-skin=kid] .btn:active:not(:disabled){transform:translateY(3px);box-shadow:var(--k-press)}
+[data-skin=kid] .btn.soft{background:var(--card);color:var(--ink);border-color:var(--k-card-edge);box-shadow:var(--k-card-drop)}
+[data-skin=kid] .btn.soft:hover{background:var(--sun-2);color:var(--ink);border-color:var(--k-card-edge)}[data-skin=kid] .btn.soft:active:not(:disabled){box-shadow:0 1px 0 var(--k-card-edge)}
+[data-skin=kid] .btn.ghost{border-color:transparent;box-shadow:none}[data-skin=kid] .btn.ghost:hover{border-color:transparent}
+[data-skin=kid] .btn.sm{box-shadow:var(--k-drop-sm);border-width:2px;border-radius:12px}
+[data-skin=kid] .btn.lg{border-radius:18px;font-size:18px}
+[data-skin=kid] .btn:disabled{box-shadow:var(--k-press)}
+/* 选项：和乐园答题卡一样的大块按钮；字母放在小圆角方块里 */
+[data-skin=kid] .opt{border:var(--k-edge) solid var(--k-ink);box-shadow:var(--k-drop);border-radius:18px;font-weight:700;font-size:17px;min-height:58px;margin:10px 0;transition:background .15s,transform .06s,box-shadow .06s}
+[data-skin=kid] .opt:hover{border-color:var(--k-ink);background:var(--sun-2)}
+[data-skin=kid] .opt:active:not(:disabled){transform:translateY(3px);box-shadow:var(--k-press)}
+[data-skin=kid] .opt.sel{border-color:var(--k-ink);background:var(--brand-3)}
+[data-skin=kid] .opt.right{border-color:var(--k-ink);background:var(--mint-2)}[data-skin=kid] .opt.wrong{border-color:var(--k-ink);background:var(--coral-2)}
+[data-skin=kid] .opt:disabled{transform:none}[data-skin=kid] .opt:disabled:not(.right):not(.wrong){box-shadow:var(--k-press);opacity:.7}
+[data-skin=kid] .qc-key{width:32px;height:32px;border-radius:10px;border:2px solid var(--k-ink);background:var(--card);color:var(--ink);font-size:15px}
+[data-skin=kid] .opt.sel .qc-key{background:var(--brand);color:var(--on-brand)}
+[data-skin=kid] .opt.right .qc-key{background:var(--mint);color:#fff}[data-skin=kid] .opt.wrong .qc-key{background:var(--coral);color:#fff}
+/* 带答案的题（错题本、试卷）：不是按钮，就不要厚度 */
+[data-skin=kid] .opt.static{box-shadow:none;border-width:2px;border-color:var(--k-card-edge);font-weight:600}
+[data-skin=kid] .opt.static.right{border-color:var(--mint);background:var(--mint-2)}[data-skin=kid] .opt.static.wrong{border-color:var(--coral);background:var(--coral-2)}
+[data-skin=kid] .qc-stem{font-size:18px;font-weight:700}
+/* 答完的反馈：答对蹦一下，答错轻轻摇一下（不是惩罚，只是「这里不对」） */
+[data-skin=kid] .fb{border-radius:18px;border:2px solid transparent}
+[data-skin=kid] .fb.ok{border-color:color-mix(in srgb,var(--mint) 45%,transparent);background:var(--mint-2)}
+[data-skin=kid] .fb.no{border-color:color-mix(in srgb,var(--coral) 40%,transparent);background:var(--coral-2)}
+[data-skin=kid] .fb.dk{border-color:color-mix(in srgb,var(--learn) 35%,transparent)}
+[data-skin=kid] .fb-v{font-size:19px;font-weight:800}
+[data-skin=kid] .opt.right:not(.static){animation:kbounce .45s cubic-bezier(.3,1.6,.5,1)}
+[data-skin=kid] .opt.wrong:not(.static){animation:kshake .4s ease-in-out}
+@keyframes kbounce{40%{transform:scale(1.04)}}
+@keyframes kshake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+/* 小标签、分段、标签页：选中的那个有描边和厚度，像按下去的键 */
+[data-skin=kid] .chip{border-width:2px;border-color:var(--k-card-edge);font-weight:650}
+[data-skin=kid] .chip.on{border-color:var(--k-ink);background:var(--sun-2);color:var(--ink);box-shadow:var(--k-drop-sm)}
+[data-skin=kid] .tabset{border:2px solid var(--k-card-edge);background:var(--line-2)}
+[data-skin=kid] .tabset button[aria-selected=true]{color:var(--ink);box-shadow:0 0 0 2px var(--k-ink),0 3px 0 2px var(--k-ink)}
+[data-skin=kid] .seg input:checked+span{color:var(--ink);box-shadow:0 0 0 2px var(--k-ink),0 3px 0 2px var(--k-ink)}
+[data-skin=kid] .moods button.sel{border-color:var(--k-ink);box-shadow:var(--k-drop-sm)}
+/* 输入框：厚一点的边，聚焦时变深色 */
+[data-skin=kid] :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=hidden]),select,textarea){border-width:2px;border-color:var(--k-card-edge);border-radius:16px}
+[data-skin=kid] :is(input:not([type=checkbox]):not([type=radio]),select,textarea):focus{border-color:var(--k-ink);box-shadow:0 0 0 4px rgba(246,180,0,.35)}
+/* 进度条：粗一点、有边，像游戏里的血条 */
+[data-skin=kid] :is(.bar,.daybar,.gbar,.fs-prog i){height:14px;box-shadow:inset 0 0 0 2px var(--k-card-edge)}
+[data-skin=kid] .hero.focus .hprog .dots i{height:12px;box-shadow:inset 0 0 0 2px var(--k-card-edge)}
+[data-skin=kid] .hero.focus .hprog .dots i.ok{background:var(--brand);box-shadow:inset 0 0 0 2px var(--k-ink)}
+[data-skin=kid] .hero.focus .hprog .dots i.cur{background:var(--sun-2);box-shadow:inset 0 0 0 2px var(--k-ink)}
+/* 清单：编号是圆体大数字；做完的打勾变绿 */
+[data-skin=kid] .step .num{border-width:2.5px;font-size:17px}
+[data-skin=kid] .step.next{border:2px solid var(--brand-3)}
+[data-skin=kid] .step.next .num,[data-skin=kid] .step.done .num{border-color:var(--k-ink);box-shadow:none}
+[data-skin=kid] .step.done .num{background:var(--mint)}
+/* 学科图标、小伙伴按钮、底部导航：贴纸样子 */
+[data-skin=kid] .sico{border:2px solid var(--k-ink);border-radius:14px}
+[data-skin=kid] #askbtn{border:var(--k-edge) solid var(--k-ink);box-shadow:var(--k-drop);background:var(--sun-2)}
+[data-skin=kid] #askbtn:active{transform:translateY(3px);box-shadow:var(--k-press)}
+[data-skin=kid] nav.tabs{border:var(--k-edge) solid var(--k-ink);box-shadow:0 5px 0 var(--k-ink),var(--shadow-lg)}
+[data-skin=kid] nav.tabs a{font-weight:700}
+[data-skin=kid] nav.tabs a.on{background:var(--sun-2);color:var(--ink);box-shadow:inset 0 0 0 2px var(--k-ink)}
+[data-skin=kid] nav.tabs a.play .i{border:var(--k-edge) solid var(--k-ink);box-shadow:0 4px 0 var(--k-ink),0 0 0 5px var(--card)}
+[data-skin=kid] nav.tabs a.play.on{box-shadow:none}
+[data-skin=kid] .flb-prog{border:2px solid var(--k-ink)}
+[data-skin=kid] .flowbar.done .flb-go{border:2px solid var(--k-ink);box-shadow:var(--k-drop-sm)}
+@media (prefers-reduced-motion:reduce){[data-skin=kid] .opt.right,[data-skin=kid] .opt.wrong{animation:none}[data-skin=kid] :is(.btn,.opt,a.card,.tile):active{transform:none}}

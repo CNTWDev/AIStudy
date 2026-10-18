@@ -8,7 +8,7 @@
 <div class="card subj">
   <a class="cover" href="/map/{{ r.pack.id }}" aria-label="{{ r.pack.subject_name }}知识地图"></a>
   <div class="top">{{ ui.subj_ico(r.pack.subject, 46) }}<div class="grow"><h2>{{ r.pack.subject_name }}</h2><div class="ed"><span class="for-grownups">{{ r.pack.edition }} · </span>{{ stage_label(r.e.stage) }}</div></div>
-    <div style="text-align:right"><div class="num-big" style="font-size:24px">{{ ((100 * s.mastered / s.total)|round|int) if s.total else 0 }}<small style="font-size:13px">%</small></div><div class="tiny faint">学会了</div></div></div>
+    <div class="for-grownups" style="text-align:right"><div class="num-big" style="font-size:24px">{{ ((100 * s.mastered / s.total)|round|int) if s.total else 0 }}<small style="font-size:13px">%</small></div><div class="tiny faint">学会了</div></div></div>
   {{ ui.mastery(s) }}
   {% if r.e.progress_kp and catalog.kp(r.e.progress_kp) %}<div class="now">🏫 学校正在学：<b>{{ catalog.kp(r.e.progress_kp).name }}</b></div>{% endif %}
   <div class="acts">
