@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% block title %}{{ g.name }} · {{ SITE }}{% endblock %}
+{# 游戏页有自己的样子（play.css），不套孩子风格那一层 #}
+{% block skin %}{% endblock %}
 {% block body %}
 {# 所有游戏一个页面（单机、联网都一样）：外壳 shell.js，联网连接 net.js，玩法 <游戏>.js；服务器 app/arena/（rooms.py、games/） #}
 <link rel="stylesheet" href="/static/play/play.css?v={{ ASSET_V }}">
