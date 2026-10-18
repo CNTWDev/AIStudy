@@ -11,6 +11,8 @@
        begin(ctx) {},            // 倒计时结束：开始玩
        end() {},                 // 这一关停下了（结束、换设备）：停掉循环
        onAnswer(res) {}, onXP(res) {}, onQuizOpen() {}, onQuizClose() {}, onRevive(info) {},
+       revive: {need: 5, grow: false, verb: '接着打', done: '…'},   // 倒下答题的规矩（不写：答对 1 道复活、答错多欠 1 道）
+       verdict(res) {},          // 对战：这一局对我来说是赢还是输 → {result, title, why}（res 是房主报的结果）
        save() {},                // 我自己的状态，每 2 秒存到服务器（写了它，刷新、换设备才能接着玩）
        saveWorld() {}, loadWorld(w) {}, peerView() {}, loadMe(v) {},   // 联网：共享的世界、队友那边看到的我（重连时以在线的人为准）
      });
@@ -36,6 +38,7 @@
     const data = JSON.parse(root.dataset.info || '{}');
     const G = data.game, LV = G.levels, multi = G.players[1] > 1, me0 = data.me;
     const quizMode = def.quiz || 'modal';
+    const RV = Object.assign({need: 1, grow: true, verb: '复活', done: '🎉 复活啦！'}, def.revive);
     const device = deviceId();
     const sh = {root, def, data, canvas: $('canvas'), hud: $('.pl-hud'), ctrl: $('.pl-ctrl'), dock: $('.pl-dock'),
                 match: null, quiz: null, over: true};
@@ -83,7 +86,7 @@
         h += `<p class="mp-note">这是大家一起玩的游戏。家里还没有别的小伙伴的账号，请爸爸妈妈在家长页添加兄弟姐妹。</p>`;
       } else {
         h += waiting.map(r => `<div class="mp-invite"><canvas class="mp-face" data-av="${esc(r.host.avatar)}"></canvas>
-            <div class="grow"><b>${esc(r.host.name)}</b> 开了房间在等你<small>${r.role ? `${roleOf(r.role).icon} ${esc(roleOf(r.role).name)} · ` : ''}第 ${r.level} 关</small></div>
+            <div class="grow"><b>${esc(r.host.name)}</b> 开了房间在等你<small>${r.role ? `${roleOf(r.role).icon} ${esc(roleOf(r.role).name)} · ` : ''}${LV.length ? `第 ${r.level} 关` : ''}</small></div>
             <button type="button" class="btn lg pl-go mp-join" data-id="${r.id}">加入！</button></div>`).join('');
         h += G.roles.length ? `<div class="pl-label">${waiting.length ? '或者自己开一个房间，' : ''}我想当：</div>
             <div class="mp-roles">${G.roles.map(v => `<button type="button" class="mp-role" data-role="${v.id}"><span>${v.icon}</span>${esc(v.name)}</button>`).join('')}</div>`
@@ -375,8 +378,8 @@
     // ---------------------------------------------------------------- 倒下答题复活（联网）
     function die() {
       if (!ctx || ctx.reviving) return;
-      ctx.reviving = true; ctx.need = 1; myDeaths++;
-      send({t: 'rv', need: 1, fresh: true});
+      ctx.reviving = true; ctx.need = RV.need; myDeaths++;
+      send({t: 'rv', need: ctx.need, fresh: true});
       Play.input.clear(); Play.input.blocked = true;
       debtText(); hudDraw();
       setTimeout(askNow, 600);
@@ -391,14 +394,14 @@
     function onReviveAnswer(res) {
       if (!ctx || !ctx.reviving) return;
       if (res.correct) ctx.need--;
-      else if (!res.dont_know) ctx.need = Math.min(3, ctx.need + 1);
+      else if (!res.dont_know && RV.grow) ctx.need = Math.min(3, ctx.need + 1);
       send({t: 'rv', need: ctx.need});
       debtText(res); hudDraw();
       if (ctx.need <= 0) setTimeout(() => revived(false), 650);
     }
     function debtText(res) {
       const el = quiz && quiz.el.querySelector('.mp-debt'); if (!el) return;
-      el.innerHTML = ctx.need <= 0 ? '🎉 复活啦！' : `${res && !res.correct && !res.dont_know ? '答错了，多欠 1 道。' : ''}再答对 <b>${ctx.need}</b> 道就复活`;
+      el.innerHTML = ctx.need <= 0 ? RV.done : `${res && !res.correct && !res.dont_know && RV.grow ? '答错了，多欠 1 道。' : ''}再答对 <b>${ctx.need}</b> 道就${RV.verb}`;
     }
     function revived(rescued) {
       if (!ctx || !ctx.reviving) return;
@@ -479,6 +482,7 @@
     async function endLevel(result, res, title, why, stats) {
       if (!cur) return;
       const p = stopPlay();
+      if (def.verdict && res && !res.error) ({result, title, why} = Object.assign({result, title, why}, def.verdict(res, result)));
       Play.sfx.play(result === 'win' ? 'win' : result === 'lose' ? 'lose' : 'pop');
       let mine = null;
       try { mine = await api(`/api/arena/${match.match_id}/end`, {result, stats: stats || {}}); } catch (e) { /* 对局已经结束了 */ }
@@ -510,7 +514,7 @@
     }
     function personal(r) {
       if (!r) return '';
-      if (quizMode === 'revive' && !r.answered) return '<p class="small muted">这一关我没有倒下，一道题都不用答！</p>';
+      if (quizMode === 'revive' && !r.answered) return `<p class="small muted">${esc(def.noQuiz || '这一关我没有倒下，一道题都不用答！')}</p>`;
       const lv = r.level;
       return `<div class="pl-stats"><div class="focus" title="100 = 平时的你。这局比平时多答对，就超过 100"><b>${r.focus ?? '—'}</b><span>💎 ${multi ? '我的' : ''}专注值</span></div><div><b>${r.right}/${r.answered}</b><span>${multi ? '我' : ''}答对 / 答题</span></div><div><b>${r.best_streak || 0}</b><span>最长连对</span></div></div>
         ${r.topics && r.topics.length ? `<div class="pl-topics">这局练了：${r.topics.map(t => `<span>${esc(t.topic)} <b>${t.right}/${t.n}</b></span>`).join('')}</div>` : ''}

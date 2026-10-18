@@ -2,7 +2,7 @@
 import json
 from datetime import date, timedelta
 
-from . import bank, bankflow, db, evidence, itemtypes, llm
+from . import ability, bank, bankflow, db, evidence, itemtypes, llm
 from . import streak as _streak
 from .catalog import catalog, stage_rank
 
@@ -228,9 +228,10 @@ def answer_display(it: dict) -> str:
 
 @db.atomic_user
 def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, correct: bool, answer="", dont_know=False,
-                   touch=True, ms=None, weight=1.0):
+                   touch=True, ms=None, weight=1.0, calibrate=True):
     """dont_know=True：孩子点了「这道题还不会」。算一次没答对，但掌握度只轻微下调，并把讲解放进错题本。
-    weight：这条证据的分量（游戏里限时作答记 0.5，见 app/arena/sources.py）。"""
+    weight：这条证据的分量（游戏里限时作答记 0.5，见 app/arena/sources.py）。
+    calibrate：同时更新水平 θ 和题目难度（app/ability.py）；刚看过答案再答的那一道不算。"""
     try:
         ms = int(ms) if ms and 500 <= int(ms) <= 30 * 60000 else None  # 做题用时（毫秒），太短/太长的不算
     except (TypeError, ValueError):
@@ -240,6 +241,8 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
            1 if dont_know else 0, ms, db.now())
     if item and item.get("id"):  # 游戏里限时作答，用时不算进题目的平均用时
         bank.record(item["id"], correct, dont_know, None if mode in QUICK_MODES else ms)
+    if calibrate:   # 先更新 θ：第一次用到这个知识点时，θ 从这条证据之前的掌握状态起步
+        ability.observe(user_id, kp_id, item, correct and not dont_know)
     # 诊断、摸底答对也只是一条证据：概率升高，要隔天换题再对才算掌握
     status = update_mastery(user_id, kp_id, correct, weight=weight, source=mode, item=item, dont_know=dont_know)
     if correct and status in ("mastered", "learning"):  # 别的教材里同一概念、还没测过的：推断为「学习中」
