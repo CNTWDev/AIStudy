@@ -177,8 +177,8 @@
         if (!cur && m.playing && (state === 'room' || state === 'end')) rejoin();   // 队友还在玩：我回到这一局
         else if (!cur) refresh();
       });
-      net.on('need_world', m => {
-        if (isPeer(m) && cur && def.saveWorld) net.send({t: 'world', s: cur.session, el: +ctx.elapsed().toFixed(1), w: def.saveWorld(), you: def.peerView ? def.peerView() : null});
+      net.on('need_world', m => {   // 倒数还没完时游戏里还是上一关，不发
+        if (isPeer(m) && cur && ctx && ctx.begun && def.saveWorld) net.send({t: 'world', s: cur.session, el: +ctx.elapsed().toFixed(1), w: def.saveWorld(), you: def.peerView ? def.peerView() : null});
       });
       net.on('world', m => {
         if (!isPeer(m) || !cur || m.s !== cur.session || !ctx) return;
@@ -196,7 +196,7 @@
       });
       net.on('*', m => { if (isPeer(m) && m.t !== 'bye') seen(m); });
       net.on('room', () => refresh());
-      net.on('start', m => { if (!room.host) rejoin(); });
+      net.on('start', m => { if (!room.host) rejoin(true); });
       net.on('cant', m => { sh.toast(`${nameOf(m.from)}：${m.why}`, 'warn'); if (cur) quit(m.why); });
       net.on('rv', m => {
         if (!isPeer(m) || !ctx) return;
@@ -228,12 +228,12 @@
       try { lobby = await api(`/api/games/${G.id}/lobby`); } catch (e) { /* 用旧的 */ }
       showLobby();
     }
-    async function rejoin() {   // 回到正在玩的这一局（队友开始了、队友还在玩）
+    async function rejoin(fresh) {   // 回到正在玩的这一局（fresh：房主刚开的新一局，和房主一起倒数；不然是队友还在玩，接着玩）
       if (resuming || cur || gone) return;
       resuming = true;
       try {
         room = await api(`/api/rooms/${room.id}`);
-        if (room.play) await startLevel(room.play, room.play.resume || {}, true);
+        if (room.play) await startLevel(room.play, room.play.resume || (fresh ? null : {}), true);
         if (!cur && !gone && state !== 'play') showRoom();
       } catch (e) { /* 等下次 */ }
       resuming = false;
@@ -349,7 +349,7 @@
         sh.over = false;
         Play.music.start(def.tempo);
         if (quizMode === 'dock') { quiz.el.classList.remove('wait'); quiz.load(); }
-        def.begin(ctx);
+        def.begin(ctx); ctx.begun = true;
         clearInterval(saveTimer);
         if (def.save) { saveTimer = setInterval(save, 2000); save(); }
         if (resume) {
@@ -369,11 +369,11 @@
       return msg;
     }
     async function save() {
-      if (!cur || !ctx || !def.save || sh.over) return;
+      if (!cur || !ctx || !ctx.begun || !def.save || sh.over) return;
       try { await roomApi('save', saveMsg()); } catch (e) { /* 这一局结束了 / 换设备了（post 处理）/ 网断了：等下次 */ }
     }
     function saveNow() {   // 关页面、切到后台：用 sendBeacon，页面关了也送得出去
-      if (!cur || !ctx || !def.save || sh.over || gone) return;
+      if (!cur || !ctx || !ctx.begun || !def.save || sh.over || gone) return;
       const body = JSON.stringify(Object.assign({device}, saveMsg()));
       if (!(navigator.sendBeacon && navigator.sendBeacon(`/api/rooms/${room.id}/save`, new Blob([body], {type: 'application/json'})))) save();
     }

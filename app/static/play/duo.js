@@ -67,7 +67,7 @@
     for (const l of Wd.levers) if (l.on) on[l.id] = true;
     return on;
   }
-  const col = id => LINK_COLORS[String(id)[0]] || '#ffcf3f';
+  const linkColor = id => LINK_COLORS[String(id)[0]] || '#ffcf3f';
   function movers(dt) {
     const on = active(), isOn = id => String(id).split('|').some(i => on[i]);   // "a|c"：a 或 c 打开都行
     for (const g of Wd.gates) { const want = isOn(g.id) !== !!g.inv ? 1 : 0; g.open += Math.sign(want - g.open) * Math.min(Math.abs(want - g.open), dt * 2.2); }
@@ -242,30 +242,30 @@
   }
   function drawObjects(c) {
     for (const b of Wd.btns) {
-      const r = btnRect(b), col = col(b.id), h = b.down ? 3 : 6;
+      const r = btnRect(b), col = linkColor(b.id), h = b.down ? 3 : 6;
       c.fillStyle = '#3a2f2a'; c.fillRect(r.x - 2, r.y + r.h - 3, r.w + 4, 3);
       c.fillStyle = col; Play.roundRect(c, r.x + 2, r.y + r.h - 3 - h, r.w - 4, h, 3); c.fill();
     }
     for (const l of Wd.levers) {
-      const x = l.x * T + T / 2, y = l.y * T + T, col = col(l.id);
+      const x = l.x * T + T / 2, y = l.y * T + T, col = linkColor(l.id);
       c.strokeStyle = '#3a2f2a'; c.lineWidth = 4; c.beginPath(); c.moveTo(x, y - 4); c.lineTo(x + (l.on ? 9 : -9), y - 22); c.stroke();
       c.fillStyle = col; c.beginPath(); c.arc(x + (l.on ? 9 : -9), y - 22, 5, 0, 7); c.fill();
       c.fillStyle = '#3a2f2a'; Play.roundRect(c, x - 10, y - 6, 20, 6, 3); c.fill();
     }
     for (const g of Wd.gates) {
       const hh = g.h * T * (1 - g.open); if (hh < 1) continue;
-      const col = col(g.id);
+      const col = linkColor(g.id);
       c.fillStyle = '#4a4058'; c.fillRect(g.x * T + 3, g.y * T, g.w * T - 6, hh);
       c.fillStyle = col; for (let y = g.y * T + 6; y < g.y * T + hh - 4; y += 14) c.fillRect(g.x * T + 6, y, g.w * T - 12, 5);
     }
     for (const b of Wd.bridges) {
-      if (b.on < 0.02) { c.globalAlpha = 0.25; c.setLineDash([6, 6]); c.strokeStyle = col(b.id); c.strokeRect(b.x * T, b.y * T, b.w * T, 10); c.setLineDash([]); c.globalAlpha = 1; continue; }
+      if (b.on < 0.02) { c.globalAlpha = 0.25; c.setLineDash([6, 6]); c.strokeStyle = linkColor(b.id); c.strokeRect(b.x * T, b.y * T, b.w * T, 10); c.setLineDash([]); c.globalAlpha = 1; continue; }
       c.globalAlpha = b.on; c.fillStyle = '#a5784a';
       for (let i = 0; i < b.w * 2; i++) c.fillRect(b.x * T + i * T / 2 + 1, b.y * T, T / 2 - 2, 10);
-      c.fillStyle = col(b.id); c.fillRect(b.x * T, b.y * T + 8, b.w * T, 2); c.globalAlpha = 1;
+      c.fillStyle = linkColor(b.id); c.fillRect(b.x * T, b.y * T + 8, b.w * T, 2); c.globalAlpha = 1;
     }
     for (const l of Wd.lifts) {
-      const col = col(l.id);
+      const col = linkColor(l.id);
       c.strokeStyle = 'rgba(255,255,255,.15)'; c.setLineDash([4, 6]); c.beginPath();
       c.moveTo(l.x * T + l.w * T / 2, l.to * T); c.lineTo(l.x * T + l.w * T / 2, l.y * T); c.stroke(); c.setLineDash([]);
       c.fillStyle = '#5b6070'; Play.roundRect(c, l.x * T, l.pos, l.w * T, 14, 4); c.fill();
