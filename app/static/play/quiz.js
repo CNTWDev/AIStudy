@@ -5,7 +5,7 @@
      quiz.open();   // 弹出式（火柴人：左下角「答题」按钮）
    dock：传一个容器元素就变成「常驻」式，一直显示在游戏下方（闪电赛跑、星星守卫：答题就是操作）。
    答对：+经验值、撒花，马上出下一题；答错：冷冻 5 秒（瞎答更久），显示正确答案和思路。
-   单词题可以点 🔊 听发音（浏览器自带的朗读）。
+   单词题可以点 🔊 听发音：和全站一样走 app.js 的 Speak（服务器真人声音，有缓存；没配朗读服务才用浏览器自带的）。
    mount: 元素 —— 弹出式的题目盖在这个元素上（联网游戏：盖在游戏画面上），不传就盖住整个页面。
    sticky: true —— 关不掉（联网游戏倒下后答题复活：没有「回去玩」，点外面、按 Esc 都不关，由游戏答够了再 close(true)）。 */
 class ArenaQuiz {
@@ -56,9 +56,7 @@ class ArenaQuiz {
       this.item = d.item; this.render();
     } catch (e) { this.body.innerHTML = `<div class="err">${esc(e.message)}</div><button type="button" class="btn sm aq-retry">再试一次</button>`; this.body.querySelector('.aq-retry').onclick = () => this.load(); }
   }
-  speak(text) {
-    try { const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.85; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) { /* 不支持朗读 */ }
-  }
+  speak(text) { if (typeof Speak !== 'undefined') Speak.play(text, 'en', 'word'); }
   render() {
     const it = this.item;
     this.el.querySelector('.aq-topic').textContent = it.topic || '';
