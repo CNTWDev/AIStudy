@@ -538,6 +538,28 @@ FastAPI 应用（app/main.py）
 - **真要等**（`waitWith`）：超过 1 秒还没好，放一张今天到期的单词（看意思四选一，答了照常算复习，`/api/filler`），没有就放这个知识点「记住」那一句；题好了下面出「题来了 →」，孩子点了才换。等待时做一次小回想本身就是有效练习（提取练习），放笑话、动画反而把注意力带离学习。
 - 做题用时扣掉页面在后台的时间（`Away`），「会做但很慢」不再把切出去的时间算成慢。
 
+### 5.25 联网游戏：两个孩子在各自的设备上一起玩（`app/arena/mp/`）
+
+乐园里的「联网合作」游戏：**双人闯关**（森林冰火人式，火苗和水滴各走各的机关）、**泡泡堂**（炸开砖块和怪兽，困住了等队友来救）、**贪吃蛇**（两条蛇一起长到目标长度）。每款 8 关，分世界，一关一关解锁，下次进来接着玩。
+
+**规则**：同一个家庭的兄弟姐妹才能进同一个房间。倒下的人要答题才能复活：答对一题就起来；答错再加一题（最多欠 3 题）；「不会」不加。答题不冷冻（`GAMES[...]["freeze"] = False`），题目和单人游戏一样按孩子自己的水平出，所以姐姐和弟弟各答各的难度。两个人是队友，**比的是这一队和自己上次**：每关记队伍最好成绩和三颗星（过关 + 两个各游戏自己定的条件，比如宝石全拿、在时间内、倒下不超过 2 次），没有家庭之间的排行榜。
+
+**分层**（加新游戏只写最上面两层）：
+
+| 层 | 文件 | 管什么 |
+|---|---|---|
+| 实时转发 | `mp/bus.py`、`routes/play.py` 的 `/ws/mp/{room}` | 服务器只转发、不模拟：盖上发送人 `from`，每秒最多 60 条、每条最多 2000 字节。多进程用 PostgreSQL LISTEN/NOTIFY，SQLite 进程内转发。进出房间发 hello / bye |
+| 房间和纪录 | `mp/rooms.py`、表 `mp_rooms` / `mp_runs` | 开房间、加入、换角色、选关（只有开房间的人）、过关上报（开房间的人报，服务器按 `checks` 算星星、记队伍纪录、发贴纸、解锁下一关） |
+| 游戏登记 | `mp/base.py` 的 `MpGame` 子类 + `mp/levels/<id>/NN.json` | 角色、三颗星的条件、世界、关卡检查（启动和测试时都查） |
+| 前端外壳 | `static/play/net.js`、`mpshell.js` | 连接和重连、大厅 / 邀请 / 房间 / 选关、倒下答题欠题、表情、结算、触屏按钮；`MpNet.Track` 插值、`MpNet.rng` 两边同一个随机种子 |
+| 玩法 | `static/play/<id>.js` | 只写画面和操作，调用 `ctx.die()` / `ctx.rescue()` / `ctx.finish(report)` / `ctx.lose(why)` |
+
+**谁说了算**：每个孩子的设备算自己的角色（手感不受网络延迟影响），开房间的那台算共享的东西（怪兽、炸弹、食物、电脑蛇），然后发给对方。家里两台设备之间这样足够；不防作弊（只是家里兄弟姐妹）。服务器只校验过关数据的范围（太快不算、宝石不能比地图上多）。
+
+**加一款联网游戏**：`mp/<id>.py` 写 `MpGame` 子类并在 `mp/__init__.py` 里 import → 关卡 JSON → `matches.py` 的 `GAMES` 里登记（`multi=True`、`freeze=False`）→ `static/play/<id>.js` 用 `MpShell.init({...})` 写玩法。房间、转发、答题、结算、纪录都不用改。
+
+**部署**：用 Nginx 反向代理时要转发 WebSocket，见 `docs/DEPLOY.md` 和 `deploy/nginx-websocket.conf`。
+
 ## 6. AI 抽象层与使用原则
 
 - **配置和代码分离**：提供方、模型、密钥、每日上限、按任务路由都在 `config/llm.toml`（模板 `config/llm.example.toml`），改完重启服务生效，不用改代码。值可以写成 `"${环境变量}"`。
@@ -556,7 +578,7 @@ FastAPI 应用（app/main.py）
 
 ## 7. 数据表
 
-`users`（家长/孩子；`settings.method` 是学习方式）· `enrollments`（孩子选的教材包和当前学段）· `events`（学习事件：所有学习证据，掌握度按它重放）· `mastery`（掌握度，带模型指纹）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· 乐园：`arena_ability` / `arena_calib` / `arena_matches` / `arena_answers` / `arena_ledger` / `arena_awards`（贴纸）/ `arena_levels`（闯关）· `traces`（追根：每次测了什么、根在哪）· `streak_freezes`（补签卡）· `sprint_runs`（冲刺）· `mix_sets`（每门课每天一组混合练习）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
+`users`（家长/孩子；`settings.method` 是学习方式）· `enrollments`（孩子选的教材包和当前学段）· `events`（学习事件：所有学习证据，掌握度按它重放）· `mastery`（掌握度，带模型指纹）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· 乐园：`arena_ability` / `arena_calib` / `arena_matches` / `arena_answers` / `arena_ledger` / `arena_awards`（贴纸）/ `arena_levels`（闯关）/ `mp_rooms`（联网房间）/ `mp_runs`（联网每关成绩）· `traces`（追根：每次测了什么、根在哪）· `streak_freezes`（补签卡）· `sprint_runs`（冲刺）· `mix_sets`（每门课每天一组混合练习）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
 
 ## 8. 后续路线
 

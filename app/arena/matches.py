@@ -18,6 +18,14 @@ GAMES = {
              "tag": "竞速", "desc": "答对一题冲刺一段，和「上次的我」赛跑，看谁先到终点。"},
     "defense": {"name": "星星守卫", "icon": "🏰", "target": 0.72, "max_seconds": 600, "color": "#6d4fd8",
                 "tag": "守城", "desc": "小怪兽一波波来了！答对放星星魔法，守住城堡，打败大怪兽。"},
+    # 联网游戏（app/arena/mp/）：和家里的兄弟姐妹各用一台设备一起玩。谁倒下谁答题：答错不冷冻，改成「多欠一道题」
+    # （前端 mpshell.js 算），所以 freeze=False
+    "duo": {"name": "双人闯关", "icon": "🔥", "target": 0.75, "max_seconds": 900, "color": "#e0582b", "freeze": False, "multi": True,
+            "tag": "联网合作", "desc": "一个当小火苗、一个当小水滴，按按钮、坐升降台，互相帮忙一起走到门口。"},
+    "bubble": {"name": "泡泡堂", "icon": "🫧", "target": 0.75, "max_seconds": 900, "color": "#2f8fdc", "freeze": False, "multi": True,
+               "tag": "联网合作", "desc": "放泡泡炸开砖块、打败小怪兽。被泡泡困住时，队友碰一下就能救你，不然就答题自救。"},
+    "snake": {"name": "贪吃蛇大作战", "icon": "🐍", "target": 0.75, "max_seconds": 900, "color": "#3aa860", "freeze": False, "multi": True,
+              "tag": "联网合作", "desc": "两条小蛇一起吃豆子长大，躲开电脑蛇，让它们撞到你们身上，两条蛇加起来够长就过关。"},
 }
 
 
@@ -128,9 +136,9 @@ def answer(kid: dict, match_id, item_id: str, ans, dont_know=False, rng: random.
         if fast:
             st["guesses"] = st.get("guesses", 0) + (1 if st["fast_wrongs"] >= 2 else 0)
         st["streak"] = 0
-        sec = rules.freeze_seconds(st["fast_wrongs"], fast)
+        sec = rules.freeze_seconds(st["fast_wrongs"], fast) if GAMES[m["game"]].get("freeze", True) else 0
         st["freeze_until"] = now + sec
-        out.update(freeze_ms=sec * 1000, streak=0, guessing=fast and st["fast_wrongs"] >= 2)
+        out.update(freeze_ms=sec * 1000, streak=0, guessing=fast and st["fast_wrongs"] >= 2, dont_know=bool(dont_know))
     st["answered"] = st.get("answered", 0) + 1
     st["ms"] = st.get("ms", 0) + ms
     st.setdefault("dims", {})

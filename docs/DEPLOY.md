@@ -62,6 +62,23 @@ sudo /opt/aistudy/install.sh install            # 可加 --domain / --mirror cn
 
 云服务器的**安全组 / 防火墙**要放行：有域名时 80 和 443；没域名时 8000。
 
+### 自己用 Nginx（宝塔等）反向代理：WebSocket 要单独配
+
+乐园里的联网游戏（双人闯关、泡泡堂、贪吃蛇）走 WebSocket（`/ws/mp/房间号`）。Caddy 默认就转发，**Nginx 不会**，要在站点配置里加
+[`deploy/nginx-websocket.conf`](../deploy/nginx-websocket.conf) 这一段（`proxy_http_version 1.1` + `Upgrade` / `Connection` 头 + 长一点的
+`proxy_read_timeout`）。开了宝塔防火墙的，把 `/ws/` 加进 URL 白名单。
+
+检查：在服务器上运行
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" -H "Connection: Upgrade" -H "Upgrade: websocket" \
+     -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" https://你的域名/ws/mp/1
+```
+
+`403`（没登录被拒）说明已经通了；`404` / `400` 说明 Nginx 还没转发 WebSocket。孩子那边连不上时，游戏里会提示「连不上联网服务」。
+
+应用开多个进程（`--workers`，默认 2）也没问题：两个孩子连到不同进程时，消息经 PostgreSQL 的 LISTEN / NOTIFY 转过去，不需要 Redis。
+
 ## 3. 第一次使用
 
 1. 打开网址，**第一个注册的账号是网站管理员**（只管网站，不带孩子）。在「管理 → 家庭与孩子」底部给自己创建一个**家长账号**，退出后用家长账号登录。
