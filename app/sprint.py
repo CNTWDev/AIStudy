@@ -8,6 +8,7 @@
 - 每答对一题得「当前倍数」分（冲刺分）。冲刺分只在三个地方用：今天每 10 分换 1 颗 ⭐、乐园多玩几分钟（封顶）、每日目标。
   不能换东西，没有抽奖，也没有排行榜，只跟自己比（最高的一天是个人纪录）。
 - 作答照常记进学习记录（mode = sprint），作为掌握度证据记 0.75（四选一短题，比正式练习轻一点）。
+- 一次冲刺 / 快练里出过的题不再出；答错的隔几道再考一次，只一次（arena/sources.py 的 next_item / settle）。
 - 连续冲了 20 分钟提醒休息眼睛；今天一共学满 90 分钟时也提醒一次。冲多少都不影响明天的任务量。
 - 快练（drill）：今天任务里的「⚡ 快练 5 分钟」用同一套玩法，不用等任务做完；答满 5 分钟（至少 8 题）这一项就完成，
   可以接着冲。基本功（口算、单词、术语、公式和单位）练到不用想，靠的就是这种又快又多的反复。
@@ -16,7 +17,7 @@ import random
 import time
 
 from . import db, engine
-from .arena import fair, sources
+from .arena import sources
 
 TARGET = 0.8
 SPRINT_WEIGHT = 0.75
@@ -104,7 +105,7 @@ def question(kid: dict, run_id, rng: random.Random | None = None) -> dict:
     st, now = r["state"], time.time()
     pend = st.get("pending")
     if not pend or now - pend["issued"] > PENDING_KEEP_S:
-        pend = {"item": sources.pick(kid, "mix", TARGET, rng or random.Random()), "issued": now}
+        pend = {"item": sources.next_item(kid, st, "mix", TARGET, rng or random.Random(), mode="sprint"), "issued": now}
         st["pending"] = pend
         _save(r["id"], st)
     return {"item": sources.public(pend["item"])}
@@ -119,11 +120,7 @@ def answer(kid: dict, run_id, item_id: str, ans, dont_know=False) -> dict:
         raise SprintError("这道题已经过期了，换一道", 409)
     it = pend["item"]
     ms = int((now - pend["issued"]) * 1000)
-    correct = (not dont_know) and bool(sources.itemtypes.check(it, ans))
-    sources.record(kid, it, correct, ans, dont_know, ms, mode="sprint", weight=SPRINT_WEIGHT)
-    theta, n = fair.stored_ability(kid["id"], it["dim"]) or (it["theta"], 0)
-    b, nb = fair.stored_b(it["family"], it["level"]) or (it["b"], 0)
-    fair.update(kid["id"], it["dim"], it["family"], it["level"], correct, theta, n, b, nb)
+    correct = sources.settle(kid, st, it, ans, dont_know, ms, mode="sprint", weight=SPRINT_WEIGHT)
 
     heat = st.get("heat", 0)
     before = tier_of(heat)

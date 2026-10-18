@@ -10,7 +10,7 @@ import time
 from datetime import timedelta
 
 from .. import db
-from . import awards, fair, progress, rules, sources
+from . import awards, progress, rules, sources
 from .errors import ArenaError
 from .games import GAMES, get
 
@@ -88,7 +88,7 @@ def question(kid: dict, match_id, rng: random.Random | None = None) -> dict:
         raise ArenaError("冷冻中，等一下再答", 423, freeze_ms=int((st["freeze_until"] - now) * 1000))
     pend = st.get("pending")
     if not pend or now - pend["issued"] > rules.PENDING_KEEP_S:
-        it = sources.pick(kid, st.get("src") or "mix", get(m["game"]).target, rng or random.Random())
+        it = sources.next_item(kid, st, st.get("src") or "mix", get(m["game"]).target, rng or random.Random())
         pend = {"item": it, "issued": now}
         st["pending"] = pend
         _save_state(m["id"], st)
@@ -105,12 +105,8 @@ def answer(kid: dict, match_id, item_id: str, ans, dont_know=False, rng: random.
         raise ArenaError("这道题已经过期了，再点一次答题", 409)
     it = pend["item"]
     ms = int((now - pend["issued"]) * 1000)  # 用服务器计时，不信客户端
-    correct = (not dont_know) and bool(sources.itemtypes.check(it, ans))
-    sources.record(kid, it, correct, ans, dont_know, ms)   # 学习记录（不计入当天打卡）
+    correct = sources.settle(kid, st, it, ans, dont_know, ms)   # 学习记录（不计入当天打卡）、能力值
     dim, fam, lv = it["dim"], it["family"], it["level"]
-    theta, n = fair.stored_ability(kid["id"], dim) or (it["theta"], 0)   # 出题时的起点（还没存过）
-    b, nb = fair.stored_b(fam, lv) or (it["b"], 0)
-    fair.update(kid["id"], dim, fam, lv, correct, theta, n, b, nb)
     out = {"correct": correct, "answer": sources.itemtypes.display(it), "explain": it.get("explain", ""), "xp": 0}
     if correct:
         xp, crit = rules.roll_xp(rng, xp_today(kid["id"]))

@@ -220,8 +220,11 @@ def test_word_and_bank_sources():
         src, ctx, rng = sources.SOURCES["words"], sources.Ctx(kid), random.Random(5)
         for _ in range(30):
             it = src.pick(kid, ctx, 0.8, rng)
-            assert it["type"] == "mcq" and len(set(it["options"])) == 4 and 0 <= it["answer"] < 4
-            assert itemtypes.check(it, str(it["answer"])) and not itemtypes.check(it, str((it["answer"] + 1) % 4))
+            if it["type"] == "fill":   # 拼写：给一盘字母
+                assert it["fmt"] == "spell" and itemtypes.check(it, it["word"]) and not itemtypes.check(it, "zzz")
+            else:
+                assert it["type"] == "mcq" and len(set(it["options"])) == 4 and 0 <= it["answer"] < 4
+                assert itemtypes.check(it, str(it["answer"])) and not itemtypes.check(it, str((it["answer"] + 1) % 4))
             assert it["dim"].startswith(("vocab:", "terms:")) and 0 < it["p"] < 1
             pub = sources.public(it)
             assert "answer" not in pub and pub["q"]
@@ -231,8 +234,8 @@ def test_word_and_bank_sources():
         mid = c.post("/api/arena/start", json={"game": "race", "src": "words"}).json()["match_id"]
         q = c.get(f"/api/arena/{mid}/q").json()["item"]
         it = _pending(mid)
-        assert it["src"] == "words" and len(q["options"]) == 4
-        wrong = str((it["answer"] + 1) % 4)
+        assert it["src"] == "words" and (it["type"] == "fill" or len(q["options"]) == 4)
+        wrong = "zzz" if it["type"] == "fill" else str((it["answer"] + 1) % 4)
         assert c.post(f"/api/arena/{mid}/a", json={"item_id": q["id"], "answer": wrong}).json()["correct"] is False
         assert db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=?", kid["id"])["n"] >= 1   # 答错的词进生词本
         end = c.post(f"/api/arena/{mid}/end", json={"result": "lose", "stats": {"finish_s": 80}}).json()

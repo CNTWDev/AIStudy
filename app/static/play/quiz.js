@@ -65,11 +65,11 @@ class ArenaQuiz {
     if (it.widget === 'choice') {
       h += `<div class="aq-opts">${it.options.map((o, i) => `<button type="button" class="aq-opt c${i}" data-i="${i}"><b>${'ABCD'[i]}</b><span>${esc(o)}</span></button>`).join('')}</div>`;
     } else {
-      const coarse = matchMedia('(pointer:coarse)').matches;
-      h += `<div class="aq-ans"><input class="aq-in" autocomplete="off" ${coarse ? 'inputmode="none" readonly' : 'inputmode="decimal"'} placeholder="?">` +
+      const coarse = matchMedia('(pointer:coarse)').matches, abc = it.keypad === 'letters';   // abc：拼单词，给一盘字母
+      h += `<div class="aq-ans"><input class="aq-in" autocomplete="off" autocapitalize="off" spellcheck="false" ${coarse ? 'inputmode="none" readonly' : `inputmode="${abc ? 'text' : 'decimal'}"`} placeholder="?">` +
         (it.unit ? `<span class="aq-unit">${esc(it.unit)}</span>` : '') + `<button type="button" class="aq-ok">确定</button></div>`;
       const extra = it.keypad === 'frac' ? '/' : it.keypad === 'neg' ? '−' : '.';
-      const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', extra, '0', '⌫'];
+      const keys = abc ? [...(it.letters || []), '⌫'] : ['1', '2', '3', '4', '5', '6', '7', '8', '9', extra, '0', '⌫'];
       h += `<div class="aq-pad">${keys.map(k => `<button type="button" data-k="${k}"${k === '⌫' ? ' class="del"' : ''}>${k}</button>`).join('')}</div>`;
     }
     if (this.o.dontKnow) h += `<button type="button" class="aq-dk">🤔 这题不会</button>`;
@@ -106,7 +106,7 @@ class ArenaQuiz {
       const b = this.body.querySelector(`.aq-opt[data-i="${i}"]`); if (b && !b.disabled) { e.preventDefault(); e.stopPropagation(); b.click(); }
       return;
     }
-    if (inp && inp.readOnly && /^[0-9./-]$/.test(e.key)) { inp.value = (inp.value + e.key).slice(0, 12); e.preventDefault(); e.stopPropagation(); }
+    if (inp && inp.readOnly && (this.item && this.item.keypad === 'letters' ? /^[a-zA-Z]$/ : /^[0-9./-]$/).test(e.key)) { inp.value = (inp.value + e.key).slice(0, 12); e.preventDefault(); e.stopPropagation(); }
     else if (inp && inp.readOnly && e.key === 'Backspace') { inp.value = inp.value.slice(0, -1); e.preventDefault(); e.stopPropagation(); }
   }
   async submit(answer, btn, dk) {
