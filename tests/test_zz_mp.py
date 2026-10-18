@@ -17,7 +17,7 @@ def test_levels_load():
     for gid in ("duo", "bubble", "snake"):
         g = games.get(gid)
         assert len(g.levels) >= 8, gid
-        assert gid in arena.GAMES and g.multi and g.players == (2, 2) and g.freeze is False
+        assert gid in arena.GAMES and g.multi and g.players == ((2, 2) if gid == "duo" else (2, 4)) and g.freeze is False
         assert [lv["n"] for lv in g.levels] == list(range(1, len(g.levels) + 1))
         assert g.stars[0][0] == "clear" and len(g.stars) == 3
 

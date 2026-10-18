@@ -23,11 +23,12 @@ from .errors import ArenaError
 from .games import GAMES
 from .matches import answer, end, hub, parent_summary, question, start, status
 from .rules import (DAILY_SOFT_CAP, DEFAULT_GAME_MINUTES, FREEZE_SECONDS, GAME_MINUTE_CHOICES, UNLOCK_CHOICES,
-                    freeze_seconds, game_minutes, game_unlock, locked_reason, roll_xp, set_game_minutes, set_game_unlock)
+                    freeze_seconds, game_minutes, game_unlock, locked_reason, public_rooms, roll_xp, set_game_minutes,
+                    set_game_unlock, set_public_rooms)
 from .sources import SOURCES
 
 __all__ = ["AVATARS", "STICKERS", "set_avatar", "fairness", "kid_band", "elo_step", "logit", "pick_level", "prior_b",
            "sigmoid", "GAMES", "ArenaError", "answer", "end", "hub", "parent_summary", "question", "start", "status",
            "DAILY_SOFT_CAP", "DEFAULT_GAME_MINUTES", "FREEZE_SECONDS", "GAME_MINUTE_CHOICES", "UNLOCK_CHOICES",
-           "freeze_seconds", "game_minutes", "game_unlock", "locked_reason", "roll_xp", "set_game_minutes", "set_game_unlock",
+           "freeze_seconds", "game_minutes", "game_unlock", "locked_reason", "public_rooms", "roll_xp", "set_game_minutes", "set_game_unlock", "set_public_rooms",
            "SOURCES"]

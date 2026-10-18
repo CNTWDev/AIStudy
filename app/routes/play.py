@@ -39,6 +39,14 @@ def arena_start(request: Request, body: dict = Body(...)):
     return arena.start(kid_or_redirect(request), str(body.get("game") or ""), body.get("session"), body.get("resume"))
 
 
+@router.post("/api/arena/nickname")
+def arena_nickname(request: Request, body: dict = Body(...)):
+    try:
+        return {"nickname": auth.set_nickname(kid_or_redirect(request), str(body.get("nickname") or ""))}
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
 @router.post("/api/arena/avatar")
 def arena_avatar(request: Request, body: dict = Body(...)):
     if not arena.set_avatar(kid_or_redirect(request)["id"], str(body.get("avatar") or "")):
@@ -76,7 +84,8 @@ def game_lobby(request: Request, game: str):
 
 @router.post("/api/rooms")
 def room_create(request: Request, body: dict = Body(...)):
-    return rooms.create(kid_or_redirect(request), str(body.get("game") or ""), str(body.get("role") or ""), _dev(body))
+    return rooms.create(kid_or_redirect(request), str(body.get("game") or ""), str(body.get("role") or ""), _dev(body),
+                        str(body.get("kind") or "family"))
 
 
 @router.get("/api/rooms/{room_id}")
@@ -86,7 +95,7 @@ def room_get(request: Request, room_id: int):
 
 @router.post("/api/rooms/{room_id}/enter")
 def room_enter(request: Request, room_id: int, body: dict = Body(...)):
-    return rooms.enter(kid_or_redirect(request), room_id, _dev(body))
+    return rooms.enter(kid_or_redirect(request), room_id, _dev(body), str(body.get("pin") or ""))
 
 
 @router.post("/api/rooms/{room_id}/take")

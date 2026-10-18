@@ -56,6 +56,31 @@ def validate_pw(pw: str) -> str:
     return pw
 
 
+NICK_MAX = 10
+
+
+def set_nickname(user: dict, nick: str) -> str:
+    """起昵称：和别的家庭的孩子一起玩、上排行榜时只显示昵称。1～10 个字，不能用自己的名字（真名不出现在公开的地方）。"""
+    nick = re.sub(r"\s+", " ", "".join(ch for ch in (nick or "") if ch.isprintable())).strip()
+    if not nick:
+        raise ValueError("昵称不能是空的")
+    if len(nick) > NICK_MAX:
+        raise ValueError(f"昵称最多 {NICK_MAX} 个字")
+    name = (user.get("name") or "").strip()
+    given = name[1:] if len(name) >= 3 else ""   # 名（不带姓）也不行
+    if len(name) >= 2 and (name in nick or nick in name or (given and given in nick)):
+        raise ValueError("昵称别用自己的名字，起一个外号吧")
+    if re.search(r"\d{5,}|@", nick):
+        raise ValueError("昵称里不要放电话、邮箱这类信息")
+    db.run("UPDATE users SET nickname=? WHERE id=?", nick, user["id"])
+    return nick
+
+
+def public_name(user: dict) -> str:
+    """在公开的地方（别的家庭的孩子能看到）显示的名字：昵称，没起就是「小玩家 + 编号」。"""
+    return (user.get("nickname") or "").strip() or f"小玩家{user['id']}"
+
+
 def _sha(s: str) -> str:
     return hashlib.sha256(s.encode()).hexdigest()
 
