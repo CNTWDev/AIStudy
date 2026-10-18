@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 {% import "_ui.html" as ui %}
+{% from "_admin.html" import admin_nav %}
 {% block body %}
+<h1>管理后台</h1>
+{{ admin_nav('papers') }}
 <p class="small"><a href="/admin?tab=papers">← 卷库</a></p>
-<h1>{{ bp.title }} <span class="pill {{ {'published': 'st-mastered', 'draft': 'st-learning'}.get(bp.status, 'st-weak') }}">{{ status[bp.status] }}</span></h1>
+<h2>{{ bp.title }} <span class="pill {{ {'published': 'st-mastered', 'draft': 'st-learning'}.get(bp.status, 'st-weak') }}">{{ status[bp.status] }}</span></h2>
 {% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
 <p class="muted small">{{ pack.subject_name if pack }} · {{ label }} · {{ rows|length }} 题{% if used %} · 学习者做过 {{ used }} 次{% endif %}
   {% if images %} · 原卷：{% for im in images %}<a href="/admin/bank-papers/{{ bp.id }}/img/{{ im }}" target="_blank">第 {{ loop.index }} 张</a> {% endfor %}{% endif %}</p>

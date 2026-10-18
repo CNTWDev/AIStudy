@@ -1,8 +1,9 @@
 {% extends "base.html" %}
+{% from "_admin.html" import admin_nav %}
 {% block title %}教材与知识点 · {{ SITE }}{% endblock %}
 {% block body %}
-<a href="/admin">← 管理后台</a>
-<h1>教材与知识点</h1>
+<h1>管理后台</h1>
+{{ admin_nav('curricula') }}
 <nav class="subnav"><a href="/admin/curricula" class="on">教材与知识点</a><a href="#inventory">版本核实</a><a href="#knowledge">知识点</a><a href="#publishing">发布与历史</a><a href="/admin?tab=bank">题库</a></nav>
 {% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
 <div class="card">
