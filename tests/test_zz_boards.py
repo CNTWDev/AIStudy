@@ -166,3 +166,19 @@ def test_progress_and_rank_moves():
         c.post("/login", data={"email": "bd-pr@x.com", "password": "secret1"})
         page = c.get("/boards?metric=total").text
         assert "上周这时候" in page and "bd-podium" in page and "bd-rank" in page
+
+
+def test_board_asks_for_nickname():
+    """还没起昵称：榜上叫「小玩家 + 编号」，打开排行榜先请孩子起一个；起好了就不再问。"""
+    with TestClient(app) as c:
+        boards.refresh()
+        _, k = _family("nn", name="张三丰")
+        c.cookies.clear()
+        c.post("/login", data={"email": "bd-nn@x.com", "password": "secret1"})
+        page = c.get("/boards").text
+        assert "给自己起个昵称" in page and f"小玩家{k}" in page and "nm\">张三丰" not in page
+        assert c.post("/api/arena/nickname", json={"nickname": "三丰"}).status_code == 400   # 不能用名字
+        assert c.post("/api/arena/nickname", json={"nickname": "太极高手"}).status_code == 200
+        boards.refresh()
+        page = c.get("/boards").text
+        assert "给自己起个昵称" not in page
