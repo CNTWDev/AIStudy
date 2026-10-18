@@ -155,6 +155,7 @@ def test_bank_source_covers_wide_and_asks_for_new(monkeypatch):
         assert not any(catalog.kps[kp].get("strand") in ("WRI", "LIS") for kp in allk if catalog.kps[kp]["pack"] == "eng-cambridge")
         asked = []
         monkeypatch.setattr(prefetch, "quick", lambda uid, kp, grade="": asked.append(kp))
+        monkeypatch.setattr(sources.engine, "items_for", lambda *a, **kw: [])   # 题库里一道新的快答题都没有
         assert src.pick(k, sources.Ctx(k), 0.8, random.Random(1)) is None and len(asked) == sources.KP_TRIES
         it = sources.pick(k, 0.8, random.Random(1))           # 题库题一时出不了：换别的题源，照样有题
         assert it and it["src"] in ("math", "words")
