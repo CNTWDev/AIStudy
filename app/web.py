@@ -42,7 +42,8 @@ templates.env.globals["news_today_title"] = news.today_title
 
 _STATIC = config.BASE_DIR / "app" / "static"
 
-templates.env.globals["ASSET_V"] = str(int(max((_STATIC / f).stat().st_mtime for f in ("app.css", "app.js", "course-picker.js"))))
+# 静态文件的版本号：任何一个 js / css 改了（升级后）就变，浏览器不会拿旧的缓存配新的页面
+templates.env.globals["ASSET_V"] = str(int(max(f.stat().st_mtime for f in _STATIC.rglob("*") if f.suffix in (".css", ".js"))))
 
 def device_label(ua: str | None) -> str:
     """把浏览器 User-Agent 变成人看得懂的「Chrome · iPad」。"""

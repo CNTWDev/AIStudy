@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}冲刺 · {{ SITE }}{% endblock %}
 {% block body %}
-<link rel="stylesheet" href="/static/play/play.css">
+<link rel="stylesheet" href="/static/play/play.css?v={{ ASSET_V }}">
 <div id="sp" class="sp" data-info='{{ {"open": open, "drill": drill, "drill_min": drill_min, "today": today_points, "best": best, "tier_at": tier_at, "goal_name": goal.goal_name, "goal_need": goal.goal_need or 0}|tojson }}'>
   <div class="sp-top">
     <a class="btn ghost sm" href="/today">‹ 今天</a>
@@ -49,7 +49,7 @@
   <div class="card sp-intro" id="sp-end" hidden></div>
   {% endif %}
 </div>
-<script src="/static/play/engine.js"></script>
+<script src="/static/play/engine.js?v={{ ASSET_V }}"></script>
 <script src="/static/play/quiz.js?v={{ ASSET_V }}"></script>
 <script src="/static/play/sprint.js?v={{ ASSET_V }}"></script>
 {% endblock %}
