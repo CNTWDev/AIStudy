@@ -10,8 +10,9 @@
 import random
 import time
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
-from .. import auth, db, explore
+from .. import auth, config, db, explore
 from ..catalog import is_adult
 
 DEFAULT_GAME_MINUTES = 20
@@ -88,7 +89,9 @@ def public_rooms(kid: dict) -> bool:
 # ------------------------------------------------------------------ 今天能不能玩、能玩多久
 
 def _ts(s: str) -> datetime:
-    return datetime.fromisoformat(s)
+    """存的时间一般带时区（db.now）；没带时区的（老数据、手写的）按站点时区算，免得和带时区的相减出错。"""
+    t = datetime.fromisoformat(s)
+    return t if t.tzinfo else t.replace(tzinfo=ZoneInfo(config.TIMEZONE))
 
 
 def paused_seconds(st: dict) -> float:
