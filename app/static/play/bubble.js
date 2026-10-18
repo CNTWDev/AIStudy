@@ -13,6 +13,10 @@
   const SCENES = {
     candy: {floor: ['#ffe8f2', '#fff4f9'], wall: '#ff8fbf', wallHi: '#ffc4dd', wallLo: '#d9659a', box: '#c98b55', boxHi: '#e4ad78', ribbon: '#ff5d8f'},
     ice: {floor: ['#e3f2ff', '#f1f9ff'], wall: '#7fb6ff', wallHi: '#cfe5ff', wallLo: '#4f86d6', box: '#9fc7e8', boxHi: '#d6ecff', ribbon: '#5a8fd6'},
+    jungle: {floor: ['#e2f2cf', '#eef8e2'], wall: '#6aa84f', wallHi: '#a8d68c', wallLo: '#447a32', box: '#a0794d', boxHi: '#c49b6a', ribbon: '#e2b13c'},
+    lava: {floor: ['#3b2a2a', '#4a3333'], wall: '#8a5a4a', wallHi: '#b88470', wallLo: '#5e3a2f', box: '#c2562f', boxHi: '#e88a4f', ribbon: '#ffb33d'},
+    sea: {floor: ['#d4f1f4', '#e6f8fa'], wall: '#3ba3b8', wallHi: '#86d3e0', wallLo: '#257487', box: '#e6a77a', boxHi: '#f6c9a2', ribbon: '#ff7f6e'},
+    cloud: {floor: ['#f3f0ff', '#fbfaff'], wall: '#b9a6f0', wallHi: '#e2d9ff', wallLo: '#8a76c9', box: '#ffd6e8', boxHi: '#fff0f7', ribbon: '#ffb84d'},
   };
 
   let sh, mp, loop, fx, g = null, scene = 'candy', bubbles = new Map(), flames = [], items = new Map(), mons = [], monTracks = new Map();

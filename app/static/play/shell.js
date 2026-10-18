@@ -508,7 +508,9 @@
       return `<div class="pl-stage-res"><div class="ps-n">第 ${res.n} 关${lv.name && lv.name !== `第 ${res.n} 关` ? ` · ${esc(lv.name)}` : ''}</div><div class="ps-stars">${stars}</div><div class="ps-how">${how}</div>${rec}
         ${res.result !== 'win' ? `<p class="small">${esc(G.stars[0] ? G.stars[0].label : '过关')}就能拿第 1 颗星。</p>` : ''}
         ${res.unlocked ? `<div class="ps-unlock">${res.unlocked.icon} 解锁了 <b>${esc(res.unlocked.name)}</b>：${esc(res.unlocked.how)}</div>` : ''}
-        ${res.all_clear && res.first_clear ? `<div class="ps-unlock">🏆 全部 ${LV.length} 关都打通了！</div>` : ''}</div>`;
+        ${res.all_clear && res.first_clear ? `<div class="ps-unlock">🏆 全部 ${LV.length} 关都打通了！</div>`
+          : res.world && res.world.done ? `<div class="ps-unlock">🗺️ ${multi ? '我们' : ''}打通了世界 ${res.world.n}${res.world.name ? `「${esc(res.world.name)}」` : ''}！</div>`
+          : res.world && res.world.left ? `<p class="small">再过 ${res.world.left} 关，就打通${res.world.name ? `「${esc(res.world.name)}」` : '这个世界'}。</p>` : ''}</div>`;
     }
     function personal(r) {
       if (!r) return '';
