@@ -1,43 +1,100 @@
 {% extends "base.html" %}
 {% block body %}
-<div style="max-width:440px;margin:24px auto">
-  {% if SITE|lower == 'beejoy' %}<div class="brandhero">{{ mascot_svg('hive', 72) }}{{ wordmark_svg(34) }}<p>每天勤快一点，开心一点</p></div>{% endif %}
-  {% if mode == 'first' %}
-  <h1>第一次使用：创建网站管理员账号</h1>
-  <p class="muted">这是系统里的第一个账号，不需要邀请码，用来管理整个网站（站点设置、数据统计、审批和邀请）。进入管理后台后，再给自己创建一个家长账号，用家长账号添加孩子。</p>
-  {% else %}
-  <h1>登录</h1>
-  {% endif %}
-  {% if error %}<div class="err">{{ error }}</div>{% endif %}
-  {% if mode != 'first' %}
-  <form method="post" action="/login" class="card">
-    <label>邮箱</label><input type="email" name="email" required autocomplete="username" value="{{ email or '' }}">
-    <label>密码</label><input type="password" name="password" required autocomplete="current-password">
-    <div style="margin-top:16px"><button class="btn" style="width:100%">登录</button></div>
-    <p class="muted small">孩子的账号由家长创建，忘记密码请找家长在「编辑孩子」里重设；家长忘记密码请找管理员。</p>
-  </form>
-  {% endif %}
-  {% if mode in ('first', 'open', 'invite', 'approval') %}
-  <details class="card" {{ 'open' if mode == 'first' or show_register }}>
-    {% if mode != 'first' %}<summary><b>注册新账号</b></summary>{% endif %}
-    <form method="post" action="/register">
+{# 登录页：孩子、家长、成人自学者、管理员都从这里进，用中性的成人口吻（docs/DESIGN.md 5.31）。
+   左边说清楚这是什么、能学什么（只展示，不选课不付费）；右边登录 / 注册。手机上登录在前、课程在后。 #}
+{% set reg = mode in ('first', 'open', 'invite', 'approval') %}
+<div class="auth">
+  <section class="auth-intro">
+    {% if mode == 'first' %}
+    <h1>创建网站管理员账号</h1>
+    <p class="lead">这是系统里的第一个账号，不需要邀请码，用来管理整个网站：站点设置、数据统计、审批和邀请。进入管理后台后，再给自己创建家长账号或学习账号。</p>
+    {% else %}
+    <p class="auth-eyebrow">{{ 'BeeJoy' if SITE|lower == 'beejoy' else SITE }} 学习平台</p>
+    <h1>每天学一点，真正学会</h1>
+    <p class="lead">按每个人自己的进度安排练习和复习。中小学各科、国际课程，也有成人的职业考试课程。</p>
+    {% endif %}
+  </section>
+
+  <section class="auth-box">
+    {% if error %}<div class="err">{{ error }}</div>{% endif %}
+    <div class="card auth-card">
       {% if mode != 'first' %}
-      <label>我是</label>
-      <label class="row" style="margin:4px 0 0;font-weight:400"><input type="radio" name="who" value="parent" style="width:auto" checked> <span class="grow"><b>家长</b> <span class="muted small">给孩子开账号、安排和查看孩子的学习</span></span></label>
-      <label class="row" style="margin:4px 0 0;font-weight:400"><input type="radio" name="who" value="self" style="width:auto"> <span class="grow"><b>自己学</b> <span class="muted small">自己选课、自己定考试日期（比如备考基金从业资格）</span></span></label>
+      {% if reg %}
+      <div class="seg full auth-tabs" role="tablist">
+        <label data-tab="login"><input type="radio" name="authtab" value="login" {{ 'checked' if not show_register }}><span>登录</span></label>
+        <label data-tab="register"><input type="radio" name="authtab" value="register" {{ 'checked' if show_register }}><span>注册新账号</span></label>
+      </div>
+      {% else %}<h2>登录</h2>{% endif %}
+      <form method="post" action="/login" class="pane-login">
+        <label>邮箱</label><input type="email" name="email" required autocomplete="username" value="{{ email or '' }}">
+        <label>密码</label><input type="password" name="password" required autocomplete="current-password">
+        <div style="margin-top:16px"><button class="btn" style="width:100%">登录</button></div>
+        <p class="muted small">忘记密码：孩子的账号找家长重设，其他账号找管理员。</p>
+      </form>
       {% endif %}
-      <label>你的称呼</label><input type="text" name="name" placeholder="例如：小明妈妈" required>
-      <label>邮箱</label><input type="email" name="email" required value="{{ email or '' }}">
-      <label>密码（至少 6 位）</label><input type="password" name="password" required minlength="6" autocomplete="new-password">
-      {% if mode == 'invite' %}
-      <label>邀请码（向管理员或已经在用的家长索取）</label><input type="text" name="invite" required value="{{ invite or '' }}" placeholder="例如 3F2A-91BC-07DE">
-      {% elif mode == 'approval' %}
-      <label>邀请码（有就填，直接开通；没有可以留空，提交后等管理员审批）</label><input type="text" name="invite" value="{{ invite or '' }}" placeholder="例如 3F2A-91BC-07DE">
-      <label>没有邀请码时：简单介绍一下（例如：谁介绍的、孩子几年级、想学什么）</label><input type="text" name="note" maxlength="200">
+      {% if reg %}
+      <form method="post" action="/register" class="pane-register">
+        {% if mode != 'first' %}
+        <label>账号用来</label>
+        <div class="who-pick">
+          <label><input type="radio" name="who" value="parent" {{ 'checked' if who != 'self' }}><span><b>给孩子用</b><small>家长账号。开通后在家长页添加孩子，安排和查看孩子的学习</small></span></label>
+          <label><input type="radio" name="who" value="self" {{ 'checked' if who == 'self' }}><span><b>自己学</b><small>成人自学：选课程、定考试日期，比如备考基金从业资格</small></span></label>
+        </div>
+        <p class="muted small for-parent">孩子不用自己注册，家长开通后给孩子添加账号。</p>
+        {% endif %}
+        <label>你的称呼 <span class="muted small for-parent">例如：豆豆妈妈、王先生</span><span class="muted small for-self">例如：张伟</span></label>
+        <input type="text" name="name" required maxlength="40" value="{{ reg_name or '' }}">
+        <label>邮箱 <span class="muted small">用来登录</span></label><input type="email" name="email" required value="{{ email or '' }}" autocomplete="username">
+        <label>密码 <span class="muted small">至少 6 位</span></label><input type="password" name="password" required minlength="6" autocomplete="new-password">
+        {% if mode == 'invite' %}
+        <label>邀请码 <span class="muted small">向管理员或已经在用的朋友要</span></label><input type="text" name="invite" required value="{{ invite or '' }}" placeholder="例如 3F2A-91BC-07DE">
+        {% elif mode == 'approval' %}
+        <label>邀请码 <span class="muted small">选填</span></label><input type="text" name="invite" value="{{ invite or '' }}" placeholder="例如 3F2A-91BC-07DE">
+        <p class="muted small" style="margin:6px 0 0">有邀请码直接开通；没有也可以提交，管理员看过后开通。</p>
+        <label>简单介绍一下 <span class="muted small for-parent">谁介绍的、孩子几年级</span><span class="muted small for-self">谁介绍的、想学什么</span></label>
+        <input type="text" name="note" maxlength="200" value="{{ note or '' }}">
+        {% endif %}
+        <div style="margin-top:16px"><button class="btn" style="width:100%">{{ '提交' if mode == 'approval' and not invite else '创建账号' }}</button></div>
+      </form>
       {% endif %}
-      <div style="margin-top:16px"><button class="btn" style="width:100%">{{ '提交申请' if mode == 'approval' and not invite else '创建账号' }}</button></div>
-    </form>
-  </details>
+    </div>
+    {% if mode == 'approval' %}<p class="muted small auth-foot">这是小范围使用的学习平台：有邀请码直接开通，没有的由管理员审核。</p>
+    {% elif mode == 'invite' %}<p class="muted small auth-foot">这是小范围使用的学习平台，注册需要邀请码。</p>
+    {% elif mode == 'closed' %}<p class="muted small auth-foot">这是小范围使用的学习平台，账号由管理员开通。</p>{% endif %}
+  </section>
+
+  {% if mode != 'first' %}
+  <ul class="auth-how">
+    <li><b>每天一份清单</b><span>新学、复习、错题重做排好了，做完就收工。</span></li>
+    <li><b>按遗忘规律复习</b><span>学过的东西隔 1、2、4、7 天再见一次。</span></li>
+    <li><b>错题追到根</b><span>找出是前面哪一块没学稳，先补那一块。</span></li>
+  </ul>
+  {% endif %}
+
+  {% if showcase and mode != 'first' %}
+  <section class="auth-show">
+    <h2>这里能学什么</h2>
+    <p class="muted small">{{ showcase.kps }} 个知识点，每个都标了要先会什么；{% if showcase.books %}还有 {{ showcase.books }} 本中英文名著和每天的英文新闻。{% endif %}点开一门课可以看看大纲。</p>
+    {% for g, title, sub in [('school', '中小学', '上海五·四学制教材和剑桥国际课程，按学校的进度学'), ('adult', '成人', '职业资格考试，按考试大纲学')] if showcase[g] %}
+    <h3>{{ title }} <span class="muted small">{{ sub }}</span></h3>
+    <div class="course-grid">
+      {% for s in showcase[g] %}
+      <details class="course">
+        <summary><span class="c-ico" aria-hidden="true">{{ s.icon }}</span><span class="c-t"><b>{{ s.packs[0].title if g == 'adult' else s.name }}</b>
+          <small>{% for p in s.packs %}<span>{{ p.system }} {{ p.stages }}</span>{% endfor %}</small></span></summary>
+        {% for p in s.packs %}
+        <div class="c-pack">
+          {% if s.packs|length > 1 %}<div class="c-ph"><b>{{ p.system }}</b> <span class="muted small">{{ p.stages }} · {{ p.kps }} 个知识点</span></div>
+          {% else %}<div class="c-ph muted small">{{ p.stages }} · {{ p.kps }} 个知识点</div>{% endif %}
+          <ol>{% for st in p.strands %}<li><span>{{ st.name }}</span><i>{{ st.n }}</i></li>{% endfor %}</ol>
+          <p class="muted small c-ed">{{ p.edition }}</p>
+        </div>
+        {% endfor %}
+      </details>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </section>
   {% endif %}
 </div>
 {% endblock %}
