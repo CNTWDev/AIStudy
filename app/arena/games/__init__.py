@@ -4,7 +4,7 @@
 加一款游戏：
 1. 在这个目录写 <id>.py：一个 Game 子类，@register 登记，在下面 import；
 2. 有关卡的话放 levels/<id>/NN.json，一关一个文件（check 检查格式）；关卡要按进度算的（火柴人大战）就改写 stage；
-3. 前端写 app/static/play/<id>.js，用 PlayShell（shell.js）只写玩法。
+3. 前端写 app/static/play/<id>.js，用 PlayShell（shell.js）只写玩法；开局要按队伍现算的参数（对战的让球）写 team_setup。
 """
 import json
 from functools import cached_property
@@ -85,6 +85,10 @@ class Game:
         lv = self.level(n)
         return {**lv, "world": self.world_of(lv["n"])}
 
+    def team_setup(self, team: str) -> dict:
+        """开局时按这支队伍现算、发给前端的参数（并进 stage，没有关卡的游戏也有，比如对战游戏的让球）。team：队伍键。"""
+        return {}
+
     def public_levels(self) -> list[dict]:
         """大厅和地图上用的关卡（联网游戏的预览要整关数据）。"""
         return [{**lv, "world": self.world_of(lv["n"])} for lv in self.levels]
@@ -125,9 +129,9 @@ class Game:
                 "stars": [{"key": k, "label": t} for k, t in self.stars], "levels": self.public_levels()}
 
 
-from . import bubble, defense, duo, race, snake, stickman  # noqa: E402,F401  （登记游戏；首页按这个顺序）
+from . import bubble, defense, duo, pingpong, race, snake, stickman  # noqa: E402,F401  （登记游戏；首页按这个顺序）
 
-ORDER = ("stickman", "race", "defense", "duo", "bubble", "snake")
+ORDER = ("stickman", "race", "defense", "duo", "bubble", "snake", "pingpong")
 GAMES = {k: REGISTRY[k] for k in ORDER} | REGISTRY
 
 __all__ = ["REGISTRY", "GAMES", "Game", "get", "register"]

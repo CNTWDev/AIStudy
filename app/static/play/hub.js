@@ -77,6 +77,22 @@
       worm(W * 0.55 + Math.sin(t) * 10, 55, 0, '#3fcf6e', '#1f9e4c'); worm(W * 0.8 + Math.sin(t + 1) * 10, 100, 1.5, '#ff7fb8', '#e04b8f');
       return true;
     }
+    if (g === 'pingpong') {
+      ctx.fillStyle = '#2a3a63'; ctx.fillRect(0, 0, W, H);
+      const x0 = 40, y0 = 30, w = W - 80, h = H - 60;
+      ctx.fillStyle = '#1f7a5a'; Play.roundRect(ctx, x0, y0, w, h, 5); ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.strokeRect(x0 + 2, y0 + 2, w - 4, h - 4);
+      ctx.beginPath(); ctx.moveTo(x0, y0 + h / 2); ctx.lineTo(x0 + w, y0 + h / 2); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillRect(x0 + w / 2 - 2, y0 - 6, 4, h + 12);
+      const k = (t * 0.7) % 2, p = k < 1 ? k : 2 - k, by = y0 + h / 2 + Math.sin(t * 1.7) * h * 0.35;
+      const pad = (x, y, c) => { ctx.fillStyle = c; Play.roundRect(ctx, x - 4, y - 18, 8, 36, 4); ctx.fill(); };
+      pad(x0 - 14, y0 + h / 2 + Math.sin(t * 1.7 + (k < 1 ? 0 : 0.4)) * h * 0.3, '#e8453c');
+      pad(x0 + w + 14, y0 + h / 2 + Math.sin(t * 1.7 - 0.3) * h * 0.3, '#2f7de1');
+      const bx = x0 - 6 + p * (w + 12);
+      ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(bx + 2, by + 3, 4, 2.5, 0, 0, 7); ctx.fill();
+      ctx.fillStyle = '#fff6e0'; ctx.beginPath(); ctx.arc(bx, by - 8 * Math.sin(Math.PI * p), 4.5, 0, 7); ctx.fill();
+      return true;
+    }
     return false;
   }
 

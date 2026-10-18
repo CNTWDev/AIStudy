@@ -68,7 +68,7 @@ def save(s: dict, kid_id: int, host: bool, msg: dict) -> None:
         el = max(0.0, min(3600.0, float(msg.get("el") or 0)))
     except (TypeError, ValueError):
         el = 0.0
-    st["players"][str(kid_id)] = {"me": msg.get("me"), "need": _int(msg.get("need"), 0, 3), "deaths": _int(msg.get("deaths"), 0, 999),
+    st["players"][str(kid_id)] = {"me": msg.get("me"), "need": _int(msg.get("need"), 0, 9), "deaths": _int(msg.get("deaths"), 0, 999),
                                   "match": _int(msg.get("match"), 0, 2 ** 62) or None, "el": el, "at": time.time()}
     if host and msg.get("w") is not None:
         st["world"] = msg.get("w")
