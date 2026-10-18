@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
 
 from app import arena, auth, db
-from app.arena import games, progress, rooms, sessions
+from app.arena import games, progress, sessions
 from app.main import app
 
 
