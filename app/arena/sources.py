@@ -24,10 +24,9 @@
 import hashlib
 import random
 
-from .. import db, engine, evidence, explore, itemtypes, quickgen
+from .. import ability, db, engine, evidence, explore, itemtypes, quickgen
 from ..catalog import catalog, stage_rank
 from ..content import content
-from . import fair
 
 GAME_WEIGHT = 0.5   # 游戏里限时作答，作为掌握度证据打对折（不会因为手快手慢误判）
 
@@ -63,33 +62,33 @@ class Ctx(dict):
         return {catalog.packs[e["pack_id"]].subject for e in self.packs}
 
     @property
+    def due(self) -> set:
+        """学会过、现在快忘了的知识点（该复习了）。"""
+        return self.get_or("due", lambda: {m["kp_id"] for m in evidence.due_checks(self.kid["id"], self.mastery, limit=30)})
+
+    @property
     def rank(self) -> float:
         r = stage_rank(self.kid.get("grade") or "G3")
         return r if r < 99 else 6.0
 
 
 def kp_ability(ctx: Ctx, kp_id: str, rank: float | None = None) -> tuple[float, int]:
-    """知识点上的 θ：玩过就用游戏里校准的；没玩过从掌握度（BKT 的「现在还记得的概率」）起步；都没有按学段估。"""
-    got = fair.stored_ability(ctx.kid["id"], kp_id)
-    if got:
-        return got
-    m = ctx.mastery.get(kp_id)
-    if m and m.get("attempts"):
-        p = evidence.now_p(ctx.kid["id"], dict(m))
-    else:
-        kp = catalog.kps.get(kp_id)
-        gap = (rank if rank is not None else ctx.rank) - stage_rank(kp["stage"]) if kp else 0
-        p = 0.8 if gap >= 1 else 0.5
-    return fair.logit(p), 0
+    """知识点上的 θ（全站同一个，见 app/ability.py）；还没有就从掌握度起步，掌握度也没有按学段估。"""
+    kp = catalog.kps.get(kp_id)
+    gap = (rank if rank is not None else ctx.rank) - stage_rank(kp["stage"]) if kp else 0
+    return ability.start(ctx.kid["id"], kp_id, 0.8 if gap >= 1 else 0.5)
+
+
+DUE_BOOST = 2.5   # 该复习的知识点（记得的概率掉到目标以下）在快练和游戏里多出：答对了就是一次复习
 
 
 def _status_weight(ctx: Ctx, kp_id: str, behind: bool) -> float:
-    """学习中、薄弱的多出（按水平出题，所以薄弱也答得上），掌握了的偶尔复习。"""
+    """学习中、薄弱的多出（按水平出题，所以薄弱也答得上），掌握了的偶尔复习，快忘了的（该复习了）再多出。"""
     status = (ctx.mastery.get(kp_id) or {}).get("status") or "unknown"
     w = {"learning": 3.0, "weak": 2.0, "mastered": 1.2}.get(status)
     if w is None:
         w = 1.0 if behind else (1.5 if kp_id in ctx.taught else 0.4)
-    return w
+    return w * (DUE_BOOST if kp_id in ctx.due else 1)
 
 
 def _mcq(q: str, right: str, wrongs: list[str], rng: random.Random) -> dict:
@@ -108,10 +107,13 @@ class Source:
     def pick(self, kid: dict, ctx: Ctx, target: float, rng: random.Random) -> dict:
         raise NotImplementedError
 
-    def record(self, kid: dict, it: dict, correct: bool, ans, dont_know: bool, ms: int, mode="game", weight=GAME_WEIGHT):
+    def record(self, kid: dict, it: dict, correct: bool, ans, dont_know: bool, ms: int, mode="game", weight=GAME_WEIGHT,
+               calibrate: bool | None = None):
+        """记进学习记录；engine.record_attempt 同时更新 θ（刚看过答案再答的那一道不更新）。"""
         if it.get("kp_id"):
             engine.record_attempt(kid["id"], it, it["kp_id"], mode, correct, "" if dont_know else ans,
-                                  dont_know=dont_know, touch=False, ms=ms, weight=weight)
+                                  dont_know=dont_know, touch=False, ms=ms, weight=weight,
+                                  calibrate=not it.get("retry") if calibrate is None else calibrate)
 
 
 # ------------------------------------------------------------------ 数学口算（现场生成）
@@ -150,7 +152,7 @@ class MathSource(Source):
             w = _status_weight(ctx, kp_id, r < rank)
             theta, _ = kp_ability(ctx, kp_id, rank)
             # 这个知识点最合适的一级也离目标很远（太难或太简单）：少出，换别的知识点
-            w *= max(0.05, 1 - 2.5 * fair.fit_gap(theta, fair.calib(fam, quickgen.LEVELS), target))
+            w *= max(0.05, 1 - 2.5 * ability.fit_gap(theta, ability.calib(fam, quickgen.LEVELS), target))
             out.append((kp_id, w / (1 + 0.35 * (rank - r))))
         return out or [(quickgen.FAMILIES["add10"][0], 1.0)]
 
@@ -166,10 +168,10 @@ class MathSource(Source):
         kp_id = rng.choices([k for k, _ in pool], weights=[w for _, w in pool])[0]
         fam = quickgen.BY_KP[kp_id]
         theta, _ = kp_ability(ctx, kp_id, self._rank(ctx))
-        levels = fair.calib(fam, quickgen.LEVELS)
-        lv = fair.pick_level(theta, levels, target, rng)
+        levels = ability.calib(fam, quickgen.LEVELS)
+        lv = ability.pick_level(theta, levels, target, rng)
         it = quickgen.generate(fam, lv, rng)
-        it.update(dim=kp_id, theta=theta, b=levels[lv][0], p=round(fair.sigmoid(theta - levels[lv][0]), 4),
+        it.update(dim=kp_id, theta=theta, b=levels[lv][0], p=round(ability.sigmoid(theta - levels[lv][0]), 4),
                   topic=quickgen.FAMILIES[fam][2])
         return it
 
@@ -178,7 +180,7 @@ class MathSource(Source):
 
 class WordSource(Source):
     """英语核心词表按年级分 5 级（同一个能力维度 vocab:en）；教材术语表（比如 IGCSE 物理术语）各自一个维度。
-    孩子自己的生词卡、术语卡优先出（三成左右），这样游戏也在帮着复习。"""
+    今天该复习的生词卡、术语卡先出（四成左右，答了就算复习过，按记忆模型排下次），别的生词卡也常拿出来见见。"""
     id, name, icon, desc = "words", "单词", "🔤", "英语单词和课本术语，四选一认意思"
     target_shift = 0.05
 
@@ -212,7 +214,7 @@ class WordSource(Source):
         return out
 
     def _theta(self, ctx: Ctx, g: dict) -> tuple[float, int]:
-        got = fair.stored_ability(ctx.kid["id"], g["dim"])
+        got = ability.stored_ability(ctx.kid["id"], g["dim"])
         if got:
             return got
         if g["family"] == "words":   # 和孩子同年级的词表答对率约 75%
@@ -227,7 +229,7 @@ class WordSource(Source):
 
     def _my_cards(self, ctx: Ctx) -> list:
         return ctx.get_or("word_cards", lambda: db.q(
-            "SELECT front, back, kind, kp_id FROM cards WHERE user_id=? AND kind IN ('word','term') AND LENGTH(back)<=24 "
+            "SELECT id, front, back, kind, kp_id, due FROM cards WHERE user_id=? AND kind IN ('word','term') AND LENGTH(back)<=24 "
             "ORDER BY due LIMIT 60", ctx.kid["id"]))
 
     # 同一个词换着方式考：认意思（看英文选中文）、反过来（看中文选英文）、听音选意思、拼写。
@@ -254,12 +256,16 @@ class WordSource(Source):
         family = g["family"] if fmt in ("read", "reverse") else f"{g['family']}:{fmt}"
         shift = self.FORMAT_SHIFT.get(fmt, 0)
         theta, _ = self._theta(ctx, g)
-        levels = fair.calib(family, list(g["levels"]), lambda lv: self._prior(lv) + shift)
-        lv = fair.pick_level(theta, levels, target, rng)
+        levels = ability.calib(family, list(g["levels"]), lambda lv: self._prior(lv) + shift)
+        lv = ability.pick_level(theta, levels, target, rng)
         wl = rng.choice(g["levels"][lv])
         words = [w for w in wl["words"] if w.get("zh")]
         cards = [c for c in self._my_cards(ctx) if (c["kind"] == "word") == (g["family"] == "words")]
-        if cards and rng.random() < 0.3:   # 自己的生词 / 术语卡
+        due = [c for c in cards if str(c["due"]) <= db.today().isoformat()]
+        if due and rng.random() < 0.4:      # 今天该复习的生词 / 术语卡先出：答了就算复习过
+            c = rng.choice(due)
+            w = {"w": c["front"], "zh": c["back"], "kp": c["kp_id"], "card": c["id"]}
+        elif cards and rng.random() < 0.2:  # 别的生词卡也常拿出来见见
             c = rng.choice(cards)
             w = {"w": c["front"], "zh": c["back"], "kp": c["kp_id"]}
         else:
@@ -268,7 +274,7 @@ class WordSource(Source):
             w = next((x for x in rng.sample(words, len(words)) if self._spellable(x["w"])), None) or w
             if not self._spellable(w["w"]):
                 fmt, family = "read", g["family"]
-                levels = fair.calib(family, list(g["levels"]), self._prior)
+                levels = ability.calib(family, list(g["levels"]), self._prior)
         others = list({x["zh"] for x in words if x["zh"] != w["zh"] and x["w"] != w["w"]})
         if len(others) < 3:
             others += [x["zh"] for x in rng.sample(content.word_lists[next(iter(content.word_lists))]["words"], 6)]
@@ -292,15 +298,21 @@ class WordSource(Source):
             it["say"] = w["w"]   # 前端可以读出来
         h = hashlib.sha1(f"{wl['id']}|{w['w']}|{fmt}".encode()).hexdigest()[:10]
         it.update(id=f"word-{h}", family=family, level=lv, dim=g["dim"], word=w["w"], zh=w["zh"], list=wl["id"], fmt=fmt,
-                  kp_id=w.get("kp") or "", topic=g["title"], theta=theta, b=levels[lv][0], p=round(fair.sigmoid(theta - levels[lv][0]), 4),
+                  kp_id=w.get("kp") or "", card=w.get("card"), topic=g["title"], theta=theta, b=levels[lv][0], p=round(ability.sigmoid(theta - levels[lv][0]), 4),
                   explain=f"{w['w']}：{w['zh']}")
         return it
 
-    def record(self, kid, it, correct, ans, dont_know, ms, mode="game", weight=GAME_WEIGHT):
-        evidence.log(kid["id"], "word", f"{it['list']}:{it['word']}", "answer", correct=correct, mode=mode,
-                     fmt="recall" if it.get("type") == "fill" else "choice", weight=weight)
-        if it.get("kp_id"):   # 术语卡挂了知识点：也算这个知识点的一条证据
-            super().record(kid, it, correct, ans, dont_know, ms, mode, weight)
+    def record(self, kid, it, correct, ans, dont_know, ms, mode="game", weight=GAME_WEIGHT, calibrate=None):
+        fmt = "recall" if it.get("type") == "fill" else "choice"
+        evidence.log(kid["id"], "word", f"{it['list']}:{it['word']}", "answer", correct=correct, mode=mode, fmt=fmt, weight=weight)
+        if not it.get("retry"):
+            ability.observe(kid["id"], it["dim"], it, correct)
+            c = db.one("SELECT * FROM cards WHERE id=? AND user_id=? AND due<=?", it["card"], kid["id"], db.today().isoformat()) \
+                if it.get("card") else None
+            if c:   # 今天该复习的生词卡：在这里答了就算复习过了，按记忆模型排下次
+                engine.schedule_card(kid["id"], c, "good" if correct else "again", fmt=fmt)
+        if it.get("kp_id"):   # 术语卡挂了知识点：也算这个知识点的一条证据（θ 上面已经记在词汇维度上）
+            super().record(kid, it, correct, ans, dont_know, ms, mode, weight, calibrate=False)
         if not correct:       # 不认识的词放进复习
             engine.add_card(kid["id"], "word" if it["family"].startswith("words") else "term", it["word"], it["zh"],
                             {"list": it["list"], "from": mode}, it.get("kp_id") or None)
@@ -313,15 +325,6 @@ def _short(d: dict, kind: str = "mcq") -> bool:
     fits = len(opts) == 4 and all(len(str(o)) <= 36 for o in opts) if kind == "mcq" else kind == "num"
     return (len(str(d.get("q", ""))) <= 90 and fits
             and not d.get("code") and not d.get("passage") and not d.get("fig") and not d.get("audio"))  # 带图、带录音的题不适合游戏里快速作答
-
-
-def bank_level(r) -> int:
-    """题目难度分 5 级：做过的人多就看大家的正确率，少就看出题时标的难度。"""
-    n, c = r["n_attempts"] or 0, r["n_correct"] or 0
-    if n >= 5:
-        acc = c / n
-        return 1 if acc >= 0.85 else 2 if acc >= 0.7 else 3 if acc >= 0.55 else 4 if acc >= 0.4 else 5
-    return {1: 2, 2: 3, 3: 4}.get(r["difficulty"] or 2, 3)
 
 
 class BankSource(Source):
@@ -347,7 +350,7 @@ class BankSource(Source):
                 for r in rows:
                     d = db.jload(r["data"], {})
                     if _short(d, r["type"]):
-                        out.append({"row": r, "data": d, "kp_id": r["kp_id"], "level": bank_level(r)})
+                        out.append({"row": r, "data": d, "kp_id": r["kp_id"], "level": ability.bank_level(r)})
             return out
         return ctx.get_or("bank_items", load)
 
@@ -366,15 +369,15 @@ class BankSource(Source):
         cand = by_kp[kp_id]
         kind = rng.choice(sorted({x["row"]["type"] for x in cand}))   # 这个知识点有选择题也有计算题：换着出
         cand = [x for x in cand if x["row"]["type"] == kind]
-        family = "bank" if kind == "mcq" else f"bank:{kind}"           # 计算题蒙不对，难度单独校准
-        levels_all = fair.calib(family, quickgen.LEVELS)
+        family = ability.bank_family(kind)   # 计算题蒙不对，难度单独校准
+        levels_all = ability.calib(family, quickgen.LEVELS)
         levels = {lv: levels_all[lv] for lv in {x["level"] for x in cand}}
-        lv = fair.pick_level(theta, levels, target, rng)
+        lv = ability.pick_level(theta, levels, target, rng)
         x = rng.choice([c for c in cand if c["level"] == lv])
         d, r = x["data"], x["row"]
         it = {**d, "id": r["id"], "type": kind, "family": family, "level": lv, "dim": kp_id, "kp_id": kp_id,
               "difficulty": r["difficulty"], "topic": (catalog.kps.get(kp_id) or {}).get("name", ""), "theta": theta,
-              "b": levels[lv][0], "p": round(fair.sigmoid(theta - levels[lv][0]), 4)}
+              "b": levels[lv][0], "p": round(ability.sigmoid(theta - levels[lv][0]), 4)}
         return _reshuffle(it, rng) if kind == "mcq" else it
 
 
@@ -440,15 +443,12 @@ def next_item(kid: dict, st: dict, target: float, rng: random.Random, mode: str 
 
 
 def settle(kid: dict, st: dict, it: dict, ans, dont_know: bool, ms: int, mode="game", weight=GAME_WEIGHT) -> bool:
-    """判对错、记进学习记录、更新能力值和题目难度；答错（或不会）的排进「隔几道再考一次」。返回答对没有。"""
+    """判对错、记进学习记录（同时更新水平和题目难度）；答错（或不会）的排进「隔几道再考一次」。返回答对没有。"""
     correct = (not dont_know) and bool(itemtypes.check(it, ans))
-    if it.get("retry"):   # 刚看过答案：证据记一半，不估能力和难度，也不再排
+    if it.get("retry"):   # 刚看过答案：证据记一半，不估水平和难度（record 里看 retry），也不再排
         record(kid, it, correct, ans, dont_know, ms, mode, weight * 0.5)
         return correct
     record(kid, it, correct, ans, dont_know, ms, mode, weight)
-    theta, n = fair.stored_ability(kid["id"], it["dim"]) or (it["theta"], 0)   # 出题时的起点（还没存过）
-    b, nb = fair.stored_b(it["family"], it["level"]) or (it["b"], 0)
-    fair.update(kid["id"], it["dim"], it["family"], it["level"], correct, theta, n, b, nb)
     if not correct:
         st.setdefault("retry", []).append({"at": st.get("n", 0) + RETRY_GAP, "item": it})
     return correct
