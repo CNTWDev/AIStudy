@@ -11,8 +11,13 @@
           {"k":"bridge","x","y","w","id"}     桥：id 打开时出现（一格厚）
           {"k":"lift","x","y","w","to","id"}  升降台：平时在第 y 行，id 打开时升到第 to 行
   par     三星目标秒数；tip 开局提示
+前 16 关手做；第 17～1000 关是程序生成、逐关用解题器验证过的（tools/gen_duo_levels.py 生成 levels/duo_more.json，
+能一起走到门口、宝石都拿得到、不会走进死路），越往后越要两个人轮流按机关。
 """
-from . import Game, register
+import json
+from functools import cached_property
+
+from . import LEVELS_DIR, Game, register
 
 COLS, ROWS = 32, 15
 TILES = set("#.FWGfw12DE")
@@ -27,6 +32,18 @@ class Duo(Game):
     roles = {"fire": ("小火苗", "🔥"), "water": ("小水滴", "💧")}
     stars = (("clear", "一起过关"), ("gems", "宝石全拿到"), ("time", "进入目标时间"))
     worlds = (("森林神殿", "forest"), ("水晶洞穴", "cave"), ("火山之巅", "lava"), ("冰雪宫殿", "ice"))
+    count = 1000
+
+    @cached_property
+    def more(self) -> list:
+        """第 17 关起的关卡（生成好、验证过的，存在一个文件里，不在网站上现算）。"""
+        return json.loads((LEVELS_DIR / "duo_more.json").read_text(encoding="utf-8"))
+
+    def make(self, n, rng):
+        return dict(self.more[n - len(self.handmade) - 1])
+
+    def title(self, n):
+        return self.handmade[n - 1]["name"] if n <= len(self.handmade) else self.more[n - len(self.handmade) - 1]["name"]
 
     def check(self, lv, name):
         rows = lv.get("map") or []
