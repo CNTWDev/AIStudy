@@ -93,6 +93,11 @@ class Game:
         lv = self.level(n)
         return {**lv, "world": self.world_of(lv["n"])}
 
+    def for_team(self, lv: dict, k: int) -> dict:
+        """这一关给 k 个人玩时的样子（开局发给前端、过关算星星都用它）：人多的游戏按人数加怪、加目标。默认不变。
+        lv 是共用的关卡数据，要改就先复制。"""
+        return lv
+
     def team_setup(self, team: str) -> dict:
         """开局时按这支队伍现算、发给前端的参数（并进 stage，没有关卡的游戏也有，比如对战游戏的让球）。team：队伍键。"""
         return {}

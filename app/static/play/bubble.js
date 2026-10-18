@@ -1,6 +1,6 @@
-/* 泡泡堂（合作打怪，两个人各用一台设备）。关卡在 app/arena/games/levels/bubble/，格式见 app/arena/games/bubble.py。
+/* 泡泡堂（合作打怪，2～4 个人各用一台设备）。关卡在 app/arena/games/levels/bubble/，格式见 app/arena/games/bubble.py。
    - 自己的角色自己的设备算（走、放泡泡、被困、捡道具、救队友），每秒发 15 次位置；
-   - 泡泡什么时候炸、炸到哪、砖块掉什么、怪兽怎么走，都由开房间的设备算，再发给另一台（'boom'、'w' 消息）；
+   - 泡泡什么时候炸、炸到哪、砖块掉什么、怪兽怎么走，都由开房间的设备算，再发给别的设备（'boom'、'w' 消息）；
    - 被泡泡炸到或被怪兽碰到：困在泡泡里。队友跑过来碰一下就救出来（不算倒下），不然答题自救（外壳 shell.js）。
    - 怪兽全打败，开房间的设备报过关。
    - 刷新 / 换设备：存档里有自己（位置、道具、是不是被困着）和地图（炸开的砖块、地上的道具、怪兽、泡泡），接着玩。 */
@@ -9,7 +9,7 @@
   const FUSE = 2.6, FLAME = 0.5;
   const MON = {s: {kind: 'slime', speed: 48}, b: {kind: 'bat', speed: 86}, g: {kind: 'ghost', speed: 44, ghost: true}};
   const ITEMS = {fire: '🔥', bub: '🫧', shoe: '👟'};
-  const ROLE_COLOR = {red: '#ff5d6c', blue: '#4d8dff'};
+  const ROLE_COLOR = {red: '#ff5d6c', blue: '#4d8dff', yellow: '#f5b700', green: '#2fbf71'};
   const SCENES = {
     candy: {floor: ['#ffe8f2', '#fff4f9'], wall: '#ff8fbf', wallHi: '#ffc4dd', wallLo: '#d9659a', box: '#c98b55', boxHi: '#e4ad78', ribbon: '#ff5d8f'},
     ice: {floor: ['#e3f2ff', '#f1f9ff'], wall: '#7fb6ff', wallHi: '#cfe5ff', wallLo: '#4f86d6', box: '#9fc7e8', boxHi: '#d6ecff', ribbon: '#5a8fd6'},
@@ -20,7 +20,7 @@
   };
 
   let sh, mp, loop, fx, g = null, scene = 'candy', bubbles = new Map(), flames = [], items = new Map(), mons = [], monTracks = new Map();
-  let me = null, peerTrack = null, peerRaw = null, t = 0, clockT = 0, snapT = 0, ended = true, bubN = 0, rng = Math.random, lastDir = null, saveT = 0, winT = 0;
+  let me = null, peers = new Map(), t = 0, clockT = 0, snapT = 0, ended = true, bubN = 0, rng = Math.random, lastDir = null, saveT = 0, winT = 0;
 
   // ---------------------------------------------------------------- 地图
   const key = (r, c) => `${r},${c}`;
@@ -33,7 +33,7 @@
     let id = 0;
     for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
       const ch = g[r][c];
-      if (ch === '1' || ch === '2') { starts[ch] = {r, c}; g[r][c] = '.'; }
+      if ('1234'.includes(ch)) { starts[ch] = {r, c}; g[r][c] = '.'; }
       if (MON[ch]) { mons.push({id: id++, kind: ch, x: ctr(c), y: ctr(r), dir: [0, 0], alive: true, speed: MON[ch].speed}); g[r][c] = '.'; }
     }
     return starts;
@@ -103,10 +103,12 @@
     const k = key(cellOf(me.y), cellOf(me.x)), it = items.get(k);
     if (it) { items.delete(k); apply(it); mp.net.send({t: 'pick', k}); }
     // 救队友：碰一下困在泡泡里的队友
-    if (peerRaw && peerRaw.d && Math.hypot(peerRaw.x - me.x, peerRaw.y - me.y) < 30 && t > saveT) {
-      saveT = t + 1; mp.net.send({t: 'rescue', to: mp.peer.id});
-      fx.burst(peerRaw.x, peerRaw.y, {n: 16, colors: ['#fff', '#9fe7ff', '#ffd23f'], speed: 220, shape: 'star', size: 5, grav: 100});
-      Play.sfx.play('shield'); mp.toast(`你救了${mp.peer.name}！`, 'good');
+    for (const p of peers.values()) {
+      const raw = p.raw;
+      if (!raw || !raw.d || Math.hypot(raw.x - me.x, raw.y - me.y) >= 30 || t <= saveT) continue;
+      saveT = t + 1; raw.d = 0; mp.net.send({t: 'rescue', to: p.info.id});
+      fx.burst(raw.x, raw.y, {n: 16, colors: ['#fff', '#9fe7ff', '#ffd23f'], speed: 220, shape: 'star', size: 5, grav: 100});
+      Play.sfx.play('shield'); mp.toast(`你救了${p.info.name}！`, 'good');
     }
   }
   function apply(it) {
@@ -132,7 +134,7 @@
     if (fire || mon) {
       me.trapped = true; me.mv = false;
       Play.sfx.play('hurt'); fx.shake(4, 0.2);
-      mp.toast(mp.peer ? `被困住了！等${mp.peer.name}来救，或者答题自救` : '被困住了！答题自救', 'warn');
+      mp.toast(peers.size ? '被困住了！等队友来救，或者答题自救' : '被困住了！答题自救', 'warn');
       mp.die();
     }
   }
@@ -228,7 +230,7 @@
   function nearestPlayer(m) {
     const ps = [];
     if (me && !me.trapped) ps.push(me);
-    if (peerRaw && !peerRaw.d) ps.push(peerRaw);
+    for (const p of peers.values()) if (p.raw && !p.raw.d) ps.push(p.raw);
     ps.sort((a, b) => Math.hypot(a.x - m.x, a.y - m.y) - Math.hypot(b.x - m.x, b.y - m.y));
     return ps[0] && Math.hypot(ps[0].x - m.x, ps[0].y - m.y) < T * 5 ? ps[0] : null;
   }
@@ -260,7 +262,7 @@
     // 人和怪兽按上下排序画
     const list = [];
     for (const m of mons) if (m.alive) list.push({y: m.y, draw: () => Art.monster(c, m.x, m.y + 14, {kind: MON[m.kind].kind, t: t + m.id, scale: 0.5, facing: m.dir[0] > 0 ? 1 : -1})});
-    if (peerTrack && mp && mp.peer) { const p = peerTrack.get(['x', 'y']); if (p) list.push({y: p.y, draw: () => drawPlayer(c, p.x, p.y, mp.peer, p.f || 1, p.mv, p.d, false)}); }
+    for (const pr of peers.values()) { const p = pr.track.get(['x', 'y']); if (p) list.push({y: p.y, draw: () => drawPlayer(c, p.x, p.y, pr.info, p.f || 1, p.mv, p.d, false)}); }
     if (me && mp) list.push({y: me.y, draw: () => drawPlayer(c, me.x, me.y, mp.me, me.face, me.mv, me.trapped, true)});
     list.sort((a, b) => a.y - b.y).forEach(o => o.draw());
     fx.draw(c);
@@ -271,7 +273,7 @@
     c.font = '18px system-ui'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(ITEMS[it], x, y + 1 + Math.sin(t * 4) * 2);
   }
   function drawBubble(c, b) {
-    const x = ctr(b.c), y = ctr(b.r), owner = mp && (b.owner === mp.me.id ? mp.me : mp.peer);
+    const x = ctr(b.c), y = ctr(b.r), owner = mp && (b.owner === mp.me.id ? mp.me : (peers.get(b.owner) || {}).info);
     const col = owner ? ROLE_COLOR[owner.role] : '#7bdff2';
     const left = mp && mp.host ? b.fuse : FUSE - (t - (b.born || t));
     const s = 15 + Math.sin(t * (left < 0.8 ? 18 : 6)) * 1.6;
@@ -303,7 +305,7 @@
   let starts = null;
   PlayShell.init({
     quiz: 'revive', tempo: 132,
-    rules: ['两个人一队，在格子地图上<b>放泡泡</b>：泡泡过一会儿炸成十字，炸开砖块、打败怪兽。',
+    rules: ['2～4 个人一队，在格子地图上<b>放泡泡</b>：泡泡过一会儿炸成十字，炸开砖块、打败怪兽。',
             '砖块里会掉道具：🔥 炸得更远、🫧 多放一个泡泡、👟 跑得更快。',
             '被泡泡炸到、被怪兽碰到就会<b>困在泡泡里</b>：队友跑过来碰一下马上救出来！',
             '没人救就答题自救：答对出来；答错多欠一道（最多欠 3 道）；「这题不会」不加。',
@@ -314,23 +316,28 @@
     preview(s, lv) {
       sh = s; fx = fx || new Play.FX();
       if (!ended) return;
-      starts = build(lv); me = null; peerTrack = null; mp = null;
+      starts = build(lv); me = null; peers = new Map(); mp = null;
       render();
     },
     begin(ctx) {
       mp = ctx; sh = ctx.sh; fx = new Play.FX(); t = 0; clockT = 0; snapT = 0; winT = 0; ended = false; bubN = 0; lastDir = null;
       rng = MpNet.rng(ctx.seed);
       starts = build(ctx.level);
-      const mine = starts[ctx.roleIndex(ctx.me.role) === 0 ? '1' : '2'], other = starts[mine === starts['1'] ? '2' : '1'];
+      const startOf = id => starts[String(ctx.slot(id) + 1)] || starts['1'];   // 出生点：按角色排第几个
+      const mine = startOf(ctx.me.id);
       me = {x: ctr(mine.c), y: ctr(mine.r), face: 1, mv: false, trapped: false, inv: 0, power: 1, max: 1, shoe: 0};
-      peerTrack = new MpNet.Track(100); peerRaw = {x: ctr(other.c), y: ctr(other.r), f: 1}; peerTrack.push(Object.assign({}, peerRaw));
+      peers = new Map(ctx.peers.map(p => {
+        const st = startOf(p.id), raw = {x: ctr(st.c), y: ctr(st.r), f: 1}, track = new MpNet.Track(100);
+        track.push(Object.assign({}, raw));
+        return [p.id, {info: p, raw, track}];
+      }));
       const rs = ctx.resume;
       if (rs && rs.world) loadWorld(rs.world);
       if (rs && rs.me) Object.assign(me, pick(rs.me, ['x', 'y', 'face', 'power', 'max', 'shoe']), {trapped: !!rs.me.trapped, inv: rs.me.trapped ? 0 : 2});
       if (ctx.level.tip && !rs) mp.toast(ctx.level.tip.split('。')[0], 'good');
       const net = ctx.net;
       net.off('s', 'bub', 'boom', 'w', 'pick', 'rescue');
-      net.on('s', m => { peerRaw = m; peerTrack.push(m); });
+      net.on('s', m => { const p = peers.get(m.from); if (p) { p.raw = m; p.track.push(m); } });
       net.on('bub', m => {
         if (bubbles.has(m.id)) return;
         const b = {id: m.id, r: m.r, c: m.c, p: Math.max(1, Math.min(6, m.p | 0)), owner: m.from, fuse: FUSE, born: t, passMe: me && overlapsCell(m.r, m.c)};
@@ -352,7 +359,7 @@
       net.on('rescue', m => {
         if (m.to !== mp.me.id || !me.trapped) return;
         me.trapped = false; me.inv = 2;
-        mp.toast(`${mp.peer.name}救了你！`, 'good'); Play.sfx.play('power');
+        mp.toast(`${((peers.get(m.from) || {}).info || {}).name || '队友'}救了你！`, 'good'); Play.sfx.play('power');
         mp.rescue();
       });
       net.stream(() => me && !ended ? {t: 's', x: Math.round(me.x), y: Math.round(me.y), f: me.face, mv: me.mv ? 1 : 0, d: me.trapped ? 1 : 0} : null, 15);
@@ -370,7 +377,7 @@
     saveWorld: () => g && {g: g.map(r => r.join('')), it: [...items], m: mons.map(m => [m.id, Math.round(m.x), Math.round(m.y), m.alive ? 1 : 0]),
                            b: [...bubbles.values()].map(b => [b.id, b.r, b.c, b.p, b.owner, +(mp && mp.host ? b.fuse : FUSE - (t - (b.born || t))).toFixed(2)])},
     loadWorld: w => loadWorld(w),
-    peerView: () => peerRaw && {x: Math.round(peerRaw.x), y: Math.round(peerRaw.y)},
+    peerView: id => { const p = peers.get(id); return p && p.raw && {x: Math.round(p.raw.x), y: Math.round(p.raw.y)}; },
     loadMe(v) { if (me && v && !me.trapped && boxFree(v.x, v.y)) { me.x = v.x; me.y = v.y; } },
   });
 })();

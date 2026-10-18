@@ -1,12 +1,13 @@
-/* 贪吃蛇大作战（合作长大，两个人各用一台设备）。关卡在 app/arena/games/levels/snake/，格式见 app/arena/games/snake.py。
-   - 自己的蛇自己的设备算（转弯、冲刺、吃豆子、撞墙 / 撞电脑蛇），每秒发 15 次蛇头位置和长度，对方按蛇头轨迹画出身体；
+/* 贪吃蛇大作战（合作长大，2～4 个人各用一台设备）。关卡在 app/arena/games/levels/snake/，格式见 app/arena/games/snake.py。
+   - 自己的蛇自己的设备算（转弯、冲刺、吃豆子、撞墙 / 撞电脑蛇），每秒发 15 次蛇头位置和长度，队友那边按蛇头轨迹画出身体；
    - 豆子和电脑蛇由开房间的设备算：豆子被吃了补新的（'food'），电脑蛇每秒发 10 次（'ai'）；
-   - 两条蛇加起来够长，开房间的设备报过关；时间到了还不够长就差一点（外壳 shell.js 结算）。
+   - 大家的蛇加起来够长，开房间的设备报过关；时间到了还不够长就差一点（外壳 shell.js 结算）。
    - 倒下答题复活后长度不变（像贪吃蛇大作战的「复活」），所以倒下不掉豆子；代价是答题这段时间少一条蛇在长。
    - 刷新 / 换设备：存档里有自己的蛇（位置、方向、长度）和豆子、电脑蛇，接着玩。 */
 (function () {
   const SEG = 7, SPEED = 135, BOOST = 225, TURN = 3.4, START_LEN = 10, MIN_LEN = 6, HEAD_R = 10;
-  const ROLE_COLOR = {green: ['#3fcf6e', '#1f9e4c'], pink: ['#ff7fb8', '#e04b8f']};
+  const ROLE_COLOR = {green: ['#3fcf6e', '#1f9e4c'], pink: ['#ff7fb8', '#e04b8f'], blue: ['#4d9dff', '#2a6fd0'], orange: ['#ff9f43', '#e07a1a']};
+  const STARTS = [[-60, 0, Math.PI], [60, 0, 0], [0, -60, -Math.PI / 2], [0, 60, Math.PI / 2]];   // 第几个人：离场地中间多远、朝哪
   const AI_COLORS = [['#9b7bff', '#6a4fd8'], ['#ffb347', '#e0832a'], ['#4fc3ff', '#2a8fd0'], ['#ff6b6b', '#d04545'], ['#c0c0c0', '#8a8a8a'], ['#ffd23f', '#d9a800']];
   const FOOD_COLORS = ['#ff6b6b', '#ffd23f', '#7bdff2', '#b8f2a6', '#c3a6ff', '#ff9ff3'];
 
@@ -20,7 +21,7 @@
     volcano: {out: '#3a1d1d', field: '#5b2b25', grid: 'rgba(255,160,90,.08)', sparkle: '#ffb36b'},
   };
   let sh, mp, loop, fx, lv = null, t = 0, ended = true, clockT = 0, snapT = 0;
-  let me = null, peer = null, foods = new Map(), ais = [], foodN = 0, rng = Math.random, pointer = null, cam = {x: 0, y: 0};
+  let me = null, peers = new Map(), foods = new Map(), ais = [], foodN = 0, rng = Math.random, pointer = null, cam = {x: 0, y: 0};
 
   // ---------------------------------------------------------------- 蛇（自己的、队友的、电脑的都用这个）
   function snake(x, y, a, len, colors) { return {x, y, a, len, path: [{x, y}], colors, alive: true, boost: false}; }
@@ -56,7 +57,7 @@
     t += dt; fx.update(dt);
     if (mp.host) hostStep(dt);
     else for (const a of ais) { const p = a.track && a.track.get(['x', 'y']); if (p && a.alive) grow(a, p.x, p.y); }
-    if (peer && peer.track) { const p = peer.track.get(['x', 'y']); if (p && peer.alive) grow(peer, p.x, p.y); }
+    for (const q of peers.values()) { const p = q.track.get(['x', 'y']); if (p && q.alive) grow(q, p.x, p.y); }
     if (!me || ended) return;
     if (me.inv > 0) me.inv -= dt;
     if (me.alive) control(dt);
@@ -67,7 +68,8 @@
       sh.hudClock(`⏱ ${Math.ceil(left)} · 🐍 ${teamLen()}/${lv.target}`);
     }
   }
-  const teamLen = () => (me && me.alive ? me.len : 0) + (peer && peer.alive ? peer.len : 0);
+  const team = () => [me, ...peers.values()].filter(Boolean);
+  const teamLen = () => team().reduce((n, q) => n + (q.alive ? q.len : 0), 0);
   function control(dt) {
     const I = Play.input;
     let turn = (I.keys.right ? 1 : 0) - (I.keys.left ? 1 : 0);
@@ -160,7 +162,7 @@
     const [W, H] = lv.size;
     for (let k = 0; k < 20; k++) {
       const x = 60 + rng() * (W - 120), y = 60 + rng() * (H - 120);
-      const far = [me, peer].every(s => !s || !s.alive || Math.hypot(s.x - x, s.y - y) > 350);
+      const far = team().every(s => !s.alive || Math.hypot(s.x - x, s.y - y) > 350);
       if (far || k === 19) { Object.assign(a, {x, y, a: rng() * Math.PI * 2, len: lv.ai_len, path: [{x, y}], alive: true, think: 0}); return; }
     }
   }
@@ -172,7 +174,7 @@
       if (a.think <= 0) {   // 想一想往哪游：靠墙就转开，有时去拦玩家，平时去吃最近的豆子
         a.think = 0.25 + rng() * 0.3;
         let tx = null, ty = null;
-        const players = [me, peer].filter(s => s && s.alive);
+        const players = team().filter(s => s.alive);
         if (players.length && rng() < lv.ai_aggr) {
           const p = players.sort((u, v) => Math.hypot(u.x - a.x, u.y - a.y) - Math.hypot(v.x - a.x, v.y - a.y))[0];
           if (Math.hypot(p.x - a.x, p.y - a.y) < 400) { tx = p.x + Math.cos(p.a || 0) * 120; ty = p.y + Math.sin(p.a || 0) * 120; }
@@ -192,7 +194,7 @@
       const nx = Math.max(12, Math.min(W - 12, a.x + Math.cos(a.a) * sp * dt)), ny = Math.max(12, Math.min(H - 12, a.y + Math.sin(a.a) * sp * dt));
       grow(a, nx, ny);
       // 电脑蛇的头撞到玩家身上：散成豆子
-      if (hitsBody(nx, ny, me, 0) || hitsBody(nx, ny, peer, 0) || ais.some(o => o !== a && o.alive && hitsBody(nx, ny, o, 0))) aiDie(a);
+      if (team().some(q => hitsBody(nx, ny, q, 0)) || ais.some(o => o !== a && o.alive && hitsBody(nx, ny, o, 0))) aiDie(a);
       else {   // 电脑蛇也吃豆子
         const eaten = [];
         for (const [id, f] of foods) if (Math.hypot(f.x - nx, f.y - ny) < 14) eaten.push(id);
@@ -222,7 +224,7 @@
     const sc = SCENES[lv && lv.world && lv.world.scene] || SCENES.day;
     c.fillStyle = sc.out; c.fillRect(0, 0, st.W, st.H);
     if (!lv) return;
-    const [W, H] = lv.size, focus = me && (me.alive || !peer) ? me : peer || me;
+    const [W, H] = lv.size, focus = me && (me.alive || !peers.size) ? me : [...peers.values()].find(q => q.alive) || me;
     const k = Math.max(st.W / Math.max(W, 1100), st.H / Math.max(H, 650), 0.62);   // 比例：一屏看得到周围一大片
     if (focus) { cam.x += ((focus.x || W / 2) - cam.x) * 0.15; cam.y += ((focus.y || H / 2) - cam.y) * 0.15; }
     const [sx, sy] = fx.offset();
@@ -241,9 +243,9 @@
       c.globalAlpha = 1; c.beginPath(); c.arc(f.x, f.y, r, 0, 7); c.fill();
     }
     for (const a of ais) if (a.alive) drawSnake(c, a, '');
-    if (peer && peer.alive && mp) drawSnake(c, peer, mp.peer.name);
+    if (mp) for (const q of peers.values()) if (q.alive) drawSnake(c, q, q.info.name);
     if (me && me.alive && mp) drawSnake(c, me, mp.me.name, true);
-    if (peer && !peer.alive && peer.x) bubbleQ(c, peer.x, peer.y);
+    for (const q of peers.values()) if (!q.alive && q.x) bubbleQ(c, q.x, q.y);
     if (me && !me.alive && me.x) bubbleQ(c, me.x, me.y);
     fx.draw(c);
     c.restore();
@@ -281,7 +283,7 @@
     c.fillStyle = 'rgba(43,35,64,.55)'; Play.roundRect(c, x0 - 3, y0 - 3, mw + 6, mh + 6, 8); c.fill();
     const dot = (s, col, r) => { if (s && s.alive) { c.fillStyle = col; c.beginPath(); c.arc(x0 + s.x / W * mw, y0 + s.y / H * mh, r, 0, 7); c.fill(); } };
     for (const a of ais) dot(a, a.colors[0], 2.5);
-    if (peer && mp) dot(peer, peer.colors[0], 4);
+    if (mp) for (const q of peers.values()) dot(q, q.colors[0], 4);
     if (me && mp) dot(me, '#fff', 4.5);
   }
 
@@ -304,18 +306,18 @@
   let pointerReady = false;
   PlayShell.init({
     quiz: 'revive', tempo: 126,
-    rules: ['两条小蛇是一队，一起<b>吃豆子长大</b>，两条加起来够长就过关。',
+    rules: ['2～4 条小蛇是一队，一起<b>吃豆子长大</b>，大家加起来够长就过关（人多目标也长）。',
             '← → 转弯，按住空格冲刺（会变短一点）；手机、平板：手指按住往哪拖就往哪游。',
             '撞到墙、撞到电脑蛇就倒下：答题复活。电脑蛇的头撞到你们身上，它就散成一地豆子！',
-            '答错多欠一道（最多欠 3 道）；「这题不会」不加。两条小蛇互相穿过去不会撞。',
-            '有时间限制；在目标时间内过关、倒下不超过 1 次，还能多拿星星。'],
+            '答错多欠一道（最多欠 3 道）；「这题不会」不加。队友的小蛇互相穿过去不会撞。',
+            '有时间限制；在目标时间内过关、倒下次数少，还能多拿星星。'],
     keys: '电脑键盘：← → 或 A D 转弯，空格 冲刺；也可以按住鼠标往哪拖就往哪游',
     input: {left: ['ArrowLeft', 'a'], right: ['ArrowRight', 'd'], boost: [' ', 'ArrowUp', 'w']},
     touch: [['boost', '⚡ 冲刺', 'big']], touchSplit: 0,
     preview(s, l) {
       sh = s; fx = fx || new Play.FX();
       if (!ended) return;
-      lv = l; me = null; peer = null; ais = []; foods = new Map(); mp = null;
+      lv = l; me = null; peers = new Map(); ais = []; foods = new Map(); mp = null;
       const r = MpNet.rng(7);
       for (let i = 0; i < 40; i++) foods.set(i, {id: i, x: r() * l.size[0], y: r() * l.size[1], v: 1 + Math.floor(r() * 3), c: i % 6});
       cam = {x: l.size[0] / 2, y: l.size[1] / 2};
@@ -326,11 +328,11 @@
       mp = ctx; sh = ctx.sh; fx = new Play.FX(); lv = ctx.level; t = 0; clockT = 0; snapT = 0; ended = false; foodN = 0;
       if (!pointerReady) { pointerSetup(sh.canvas); pointerReady = true; }
       rng = MpNet.rng(ctx.seed);
-      const [W, H] = lv.size, mine = ctx.roleIndex(ctx.me.role);
-      me = snake(W / 2 + (mine ? 60 : -60), H / 2, mine ? 0 : Math.PI, START_LEN, ROLE_COLOR[ctx.me.role] || ROLE_COLOR.green);
+      const [W, H] = lv.size;
+      const start = m => { const [dx, dy, a] = STARTS[ctx.slot(m.id)] || STARTS[0]; return snake(W / 2 + dx, H / 2 + dy, a, START_LEN, ROLE_COLOR[m.role] || ROLE_COLOR.green); };
+      me = start(ctx.me);
       for (let i = 0; i < START_LEN * 3; i++) grow(me, me.x + Math.cos(me.a) * 2.5, me.y + Math.sin(me.a) * 2.5);
-      peer = snake(W / 2 + (mine ? -60 : 60), H / 2, mine ? Math.PI : 0, START_LEN, ROLE_COLOR[ctx.peer.role] || ROLE_COLOR.pink);
-      peer.track = new MpNet.Track(100);
+      peers = new Map(ctx.peers.map(p => [p.id, Object.assign(start(p), {info: p, track: new MpNet.Track(100)})]));
       foods = new Map(); ais = [];
       for (let i = 0; i < lv.ai; i++) ais.push(Object.assign(snake(0, 0, 0, lv.ai_len, AI_COLORS[i % AI_COLORS.length]), {id: i, track: new MpNet.Track(100)}));
       const rs = ctx.resume;
@@ -350,6 +352,7 @@
       const net = ctx.net;
       net.off('s', 'food', 'ai', 'eat', 'drop');
       net.on('s', m => {
+        const peer = peers.get(m.from); if (!peer) return;
         if (m.d) { if (peer.alive) { peer.alive = false; peer.path = []; } peer.x = m.x; peer.y = m.y; return; }
         if (!peer.alive) { peer.alive = true; peer.path = [{x: m.x, y: m.y}]; peer.track.clear(); }
         peer.len = m.len; peer.a = m.a; peer.boost = !!m.b; peer.track.push(m);
@@ -379,7 +382,7 @@
     onRevive() { if (me) { respawn(); Play.sfx.play('power'); } },
     save: () => me && {x: Math.round(me.x), y: Math.round(me.y), a: +me.a.toFixed(2), len: me.len, alive: me.alive ? 1 : 0},
     saveWorld: () => ({f: [...foods.values()].map(pack), n: foodN, ai: ais.map(a => [Math.round(a.x), Math.round(a.y), a.len, a.alive ? 1 : 0])}),
-    peerView: () => peer && {x: Math.round(peer.x), y: Math.round(peer.y), a: +(peer.a || 0).toFixed(2), len: peer.len, alive: peer.alive ? 1 : 0},
+    peerView: id => { const peer = peers.get(id); return peer && {x: Math.round(peer.x), y: Math.round(peer.y), a: +(peer.a || 0).toFixed(2), len: peer.len, alive: peer.alive ? 1 : 0}; },
     loadMe(v) {
       if (!me || !v || !me.alive || !v.alive) return;
       me.len = Math.max(MIN_LEN, v.len | 0 || me.len); coil(me, v.x, v.y, v.a || 0); me.inv = 2;

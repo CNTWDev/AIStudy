@@ -4,22 +4,27 @@
 - 砖块里会掉道具：🔥 火力（泡泡炸得更远）、🫧 多一个泡泡、👟 跑得快。掉什么由开房间的那台设备按关卡种子决定，两边一样。
 
 关卡（levels/bubble/NN.json）：
-  map  11 行 × 17 列：# 打不坏的墙  + 砖块  . 空  1 / 2 两个人的出生点  s 史莱姆（慢）  b 蝙蝠（快）  g 幽灵（能穿砖块）
+  map  11 行 × 17 列：# 打不坏的墙  + 砖块  . 空  1 / 2 两个人的出生点（3 / 4 可以不写）  s 史莱姆（慢）  b 蝙蝠（快）  g 幽灵（能穿砖块）
   par  三星目标秒数；tip 开局提示
 前 8 关手做，第 9 关起按关数生成（make）：砖块更密、怪兽更多，快的蝙蝠、能穿墙的幽灵越来越多。
+3、4 个人玩（for_team）：在空着的角落加出生点，每多一个人多约 1/3 的怪兽，「被困答题」那颗星也多放宽 1 次。
 """
+import random
+
 from . import Game, register
 
 COLS, ROWS = 17, 11
-TILES = set("#+.12sbg")
+TILES = set("#+.1234sbg")
+MONS = "sbg"
+CORNERS = ((1, 1), (1, COLS - 2), (ROWS - 2, 1), (ROWS - 2, COLS - 2))
 
 
 @register
 class Bubble(Game):
     id, name, icon, color, tag = "bubble", "泡泡堂", "🫧", "#2f8fdc", "联网合作"
-    desc = "放泡泡炸开砖块、打败小怪兽。被泡泡困住时，队友碰一下就能救你，不然就答题自救。"
-    players, freeze, max_seconds = (2, 2), False, 900   # 谁倒下谁答题：答错不冷冻，改成「多欠一道题」
-    roles = {"red": ("红泡泡", "🔴"), "blue": ("蓝泡泡", "🔵")}
+    desc = "2～4 个人放泡泡炸开砖块、打败小怪兽。被泡泡困住时，队友碰一下就能救你，不然就答题自救。"
+    players, freeze, max_seconds = (2, 4), False, 900   # 谁倒下谁答题：答错不冷冻，改成「多欠一道题」
+    roles = {"red": ("红泡泡", "🔴"), "blue": ("蓝泡泡", "🔵"), "yellow": ("黄泡泡", "🟡"), "green": ("绿泡泡", "🟢")}
     stars = (("clear", "打败所有怪兽"), ("time", "进入目标时间"), ("safe", "被困答题不超过 2 次"))
     worlds = (("糖果小镇", "candy"), ("冰雪城堡", "ice"), ("丛林遗迹", "jungle"), ("熔岩地牢", "lava"),
               ("海底宫殿", "sea"), ("云端花园", "cloud"))
@@ -70,9 +75,62 @@ class Bubble(Game):
         for ch in "12":
             if sum(r.count(ch) for r in rows) != 1:
                 raise ValueError(f"bubble/{name}: {ch} 必须正好有一个")
+        for ch in "34":
+            if sum(r.count(ch) for r in rows) > 1:
+                raise ValueError(f"bubble/{name}: {ch} 最多一个")
         lv["monsters"] = sum(r.count("s") + r.count("b") + r.count("g") for r in rows)
         if not lv["monsters"]:
             raise ValueError(f"bubble/{name}: 至少要有一只怪兽")
 
+    def for_team(self, lv, k):
+        k = max(2, min(4, int(k)))
+        if k == 2:
+            return lv
+        rng = random.Random(f"bubble:{lv['n']}:{k}")
+        g = [list(r) for r in lv["map"]]
+        at = lambda ch: next(((r, c) for r in range(ROWS) for c in range(COLS) if g[r][c] == ch), None)
+        spawns = [p for p in (at(ch) for ch in "1234") if p]
+        dist = lambda p, q: abs(p[0] - q[0]) + abs(p[1] - q[1])
+        pool = []   # 离新出生点太近、要挪走的怪兽
+        for ch in "34"[:k - 2]:
+            if at(ch):
+                continue
+            spots = sorted(CORNERS, key=lambda p: -min(dist(p, s) for s in spawns))
+            spots += sorted(((r, c) for r in range(1, ROWS - 1) for c in range(1, COLS - 1) if g[r][c] == "."),
+                            key=lambda p: -min(dist(p, s) for s in spawns))
+            for r, c in spots:
+                if g[r][c] in "#1234" or min(dist((r, c), s) for s in spawns) < 4:
+                    continue
+                around = [(r + dr, c + dc) for dr, dc in ((0, 1), (0, -1), (1, 0), (-1, 0)) if g[r + dr][c + dc] != "#"]
+                if len(around) < 2:
+                    continue
+                if g[r][c] in MONS:
+                    pool.append(g[r][c])
+                g[r][c] = ch
+                for rr, cc in around:   # 出生点旁边留空地：能放第一个泡泡再躲开
+                    if g[rr][cc] == "+":
+                        g[rr][cc] = "."
+                spawns.append((r, c))
+                break
+        for r in range(ROWS):   # 怪兽离每个出生点都要够远
+            for c in range(COLS):
+                if g[r][c] in MONS and min(dist((r, c), s) for s in spawns) < 5:
+                    pool.append(g[r][c])
+                    g[r][c] = "."
+        have = [ch for row in g for ch in row if ch in MONS]
+        extra = round(lv["monsters"] * (k - 2) / 3)
+        pool += [rng.choice(have or ["s"]) for _ in range(extra)]
+        far = [(r, c) for r in range(1, ROWS - 1) for c in range(1, COLS - 1)
+               if g[r][c] in ".+" and min(dist((r, c), s) for s in spawns) >= 6]
+        rng.shuffle(far)
+        for (r, c), m in zip(far, pool):
+            g[r][c] = m
+            for dr, dc in ((0, 1), (0, -1), (1, 0), (-1, 0)):   # 怪兽身边至少空一格，能动
+                if g[r + dr][c + dc] == "+":
+                    g[r + dr][c + dc] = "."
+                    break
+        rows = ["".join(r) for r in g]
+        return {**lv, "map": rows, "monsters": sum(sum(r.count(m) for m in MONS) for r in rows), "players": k, "safe": k}
+
     def checks(self, lv, rep, focus):
-        return {"clear": True, "time": rep["seconds"] <= lv["par"], "safe": rep["deaths"] <= 2}
+        return {"clear": True, "time": rep["seconds"] <= lv["par"], "safe": rep["deaths"] <= lv.get("safe", 2)}

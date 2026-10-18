@@ -10,6 +10,7 @@
   ai     电脑蛇几条    ai_len 电脑蛇多长    ai_speed 电脑蛇速度（小蛇是 1）    ai_aggr 电脑蛇多爱拦路（0–1）
   food   场上同时有多少豆子；tip 开局提示
 前 8 关手做，第 9 关起按关数生成（make）：场地更大、目标更长、电脑蛇更多更快更爱拦路。
+3、4 个人玩（for_team）：目标长度和豆子按人数加，「倒下」那颗星也多放宽 1 次。
 """
 from . import Game, register
 
@@ -19,9 +20,9 @@ FIELDS = ("size", "target", "time", "ai", "ai_len", "ai_speed", "ai_aggr", "food
 @register
 class Snake(Game):
     id, name, icon, color, tag = "snake", "贪吃蛇大作战", "🐍", "#3aa860", "联网合作"
-    desc = "两条小蛇一起吃豆子长大，躲开电脑蛇，让它们撞到你们身上，两条蛇加起来够长就过关。"
-    players, freeze, max_seconds = (2, 2), False, 900   # 谁倒下谁答题：答错不冷冻，改成「多欠一道题」
-    roles = {"green": ("小绿", "🟢"), "pink": ("小粉", "🩷")}
+    desc = "2～4 条小蛇一起吃豆子长大，躲开电脑蛇，让它们撞到你们身上，大家加起来够长就过关。"
+    players, freeze, max_seconds = (2, 4), False, 900   # 谁倒下谁答题：答错不冷冻，改成「多欠一道题」
+    roles = {"green": ("小绿", "🟢"), "pink": ("小粉", "🩷"), "blue": ("小蓝", "🔵"), "orange": ("小橙", "🟠")}
     stars = (("clear", "一起长到目标长度"), ("time", "进入目标时间"), ("safe", "倒下不超过 1 次"))
     worlds = (("草地", "day"), ("星空", "night"), ("沙漠", "desert"), ("雪原", "snow"), ("海底", "sea"), ("火山", "volcano"))
     count = 24
@@ -47,10 +48,16 @@ class Snake(Game):
         if lv["par"] > lv["time"]:
             raise ValueError(f"snake/{name}: par 不能比限时长")
 
+    def for_team(self, lv, k):
+        k = max(2, min(4, int(k)))
+        if k == 2:
+            return lv
+        return {**lv, "target": round(lv["target"] * k / 2), "food": round(lv["food"] * k / 2), "players": k, "safe": k - 1}
+
     def clean(self, lv, rep):
         out = super().clean(lv, rep)
         out["score"] = min(out["score"], 10_000)
         return out
 
     def checks(self, lv, rep, focus):
-        return {"clear": True, "time": rep["seconds"] <= lv["par"], "safe": rep["deaths"] <= 1}
+        return {"clear": True, "time": rep["seconds"] <= lv["par"], "safe": rep["deaths"] <= lv.get("safe", 1)}

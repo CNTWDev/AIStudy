@@ -78,6 +78,15 @@ def set_game_unlock(kid_id: int, rule) -> None:
         _save_setting(kid_id, "game_unlock", rule)
 
 
+def public_rooms(kid: dict) -> bool:
+    """能不能进全站的公开房间（和别的家庭的孩子一起玩）。家长可以关掉；关掉以后只能进家里的和用密码进的房间。"""
+    return bool(_settings(kid).get("public_rooms", True))
+
+
+def set_public_rooms(kid_id: int, on: bool) -> None:
+    _save_setting(kid_id, "public_rooms", bool(on))
+
+
 # ------------------------------------------------------------------ 今天能不能玩、能玩多久
 
 def _ts(s: str) -> datetime:

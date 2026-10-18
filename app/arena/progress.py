@@ -5,6 +5,7 @@
 - 过关才开下一关（打过的最高一关的下一关）。
 - 世界：一个世界的最后一关过了算打通（要从第 1 个世界起连续打通），打通了解锁这个世界登记的东西。
 比的是自己（或「我们」）和上次的自己，不和别人排名（docs/DESIGN.md 5.12 的原则）。
+几个人第一次凑成一队时，每个人都打过的关直接开放（reach）。
 """
 from .. import db
 from .games import Game
@@ -22,11 +23,21 @@ def unlock_of(w: tuple):
     return {"id": w[2][0], "icon": w[2][1], "name": w[2][2], "how": w[2][3]} if len(w) > 2 else None
 
 
+def reach(game: Game, kid_id: int) -> int:
+    """这个孩子和任何人一起（或者自己）打过的最高一关。"""
+    r = db.one("SELECT MAX(level) AS n FROM game_runs WHERE game=? AND cleared_at IS NOT NULL AND (',' || team || ',') LIKE ?",
+               game.id, f"%,{int(kid_id)},%")
+    return int(r["n"] or 0) if r else 0
+
+
 def progress(game: Game, team: str) -> dict:
+    """这支队伍的进度。几个人第一次凑成一队（比如公开房间里遇到的）：每个人都打过的关，这队也能直接选，不用从第 1 关打起。"""
     rows = _rows(game, team)
     total = len(game.levels)
     cleared = {n for n, r in rows.items() if r["cleared_at"] and n <= total}
-    upto = min(total, max(cleared, default=0) + 1)
+    ids = [x for x in team.split(",") if x]
+    shared = min(reach(game, int(i)) for i in ids) if len(ids) > 1 else 0
+    upto = min(total, max(max(cleared, default=0), shared) + 1)
     levels = [{"n": lv["n"], "name": lv["name"], "boss": bool(lv.get("boss")), "world": game.world_of(lv["n"])["n"],
                "stars": (rows.get(lv["n"]) or {}).get("stars") or 0, "best": (rows.get(lv["n"]) or {}).get("best"),
                "open": lv["n"] <= upto, "cleared": lv["n"] in cleared} for lv in game.levels]
