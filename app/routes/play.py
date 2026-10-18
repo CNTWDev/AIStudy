@@ -18,7 +18,7 @@ router = APIRouter()
 @router.get("/arena", response_class=HTMLResponse)
 def arena_home(request: Request):
     k = kid_or_redirect(request)
-    return render(request, "arena.html", a=arena.hub(k), invites=rooms.invites(k))
+    return render(request, "arena.html", a=arena.hub(k), invites=rooms.invites(k), board_tip=boards.nudge(dict(k), park=True))
 
 
 @router.get("/arena/{game}", response_class=HTMLResponse)
@@ -31,7 +31,7 @@ def arena_game(request: Request, game: str):
     if a["locked"] and not rooms.playing(room):   # 还不能玩：回乐园首页，那里写着为什么、去做任务
         return RedirectResponse("/arena?locked=1", 303)
     return render(request, "arena_game.html", g=g, game=game, a=a, me=rooms.member(k), room=room,
-                  lobby=rooms.lobby(k, game) if g.multi else None, gb=boards.board(dict(k), "game", "all", game))
+                  lobby=rooms.lobby(k, game) if g.multi else None, gb=boards.board(dict(k), "game", "all", game), gba=boards.board(dict(k), "game_all", "all", game))
 
 
 @router.post("/api/arena/start")

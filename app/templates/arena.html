@@ -24,7 +24,7 @@
 <p class="small muted" style="margin:-4px 0 12px">{% if simple %}💡 全做完 +10 分钟 · 点亮 1 个 +2 分钟{% else %}💡 把今天的任务全部做完，还能多玩 10 分钟；每点亮一个知识点再多 2 分钟。{% endif %}</p>
 {% endif %}
 
-<a class="ah-invite ah-board" href="/boards?metric=game"><span class="i">🏆</span><span class="grow"><b>乐园榜</b> · 这周你答对了 {{ a.week.right }} 道题，看看排第几</span><span class="btn sm">去看</span></a>
+<a class="ah-invite ah-board" href="/boards?metric=game"><span class="i">🏆</span><span class="grow"><b>乐园榜</b> · {{ board_tip or '比一比这周谁答对的题多' }}</span><span class="btn sm">去看</span></a>
 {% for inv in invites %}
 <a class="ah-invite" {% if a.locked %}role="button" data-locked{% else %}href="/arena/{{ inv.game }}"{% endif %}><span class="i">{{ inv.icon }}</span><span class="grow"><b>{{ inv.host.name }}</b> 开了「{{ inv.name }}」的房间，在等你一起玩！</span><span class="btn sm">去加入</span></a>
 {% endfor %}

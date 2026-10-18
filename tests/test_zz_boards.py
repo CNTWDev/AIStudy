@@ -122,7 +122,7 @@ def test_game_board():
         assert r["mine"]["rank"] == 1 and r["mine"]["value"] == 2 and [x["id"] for x in r["top"]] == [a]
         assert boards.board(dict(auth.get_user(a)), "game")["mine"]["value"] == 5
         page = c.get("/arena/bubble").text
-        assert "泡泡堂榜" in page and "第 1 名" in page and "/boards?metric=game&game=bubble" in page
+        assert "泡泡堂榜" in page and "我第 1 名" in page and "一共答对" in page
         assert "泡泡堂榜" in c.get("/boards?metric=game&game=bubble").text
 
 
@@ -134,10 +134,35 @@ def test_empty_board_explains_and_admin_can_view():
         c.cookies.clear()
         c.post("/login", data={"email": "bd-p-em@x.com", "password": "secret1"})
         page = c.get("/boards").text
-        assert "学习榜" in page and "上榜的小伙伴" in page and "在家长页选一个孩子" in page
-        assert "家长打开" in page or "上榜的小伙伴" in page
+        assert "学习榜" in page and "榜上的小伙伴" in page and "在家长页选一个孩子" in page
         auth.create_user("bd-admin@x.com", "secret1", "管理员", "admin")
         c.cookies.clear()
         c.post("/login", data={"email": "bd-admin@x.com", "password": "secret1"})
         r = c.get("/boards?metric=game")
         assert r.status_code == 200 and "乐园榜" in r.text and pid and k
+
+
+def test_progress_and_rank_moves():
+    """和上周同一天比：本周进步榜、比上周前进几名、再多少进前 10；今天页、乐园页各一句。"""
+    with TestClient(app) as c:
+        boards.refresh()
+        _, me = _family("pr")
+        _, other = _family("po")
+        _days(other, [7, 8, 9, 10])          # 上周打卡多，这周没来
+        _days(me, [0, 1, 2])                 # 这周（往前 3 天里的）打卡
+        boards.refresh()
+        kid = dict(auth.get_user(me))
+        r = boards.board(kid, "total")
+        assert r["week"]["now"] >= 1 and r["week"]["prev"] == 0
+        assert r["moved"] == "new" or (isinstance(r["moved"], int) and r["moved"] >= 0)
+        up = boards.board(kid, "up")
+        assert up["mine"]["value"] == r["week"]["now"] and other not in [x["id"] for x in up["top"]] and up["moved"] is None
+        tip = boards.nudge(kid)
+        assert tip and "学习榜" in tip or "👍" in tip
+        auth.set_private(me, True)
+        assert boards.nudge(dict(auth.get_user(me))) == ""
+        auth.set_private(me, False)
+        boards.refresh()
+        c.post("/login", data={"email": "bd-pr@x.com", "password": "secret1"})
+        page = c.get("/boards?metric=total").text
+        assert "上周这时候" in page and "bd-podium" in page and "bd-rank" in page
