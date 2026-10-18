@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="/records" class="back">← 记录</a>
+<div class="ph"><h1>🏆 打卡榜</h1></div>
+<p class="muted small" style="margin:4px 0 10px">比的是每天坚持，不比谁做得多、做得对。做完今天的第 1 节就算打卡。</p>
+<div class="subnav" style="margin:8px 0">
+{% for m, n in b.metrics.items() %}<a class="{{ 'on' if b.metric == m }}" href="/boards?metric={{ m }}&scope={{ b.scope }}">{{ n }}</a>{% endfor %}
+</div>
+<div class="subnav" style="margin:0 0 12px">
+<a class="{{ 'on' if b.scope == 'all' }}" href="/boards?metric={{ b.metric }}&scope=all">🌏 全站</a>
+{% if b.city_ok %}<a class="{{ 'on' if b.scope == 'city' }}" href="/boards?metric={{ b.metric }}&scope=city">📍 {{ b.city }}</a>{% endif %}
+</div>
+<div class="card board">
+{% for r in b.top %}
+  <div class="brow{{ ' me' if r.me }}"><span class="bk">{{ ['🥇','🥈','🥉'][r.rank - 1] if r.rank <= 3 else r.rank }}</span><b class="grow">{{ r.name }}{% if r.me %} <small>（我）</small>{% endif %}</b><span class="bv">{{ r.value }} 天</span></div>
+{% else %}
+  <div class="empty"><div class="e">🌱</div><b>榜上还没有人</b>打开上榜的小伙伴多了，这里就热闹了。</div>
+{% endfor %}
+{% if b.mine and b.mine.rank > b.top|length %}
+  <div class="brow gap">⋯</div>
+  <div class="brow me"><span class="bk">{{ b.mine.rank }}</span><b class="grow">{{ b.mine.name }} <small>（我）</small></b><span class="bv">{{ b.mine.value }} 天</span></div>
+{% endif %}
+</div>
+<div class="card">
+{% if b.mine %}
+  {% if b.mine.rank == 1 %}<b>🎉 你在第 1 名！</b>每天做完第 1 节，就能一直保持。
+  {% elif b.ahead %}<b>再坚持 {{ b.ahead }} 天，就能超过前面一位。</b>
+  {% endif %}
+{% elif b.metric == 'streak' and not b.counts.streak %}
+  <b>这个月你已经打卡 {{ b.counts.month }} 天。</b>今天做完第 1 节，连续打卡就从 1 天重新开始。
+{% else %}
+  <b>你{{ b.metrics[b.metric] }} {{ b.counts[b.metric] }} 天。</b>
+{% endif %}
+{% if not b.on_board %}<p class="muted small" style="margin:6px 0 0">你还没上榜。想上榜的话，请爸爸妈妈在家长页打开「上打卡榜」。榜上只显示你的游戏昵称。</p>{% endif %}
+</div>
+{% endblock %}

@@ -652,3 +652,8 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .calendar .d.tip-on,.heat a.tip-on{outline:2px solid var(--brand-ink);outline-offset:1px}
 /* 等题时的复习小卡（app.js waitWith） */
 .fillcard{max-width:520px;margin:0 auto}.fillcard .face{font-size:20px;text-align:center;padding:14px 4px 6px;white-space:pre-wrap}
+/* 打卡榜 */
+.board{padding:6px 10px}.brow{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line-2)}
+.brow:last-child{border-bottom:0}.brow .bk{width:30px;text-align:center;font-weight:800;font-size:17px}
+.brow .bv{font-weight:800;white-space:nowrap}.brow.me{background:var(--brand-2);border-radius:12px}.brow.gap{justify-content:center;color:var(--muted)}
+.brow small{font-weight:400;color:var(--muted)}

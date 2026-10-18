@@ -2,7 +2,7 @@
 from fastapi import APIRouter
 from fastapi import Body, HTTPException, Request
 from fastapi.responses import HTMLResponse
-from .. import db, llm, records
+from .. import boards, db, llm, records
 from ..web import (
     _records_ctx,
     catalog,
@@ -32,6 +32,12 @@ def run_save(request: Request, body: dict = Body(...)):
 def records_page(request: Request):
     k = kid_or_redirect(request, manage=True)
     return render(request, "records.html", **_records_ctx(k), report_for=None)
+
+
+@router.get("/boards", response_class=HTMLResponse)
+def boards_page(request: Request, metric: str = "streak", scope: str = "all"):
+    k = kid_or_redirect(request, manage=True)
+    return render(request, "boards.html", b=boards.board(dict(k), metric, scope))
 
 
 @router.get("/healthz")

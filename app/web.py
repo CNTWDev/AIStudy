@@ -10,7 +10,7 @@ from fastapi.responses import RedirectResponse
 
 from fastapi.templating import Jinja2Templates
 
-from . import arena, auth, bankpapers, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, sprint, streak, trace
+from . import arena, auth, bankpapers, boards, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, sprint, streak, trace
 
 from . import figures
 
@@ -30,7 +30,7 @@ templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
-                             stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock, public_rooms=arena.public_rooms,
+                             stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock, public_rooms=arena.public_rooms, on_board=boards.on_board, PROVINCES=boards.PROVINCES,
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES,
                              trend_words=records.trend_words, tts_info=tts_web.client_info, qview=itemtypes.view,
                              qfig=figures.present)
@@ -336,6 +336,9 @@ def _save_learning(kid_id: int, form, grade: str, old_grade, games: bool = True)
                 auth.set_nickname(dict(k), nick)
             except ValueError as e:
                 raise HTTPException(400, str(e))
+        boards.set_on_board(kid_id, bool(form.get("board")))
+        if k["parent_id"] and form.get("province") is not None:
+            boards.set_city(k["parent_id"], form.get("province") or "", form.get("city") or "")
     old = {e["pack_id"]: e["stage"] for e in enrollments(kid_id)}
     chosen = _kid_form_packs(form, grade, old, grade != old_grade)
     db.run("UPDATE enrollments SET active=0 WHERE user_id=?", kid_id)
