@@ -255,3 +255,42 @@ def test_focus_index():
                uid, mid, "MSH-NUM-10", "mult", 3, 0.5, ok, ms, db.now())
     f = matches.focus(mid)
     assert f["index"] == 133 and f["extra"] == 1 and f["guesses"] == 2
+
+
+def test_unlimited_game_time():
+    """家长选「不限时」：不封顶、不倒计时、不显示还剩几分钟；解锁规则照常。"""
+    with TestClient(app) as c:
+        if c.get("/login").text.count("创建网站管理员账号"):
+            c.post("/register", data={"email": "admin@x.com", "password": "secret1", "name": "站长"})
+        else:
+            c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
+        c.post("/admin/users/create", data={"email": "up@x.com", "password": "secret1", "name": "不限爸爸", "role": "parent"})
+        c.get("/logout")
+        c.post("/login", data={"email": "up@x.com", "password": "secret1"})
+        assert "不限时" in c.get("/parent/kids/new").text
+        c.post("/parent/kids/save", data={"name": "小不限", "email": "uk@x.com", "password": "secret1", "grade": "G3",
+                                          "daily_minutes": "60", "subj_math": "math-shanghai", "game_minutes": "-1"})
+        kid = dict(db.one("SELECT * FROM users WHERE email='uk@x.com'"))
+        assert arena.game_minutes(kid) == arena.UNLIMITED
+        assert 'value="-1" selected' in c.get(f"/parent/kids/{kid['id']}/edit").text
+        st = arena.status(kid)
+        assert st["unlimited"] and st["minutes"] is None and not st["bonus_all"] and not st["can_bonus_all"]
+        assert st["need"] == (st["total"] + 1) // 2      # 解锁规则还是「做完一半」
+        arena.set_game_unlock(kid["id"], "free")
+        # 玩了很久也不会用完
+        db.insert("INSERT INTO arena_matches(user_id, game, mode, started_at, ended_at, seconds, data) VALUES(?,?,?,?,?,?,?)",
+                  kid["id"], "stickman", "solo", db.now(), db.now(), 5 * 3600, "{}")
+        kid = dict(db.one("SELECT * FROM users WHERE id=?", kid["id"]))
+        st = arena.status(kid)
+        assert st["unlocked"] and st["left"] > 0 and arena.locked_reason(st) == ""
+        c.get("/logout")
+        c.post("/login", data={"email": "uk@x.com", "password": "secret1"})
+        hub = c.get("/arena").text
+        assert "今天不限时" in hub and "今天还能玩" not in hub
+        assert "今天不限时" in c.get("/today").text
+        start = c.post("/api/arena/start", json={"game": "stickman"}).json()
+        assert start["unlimited"] and start["seconds_left"] > 0
+        # 改回有限时长，照常封顶
+        arena.set_game_minutes(kid["id"], 25)
+        assert arena.game_minutes(dict(db.one("SELECT * FROM users WHERE id=?", kid["id"]))) in (20, 30)
+        c.get("/logout")

@@ -312,7 +312,7 @@
       over.classList.toggle('has-map', !!prog);
       const lv = lvAt(room.level);
       if (lv && lv.tip) h += `<p class="mp-tip">💡 ${esc(lv.tip)}</p>`;
-      if (room.host) h += `<button type="button" class="btn lg block pl-go mp-start">${LV.length ? `开始第 ${room.level} 关！` : '开始！'}<small>（今天还能玩 ${Math.floor((data.left || 0) / 60)} 分钟）</small></button>`;
+      if (room.host) h += `<button type="button" class="btn lg block pl-go mp-start">${LV.length ? `开始第 ${room.level} 关！` : '开始！'}${data.unlimited ? '' : `<small>（今天还能玩 ${Math.floor((data.left || 0) / 60)} 分钟）</small>`}</button>`;
       else h += `<p class="mp-note">等 <b>${esc(nameOf(room.members.find(m => m.host).id))}</b> 选关、点开始。</p>`;
       h += `<p class="pl-locked">${locked ? esc(multi ? `${locked.name}：${locked.locked}` : locked.locked) : ''}</p>`;
       if (locked && locked.id === me0.id && data.need) h += `<a class="btn block" href="/today">去做任务</a>`;
@@ -573,7 +573,7 @@
         ${r.topics && r.topics.length ? `<div class="pl-topics">这局练了：${r.topics.map(t => `<span>${esc(t.topic)} <b>${t.right}/${t.n}</b></span>`).join('')}</div>` : ''}
         ${r.tips && r.tips.length ? `<ul class="pl-tips">${r.tips.slice(0, multi ? 2 : 4).map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
         ${lv ? `<div class="pl-lv"><span>乐园 Lv.${lv.level}</span><i><b style="width:${lv.pct}%"></b></i><small>再答对 ${lv.to_next} 题升级</small></div>` : ''}
-        <p class="pl-left">今天还能玩 ${Math.floor((r.seconds_left || 0) / 60)} 分钟</p>`;
+        ${r.unlimited ? '' : `<p class="pl-left">今天还能玩 ${Math.floor((r.seconds_left || 0) / 60)} 分钟</p>`}`;
     }
     function showEnd(h, res, p) {
       state = 'end';

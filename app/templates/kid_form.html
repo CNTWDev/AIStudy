@@ -17,7 +17,7 @@
   <p class="muted small" style="margin:4px 0 0">{% if self_mode %}成年人选「成人」：AI 用成人的口吻讲解。{% else %}成人学习者（比如备考基金从业资格）年级选「成人」：AI 用成人的口吻讲解，不显示乐园。成年人也可以自己注册「自己学」的账号，自己选课。{% endif %}</p>
   {% if not self_mode %}
   <div id="games">
-  <label>每天最多玩游戏</label><select name="game_minutes">{% set gm = game_minutes(k) if k else 20 %}{% for m in GAME_MINUTE_CHOICES %}<option value="{{ m }}" {{ 'selected' if m == gm }}>{{ '不玩' if m == 0 else m ~ ' 分钟' }}</option>{% endfor %}</select>
+  <label>每天最多玩游戏</label><select name="game_minutes">{% set gm = game_minutes(k) if k else 20 %}{% for m in GAME_MINUTE_CHOICES %}<option value="{{ m }}" {{ 'selected' if m == gm }}>{{ '不玩' if m == 0 else ('不限时' if m < 0 else m ~ ' 分钟') }}</option>{% endfor %}</select>
   <label>什么时候可以玩</label><select name="game_unlock">{% set gu = game_unlock(k) if k else 'half' %}{% for v, n in UNLOCK_CHOICES.items() %}<option value="{{ v }}" {{ 'selected' if v == gu }}>{{ n }}</option>{% endfor %}</select>
   <label>游戏里的昵称（选填）</label><input type="text" name="nickname" maxlength="10" value="{{ k.nickname if k else '' }}" placeholder="比如：闪电小队长">
   <label style="display:flex;gap:8px;align-items:center;font-weight:normal"><input type="checkbox" name="public_rooms" value="1" style="width:auto" {{ 'checked' if (public_rooms(k) if k else True) }}> 可以进全站的公开房间，和别的家庭的孩子一起玩</label>

@@ -9,7 +9,7 @@
     <h1>🎮 乐园</h1>
     <div class="lv"><span>Lv.{{ a.level.level }}</span><i><b style="width:{{ a.level.pct }}%"></b></i><small>再答对 {{ a.level.to_next }} 题升级</small></div>
     <div class="ah-time">
-      {% if S.base %}<span>⏱ 今天还能玩 {{ (S.left / 60)|round(0, 'floor')|int }} 分钟</span>{% endif %}
+      {% if S.unlimited %}<span>⏱ 今天不限时</span>{% elif S.base %}<span>⏱ 今天还能玩 {{ (S.left / 60)|round(0, 'floor')|int }} 分钟</span>{% endif %}
       {% if S.bonus_all %}<span>✅ 任务全做完 +{{ S.bonus_all }}</span>{% endif %}
       {% if S.bonus_sprint %}<span>⚡ 冲刺 +{{ S.bonus_sprint }}</span>{% endif %}
       {% if S.bonus_lit %}<span>🌟 点亮 {{ S.lit }} 个 +{{ S.bonus_lit }}</span>{% endif %}

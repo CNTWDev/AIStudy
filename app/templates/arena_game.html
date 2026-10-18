@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="/static/play/play.css?v={{ ASSET_V }}">
 <link rel="stylesheet" href="/static/play/mp.css?v={{ ASSET_V }}">
 {% if g.css %}<link rel="stylesheet" href="/static/play/{{ game }}.css?v={{ ASSET_V }}">{% endif %}
-{% set info = {'game': g.describe(), 'me': me, 'room': room, 'lobby': lobby, 'avatar': a.avatar, 'left': a.status.left,
+{% set info = {'game': g.describe(), 'me': me, 'room': room, 'lobby': lobby, 'avatar': a.avatar, 'left': a.status.left, 'unlimited': a.status.unlimited,
                'locked': a.locked, 'need': a.status.need, 'ghost': a.ghost, 'level': a.level.level} %}
 <div id="pl" class="pl pl-{{ game }}{{ ' pl-mp' if g.multi }}" data-info='{{ info|tojson }}'>
   <div class="pl-top">
