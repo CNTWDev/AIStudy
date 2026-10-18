@@ -1,0 +1,12 @@
+{# 管理后台共用：导航（app/web.py ADMIN_NAV，四组，每个后台页面顶部用 {{ admin_nav('当前页的 key') }}）、账号状态标签。 #}
+{% macro admin_nav(on, pending=0) -%}
+<nav class="adminnav" aria-label="管理后台">
+  {% for group, items in ADMIN_NAV %}<div class="grp"><span class="gl">{{ group }}</span>{% for key, label, url in items %}<a href="{{ url }}" class="{{ 'on' if key == on }}">{{ label }}{% if key == 'overview' and pending %} <span class="badge">{{ pending }}</span>{% endif %}</a>{% endfor %}</div>{% endfor %}
+</nav>
+{%- endmacro %}
+
+{% macro status_pill(u) -%}
+{% if u.status == 'pending' %}<span class="pill st-learning">待审批</span>{% elif u.status == 'disabled' %}<span class="pill st-weak">已停用</span>{% elif u.status == 'rejected' %}<span class="pill st-weak">未通过</span>{% endif %}
+{%- if u.locked_until and u.locked_until > now %} <span class="pill st-weak">锁定中</span>{% endif %}
+{%- if u.is_admin %} <span class="pill">管理员</span>{% endif %}
+{%- endmacro %}

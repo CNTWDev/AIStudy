@@ -2,11 +2,13 @@
 from fastapi import APIRouter
 from fastapi import Body, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
-from .. import arena, auth, bank, bankflow, bankpapers, config, db, evidence, itemtypes, llm, papers, sitecfg, tts_web
+from .. import arena, auth, bank, boards, bankflow, bankpapers, config, db, evidence, itemtypes, llm, papers, sitecfg, tts_web
 from datetime import timedelta
+from urllib.parse import urlencode
 from ..web import (
     ADMIN_TABS,
     _admin_back,
+    enrollments,
     _admin_user_page,
     _bp_back,
     _bp_or_404,
@@ -24,41 +26,54 @@ from ..web import (
 
 router = APIRouter()
 
+def _active_week() -> set:
+    """近 7 天学过（有学习分钟或打了卡）的学习账号。"""
+    since = (db.today() - timedelta(days=7)).isoformat()
+    return {r["user_id"] for r in db.q("SELECT DISTINCT user_id FROM days WHERE day>=? AND (minutes>0 OR checked_in=1)", since)}
+
+
+def _family_row(p, users, active) -> dict:
+    """家庭列表的一行：一个家长账号和他添加的孩子。"""
+    kids = [k for k in users if k["role"] == "kid" and k["parent_id"] == p["id"]]
+    seen = [x for x in [p["last_active_at"] or p["last_login_at"]] + [k["last_active_at"] or k["last_login_at"] for k in kids] if x]
+    return {"p": p, "kids": kids, "active": sum(1 for k in kids if k["id"] in active), "last": max(seen) if seen else "",
+            "n_invited": sum(1 for u in users if u["invited_by"] == p["id"])}
+
+
 @router.get("/admin", response_class=HTMLResponse)
 def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str = "", q: str = ""):
     a = auth.require_admin(request)
     if tab == "curricula":
         return RedirectResponse("/admin/curricula", 303)
-    ctx = {"tab": tab, "tabs": ADMIN_TABS, "msg": msg, "link": link, "now": db.now(), "q": q}
+    tab = "invites" if tab == "tree" else tab   # 邀请关系并进了邀请码
+    if tab not in ADMIN_TABS:
+        tab = "overview"
+    ctx = {"tab": tab, "msg": msg, "link": link, "now": db.now(), "q": q}
     users = db.q("SELECT u.*, i.name AS inviter_name, i.email AS inviter_email, p.name AS parent_name "
                  "FROM users u LEFT JOIN users i ON i.id=u.invited_by LEFT JOIN users p ON p.id=u.parent_id ORDER BY u.id")
     by_id = {u["id"]: u for u in users}
     ctx["pending"] = [u for u in users if u["status"] == "pending"]
-    week_ago = (db.today() - timedelta(days=7)).isoformat()
+    active = _active_week()
     ctx["stats"] = {
         "families": sum(1 for u in users if u["role"] == "parent" and u["status"] == "active"),
         "kids": sum(1 for u in users if u["role"] == "kid" and u["parent_id"]),
         "selfs": sum(1 for u in users if auth.is_self_learner(u)),
         "pending": len(ctx["pending"]),
-        "active_kids": db.one("SELECT COUNT(DISTINCT user_id) AS n FROM days WHERE day>=? AND (minutes>0 OR checked_in=1)",
-                              week_ago)["n"],
+        "active_kids": len(active),
         "invites_open": db.one("SELECT COUNT(*) AS n FROM invites WHERE used<max_uses AND (expires_at IS NULL OR expires_at>?)",
                                db.now())["n"],
     }
     if tab == "overview":
-        ctx["recent"] = sorted([u for u in users if u["role"] == "parent"], key=lambda u: u["created_at"], reverse=True)[:8]
+        ctx["recent"] = [_family_row(p, users, active) for p in
+                         sorted([u for u in users if u["role"] == "parent"], key=lambda u: u["created_at"], reverse=True)[:8]]
+        ctx["recent_selfs"] = sorted([u for u in users if auth.is_self_learner(u)], key=lambda u: u["created_at"], reverse=True)[:5]
     elif tab == "families":
-        fams = []
-        for p in users:
-            if p["role"] != "parent":
-                continue
-            if q and q.lower() not in (p["email"] + p["name"]).lower():
-                continue
-            kids = [kid_brief(k) for k in users if k["parent_id"] == p["id"]]
-            fams.append({"p": p, "kids": kids,
-                         "invited": [u for u in users if u["invited_by"] == p["id"]]})
-        ctx["families"] = fams
-        ctx["selfs"] = [kid_brief(u) for u in users if auth.is_self_learner(u)
+        ctx["families"] = [_family_row(p, users, active) for p in users if p["role"] == "parent"
+                           and (not q or q.lower() in (p["email"] + p["name"] + p["city"]).lower()
+                                or any(q.lower() in k["name"].lower() for k in users if k["parent_id"] == p["id"]))]
+    elif tab == "selfs":
+        ctx["selfs"] = [{"u": u, "packs": [catalog.packs[e["pack_id"]].subject_name for e in enrollments(u["id"])],
+                         "active": u["id"] in active} for u in users if auth.is_self_learner(u)
                         and (not q or q.lower() in (u["email"] + u["name"]).lower())]
     elif tab == "invites":
         invites = db.q("SELECT v.*, u.name AS creator_name, u.email AS creator_email FROM invites v "
@@ -68,8 +83,8 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
             if u["invite_code"]:
                 used_by.setdefault(u["invite_code"], []).append(u)
         ctx["invites"], ctx["used_by"] = invites, used_by
-    elif tab == "tree":
-        parents = [u for u in users if u["role"] in ("parent", "admin") or auth.is_self_learner(u)]  # 管理员也是邀请树的起点
+        # 邀请关系：谁邀请了谁（管理员也是邀请树的起点）
+        parents = [u for u in users if u["role"] in ("parent", "admin") or auth.is_self_learner(u)]
         children = {}
         for u in parents:
             children.setdefault(u["invited_by"] if u["invited_by"] in by_id else None, []).append(u)
@@ -159,13 +174,15 @@ def admin_user_status(request: Request, uid: int, status: str = Form(...), back:
 
 
 @router.post("/admin/users/{uid}/admin")
-def admin_toggle_admin(request: Request, uid: int, on: str = Form("")):
+def admin_toggle_admin(request: Request, uid: int, on: str = Form(""), back: str = Form("families")):
     a = auth.require_admin(request)
     u = auth.get_user(uid)
     if not u or u["role"] != "parent" or uid == a["id"]:
         return _admin_back("families", msg="只能把其他家长账号设为管理员")
     db.run("UPDATE users SET is_admin=? WHERE id=?", 1 if on else 0, uid)
     auth.log_event("admin_grant" if on else "admin_revoke", user_id=uid, email=u["email"], detail=f"by {a['email']}", request=request)
+    if back == "family":
+        return RedirectResponse(f"/admin/families/{uid}?" + urlencode({"msg": "已更新管理员权限"}), 303)
     return _admin_back("families", msg="已更新管理员权限")
 
 
@@ -381,3 +398,53 @@ def operations(request: Request):
                  "SUM(input_tokens) AS input_tokens,SUM(output_tokens) AS output_tokens,COUNT(input_tokens) AS input_known,COUNT(output_tokens) AS output_known FROM llm_calls "
                  "WHERE created_at>=? GROUP BY task,provider,model,status", db.today().isoformat())
     return render(request, 'operations.html', jobs=db.q('SELECT * FROM jobs ORDER BY name'), calls=calls)
+
+
+# ------------------------------------------------------------------ 家庭页、学习账号换家庭
+
+@router.get("/admin/families/{pid}", response_class=HTMLResponse)
+def admin_family(request: Request, pid: int, msg: str = ""):
+    """一个家庭：家长账号 + 每个孩子的学习概况和家长给孩子定的规矩（游戏、公开房间、排行榜，只看不改：归家长管）。"""
+    a = auth.require_admin(request)
+    p = db.one("SELECT * FROM users WHERE id=? AND role='parent'", pid)
+    if not p:
+        raise HTTPException(404)
+    kids = db.q("SELECT * FROM users WHERE parent_id=? AND role='kid' ORDER BY id", pid)
+    inviter = auth.get_user(p["invited_by"]) if p["invited_by"] else None
+    return render(request, "admin_family.html", p=p, me=a, inviter=inviter, kids=[kid_brief(k) for k in kids],
+                  city=boards.city_label(p["city"]), msg=msg, now=db.now())
+
+
+def move_learner(kid, parent, actor, request=None) -> str:
+    """把学习账号挂到另一个家庭（parent），或者 parent=None 改为自学者。
+    学习记录、课程、游戏和隐私设置都按账号存，原样跟着走（新家长在家长页能看到、能改）；只离开正在玩的联网房间。"""
+    old = auth.get_user(kid["parent_id"]) if kid["parent_id"] else None
+    db.run("UPDATE users SET parent_id=? WHERE id=?", parent["id"] if parent else None, kid["id"])
+    arena.leave_rooms(dict(kid))
+    boards.refresh()
+    frm = f"{old['email']} 家" if old else "自学者"
+    to = f"{parent['email']} 家" if parent else "自学者"
+    auth.log_event("admin_move_learner", user_id=kid["id"], email=kid["email"], detail=f"{frm} → {to} by {actor['email']}", request=request)
+    return to
+
+
+@router.post("/admin/users/{uid}/family")
+def admin_user_family(request: Request, uid: int, to: str = Form(...), confirm: str = Form("")):
+    a = auth.require_admin(request)
+    k = db.one("SELECT * FROM users WHERE id=? AND role='kid'", uid)
+    if not k:
+        raise HTTPException(404)
+    if confirm.strip() != k["name"]:
+        return _admin_back("user", msg="确认名字没填对，账号没有调整", uid=uid)
+    if to == "self":
+        if not k["parent_id"]:
+            return _admin_back("user", msg="已经是自学者了", uid=uid)
+        parent = None
+    else:
+        parent = db.one("SELECT * FROM users WHERE id=? AND role='parent' AND status='active'", int(to) if to.isdigit() else 0)
+        if not parent:
+            return _admin_back("user", msg="没有这个家庭（只能挂到正常使用中的家长账号下）", uid=uid)
+        if parent["id"] == k["parent_id"]:
+            return _admin_back("user", msg="已经在这个家庭里了", uid=uid)
+    to = move_learner(k, parent, a, request)
+    return _admin_back("user", msg=f"已把 {k['name']} 调整为：{to}。学习记录和设置都保留。", uid=uid)

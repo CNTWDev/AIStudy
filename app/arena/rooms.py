@@ -118,6 +118,11 @@ def _leave_multi(kid: dict) -> None:
         _remove(_room(r["id"]), kid["id"])
 
 
+def leave_rooms(kid: dict) -> None:
+    """管理员把孩子换到别的家庭、或改为自学者：先离开所有联网房间（家里的房间按家庭找人）。"""
+    _leave_multi(kid)
+
+
 def _frontier(room_id: int) -> None:
     """房间里的人变了：选中的关跳到这队能打的最远一关（房主还能往回选），大家接着往下打。"""
     r = db.one("SELECT game FROM game_rooms WHERE id=?", room_id)

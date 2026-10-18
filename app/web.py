@@ -30,7 +30,7 @@ templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
-                             stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock, is_private=auth.is_private, PROVINCES=boards.PROVINCES,
+                             stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock, is_private=auth.is_private, PROVINCES=boards.PROVINCES, city_label=boards.city_label,
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES,
                              trend_words=records.trend_words, tts_info=tts_web.client_info, qview=itemtypes.view,
                              qfig=figures.present)
@@ -110,7 +110,7 @@ def kid_or_redirect(request: Request, manage: bool = False):
     if user["role"] == "kid":
         return user
     if user["role"] != "parent":
-        raise HTTPException(403, "管理员账号不用来学习；在「管理 → 家庭与孩子」里可以查看每个孩子的情况。")
+        raise HTTPException(403, "管理员账号不用来学习；在「管理 → 家庭」里可以查看每个孩子的情况。")
     kid_id = request.session.get("as_kid")
     k = db.one("SELECT * FROM users WHERE id=? AND parent_id=?", kid_id, user["id"]) if kid_id else None
     if not k:
@@ -193,8 +193,18 @@ def _school_progress(k) -> list[dict]:
                         "check": not e["progress_at"] or e["progress_at"] < confirm_before})
     return out
 
-ADMIN_TABS = [("overview", "概览"), ("stats", "数据统计"), ("families", "家庭与孩子"), ("invites", "邀请码"),
-              ("tree", "邀请关系"), ("curricula", "教材与知识点"), ("bank", "题库"), ("papers", "卷库"), ("arena", "游戏公平"), ("log", "安全日志"), ("system", "站点设置")]
+# 管理后台导航：按「管谁、管什么内容、看运行、改设置」分四组，每个后台页面顶部都用这一份（_admin.html）。
+ADMIN_NAV = [
+    ("用户", [("overview", "概览", "/admin"), ("families", "家庭", "/admin?tab=families"), ("selfs", "自学者", "/admin?tab=selfs"),
+             ("invites", "邀请码", "/admin?tab=invites"), ("log", "安全日志", "/admin?tab=log")]),
+    ("内容", [("curricula", "教材与知识点", "/admin/curricula"), ("bank", "题库", "/admin?tab=bank"), ("papers", "卷库", "/admin?tab=papers"),
+             ("library", "书库", "/admin/library"), ("news", "每日新闻", "/admin/news")]),
+    ("运行", [("stats", "数据统计", "/admin?tab=stats"), ("arena", "游戏公平", "/admin?tab=arena"),
+             ("operations", "后台任务与 AI", "/admin/operations")]),
+    ("设置", [("system", "站点设置", "/admin?tab=system")]),
+]
+ADMIN_TABS = {key for _, items in ADMIN_NAV for key, _, url in items if url.startswith("/admin?") or url == "/admin"}
+templates.env.globals["ADMIN_NAV"] = ADMIN_NAV
 
 def _site_stats(users):
     """数据统计：近 14 天每天的在学孩子数、学习分钟、做题数、AI 调用次数；每个孩子近 7 天的情况。"""
@@ -263,7 +273,8 @@ def _admin_user_page(request: Request, a, u, msg="", link="", **extra):
     kids = db.q("SELECT * FROM users WHERE parent_id=? AND role='kid' ORDER BY id", u["id"])
     inviter = auth.get_user(u["invited_by"]) if u["invited_by"] else None
     events = db.q("SELECT * FROM auth_events WHERE user_id=? ORDER BY id DESC LIMIT 12", u["id"])
-    return render(request, "admin_user.html", u=u, me=a, parent=parent, kids=kids, inviter=inviter, events=events,
+    families = db.q("SELECT id, name, email FROM users WHERE role='parent' AND status='active' ORDER BY name, id") if u["role"] == "kid" else []
+    return render(request, "admin_user.html", u=u, me=a, parent=parent, kids=kids, inviter=inviter, events=events, families=families,
                   msg=msg, link=link, **account_ctx(u, f"/admin/users/{u['id']}/account", force=u["role"] != "kid",
                                                      reset_link=True), **extra)
 

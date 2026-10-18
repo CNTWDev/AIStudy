@@ -305,7 +305,10 @@ def test_approval_and_admin(monkeypatch):
         for tab in ["overview", "stats", "families", "invites", "tree", "log", "system"]:
             assert c.get(f"/admin?tab={tab}").status_code == 200, tab
         fam = c.get("/admin?tab=families").text
-        assert "姐姐" in fam and "连续" in fam
+        assert "姐姐" in fam
+        pid = db.one("SELECT parent_id FROM users WHERE role='kid' AND parent_id IS NOT NULL ORDER BY id")["parent_id"]
+        assert f"/admin/families/{pid}" in fam and f"/admin/families/{pid}" in c.get("/admin").text
+        assert "连续" in c.get(f"/admin/families/{pid}").text
         assert "同事" in c.get("/admin?tab=tree").text
         assert "→ 同事" in c.get("/admin?tab=invites").text
         kid = db.one("SELECT id FROM users WHERE role='kid' ORDER BY id")["id"]
@@ -608,7 +611,7 @@ def test_account_management():
         c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
         r = c.get(f"/admin/users/{parent}")
         assert "登录与安全" in r.text and "最近的账号记录" in r.text
-        assert f'/admin/users/{parent}' in c.get("/admin?tab=families").text
+        assert f'/admin/users/{parent}' in c.get(f"/admin/families/{parent}").text
         c.post(f"/admin/users/{parent}/profile", data={"name": "爸爸", "email": "p2@x.com"})
         assert auth.get_user(parent)["email"] == "p2@x.com"
         db.run("UPDATE users SET locked_until=? WHERE id=?", "2999-01-01", parent)
@@ -1069,7 +1072,7 @@ def test_adult_exam_course():
 
         # 管理后台：自学者单独列出
         c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
-        page = c.get("/admin?tab=families").text
+        page = c.get("/admin?tab=selfs").text
         assert "自学者" in page and "mom@x.com" in page
         assert c.get("/admin?tab=tree").status_code == 200 and "自学者" in c.get(f"/admin/users/{mom['id']}").text
         # 家长给家人开的成人账号：考证课的考试日期直接在表单里填
