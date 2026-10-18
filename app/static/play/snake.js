@@ -1,7 +1,7 @@
-/* 贪吃蛇大作战（合作长大，两个人各用一台设备）。关卡在 app/arena/mp/levels/snake/，格式见 app/arena/mp/snake.py。
+/* 贪吃蛇大作战（合作长大，两个人各用一台设备）。关卡在 app/arena/games/levels/snake/，格式见 app/arena/games/snake.py。
    - 自己的蛇自己的设备算（转弯、冲刺、吃豆子、撞墙 / 撞电脑蛇），每秒发 15 次蛇头位置和长度，对方按蛇头轨迹画出身体；
    - 豆子和电脑蛇由开房间的设备算：豆子被吃了补新的（'food'），电脑蛇每秒发 10 次（'ai'）；
-   - 两条蛇加起来够长，开房间的设备报过关；时间到了还不够长就差一点（外壳 mpshell.js 结算）。
+   - 两条蛇加起来够长，开房间的设备报过关；时间到了还不够长就差一点（外壳 shell.js 结算）。
    - 倒下答题复活后长度不变（像贪吃蛇大作战的「复活」），所以倒下不掉豆子；代价是答题这段时间少一条蛇在长。
    - 刷新 / 换设备：存档里有自己的蛇（位置、方向、长度）和豆子、电脑蛇，接着玩。 */
 (function () {
@@ -193,8 +193,8 @@
     snapT -= dt;
     if (snapT <= 0) { snapT = 0.1; mp.net.send({t: 'ai', s: ais.map(a => [a.id, Math.round(a.x), Math.round(a.y), a.len, a.alive ? 1 : 0])}); }
     if (ended) return;
-    if (teamLen() >= lv.target) { ended = true; Play.sfx.play('win'); mp.finish({score: teamLen()}); }
-    else if (mp.elapsed() >= lv.time) { ended = true; mp.lose(`时间到了！我们一共长到 ${teamLen()}，目标是 ${lv.target}，再试一次！`); }
+    if (teamLen() >= lv.target) { ended = true; Play.sfx.play('win'); mp.finish('win', {score: teamLen()}); }
+    else if (mp.elapsed() >= lv.time) { ended = true; mp.finish('lose', {why: `时间到了！我们一共长到 ${teamLen()}，目标是 ${lv.target}，再试一次！`}); }
   }
   function aiDie(a) {
     a.alive = false; a.back = 4;
@@ -293,8 +293,8 @@
     setInterval(() => { if (held && pointer && lv) { const st = sh.stage, [W, H] = lv.size, k = Math.max(st.W / Math.max(W, 1100), st.H / Math.max(H, 650), 0.62); pointer.x = (pointer.sx - st.W / 2) / k + cam.x; pointer.y = (pointer.sy - st.H / 2) / k + cam.y; } }, 50);
   }
   let pointerReady = false;
-  MpShell.init({
-    id: 'snake', tempo: 126,
+  PlayShell.init({
+    quiz: 'revive', tempo: 126,
     rules: ['两条小蛇是一队，一起<b>吃豆子长大</b>，两条加起来够长就过关。',
             '← → 转弯，按住空格冲刺（会变短一点）；手机、平板：手指按住往哪拖就往哪游。',
             '撞到墙、撞到电脑蛇就倒下：答题复活。电脑蛇的头撞到你们身上，它就散成一地豆子！',

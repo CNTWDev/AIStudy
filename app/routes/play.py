@@ -7,7 +7,7 @@ from fastapi import Body, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from starlette.concurrency import run_in_threadpool
 from .. import arena, auth, db, engine, sprint, streak
-from ..arena.mp import bus as mp_bus, rooms
+from ..arena import bus, rooms
 from ..web import (
     kid_or_redirect,
     render,
@@ -23,18 +23,19 @@ def arena_home(request: Request):
 
 @router.get("/arena/{game}", response_class=HTMLResponse)
 def arena_game(request: Request, game: str):
+    """所有游戏一个页面：外壳 shell.js（单机、联网都是它），玩法 <游戏>.js。"""
     k = kid_or_redirect(request)
     if game not in arena.GAMES:
         raise HTTPException(404)
-    if arena.GAMES[game].get("multi"):
-        return render(request, "arena_mp.html", g=arena.GAMES[game], game=game, a=arena.hub(k), lobby=rooms.lobby(k, game),
-                      me=rooms.member(k))
-    return render(request, "arena_game.html", g=arena.GAMES[game], game=game, a=arena.hub(k))
+    g = arena.GAMES[game]
+    return render(request, "arena_game.html", g=g, game=game, a=arena.hub(k), me=rooms.member(k), room=rooms.my_room(k, game),
+                  lobby=rooms.lobby(k, game) if g.multi else None)
 
 
 @router.post("/api/arena/start")
 def arena_start(request: Request, body: dict = Body(...)):
-    return arena.start(kid_or_redirect(request), str(body.get("game") or ""), str(body.get("src") or "mix"), body.get("stage"))
+    return arena.start(kid_or_redirect(request), str(body.get("game") or ""), str(body.get("src") or "mix"), body.get("session"),
+                       body.get("resume"))
 
 
 @router.post("/api/arena/avatar")
@@ -60,47 +61,79 @@ def arena_end(request: Request, match_id: int, body: dict = Body(...)):
     return arena.end(kid_or_redirect(request), match_id, str(body.get("result") or ""), body.get("stats") or {})
 
 
-# ------------------------------------------------------------------ 联网游戏（app/arena/mp/）
+# ------------------------------------------------------------------ 房间（单机、联网都是房间，app/arena/rooms.py）
+# 改房间的请求都带 device（这个页面的设备号）：不是这个账号现在在玩的那台设备就拒绝（409 moved）。
 
-@router.get("/api/mp/{game}/lobby")
-def mp_lobby(request: Request, game: str):
+def _dev(body: dict) -> str:
+    return str((body or {}).get("device") or "")
+
+
+@router.get("/api/games/{game}/lobby")
+def game_lobby(request: Request, game: str):
     return rooms.lobby(kid_or_redirect(request), game)
 
 
-@router.post("/api/mp/rooms")
-def mp_create(request: Request, body: dict = Body(...)):
-    return rooms.create_room(kid_or_redirect(request), str(body.get("game") or ""), str(body.get("role") or ""))
+@router.post("/api/rooms")
+def room_create(request: Request, body: dict = Body(...)):
+    return rooms.create(kid_or_redirect(request), str(body.get("game") or ""), str(body.get("role") or ""), _dev(body))
 
 
-@router.get("/api/mp/rooms/{room_id}")
-def mp_room(request: Request, room_id: int):
+@router.get("/api/rooms/{room_id}")
+def room_get(request: Request, room_id: int):
     return rooms.room_info(kid_or_redirect(request), room_id)
 
 
-@router.post("/api/mp/rooms/{room_id}/join")
-def mp_join(request: Request, room_id: int):
-    return rooms.join(kid_or_redirect(request), room_id)
+@router.post("/api/rooms/{room_id}/enter")
+def room_enter(request: Request, room_id: int, body: dict = Body(...)):
+    return rooms.enter(kid_or_redirect(request), room_id, _dev(body))
 
 
-@router.post("/api/mp/rooms/{room_id}/leave")
-def mp_leave(request: Request, room_id: int):
-    rooms.leave(kid_or_redirect(request), room_id)
+@router.post("/api/rooms/{room_id}/take")
+def room_take(request: Request, room_id: int, body: dict = Body(...)):
+    return rooms.take(kid_or_redirect(request), room_id, _dev(body))
+
+
+@router.post("/api/rooms/{room_id}/leave")
+def room_leave(request: Request, room_id: int, body: dict = Body(...)):
+    rooms.leave(kid_or_redirect(request), room_id, _dev(body))
     return {"ok": True}
 
 
-@router.post("/api/mp/rooms/{room_id}/role")
-def mp_role(request: Request, room_id: int, body: dict = Body(...)):
-    return rooms.set_role(kid_or_redirect(request), room_id, str(body.get("role") or ""))
+@router.post("/api/rooms/{room_id}/role")
+def room_role(request: Request, room_id: int, body: dict = Body(...)):
+    return rooms.swap_roles(kid_or_redirect(request), room_id, _dev(body))
 
 
-@router.post("/api/mp/rooms/{room_id}/level")
-def mp_level(request: Request, room_id: int, body: dict = Body(...)):
-    return rooms.set_level(kid_or_redirect(request), room_id, body.get("n"))
+@router.post("/api/rooms/{room_id}/level")
+def room_level(request: Request, room_id: int, body: dict = Body(...)):
+    return rooms.set_level(kid_or_redirect(request), room_id, body.get("n"), _dev(body))
 
 
-@router.post("/api/mp/rooms/{room_id}/finish")
-def mp_finish(request: Request, room_id: int, body: dict = Body(...)):
-    return rooms.finish(kid_or_redirect(request), room_id, body.get("n"), body.get("report") or {})
+@router.post("/api/rooms/{room_id}/start")
+def room_start(request: Request, room_id: int, body: dict = Body(...)):
+    return rooms.start(kid_or_redirect(request), room_id, body.get("n"), _dev(body))
+
+
+@router.post("/api/rooms/{room_id}/save")
+async def room_save(request: Request, room_id: int):
+    """存档（每 2 秒一次；关页面时用 sendBeacon）。最多 MAX_SAVE 字节。"""
+    raw = await request.body()
+    if len(raw) > rooms.MAX_SAVE:
+        raise HTTPException(413, "存档太大了")
+    try:
+        body = json.loads(raw or b"{}")
+    except ValueError:
+        raise HTTPException(400)
+    if not isinstance(body, dict):
+        raise HTTPException(400)
+    k = await run_in_threadpool(kid_or_redirect, request)
+    return await run_in_threadpool(rooms.save, k, room_id, _dev(body), body)
+
+
+@router.post("/api/rooms/{room_id}/finish")
+def room_finish(request: Request, room_id: int, body: dict = Body(...)):
+    return rooms.finish(kid_or_redirect(request), room_id, _dev(body), body.get("session"), str(body.get("result") or ""),
+                        body.get("report") or {})
 
 
 def _ws_user(ws: WebSocket, room_id: int):
@@ -115,23 +148,22 @@ def _ws_user(ws: WebSocket, room_id: int):
     return dict(u), r
 
 
-@router.websocket("/ws/mp/{room_id}")
-async def mp_ws(ws: WebSocket, room_id: int):
-    """房间里的实时消息：服务器只转发（盖上发送人 from），不看内容；每秒最多 60 条，每条最多 6000 字节。
-    例外是存档 {"t": "save"}：记进房间（刷新、换设备后接着玩），不转发。
+@router.websocket("/ws/room/{room_id}")
+async def room_ws(ws: WebSocket, room_id: int):
+    """联网房间里的实时消息：服务器只转发（盖上发送人 from），不看内容；每秒最多 60 条，每条最多 6000 字节（bus.MAX_MSG）。
     进来时告诉别人 hello，断开时告诉别人 bye。页面开着时每 20 秒记一次房间还有人（大厅只显示有人的房间）。
-    同一个孩子可以有两个连接（两台设备）：别的设备收到 hello 会回 here，新设备据此问要不要接过来（mpshell.js 的 take）。"""
+    存档、换设备不走这里（/api/rooms/…）。"""
     u, r = await run_in_threadpool(_ws_user, ws, room_id)
     if not u:
         await ws.close(code=4403)
         return
     await ws.accept()
-    b = mp_bus.bus()
-    conn = mp_bus.Conn(ws, r["id"], u["id"])
+    b = bus.bus()
+    conn = bus.Conn(ws, r["id"], u["id"])
     await b.join(conn)
     await b.publish(r["id"], conn.id, json.dumps({"t": "hello", "from": u["id"]}))
     last_touch = window = time.monotonic()
-    count, last_save = 0, 0.0
+    count = 0
     try:
         while True:
             text = await ws.receive_text()
@@ -139,7 +171,7 @@ async def mp_ws(ws: WebSocket, room_id: int):
             if now - window > 1:
                 window, count = now, 0
             count += 1
-            if count > 60 or len(text) > rooms.MAX_SAVE:
+            if count > 60 or len(text) > bus.MAX_MSG:
                 continue
             try:
                 msg = json.loads(text)
@@ -151,13 +183,6 @@ async def mp_ws(ws: WebSocket, room_id: int):
                 last_touch = now
                 await run_in_threadpool(rooms.touch, r["id"])
             if msg["t"] == "ping":
-                continue
-            if msg["t"] == "save":   # 存档：服务器记下来，不转发（rooms.save_play）
-                if msg.get("end") or now - last_save >= 0.8:
-                    last_save = now
-                    await run_in_threadpool(rooms.save_play, u["id"], r["id"], msg)
-                continue
-            if len(text) > mp_bus.MAX_MSG:
                 continue
             msg["from"] = u["id"]
             await b.publish(r["id"], conn.id, json.dumps(msg, ensure_ascii=False))

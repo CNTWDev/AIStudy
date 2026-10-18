@@ -1,161 +1,567 @@
-/* 每个游戏页面的外壳（所有游戏共用）：开始面板（规则、选出什么题）、倒计时、答题面板、结束战报、贴纸、再来一局。
+/* 所有游戏共用的外壳（docs/DESIGN.md 5.26）：单机、两人联网、全家一起玩是同一套，区别只是房间里有几个人。
+   外壳管：大厅（联网：家里谁在等我、开房间）、房间（谁在、角色、闯关地图、出什么题）、开局倒计时、答题面板、
+   倒下答题复活（联网）、存档和刷新 / 换设备接着玩、状态条和表情（联网）、结算（星星、纪录、解锁、个人战报、贴纸）。
    游戏只写玩法：
      PlayShell.init({
-       game: 'race', tempo: 140, dock: true,           // dock = 答题面板常驻在下方
-       rules: ['……', '……'], keys: '电脑键盘：……',
-       setup(shell) {},                                  // 页面打开时：画一帧预览、生成按钮
-       begin(match, quiz, shell) {},                     // 倒计时结束：开始玩
-       onAnswer(res) {}, onXP(res) {},                   // 答题结果（答题面板转发）
+       tempo: 120, rules: ['……'], keys: '电脑键盘：……',
+       quiz: 'modal' | 'dock' | 'revive',   // 答题面板：点按钮弹出（火柴人）/ 常驻下方（赛跑、守城）/ 倒下才弹出、答够才关（联网游戏）
+       setup(sh) {},             // 页面打开时（自己建画布、按钮）；或者写 preview(sh, lv)：外壳建好 sh.stage，房间里画选中的关
+       input: {left: ['ArrowLeft', 'a'], …}, touch: [['left', '◀'], …],   // 键盘、触屏按钮交给外壳管（不写就自己管）
+       ready(sh) {},             // 点了开始、倒计时之前（把画面放回起点）
+       begin(ctx) {},            // 倒计时结束：开始玩
+       end() {},                 // 这一关停下了（结束、换设备）：停掉循环
+       onAnswer(res) {}, onXP(res) {}, onQuizOpen() {}, onQuizClose() {}, onRevive(info) {},
+       save() {},                // 我自己的状态，每 2 秒存到服务器（写了它，刷新、换设备才能接着玩）
+       saveWorld() {}, loadWorld(w) {}, peerView() {}, loadMe(v) {},   // 联网：共享的世界、队友那边看到的我（重连时以在线的人为准）
      });
-     shell.finish(result, stats)   // 结束一局：win / lose / draw / quit，stats 是给战报和贴纸用的统计
-     shell.toast(text, kind)       // 顶部提示：good / warn
-   有关卡的游戏（app/arena/levels.py，现在是火柴人大战）：开始面板上是闯关地图，一个世界一页，选一关开打；
-   开局时服务器把这一关的参数放在 match.stage 里，战报显示这次几颗星、解锁了什么，可以直接点「下一关」。
-   开局、出题、结束都走服务器（app/arena/matches.py）。 */
+   ctx（begin 时给游戏的）：
+     ctx.level 这一关（app/arena/games/：关卡文件，或者服务器按进度算的参数）；ctx.seed 大家一样的随机种子；ctx.match 我的答题对局
+     ctx.quiz 答题面板；ctx.resume 接着玩时的存档 {me, world}（不是接着玩就是 null）；ctx.sh 外壳
+     ctx.finish(result, report, title)   这一关结束：win / lose / draw / quit；report 是游戏报的数据（用时、分数、血量……），
+                                         联网时只有开房间的人报过关，谁都可以报没过（时间到了）。report.why 写在结算上
+     ctx.toast(文字, 'good' | 'warn')；ctx.elapsed() 这一关玩了多少秒
+   联网时还有：ctx.net 连接（net.js）；ctx.me / ctx.peer / ctx.peers {id, name, avatar, role}；ctx.host 我是不是开房间的（共享的东西由他算）；
+     ctx.die() 我倒下了：题目盖在游戏上，答对 1 道复活，答错多欠 1 道（最多 3 道），点「这题不会」不加；ctx.rescue() 队友救了我；
+     ctx.reviving 我在答题；ctx.deaths() 大家一共倒下几次；ctx.roleIndex(r) 角色是第几个（对应关卡里的 1 / 2 号出生点）
+   设备：每个页面一个设备号（刷新不变）。服务器记着每个账号在哪台设备上玩（app/arena/rooms.py）：另一台设备上正在玩，
+   就先问要不要换过来；换走了的那台下次存档时被告知，停下来。 */
 (function () {
   const PlayShell = window.PlayShell = {};
   const root = document.getElementById('pl');
   const $ = s => root.querySelector(s);
+  const EMOTES = ['👍', '⏳', '🙌', '❤️', '❓'];
+  const EMOTE_TEXT = {'👍': '好的', '⏳': '等等我', '🙌': '太棒了', '❤️': '加油', '❓': '怎么走？'};
 
-  PlayShell.init = function (game) {
+  PlayShell.init = function (def) {
     const data = JSON.parse(root.dataset.info || '{}');
-    const sh = {root, game, data, match: null, quiz: null, over: true, src: localStorageGet('play.src') || 'mix'};
-    sh.canvas = $('canvas'); sh.hud = $('.pl-hud'); sh.ctrl = $('.pl-ctrl'); sh.dock = $('.pl-dock');
+    const G = data.game, LV = G.levels, multi = G.players[1] > 1, me0 = data.me;
+    const quizMode = def.quiz || 'modal';
+    const device = deviceId();
+    const sh = {root, def, data, canvas: $('canvas'), hud: $('.pl-hud'), ctrl: $('.pl-ctrl'), dock: $('.pl-dock'),
+                match: null, quiz: null, over: true, src: storeGet('play.src') || 'mix'};
+    const panel = $('.pl-start .pl-panel'), over = $('.pl-start'), endEl = $('.pl-end'), stageEl = $('.pl-stage');
     sh.toast = (t, k) => Play.ui.toast($('.pl-toast'), t, k);
-    if (game.dock) root.classList.add('has-dock');
-    const me = $('.pl-me'); if (me) Art.portrait(me, data.avatar, 'win');
-    Play.ui.soundButtons(root, game.tempo);
-
-    // ---- 开始面板
-    const start = $('.pl-start'), end = $('.pl-end');
+    sh.finish = finish;
+    sh.hudClock = text => { const c = sh.hud.querySelector('.mp-clock'); if (c) c.textContent = text; };
+    if (quizMode === 'dock') root.classList.add('has-dock');
+    Play.ui.soundButtons(root, def.tempo);
+    if (def.input) Play.input.init(def.input);
     const srcs = data.sources || [];
     if (!srcs.find(s => s.id === sh.src)) sh.src = srcs.length ? srcs[0].id : 'mix';
-    start.querySelector('.pl-rules').innerHTML = game.rules.map(r => `<li>${r}</li>`).join('');
-    start.querySelector('.pl-keys').textContent = game.keys || '';
-    const box = start.querySelector('.pl-srcs');
-    if (srcs.length > 1) {
-      box.innerHTML = '<div class="pl-label">出什么题？</div>' + srcs.map(s =>
-        `<button type="button" class="pl-src${s.id === sh.src ? ' on' : ''}" data-src="${s.id}" title="${esc(s.desc)}"><span>${s.icon}</span>${esc(s.name)}</button>`).join('');
-      box.querySelectorAll('.pl-src').forEach(b => b.onclick = () => {
-        sh.src = b.dataset.src; localStorageSet('play.src', sh.src); Play.sfx.play('click');
-        box.querySelectorAll('.pl-src').forEach(x => x.classList.toggle('on', x === b));
-      });
-    }
-    const how = start.querySelector('.pl-how');
-    if (how && $('.pl-stage').clientHeight < 460) how.open = false;   // 小屏幕先收起规则，开始按钮一眼能看到
-    const go = start.querySelector('.pl-go');
-    if (data.locked) { go.hidden = true; start.querySelector('.pl-locked').textContent = data.locked; }
-    go.onclick = () => begin();
-    end.querySelector('.pl-again').onclick = () => begin();
-    const nextBtn = end.querySelector('.pl-next');
-    if (nextBtn) nextBtn.onclick = () => { sh.stage = +nextBtn.dataset.n; drawMap(); begin(); };
 
-    // ---- 闯关地图：一个世界一页
-    const map = start.querySelector('.pl-map'), stages = data.stages;
-    sh.stage = stages ? stages.upto : null;
-    let page = stages ? Math.ceil(stages.upto / 6) - 1 : 0;
-    function drawMap() {
-      if (!map || !stages) return;
-      page = Math.max(0, Math.min(stages.worlds.length - 1, page));
-      const w = stages.worlds[page];
-      map.hidden = false; start.classList.add('has-map');
-      map.innerHTML = `<div class="pm-head"><button type="button" class="pm-arr" data-d="-1" ${page ? '' : 'disabled'} aria-label="上一个世界">‹</button>
-          <div class="pm-name"><b>世界 ${w.n} · ${esc(w.name)}</b><small>⭐ ${w.stars}/18 · 一共 ⭐ ${stages.stars}/${stages.max_stars}</small></div>
-          <button type="button" class="pm-arr" data-d="1" ${page < stages.worlds.length - 1 ? '' : 'disabled'} aria-label="下一个世界">›</button></div>
-        <div class="pm-row pm-${w.scene}">${w.levels.map(l => `<button type="button" class="pm-lv${l.boss ? ' boss' : ''}${l.open ? '' : ' lock'}${l.n === sh.stage ? ' on' : ''}${l.cleared ? ' done' : ''}" data-n="${l.n}" ${l.open ? '' : 'disabled'}>
-            <b>${l.boss ? '👑' : l.open ? l.n : '🔒'}</b><span>${l.open ? '★★★'.slice(0, l.stars).padEnd(3, '☆') : ''}</span></button>`).join('<i class="pm-path"></i>')}</div>
-        <div class="pm-gift${w.done ? ' got' : ''}">${w.unlock.icon} ${w.done ? `已解锁：${esc(w.unlock.name)}` : `打败第 ${w.n * 6} 关的大怪兽，解锁 <b>${esc(w.unlock.name)}</b>（${esc(w.unlock.how)}）`}</div>`;
-      map.querySelectorAll('.pm-arr').forEach(b => b.onclick = () => { page += +b.dataset.d; Play.sfx.play('click'); drawMap(); });
-      map.querySelectorAll('.pm-lv:not(.lock)').forEach(b => b.onclick = () => { sh.stage = +b.dataset.n; Play.sfx.play('click'); drawMap(); });
-      go.firstChild.textContent = `开始第 ${sh.stage} 关！`;
-    }
-    drawMap();
+    let lobby = data.lobby, room = null, net = null, state = 'lobby', page = -1, poll = 0, gone = false;
+    let ctx = null, cur = null, match = null, quiz = null, t0 = 0, myDeaths = 0, peerDeaths = 0, byeTimer = 0, saveTimer = 0, resuming = false;
+    const online = new Set(), peerPlaying = {};
+    const ROLES = Object.fromEntries(G.roles.map(r => [r.id, r]));
+    const roleOf = r => ROLES[r] || {name: r, icon: ''};
+    const lvAt = n => LV[n - 1];
+    const peers = () => room ? room.members.filter(m => m.id !== me0.id) : [];
+    const peerName = () => peers().map(p => p.name).join('、') || '队友';
+    const allOnline = () => peers().every(p => online.has(p.id));
 
-    async function begin() {
-      Play.sfx.unlock(); Play.sfx.play('click');
-      start.hidden = true; end.hidden = true;
-      try {
-        sh.match = await api('/api/arena/start', {game: data.game, src: sh.src, stage: sh.stage});
-      } catch (e) {
-        end.hidden = false; end.querySelector('.pl-sum').innerHTML = `<div class="pl-big">🙈</div><p class="err">${esc(e.message)}</p>`;
-        end.querySelector('.pl-again').hidden = true; return;
+    // ---------------------------------------------------------------- 画布（写了 preview 的游戏由外壳建）
+    let previewN = 1;
+    function preview() { if (!cur && def.preview && LV.length) def.preview(sh, lvAt(previewN) || LV[0]); }
+    if (def.preview) { sh.stage = Play.stage(sh.canvas, {height: 450, minW: 640, maxW: 1400}); sh.stage.onResize = () => preview(); }
+    if (def.setup) def.setup(sh);
+
+    // ---------------------------------------------------------------- 和服务器说话（房间、存档、结果都带设备号）
+    async function post(path, body) {
+      const r = await fetch(path, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(Object.assign({device}, body || {}))});
+      let d = {}; try { d = await r.json(); } catch (e) { /* 空 */ }
+      if (r.status === 409 && d.moved) { takenAway(); throw new Error(d.error); }
+      if (!r.ok) { const e = new Error(d.error || d.detail || ('出错了 ' + r.status)); e.status = r.status; throw e; }
+      return d;
+    }
+    const roomApi = (what, body) => post(`/api/rooms/${room.id}/${what}`, body);
+
+    // ---------------------------------------------------------------- 大厅（联网）
+    function showLobby() {
+      state = 'lobby'; over.hidden = false; room = null;
+      if (net) { net.close(); net = null; }
+      const sibs = lobby.siblings, waiting = lobby.rooms.filter(r => !r.mine && r.host);
+      let h = `<div class="pl-title">${esc(G.icon)} ${esc(G.name)}</div>`;
+      if (!sibs.length) {
+        h += `<p class="mp-note">这是大家一起玩的游戏。家里还没有别的小伙伴的账号，请爸爸妈妈在家长页添加兄弟姐妹。</p>`;
+      } else {
+        h += waiting.map(r => `<div class="mp-invite"><canvas class="mp-face" data-av="${esc(r.host.avatar)}"></canvas>
+            <div class="grow"><b>${esc(r.host.name)}</b> 开了房间在等你<small>${r.role ? `${roleOf(r.role).icon} ${esc(roleOf(r.role).name)} · ` : ''}第 ${r.level} 关</small></div>
+            <button type="button" class="btn lg pl-go mp-join" data-id="${r.id}">加入！</button></div>`).join('');
+        h += G.roles.length ? `<div class="pl-label">${waiting.length ? '或者自己开一个房间，' : ''}我想当：</div>
+            <div class="mp-roles">${G.roles.map(v => `<button type="button" class="mp-role" data-role="${v.id}"><span>${v.icon}</span>${esc(v.name)}</button>`).join('')}</div>`
+          : `<button type="button" class="btn lg block pl-go mp-role" data-role="">开一个房间</button>`;
+        h += `<p class="mp-hint">开好房间后，让${sibs.map(s => esc(s.name)).join('、')}在自己的平板或电脑上打开 乐园 → ${esc(G.name)}，点「加入」。</p>`;
       }
-      if (sh.quiz) sh.quiz.destroy();
-      sh.quiz = new ArenaQuiz({matchId: sh.match.match_id, dock: game.dock ? sh.dock : null,
-        onAnswer: r => game.onAnswer && game.onAnswer(r, sh), onXP: r => game.onXP && game.onXP(r, sh),
-        onOpen: () => game.onQuizOpen && game.onQuizOpen(sh), onClose: () => game.onQuizClose && game.onQuizClose(sh)});
-      if (game.dock) { sh.dock.hidden = false; sh.quiz.el.classList.add('wait'); }
-      root.classList.add('playing');
-      Play.ui.countdown($('.pl-cd'), () => {
-        sh.over = false;
-        Play.music.start(game.tempo);
-        if (game.dock) { sh.quiz.el.classList.remove('wait'); sh.quiz.load(); }
-        game.begin(sh.match, sh.quiz, sh);
-      });
+      if (lobby.locked) h += `<p class="pl-locked">${esc(lobby.locked)}</p>`;
+      panel.innerHTML = h + rulesHtml();
+      faces(panel);
+      panel.querySelectorAll('.mp-join').forEach(b => b.onclick = () => enter(post(`/api/rooms/${b.dataset.id}/enter`)));
+      panel.querySelectorAll('.mp-role').forEach(b => b.onclick = () => enter(post('/api/rooms', {game: G.id, role: b.dataset.role})));
+      clearInterval(poll);
+      poll = setInterval(async () => {   // 家里有人开房间了就显示出来
+        if (state !== 'lobby') return;
+        try { const l = await (await fetch(`/api/games/${G.id}/lobby`)).json(); if (JSON.stringify(l.rooms) !== JSON.stringify(lobby.rooms)) { lobby = l; showLobby(); } } catch (e) { /* 等下次 */ }
+      }, 3000);
+      preview();
+    }
+    const rulesHtml = () => `<details class="pl-how"${stageEl.clientHeight < 460 ? '' : ' open'}><summary>怎么玩</summary><ul class="pl-rules">${def.rules.map(r => `<li>${r}</li>`).join('')}</ul></details><p class="pl-keys">${esc(def.keys || '')}</p>`;
+    function faces(el) { el.querySelectorAll('canvas[data-av]').forEach(c => { c.width = 96; c.height = 120; Art.portrait(c, c.dataset.av, 'win'); }); }
+
+    // ---------------------------------------------------------------- 进房间（打开页面、加入、刷新、换设备）
+    async function enter(p) {
+      Play.sfx.unlock();
+      try { room = await p; } catch (e) { sh.toast(e.message, 'warn'); if (multi && !room) showLobby(); return; }
+      clearInterval(poll);
+      if (room.elsewhere) return askTake(room.elsewhere);
+      afterEnter();
+    }
+    function afterEnter() {
+      previewN = room.level || 1;
+      if (multi && !net) connect();
+      const p = room.play;
+      if (p && (multi || (p.resume && def.save))) startLevel(p, p.resume || {}); else showRoom();
+    }
+    function askTake(n) {   // 同一个账号在另一台设备上正在玩
+      state = 'take'; over.hidden = false;
+      panel.innerHTML = `<div class="pl-title">📱 换到这台设备？</div>
+        <p>你在另一台设备上正在玩${n > 0 ? `第 ${n} 关` : ''}。</p>
+        <button type="button" class="btn lg block pl-go mp-take">在这台设备上接着玩</button>
+        <button type="button" class="btn ghost block mp-keep" style="margin-top:8px">不了，接着用那台玩</button>`;
+      panel.querySelector('.mp-take').onclick = async () => {
+        panel.innerHTML = '<div class="pl-title">正在换过来…</div>';
+        try { room = await roomApi('take'); } catch (e) { sh.toast(e.message, 'warn'); return; }
+        setTimeout(() => { state = 'room'; afterEnter(); }, 2200);   // 等那台把最后一次存档存好（它每 2 秒存一次，存的时候就知道换走了）
+      };
+      panel.querySelector('.mp-keep').onclick = () => showGone('好的，接着在另一台设备上玩吧。');
+    }
+    function takenAway() {   // 我在另一台设备上接着玩了：这台停下来（进度在服务器上，不算结束）
+      if (gone) return;
+      gone = true;
+      if (cur) { if (def.end) def.end(); Play.music.stop(); if (quiz) quiz.stop(); }
+      clearInterval(saveTimer); clearInterval(poll); cur = null; sh.over = true; t0 = 0;
+      Play.input.blocked = false; Play.input.clear(); root.classList.remove('playing'); endEl.hidden = true;
+      if (ownCtrl) { sh.ctrl.innerHTML = ''; sh.hud.innerHTML = ''; }
+      if (net) { net.close(); net = null; }
+      showGone('已经换到另一台设备上玩了。');
+    }
+    function showGone(text) {
+      gone = true; state = 'gone'; over.hidden = false;
+      if (net) { net.close(); net = null; }
+      panel.innerHTML = `<div class="pl-title">👋 ${esc(text)}</div><button type="button" class="btn lg block pl-go mp-here">回到这台设备上玩</button>`;
+      panel.querySelector('.mp-here').onclick = () => location.reload();
     }
 
-    sh.finish = async function (result, stats, title) {
-      if (sh.over) return;
-      sh.over = true;
-      Play.music.stop();
-      if (sh.quiz) { sh.quiz.stop(); if (game.dock) sh.quiz.el.classList.add('wait'); }
+    // ---------------------------------------------------------------- 联网连接
+    function connect() {
+      net = new MpNet(room.id);
+      net.onStatus = (ok, why) => {
+        if (ok) { net.send({t: 'here', playing: cur ? cur.session : 0}); refresh(); }
+        if (!ok && why === 'ws') sh.toast('连不上联网服务。请爸爸妈妈看看服务器的 WebSocket 设置（docs/DEPLOY.md）', 'warn');
+        if (!ok && why && why !== 'ws') { sh.toast(why, 'warn'); backToLobby(); }
+        drawRoomBits();
+      };
+      net.on('hello', m => {   // 有人进房间了（刷新回来的也算）：告诉他我在不在玩、是不是正在答题
+        if (!isPeer(m)) return;
+        seen(m); net.send({t: 'here', playing: cur ? cur.session : 0});
+        if (ctx && ctx.reviving) net.send({t: 'rv', need: ctx.need});
+        if (!cur) refresh();
+      });
+      net.on('here', m => {
+        if (!isPeer(m)) return;
+        seen(m); peerPlaying[m.from] = m.playing || 0;
+        if (!cur && m.playing && (state === 'room' || state === 'end')) rejoin();   // 队友还在玩：我回到这一局
+        else if (!cur) refresh();
+      });
+      net.on('need_world', m => {
+        if (isPeer(m) && cur && def.saveWorld) net.send({t: 'world', s: cur.session, el: +ctx.elapsed().toFixed(1), w: def.saveWorld(), you: def.peerView ? def.peerView() : null});
+      });
+      net.on('world', m => {
+        if (!isPeer(m) || !cur || m.s !== cur.session || !ctx) return;
+        if (def.loadWorld) def.loadWorld(m.w);
+        if (m.you && def.loadMe) def.loadMe(m.you);
+        if (m.el > ctx.elapsed() + 1) t0 = performance.now() - m.el * 1000;   // 时间跟还在玩的那台对齐
+      });
+      net.on('bye', m => {
+        if (!isPeer(m)) return;
+        online.delete(m.from); peerPlaying[m.from] = 0; drawRoomBits(); hudDraw();
+        if (cur) {
+          sh.toast(`${(room.members.find(x => x.id === m.from) || {}).name || '队友'}掉线了，等一等…`, 'warn');
+          clearTimeout(byeTimer); byeTimer = setTimeout(() => { if (cur && !allOnline()) quit(`${peerName()}离开了`); }, 30000);
+        }
+      });
+      net.on('*', m => { if (isPeer(m) && m.t !== 'bye') seen(m); });
+      net.on('room', () => refresh());
+      net.on('start', m => { if (!room.host) rejoin(); });
+      net.on('cant', m => { sh.toast(`${nameOf(m.from)}：${m.why}`, 'warn'); if (cur) quit(m.why); });
+      net.on('rv', m => {
+        if (!isPeer(m) || !ctx) return;
+        ctx.needs[m.from] = m.need; if (m.fresh) peerDeaths++; if (m.rescued) peerDeaths = Math.max(0, peerDeaths - 1);
+        hudDraw();
+      });
+      net.on('emote', m => { if (isPeer(m) && EMOTES.includes(m.e)) showEmote(m.e, m.from); });
+      net.on('done', m => { if (!room.host && cur && m.res && m.res.session === cur.session) endLevel('win', m.res); });
+      net.on('over', m => {
+        if (!cur) return;
+        if (room.host && !m.res) finish(m.result || 'lose', {why: m.why});   // 队友那边时间到了：我来报
+        else endLevel(m.res ? m.res.result : (m.result || 'quit'), m.res, null, m.why);
+      });
+    }
+    const isPeer = m => room && m.from !== me0.id;   // 服务器只转发房间里的人的消息；刚进来的人可能还不在 room.members 里（refresh 后就在了）
+    const nameOf = id => (room && room.members.find(x => x.id === id) || {}).name || '队友';
+    function seen(m) { if (!online.has(m.from)) { online.add(m.from); clearTimeout(byeTimer); drawRoomBits(); hudDraw(); } }
+    async function refresh() {
+      if (!room || gone) return;
+      try { room = await api(`/api/rooms/${room.id}`); } catch (e) { sh.toast(e.message, 'warn'); return backToLobby(); }
+      previewN = room.level || 1;
+      if (state === 'room') showRoom();
+    }
+    async function backToLobby() {
+      if (room) { try { await roomApi('leave'); } catch (e) { /* 房间已经关了 */ } }
+      if (net) { net.send({t: 'room'}); net.close(); net = null; }
+      online.clear();
+      if (!multi) { location.href = '/arena'; return; }
+      try { lobby = await api(`/api/games/${G.id}/lobby`); } catch (e) { /* 用旧的 */ }
+      showLobby();
+    }
+    async function rejoin() {   // 回到正在玩的这一局（队友开始了、队友还在玩）
+      if (resuming || cur || gone) return;
+      resuming = true;
+      try {
+        room = await api(`/api/rooms/${room.id}`);
+        if (room.play) await startLevel(room.play, room.play.resume || {}, true);
+        if (!cur && !gone && state !== 'play') showRoom();
+      } catch (e) { /* 等下次 */ }
+      resuming = false;
+    }
+
+    // ---------------------------------------------------------------- 房间
+    function showRoom() {
+      state = 'room'; over.hidden = false; endEl.hidden = true;
+      const ps = peers(), prog = room.progress, locked = room.members.find(m => m.locked);
+      let h = `<div class="pl-title">${esc(G.icon)} ${esc(G.name)}</div>`;
+      if (multi) {
+        const card = m => `<div class="mp-mem${m.id === me0.id ? ' me' : ''}"><canvas class="mp-face" data-av="${esc(m.avatar)}"></canvas>
+            <b>${esc(m.name)}</b>${m.role ? `<span class="mp-r">${roleOf(m.role).icon} ${esc(roleOf(m.role).name)}</span>` : ''}
+            ${m.id === me0.id ? '<small class="mp-dot on">我</small>' : `<small class="mp-dot" data-dot="${m.id}">…</small>`}
+            ${m.locked ? `<small class="mp-lock">🔒 ${esc(m.locked)}</small>` : ''}</div>`;
+        const names = lobby.siblings.filter(s => !room.members.some(m => m.id === s.id)).map(s => s.name).join('或') || '队友';
+        const empty = `<div class="mp-mem empty"><div class="mp-wait">⏳</div><b>等${esc(names)}进来</b><small>让${esc(names)}在自己的设备上打开 乐园 → ${esc(G.name)}</small></div>`;
+        const cards = room.members.map(card).concat(Array(Math.max(0, G.players[0] - room.members.length)).fill(empty));
+        h += `<div class="mp-mems">${cards.join('<span class="mp-amp">＋</span>')}</div>`;
+        if (room.host && G.roles.length > 1 && room.members.length > 1) h += `<button type="button" class="btn sm ghost mp-swap">🔁 换角色</button>`;
+      } else {
+        h = `<canvas class="pl-me" data-av="${esc(data.avatar)}"></canvas>` + h;
+      }
+      if (prog) h += mapHtml(prog);
+      over.classList.toggle('has-map', !!prog);
+      const lv = lvAt(room.level);
+      if (lv && lv.tip) h += `<p class="mp-tip">💡 ${esc(lv.tip)}</p>`;
+      if (srcs.length > 1) h += `<div class="pl-srcs"><div class="pl-label">${multi ? '我出什么题？' : '出什么题？'}</div>${srcs.map(s =>
+        `<button type="button" class="pl-src${s.id === sh.src ? ' on' : ''}" data-src="${s.id}" title="${esc(s.desc)}"><span>${s.icon}</span>${esc(s.name)}</button>`).join('')}</div>`;
+      if (room.host) h += `<button type="button" class="btn lg block pl-go mp-start">${LV.length ? `开始第 ${room.level} 关！` : '开始！'}<small>（今天还能玩 ${Math.floor((data.left || 0) / 60)} 分钟）</small></button>`;
+      else h += `<p class="mp-note">等 <b>${esc(nameOf(room.members.find(m => m.host).id))}</b> 选关、点开始。</p>`;
+      h += `<p class="pl-locked">${locked ? esc(multi ? `${locked.name}：${locked.locked}` : locked.locked) : ''}</p>` + rulesHtml();
+      if (multi) h += `<div class="mp-foot"><button type="button" class="btn sm ghost mp-leave">退出房间</button></div>`;
+      panel.innerHTML = h;
+      faces(panel); drawRoomBits();
+      const sw = panel.querySelector('.mp-swap');
+      if (sw) sw.onclick = () => act(roomApi('role'));
+      panel.querySelectorAll('.pm-arr').forEach(b => b.onclick = () => { page += +b.dataset.d; Play.sfx.play('click'); showRoom(); });
+      if (room.host) panel.querySelectorAll('.pm-lv:not(.lock)').forEach(b => b.onclick = () => { Play.sfx.play('click'); act(roomApi('level', {n: +b.dataset.n})); });
+      panel.querySelectorAll('.pl-src').forEach(b => b.onclick = () => {
+        sh.src = b.dataset.src; storeSet('play.src', sh.src); Play.sfx.play('click');
+        panel.querySelectorAll('.pl-src').forEach(x => x.classList.toggle('on', x === b));
+      });
+      const go = panel.querySelector('.mp-start');
+      if (go) go.onclick = () => startNew(room.level);
+      const lb = panel.querySelector('.mp-leave');
+      if (lb) lb.onclick = () => backToLobby();
+      preview();
+    }
+    async function act(p) {   // 房主改了房间（换角色、选关）：告诉大家
+      try { room = await p; } catch (e) { sh.toast(e.message, 'warn'); return; }
+      previewN = room.level || 1;
+      if (net) net.send({t: 'room'});
+      showRoom();
+    }
+    function drawRoomBits() {
+      panel.querySelectorAll('[data-dot]').forEach(d => { const on = online.has(+d.dataset.dot); d.textContent = on ? '在线' : '还没连上'; d.classList.toggle('on', on); });
+      const go = panel.querySelector('.mp-start');
+      if (go && room) go.disabled = !room.full || !allOnline() || !!room.members.find(m => m.locked);
+    }
+    function mapHtml(prog) {   // 闯关地图：一个世界一页
+      const ws = prog.worlds.length ? prog.worlds : [{n: 1, name: '', scene: '', stars: prog.stars, max_stars: prog.max_stars}];
+      if (page < 0 || page >= ws.length) page = Math.max(0, (lvAt(room.level) ? lvAt(room.level).world.n : 1) - 1);
+      const w = ws[page], ls = prog.levels.filter(l => l.world === w.n), sel = prog.levels[room.level - 1];
+      const gift = w.unlock ? `<div class="pm-gift${w.done ? ' got' : ''}">${w.unlock.icon} ${w.done ? `已解锁：${esc(w.unlock.name)}` : `打通第 ${ls[ls.length - 1].n} 关，解锁 <b>${esc(w.unlock.name)}</b>（${esc(w.unlock.how)}）`}</div>` : '';
+      return `<div class="pl-map${multi ? ' mp-map' : ''}"><div class="pm-head"><button type="button" class="pm-arr" data-d="-1" ${page ? '' : 'disabled'} aria-label="上一个世界">‹</button>
+          <div class="pm-name"><b>${w.name ? `世界 ${w.n} · ${esc(w.name)}` : '关卡'}</b><small>⭐ ${w.stars}/${w.max_stars} · ${multi ? '我们' : ''}一共 ⭐ ${prog.stars}/${prog.max_stars}</small></div>
+          <button type="button" class="pm-arr" data-d="1" ${page < ws.length - 1 ? '' : 'disabled'} aria-label="下一个世界">›</button></div>
+        <div class="pm-row pm-${w.scene}">${ls.map(l => `<button type="button" class="pm-lv${l.boss ? ' boss' : ''}${l.open ? '' : ' lock'}${l.n === room.level ? ' on' : ''}${l.cleared ? ' done' : ''}" data-n="${l.n}" ${l.open && room.host ? '' : 'disabled'} title="${esc(l.name)}">
+            <b>${l.boss ? '👑' : l.open ? l.n : '🔒'}</b><span>${l.open ? '★★★'.slice(0, l.stars).padEnd(3, '☆') : ''}</span></button>`).join('<i class="pm-path"></i>')}</div>
+        ${multi && sel ? `<div class="mp-lvname">第 ${sel.n} 关 · ${esc(sel.name)}${sel.best ? ` · ${multi ? '我们的' : ''}纪录 ${fmtRecord(sel.best)}` : ''}</div>` : ''}${gift}</div>`;
+    }
+    const fmtS = s => s >= 60 ? `${Math.floor(s / 60)} 分 ${Math.round(s % 60)} 秒` : `${(+s).toFixed(1)} 秒`;
+    const fmtRecord = v => G.record === 'seconds' ? fmtS(v) : `${Math.round(v)} 分`;
+
+    // ---------------------------------------------------------------- 开局
+    async function startNew(n) {   // 房主开一局：服务器定这一局和随机种子，告诉大家
+      if (multi && !allOnline()) { sh.toast(`${peerName()}还没连上`, 'warn'); return; }
+      Play.sfx.unlock(); Play.sfx.play('click');
+      if (def.ready) def.ready(sh);
+      try { room = await roomApi('start', {n}); } catch (e) { sh.toast(e.message, 'warn'); return; }
+      if (net) net.send({t: 'start', s: room.play.session});
+      startLevel(room.play, null);
+    }
+    async function startLevel(play, resume, joining) {
+      if (cur || gone || state === 'take') return;
+      Play.sfx.unlock();
+      try { match = await api('/api/arena/start', {game: G.id, src: sh.src, session: play.session, resume: resume && resume.match}); }
+      catch (e) { sh.toast(e.message, 'warn'); if (net) net.send({t: 'cant', why: e.message}); if (!joining) showRoom(); return; }
+      cur = play; previewN = play.n || 1; state = 'play'; over.hidden = true; endEl.hidden = true;
+      sh.match = match;
+      if (net) net.send({t: 'here', playing: cur.session});
+      if (quiz) quiz.destroy();
+      quiz = sh.quiz = new ArenaQuiz({matchId: match.match_id, dock: quizMode === 'dock' ? sh.dock : null,
+        sticky: quizMode === 'revive', autoNext: quizMode === 'revive', mount: quizMode === 'revive' ? stageEl : null,
+        onAnswer: r => { onReviveAnswer(r); if (def.onAnswer) def.onAnswer(r, sh); }, onXP: r => def.onXP && def.onXP(r, sh),
+        onOpen: () => def.onQuizOpen && def.onQuizOpen(sh), onClose: () => def.onQuizClose && def.onQuizClose(sh)});
+      if (quizMode === 'revive') quiz.el.querySelector('.aq-card').insertAdjacentHTML('afterbegin', '<div class="mp-debt"></div>');
+      if (quizMode === 'dock') { sh.dock.hidden = false; quiz.el.classList.add('wait'); }
+      myDeaths = resume ? resume.deaths || 0 : 0; peerDeaths = resume ? resume.peer_deaths || 0 : 0;
+      const ps = peers(), mine = room.members.find(m => m.id === me0.id);
+      ctx = {net, me: mine, peer: ps[0] || null, peers: ps, host: room.host, level: play.stage || {}, seed: play.seed, session: play.session,
+             match, quiz, sh, reviving: false, need: 0, needs: {}, resume: resume ? {me: resume.me || null, world: resume.world || null} : null,
+             die, rescue, finish, toast: sh.toast, elapsed: () => t0 ? (performance.now() - t0) / 1000 : 0,
+             deaths: () => myDeaths + peerDeaths, roleName: r => roleOf(r).name, roleIndex: r => G.roles.findIndex(x => x.id === r)};
+      root.classList.add('playing');
+      buildCtrl(); hudDraw();
+      const go = () => {
+        if (cur !== play) return;
+        t0 = performance.now() - (resume ? (resume.el || 0) * 1000 : 0);
+        sh.over = false;
+        Play.music.start(def.tempo);
+        if (quizMode === 'dock') { quiz.el.classList.remove('wait'); quiz.load(); }
+        def.begin(ctx);
+        clearInterval(saveTimer);
+        if (def.save) { saveTimer = setInterval(save, 2000); save(); }
+        if (resume) {
+          if (net) net.send({t: 'need_world'});
+          if (resume.need > 0) { ctx.reviving = true; ctx.need = resume.need; send({t: 'rv', need: ctx.need}); Play.input.blocked = true; debtText(); hudDraw(); askNow(); }
+          sh.toast('接着玩！', 'good');
+        }
+      };
+      if (resume) go(); else Play.ui.countdown($('.pl-cd'), go);
+    }
+    const send = m => { if (net) net.send(m); };
+
+    // ---------------------------------------------------------------- 存档（刷新、换设备接着玩）
+    function saveMsg() {
+      const msg = {session: cur.session, el: +ctx.elapsed().toFixed(1), need: ctx.need, deaths: myDeaths, match: match && match.match_id};
+      try { msg.me = def.save(); if (room.host && def.saveWorld) msg.w = def.saveWorld(); } catch (e) { /* 游戏还没准备好 */ }
+      return msg;
+    }
+    async function save() {
+      if (!cur || !ctx || !def.save || sh.over) return;
+      try { await roomApi('save', saveMsg()); } catch (e) { /* 这一局结束了 / 换设备了（post 处理）/ 网断了：等下次 */ }
+    }
+    function saveNow() {   // 关页面、切到后台：用 sendBeacon，页面关了也送得出去
+      if (!cur || !ctx || !def.save || sh.over || gone) return;
+      const body = JSON.stringify(Object.assign({device}, saveMsg()));
+      if (!(navigator.sendBeacon && navigator.sendBeacon(`/api/rooms/${room.id}/save`, new Blob([body], {type: 'application/json'})))) save();
+    }
+    addEventListener('pagehide', saveNow);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) saveNow(); });
+
+    // ---------------------------------------------------------------- 倒下答题复活（联网）
+    function die() {
+      if (!ctx || ctx.reviving) return;
+      ctx.reviving = true; ctx.need = 1; myDeaths++;
+      send({t: 'rv', need: 1, fresh: true});
+      Play.input.clear(); Play.input.blocked = true;
+      debtText(); hudDraw();
+      setTimeout(askNow, 600);
+    }
+    function askNow() {   // 题目盖在游戏画面上，答对之前一直在（关不掉）
+      if (!ctx || !ctx.reviving || !quiz) return;
+      quiz.open();
+      const r = stageEl.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight) stageEl.scrollIntoView({block: 'center', behavior: 'smooth'});
+    }
+    setInterval(() => { if (cur && ctx && ctx.reviving && quiz && !quiz.isOpen) askNow(); }, 1000);   // 万一题目没弹出来
+    function onReviveAnswer(res) {
+      if (!ctx || !ctx.reviving) return;
+      if (res.correct) ctx.need--;
+      else if (!res.dont_know) ctx.need = Math.min(3, ctx.need + 1);
+      send({t: 'rv', need: ctx.need});
+      debtText(res); hudDraw();
+      if (ctx.need <= 0) setTimeout(() => revived(false), 650);
+    }
+    function debtText(res) {
+      const el = quiz && quiz.el.querySelector('.mp-debt'); if (!el) return;
+      el.innerHTML = ctx.need <= 0 ? '🎉 复活啦！' : `${res && !res.correct && !res.dont_know ? '答错了，多欠 1 道。' : ''}再答对 <b>${ctx.need}</b> 道就复活`;
+    }
+    function revived(rescued) {
+      if (!ctx || !ctx.reviving) return;
+      ctx.reviving = false; ctx.need = 0;
+      quiz.close(true); quiz.item = null;
+      Play.input.blocked = false; Play.input.clear();
+      send({t: 'rv', need: 0, rescued});
+      if (rescued) myDeaths = Math.max(0, myDeaths - 1);
+      hudDraw();
+      if (def.onRevive) def.onRevive({rescued});
+    }
+    function rescue() { revived(true); }
+
+    // ---------------------------------------------------------------- 状态条、表情、触屏按钮（联网的状态条、写了 touch 的按钮由外壳画）
+    const ownCtrl = multi || !!def.touch;
+    function hudDraw() {
+      if (!multi) return;
+      if (!room || !cur) { sh.hud.innerHTML = ''; return; }
+      const chip = m => {
+        const mine = m.id === me0.id, need = mine ? ctx.need : ctx.needs[m.id], off = !mine && !online.has(m.id);
+        return `<div class="mp-chip${mine ? ' me' : ''}${need ? ' dead' : ''}${off ? ' off' : ''}" data-id="${m.id}"><span>${roleOf(m.role).icon}</span><b>${esc(m.name)}</b>
+          <small>${off ? '掉线了' : need ? `答题中 · 还要对 ${need} 道` : '在玩'}</small><i class="mp-emote"></i></div>`;
+      };
+      const clock = sh.hud.querySelector('.mp-clock');
+      sh.hud.innerHTML = `<div class="mp-chips">${room.members.map(chip).join('')}</div><div class="grow"></div><div class="mp-clock">${clock ? esc(clock.textContent) : ''}</div>`;
+    }
+    function showEmote(e, id) {
+      const el = sh.hud.querySelector(`.mp-chip[data-id="${id}"] .mp-emote`);
+      if (el) { el.textContent = `${e} ${EMOTE_TEXT[e]}`; el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); }
+      Play.sfx.play('pop');
+    }
+    function buildCtrl() {
+      if (!ownCtrl) return;
+      const touch = (def.touch || []).map(([k, label, cls]) => `<button type="button" class="pl-btn ${cls || ''}" data-k="${k}">${label}</button>`);
+      const half = def.touchSplit ?? Math.ceil(touch.length / 2);
+      sh.ctrl.innerHTML = `<div class="pl-pad mp-touch">${touch.slice(0, half).join('')}</div>
+        ${multi ? `<div class="mp-emotes">${EMOTES.map(e => `<button type="button" class="mp-em" data-e="${e}" title="${EMOTE_TEXT[e]}">${e}</button>`).join('')}</div>` : ''}
+        <div class="pl-pad mp-touch">${touch.slice(half).join('')}</div>`;
+      sh.ctrl.querySelectorAll('[data-k]').forEach(b => Play.input.hold(b, b.dataset.k));
+      sh.ctrl.querySelectorAll('.mp-em').forEach(b => b.onclick = () => { send({t: 'emote', e: b.dataset.e}); showEmote(b.dataset.e, me0.id); });
+      if (!matchMedia('(pointer:coarse)').matches) sh.ctrl.querySelectorAll('.mp-touch').forEach(x => x.classList.add('mouse'));
+    }
+
+    // ---------------------------------------------------------------- 结束
+    async function finish(result, report, title) {
+      if (!ctx || ctx.finishing || !cur) return;
+      report = report || {};
+      if (multi && !room.host) {   // 联网：过关由开房间的人报；没过（时间到了）谁发现都行，告诉房主来报
+        if (result !== 'win') { send({t: 'over', why: report.why, result}); endLevel(result, null, title, report.why); }
+        return;
+      }
+      ctx.finishing = true;
+      const rep = Object.assign({seconds: +ctx.elapsed().toFixed(1), deaths: ctx.deaths()}, report);
+      let res;
+      try { res = await roomApi('finish', {session: cur.session, result, report: rep}); }
+      catch (e) { res = {error: e.message, n: cur.n, result, ...rep, stars: 0, checks: {}}; }
+      res.session = cur.session;
+      send(result === 'win' ? {t: 'done', res} : {t: 'over', why: report.why, res});
+      endLevel(result, res, title, report.why, report);
+    }
+    function quit(why) {   // 这一关先停下了（队友走了、队友开不了局）：房主把这一局记成退出
+      if (!cur) return;
+      if (room.host) roomApi('save', {session: cur.session, end: 1}).catch(() => {});
+      send({t: 'over', why, result: 'quit', res: {result: 'quit', session: cur.session}});
+      endLevel('quit', null, null, why);
+    }
+    function stopPlay() {
+      clearInterval(saveTimer);
+      if (def.end) def.end();
+      Play.music.stop(); Play.input.blocked = false; Play.input.clear();
+      if (quiz) { quiz.stop(); if (quizMode === 'dock') quiz.el.classList.add('wait'); }
       root.classList.remove('playing');
+      if (ownCtrl) { sh.ctrl.innerHTML = ''; sh.hud.innerHTML = ''; }
+      const p = cur; cur = null; t0 = 0; sh.over = true;
+      send({t: 'here', playing: 0});
+      return p;
+    }
+    async function endLevel(result, res, title, why, stats) {
+      if (!cur) return;
+      const p = stopPlay();
       Play.sfx.play(result === 'win' ? 'win' : result === 'lose' ? 'lose' : 'pop');
-      let r;
-      try { r = await api(`/api/arena/${sh.match.match_id}/end`, {result, stats: stats || {}}); }
-      catch (e) { r = {result, answered: 0, right: 0, accuracy: 0, xp: 0, tips: [e.message], topics: [], stickers: [], seconds_left: 0}; }
-      const head = title || {win: '🏆 你赢了！', lose: '💪 差一点！再来一局', draw: '🤝 平局', quit: '这局结束了'}[result];
-      const lv = r.level, sg = r.stage;
-      end.querySelector('.pl-sum').innerHTML = `<div class="pl-title ${result}">${head}</div>
-        ${sg ? stageHtml(sg) : ''}
-        <div class="pl-stats"><div class="focus" title="100 = 平时的你。这局比平时多答对，就超过 100"><b>${r.focus ?? '—'}</b><span>💎 专注值</span></div><div><b>${r.right}/${r.answered}</b><span>答对 / 答题</span></div><div><b>${r.best_streak || 0}</b><span>最长连对</span></div></div>
+      let mine = null;
+      try { mine = await api(`/api/arena/${match.match_id}/end`, {result, stats: stats || {}}); } catch (e) { /* 对局已经结束了 */ }
+      const head = title || (multi ? {win: '🎉 我们一起过关了！', lose: '💪 差一点！', draw: '🤝 平局', quit: '这一关先停下了'}
+                                   : {win: '🏆 你赢了！', lose: '💪 差一点！再来一局', draw: '🤝 平局', quit: '这局结束了'})[result];
+      let h = `<div class="pl-title ${result === 'win' ? 'win' : 'lose'}">${head}</div>${why ? `<p>${esc(why)}</p>` : ''}`;
+      if (res && res.n) h += stageHtml(res);
+      if (res && res.error) h += `<p class="err">${esc(res.error)}</p>`;
+      h += personal(mine);
+      showEnd(h, res, p);
+      const st = [].concat(((res && res.stickers) || {})[String(me0.id)] || [], (mine && mine.stickers) || []);
+      if (res && res.stars) Play.sfx.play('star');
+      if (st.length) stickers(st);
+      if (res && res.progress && room) { room.progress = res.progress; if (res.next) room.level = res.next; }
+    }
+    function stageHtml(res) {
+      const lv = lvAt(res.n) || {};
+      const stars = G.stars.map((s, i) => `<span class="${res.checks && res.checks[s.key] ? 'on' : ''}" style="animation-delay:${0.25 + i * 0.3}s">★</span>`).join('');
+      const how = G.stars.map(s => `<span class="${res.checks && res.checks[s.key] ? 'ok' : ''}">${res.checks && res.checks[s.key] ? '✓' : '·'} ${esc(s.key === 'time' && lv.par ? `${lv.par} 秒内` : s.label)}</span>`).join('');
+      let rec = '';
+      if (res.result === 'win' && G.record && res.value != null) rec = `<div class="mp-time">${G.record === 'seconds' ? '⏱' : '🏅'} ${fmtRecord(res.value)}${res.new_best && res.prev_best ? ' <b class="ps-best">新纪录！</b>' : res.prev_best ? `<small>（${multi ? '我们的' : ''}纪录 ${fmtRecord(res.best)}）</small>` : ''}</div>`;
+      else if (res.new_best && res.prev_best == null && !G.record && res.first_clear === false) rec = '<div class="ps-best">新纪录！</div>';
+      return `<div class="pl-stage-res"><div class="ps-n">第 ${res.n} 关${lv.name && lv.name !== `第 ${res.n} 关` ? ` · ${esc(lv.name)}` : ''}</div><div class="ps-stars">${stars}</div><div class="ps-how">${how}</div>${rec}
+        ${res.result !== 'win' ? `<p class="small">${esc(G.stars[0] ? G.stars[0].label : '过关')}就能拿第 1 颗星。</p>` : ''}
+        ${res.unlocked ? `<div class="ps-unlock">${res.unlocked.icon} 解锁了 <b>${esc(res.unlocked.name)}</b>：${esc(res.unlocked.how)}</div>` : ''}
+        ${res.all_clear && res.first_clear ? `<div class="ps-unlock">🏆 全部 ${LV.length} 关都打通了！</div>` : ''}</div>`;
+    }
+    function personal(r) {
+      if (!r) return '';
+      if (quizMode === 'revive' && !r.answered) return '<p class="small muted">这一关我没有倒下，一道题都不用答！</p>';
+      const lv = r.level;
+      return `<div class="pl-stats"><div class="focus" title="100 = 平时的你。这局比平时多答对，就超过 100"><b>${r.focus ?? '—'}</b><span>💎 ${multi ? '我的' : ''}专注值</span></div><div><b>${r.right}/${r.answered}</b><span>${multi ? '我' : ''}答对 / 答题</span></div><div><b>${r.best_streak || 0}</b><span>最长连对</span></div></div>
         ${r.topics && r.topics.length ? `<div class="pl-topics">这局练了：${r.topics.map(t => `<span>${esc(t.topic)} <b>${t.right}/${t.n}</b></span>`).join('')}</div>` : ''}
-        ${r.tips.length ? `<ul class="pl-tips">${r.tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
+        ${r.tips && r.tips.length ? `<ul class="pl-tips">${r.tips.slice(0, multi ? 2 : 4).map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
         ${lv ? `<div class="pl-lv"><span>乐园 Lv.${lv.level}</span><i><b style="width:${lv.pct}%"></b></i><small>再答对 ${lv.to_next} 题升级</small></div>` : ''}
         <p class="pl-left">今天还能玩 ${Math.floor((r.seconds_left || 0) / 60)} 分钟</p>`;
-      const tooLate = (r.seconds_left || 0) < 30;
-      end.querySelector('.pl-again').hidden = tooLate;
-      end.querySelector('.pl-again').textContent = sg ? (sg.stars ? '再打一次' : '再试一次') : '再来一局';
-      if (nextBtn) { nextBtn.hidden = tooLate || !(sg && sg.next); if (sg && sg.next) { nextBtn.dataset.n = sg.next; nextBtn.textContent = `下一关 →`; } }
-      if (sg) updateStages(sg);
-      end.hidden = false;
-      if (sg && sg.stars) Play.sfx.play('star');
-      if (r.stickers && r.stickers.length) showStickers(r.stickers);
-    };
-
-    function stageHtml(sg) {
-      const stars = [0, 1, 2].map(i => `<span class="${i < sg.stars ? 'on' : ''}" style="animation-delay:${0.25 + i * 0.3}s">★</span>`).join('');
-      const why = sg.stars ? '' : '<p class="small">打赢电脑就能拿第 1 颗星。能量快没了就去答题！</p>';
-      return `<div class="pl-stage-res"><div class="ps-n">第 ${sg.n} 关</div><div class="ps-stars">${stars}</div>
-        <div class="ps-how">${[['win', '过关'], ['focus', '专注值 90+'], ['hp', '血量剩一半']].map(([k, t]) => `<span class="${sg.checks[k] ? 'ok' : ''}">${sg.checks[k] ? '✓' : '·'} ${t}</span>`).join('')}</div>
-        ${sg.new_best && sg.best > 0 ? '<div class="ps-best">新纪录！</div>' : ''}${why}
-        ${sg.unlocked ? `<div class="ps-unlock">${sg.unlocked.icon} 解锁了 <b>${esc(sg.unlocked.name)}</b>：${esc(sg.unlocked.how)}</div>` : ''}
-        ${sg.all_clear && sg.first_clear ? '<div class="ps-unlock">🥋 30 关全部打通！你是火柴人大师！</div>' : ''}</div>`;
     }
-    function updateStages(sg) {   // 战报回来后，地图上的星星和能打到第几关跟着更新
-      if (!stages) return;
-      for (const w of stages.worlds) for (const l of w.levels) {
-        if (l.n === sg.n) { stages.stars += Math.max(0, sg.best - l.stars); w.stars += Math.max(0, sg.best - l.stars); l.stars = sg.best; l.cleared = l.cleared || sg.stars > 0; }
-        if (sg.next && l.n === sg.next) l.open = true;
+    function showEnd(h, res, p) {
+      state = 'end';
+      endEl.querySelector('.pl-sum').innerHTML = h;
+      const row = endEl.querySelector('.pl-row');
+      const n = (res && res.n) || p.n, next = res && res.next;
+      if (room.host) {
+        const again = LV.length ? (res && res.stars ? '再打一次' : '再试一次') : '再来一局';
+        row.innerHTML = `${next ? `<button type="button" class="btn lg pl-next" data-n="${next}">下一关 →</button>` : ''}
+          <button type="button" class="btn lg pl-again" data-n="${n}">${again}</button>
+          ${multi || LV.length ? `<button type="button" class="btn ghost lg mp-back">${multi ? '回房间' : '选关'}</button>` : ''}
+          ${multi ? '' : '<a class="btn ghost lg" href="/arena">回乐园</a>'}`;
+        row.querySelectorAll('[data-n]').forEach(b => b.onclick = async () => {
+          if (LV.length) { try { room = await roomApi('level', {n: +b.dataset.n}); } catch (e) { sh.toast(e.message, 'warn'); return; } }
+          startNew(+b.dataset.n);
+        });
+      } else {
+        row.innerHTML = `<p class="mp-note grow">等 <b>${esc(nameOf(room.members.find(m => m.host).id))}</b> 开始下一局…</p><button type="button" class="btn ghost lg mp-back">回房间</button>`;
       }
-      if (sg.unlocked) stages.worlds[Math.floor((sg.n - 1) / 6)].done = true;
-      if (sg.next) { stages.upto = Math.max(stages.upto, sg.next); sh.stage = sg.next; page = Math.floor((sg.next - 1) / 6); }
-      drawMap();
+      const back = row.querySelector('.mp-back');
+      if (back) back.onclick = () => { endEl.hidden = true; state = 'room'; page = -1; refresh().then(showRoom); };
+      endEl.hidden = false;
     }
-
-    function showStickers(list) {
+    function stickers(list) {
       const pop = document.createElement('div'); pop.className = 'pl-sticker-pop';
       pop.innerHTML = `<div class="pl-sticker-card"><div class="pl-label">得到新贴纸！</div>${list.map(s =>
         `<div class="pl-sticker"><span class="ico">${s.icon}</span><b>${esc(s.name)}</b><small>${esc(s.how)}</small>${s.avatar ? '<em>解锁了新角色，回乐园首页换上吧</em>' : ''}</div>`).join('')}
         <button type="button" class="btn lg block">太棒了！</button></div>`;
-      root.appendChild(pop); Play.sfx.play('sticker');
+      document.body.appendChild(pop); Play.sfx.play('sticker');
       pop.querySelector('button').onclick = () => pop.remove();
     }
 
-    if (game.setup) game.setup(sh);
+    // ---------------------------------------------------------------- 打开页面：回到我的房间（刷新了、换了设备），正在玩就接着玩
+    if (data.locked) over.classList.add('locked');
+    if (!multi) { panel.innerHTML = `<div class="pl-title">${esc(G.icon)} ${esc(G.name)}</div>`; enter(post('/api/rooms', {game: G.id})); }
+    else if (data.room) { panel.innerHTML = '<div class="pl-title">正在回到房间…</div>'; enter(post(`/api/rooms/${data.room}/enter`)); }
+    else showLobby();
     return sh;
   };
 
-  function localStorageGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-  function localStorageSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* 隐私模式 */ } }
+  function deviceId() {   // 这个页面的设备号：刷新不变，另一个标签页、另一台设备不一样
+    let id = null;
+    try { id = sessionStorage.getItem('play.device'); } catch (e) { /* 隐私模式 */ }
+    if (!id) { id = Math.random().toString(36).slice(2, 12); try { sessionStorage.setItem('play.device', id); } catch (e) { /* 隐私模式 */ } }
+    return id;
+  }
+  function storeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function storeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* 隐私模式 */ } }
 })();

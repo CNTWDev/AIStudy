@@ -1,7 +1,7 @@
-/* 双人闯关（冰火人玩法，两个人各用一台设备）。关卡在 app/arena/mp/levels/duo/，格式见 app/arena/mp/duo.py。
+/* 双人闯关（冰火人玩法，两个人各用一台设备）。关卡在 app/arena/games/levels/duo/，格式见 app/arena/games/duo.py。
    - 自己的角色自己的设备算（走、跳、掉进池子、拿宝石、推拉杆），每秒发 15 次位置给队友；
    - 按钮、门、桥、升降台按两个人的位置各自算（两边看到的几乎一样）；拉杆、宝石用消息同步；
-   - 两个人都站在自己的门前，开房间的设备报过关（外壳 mpshell.js 负责结算）。
+   - 两个人都站在自己的门前，开房间的设备报过关（外壳 shell.js 负责结算）。
    - 掉进池子：外壳弹出答题（ctx.die），答够了从刚才站稳的地方复活。 */
 (function () {
   const T = 30, COLS = 32, ROWS = 15, MW = COLS * T, MH = ROWS * T;
@@ -103,7 +103,7 @@
     // 两个人都到门口：开房间的设备报过关
     if (mp.host && me.door && peerRaw && peerRaw.a && !peerRaw.d && !me.dead) {
       doorT += dt;
-      if (doorT > 0.4 && !mp.finishing) { ended = true; Play.sfx.play('win'); mp.finish({gems: Wd.got}); }
+      if (doorT > 0.4 && !mp.finishing) { ended = true; Play.sfx.play('win'); mp.finish('win', {gems: Wd.got}); }
     } else doorT = 0;
     clockT -= dt;
     if (clockT <= 0) { clockT = 0.25; sh.hudClock(`⏱ ${mp.elapsed().toFixed(0)} 秒 · 💎 ${Wd.got}/${Wd.lv.gems}`); }
@@ -321,8 +321,8 @@
   }
 
   // ---------------------------------------------------------------- 外壳
-  MpShell.init({
-    id: 'duo', tempo: 118,
+  PlayShell.init({
+    quiz: 'revive', tempo: 118,
     rules: ['一个人当 <b>小火苗</b> 🔥，一个人当 <b>小水滴</b> 💧，各用自己的平板或电脑。',
             '火苗不怕岩浆，水滴不怕水，<b>绿色毒水</b>谁都不能碰。',
             '踩住按钮门才开；拉杆往右推打开、往左推关上；升降台、桥也要队友帮忙。',

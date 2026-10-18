@@ -1,7 +1,7 @@
-/* 泡泡堂（合作打怪，两个人各用一台设备）。关卡在 app/arena/mp/levels/bubble/，格式见 app/arena/mp/bubble.py。
+/* 泡泡堂（合作打怪，两个人各用一台设备）。关卡在 app/arena/games/levels/bubble/，格式见 app/arena/games/bubble.py。
    - 自己的角色自己的设备算（走、放泡泡、被困、捡道具、救队友），每秒发 15 次位置；
    - 泡泡什么时候炸、炸到哪、砖块掉什么、怪兽怎么走，都由开房间的设备算，再发给另一台（'boom'、'w' 消息）；
-   - 被泡泡炸到或被怪兽碰到：困在泡泡里。队友跑过来碰一下就救出来（不算倒下），不然答题自救（外壳 mpshell.js）。
+   - 被泡泡炸到或被怪兽碰到：困在泡泡里。队友跑过来碰一下就救出来（不算倒下），不然答题自救（外壳 shell.js）。
    - 怪兽全打败，开房间的设备报过关。
    - 刷新 / 换设备：存档里有自己（位置、道具、是不是被困着）和地图（炸开的砖块、地上的道具、怪兽、泡泡），接着玩。 */
 (function () {
@@ -100,7 +100,7 @@
     if (it) { items.delete(k); apply(it); mp.net.send({t: 'pick', k}); }
     // 救队友：碰一下困在泡泡里的队友
     if (peerRaw && peerRaw.d && Math.hypot(peerRaw.x - me.x, peerRaw.y - me.y) < 30 && t > saveT) {
-      saveT = t + 1; mp.net.send({t: 'save', to: mp.peer.id});
+      saveT = t + 1; mp.net.send({t: 'rescue', to: mp.peer.id});
       fx.burst(peerRaw.x, peerRaw.y, {n: 16, colors: ['#fff', '#9fe7ff', '#ffd23f'], speed: 220, shape: 'star', size: 5, grav: 100});
       Play.sfx.play('shield'); mp.toast(`你救了${mp.peer.name}！`, 'good');
     }
@@ -163,7 +163,7 @@
     if (snapT <= 0) { snapT = 0.1; mp.net.send({t: 'w', m: mons.map(m => [m.id, Math.round(m.x), Math.round(m.y), m.alive ? 1 : 0])}); }
     if (!mons.some(m => m.alive) && !ended) {
       winT += dt;
-      if (winT > 1) { ended = true; mp.finish({score: mons.length}); }
+      if (winT > 1) { ended = true; mp.finish('win', {score: mons.length}); }
     }
   }
   function explode(id) {
@@ -297,8 +297,8 @@
 
   // ---------------------------------------------------------------- 外壳
   let starts = null;
-  MpShell.init({
-    id: 'bubble', tempo: 132,
+  PlayShell.init({
+    quiz: 'revive', tempo: 132,
     rules: ['两个人一队，在格子地图上<b>放泡泡</b>：泡泡过一会儿炸成十字，炸开砖块、打败怪兽。',
             '砖块里会掉道具：🔥 炸得更远、🫧 多放一个泡泡、👟 跑得更快。',
             '被泡泡炸到、被怪兽碰到就会<b>困在泡泡里</b>：队友跑过来碰一下马上救出来！',
@@ -325,7 +325,7 @@
       if (rs && rs.me) Object.assign(me, pick(rs.me, ['x', 'y', 'face', 'power', 'max', 'shoe']), {trapped: !!rs.me.trapped, inv: rs.me.trapped ? 0 : 2});
       if (ctx.level.tip && !rs) mp.toast(ctx.level.tip.split('。')[0], 'good');
       const net = ctx.net;
-      net.off('s', 'bub', 'boom', 'w', 'pick', 'save');
+      net.off('s', 'bub', 'boom', 'w', 'pick', 'rescue');
       net.on('s', m => { peerRaw = m; peerTrack.push(m); });
       net.on('bub', m => {
         if (bubbles.has(m.id)) return;
@@ -345,7 +345,7 @@
         }
       });
       net.on('pick', m => { items.delete(m.k); });
-      net.on('save', m => {
+      net.on('rescue', m => {
         if (m.to !== mp.me.id || !me.trapped) return;
         me.trapped = false; me.inv = 2;
         mp.toast(`${mp.peer.name}救了你！`, 'good'); Play.sfx.play('power');

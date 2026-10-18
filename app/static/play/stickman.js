@@ -1,5 +1,5 @@
 /* 火柴人大战（单机打电脑，闯关）。玩法在这里；出题、经验值、冷冻在服务器，答题面板是 quiz.js，外壳是 shell.js，
-   关卡参数在 app/arena/levels.py（开局时放在 match.stage.params 里）。
+   关卡参数在 app/arena/games/stickman.py（开局时放在 ctx.level.params 里）。刷新、换设备接着打（save / ctx.resume）。
    - 能量只从答题来：开局只给一点点，不会自己回（前两关会慢慢回一点，先学会玩）；走、跳、出拳都要花。
    - 答题时整个游戏暂停（时间停止），答完再接着打；答错冷冻照旧。
    - 用能量换装备：木棍 / 护盾 / 剑 / 激光，后三样要打通前面的世界才解锁；连对 3 题攒一次必杀。
@@ -202,7 +202,7 @@
     st.begin();
     const [ox, oy] = fx.fx.offset();
     ctx.save(); ctx.translate(ox, oy);
-    const scene = (G && G.scene) || 'sunset';
+    const scene = (G && G.world.scene) || 'sunset';
     Play.scene.sky(ctx, W, H, scene);
     Play.scene.drawClouds(ctx, W, scene, t);
     Play.scene.hills(ctx, W, H, GROUND, scene, 0);
@@ -317,11 +317,11 @@
     });
   }
 
-  function reset(match) {
+  function reset(ctx) {
     const W = st.W;
-    G = match && match.stage; C = (G && G.params) || DEFAULT;
-    const rival = G ? RIVALS[(G.n * 7 + G.world) % RIVALS.length] : Play.pick(RIVALS);
-    P = fighter(W * 0.25, (match && match.avatar) || sh.data.avatar, 1);
+    G = ctx && ctx.level.n ? ctx.level : null; C = (G && G.params) || DEFAULT;
+    const rival = G ? RIVALS[(G.n * 7 + G.world.n) % RIVALS.length] : Play.pick(RIVALS);
+    P = fighter(W * 0.25, (ctx && ctx.match.avatar) || sh.data.avatar, 1);
     A = fighter(W * 0.75, rival === P.avatar ? 'rival' : rival, -1, C.ai_hp);
     A.ai = {think: 0, answering: 0, aggr: C.ai_aggr};
     A.weapon = C.ai_weapon || 'fist'; A.shield = C.ai_shield || 0;
@@ -350,7 +350,7 @@
   }
 
   PlayShell.init({
-    game: 'stickman', tempo: 138, dock: false,
+    tempo: 138,
     rules: ['走、跳、出拳都要花 <b>⚡能量</b>，能量<b>只能靠答题</b>补：答对一题约 +100。',
             '点 <b>✍️ 答题</b> 时<b>时间停止</b>，答完接着打。连对 3 题攒一颗 <b>⭐ 必杀</b>，答错冷冻 5 秒。',
             '一关比一关难；每个世界第 6 关是 <b>👑 大怪兽</b>，有护盾，答对几题才能破盾。',
@@ -368,10 +368,18 @@
       loop.onHide = () => { if (!sh.over && !ended) sh.quiz.open(); };   // 切走了：自动打开答题（充能、减伤），回来接着打
       loop.start();
     },
-    begin(match) {
-      reset(match);
-      tLeft = Math.max(30, Math.min(C.seconds, match.seconds_left));
+    begin(ctx) {
+      reset(ctx);
+      tLeft = Math.max(30, Math.min(C.seconds, ctx.match.seconds_left));
+      const rs = ctx.resume && ctx.resume.me;
+      if (rs) {   // 接着打：血量、能量、装备、时间都回到刚才
+        tLeft = Math.max(10, Math.min(tLeft, rs.tLeft));
+        Object.assign(P, rs.P, {shownHp: rs.P.hp}); Object.assign(A, rs.A, {shownHp: rs.A.hp});
+        if (B && rs.B) Object.assign(B, rs.B);
+        bought = rs.bought || []; zeroTime = rs.zeroTime || 0; specials = rs.specials || 0;
+      }
       Play.input.clear(); syncHud();
+      if (rs) return;
       if (B) sh.toast(`👑 大怪兽有护盾！答对 ${B.max} 题破盾，再狠狠打`, 'warn');
       else if (G && G.n <= 2) sh.toast('开打！能量快没了就点「✍️ 答题」', 'good');
       else sh.toast(`第 ${G ? G.n : ''} 关，开打！`, 'good');
@@ -391,5 +399,10 @@
       fx.fx.burst(P.x, P.y - 60, {n: res.crit ? 26 : 12, colors: ['#ffd23f', '#fff1a8'], shape: 'star', speed: 200, grav: -100});
     },
     onAnswer(res) { if (!res.correct) { P.frozen = 0; } },
+    save() {
+      if (ended) return null;
+      const f = x => ({x: Math.round(x.x), hp: x.hp, energy: Math.round(x.energy), weapon: x.weapon, shield: x.shield, sp: x.sp, facing: x.facing});
+      return {tLeft: Math.round(tLeft), P: f(P), A: f(A), B: B && {pips: B.pips, window: B.window}, bought, zeroTime: Math.round(zeroTime), specials};
+    },
   });
 })();

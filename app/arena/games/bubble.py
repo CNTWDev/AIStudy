@@ -7,15 +7,17 @@
   map  11 行 × 17 列：# 打不坏的墙  + 砖块  . 空  1 / 2 两个人的出生点  s 史莱姆（慢）  b 蝙蝠（快）  g 幽灵（能穿砖块）
   par  三星目标秒数；tip 开局提示
 """
-from .base import MpGame, register
+from . import Game, register
 
 COLS, ROWS = 17, 11
 TILES = set("#+.12sbg")
 
 
 @register
-class Bubble(MpGame):
-    id = "bubble"
+class Bubble(Game):
+    id, name, icon, color, tag = "bubble", "泡泡堂", "🫧", "#2f8fdc", "联网合作"
+    desc = "放泡泡炸开砖块、打败小怪兽。被泡泡困住时，队友碰一下就能救你，不然就答题自救。"
+    players, freeze, max_seconds = (2, 2), False, 900   # 谁倒下谁答题：答错不冷冻，改成「多欠一道题」
     roles = {"red": ("红泡泡", "🔴"), "blue": ("蓝泡泡", "🔵")}
     stars = (("clear", "打败所有怪兽"), ("time", "进入目标时间"), ("safe", "被困答题不超过 2 次"))
     worlds = (("糖果小镇", "candy"), ("冰雪城堡", "ice"))
@@ -34,5 +36,5 @@ class Bubble(MpGame):
         if not lv["monsters"]:
             raise ValueError(f"bubble/{name}: 至少要有一只怪兽")
 
-    def checks(self, lv, rep):
+    def checks(self, lv, rep, focus):
         return {"clear": True, "time": rep["seconds"] <= lv["par"], "safe": rep["deaths"] <= 2}

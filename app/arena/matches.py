@@ -1,5 +1,6 @@
-"""一局游戏的流程（所有游戏共用）：开局 → 出题 / 作答（可以很多次）→ 结束。
+"""每个孩子自己的答题对局（所有游戏共用）：开局 → 出题 / 作答（可以很多次）→ 结束（个人战报：专注值、练了什么、贴纸）。
 
+一局游戏（房间里大家一起打的那一关）记在 sessions.py；联网时一局里每个人各有一个答题对局，题按各自的水平出。
 游戏前端只管玩法；出题、判分、经验值、冷冻、时长、贴纸都在服务器，客户端改不了：
 - 作答用服务器计时；关掉答题面板 90 秒内再打开还是同一道题（不能换掉难题）。
 - 冷冻期间不出题；结束时客户端报的统计只用来写战报和发贴纸，数字都限定范围。
@@ -9,34 +10,13 @@ import time
 from datetime import timedelta
 
 from .. import db
-from . import awards, fair, levels, rules, sources
-
-GAMES = {
-    "stickman": {"name": "火柴人大战", "icon": "🥋", "target": 0.75, "max_seconds": 600, "color": "#2f6f5e",
-                 "tag": "对战", "desc": "30 关闯关！能量只靠答题补，打败每个世界的大怪兽，解锁新装备。"},
-    "race": {"name": "闪电赛跑", "icon": "⚡", "target": 0.8, "max_seconds": 300, "color": "#2f6fdc",
-             "tag": "竞速", "desc": "答对一题冲刺一段，和「上次的我」赛跑，看谁先到终点。"},
-    "defense": {"name": "星星守卫", "icon": "🏰", "target": 0.72, "max_seconds": 600, "color": "#6d4fd8",
-                "tag": "守城", "desc": "小怪兽一波波来了！答对放星星魔法，守住城堡，打败大怪兽。"},
-    # 联网游戏（app/arena/mp/）：和家里的兄弟姐妹各用一台设备一起玩。谁倒下谁答题：答错不冷冻，改成「多欠一道题」
-    # （前端 mpshell.js 算），所以 freeze=False
-    "duo": {"name": "双人闯关", "icon": "🔥", "target": 0.75, "max_seconds": 900, "color": "#e0582b", "freeze": False, "multi": True,
-            "tag": "联网合作", "desc": "一个当小火苗、一个当小水滴，按按钮、坐升降台，互相帮忙一起走到门口。"},
-    "bubble": {"name": "泡泡堂", "icon": "🫧", "target": 0.75, "max_seconds": 900, "color": "#2f8fdc", "freeze": False, "multi": True,
-               "tag": "联网合作", "desc": "放泡泡炸开砖块、打败小怪兽。被泡泡困住时，队友碰一下就能救你，不然就答题自救。"},
-    "snake": {"name": "贪吃蛇大作战", "icon": "🐍", "target": 0.75, "max_seconds": 900, "color": "#3aa860", "freeze": False, "multi": True,
-              "tag": "联网合作", "desc": "两条小蛇一起吃豆子长大，躲开电脑蛇，让它们撞到你们身上，两条蛇加起来够长就过关。"},
-}
-
-
-class ArenaError(Exception):
-    def __init__(self, msg: str, status: int = 400, **extra):
-        super().__init__(msg)
-        self.status, self.extra = status, extra
+from . import awards, fair, progress, rules, sources
+from .errors import ArenaError
+from .games import GAMES, get
 
 
 def max_seconds() -> dict:
-    return {g: v["max_seconds"] for g, v in GAMES.items()}
+    return {g: v.max_seconds for g, v in GAMES.items()}
 
 
 def status(kid: dict) -> dict:
@@ -71,22 +51,34 @@ def ghost(kid_id: int) -> dict | None:
     return None
 
 
-def start(kid: dict, game: str, src: str = "mix", stage=None) -> dict:
-    if game not in GAMES:
-        raise ArenaError("没有这个游戏", 404)
+def start(kid: dict, game: str, src: str = "mix", session=None, resume=None) -> dict:
+    """我自己的一局答题（每个孩子各一局，题按自己的水平出）。session：房间里正在玩的那一局（sessions.py），对局挂在它下面。
+    resume：刷新、换设备回到这一局时，接着用原来的对局（还开着的话）。"""
+    g = get(game)
     st = status(kid)
     why = rules.locked_reason(st)
     if why:
         raise ArenaError(why, 403)
-    stg = levels.check_start(kid["id"], game, stage) if game in levels.LEVELED else None
+    sid = None
+    if session:
+        s = db.one("SELECT s.id FROM game_sessions s JOIN room_members m ON m.room_id=s.room_id "
+                   "WHERE s.id=? AND s.game=? AND m.user_id=? AND s.ended_at IS NULL", session, game, kid["id"])
+        if not s:
+            raise ArenaError("这一局已经结束了", 410)
+        sid = s["id"]
+        old = db.one("SELECT id, data FROM arena_matches WHERE id=? AND user_id=? AND session_id=? AND ended_at IS NULL", resume, kid["id"], sid) \
+            if resume else None
+        if old:
+            return {"match_id": old["id"], "seconds_left": st["left"], "src": (db.jload(old["data"], {}) or {}).get("src", "mix"),
+                    "avatar": awards.avatar(kid), "ghost": ghost(kid["id"]) if game == "race" else None, "target": g.target}
     for m in db.q("SELECT id, game, started_at FROM arena_matches WHERE user_id=? AND ended_at IS NULL", kid["id"]):
-        _close(m["id"], m["started_at"], "quit", {}, GAMES.get(m["game"], {}).get("max_seconds", 600))
+        _close(m["id"], m["started_at"], "quit", {}, GAMES[m["game"]].max_seconds if m["game"] in GAMES else 600)
     avail = {s["id"] for s in sources.available(kid)}
     src = src if src in avail else "mix"
-    mid = db.insert("INSERT INTO arena_matches(user_id, game, mode, started_at, data) VALUES(?,?,?,?,?)",
-                    kid["id"], game, "solo", db.now(), db.jdump({"streak": 0, "fast_wrongs": 0, "src": src, "stage": stg and stg["n"]}))
+    mid = db.insert("INSERT INTO arena_matches(user_id, game, mode, started_at, data, session_id) VALUES(?,?,?,?,?,?)",
+                    kid["id"], game, "solo" if not g.multi else "team", db.now(), db.jdump({"streak": 0, "fast_wrongs": 0, "src": src}), sid)
     return {"match_id": mid, "seconds_left": st["left"], "src": src, "avatar": awards.avatar(kid),
-            "ghost": ghost(kid["id"]) if game == "race" else None, "target": GAMES[game]["target"], "stage": stg}
+            "ghost": ghost(kid["id"]) if game == "race" else None, "target": g.target}
 
 
 def question(kid: dict, match_id, rng: random.Random | None = None) -> dict:
@@ -96,7 +88,7 @@ def question(kid: dict, match_id, rng: random.Random | None = None) -> dict:
         raise ArenaError("冷冻中，等一下再答", 423, freeze_ms=int((st["freeze_until"] - now) * 1000))
     pend = st.get("pending")
     if not pend or now - pend["issued"] > rules.PENDING_KEEP_S:
-        it = sources.pick(kid, st.get("src") or "mix", GAMES[m["game"]]["target"], rng or random.Random())
+        it = sources.pick(kid, st.get("src") or "mix", get(m["game"]).target, rng or random.Random())
         pend = {"item": it, "issued": now}
         st["pending"] = pend
         _save_state(m["id"], st)
@@ -136,7 +128,7 @@ def answer(kid: dict, match_id, item_id: str, ans, dont_know=False, rng: random.
         if fast:
             st["guesses"] = st.get("guesses", 0) + (1 if st["fast_wrongs"] >= 2 else 0)
         st["streak"] = 0
-        sec = rules.freeze_seconds(st["fast_wrongs"], fast) if GAMES[m["game"]].get("freeze", True) else 0
+        sec = rules.freeze_seconds(st["fast_wrongs"], fast) if get(m["game"]).freeze else 0
         st["freeze_until"] = now + sec
         out.update(freeze_ms=sec * 1000, streak=0, guessing=fast and st["fast_wrongs"] >= 2, dont_know=bool(dont_know))
     st["answered"] = st.get("answered", 0) + 1
@@ -185,7 +177,7 @@ def end(kid: dict, match_id, result: str, stats: dict | None = None) -> dict:
     m = _match(kid, match_id)
     result = result if result in ("win", "lose", "draw", "quit") else "quit"
     clean = _clean_stats(stats or {})
-    secs = _close(m["id"], m["started_at"], result, clean, GAMES[m["game"]]["max_seconds"])
+    secs = _close(m["id"], m["started_at"], result, clean, get(m["game"]).max_seconds)
     st = m["state"]
     answered, right = st.get("answered", 0), st.get("right", 0)
     f = focus(m["id"])
@@ -206,24 +198,22 @@ def end(kid: dict, match_id, result: str, stats: dict | None = None) -> dict:
     # 这局在哪些内容上进步了：按能力维度汇总答对几题
     topics = [{"topic": t, "n": n, "right": r} for n, r, t in (st.get("dims") or {}).values() if t]
     topics.sort(key=lambda x: -x["n"])
-    stage = None
-    if m["game"] in levels.LEVELED and st.get("stage"):
-        stage = levels.finish(kid["id"], m["game"], st["stage"], result, f["index"], clean.get("hp_left"))
     st_now = status(kid)
-    new = awards.after_match(kid["id"], m["game"], result, st, clean, st_now, f)
-    if stage:
-        new += awards.give(kid["id"], levels.sticker_keys(m["game"], stage))
+    new = awards.after_match(kid["id"], get(m["game"]).match_stickers(result, clean), st, st_now, f)
     return {"result": result, "seconds": secs, "answered": answered, "right": right,
             "accuracy": round(right / answered * 100) if answered else 0, "xp": st.get("xp", 0), "focus": f["index"],
             "best_streak": st.get("best_streak", 0), "seconds_left": st_now["left"], "tips": tips,
-            "topics": topics[:4], "stickers": new, "level": awards.level(kid["id"]), "stage": stage}
+            "topics": topics[:4], "stickers": new, "level": awards.level(kid["id"])}
 
 
 def focus(match_id: int) -> dict:
     """专注指数 = 实际答对题数 ÷ 预期答对题数 × 100（预期 = 每题出题时预测的答对概率之和）。
     每道题都按孩子自己的水平出，预期答对的概率大家一样，所以比的不是会多少，而是这一局有多投入：
     100 是正常发挥，高于 100 是比平时的自己更专注。答题少于 3 道不算（太少，看不出来）。3 秒内答错算「猜」。"""
-    rows = db.q("SELECT correct, p_pred, ms FROM arena_answers WHERE match_id=?", match_id)
+    return focus_of(db.q("SELECT correct, p_pred, ms FROM arena_answers WHERE match_id=?", match_id))
+
+
+def focus_of(rows) -> dict:
     exp = sum(r["p_pred"] or 0 for r in rows)
     right = sum(r["correct"] for r in rows)
     guesses = sum(1 for r in rows if not r["correct"] and (r["ms"] or 0) < rules.FAST_MS)
@@ -245,10 +235,11 @@ def _week(kid_id: int) -> dict:
 def hub(kid: dict) -> dict:
     new = awards.refresh_learning(kid["id"])
     st = status(kid)
-    return {"games": GAMES, "status": st, "locked": rules.locked_reason(st), "level": awards.level(kid["id"]),
+    return {"games": [g.card() for g in GAMES.values()], "status": st, "locked": rules.locked_reason(st), "level": awards.level(kid["id"]),
             "avatar": awards.avatar(kid), "avatars": awards.avatars(kid["id"]), "wall": awards.wall(kid["id"]),
             "new_stickers": new, "sources": sources.available(kid), "week": _week(kid["id"]),
-            "ghost": ghost(kid["id"]), "stages": {g: levels.progress(kid["id"], g) for g in levels.LEVELED}}
+            "ghost": ghost(kid["id"]),
+            "stages": {g.id: progress.progress(g, str(kid["id"])) for g in GAMES.values() if g.levels and not g.multi}}
 
 
 def parent_summary(kid: dict) -> dict:

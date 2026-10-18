@@ -12,7 +12,7 @@ import json
 import logging
 import secrets
 
-from ... import db
+from .. import db
 
 log = logging.getLogger("aistudy.mp")
 CHANNEL = "aistudy_mp"

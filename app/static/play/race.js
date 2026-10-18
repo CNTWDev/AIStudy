@@ -553,12 +553,14 @@
       if (document.hidden) loop.pause();
       else { loop.resume(); if (S.mode === 'run' && (performance.now() - S.wall0) / 1000 >= S.limit) timeUp(); }
     });
-    // 「开始」「再来一局」：倒计时期间回到起跑线
-    for (const b of sh.root.querySelectorAll('.pl-go, .pl-again')) b.addEventListener('click', () => { S = fresh(sh.data.avatar); fx.parts = []; fx.texts = []; lines = []; sh.hud.innerHTML = ''; hud = null; });
   }
 
-  function begin(match, q, shell) {
-    sh = shell; quiz = q;
+  function ready() {   // 点了开始：倒计时期间回到起跑线
+    S = fresh(sh.data.avatar); fx.parts = []; fx.texts = []; lines = []; sh.hud.innerHTML = ''; hud = null;
+  }
+
+  function begin(c) {
+    const match = c.match; quiz = c.quiz;
     S = fresh(match.avatar || sh.data.avatar);
     const g = match.ghost && match.ghost.finish_s;
     S.ghostV = LEN / Play.clamp(g || GHOST_FIRST, 40, HARD_CAP);
@@ -578,9 +580,9 @@
   ];
 
   PlayShell.init({
-    game: 'race', dock: true, tempo: 140, rules,
+    quiz: 'dock', tempo: 140, rules,
     keys: '电脑键盘：1–4 选答案，Enter 确定',
-    setup: boot, begin,
+    setup: boot, ready, begin,
     onAnswer: res => onAnswer(res), onXP: res => onXP(res),
   });
 })();

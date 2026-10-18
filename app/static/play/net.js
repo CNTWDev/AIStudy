@@ -1,4 +1,4 @@
-/* 联网游戏的连接层（所有联网游戏共用，不依赖任何库）。服务器只转发（app/routes/play.py /ws/mp/<房间>），不模拟游戏。
+/* 联网游戏的连接层（所有联网游戏共用，不依赖任何库）。服务器只转发（app/routes/play.py /ws/room/<房间>），不模拟游戏。
      const net = new MpNet(roomId);
      net.on('s', m => …);         // 收到某种消息（m.from 是发送人 id，服务器盖的，改不了）
      net.on('*', m => …);         // 收到任何消息；net.off('s', 'gem') 清掉
@@ -19,7 +19,7 @@ class MpNet {
   connect() {
     const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
     let ws;
-    try { ws = new WebSocket(`${proto}//${location.host}/ws/mp/${this.roomId}`); } catch (e) { return this.retry(); }
+    try { ws = new WebSocket(`${proto}//${location.host}/ws/room/${this.roomId}`); } catch (e) { return this.retry(); }
     this.ws = ws;
     ws.onopen = () => {
       this.tries = 0; this.ok = true; this.everOk = true;
