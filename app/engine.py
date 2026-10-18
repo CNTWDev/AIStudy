@@ -857,6 +857,8 @@ def flow_state(user_id: int, current: str | None = None) -> dict:
     out = {"day": db.today().isoformat(), "done": done, "total": len(plan), "all_done": bool(plan) and done == len(plan),
            "next": None, "section": None, "just": any(t["id"] == current and t.get("done") for t in plan)}
     if nxt:
+        from . import prefetch
+        prefetch.prepare_next(user_id, nxt)   # 孩子看「下一项」的工夫，后台把下一项的题备好
         out["next"] = {"id": nxt["id"], "n": plan.index(nxt) + 1, "title": nxt["title"], "why": nxt.get("why", ""),
                        "minutes": nxt.get("minutes"), "url": nxt["url"]}
     secs = _streak.sections(plan)

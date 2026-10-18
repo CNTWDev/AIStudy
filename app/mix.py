@@ -353,6 +353,8 @@ def next_items(user_id: int, set_id: int, grade: str, k: int = CHUNK) -> dict:
             tag["probe"] = sl["probe"]
         out.append({**it, "kp_id": sl["kp"], "mix": tag})
     db.run("UPDATE mix_sets SET pos=?, served=? WHERE id=?", pos, db.jdump(served), set_id)
+    if llm.enabled():
+        prefetch.ahead(user_id, slots, pos, grade)   # 孩子做这几道时，后台备后面几道
     return {"items": out, "pos": pos, "total": len(slots), "done": pos >= len(slots)}
 
 
@@ -373,6 +375,10 @@ def tick(user_id: int, set_id: int, kp_id: str, role: str, correct: bool) -> dic
                 again = True
         t.run("UPDATE mix_sets SET slots=?, answered=answered+1, right_n=right_n+? WHERE id=?",
               db.jdump(slots), 1 if correct else 0, set_id)
+    if again:   # 过几题要再来一道同类的：现在就去备
+        from . import prefetch
+        u = db.one("SELECT grade FROM users WHERE id=?", user_id)
+        prefetch.kick(user_id, kp_id, 2, "practice", (u and u["grade"]) or "")
     return {"again": again, "total": len(slots)}
 
 

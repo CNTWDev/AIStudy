@@ -10,7 +10,7 @@ os.environ["SECRET_KEY"] = "test"
 os.environ["TTS_CONFIG_FILE"] = os.path.join(os.environ["DATA_DIR"], "no-tts.toml")
 os.environ["TTS_PROVIDER"] = "mock"  # 朗读用假声音（不联网）
 os.environ["AISTUDY_JOBS"] = "0"  # 不开后台题库流水线（测试里直接调用 bankflow.run_once）
-os.environ["AISTUDY_PREFETCH"] = "inline"  # 后台备题在当前线程跑完（app/prefetch.py）
+os.environ["AISTUDY_PREFETCH"] = "off"  # 不提前备题（app/prefetch.py）；测 prefetch 的用例自己打开
 os.environ["REGISTRATION"] = "invite"
 os.environ["METHODS_FILE"] = os.path.join(os.environ["DATA_DIR"], "no-methods.toml")  # 不受本机 config/methods.toml 影响
 

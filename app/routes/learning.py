@@ -84,6 +84,8 @@ def today(request: Request):
     t = engine.today_plan(k["id"])
     me = auth.current_user(request)
     settled = streak.settle(k["id"]) if me["role"] == "kid" else {"used": [], "earned": 0}   # 家长查看不结算
+    if me["role"] == "kid":  # 后台先把第一项没做的备好题，点「开始」不用等
+        prefetch.prepare_next(k["id"], engine.next_task(t["plan"]))
     st = engine.streak(k["id"])
     cal = engine.calendar(k["id"], 4, full_weeks=True)
     m = engine.get_mastery(k["id"])
