@@ -127,7 +127,7 @@ def _frontier(room_id: int) -> None:
     """房间里的人变了：选中的关跳到这队能打的最远一关（房主还能往回选），大家接着往下打。"""
     r = db.one("SELECT game FROM game_rooms WHERE id=?", room_id)
     g = GAMES.get(r["game"]) if r else None
-    if g and g.levels:
+    if g and g.total:
         db.run("UPDATE game_rooms SET level=? WHERE id=?", progress.progress(g, team_of(room_id))["upto"], room_id)
 
 
@@ -278,7 +278,9 @@ def set_level(kid: dict, room_id, n, device: str = "") -> dict:
     return room_info(kid, r["id"])
 
 
-def room_info(kid: dict, room_id) -> dict:
+def room_info(kid: dict, room_id, world=None) -> dict:
+    """房间里的一切。progress 的 levels 是一个世界的关卡（world：闯关地图翻到第几个世界，不给就是选中的这一关所在的世界）；
+    preview 是选中的这一关的整关数据（房间里画预览、显示提示用）。"""
     r = member_room(kid, room_id)
     g = get(r["game"])
     public = bool(r["multi"]) and r["kind"] in ("public", "code")
@@ -287,7 +289,8 @@ def room_info(kid: dict, room_id) -> dict:
                 "locked": _locked(users[m["user_id"]])} for m in _members(r["id"]) if m["user_id"] in users]
     team = progress.team_key(m["id"] for m in members)
     full = len(members) >= g.players[0]
-    prog = progress.progress(g, team) if g.levels and full else None
+    lv = g.level(max(1, min(g.total, r["level"] or 1))) if g.total else None
+    prog = progress.progress(g, team, world or g.world_of(lv["n"])["n"]) if lv and full else None
     s = sessions.live(r["session_id"])
     play = None
     if s:
@@ -297,7 +300,7 @@ def room_info(kid: dict, room_id) -> dict:
                 "resume": sessions.resume_for(s, kid["id"])}
     return {"id": r["id"], "game": r["game"], "kind": r["kind"] if r["multi"] else "", "pin": r["pin"], "level": r["level"], "members": members,
             "me": next(m for m in members if m["id"] == kid["id"]), "host": kid["id"] == r["host_id"], "full": full,
-            "progress": prog, "play": play}
+            "progress": prog, "play": play, "preview": {**lv, "world": g.world_of(lv["n"])} if lv else None}
 
 
 # ------------------------------------------------------------------ 大厅、邀请
@@ -344,7 +347,7 @@ def lobby(kid: dict, game: str) -> dict:
             rooms.append({"id": r["id"], "kind": r["kind"], "mine": mine, "level": r["level"], "role": host.get("role", ""),
                           "count": len(ms), "max": g.players[1],
                           "host": member(dict(hu), r["kind"] != "family") if hu and r["host_id"] != kid["id"] else None})
-    teams = {str(s["id"]): progress.progress(g, progress.team_key((kid["id"], s["id"]))) for s in sibs} if g.levels and g.multi else {}
+    teams = {str(s["id"]): progress.progress(g, progress.team_key((kid["id"], s["id"]))) for s in sibs} if g.total and g.multi else {}
     return {"siblings": sibs, "rooms": rooms, "locked": _locked(kid), "teams": teams, "public_ok": public_ok,
             "nickname": (kid.get("nickname") or "").strip()}
 
@@ -378,7 +381,7 @@ def start(kid: dict, room_id, n, device: str = "") -> dict:
     if locked:
         raise ArenaError(f"{locked['name']}：{locked['locked']}" if g.multi else locked["locked"], 403)
     level = 0
-    if g.levels:
+    if g.total:
         level = g.level(n)["n"]
         upto = info["progress"]["upto"]
         if level > upto:
@@ -431,19 +434,17 @@ def finish(kid: dict, room_id, device: str, session_id, result: str, report: dic
     if n:
         value = rep.get(g.record) if g.record else None
         before, after = progress.record(g, s["team"], n, win, stars, value)
-        b, a = before["levels"][n - 1], after["levels"][n - 1]
-        unlocked = g.worlds[after["worlds_done"] - 1] if after["worlds_done"] > before["worlds_done"] else None
+        b = next(lv for lv in before["levels"] if lv["n"] == n)
+        a = next(lv for lv in after["levels"] if lv["n"] == n)
+        unlocked = after["world"]["unlock"] if after["worlds_done"] > before["worlds_done"] else None
         nxt = n + 1 if win and n < after["total"] else None
         out.update(value=value, prev_best=b["best"], best=a["best"], best_stars=a["stars"], first_clear=win and not b["cleared"],
                    new_best=win and (a["best"] != b["best"] if g.record else stars > b["stars"]),
-                   unlocked=progress.unlock_of(unlocked) if unlocked else None, next=nxt,
-                   all_clear=after["cleared"] == after["total"], progress=after)
-        world = g.world_of(n)
-        ws = [w for w in after["worlds"] if w["n"] == world["n"]]
-        if ws and win:   # 这个世界：刚打通了，或者还差几关
-            left = sum(1 for lv in after["levels"] if lv["world"] == world["n"] and not lv["cleared"])
-            out["world"] = {"name": ws[0]["name"], "n": world["n"], "left": left,
-                            "done": after["worlds_done"] > before["worlds_done"]}
+                   unlocked=unlocked, next=nxt, all_clear=after["cleared"] == after["total"], progress=after,
+                   name=g.level(n)["name"])
+        if g.worlds and win:   # 这个世界：刚打通了，或者还差几关
+            w = after["world"]
+            out["world"] = {"name": w["name"], "n": w["n"], "left": w["left"], "done": w["done"] and not before["world"]["done"]}
         if win:
             keys = g.run_stickers(rep, before, after) + awards.after_run(g, s["team"], s["id"], rep, before, after)
             out["stickers"] = {uid: awards.give(int(uid), keys) for uid in s["team"].split(",")} if keys else {}

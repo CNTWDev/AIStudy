@@ -546,5 +546,6 @@
     },
     onAnswer(res) { onAnswer(res); },
     onXP(res) { if (S && S.mode === 'play' && !S.result) onXP(res); },
+    pause(on, ms) { if (!on && S && S.deadline) S.deadline += ms; },   // 暂停的时间不算：截止时刻往后挪
   });
 })();

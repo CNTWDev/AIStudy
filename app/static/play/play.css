@@ -301,3 +301,4 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 @keyframes bdfall{to{transform:translate(var(--x),105vh) rotate(var(--r));opacity:.9}}
 @media (prefers-reduced-motion:reduce){.bd *{animation:none!important}}
 .gb-tab .brow.more{display:none}.gb-tab.all .brow.more{display:flex}.gb-tab > .btn{margin:6px auto 4px;display:block}
+.pl-paused{position:fixed;z-index:55;background:rgba(43,35,64,.6)}

@@ -20,7 +20,7 @@ def test_stage_params_get_harder():
         assert all(a[key] <= b[key] for a, b in zip(ps, ps[1:])), key
     normal = [p["ai_hp"] for i, p in enumerate(ps) if (i + 1) % 6]
     assert normal == sorted(normal) and normal[0] < normal[-1]
-    bosses = [lv["n"] for lv in sm.levels if lv["boss"]]
+    bosses = [lv["n"] for lv in sm.handmade if lv["boss"]]
     assert bosses == [6, 12, 18, 24, 30] and all(ps[n - 1]["boss"]["pips"] >= 3 for n in bosses)
     assert ps[0]["regen"] and ps[1]["regen"] and not ps[2]["regen"]          # 前两关能量会慢慢回，之后只靠答题
     assert ps[2]["start_energy"] < ps[0]["start_energy"]
@@ -110,7 +110,7 @@ def test_stage_flow():
         play, _ = _play(c, rid, 7)
         assert "shield" in play["stage"]["params"]["shop"]
         p = progress.progress(games.get("stickman"), str(kid["id"]))
-        assert p["upto"] == 7 and p["worlds_done"] == 1 and p["worlds"][0]["done"] and p["cleared"] == 6
+        assert p["upto"] == 7 and p["worlds_done"] == 1 and p["world"]["n"] == 2 and not p["world"]["done"] and p["cleared"] == 6
 
         # 存档：刷新后接着打（这一局还开着）
         c.post(f"/api/rooms/{rid}/save", json={**DEV, "session": play["session"], "el": 20, "me": {"tLeft": 99}})

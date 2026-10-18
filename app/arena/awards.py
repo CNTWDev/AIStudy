@@ -35,6 +35,10 @@ STICKERS = {
     "mp_streak3": ("🤜", "默契三连", "联网游戏连着 3 关都是谁都没倒下就过关"),
     "mp_quiz": ("🧠", "答题零失误", "过关的这一局，两个人倒下答的题全答对了（至少 3 题）"),
     "mp_stars": ("🌠", "默契之星", "和同一个搭档在联网游戏里一共拿到 50 颗星"),
+    "mp_world10": ("🧭", "十个世界的旅伴", "和同一个搭档在一款联网游戏里连着打通 10 个世界"),
+    "mp_lv50": ("🧗", "一起闯过 50 关", "和同一个搭档在联网游戏里一共打通 50 关"),
+    "mp_lv200": ("🏔️", "一起闯过 200 关", "和同一个搭档在联网游戏里一共打通 200 关"),
+    "mp_lv500": ("🚀", "一起闯过 500 关", "和同一个搭档在联网游戏里一共打通 500 关"),
     "mp_all": ("🏯", "默契大师", "一款联网游戏的全部关卡一起打通"),
     "done_first": ("✅", "先学后玩", "做完今天全部任务以后来乐园"),
     "days7": ("📅", "坚持一周", "连续学习 7 天"),
@@ -137,8 +141,8 @@ def after_match(kid_id: int, game_keys: list[str], st: dict, status: dict, focus
 
 
 def after_run(game, team: str, session_id: int, rep: dict, before: dict, after: dict) -> list[str]:
-    """一起过了一关（联网游戏）：给全队的贴纸。一路上都有：第一次过关、打通一个世界、连着几关没人倒下、
-    倒下答的题全答对、星星攒够、全部打通。比的是「我们」和上次的「我们」。"""
+    """一起过了一关（联网游戏）：给全队的贴纸。一路上都有：第一次过关、打通一个世界（10 个世界）、连着几关没人倒下、
+    倒下答的题全答对、星星攒够、一共闯过 50 / 200 / 500 关、全部打通。比的是「我们」和上次的「我们」。"""
     if not game.multi:
         return []
     keys = ["mp1"]
@@ -150,16 +154,19 @@ def after_run(game, team: str, session_id: int, rep: dict, before: dict, after: 
             keys.append("mp_streak3")
     if after["worlds_done"] > before["worlds_done"]:
         keys.append("mp_world")
+        if after["worlds_done"] >= 10:
+            keys.append("mp_world10")
     answers = [r["correct"] for r in db.q("SELECT a.correct FROM arena_answers a JOIN arena_matches m ON m.id=a.match_id "
                                           "WHERE m.session_id=?", session_id)]
     if len(answers) >= 3 and all(answers):
         keys.append("mp_quiz")
     from .games import GAMES
     multi = [g.id for g in GAMES.values() if g.multi]
-    stars = db.one(f"SELECT COALESCE(SUM(stars), 0) AS n FROM game_runs WHERE team=? AND game IN ({','.join('?' * len(multi))})",
-                   team, *multi)["n"]
-    if stars >= 50:
+    t = db.one(f"SELECT COALESCE(SUM(stars), 0) AS stars, COUNT(cleared_at) AS cleared FROM game_runs "
+               f"WHERE team=? AND game IN ({','.join('?' * len(multi))})", team, *multi)
+    if t["stars"] >= 50:
         keys.append("mp_stars")
+    keys += [k for k, n in (("mp_lv50", 50), ("mp_lv200", 200), ("mp_lv500", 500)) if t["cleared"] >= n]
     if after["cleared"] == after["total"]:
         keys.append("mp_all")
     return keys
