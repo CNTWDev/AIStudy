@@ -125,60 +125,80 @@ _item_row_to_dict = bank.row_to_item
 save_items = bank.save_items
 
 
-def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="", exclude=None, uses=None, ai=True) -> list[dict]:
-    """取题：先用题库里的（这个知识点的，加上别的教材里同一概念的），优先没做过的、卷库真题优先、难度从低到高；
-    不够且配置了 AI 时现场出题，存进题库，以后别的孩子也能用。
-    exclude：这次已经出过的题（混合练习里同一个知识点出好几次，不重复）。
+def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="", exclude=None, uses=None, ai=True,
+              near_level: int | None = None, fallback: bool | None = None) -> list[dict]:
+    """取题（全站出题都走这里：练习、热身、学新、游戏、快练、冲刺）：先用题库里这个孩子没做过的题
+    （这个知识点的，加上别的教材里同一概念的），卷库真题优先；没做过的不够，配置了 AI 就现场出新题、存进题库，
+    以后别的孩子也能用。做过的题（换了数字的同一道、做错过的）只在出不了新题时才拿来凑数——
+    同一个孩子尽量不见重复的题，知识点用新题反复考，才知道是真会了还是记住了这道题。
+    exclude：这次已经出过的题。near_level：想要的难度级别（1-5，按孩子的水平定，见 app/ability.py），新题里离它近的先出。
+    purpose="quick"：只要 20 秒内答得完的短题（bank.is_quick），游戏和快练用；不够时请 AI 出的也是快答题。
     purpose="combine"：融合题——一道题同时要用到这个知识点和 uses 里的旧知识（见 app/mix.py），题挂在几个知识点上。
-    ai=False：只看题库里现成的、这个孩子没做过的题，不请 AI、也不拿做过的老题凑数——不够就少给，
-    由调用的地方交给后台去出（app/prefetch.py），孩子先做别的，不用等。"""
+    ai=False：不请 AI——只给没做过的现成题，不够就少给，由调用的地方交给后台去出（app/prefetch.py），孩子先做别的。
+    fallback：新题出不来时拿做过的老题凑数（默认：请了 AI 或没配置 AI 时凑；ai=False 且有 AI 时不凑，等后台出新题）。"""
     exclude = set(exclude or ())
     if purpose == "combine":
         return _combine_items(user_id, kp_id, n, grade, exclude, uses or [], ai)
     rows = [r for r in bank.candidates(user_id, kp_id) if r["id"] not in exclude]
+    if purpose == "quick":
+        rows = [r for r in rows if bank.is_quick(r["type"], db.jload(r["data"], {}))]
     fresh = [r for r in rows if r["done"] == 0 and not r["gdone"]]
     # 同型组里做过别的题（换了数字的同一道题）：排在新题后面；做错过的那组，先出同组没做过的，再出原题
     twins = [r for r in rows if r["done"] == 0 and r["gdone"]]
     redo = [r for r in rows if r["done"] > 0 and r["ok"] == 0]  # 做错过的题，换个时间再做
+    done_ok = [r for r in rows if r["done"] > 0 and r["ok"] > 0]
     # 交叉验证：优先没用过的题型（已经用选择题答对过，就先给填空 / 计算）
     m = db.one("SELECT evidence FROM mastery WHERE user_id=? AND kp_id=?", user_id, kp_id)
     seen_fmts = set(db.jload(m["evidence"], {}).get("fmts", [])) if m and m["evidence"] else set()
+    near = (lambda r: abs(bankflow.level(r) - near_level)) if near_level else (lambda r: 0)
     # 卷库里管理员核对过的真题 / 名校卷 / 名师卷，比 AI 出的题优先
-    pool = sorted(fresh, key=lambda r: (r["other"] or 0, r["source"] != "bank", itemtypes.fmt(r["type"]) in seen_fmts,
-                                        bankflow.level(r))) + sorted(twins, key=bankflow.level) + redo
+    fresh = sorted(fresh, key=lambda r: (near(r), r["other"] or 0, r["source"] != "bank", itemtypes.fmt(r["type"]) in seen_fmts,
+                                         bankflow.level(r)))
+    old = sorted(twins, key=lambda r: (near(r), bankflow.level(r))) + redo + done_ok
     if purpose == "diagnose":
-        pool = sorted(rows, key=lambda r: (r["done"] > 0, r["other"] or 0, abs(r["difficulty"] - 2)))
-    seen, uniq = set(), []
-    for r in pool:  # 一次不出同一组的两道题
-        if r["near_key"] and r["near_key"] in seen:
-            continue
-        seen.add(r["near_key"])
-        uniq.append(r)
-    picked = [{**bank.row_to_item(r), "kp_id": kp_id} for r in uniq[:n]]  # 共用的题，这次记在正在学的知识点上
+        fresh, old = sorted(rows, key=lambda r: (r["done"] > 0, r["other"] or 0, abs(r["difficulty"] - 2))), []
+    picked, spare = _one_per_group(fresh, n, kp_id), _one_per_group(old, n, kp_id)
     lack_figs = purpose in ("practice", "preview") and _lacks_figs(kp_id, rows)
     if lack_figs:  # 要看图的知识点题库里还一道带图的都没有（多是有配图以前出的老题）：带图的新题排在前面
-        picked = []
-    if not ai and llm.enabled():
-        return picked[:n]
-    if (len(picked) < n or lack_figs) and llm.enabled():
+        picked, spare = [], picked + spare
+    if fallback is None:
+        fallback = ai or not llm.enabled()
+    if (len(picked) < n or lack_figs) and ai and llm.enabled():
         grade = grade or catalog.default_grade
         kp = catalog.kp(kp_id)
         pack = catalog.packs[catalog.kp_pack[kp_id]]
         try:
-            new = llm.generate_items(kp, pack, grade, n=max(3, n - len(picked)), purpose=purpose, user_id=user_id)
+            new = llm.generate_items(kp, pack, grade, n=max(QUICK_BATCH if purpose == "quick" else 3, n - len(picked)),
+                                     purpose=purpose, user_id=user_id)
             have = {p["id"] for p in picked} | bank.flagged_by(user_id) | exclude
             saved = [it for it in save_items(kp_id, new, purpose=purpose, grade=grade, meta=bank.gen_meta("items", purpose=purpose))
-                     if it["id"] not in have]
+                     if it["id"] not in have and (purpose != "quick" or bank.is_quick(it["type"], it))]
             # 题目内容和别的知识点的题一样时，存的是那道旧题：这次也记在正在学的知识点上
             if lack_figs:
                 saved.sort(key=lambda it: not it.get("fig"))
             picked += [{**it, "kp_id": kp_id} for it in saved[: n - len(picked)]]
         except llm.LLMError:
             pass
-    if len(picked) < n:  # AI 没出成：老题照用
+    if len(picked) < n and fallback:  # 新题出不来：做过的题照用（先换了数字的同型题，再做错过的，最后做对过的）
         have = {p["id"] for p in picked}
-        picked += [{**bank.row_to_item(r), "kp_id": kp_id} for r in uniq if r["id"] not in have][: n - len(picked)]
+        picked += [it for it in spare if it["id"] not in have][: n - len(picked)]
     return picked[:n]
+
+
+QUICK_BATCH = 5   # 快答题一次请 AI 出几道（一次调用，存下来以后都能用）
+
+
+def _one_per_group(rows, n: int, kp_id: str) -> list[dict]:
+    """一次不出同一组（换了数字的同一道题）的两道；共用的题，这次记在正在学的知识点上。"""
+    seen, out = set(), []
+    for r in rows:
+        if r["near_key"] and r["near_key"] in seen:
+            continue
+        seen.add(r["near_key"])
+        out.append({**bank.row_to_item(r), "kp_id": kp_id})
+        if len(out) >= n:
+            break
+    return out
 
 
 def _lacks_figs(kp_id: str, rows) -> bool:

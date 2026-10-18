@@ -10,7 +10,7 @@
   知识点 id，或者「vocab:en」这类词汇维度。
 - 每个（题族, 级别）有一个难度 b（arena_calib），由全体孩子的作答校准；没有记录时用先验。
   现场生成的题按题族和级别（app/quickgen.py）；题库里存下来的题按题型分族（bank、bank:num……），
-  级别看大家的正确率（bank_level）；自己判对错的简答题不算。
+  级别用后台按真实作答校准的难度（bank_level）；自己判对错的简答题不算。
 - 出题时选让 p 最接近目标的级别（在目标两侧的两级之间按比例混着出，平均下来正好是目标）。
 这一层只管水平和难度，不知道题从哪来（见 arena/sources.py），也不知道经验值（见 arena/rules.py）。
 （表名还叫 arena_*：最早只给游戏用。）
@@ -87,12 +87,13 @@ def fit_gap(theta: float, levels: dict[int, tuple[float, int]], target: float) -
 
 
 def bank_level(r) -> int:
-    """题库题的难度分 5 级：做过的人多就看大家的正确率，少就看出题时标的难度。"""
-    n, c = r["n_attempts"] or 0, r["n_correct"] or 0
-    if n >= 5:
-        acc = c / n
-        return 1 if acc >= 0.85 else 2 if acc >= 0.7 else 3 if acc >= 0.55 else 4 if acc >= 0.4 else 5
-    return {1: 2, 2: 3, 3: 4}.get(r["difficulty"] or 2, 3)
+    """题库题的难度级别（1-5）：后台按真实作答校准过的用校准值（items.level，见 app/bankflow.py），
+    没有就用出题时 AI 估的难度（1-3 → 2-4）。练习、游戏、快练都按这一个级别。"""
+    try:
+        lv = r["level"]
+    except (KeyError, IndexError):
+        lv = None
+    return lv or min(5, max(1, (r["difficulty"] or 2) + 1))
 
 
 def bank_family(kind: str) -> str:
@@ -108,7 +109,7 @@ def scale_of(item: dict | None) -> tuple[str, int] | None:
         return item["family"], int(item["level"])
     if not item.get("id") or itemtypes.of(item).self_rated:
         return None
-    row = db.one("SELECT type, difficulty, n_attempts, n_correct FROM items WHERE id=?", item["id"])
+    row = db.one("SELECT type, difficulty, level FROM items WHERE id=?", item["id"])
     return (bank_family(row["type"]), bank_level(row)) if row else None
 
 

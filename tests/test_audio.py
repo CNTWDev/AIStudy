@@ -2,7 +2,6 @@
 import tempfile
 
 from app import audio, bank, itemtypes
-from app.arena import sources
 from app.catalog import catalog
 from app.llm import tasks
 from app.tts import TTS, SQLiteIndex, parse_settings
@@ -46,7 +45,7 @@ def test_item_with_audio():
     # 文字一样、录音不一样是两道题
     other = itemtypes.normalize(_item(audio={"lines": [{"who": "F", "text": "It's 45 yuan."}]}))
     assert bank.item_hash(it) != bank.item_hash(other) != bank.item_hash(itemtypes.normalize(_item(audio=None)))
-    assert not sources._short({**it, "options": ["a", "b", "c", "d"]})  # 游戏里不出听力题
+    assert not bank.is_quick("mcq", {**it, "options": ["a", "b", "c", "d"]})  # 游戏里不出听力题
 
 
 def test_prompts():

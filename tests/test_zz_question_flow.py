@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 
 from app import db, itemtypes, sprint
 from app.arena import sources
+from app.catalog import catalog
 from app.main import app
 from tests.test_zz_mix import _setup
 
@@ -117,3 +118,60 @@ def test_due_reviews_come_first(monkeypatch):
         sources.settle(k, {}, it, it["word"] if it["type"] == "fill" else it["answer"], False, 4000, mode="sprint", weight=0.75)
         card = db.one("SELECT due, reviews FROM cards WHERE id=?", cid)
         assert card["reviews"] == 1 and str(card["due"]) > db.today().isoformat()   # 答对了：排到以后
+
+
+def test_same_item_not_again_anywhere(monkeypatch):
+    """练习、游戏、快练取题都走 engine.items_for：做过的题不再给（不请 AI 时只给没做过的，由后台去出新题）。"""
+    from app import bank, engine, llm
+    with TestClient(app) as c:
+        k = _kid(c, monkeypatch, "qf6@x.com", "G8", {"subj_physics": "phy-cambridge"})
+        kp = "PHY-IG-1.4-01"
+        a, b = bank.save_items(kp, [{"type": "mcq", "q": "Density unit?", "options": ["kg/m³", "N", "J", "W"], "answer": 0},
+                                     {"type": "num", "q": "m=10 g, V=5 cm³. ρ = ? g/cm³", "answer": 2}])
+        monkeypatch.setattr(llm, "enabled", lambda: True)
+        got = engine.items_for(k["id"], kp, n=5, purpose="quick", ai=False)
+        assert {x["id"] for x in got} == {a["id"], b["id"]}
+        engine.record_attempt(k["id"], a, kp, "practice", True, "0")
+        assert [x["id"] for x in engine.items_for(k["id"], kp, n=5, purpose="quick", ai=False)] == [b["id"]]
+        engine.record_attempt(k["id"], b, kp, "game", False, "1")
+        assert engine.items_for(k["id"], kp, n=5, purpose="quick", ai=False) == []      # 都做过了：等后台出新题
+        old = engine.items_for(k["id"], kp, n=5, purpose="quick", ai=False, fallback=True)
+        assert [x["id"] for x in old] == [b["id"], a["id"]]                              # 实在出不了新题：先做错过的
+        long = bank.save_items(kp, [{"type": "mcq", "q": "x" * 120, "options": ["a", "b", "c", "d"], "answer": 0}])[0]
+        assert long["id"] not in {x["id"] for x in engine.items_for(k["id"], kp, n=5, purpose="quick", ai=False)}   # 快答只要短题
+
+
+def test_bank_source_covers_wide_and_asks_for_new(monkeypatch):
+    """游戏和快练的题铺到所有在学科目（英语语法也在内，写作、听说这种答不快的不出）；没有新题就让后台出，这次换一道。"""
+    from app import prefetch
+    with TestClient(app) as c:
+        k = _kid(c, monkeypatch, "qf7@x.com", "G8", {"subj_physics": "phy-cambridge", "subj_english": "eng-cambridge"})
+        src = sources.SOURCES["bank"]
+        cats = src._kps(sources.Ctx(k))
+        allk = [kp for ks in cats.values() for kp in ks]
+        packs = {catalog.kps[kp]["pack"] for kp in allk}
+        assert {"phy-cambridge", "eng-cambridge"} <= packs
+        assert any(catalog.kps[kp].get("strand") == "GRA" for kp in allk)
+        assert not any(catalog.kps[kp].get("strand") in ("WRI", "LIS") for kp in allk if catalog.kps[kp]["pack"] == "eng-cambridge")
+        asked = []
+        monkeypatch.setattr(prefetch, "quick", lambda uid, kp, grade="": asked.append(kp))
+        assert src.pick(k, sources.Ctx(k), 0.8, random.Random(1)) is None and len(asked) == sources.KP_TRIES
+        it = sources.pick(k, 0.8, random.Random(1))           # 题库题一时出不了：换别的题源，照样有题
+        assert it and it["src"] in ("math", "words")
+
+
+def test_quick_generation_budget(monkeypatch):
+    from app import prefetch
+    calls = []
+    monkeypatch.setattr(prefetch, "kick", lambda *a, **kw: calls.append(a[1]))
+    for i in range(prefetch.QUICK_PER_DAY + 5):
+        prefetch.quick(99, f"KP-{i}")
+    assert len(calls) == prefetch.QUICK_PER_DAY
+
+
+def test_words_known_recently_wait(monkeypatch):
+    from app import evidence
+    with TestClient(app) as c:
+        k = _kid(c, monkeypatch, "qf8@x.com", "G4", {"subj_english": "eng-shanghai"})
+        evidence.log(k["id"], "word", "eng-core-g3:apple", "answer", correct=True, mode="probe", fmt="choice")
+        assert "apple" in sources.SOURCES["words"]._known(sources.Ctx(k))

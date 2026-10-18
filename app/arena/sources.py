@@ -23,6 +23,8 @@
 """
 import hashlib
 import random
+import re
+from datetime import timedelta
 
 from .. import ability, db, engine, evidence, explore, itemtypes, quickgen
 from ..catalog import catalog, stage_rank
@@ -54,12 +56,17 @@ class Ctx(dict):
     @property
     def packs(self) -> list[dict]:
         return self.get_or("packs", lambda: [dict(e) for e in db.q(
-            "SELECT pack_id, stage FROM enrollments WHERE user_id=? AND active=1", self.kid["id"])
+            "SELECT pack_id, stage, track FROM enrollments WHERE user_id=? AND active=1", self.kid["id"])
             if e["pack_id"] in catalog.packs])
 
     @property
     def subjects(self) -> set:
         return {catalog.packs[e["pack_id"]].subject for e in self.packs}
+
+    @property
+    def run(self) -> dict:
+        """这一次快练 / 这一局里每个知识点（能力维度）已经出过几道（next_item 填进来）。"""
+        return self.get("run") or {}
 
     @property
     def due(self) -> set:
@@ -153,7 +160,7 @@ class MathSource(Source):
             theta, _ = kp_ability(ctx, kp_id, rank)
             # 这个知识点最合适的一级也离目标很远（太难或太简单）：少出，换别的知识点
             w *= max(0.05, 1 - 2.5 * ability.fit_gap(theta, ability.calib(fam, quickgen.LEVELS), target))
-            out.append((kp_id, w / (1 + 0.35 * (rank - r))))
+            out.append((kp_id, w / (1 + 0.35 * (rank - r)) / (1 + ctx.run.get(kp_id, 0))))   # 这一次里出过的少出
         return out or [(quickgen.FAMILIES["add10"][0], 1.0)]
 
     def weight(self, kid, ctx):
@@ -232,6 +239,15 @@ class WordSource(Source):
             "SELECT id, front, back, kind, kp_id, due FROM cards WHERE user_id=? AND kind IN ('word','term') AND LENGTH(back)<=24 "
             "ORDER BY due LIMIT 60", ctx.kid["id"]))
 
+    KNOWN_DAYS = 3
+
+    def _known(self, ctx: Ctx) -> set:
+        """最近 KNOWN_DAYS 天在任何地方答对过的词（热身、复习、快练、游戏）。"""
+        since = (db.today() - timedelta(days=self.KNOWN_DAYS)).isoformat()
+        return ctx.get_or("known_words", lambda: {r["target_id"].rsplit(":", 1)[-1].lower() for r in db.q(
+            "SELECT DISTINCT target_id FROM events WHERE user_id=? AND target='word' AND correct=1 AND created_at>=?",
+            ctx.kid["id"], since)})
+
     # 同一个词换着方式考：认意思（看英文选中文）、反过来（看中文选英文）、听音选意思、拼写。
     # 认出来最容易，自己拼出来最难，也最能说明真记住了（填空蒙对的机会很小）。
     # 各方式难度不同，各自校准（题族 words / words:listen / words:spell……），能力值还是同一个。
@@ -268,10 +284,12 @@ class WordSource(Source):
         elif cards and rng.random() < 0.2:  # 别的生词卡也常拿出来见见
             c = rng.choice(cards)
             w = {"w": c["front"], "zh": c["back"], "kp": c["kp_id"]}
-        else:
-            w = rng.choice(words)
+        else:   # 最近几天答对过的词先不出（换别的词，知识面更宽）；整张词表都答对过了才轮回来
+            known = self._known(ctx)
+            w = next((x for x in rng.sample(words, min(len(words), 12)) if x["w"].lower() not in known), None) or rng.choice(words)
         if fmt == "spell" and not self._spellable(w["w"]):
-            w = next((x for x in rng.sample(words, len(words)) if self._spellable(x["w"])), None) or w
+            w = next((x for x in rng.sample(words, len(words)) if self._spellable(x["w"]) and x["w"].lower() not in self._known(ctx)), None) \
+                or next((x for x in words if self._spellable(x["w"])), w)
             if not self._spellable(w["w"]):
                 fmt, family = "read", g["family"]
                 levels = ability.calib(family, list(g["levels"]), self._prior)
@@ -318,67 +336,84 @@ class WordSource(Source):
                             {"list": it["list"], "from": mode}, it.get("kp_id") or None)
 
 
-# ------------------------------------------------------------------ 题库里的短选择题（任何学科）
+# ------------------------------------------------------------------ 题库里的快答题（任何学科）
 
-def _short(d: dict, kind: str = "mcq") -> bool:
-    opts = d.get("options") or []
-    fits = len(opts) == 4 and all(len(str(o)) <= 36 for o in opts) if kind == "mcq" else kind == "num"
-    return (len(str(d.get("q", ""))) <= 90 and fits
-            and not d.get("code") and not d.get("passage") and not d.get("fig") and not d.get("audio"))  # 带图、带录音的题不适合游戏里快速作答
+QUICK_SKIP = re.compile("写作|听|口语|阅读|考试|探究|实践|思辨|实用性")   # 这些方向的题快答不了（写作、听说、长阅读、实验探究）
+WIDE_BACK = 2       # 以前学过的往回铺多远：最近两个学年（再早的靠追根、热身沿着前置知识找）
+SHARES = {"focus": 0.3, "due": 0.25, "recent": 0.25, "wide": 0.2}
+KP_TRIES = 4        # 选中的知识点一时没有新题，换几个知识点试
 
 
 class BankSource(Source):
-    id, name, icon, desc = "bank", "我的科目", "📚", "学过的知识点上的短选择题（语文、英语、物理……）"
+    """在学的所有科目、所有知识点都能出（语文、英语语法、物理、历史……），题和每日练习走同一个入口（engine.items_for）：
+    这个孩子没做过的先出，按水平挑难度，一次里不出重复的。选知识点分四类，按比例混着出：
+    正在学 / 薄弱的、快忘了该复习的、这学期学的、以前学过的（铺开知识面，越久没碰的越先出）。
+    选中的知识点没有没做过的快答题：后台请 AI 出一批存进题库（prefetch.quick，每个孩子每天有上限），这次先换个知识点。"""
+    id, name, icon, desc = "bank", "我的科目", "📚", "在学的各科知识点上的快答题（语文、英语、物理……）"
     target_shift = 0.05
 
-    def _items(self, ctx: Ctx) -> list[dict]:
+    def _kps(self, ctx: Ctx) -> dict[str, list[str]]:
         def load():
-            kps = [k for k, m in ctx.mastery.items() if m.get("attempts")] + list(ctx.taught)
-            enrolled = {e["pack_id"] for e in ctx.packs}
-            kps = [k for k in dict.fromkeys(kps) if (kp := catalog.kps.get(k)) and kp.get("pack") in enrolled
-                   and stage_rank(kp["stage"]) <= ctx.rank + 0.5]
-            if not kps:
-                return []
-            out = []
-            for i in range(0, len(kps), 400):
-                part = kps[i:i + 400]
-                rows = db.q("SELECT i.id, i.kp_id AS own_kp, i.type, i.difficulty, i.data, i.n_attempts, i.n_correct, x.kp_id "
-                            "FROM items i JOIN item_kps x ON x.item_id=i.id AND x.role='main' "
-                            f"WHERE i.status='active' AND i.type IN ('mcq','num') AND i.source<>'paper' AND x.kp_id IN ({','.join('?' * len(part))}) "
-                            "AND i.id NOT IN (SELECT target_id FROM flags WHERE user_id=? AND target='item')",
-                            *part, ctx.kid["id"])
-                for r in rows:
-                    d = db.jload(r["data"], {})
-                    if _short(d, r["type"]):
-                        out.append({"row": r, "data": d, "kp_id": r["kp_id"], "level": ability.bank_level(r)})
+            mastery, taught, due = ctx.mastery, ctx.taught, ctx.due
+            needs = evidence.needs_work(ctx.kid["id"], mastery)
+            out: dict[str, list[str]] = {c: [] for c in SHARES}
+            for e in ctx.packs:
+                pack = catalog.packs[e["pack_id"]]
+                skip = {x["id"] for x in pack.strands if x.get("audio") or QUICK_SKIP.search(x.get("name", ""))}
+                top = stage_rank(e["stage"])
+                top = top if top < 99 else ctx.rank
+                for k in catalog.ids_for(pack.id, e.get("track")):
+                    kp = catalog.kps[k]
+                    if kp.get("strand") in skip:
+                        continue
+                    r = stage_rank(kp["stage"])
+                    if k in needs:
+                        out["focus"].append(k)
+                    elif k in due:
+                        out["due"].append(k)
+                    elif k in taught and r >= top:          # 这学期学的
+                        out["recent"].append(k)
+                    elif top - WIDE_BACK <= r < top or k in taught or (mastery.get(k) or {}).get("attempts"):
+                        out["wide"].append(k)
             return out
-        return ctx.get_or("bank_items", load)
+        return ctx.get_or("bank_kps", load)
+
+    def _kp_weight(self, ctx: Ctx, kp_id: str, cat: str) -> float:
+        w = 1 / (1 + 2 * ctx.run.get(kp_id, 0))   # 这一次里出过的知识点少出，铺开
+        if cat == "wide":                          # 以前学过的：越久没碰越先出
+            last = (ctx.mastery.get(kp_id) or {}).get("last_ev")
+            w *= 1 + min(3.0, evidence.days_since(last) / 14) if last else 4.0
+        return w
 
     def weight(self, kid, ctx):
-        n = len({x["kp_id"] for x in self._items(ctx)})
-        return 0.0 if n == 0 else min(1.5, 0.3 + n / 8)
+        return 1.5 if any(self._kps(ctx).values()) else 0.0
 
     def pick(self, kid, ctx, target, rng):
-        items = self._items(ctx)
-        by_kp: dict[str, list] = {}
-        for x in items:
-            by_kp.setdefault(x["kp_id"], []).append(x)
-        kps = list(by_kp)
-        kp_id = rng.choices(kps, weights=[_status_weight(ctx, k, True) for k in kps])[0]
-        theta, _ = kp_ability(ctx, kp_id)
-        cand = by_kp[kp_id]
-        kind = rng.choice(sorted({x["row"]["type"] for x in cand}))   # 这个知识点有选择题也有计算题：换着出
-        cand = [x for x in cand if x["row"]["type"] == kind]
-        family = ability.bank_family(kind)   # 计算题蒙不对，难度单独校准
-        levels_all = ability.calib(family, quickgen.LEVELS)
-        levels = {lv: levels_all[lv] for lv in {x["level"] for x in cand}}
-        lv = ability.pick_level(theta, levels, target, rng)
-        x = rng.choice([c for c in cand if c["level"] == lv])
-        d, r = x["data"], x["row"]
-        it = {**d, "id": r["id"], "type": kind, "family": family, "level": lv, "dim": kp_id, "kp_id": kp_id,
-              "difficulty": r["difficulty"], "topic": (catalog.kps.get(kp_id) or {}).get("name", ""), "theta": theta,
-              "b": levels[lv][0], "p": round(ability.sigmoid(theta - levels[lv][0]), 4)}
-        return _reshuffle(it, rng) if kind == "mcq" else it
+        from .. import prefetch
+        cats = {c: ks for c, ks in self._kps(ctx).items() if ks}
+        tried: set = set()
+        for _ in range(KP_TRIES):
+            cs = [c for c in cats if any(k not in tried for k in cats[c])]
+            if not cs:
+                break
+            cat = rng.choices(cs, weights=[SHARES[c] for c in cs])[0]
+            ks = [k for k in cats[cat] if k not in tried]
+            kp_id = rng.choices(ks, weights=[self._kp_weight(ctx, k, cat) for k in ks])[0]
+            tried.add(kp_id)
+            theta, _ = kp_ability(ctx, kp_id)
+            lv = ability.pick_level(theta, ability.calib("bank", quickgen.LEVELS), target, rng)
+            got = engine.items_for(kid["id"], kp_id, n=1, purpose="quick", grade=kid.get("grade") or "",
+                                   exclude=ctx.get("served") or (), ai=False, near_level=lv)
+            if not got:
+                prefetch.quick(kid["id"], kp_id, kid.get("grade") or "")
+                continue
+            it = got[0]
+            family, level = ability.scale_of(it) or (ability.bank_family(it["type"]), 3)
+            b = ability.calib(family, [level])[level][0]
+            it.update(family=family, level=level, dim=kp_id, kp_id=kp_id, theta=theta, b=b,
+                      p=round(ability.sigmoid(theta - b), 4), topic=catalog.kps[kp_id]["name"], why=cat)
+            return _reshuffle(it, rng)
+        return None
 
 
 def _reshuffle(it: dict, rng: random.Random) -> dict:
@@ -401,13 +436,19 @@ def weights(kid: dict, ctx: Ctx | None = None) -> dict[str, float]:
 
 
 def pick(kid: dict, target: float, rng: random.Random, ctx: Ctx | None = None, mode: str = "game") -> dict:
-    """给这个孩子出一道题（游戏、冲刺都用它）：target 是目标答对率；mode = sprint 时也出听音题。"""
+    """给这个孩子出一道题（游戏、冲刺都用它）：target 是目标答对率；mode = sprint 时也出听音题。
+    抽中的题源这次出不了题（比如题库里一时没有新题、后台还在出），换别的题源。"""
     ctx = ctx or Ctx(kid)
     ctx["mode"] = mode
-    ws = weights(kid, ctx) or {"math": 1.0}
-    s = SOURCES[rng.choices(list(ws), weights=list(ws.values()))[0]]
-    it = s.pick(kid, ctx, min(0.92, target + s.target_shift), rng)
-    it["src"] = s.id
+    ws, it = weights(kid, ctx) or {"math": 1.0}, None
+    while ws and not it:
+        sid = rng.choices(list(ws), weights=list(ws.values()))[0]
+        ws.pop(sid)
+        s = SOURCES[sid]
+        it = s.pick(kid, ctx, min(0.92, target + s.target_shift), rng)
+    if not it:
+        sid, it = "math", SOURCES["math"].pick(kid, ctx, target, rng)
+    it["src"] = sid
     return it
 
 
@@ -433,12 +474,15 @@ def next_item(kid: dict, st: dict, target: float, rng: random.Random, mode: str 
         return _reshuffle({**due["item"], "retry": True}, rng)
     ctx = Ctx(kid)
     seen = st.setdefault("seen", [])
+    run = st.setdefault("run", {})
+    ctx.update(served=set(seen), run=run)
     for _ in range(PICK_TRIES):
         it = pick(kid, target, rng, ctx, mode)
         if key(it) not in seen:
             break
     seen.append(key(it))
     del seen[:-SEEN_KEEP]
+    run[it["dim"]] = run.get(it["dim"], 0) + 1
     return it
 
 
