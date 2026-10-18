@@ -30,6 +30,7 @@ MIN_ITEMS, MAX_ITEMS = 6, 30
 NEW_REPS = 5           # 一个新知识点一组里最多出几次（分散开，最后一次是融合题）
 MAX_DEEP = 3           # 一组里「更早的」（地基、低两个年级以上）最多几道
 CHUNK = 4
+DEFER = 3          # 题库里没有现成题的那道往后挪几位（后台出题的时间）
 
 
 def minutes_per_item(grade: str) -> float:
@@ -265,6 +266,10 @@ def summary(slots: list[dict]) -> dict:
 def get_or_create(user_id: int, pack_id: str, n: int) -> dict:
     day = db.today().isoformat()
     row = db.one("SELECT * FROM mix_sets WHERE user_id=? AND day=? AND pack_id=?", user_id, day, pack_id)
+    if row and not row["pos"] and len(db.jload(row["slots"], [])) != n:
+        # 早上备题时建的、还没开始做，后来今天的计划改了题数：按新的题数重建（已经备好的题都在题库里，照样用得上）
+        db.run("UPDATE mix_sets SET slots=?, served='[]' WHERE id=? AND pos=0", db.jdump(build(user_id, pack_id, n)), row["id"])
+        row = db.one("SELECT * FROM mix_sets WHERE id=?", row["id"])
     if row:
         return dict(row)
     slots = build(user_id, pack_id, n)
@@ -281,8 +286,36 @@ def _set(user_id: int, set_id: int) -> dict | None:
     return dict(r) if r else None
 
 
+def _pick(user_id: int, sl: dict, grade: str, served: list, ai: bool) -> list[dict]:
+    items = engine.items_for(user_id, sl["kp"], n=1, purpose=sl.get("purpose", "practice"), grade=grade,
+                             exclude=served, uses=sl.get("uses"), ai=ai)
+    if not items and sl.get("purpose") == "combine" and ai:   # 融合题出不来：照常出一道
+        items = engine.items_for(user_id, sl["kp"], n=1, grade=grade, exclude=served)
+    return items
+
+
+def _locked(t, set_id: int) -> list:
+    """在事务里读题单（PostgreSQL 锁住这一行）：挪题和答错加题都是「读出来改了再写回」，不能互相覆盖。"""
+    row = t.one("SELECT slots FROM mix_sets WHERE id=?" + (" FOR UPDATE" if db.IS_PG else ""), set_id)
+    return db.jload(row["slots"], []) if row else []
+
+
+def _defer(set_id: int, pos: int, sl: dict) -> list:
+    """把第 pos 道往后挪 DEFER 位、标上挪过。返回挪完的题单。"""
+    with db.tx(write=True) as t:
+        slots = _locked(t, set_id)
+        if pos < len(slots) and slots[pos] == sl:
+            slots.pop(pos)
+            slots.insert(min(len(slots), pos + DEFER), {**sl, "deferred": 1})
+            t.run("UPDATE mix_sets SET slots=? WHERE id=?", db.jdump(slots), set_id)
+        return slots
+
+
 def next_items(user_id: int, set_id: int, grade: str, k: int = CHUNK) -> dict:
-    """再出 k 道（题库优先，没有才现场请 AI 出）。返回 {items, pos, total, done}。"""
+    """再出 k 道。只给题库里现成的：某一道没有现成题，不停下来等 AI，把它往后挪 DEFER 位、交给后台去出
+    （app/prefetch.py），先给后面有题的；挪过一次又轮到它还没好：手上已经有题就先给这些，下次再来；
+    一道都没有才现场出。返回 {items, pos, total, done}。"""
+    from . import llm, prefetch
     s = _set(user_id, set_id)
     if not s:
         return {"items": [], "pos": 0, "total": 0, "done": True}
@@ -290,14 +323,23 @@ def next_items(user_id: int, set_id: int, grade: str, k: int = CHUNK) -> dict:
     pos, out = s["pos"], []
     while pos < len(slots) and len(out) < k:
         sl = slots[pos]
-        pos += 1
         kp = catalog.kp(sl["kp"])
         if not kp:
+            pos += 1
             continue
-        items = engine.items_for(user_id, sl["kp"], n=1, purpose=sl.get("purpose", "practice"), grade=grade,
-                                 exclude=served, uses=sl.get("uses"))
-        if not items and sl.get("purpose") == "combine":   # 融合题出不来：照常出一道
-            items = engine.items_for(user_id, sl["kp"], n=1, grade=grade, exclude=served)
+        items = _pick(user_id, sl, grade, served, ai=not llm.enabled())
+        if not items and llm.enabled():
+            if not sl.get("deferred") and pos + 1 < len(slots):
+                left = sum(1 for x in slots[pos:] if x["kp"] == sl["kp"] and x.get("purpose", "practice") == sl.get("purpose", "practice"))
+                prefetch.kick(user_id, sl["kp"], n=min(5, left), purpose=sl.get("purpose", "practice"), grade=grade,
+                              uses=sl.get("uses"))
+                slots = _defer(set_id, pos, sl)
+                continue
+            if out:   # 已经有题可做：这道等后台出好，下次取题时再给
+                break
+            prefetch.wait(user_id, sl["kp"], sl.get("purpose", "practice"))
+            items = _pick(user_id, sl, grade, served, ai=True)
+        pos += 1
         if not items:
             continue
         it = items[0]
@@ -319,16 +361,18 @@ def tick(user_id: int, set_id: int, kp_id: str, role: str, correct: bool) -> dic
     s = _set(user_id, set_id)
     if not s:
         return {}
-    slots = db.jload(s["slots"], [])
-    again = False
-    if not correct and role != "past" and catalog.kp(kp_id):
-        n_again = sum(1 for x in slots if x["kp"] == kp_id and x["role"] == "again")
-        if n_again < MAX_AGAIN:
-            at = min(len(slots), s["pos"] + 1)
-            slots.insert(at, {"kp": kp_id, "role": "again", "mode": "practice", "purpose": "practice"})
-            again = True
-    db.run("UPDATE mix_sets SET slots=?, answered=answered+1, right_n=right_n+? WHERE id=?",
-           db.jdump(slots), 1 if correct else 0, set_id)
+    with db.tx(write=True) as t:
+        slots = _locked(t, set_id)
+        pos = t.one("SELECT pos FROM mix_sets WHERE id=?", set_id)["pos"]
+        again = False
+        if not correct and role != "past" and catalog.kp(kp_id):
+            n_again = sum(1 for x in slots if x["kp"] == kp_id and x["role"] == "again")
+            if n_again < MAX_AGAIN:
+                at = min(len(slots), pos + 1)
+                slots.insert(at, {"kp": kp_id, "role": "again", "mode": "practice", "purpose": "practice"})
+                again = True
+        t.run("UPDATE mix_sets SET slots=?, answered=answered+1, right_n=right_n+? WHERE id=?",
+              db.jdump(slots), 1 if correct else 0, set_id)
     return {"again": again, "total": len(slots)}
 
 

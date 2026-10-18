@@ -42,7 +42,7 @@ function showResult(r) {
 async function step() {
   $('#tbox').innerHTML = '<span class="loading">正在找下一个</span>';
   try {
-    const r = await api(`/api/trace/${TID}/next`);
+    const r = await waitWith($('#tbox'), api(`/api/trace/${TID}/next`));
     if (r.done) return showResult(r);
     const s = r.step, it = r.item;
     dots(s.n - 1); chain(s);

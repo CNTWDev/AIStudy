@@ -224,23 +224,39 @@ def candidates(user_id: int, mastery: dict | None = None, near_kp: str | None = 
 
 
 def pick(user_id: int, n: int, grade: str, near_kp: str | None = None, exclude: set | None = None,
-         only_near: bool = False) -> list[dict]:
-    """取 n 道摸底题（知识点题）。返回题目字典，带 probe 信息。"""
-    out, tries = [], 0
+         only_near: bool = False, wait: bool = True) -> list[dict]:
+    """取 n 道摸底题（知识点题）。返回题目字典，带 probe 信息。
+    先在靠前的候选里找题库里有现成题的；没有现成题的交给后台出（app/prefetch.py），下次就有了。
+    还不够 n 道：wait=True 才现场请 AI 出（热身要凑够题数）；wait=False 就少给（学习页里穿插的那一道，没有就不穿插）。"""
+    from . import prefetch
     exclude = exclude or set()
-    for c in candidates(user_id, near_kp=near_kp, only_near=only_near):
-        if len(out) >= n or tries >= 2 * n + 1:  # 没现成题时每次都要 AI 出题，最多试几次，别拖慢页面
+    cands = [c for c in candidates(user_id, near_kp=near_kp, only_near=only_near) if c["kp"] not in exclude][: 3 * n + 2]
+    out, lacking = [], []
+    for c in cands:
+        if len(out) >= n:
             break
-        if c["kp"] in exclude:
-            continue
+        items = engine.items_for(user_id, c["kp"], n=1, purpose="diagnose", grade=grade, ai=False)
+        if items:
+            out.append(_probe_item(items[0], c))
+        else:
+            lacking.append(c)
+    tries = 0
+    while wait and lacking and len(out) < n and tries < 2 * n + 1:  # 没现成题时每次都要 AI 出题，最多试几次，别拖慢页面
+        c = lacking.pop(0)
         tries += 1
         items = engine.items_for(user_id, c["kp"], n=1, purpose="diagnose", grade=grade)
         if items:
-            kp = catalog.kps[c["kp"]]
-            out.append({**items[0], "kp_id": c["kp"], "probe": {"kp": c["kp"], "name": kp["name"], "reason": c["reason"],
-                                                                "depth": c["depth"], "from": c["from"],
-                                                                "subject": catalog.packs[kp["pack"]].subject_name}})
+            out.append(_probe_item(items[0], c))
+    for c in lacking[:n]:
+        prefetch.kick(user_id, c["kp"], n=1, purpose="diagnose", grade=grade)
     return out
+
+
+def _probe_item(it: dict, c: dict) -> dict:
+    kp = catalog.kps[c["kp"]]
+    return {**it, "kp_id": c["kp"], "probe": {"kp": c["kp"], "name": kp["name"], "reason": c["reason"],
+                                              "depth": c["depth"], "from": c["from"],
+                                              "subject": catalog.packs[kp["pack"]].subject_name}}
 
 
 # ------------------------------------------------------------------ 作答后

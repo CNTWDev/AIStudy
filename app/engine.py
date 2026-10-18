@@ -125,14 +125,16 @@ _item_row_to_dict = bank.row_to_item
 save_items = bank.save_items
 
 
-def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="", exclude=None, uses=None) -> list[dict]:
+def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="", exclude=None, uses=None, ai=True) -> list[dict]:
     """取题：先用题库里的（这个知识点的，加上别的教材里同一概念的），优先没做过的、卷库真题优先、难度从低到高；
     不够且配置了 AI 时现场出题，存进题库，以后别的孩子也能用。
     exclude：这次已经出过的题（混合练习里同一个知识点出好几次，不重复）。
-    purpose="combine"：融合题——一道题同时要用到这个知识点和 uses 里的旧知识（见 app/mix.py），题挂在几个知识点上。"""
+    purpose="combine"：融合题——一道题同时要用到这个知识点和 uses 里的旧知识（见 app/mix.py），题挂在几个知识点上。
+    ai=False：只看题库里现成的、这个孩子没做过的题，不请 AI、也不拿做过的老题凑数——不够就少给，
+    由调用的地方交给后台去出（app/prefetch.py），孩子先做别的，不用等。"""
     exclude = set(exclude or ())
     if purpose == "combine":
-        return _combine_items(user_id, kp_id, n, grade, exclude, uses or [])
+        return _combine_items(user_id, kp_id, n, grade, exclude, uses or [], ai)
     rows = [r for r in bank.candidates(user_id, kp_id) if r["id"] not in exclude]
     fresh = [r for r in rows if r["done"] == 0 and not r["gdone"]]
     # 同型组里做过别的题（换了数字的同一道题）：排在新题后面；做错过的那组，先出同组没做过的，再出原题
@@ -156,6 +158,8 @@ def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="", exclu
     lack_figs = purpose in ("practice", "preview") and _lacks_figs(kp_id, rows)
     if lack_figs:  # 要看图的知识点题库里还一道带图的都没有（多是有配图以前出的老题）：带图的新题排在前面
         picked = []
+    if not ai and llm.enabled():
+        return picked[:n]
     if (len(picked) < n or lack_figs) and llm.enabled():
         grade = grade or catalog.default_grade
         kp = catalog.kp(kp_id)
@@ -193,13 +197,13 @@ def _lacks_figs(kp_id: str, rows) -> bool:
 FIG_PROMPT_V = 6  # 出题提示词从这一版起，要看图的知识点要求至少一半带图（llm.PROMPT_VERSION["items"]）
 
 
-def _combine_items(user_id: int, kp_id: str, n: int, grade: str, exclude: set, uses: list[str]) -> list[dict]:
+def _combine_items(user_id: int, kp_id: str, n: int, grade: str, exclude: set, uses: list[str], ai=True) -> list[dict]:
     """融合题：题库里这个知识点、还没做过的融合题先用；没有就请 AI 出（存进题库，挂在几个知识点上）。"""
     rows = [r for r in bank.candidates(user_id, kp_id)
             if r["purpose"] == "combine" and r["kp_id"] == kp_id and r["id"] not in exclude and not r["done"]]
     picked = [{**bank.row_to_item(r), "kp_id": kp_id} for r in rows[:n]]
     uses = [k for k in uses if catalog.kp(k) and k != kp_id][:2]
-    if len(picked) < n and uses and llm.enabled():
+    if len(picked) < n and uses and llm.enabled() and ai:
         kp = catalog.kp(kp_id)
         pack = catalog.packs[catalog.kp_pack[kp_id]]
         try:

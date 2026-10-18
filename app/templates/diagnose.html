@@ -25,7 +25,7 @@ async function start(resume) {
 async function next() {
   $('#box').innerHTML = '<span class="loading">正在准备下一题</span>';
   let r;
-  try { r = await api(`/api/diag/${sid}/next`); } catch (e) { $('#box').innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn" onclick="next()">重试</button>`; return; }
+  try { r = await waitWith($('#box'), api(`/api/diag/${sid}/next`)); } catch (e) { $('#box').innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn" onclick="next()">重试</button>`; return; }
   if (r.done) { location.href = r.report; return; }
   $('#prog').textContent = `第 ${r.n} 题` + (r.depth ? ` · 往回找第 ${r.depth} 步` : '');
   const head = `<div class="small muted">${esc(r.kp.stage)} · ${esc(r.kp.name)}${r.kp.name_en && !isSimple() ? ' · ' + esc(r.kp.name_en) : ''}</div>` +
