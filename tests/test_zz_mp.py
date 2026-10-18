@@ -185,6 +185,14 @@ def test_rooms_and_finish():
         assert c.get(f"/api/mp/rooms/{rid}").status_code == 403
 
 
+def _recv(ws):
+    """下一条不是 hello 的消息（PostgreSQL 转发是异步的：先进来的人的 hello 可能晚到，后进来的人也会收到，前端当作「对方在」）。"""
+    while True:
+        m = json.loads(ws.receive_text())
+        if m["t"] != "hello":
+            return m
+
+
 def test_ws_relay():
     """实时消息：转给房间里的另一个人（盖上发送人），不转回给自己；不在房间里的人连不上；太长的消息丢掉。"""
     with TestClient(app) as c:
@@ -210,9 +218,8 @@ def test_ws_relay():
                 assert hello == {"t": "hello", "from": b}
                 wb.send_text("x" * 3000)                                   # 太长：丢掉
                 wb.send_text(json.dumps({"t": "s", "x": 10, "from": 999}))   # from 由服务器盖，改不了
-                m = json.loads(wa.receive_text())
-                assert m == {"t": "s", "x": 10, "from": b}
+                assert _recv(wa) == {"t": "s", "x": 10, "from": b}
                 wa.send_text(json.dumps({"t": "gem", "k": "1,2"}))
-                assert json.loads(wb.receive_text()) == {"t": "gem", "k": "1,2", "from": a}
-            assert json.loads(wa.receive_text()) == {"t": "bye", "from": b}
+                assert _recv(wb) == {"t": "gem", "k": "1,2", "from": a}
+            assert _recv(wa) == {"t": "bye", "from": b}
         assert db.one("SELECT seen_at FROM mp_rooms WHERE id=?", rid)["seen_at"]
