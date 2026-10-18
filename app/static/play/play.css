@@ -302,3 +302,8 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 @media (prefers-reduced-motion:reduce){.bd *{animation:none!important}}
 .gb-tab .brow.more{display:none}.gb-tab.all .brow.more{display:flex}.gb-tab > .btn{margin:6px auto 4px;display:block}
 .pl-paused{position:fixed;z-index:55;background:rgba(43,35,64,.6)}
+.bd-nick{background:linear-gradient(135deg,#fff1c1,#ffe0ef);color:#3a2a00;animation:sppop .6s cubic-bezier(.2,.9,.3,1.6) both}
+.bd-nick-h{font-size:18px;font-weight:900}.bd-nick p{margin:6px 0;font-size:14px;font-weight:700}
+.bd-nick-row{display:flex;gap:8px}.bd-nick-row input{flex:1;min-width:0;font-size:16px;border:3px solid var(--pl-ink);border-radius:14px;padding:8px 12px}
+.bd-nick-err{color:#c2247a;min-height:1em}
+@media (prefers-color-scheme:dark){.bd-nick{background:linear-gradient(135deg,#4a3d12,#3a2540);color:#fff3c4}}
