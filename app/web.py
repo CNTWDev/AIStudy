@@ -10,7 +10,7 @@ from fastapi.responses import RedirectResponse
 
 from fastapi.templating import Jinja2Templates
 
-from . import arena, auth, bankpapers, boards, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, sprint, streak, trace
+from . import arena, auth, bankpapers, boards, coach, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, sprint, streak, trace
 
 from . import figures
 
@@ -372,7 +372,10 @@ def require_self_learner(request: Request):
     return u
 
 def _public_item(it: dict) -> dict:
-    return {k: v for k, v in itemtypes.public(it).items() if k not in ("tol", "source")}
+    out = {k: v for k, v in itemtypes.public(it).items() if k not in ("tol", "source")}
+    if itemtypes.of(it).self_rated and coach.on(it, it.get("kp_id", "")):
+        out["coach"] = True  # 开放题由 AI 点评和追问，不让学员自评（app/coach.py）
+    return out
 
 _answer_display = engine.answer_display
 

@@ -104,8 +104,8 @@ def record(user_id: int, kp_id: str, correct: bool, *, item=None, mode="practice
     """一条作答证据（做题 kind=answer，复习卡片 kind=review）：记事件，更新掌握状态，返回新状态。"""
     ensure_user(user_id)
     fmt = fmt or itemtypes.fmt((item or {}).get("type"))
-    if mode == "review-self" or (item and itemtypes.of(item).self_rated):
-        weight = min(weight, 0.3)
+    if mode == "review-self" or (item and itemtypes.of(item).self_rated and item.get("judge") != "ai"):
+        weight = min(weight, 0.3)  # 自己判的证据分量轻；AI 按要点点评过的开放题不受这个限制（app/coach.py）
     shared = db.one("SELECT * FROM concept_mastery WHERE user_id=? AND concept_id=?", user_id, catalog.concept_id(kp_id))
     prior = min(0.65, now_p(user_id, shared)) if shared and shared["attempts"] else None
     e = log(user_id, "kp", kp_id, kind, correct=correct, weight=weight, mode=mode, fmt=fmt,

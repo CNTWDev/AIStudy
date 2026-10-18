@@ -144,13 +144,13 @@ function renderItem(box, item, opts) {
   if (W === 'choice') {
     html += `<div class="qc-opts">${item.options.map((o, i) => qOpt(o, i)).join('')}</div>`;
   } else if (W === 'self') {
-    html += `<textarea class="ans" placeholder="先自己写一写（写关键词也行）"></textarea>`;
+    html += `<textarea class="ans" placeholder="${item.coach ? '写下你的判断和理由，AI 会按要点点评，再追问你一两句' : '先自己写一写（写关键词也行）'}"></textarea>`;
   } else {
     html += `<div class="row" style="margin-top:8px"><input type="text" class="ans grow" placeholder="你的答案" autocomplete="off">` +
       (item.unit ? `<span class="muted">${esc(item.unit)}</span>` : '') + `</div>`;
   }
   html += `<div class="qacts">` +
-    `<button class="btn submit">${W === 'self' ? '看参考答案' : '提交'}</button>` +
+    `<button class="btn submit">${W === 'self' ? (item.coach ? '提交，看点评' : '看参考答案') : '提交'}</button>` +
     (item.hint ? `<button class="btn soft hintbtn">💡 提示</button>` : '') +
     (opts.dontKnow ? `<button class="linkbtn dkbtn">🤔 这道题还不会</button>` : '') + `</div>` +
     `<div class="hintbox"></div><div class="fbbox"></div></div>`;
@@ -189,6 +189,7 @@ function renderItem(box, item, opts) {
     btn.disabled = true;
     try {
       const res = await opts.submit(answer, undefined, took());
+      if (res.coach) { btn.remove(); if (dk) dk.remove(); ans.readOnly = true; coachRound(box, res, opts, took); return; }
       if (res.reveal) {
         $('.fbbox', box).innerHTML = `<div class="fb dk">` + qAns({answer: res.answer, points: res.points}).replace('<dt>答案</dt>', '<dt>参考答案</dt>') +
           `<div class="row" style="margin-top:10px"><span>${isSimple() ? '你答到了吗？' : '对照要点，你答到了吗？'}</span><button class="btn sm selfok">基本答到</button><button class="btn ghost sm selfno">还差一些</button></div></div>`;
@@ -208,6 +209,38 @@ function renderItem(box, item, opts) {
       if (res.correct) cheer(box);
       opts.onDone && opts.onDone(res);
     } catch (e) { btn.disabled = false; $('.fbbox', box).innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+  };
+}
+/* 开放题的一轮 AI 点评（app/coach.py）。追问没结束时只说想到了哪些、还差几点，不给答案；
+   学员回答追问，再点评一轮；结束时逐条对照要点，再给参考思路 */
+function coachRound(box, res, opts, took) {
+  const hit = res.checks.filter(c => c.hit), miss = res.checks.length - hit.length;
+  const icon = {good: '✅', partial: '🟡', miss: '🔸'}[res.verdict] || '🟡';
+  const li = c => `<li class="${c.hit ? 'hit' : 'miss'}">${c.hit ? '✓' : '○'} ${esc(c.text)}${c.note ? `<div class="muted small">${esc(c.note)}</div>` : ''}</li>`;
+  let h = `<div class="fb ${res.done ? (res.verdict === 'good' ? 'ok' : 'no') : 'dk'} pop"><div class="fb-v">${icon} ${esc(res.verdict_label)}</div>` +
+    (res.feedback ? `<div style="margin-top:8px">${esc(res.feedback)}</div>` : '');
+  if (res.done) {
+    h += (res.checks.length ? `<ul class="coach-checks">${res.checks.map(li).join('')}</ul>` : '') +
+      qAns({answer: res.answer}).replace('<dt>答案</dt>', '<dt>参考思路</dt>') +
+      (res.status_label ? `<div class="fb-note">${esc(res.status_label)}</div>` : '') + '</div>';
+  } else {
+    h += (hit.length ? `<ul class="coach-checks">${hit.map(li).join('')}</ul>` : '') +
+      (miss ? `<div class="fb-note">还有 ${miss} 个要点没想到，先别看答案，再想一步。</div>` : '') +
+      `<div class="coach-fu"><div class="fb-v">🤔 追问：${esc(res.followup)}</div>` +
+      `<textarea class="ans" placeholder="接着写你的想法"></textarea><div class="qacts"><button class="btn sm fubtn">回答追问</button></div></div></div>`;
+  }
+  $('.fbbox', box).insertAdjacentHTML('beforeend', h);
+  if (res.done) { if (res.correct) cheer(box); opts.onDone && opts.onDone(res); return; }
+  const fb = $('.fbbox', box).lastElementChild, fu = $('.fubtn', fb), ta = $('textarea', fb);
+  ta.focus();
+  fu.onclick = async () => {
+    if (ta.value.trim().length < 4) { alert('先写下你的想法'); return; }
+    fu.disabled = true;
+    try {
+      const r = await opts.submit(ta.value, undefined, took(), {review_id: res.review_id});
+      fu.closest('.qacts').remove(); ta.readOnly = true;
+      coachRound(box, r, opts, took);
+    } catch (e) { fu.disabled = false; fb.insertAdjacentHTML('beforeend', `<div class="err">${esc(e.message)}</div>`); }
   };
 }
 /* 做完一道题后可以标记「这道题有问题」：题库里的题会被很多孩子反复用，坏题要能被发现 */

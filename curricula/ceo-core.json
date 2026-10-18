@@ -16,6 +16,7 @@
    }
   ],
   "progress": "none",
+  "open_review": "ai",
   "version": 1,
   "generated": "2026-10-18",
   "notes": "自编教材，没有官方大纲。主线是「高价值人性」：在招人、分钱、谈判、决策这些高代价场合起作用的人性规律，以及 CEO 自己的人性弱点。11 个模块对应 CEO 的六个维度（方向、人、钱、事、关系、自己），模块的 dimension 字段写明。知识点的 evidence 标证据强弱：研究共识 / 经典案例 / 经验之谈；sources 只记出处，不抄原文。讲义正文见 seed/teach_ceo-core.json，情景题见 seed/items_ceo-core.json。设计说明见 docs/DESIGN.md §4.6。",

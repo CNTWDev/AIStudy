@@ -5,7 +5,7 @@ import re
 
 from fastapi import HTTPException
 
-from . import db, engine, explore, itemtypes, trace
+from . import coach, db, engine, explore, itemtypes, trace
 from .catalog import catalog
 
 
@@ -14,7 +14,7 @@ def submit(user_id: int, body: dict):
     request_id = body.get("request_id")
     if request_id is not None and (not isinstance(request_id, str) or not re.fullmatch(r"[A-Za-z0-9_-]{16,100}", request_id)):
         raise HTTPException(400, "作答标识不正确")
-    semantic = {k: body[k] for k in ("item_id", "kp_id", "mode", "answer", "self", "dont_know", "probe") if k in body}
+    semantic = {k: body[k] for k in ("item_id", "kp_id", "mode", "answer", "self", "dont_know", "probe", "review_id") if k in body}
     fingerprint = hashlib.sha256(json.dumps(semantic, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
     if request_id:
         receipt = db.one("SELECT * FROM answer_receipts WHERE user_id=? AND request_id=?", user_id, request_id)
@@ -23,7 +23,7 @@ def submit(user_id: int, body: dict):
                 raise HTTPException(409, "这次作答已提交，请开始下一题")
             return db.jload(receipt["response"], {})
     result = _answer(user_id, body)
-    if request_id and not result.get("reveal"):
+    if request_id and not result.get("reveal") and not (result.get("coach") and not result.get("done")):
         db.run("INSERT INTO answer_receipts(user_id,request_id,fingerprint,response,created_at) VALUES(?,?,?,?,?)",
                user_id, request_id, fingerprint, db.jdump(result), db.now())
     return result
@@ -56,16 +56,26 @@ def _answer(user_id, body):
             explore.after_probe(user_id, kp_id, False, int(pr.get("depth") or 0), pr.get("from") or "")
         return {"correct": False, "dont_know": True, **itemtypes.reveal(it), "hint": it.get("hint", ""),
                 "trace": trace.offer(user_id, kp_id, True) if mode in trace.COUNT_MODES else None}
+    review, weight, answer = None, 1.0, body.get("answer", body.get("self", ""))
     if itemtypes.of(it).self_rated:
-        if "self" not in body:  # 先给参考答案，孩子对照后自评
+        if "self" not in body and coach.on(it, kp_id):  # AI 点评和追问；追问没结束就先返回这一轮的点评
+            u = db.one("SELECT grade FROM users WHERE id=?", user_id)
+            review = coach.review(user_id, it, kp_id, body, u["grade"] if u else "")
+            if review and not review["done"]:
+                return review
+        if review:
+            correct, weight, answer = review.pop("correct"), review.pop("weight"), review.pop("answer")
+        elif "self" not in body:  # 先给参考答案，孩子对照后自评
             return {"reveal": True, "answer": it.get("model", ""), "points": it.get("points", []), "explain": it.get("explain", "")}
-        correct = body["self"] == "ok"
+        else:
+            correct = body["self"] == "ok"
     else:
         correct = engine.check_answer(it, body.get("answer"))
     old = (db.one("SELECT status FROM mastery WHERE user_id=? AND kp_id=?", user_id, kp_id) or {}).get("status")
-    status = engine.record_attempt(user_id, it, kp_id, mode, bool(correct), body.get("answer", body.get("self", "")),
-                                   ms=body.get("ms"))
-    out = {"correct": bool(correct), **itemtypes.reveal(it), "status": status, "status_label": engine.STATUS_LABEL[status]}
+    status = engine.record_attempt(user_id, {**it, "judge": "ai"} if review else it, kp_id, mode, bool(correct), answer,
+                                   ms=body.get("ms"), weight=weight)
+    out = {"correct": bool(correct), **itemtypes.reveal(it), "status": status, "status_label": engine.STATUS_LABEL[status],
+           **(review or {})}
     if row["purpose"] == "combine" and mode in ("practice", "preview"):
         _combine_evidence(user_id, it, kp_id, bool(correct))
     if mode == "probe":
