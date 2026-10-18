@@ -320,7 +320,8 @@ def src_mix(c: Ctx) -> list[dict]:
     """每门课一组混合练习：新的、近期的、以前的（跟着今天学的往回找）、换问法、预习混着出（见 app/mix.py）。
     先按最少 10 分钟排；排完整天的计划后，把剩下的时间分给它们（build_plan 里的 fill）。"""
     out = []
-    done_today = {r["pack_id"]: r for r in db.q("SELECT pack_id, slots, done_at FROM mix_sets WHERE user_id=? AND day=?",
+    # 早上备题时建好、还没开始做的不算（app/prefetch.py）：题数照常按今天的时间分
+    done_today = {r["pack_id"]: r for r in db.q("SELECT pack_id, slots, done_at FROM mix_sets WHERE user_id=? AND day=? AND pos>0",
                                                 c.user_id, db.today().isoformat())}
     # 时间不够时排在后面的会被截掉：每天换一门打头，几门课轮着来
     k = c.day_seed % len(c.enrolls) if c.enrolls else 0

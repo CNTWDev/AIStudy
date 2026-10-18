@@ -10,7 +10,7 @@ let items = [], idx = 0, right = 0, lit = 0, found = 0;
 function bar() { $('#wbar').style.width = (items.length ? 100 * idx / items.length : 0) + '%'; }
 async function load() {
   try {
-    items = (await api('/api/warmup')).items;
+    items = (await waitWith($('#wbox'), api('/api/warmup'))).items;
     if (!items.length) { $('#wbox').innerHTML = '<p>今天没有要热身的题，直接开始下一项吧。</p>'; finishTask('warmup'); return; }
     Run.start('warmup', {total: items.length, mount: $('#wbox')});
     show();

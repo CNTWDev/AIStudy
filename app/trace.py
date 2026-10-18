@@ -11,7 +11,7 @@
 """
 from datetime import timedelta
 
-from . import bank, db, engine, evidence, explore, itemtypes
+from . import bank, db, engine, evidence, explore, itemtypes, prefetch
 from .catalog import catalog
 
 MAX_STEPS = 4
@@ -170,9 +170,13 @@ def next_step(user_id: int, tid: int, grade: str) -> dict:
                                             "max": MAX_STEPS, "why": "同一个知识点，用中文问一次：看看是不是英文卡住了"}, "item": q}
         steps.append({"kind": "lang", "skip": True})
     m = engine.get_mastery(user_id)
-    for c in suspects(user_id, focus, m, exclude | {t["kp_id"]}, t["hint_kp"])[:4]:
+    sus = suspects(user_id, focus, m, exclude | {t["kp_id"]}, t["hint_kp"])[:4]
+    for i, c in enumerate(sus):
+        prefetch.wait(user_id, c["kp"], "diagnose")
         items = engine.items_for(user_id, c["kp"], n=1, purpose="diagnose", grade=grade)
         if items:
+            for c2 in sus[i + 1:i + 3]:  # 孩子做这一步时，后台把下一步可能要问的题备好
+                prefetch.kick(user_id, c2["kp"], n=1, purpose="diagnose", grade=grade)
             db.run("UPDATE traces SET steps=? WHERE id=?", db.jdump(steps), tid)
             kp = catalog.kps[c["kp"]]
             return {"done": False, "step": {"kind": "kp", "kp": c["kp"], "name": kp["name"], "n": _counted(steps) + 1,

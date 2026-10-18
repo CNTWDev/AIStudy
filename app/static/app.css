@@ -650,3 +650,5 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .mini-bars div{cursor:default;transition:opacity .15s}.mini-bars:hover div{opacity:.45}.mini-bars div.tip-on,.mini-bars div:focus-visible{opacity:1;outline:none}
 .week .col.tip-on .track{box-shadow:0 0 0 2px var(--brand-ink)}
 .calendar .d.tip-on,.heat a.tip-on{outline:2px solid var(--brand-ink);outline-offset:1px}
+/* 等题时的复习小卡（app.js waitWith） */
+.fillcard{max-width:520px;margin:0 auto}.fillcard .face{font-size:20px;text-align:center;padding:14px 4px 6px;white-space:pre-wrap}
