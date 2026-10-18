@@ -80,8 +80,9 @@ def set_game_unlock(kid_id: int, rule) -> None:
 
 
 def public_rooms(kid: dict) -> bool:
-    """能不能进全站的公开房间（和别的家庭的孩子一起玩）。家长打开隐私模式（auth.is_private）以后只能进家里的和用密码进的房间。"""
-    return not auth.is_private(kid)
+    """能不能进全站的公开房间（和别的家庭的孩子一起玩）。家长打开隐私模式（auth.is_private）以后只能进家里的和用密码进的房间。
+    成人也不进公开房间（不和陌生的孩子同场），家里的和用密码约好的房间照样能进。"""
+    return auth.with_other_kids(kid)
 
 
 # ------------------------------------------------------------------ 今天能不能玩、能玩多久

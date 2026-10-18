@@ -165,7 +165,7 @@ def settings_mascot(request: Request, mascot: str = Form(...)):
 @router.post("/settings/profile")
 def settings_profile(request: Request, name: str = Form(...), email: str = Form(...)):
     u = auth.require_user(request)
-    if u["role"] == "kid" and not auth.is_self_learner(u):
+    if u["role"] == "kid" and not auth.self_managed(u):
         return _back(err="孩子账号的名字和邮箱由家长修改")
     try:
         email = auth.validate_email(email)

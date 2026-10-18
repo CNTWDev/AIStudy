@@ -1046,7 +1046,7 @@ def test_event_log_and_methods():
 
 
 def test_adult_exam_course():
-    """自学者（成人备考基金从业）：自己注册、自己选课和定考试日期；没有乐园、不先摸底；
+    """自学者（成人备考基金从业）：自己注册、自己选课和定考试日期；乐园默认不玩（自己可以打开）、不先摸底；
     按剩余天数排新考点，最后两周冲刺高频考点。家长给家人开的成人账号也能在表单里直接填考试日期。"""
     from datetime import timedelta
 
@@ -1060,7 +1060,7 @@ def test_adult_exam_course():
 
         # 注册时选「自己学」：没有家长，默认成人，先去「我的课程」选课
         r = c.post("/register", data={"email": "mom@x.com", "password": "secret1", "name": "妈妈", "invite": code, "who": "self"})
-        assert r.url.path == "/me/courses" and "我的课程" in r.text and 'name="email"' not in r.text and "game_minutes" not in r.text
+        assert r.url.path == "/me/courses" and "我的课程" in r.text and 'name="email"' not in r.text and 'name="private"' not in r.text
         mom = db.one("SELECT * FROM users WHERE email='mom@x.com'")
         assert mom["role"] == "kid" and mom["parent_id"] is None and mom["grade"] == "ADULT"
         assert c.get("/today").url.path == "/me/courses"  # 还没选课
@@ -1080,15 +1080,19 @@ def test_adult_exam_course():
         page = c.get("/admin?tab=selfs").text
         assert "自学者" in page and "mom@x.com" in page
         assert c.get("/admin?tab=tree").status_code == 200 and "自学者" in c.get(f"/admin/users/{mom['id']}").text
-        # 家长给家人开的成人账号：考证课的考试日期直接在表单里填
+        # 家长给家里的大人开账号：家长只开账号，课程和考试日期由本人在「我的课程」里定
         c.post("/admin/users/create", data={"email": "fp@x.com", "password": "secret1", "name": "家长", "role": "parent"})
         c.get("/logout")
         c.post("/login", data={"email": "fp@x.com", "password": "secret1"})
-        assert 'name="exam_fund-law"' in c.get("/parent/kids/new").text
         day = (db.today() + timedelta(days=90)).isoformat()
         c.post("/parent/kids/save", data={"name": "爸爸", "email": "dad@x.com", "password": "secret1", "grade": "ADULT",
                                           "subj_fund_law": "fund-law", "exam_fund-law": day})
         dad = db.one("SELECT id FROM users WHERE email='dad@x.com'")["id"]
+        assert not db.one("SELECT 1 AS x FROM enrollments WHERE user_id=?", dad)
+        c.get("/logout")
+        c.post("/login", data={"email": "dad@x.com", "password": "secret1"})
+        assert 'name="exam_fund-law"' in c.get("/me/courses").text
+        c.post("/me/courses", data={"name": "爸爸", "grade": "ADULT", "subj_fund_law": "fund-law", "exam_fund-law": day})
         assert db.one("SELECT exam_date FROM enrollments WHERE user_id=?", dad)["exam_date"] == day
         c.get("/logout")
 

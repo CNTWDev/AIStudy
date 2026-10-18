@@ -17,9 +17,10 @@ from ..web import (
     _trace_or_404,
     catalog,
     enrollments,
+    is_adult,
     kid_or_redirect,
     render,
-    require_self_learner,
+    require_self_managed,
     stage_label,
     stage_rank,
 )
@@ -55,21 +56,23 @@ def api_flag(request: Request, body: dict = Body(...)):
 
 @router.get("/me/courses", response_class=HTMLResponse)
 def my_courses(request: Request):
-    return _kid_form(request, require_self_learner(request), self_mode=True)
+    return _kid_form(request, require_self_managed(request), self_mode=True)
 
 
 @router.post("/me/courses")
 async def my_courses_save(request: Request):
-    u = require_self_learner(request)
+    u = require_self_managed(request)
     form = await request.form()
     _check_exam_dates(form)
     grade = form.get("grade") or u["grade"]
     if grade not in GRADES:
         raise HTTPException(400, "年级不对")
+    if u["parent_id"] and not is_adult(grade):
+        raise HTTPException(400, "家里的成人成员年级选大学或「成人」；要改成孩子账号，请家长在家长页改年级。")
     minutes = max(15, min(240, int(form.get("daily_minutes") or u["daily_minutes"] or 60)))
     db.run("UPDATE users SET name=?, grade=?, daily_minutes=? WHERE id=?",
            (form.get("name") or "").strip()[:40] or u["name"], grade, minutes, u["id"])
-    _save_learning(u["id"], form, grade, u["grade"], games=False)
+    _save_learning(u["id"], form, grade, u["grade"], by_parent=False)
     return RedirectResponse("/today", 303)
 
 
@@ -77,7 +80,7 @@ async def my_courses_save(request: Request):
 def today(request: Request):
     k = kid_or_redirect(request, manage=True)
     if not enrollments(k["id"]):
-        if auth.is_self_learner(k):
+        if auth.self_managed(k):
             return RedirectResponse("/me/courses", 303)
         return render(request, "message.html", title="还没有选择学科",
                       text="请家长在「家长页 → 编辑孩子」里勾选要学的教材。")

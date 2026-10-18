@@ -30,7 +30,7 @@ templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
-                             stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock, is_private=auth.is_private, PROVINCES=boards.PROVINCES, city_label=boards.city_label,
+                             stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, self_managed=auth.self_managed, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock, is_private=auth.is_private, PROVINCES=boards.PROVINCES, city_label=boards.city_label,
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES,
                              trend_words=records.trend_words, tts_info=tts_web.client_info, qview=itemtypes.view,
                              qfig=figures.present)
@@ -115,6 +115,8 @@ def kid_or_redirect(request: Request, manage: bool = False):
     k = db.one("SELECT * FROM users WHERE id=? AND parent_id=?", kid_id, user["id"]) if kid_id else None
     if not k:
         raise HTTPException(400, "请先在家长页选择一个孩子")
+    if auth.self_managed(k):  # 家里的成人成员：学习记录只有本人能看
+        raise HTTPException(403, f"{k['name']} 是家里的成人成员，学习由 TA 自己安排，学习记录也只有 TA 自己能看。")
     if not manage:
         raise HTTPException(403, PARENT_READONLY)
     return k
@@ -177,6 +179,13 @@ def kid_brief(k) -> dict:
             "due": len(engine.due_cards(k["id"], 500)), "weekly": records.weekly(k["id"]),
             "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='word'", k["id"])["n"],
             "arena": arena.parent_summary(k), "trend": records.accuracy_trend(k["id"], 14), "school": _school_progress(k)}
+
+
+def adult_brief(k) -> dict:
+    """家里的成人成员在家长页上：只有坚持（连续天数、这一周学了几天），学了什么、错在哪只有本人能看。"""
+    cal = engine.calendar(k["id"], weeks=1)
+    return {"u": k, "adult": True, "streak": engine.streak(k["id"]),
+            "week_days": sum(1 for d in cal if d["minutes"] or d["checked"])}
 
 
 def _school_progress(k) -> list[dict]:
@@ -331,15 +340,15 @@ def _check_exam_dates(form) -> None:
             except ValueError:
                 raise HTTPException(400, "考试日期格式不对")
 
-def _save_learning(kid_id: int, form, grade: str, old_grade, games: bool = True) -> None:
-    """保存学习安排：学习方式、游戏、每门课的教材 / 方向 / 考试日期、学校模板。家长编辑孩子和自学者「我的课程」共用。"""
+def _save_learning(kid_id: int, form, grade: str, old_grade, by_parent: bool = True) -> None:
+    """保存学习安排：学习方式、游戏、每门课的教材 / 方向 / 考试日期、学校模板。家长编辑孩子和「我的课程」（自己安排学习的人）共用；
+    隐私模式、城市、学校模板只在家长的表单里。"""
     set_method(kid_id, form.get("method") or "")
-    if games and form.get("game_minutes") is not None:
+    if form.get("game_minutes") is not None:
         arena.set_game_minutes(kid_id, form.get("game_minutes"))
-    if games and form.get("game_unlock"):
+    if form.get("game_unlock"):
         arena.set_game_unlock(kid_id, form.get("game_unlock"))
-    if games and form.get("game_minutes") is not None:
-        auth.set_private(kid_id, bool(form.get("private")))
+    if form.get("game_minutes") is not None:
         nick = (form.get("nickname") or "").strip()
         k = db.one("SELECT * FROM users WHERE id=?", kid_id)
         if nick and nick != (k["nickname"] or ""):
@@ -347,6 +356,8 @@ def _save_learning(kid_id: int, form, grade: str, old_grade, games: bool = True)
                 auth.set_nickname(dict(k), nick)
             except ValueError as e:
                 raise HTTPException(400, str(e))
+    if by_parent and form.get("game_minutes") is not None:
+        auth.set_private(kid_id, bool(form.get("private")))
         if k["parent_id"] and form.get("province") is not None:
             boards.set_city(k["parent_id"], form.get("province") or "", form.get("city") or "")
     old = {e["pack_id"]: e["stage"] for e in enrollments(kid_id)}
@@ -359,15 +370,16 @@ def _save_learning(kid_id: int, form, grade: str, old_grade, games: bool = True)
         if f"exam_{pid}" in form:  # 考试日期：学习者（或家长）自己定，系统按剩下的天数排计划
             engine.set_exam_date(kid_id, pid, form.get(f"exam_{pid}"))
         engine.seed_vocab(kid_id, pid, config.SEED_DIR)
-    if games:  # 学校模板只在家长的表单里
+    if by_parent:  # 学校模板只在家长的表单里
         preset = catalog.preset(form.get("preset") or "")
         db.run("UPDATE users SET preset=?, school_type=? WHERE id=?", preset["id"] if preset else "",
                preset["school_type"] if preset else "", kid_id)
     engine.today_plan(kid_id, rebuild=True)
 
-def require_self_learner(request: Request):
+def require_self_managed(request: Request):
+    """「我的课程」：自己安排学习的人（自学者、家里的成人成员）。"""
     u = auth.require_user(request)
-    if not auth.is_self_learner(u):
+    if not auth.self_managed(u):
         raise HTTPException(403, "孩子的课程由家长在家长页安排" if u["role"] == "kid" else "「我的课程」是自学账号用的")
     return u
 
@@ -486,7 +498,8 @@ def _lang_of(text: str) -> str:
 def _tools_render(request: Request, kid: int, token: str = ""):
     u = auth.require_user(request)
     target = u
-    kids = db.q("SELECT id, name FROM users WHERE parent_id=? ORDER BY id", u["id"]) if u["role"] == "parent" else []
+    kids = [k for k in db.q("SELECT * FROM users WHERE parent_id=? ORDER BY id", u["id"])
+            if not auth.self_managed(k)] if u["role"] == "parent" else []
     if u["role"] == "parent":
         kid = kid or request.session.get("as_kid") or (kids[0]["id"] if kids else 0)
         target = auth.kid_of(u, kid) if kid else None

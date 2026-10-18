@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block body %}
-<h1>{{ '我的课程' if self_mode else (('编辑' if k else '添加') ~ '孩子') }}</h1>
+<h1>{{ '我的课程' if self_mode else '编辑家人' if k and self_managed(k) else '编辑孩子' if k else '添加孩子或家人' }}</h1>
 {% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
+{% set member_adult = k and not self_mode and self_managed(k) %}{# 家里的成人成员：家长只管账号，学习由本人在「我的课程」里安排 #}
 <form method="post" action="{{ '/me/courses' if self_mode else '/parent/kids/save' }}" class="card">
   {% if k and not self_mode %}<input type="hidden" name="id" value="{{ k.id }}">{% endif %}
   <label>{{ '称呼' if self_mode else '名字' }}</label><input type="text" name="name" value="{{ k.name if k else '' }}" required placeholder="例如：姐姐">
@@ -12,14 +13,20 @@
   {% endif %}
   <div class="row">
     <div class="grow"><label>年级</label><select name="grade" id="grade">{% for g in GRADES %}<option value="{{ g }}" data-rank="{{ stage_rank(g) }}" {{ 'selected' if (k.grade if k else catalog.default_grade) == g }}>{{ stage_label(g) }}</option>{% endfor %}</select></div>
-    <div class="grow"><label>每天学习分钟</label><input type="number" name="daily_minutes" min="15" max="240" value="{{ k.daily_minutes if k else 60 }}"></div>
+    {% if not member_adult %}<div class="grow"><label>每天学习分钟</label><input type="number" name="daily_minutes" min="15" max="240" value="{{ k.daily_minutes if k else 60 }}"></div>{% endif %}
   </div>
-  <p class="muted small" style="margin:4px 0 0">{% if self_mode %}成年人选「成人」：AI 用成人的口吻讲解。{% else %}成人学习者（比如备考基金从业资格）年级选「成人」：AI 用成人的口吻讲解，不显示乐园。成年人也可以自己注册「自己学」的账号，自己选课。{% endif %}</p>
-  {% if not self_mode %}
-  <div id="games">
+  {% if member_adult %}<p class="hint small">{{ k.name }} 是家里的成人成员：课程、每天学多久由 TA 登录后在「我的课程」里自己安排，学习记录也只有 TA 自己能看。这里只管账号（名字、邮箱、密码、暂停）。年级改成大学以下，就改由家长安排学习。</p>
+  {% else %}
+  <p class="muted small" style="margin:4px 0 0">{% if self_mode %}成年人选「成人」：AI 用成人的口吻讲解。{% else %}家里的大人（比如备考基金从业资格）年级选「成人」：AI 用成人的口吻讲解，课程由 TA 登录后自己选，学习记录只有 TA 自己能看。{% endif %}</p>
+  {% if not self_mode %}<p class="hint small" id="adult-note" hidden>成人成员登录后在「我的课程」里自己选课、定每天学多久；家长这里只管账号。</p>{% endif %}
+  <div id="learning">
+  <div id="games" {{ 'data-self=1' if self_mode }}>
+  {% if self_mode %}<h2>乐园</h2>{% endif %}
   <label>每天最多玩游戏</label><select name="game_minutes">{% set gm = game_minutes(k) if k else 20 %}{% for m in GAME_MINUTE_CHOICES %}<option value="{{ m }}" {{ 'selected' if m == gm }}>{{ '不玩' if m == 0 else ('不限时' if m < 0 else m ~ ' 分钟') }}</option>{% endfor %}</select>
   <label>什么时候可以玩</label><select name="game_unlock">{% set gu = game_unlock(k) if k else 'half' %}{% for v, n in UNLOCK_CHOICES.items() %}<option value="{{ v }}" {{ 'selected' if v == gu }}>{{ n }}</option>{% endfor %}</select>
   <label>游戏里的昵称（选填）</label><input type="text" name="nickname" maxlength="10" value="{{ k.nickname if k else '' }}" placeholder="比如：闪电小队长">
+  {% if self_mode %}<p class="muted small" style="margin:4px 0 0">想和家里人一起玩乐园就打开。乐园里边玩边答题，题目按你自己的水平出。成人不上排行榜、不进全站的公开房间，家里的房间和用房间号、密码约好的房间都能进。</p>
+  {% else %}
   <label style="display:flex;gap:8px;align-items:center;font-weight:normal"><input type="checkbox" name="private" value="1" style="width:auto" {{ 'checked' if k and is_private(k) }}> 隐私模式</label>
   <p class="muted small" style="margin:4px 0 0">不开的时候：孩子上学习榜、乐园榜（比坚持和答对几道题），也能进全站的公开房间，和别的家庭的孩子一起玩。这些地方都只显示昵称，不显示名字、学校、年级，也不能打字聊天，只能发现成的表情。打开隐私模式：不上任何排行榜，也不进公开房间，只能进家里的房间和用房间号、密码约好的房间。</p>
   {% set cp = (user.city or '').split('·') %}
@@ -29,7 +36,9 @@
   </div>
   <p class="muted small" style="margin:4px 0 0">排行榜比的是每天坚持、肯不肯答题，不比成绩（游戏里的题按每个孩子自己的水平出）。默认不上榜；打开以后榜上只显示游戏昵称，不显示名字、学校和年级。城市一家填一次，同一个城市上榜的孩子满 5 个才有城市榜。</p>
   <p class="muted small" style="margin:4px 0 0">「乐园」里的游戏边玩边答题，题目按孩子自己的水平出，答题计入学习记录（游戏时间不计入每天的学习分钟）。今天的任务全部做完再奖励 10 分钟，每点亮一个知识点再奖励 2 分钟（最多 6 分钟）。今天没有任务时随时能玩。</p>
+  {% endif %}
   </div>
+  {% if not self_mode %}
   <label>学校（选填）</label><input type="text" name="school" value="{{ k.school if k else '' }}">
   <label>学校类型</label>
   <select name="preset" id="preset">
@@ -76,15 +85,19 @@
   </section>
   {% endfor %}
   </div>
+  </div>{# #learning #}
+  {% endif %}
   <div style="margin-top:16px"><button class="btn">保存</button> <a class="btn ghost" href="{{ '/today' if self_mode else '/parent' }}">取消</a></div>
 </form>
 <script>
 // 学习方式说明：换了以后，系统会按孩子已有的学习记录重新判断掌握情况
 const _md = () => { const o = $('#method').selectedOptions[0]; $('#method-desc').textContent = o ? o.dataset.desc + '（换了以后会按已有的学习记录重新判断掌握情况。）' : ''; };
 $('#method').onchange = _md; _md();
-// 成人学习者（大学及以上）不显示乐园设置；隐藏的输入框不提交，保留原设置
-const _games = () => { if (!$('#games')) return; const adult = +($('#grade').selectedOptions[0]?.dataset.rank || 0) >= 13;
-  $('#games').style.display = adult ? 'none' : ''; $$('#games select').forEach(x => x.disabled = adult); };
+// 家长的表单：成人成员（大学及以上）的学习由本人安排，不显示学习安排和乐园；隐藏的输入框不提交，保留原设置
+const _games = () => { const box = $('#learning'); if (!box || $('#games')?.dataset.self) return;
+  const adult = +($('#grade').selectedOptions[0]?.dataset.rank || 0) >= 13;
+  box.hidden = adult; $$('#learning select, #learning input').forEach(x => x.disabled = adult);
+  if ($('#adult-note')) $('#adult-note').hidden = !adult; };
 $('#grade').addEventListener('change', _games); _games();
 </script>
 <script src="/static/course-picker.js?v={{ ASSET_V }}" defer></script>

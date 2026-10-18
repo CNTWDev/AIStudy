@@ -20,6 +20,7 @@ from zoneinfo import ZoneInfo
 from fastapi import HTTPException, Request
 
 from . import config, db
+from .catalog import is_adult
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -348,14 +349,28 @@ def require_admin(request: Request):
 
 def is_self_learner(u) -> bool:
     """自学者：自己注册、自己选课的学习账号（多半是备考的成人）。和孩子账号一样能学习，只是没有家长，
-    课程、每天时长、考试日期都由自己在「我的课程」里设。孩子账号一定有家长（parent_id）。"""
+    课程、每天时长、考试日期都由自己在「我的课程」里设。挂在家庭里的成人成员也自己安排学习，见 self_managed。"""
     return bool(u) and u["role"] == "kid" and not u["parent_id"]
 
 
-def kid_of(parent, kid_id: int):
+def self_managed(u) -> bool:
+    """学习自己安排：自学者，或家庭里的成人成员（年级在大学及以上）。家庭只是把一家人放在一起（家里的房间、一起打卡），
+    家长管的只是未成年的孩子。成人成员自己在「我的课程」里选课，学习记录只有本人能看；家长只能管账号（改密码、暂停）。"""
+    return bool(u) and u["role"] == "kid" and (not u["parent_id"] or is_adult(u["grade"]))
+
+
+def with_other_kids(u) -> bool:
+    """能不能上排行榜、进全站的公开房间（和别的家庭的孩子在一起）：打开隐私模式的不行，成人也不行。"""
+    return not is_private(u) and not is_adult(u.get("grade"))
+
+
+def kid_of(parent, kid_id: int, account_only: bool = False):
+    """家长名下的一个成员。默认是要看或安排学习：成人成员（self_managed）不行；account_only：只管账号（资料、密码、暂停）。"""
     k = db.one("SELECT * FROM users WHERE id=? AND parent_id=?", kid_id, parent["id"])
     if not k:
         raise HTTPException(404, "没有这个孩子账号")
+    if not account_only and self_managed(k):
+        raise HTTPException(403, f"{k['name']} 是家里的成人成员，学习由 TA 自己安排，学习记录也只有 TA 自己能看。")
     return k
 
 
