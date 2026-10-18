@@ -225,7 +225,7 @@ def room_info(kid: dict, room_id) -> dict:
     play = None
     if s:
         play = {"session": s["id"], "n": s["level"], "seed": s["seed"],
-                "stage": g.stage(s["level"], progress.progress(g, s["team"])) if s["level"] else {},
+                "stage": {**(g.stage(s["level"], progress.progress(g, s["team"])) if s["level"] else {}), **g.team_setup(s["team"])},
                 "resume": sessions.resume_for(s, kid["id"])}
     return {"id": r["id"], "game": r["game"], "level": r["level"], "members": members,
             "me": next(m for m in members if m["id"] == kid["id"]), "host": kid["id"] == r["host_id"], "full": full,
