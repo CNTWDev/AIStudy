@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block body %}
-{% if b.metric != 'game' %}<a href="/records" class="back">← 记录</a>{% endif %}
-{% set game = b.metric == 'game' %}
+{% if not game %}<a href="/records" class="back">← 记录</a>{% endif %}
+{% set game = b.metric in ('game', 'game_all') %}
 {% if game %}<a href="/arena" class="back">← 乐园</a>{% endif %}
 <div class="ph"><h1>🏆 {{ '乐园榜' if game else '打卡榜' }}</h1></div>
-<p class="muted small" style="margin:4px 0 10px">{% if game %}这周在乐园的游戏里答对了几道题。每个人的题都按自己的水平出，比的是肯不肯答题。每周一重新数。{% else %}比的是每天坚持，不比谁做得多、做得对。做完今天的第 1 节就算打卡。{% endif %}</p>
+<p class="muted small" style="margin:4px 0 10px">{% if game %}在乐园的游戏里答对了几道题（只数答对的）。每个人的题都按自己的水平出，比的是肯不肯答题。「本周答对」每周一重新数。{% else %}比的是每天坚持，不比谁做得多、做得对。做完今天的第 1 节就算打卡。{% endif %}</p>
 <div class="subnav" style="margin:8px 0">
-{% for m, n in b.metrics.items() if (m == 'game') == game %}<a class="{{ 'on' if b.metric == m }}" href="/boards?metric={{ m }}&scope={{ b.scope }}">{{ n }}</a>{% endfor %}
+{% for m, n in b.metrics.items() if (m in ('game', 'game_all')) == game %}<a class="{{ 'on' if b.metric == m }}" href="/boards?metric={{ m }}&scope={{ b.scope }}">{{ n }}</a>{% endfor %}
 </div>
 <div class="subnav" style="margin:0 0 12px">
 <a class="{{ 'on' if b.scope == 'all' }}" href="/boards?metric={{ b.metric }}&scope=all">🌏 全站</a>
@@ -29,7 +29,7 @@
   {% elif b.ahead %}<b>{% if game %}再答对 {{ b.ahead }} 道，就能超过前面一位。{% else %}再坚持 {{ b.ahead }} 天，就能超过前面一位。{% endif %}</b>
   {% endif %}
 {% elif game %}
-  <b>你这周在乐园答对了 {{ b.counts.game }} 道题。</b>
+  <b>你这周在乐园答对了 {{ b.counts.game }} 道题，一共答对了 {{ b.counts.game_all }} 道。</b>
 {% elif b.metric == 'streak' and not b.counts.streak %}
   <b>这个月你已经打卡 {{ b.counts.month }} 天。</b>今天做完第 1 节，连续打卡就从 1 天重新开始。
 {% else %}

@@ -104,7 +104,8 @@ def test_game_board():
         mine = r["mine"]
         assert r["unit"] == "道" and mine["value"] == 3 and r["ahead"] >= 3
         assert next(x for x in r["top"] if x["id"] == b)["value"] == 5
+        assert boards.board(dict(auth.get_user(a)), "game_all")["mine"]["value"] == 4   # 一共答对：上周以前的也算
         c.post("/login", data={"email": "bd-ga@x.com", "password": "secret1"})
         page = c.get("/boards?metric=game").text
-        assert "乐园榜" in page and "本周答对" in page and "连续打卡" not in page
+        assert "乐园榜" in page and "本周答对" in page and "一共答对" in page and "连续打卡" not in page
         assert "/boards?metric=game" in c.get("/arena").text

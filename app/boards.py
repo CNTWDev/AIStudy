@@ -6,7 +6,8 @@
   免得别人猜出是谁。
 - 只有家长打开了「上排行榜」的孩子才在榜上（users.settings.board，默认不上），榜上只显示昵称（auth.public_name）。
 - 乐园榜「本周答对」：这周（周一起）在乐园所有游戏里答对了几道题。每个人的题都按自己的水平出（app/arena/sources.py），
-  预期答对的比例大家一样，比的是肯不肯答题，不是会多少；每周一重新数。
+  预期答对的比例大家一样，比的是肯不肯答题，不是会多少；每周一重新数。还有「一共答对」（从开始玩到现在）。
+  只数答对的，不数答了几道：乱点答错不算，刷不上去。
 - 不上榜的孩子也能看榜，只是没有自己的名次。
 - 按分数、正确率、通关数的跨家庭排名不做（比的是年龄和水平，小的孩子永远在后面）。
 """
@@ -15,8 +16,9 @@ from datetime import timedelta
 
 from . import auth, db, streak
 
-METRICS = {"streak": "连续打卡", "month": "本月打卡", "total": "累计打卡", "game": "本周答对"}
-UNITS = {"streak": "天", "month": "天", "total": "天", "game": "道"}
+METRICS = {"streak": "连续打卡", "month": "本月打卡", "total": "累计打卡", "game": "本周答对", "game_all": "一共答对"}
+UNITS = {"streak": "天", "month": "天", "total": "天", "game": "道", "game_all": "道"}
+GAME = ("game", "game_all")   # 乐园榜：只数答对的（乱点刷不上去）
 TOP = 10
 CITY_MIN = 5
 CACHE_S = 600   # 榜单 10 分钟算一次（每个孩子的打卡天数要从每天的记录里数）
@@ -82,9 +84,10 @@ def _monday() -> str:
 def _counts(kid_id: int, today: str, month: str) -> dict:
     counted = streak._days(kid_id)
     days = [d for d, ok in counted.items() if ok]
-    game = db.one("SELECT COALESCE(SUM(correct), 0) AS c FROM arena_answers WHERE user_id=? AND created_at>=?", kid_id, _monday())
+    game = db.one("SELECT COALESCE(SUM(CASE WHEN created_at>=? THEN correct ELSE 0 END), 0) AS w, COALESCE(SUM(correct), 0) AS a "
+                  "FROM arena_answers WHERE user_id=?", _monday(), kid_id)
     return {"streak": streak.streak(kid_id), "month": sum(1 for d in days if d.startswith(month) and d <= today),
-            "total": len(days), "game": int(game["c"] or 0)}
+            "total": len(days), "game": int(game["w"] or 0), "game_all": int(game["a"] or 0)}
 
 
 def _entries() -> list[dict]:
