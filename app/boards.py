@@ -1,18 +1,24 @@
-"""打卡榜（docs/DESIGN.md 5.29）：比坚持，不比水平。
+"""打卡榜和乐园榜（docs/DESIGN.md 5.29）：比坚持，不比水平。
 
 - 三个榜：连续打卡天数、本月打卡天数（每月 1 号重新数）、累计打卡天数。打卡沿用 app/streak.py 的规则
   （做完第 1 节才算；补签卡能保住连续，但补上的那天不加天数）。
 - 两个范围：全站、我所在的城市（家长账号上的 city，「省·市」）。一个城市上榜的孩子少于 CITY_MIN 个就不单独开城市榜，
   免得别人猜出是谁。
 - 只有家长打开了「上排行榜」的孩子才在榜上（users.settings.board，默认不上），榜上只显示昵称（auth.public_name）。
+- 乐园榜「本周答对」：这周（周一起）在乐园所有游戏里答对了几道题。每个人的题都按自己的水平出（app/arena/sources.py），
+  预期答对的比例大家一样，比的是肯不肯答题，不是会多少；每周一重新数。还有「一共答对」（从开始玩到现在）。
+  只数答对的，不数答了几道：乱点答错不算，刷不上去。
 - 不上榜的孩子也能看榜，只是没有自己的名次。
 - 按分数、正确率、通关数的跨家庭排名不做（比的是年龄和水平，小的孩子永远在后面）。
 """
 import time
+from datetime import timedelta
 
 from . import auth, db, streak
 
-METRICS = {"streak": "连续打卡", "month": "本月打卡", "total": "累计打卡"}
+METRICS = {"streak": "连续打卡", "month": "本月打卡", "total": "累计打卡", "game": "本周答对", "game_all": "一共答对"}
+UNITS = {"streak": "天", "month": "天", "total": "天", "game": "道", "game_all": "道"}
+GAME = ("game", "game_all")   # 乐园榜：只数答对的（乱点刷不上去）
 TOP = 10
 CITY_MIN = 5
 CACHE_S = 600   # 榜单 10 分钟算一次（每个孩子的打卡天数要从每天的记录里数）
@@ -70,11 +76,18 @@ def city_label(c: str) -> str:
     return c.split("·")[-1] if c else ""
 
 
+def _monday() -> str:
+    t = db.today()
+    return (t - timedelta(days=t.weekday())).isoformat()
+
+
 def _counts(kid_id: int, today: str, month: str) -> dict:
     counted = streak._days(kid_id)
     days = [d for d, ok in counted.items() if ok]
+    game = db.one("SELECT COALESCE(SUM(CASE WHEN created_at>=? THEN correct ELSE 0 END), 0) AS w, COALESCE(SUM(correct), 0) AS a "
+                  "FROM arena_answers WHERE user_id=?", _monday(), kid_id)
     return {"streak": streak.streak(kid_id), "month": sum(1 for d in days if d.startswith(month) and d <= today),
-            "total": len(days)}
+            "total": len(days), "game": int(game["w"] or 0), "game_all": int(game["a"] or 0)}
 
 
 def _entries() -> list[dict]:
@@ -129,6 +142,6 @@ def board(kid: dict, metric: str = "streak", scope: str = "all") -> dict:
         ahead = min(higher) - mine["value"] + 1 if higher else None
     me_counts = _counts(kid["id"], db.today().isoformat(), db.today().isoformat()[:7])
     top = [{**r, "me": r["id"] == kid["id"]} for r in ranked[:TOP]]
-    return {"metric": metric, "metrics": METRICS, "scope": scope, "city": city_label(city), "city_ok": city_ok,
+    return {"metric": metric, "metrics": METRICS, "unit": UNITS[metric], "scope": scope, "city": city_label(city), "city_ok": city_ok,
             "top": top, "mine": mine, "ahead": ahead, "on_board": on_board(kid), "counts": me_counts,
             "people": len(ranked)}

@@ -77,9 +77,35 @@ def test_parent_turns_board_on():
         pid = auth.create_user("bd-pp@x.com", "secret1", "家长", "parent")
         k = auth.create_user("bd-pk@x.com", "secret1", "小可", "kid", parent_id=pid, grade="G3")
         c.post("/login", data={"email": "bd-pp@x.com", "password": "secret1"})
-        assert "上打卡榜" in c.get(f"/parent/kids/{k}/edit").text
+        assert "上排行榜" in c.get(f"/parent/kids/{k}/edit").text
         base = {"id": str(k), "name": "小可", "email": "bd-pk@x.com", "grade": "G3", "daily_minutes": "60", "game_minutes": "20"}
         assert not boards.on_board(dict(auth.get_user(k)))
         c.post("/parent/kids/save", data={**base, "board": "1", "province": "江苏", "city": "南京市"})
         assert boards.on_board(dict(auth.get_user(k))) and auth.get_user(pid)["city"] == "江苏·南京"
         assert "南京" in c.get(f"/parent/kids/{k}/edit").text
+
+
+def test_game_board():
+    """乐园榜：这周在乐园答对几道题（周一起数），只算上榜的孩子。"""
+    with TestClient(app) as c:
+        _, a = _family("ga")
+        _, b = _family("gb")
+        for k in (a, b):
+            boards.set_on_board(k, True)
+        monday = boards._monday()
+        for k, n in ((a, 3), (b, 5)):
+            for i in range(n):
+                db.run("INSERT INTO arena_answers(user_id, kp_id, family, level, correct, created_at) VALUES(?,?,?,?,?,?)",
+                       k, f"x{i}", "add", 1, 1, monday + "T08:00:00")
+        db.run("INSERT INTO arena_answers(user_id, kp_id, family, level, correct, created_at) VALUES(?,?,?,?,?,?)",
+               a, "old", "add", 1, 1, "2000-01-01T08:00:00")   # 上周以前的不算
+        boards.refresh()
+        r = boards.board(dict(auth.get_user(a)), "game")
+        mine = r["mine"]
+        assert r["unit"] == "道" and mine["value"] == 3 and r["ahead"] >= 3
+        assert next(x for x in r["top"] if x["id"] == b)["value"] == 5
+        assert boards.board(dict(auth.get_user(a)), "game_all")["mine"]["value"] == 4   # 一共答对：上周以前的也算
+        c.post("/login", data={"email": "bd-ga@x.com", "password": "secret1"})
+        page = c.get("/boards?metric=game").text
+        assert "乐园榜" in page and "本周答对" in page and "一共答对" in page and "连续打卡" not in page
+        assert "/boards?metric=game" in c.get("/arena").text

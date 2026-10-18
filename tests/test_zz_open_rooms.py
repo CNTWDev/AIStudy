@@ -137,7 +137,7 @@ def test_four_players_and_no_joining_mid_game():
 
 
 def test_new_team_opens_levels_everyone_reached():
-    """几个人第一次凑成一队：每个人都打过的关直接能选（不用从第 1 关打起）。"""
+    """几个人第一次凑成一队：队里打得最远的人打到的关都能选（不用从第 1 关打起），每个人过的关都记在自己身上。"""
     g = games.get("snake")
     a, b, c = (_kid(f"rc{i}")[1] for i in range(3))
     for n in (1, 2, 3):
@@ -145,8 +145,9 @@ def test_new_team_opens_levels_everyone_reached():
     progress.record(g, progress.team_key((c,)), 1, True, 1, 30)
     progress.record(g, progress.team_key((b, c)), 2, True, 1, 30)
     assert progress.reach(g, a) == 3 and progress.reach(g, c) == 2
-    assert progress.progress(g, progress.team_key((a, b, c)))["upto"] == 3   # 三个人都打过第 2 关
-    assert progress.progress(g, progress.team_key((a, c)))["upto"] == 3
+    assert progress.progress(g, progress.team_key((a, b, c)))["upto"] == 4   # 打得最远的打到第 3 关：开到第 4 关
+    assert progress.progress(g, progress.team_key((a, c)))["upto"] == 4
+    assert progress.progress(g, progress.team_key((c,)))["upto"] == 3       # 和别人一起过的关也算自己的
 
 
 def test_levels_for_more_players():
