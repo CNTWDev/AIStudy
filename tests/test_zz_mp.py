@@ -216,10 +216,61 @@ def test_ws_relay():
             with c2.websocket_connect(f"/ws/mp/{rid}") as wb:
                 hello = json.loads(wa.receive_text())
                 assert hello == {"t": "hello", "from": b}
-                wb.send_text("x" * 3000)                                   # 太长：丢掉
+                wb.send_text("x" * 7000)                                   # 太长：丢掉
                 wb.send_text(json.dumps({"t": "s", "x": 10, "from": 999}))   # from 由服务器盖，改不了
                 assert _recv(wa) == {"t": "s", "x": 10, "from": b}
                 wa.send_text(json.dumps({"t": "gem", "k": "1,2"}))
                 assert _recv(wb) == {"t": "gem", "k": "1,2", "from": a}
             assert _recv(wa) == {"t": "bye", "from": b}
         assert db.one("SELECT seen_at FROM mp_rooms WHERE id=?", rid)["seen_at"]
+
+
+def test_save_and_resume():
+    """存档：刷新 / 换设备后接着玩。存档不转发给对方；新的一关只认开房间的人；过关就清掉。"""
+    with TestClient(app) as c:
+        _, a, b = _family("s")
+        _login(c, "mp-a-s@x.com")
+        rid = c.post("/api/mp/rooms", json={"game": "snake"}).json()["id"]
+        cookie_a = dict(c.cookies)
+        c2 = TestClient(app)
+        _login(c2, "mp-b-s@x.com")
+        c2.post(f"/api/mp/rooms/{rid}/join")
+        m = c2.post("/api/arena/start", json={"game": "snake"}).json()["match_id"]
+        c.cookies.update(cookie_a)
+        with c.websocket_connect(f"/ws/mp/{rid}") as wa:
+            with c2.websocket_connect(f"/ws/mp/{rid}") as wb:
+                assert json.loads(wa.receive_text())["t"] == "hello"
+                # 对方的旧存档不能开新的一关
+                wb.send_text(json.dumps({"t": "save", "n": 1, "seed": 7, "el": 3, "me": {"len": 30}}))
+                wb.send_text(json.dumps({"t": "gem"}))   # 存档不转发：wa 下一条收到的是这个
+                assert _recv(wa)["t"] == "gem"
+                assert rooms.play_for({"id": b}, dict(db.one("SELECT * FROM mp_rooms WHERE id=?", rid))) is None
+                wa.send_text(json.dumps({"t": "save", "n": 1, "seed": 42, "el": 12.5, "me": {"len": 20}, "w": {"f": [[1, 2, 3, 1, 0]]}, "deaths": 1}))
+                wa.send_text(json.dumps({"t": "ping"}))
+                import time as _t
+                _t.sleep(0.9)
+                wb.send_text(json.dumps({"t": "save", "n": 1, "seed": 42, "el": 13, "me": {"len": 33, "alive": 0}, "need": 2, "deaths": 4, "match": m}))
+                wb.send_text(json.dumps({"t": "gem"}))
+                assert _recv(wa)["t"] == "gem"
+        play = c2.get(f"/api/mp/rooms/{rid}").json()["play"]
+        assert play["n"] == 1 and play["seed"] == 42 and play["el"] == 13 and play["me"] == {"len": 33, "alive": 0}
+        assert play["need"] == 2 and play["deaths"] == 4 and play["peer_deaths"] == 1 and play["match"] == m
+        assert play["world"] == {"f": [[1, 2, 3, 1, 0]]}
+        pa = c.get(f"/api/mp/rooms/{rid}").json()["play"]
+        assert pa["me"] == {"len": 20} and pa["match"] is None    # 开房间的人没有开着的答题对局
+        # 对局结束了就不再接着用
+        c2.post(f"/api/arena/{m}/end", json={"result": "quit", "stats": {}})
+        assert c2.get(f"/api/mp/rooms/{rid}").json()["play"]["match"] is None
+        # 过关：清掉
+        c.post(f"/api/mp/rooms/{rid}/finish", json={"n": 1, "report": {"seconds": 30, "score": 99}})
+        assert c.get(f"/api/mp/rooms/{rid}").json()["play"] is None
+        # 太久没人：不接着玩
+        rooms.save_play(a, rid, {"n": 2, "seed": 5, "el": 1})
+        assert c.get(f"/api/mp/rooms/{rid}").json()["play"]["n"] == 2
+        alive, rooms.PLAY_ALIVE_S = rooms.PLAY_ALIVE_S, -1
+        try:
+            assert c.get(f"/api/mp/rooms/{rid}").json()["play"] is None
+        finally:
+            rooms.PLAY_ALIVE_S = alive
+        rooms.save_play(a, rid, {"end": 1, "n": 2, "seed": 5})
+        assert c.get(f"/api/mp/rooms/{rid}").json()["play"] is None

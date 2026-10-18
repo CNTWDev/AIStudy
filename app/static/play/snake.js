@@ -1,7 +1,9 @@
 /* 贪吃蛇大作战（合作长大，两个人各用一台设备）。关卡在 app/arena/mp/levels/snake/，格式见 app/arena/mp/snake.py。
    - 自己的蛇自己的设备算（转弯、冲刺、吃豆子、撞墙 / 撞电脑蛇），每秒发 15 次蛇头位置和长度，对方按蛇头轨迹画出身体；
    - 豆子和电脑蛇由开房间的设备算：豆子被吃了补新的（'food'），电脑蛇每秒发 10 次（'ai'）；
-   - 两条蛇加起来够长，开房间的设备报过关；时间到了还不够长就差一点（外壳 mpshell.js 结算）。 */
+   - 两条蛇加起来够长，开房间的设备报过关；时间到了还不够长就差一点（外壳 mpshell.js 结算）。
+   - 倒下答题复活后长度不变（像贪吃蛇大作战的「复活」），所以倒下不掉豆子；代价是答题这段时间少一条蛇在长。
+   - 刷新 / 换设备：存档里有自己的蛇（位置、方向、长度）和豆子、电脑蛇，接着玩。 */
 (function () {
   const SEG = 7, SPEED = 135, BOOST = 225, TURN = 3.4, START_LEN = 10, MIN_LEN = 6, HEAD_R = 10;
   const ROLE_COLOR = {green: ['#3fcf6e', '#1f9e4c'], pink: ['#ff7fb8', '#e04b8f']};
@@ -85,18 +87,46 @@
   }
   function die(why) {
     me.alive = false; me.boost = false;
-    const segs = body(me).filter((_, i) => i % 2 === 0).slice(0, 30).map(p => [Math.round(p.x), Math.round(p.y)]);
     fx.burst(me.x, me.y, {n: 24, colors: me.colors, speed: 260, size: 6, grav: 0});
     fx.shake(5, 0.25); Play.sfx.play('hurt');
-    if (mp.host) hostDrop(segs); else mp.net.send({t: 'drop', pts: segs});
-    me.path = []; me.len = 0;
-    mp.toast(`${why}答题复活`, 'warn');
+    me.path = [];   // 长度留着，复活时还是这么长
+    mp.toast(`${why}答对题就带着 ${me.len} 节复活`, 'warn');
     mp.die();
   }
+  function coil(s, x, y, a) {   // 把蛇盘在 (x, y) 附近：头朝 a，身子绕成圈（多长都放得下，不会伸出墙外）
+    const total = s.len * SEG + 20, r = Math.min(70, 26 + s.len * 0.6), turn = 1 / r;
+    let px = x, py = y, pa = a + Math.PI;
+    const pts = [{x: px, y: py}];
+    for (let d = 0; d < total; d += 4) { pa += turn * 4; px += Math.cos(pa) * 4; py += Math.sin(pa) * 4; pts.push({x: px, y: py}); }
+    s.x = x; s.y = y; s.a = a; s.path = pts;
+  }
+  function safeSpot() {   // 离电脑蛇远一点的地方
+    const [W, H] = lv.size;
+    let best = null;
+    for (let k = 0; k < 12; k++) {
+      const x = W * (0.25 + Math.random() * 0.5), y = H * (0.25 + Math.random() * 0.5);
+      const far = Math.min(1e9, ...ais.filter(a => a.alive).map(a => Math.hypot(a.x - x, a.y - y)));
+      if (!best || far > best.far) best = {x, y, far};
+    }
+    return best;
+  }
   function respawn() {
-    const [W, H] = lv.size, rr = Math.random;
-    const x = W * (0.3 + rr() * 0.4), y = H * (0.3 + rr() * 0.4);
-    Object.assign(me, {x, y, a: rr() * Math.PI * 2, len: START_LEN, path: [{x, y}], alive: true, inv: 2});
+    const p = safeSpot(), [W, H] = lv.size;
+    me.len = Math.max(START_LEN, me.len || 0);
+    coil(me, p.x, p.y, Math.atan2(H / 2 - p.y, W / 2 - p.x));
+    Object.assign(me, {alive: true, inv: 2});
+  }
+
+  function loadWorld(w) {   // 重连：换成存档 / 队友那里的豆子和电脑蛇
+    if (!w) return;
+    foods = new Map();
+    for (const [id, x, y, v, c] of w.f || []) foods.set(id, {id, x, y, v, c});
+    foodN = Math.max(w.n || 0, ...[...foods.keys()].map(k => k + 1), foodN);
+    (w.ai || []).forEach(([x, y, len, alive], i) => {
+      const a = ais[i]; if (!a) return;
+      Object.assign(a, {x, y, len, alive: !!alive, path: [{x, y}], think: 0});
+      if (a.track) { a.track.clear(); a.track.push({x, y}); }
+    });
   }
 
   // ---------------------------------------------------------------- 开房间的设备：豆子、电脑蛇、过关
@@ -292,14 +322,21 @@
       for (let i = 0; i < START_LEN * 3; i++) grow(me, me.x + Math.cos(me.a) * 2.5, me.y + Math.sin(me.a) * 2.5);
       peer = snake(W / 2 + (mine ? -60 : 60), H / 2, mine ? Math.PI : 0, START_LEN, ROLE_COLOR[ctx.peer.role] || ROLE_COLOR.pink);
       peer.track = new MpNet.Track(100);
-      cam = {x: me.x, y: me.y};
       foods = new Map(); ais = [];
       for (let i = 0; i < lv.ai; i++) ais.push(Object.assign(snake(0, 0, 0, lv.ai_len, AI_COLORS[i % AI_COLORS.length]), {id: i, track: new MpNet.Track(100)}));
+      const rs = ctx.resume;
+      if (rs && rs.world) loadWorld(rs.world);
+      else if (ctx.host) { for (let i = 0; i < lv.food; i++) addFood(); ais.forEach(spawnAi); }
       if (ctx.host) {
-        for (let i = 0; i < lv.food; i++) addFood();
-        ais.forEach(spawnAi);
+        while (foods.size < lv.food) addFood();
         setTimeout(() => mp.net.send({t: 'food', all: [...foods.values()].map(pack)}), 300);
       }
+      if (rs && rs.me) {   // 接着玩：还是原来那么长、在原来的地方
+        me.len = Math.max(MIN_LEN, rs.me.len | 0 || START_LEN);
+        if (rs.me.alive) { coil(me, rs.me.x, rs.me.y, rs.me.a || 0); me.inv = 2; }
+        else { me.alive = false; me.path = []; me.x = rs.me.x; me.y = rs.me.y; }
+      }
+      cam = {x: me.x, y: me.y};
       if (lv.tip) mp.toast(lv.tip.split('。')[0], 'good');
       const net = ctx.net;
       net.off('s', 'food', 'ai', 'eat', 'drop');
@@ -331,6 +368,14 @@
       loop.start();
     },
     onRevive() { if (me) { respawn(); Play.sfx.play('power'); } },
+    save: () => me && {x: Math.round(me.x), y: Math.round(me.y), a: +me.a.toFixed(2), len: me.len, alive: me.alive ? 1 : 0},
+    saveWorld: () => ({f: [...foods.values()].map(pack), n: foodN, ai: ais.map(a => [Math.round(a.x), Math.round(a.y), a.len, a.alive ? 1 : 0])}),
+    peerView: () => peer && {x: Math.round(peer.x), y: Math.round(peer.y), a: +(peer.a || 0).toFixed(2), len: peer.len, alive: peer.alive ? 1 : 0},
+    loadMe(v) {
+      if (!me || !v || !me.alive || !v.alive) return;
+      me.len = Math.max(MIN_LEN, v.len | 0 || me.len); coil(me, v.x, v.y, v.a || 0); me.inv = 2;
+    },
+    loadWorld(w) { loadWorld(w); if (mp && mp.host) mp.net.send({t: 'food', all: [...foods.values()].map(pack)}); },
     end() { ended = true; pointer = null; if (loop) loop.stop(); if (mp) mp.net.stopStreams(); },
   });
 })();

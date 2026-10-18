@@ -558,6 +558,13 @@ FastAPI 应用（app/main.py）
 
 **加一款联网游戏**：`mp/<id>.py` 写 `MpGame` 子类并在 `mp/__init__.py` 里 import → 关卡 JSON → `matches.py` 的 `GAMES` 里登记（`multi=True`、`freeze=False`）→ `static/play/<id>.js` 用 `MpShell.init({...})` 写玩法。房间、转发、答题、结算、纪录都不用改。
 
+**断线、刷新、换设备**（家长的要求：刷新后自动回到游戏、进度不丢）：
+- 以还在玩的那个人为准：重连的人先按存档放好自己和世界，再向队友要一份实时状态（`need_world` → `world`：共享的世界 + 队友看到的我），换上去接着玩。两个人在一个画面里，进度就是还在线那个人的进度。
+- 服务器存档兜底：每台设备每 2 秒通过 WebSocket 存一次（`{"t": "save"}`，不转发，写进 `mp_rooms.play`）：这一关、随机种子、玩了多久、我自己的状态、还欠几道题、倒下几次、答题对局；开房间的那台再加上世界。两个人都掉线（或队友已经走了）时从这里接着玩；还欠几道题、泡泡堂的道具这种只有自己知道的，也从这里来。10 分钟没人更新就作废；过关、失败、退出房间时清掉。
+- 对方掉线时这一关不结束：等 30 秒，回来了就接着玩。
+- 同一个账号两台设备：后打开的那台先等一下，发现另一台正在玩就问「在这台设备上接着玩吗？」，点了才把原来那台换下来（`take`，原来那台先存好进度再停）；不点就不动原来那台。另一台只是开着房间、没在玩，就直接换过来。
+- 倒下答题的题目盖在游戏画面上（`ArenaQuiz` 的 `mount`），答对之前关不掉；万一没弹出来，每秒检查一次再弹。贪吃蛇复活保留原来的长度，泡泡堂保留道具，双人闯关回到最后站稳的地方。
+
 **部署**：用 Nginx 反向代理时要转发 WebSocket，见 `docs/DEPLOY.md` 和 `deploy/nginx-websocket.conf`。
 
 ## 6. AI 抽象层与使用原则
@@ -578,7 +585,7 @@ FastAPI 应用（app/main.py）
 
 ## 7. 数据表
 
-`users`（家长/孩子；`settings.method` 是学习方式）· `enrollments`（孩子选的教材包和当前学段）· `events`（学习事件：所有学习证据，掌握度按它重放）· `mastery`（掌握度，带模型指纹）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· 乐园：`arena_ability` / `arena_calib` / `arena_matches` / `arena_answers` / `arena_ledger` / `arena_awards`（贴纸）/ `arena_levels`（闯关）/ `mp_rooms`（联网房间）/ `mp_runs`（联网每关成绩）· `traces`（追根：每次测了什么、根在哪）· `streak_freezes`（补签卡）· `sprint_runs`（冲刺）· `mix_sets`（每门课每天一组混合练习）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
+`users`（家长/孩子；`settings.method` 是学习方式）· `enrollments`（孩子选的教材包和当前学段）· `events`（学习事件：所有学习证据，掌握度按它重放）· `mastery`（掌握度，带模型指纹）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· 乐园：`arena_ability` / `arena_calib` / `arena_matches` / `arena_answers` / `arena_ledger` / `arena_awards`（贴纸）/ `arena_levels`（闯关）/ `mp_rooms`（联网房间，`play` 是正在玩的这一关的存档）/ `mp_runs`（联网每关成绩）· `traces`（追根：每次测了什么、根在哪）· `streak_freezes`（补签卡）· `sprint_runs`（冲刺）· `mix_sets`（每门课每天一组混合练习）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
 
 ## 8. 后续路线
 

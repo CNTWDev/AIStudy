@@ -42,6 +42,13 @@
     });
     return w;
   }
+  function loadWorld(w) {   // 重连：还剩哪些宝石、拉杆在哪边（门、桥、升降台跟着拉杆和按钮自己动）
+    if (!w || !Array.isArray(w.gems)) return;
+    const keep = new Set(w.gems);
+    for (const k of [...Wd.gems.keys()]) if (!keep.has(k)) Wd.gems.delete(k);
+    Wd.got = Math.max(Wd.got, w.got | 0);
+    (w.lv || []).forEach((on, i) => { if (Wd.levers[i]) Wd.levers[i].on = !!on; });
+  }
   const tile = (r, c) => (r < 0 || c < 0 || r >= ROWS || c >= COLS) ? '#' : Wd.g[r][c];
   const solidTile = ch => ch === '#' || ch === 'F' || ch === 'W' || ch === 'G';
 
@@ -338,7 +345,12 @@
       mp = ctx; sh = ctx.sh; fx = new Play.FX(); t = 0; doorT = 0; clockT = 0; ended = false;
       Wd = build(ctx.level); me = spawn(ctx.me.role); peerTrack = new MpNet.Track(100); peerRaw = null;
       const p0 = spawn(ctx.peer.role); peerTrack.push({x: p0.x, y: p0.y, f: 1}); peerRaw = {x: p0.x, y: p0.y};
-      if (ctx.level.tip) mp.toast(ctx.level.tip.split('。')[0], 'good');
+      const rs = ctx.resume;
+      if (rs && rs.world) loadWorld(rs.world);
+      if (rs && rs.me && typeof rs.me.x === 'number') {   // 接着玩：回到原来的位置（倒下着的话等答完题回到安全的地方）
+        Object.assign(me, {x: rs.me.x, y: rs.me.y, safe: rs.me.safe || null, dead: !!rs.me.dead, inv: 1.2});
+      }
+      if (ctx.level.tip && !rs) mp.toast(ctx.level.tip.split('。')[0], 'good');
       ctx.net.off('s', 'gem', 'lever');
       ctx.net.on('s', m => { peerRaw = m; peerTrack.push(m); });
       ctx.net.on('gem', m => { if (Wd.gems.delete(m.k)) { Wd.got++; Play.sfx.play('coin'); } });
@@ -356,5 +368,10 @@
       Play.sfx.play('power');
     },
     end() { ended = true; if (loop) loop.stop(); if (mp) mp.net.stopStreams(); },
+    save: () => me && {x: Math.round(me.x), y: Math.round(me.y), dead: me.dead ? 1 : 0, safe: me.safe && {x: Math.round(me.safe.x), y: Math.round(me.safe.y)}},
+    saveWorld: () => Wd && {gems: [...Wd.gems.keys()], got: Wd.got, lv: Wd.levers.map(l => l.on ? 1 : 0)},
+    loadWorld: w => loadWorld(w),
+    peerView: () => peerRaw && {x: Math.round(peerRaw.x), y: Math.round(peerRaw.y)},
+    loadMe(v) { if (me && v && !me.dead && typeof v.x === 'number') { me.x = v.x; me.y = v.y; me.vx = me.vy = 0; me.inv = 1.2; } },
   });
 })();

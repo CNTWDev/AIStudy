@@ -8,7 +8,17 @@
        begin(ctx) {},                                  // 倒计时结束：开始玩这一关
        end() {},                                       // 这一关结束（过关、失败、有人退出）：停掉循环
        onRevive(info) {},                              // 答够题复活了（info.rescued：被队友救的）
+       save() {},                                      // 我自己的状态（位置、长度、道具……），每 2 秒存到服务器
+       saveWorld() {},                                 // 共享的世界（砖块、豆子、怪兽、宝石……）：开房间的存档用，也发给重连的人
+       loadWorld(w) {},                                // 换成这份世界（重连时）
+       peerView() {},                                  // 我这边看到的队友（位置、长度……）：队友重连时发给他
+       loadMe(v) {},                                   // 队友那边看到的我：重连时用它放回自己（比存档新）
      });
+   刷新页面、换一台设备进来：服务器有这一关的存档（app/arena/mp/rooms.py 的 save_play），begin 时 ctx.resume = {me, world}，
+   游戏据此先还原自己和世界（不要从头开始）。对方还在玩的话，以对方那里的实时状态为准：外壳向对方要一份
+   （need_world → world），换成对方的世界（loadWorld）、按对方看到的我放回自己（loadMe）。存档只在两个人都掉线时兜底，
+   以及只有我自己知道的东西（还欠几道题、倒下几次、泡泡堂的道具）。
+   同一个孩子在两台设备上：后打开的那台问「在这台设备上接着玩吗？」，点了才把原来那台换下来（take）。
    ctx（begin 时给游戏的）：
      ctx.net            连接（MpNet，net.js）：ctx.net.on('s', …)、ctx.net.send({…})
      ctx.me / ctx.peer  {id, name, avatar, role}；ctx.host：我是不是开房间的（共享的东西由他算）
@@ -40,6 +50,8 @@
 
     let lobby = data.lobby, room = null, net = null, peerOn = false, state = 'lobby', page = 0, mapSeen = 0, poll = 0;
     let ctx = null, match = null, quiz = null, playing = 0, t0 = 0, myDeaths = 0, peerDeaths = 0, byeTimer = 0;
+    let saveTimer = 0, otherMe = null, peerPlaying = 0, resuming = false, gone = false;
+    const stageEl = $('.pl-stage');
     const ROLES = Object.fromEntries(G.roles.map(r => [r.id, r]));   // 角色按登记的顺序：第一个用关卡里的 1 号出生点
     const roleOf = r => ROLES[r] || {name: r, icon: ''};
     const lvAt = n => LV[n - 1];
@@ -99,11 +111,25 @@
         if (!ok && why && why !== 'ws') { sh.toast(why, 'warn'); backToLobby(); }
         drawRoomBits();
       };
-      net.on('hello', m => { peerSeen(m); net.send({t: 'here', playing}); refresh(); });
+      net.on('hello', m => {
+        if (m.from === data.me.id) { net.send({t: 'here', playing, self: 1}); return; }   // 我在另一台设备上打开了
+        peerSeen(m); net.send({t: 'here', playing}); if (!playing) refresh();
+      });
       net.on('here', m => {
-        peerSeen(m);
-        if (playing && m.playing !== playing) endOver(`${peerName()}重新进来了，这一关重新开始`, true);
-        else refresh();
+        if (m.from === data.me.id) { if (m.self) otherMe = {playing: m.playing || 0}; return; }
+        peerSeen(m); peerPlaying = m.playing || 0;
+        if (!playing && m.playing && (state === 'room' || state === 'end')) rejoin();   // 对方还在玩：我回到这一关
+        else if (!playing) refresh();
+      });
+      net.on('take', m => { if (m.from === data.me.id) takenAway(); });
+      net.on('need_world', m => {
+        if (isPeer(m) && playing && def.saveWorld) net.send({t: 'world', n: playing, el: +ctx.elapsed().toFixed(1), w: def.saveWorld(), you: def.peerView ? def.peerView() : null});
+      });
+      net.on('world', m => {
+        if (!isPeer(m) || !playing || m.n !== playing || !ctx) return;
+        if (def.loadWorld) def.loadWorld(m.w);
+        if (m.you && def.loadMe) def.loadMe(m.you);
+        if (m.el > ctx.elapsed() + 1) t0 = performance.now() - m.el * 1000;   // 时间跟还在玩的那台对齐
       });
       net.on('bye', m => {
         if (!isPeer(m)) return;
@@ -124,7 +150,7 @@
       net.on('over', m => { if (playing) endOver(m.why, false); });
     }
     const isPeer = m => room && m.from !== data.me.id && room.members.some(x => x.id === m.from);
-    function peerSeen(m) { if (isPeer(m)) { peerOn = true; clearTimeout(byeTimer); } }
+    function peerSeen(m) { if (isPeer(m)) { const was = peerOn; peerOn = true; clearTimeout(byeTimer); if (!was) { drawRoomBits(); hudDraw(); } } }
     const peer = () => room && room.members.find(x => x.id !== data.me.id);
     const peerName = () => (peer() || {}).name || '队友';
     async function refresh() {
@@ -206,29 +232,89 @@
     const fmtS = s => s >= 60 ? `${Math.floor(s / 60)} 分 ${Math.round(s % 60)} 秒` : `${(+s).toFixed(1)} 秒`;
 
     // ---------------------------------------------------------------- 开局
-    async function startLevel(n, seed) {
-      if (playing) return;
+    async function startLevel(n, seed, resume) {
+      if (playing || gone || state === 'take') return;
       Play.sfx.unlock(); Play.sfx.play('click');
-      try { match = await api('/api/arena/start', {game: G.id}); }
+      try { match = resume && resume.match ? {match_id: resume.match} : await api('/api/arena/start', {game: G.id}); }
       catch (e) { sh.toast(e.message, 'warn'); net.send({t: 'cant', why: e.message}); return; }
       playing = n; previewN = n; state = 'play'; over.hidden = true; $('.pl-end').hidden = true;
       net.send({t: 'here', playing});
       if (quiz) quiz.destroy();
-      quiz = new ArenaQuiz({matchId: match.match_id, sticky: true, autoNext: true, onAnswer: onAnswer});
+      quiz = new ArenaQuiz({matchId: match.match_id, sticky: true, autoNext: true, onAnswer: onAnswer, mount: stageEl});
       quiz.el.querySelector('.aq-card').insertAdjacentHTML('afterbegin', '<div class="mp-debt"></div>');
-      myDeaths = 0; peerDeaths = 0;
+      myDeaths = resume ? resume.deaths || 0 : 0; peerDeaths = resume ? resume.peer_deaths || 0 : 0;
       const p = peer(), me = room.members.find(m => m.id === data.me.id);
       ctx = {net, me, peer: p, host: room.host, level: lvAt(n), seed, sh, reviving: false, need: 0, peerNeed: 0,
+             resume: resume ? {me: resume.me || null, world: resume.world || null} : null,
              die, rescue, finish, lose, toast: sh.toast, elapsed: () => t0 ? (performance.now() - t0) / 1000 : 0,
              deaths: () => myDeaths + peerDeaths, roleName: r => roleOf(r).name, roleIndex: r => G.roles.findIndex(x => x.id === r)};
       root.classList.add('playing');
       buildCtrl(); hudDraw();
-      Play.ui.countdown($('.pl-cd'), () => {
+      const go = () => {
         if (playing !== n) return;
-        t0 = performance.now();
+        t0 = performance.now() - (resume ? (resume.el || 0) * 1000 : 0);
         Play.music.start(def.tempo);
         def.begin(ctx);
-      });
+        clearInterval(saveTimer); saveTimer = setInterval(save, 2000); save();
+        if (resume) {
+          net.send({t: 'need_world'});
+          if (resume.need > 0) { ctx.reviving = true; ctx.need = resume.need; net.send({t: 'rv', need: ctx.need}); Play.input.blocked = true; debtText(); hudDraw(); askNow(); }
+          sh.toast('接着玩！', 'good');
+        }
+      };
+      if (resume) go(); else Play.ui.countdown($('.pl-cd'), go);
+    }
+
+    // ---------------------------------------------------------------- 存档、重连、换设备
+    function save(end) {
+      if (!net || !ctx) return;
+      if (end) { net.send({t: 'save', end: 1, n: playing, seed: ctx.seed}); return; }
+      if (!playing) return;
+      const msg = {t: 'save', n: playing, seed: ctx.seed, el: +ctx.elapsed().toFixed(1), need: ctx.need, deaths: myDeaths, match: match && match.match_id};
+      try { msg.me = def.save ? def.save() : null; if (room.host && def.saveWorld) msg.w = def.saveWorld(); } catch (e) { /* 游戏还没准备好 */ }
+      net.send(msg);
+    }
+    addEventListener('pagehide', () => save());
+    document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+    async function rejoin() {   // 回到正在玩的这一关（刷新了、换了设备、对方还在玩）
+      if (resuming || playing || gone) return;
+      resuming = true;
+      try {
+        const r = await (await fetch(`/api/mp/rooms/${room.id}`)).json();
+        if (r.error) { resuming = false; sh.toast(r.error, 'warn'); return backToLobby(); }
+        room = r;
+        if (room.play) await startLevel(room.play.n, room.play.seed, room.play);
+        if (!playing && !gone) showRoom();
+      } catch (e) { /* 等下次 */ }
+      resuming = false;
+    }
+    function askTake(n) {   // 同一个账号在另一台设备上正在玩
+      state = 'take'; over.hidden = false;
+      panel.innerHTML = `<div class="pl-title">📱 换到这台设备？</div>
+        <p>你在另一台设备上正在玩${n ? `第 ${n} 关` : ''}。</p>
+        <button type="button" class="btn lg block pl-go mp-take">在这台设备上接着玩</button>
+        <button type="button" class="btn ghost block mp-keep" style="margin-top:8px">不了，接着用那台玩</button>`;
+      panel.querySelector('.mp-take').onclick = () => {
+        net.send({t: 'take'});
+        panel.innerHTML = '<div class="pl-title">正在换过来…</div>';
+        setTimeout(() => { otherMe = null; state = 'room'; rejoin(); }, 1200);   // 等那台把最后的进度存好
+      };
+      panel.querySelector('.mp-keep').onclick = () => { gone = true; if (net) { net.close(); net = null; } showGone('好的，接着在另一台设备上玩吧。'); };
+    }
+    function takenAway() {   // 我在另一台设备上点了「在这里接着玩」：这台停下来（进度先存好，不算结束）
+      save(); gone = true;
+      if (def.end) def.end();
+      Play.music.stop(); Play.input.blocked = false; Play.input.clear();
+      if (quiz) quiz.stop();
+      clearInterval(saveTimer); root.classList.remove('playing'); sh.ctrl.innerHTML = ''; sh.hud.innerHTML = '';
+      playing = 0; t0 = 0; $('.pl-end').hidden = true;
+      setTimeout(() => { if (net) { net.close(); net = null; } }, 300);
+      showGone('已经换到另一台设备上玩了。');
+    }
+    function showGone(text) {
+      state = 'gone'; over.hidden = false;
+      panel.innerHTML = `<div class="pl-title">👋 ${esc(text)}</div><button type="button" class="btn lg block pl-go mp-here">回到这台设备上玩</button>`;
+      panel.querySelector('.mp-here').onclick = () => location.reload();
     }
 
     // ---------------------------------------------------------------- 倒下答题复活
@@ -238,8 +324,15 @@
       net.send({t: 'rv', need: 1, fresh: true});
       Play.input.clear(); Play.input.blocked = true;
       debtText(); hudDraw();
-      setTimeout(() => { if (ctx && ctx.reviving) quiz.open(); }, 600);
+      setTimeout(askNow, 600);
     }
+    function askNow() {   // 题目盖在游戏画面上，答对之前一直在（关不掉）
+      if (!ctx || !ctx.reviving || !quiz) return;
+      quiz.open();
+      const r = stageEl.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight) stageEl.scrollIntoView({block: 'center', behavior: 'smooth'});
+    }
+    setInterval(() => { if (playing && ctx && ctx.reviving && quiz && !quiz.isOpen) askNow(); }, 1000);   // 万一题目没弹出来
     function onAnswer(res) {
       if (!ctx || !ctx.reviving) return;
       if (res.correct) ctx.need--;
@@ -307,6 +400,7 @@
     }
     function lose(why) { if (!ctx) return; net.send({t: 'over', why}); endOver(why, false, 'lose'); }
     function stopPlay() {
+      save(true); clearInterval(saveTimer);
       if (def.end) def.end();
       Play.music.stop(); Play.input.blocked = false; Play.input.clear();
       if (quiz) { quiz.stop(); }
@@ -383,9 +477,20 @@
     }
 
     // ---------------------------------------------------------------- 打开页面
-    const back = lobby.rooms.find(r => r.mine || r.joined);   // 刷新了页面：回到自己的房间
-    if (back) enter(back.mine ? fetch(`/api/mp/rooms/${back.id}`).then(r => r.json()) : api(`/api/mp/rooms/${back.id}/join`, {}));
-    else showLobby();
+    const back = lobby.rooms.find(r => r.mine || r.joined);   // 刷新了页面 / 换了设备：回到自己的房间，正在玩就接着玩
+    if (back) {
+      panel.innerHTML = '<div class="pl-title">正在回到房间…</div>';
+      (async () => {
+        try { room = await (back.mine ? fetch(`/api/mp/rooms/${back.id}`).then(r => r.json()) : api(`/api/mp/rooms/${back.id}/join`, {})); }
+        catch (e) { sh.toast(e.message, 'warn'); return showLobby(); }
+        if (room.error) return showLobby();
+        connect();
+        await new Promise(r => setTimeout(r, 1200));   // 看看我是不是在另一台设备上开着
+        if (otherMe && otherMe.playing) return askTake(otherMe.playing);
+        if (otherMe) net.send({t: 'take'});
+        if (room.play || peerPlaying) rejoin(); else showRoom();
+      })();
+    } else showLobby();
     if (lobby.locked) $('.pl-start').classList.add('locked');
     return sh;
   };

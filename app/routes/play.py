@@ -117,8 +117,10 @@ def _ws_user(ws: WebSocket, room_id: int):
 
 @router.websocket("/ws/mp/{room_id}")
 async def mp_ws(ws: WebSocket, room_id: int):
-    """房间里的实时消息：服务器只转发（盖上发送人 from），不看内容；每秒最多 60 条，每条最多 2000 字节。
-    进来时告诉别人 hello，断开时告诉别人 bye。页面开着时每 20 秒记一次房间还有人（大厅只显示有人的房间）。"""
+    """房间里的实时消息：服务器只转发（盖上发送人 from），不看内容；每秒最多 60 条，每条最多 6000 字节。
+    例外是存档 {"t": "save"}：记进房间（刷新、换设备后接着玩），不转发。
+    进来时告诉别人 hello，断开时告诉别人 bye。页面开着时每 20 秒记一次房间还有人（大厅只显示有人的房间）。
+    同一个孩子可以有两个连接（两台设备）：别的设备收到 hello 会回 here，新设备据此问要不要接过来（mpshell.js 的 take）。"""
     u, r = await run_in_threadpool(_ws_user, ws, room_id)
     if not u:
         await ws.close(code=4403)
@@ -129,7 +131,7 @@ async def mp_ws(ws: WebSocket, room_id: int):
     await b.join(conn)
     await b.publish(r["id"], conn.id, json.dumps({"t": "hello", "from": u["id"]}))
     last_touch = window = time.monotonic()
-    count = 0
+    count, last_save = 0, 0.0
     try:
         while True:
             text = await ws.receive_text()
@@ -137,7 +139,7 @@ async def mp_ws(ws: WebSocket, room_id: int):
             if now - window > 1:
                 window, count = now, 0
             count += 1
-            if count > 60 or len(text) > mp_bus.MAX_MSG:
+            if count > 60 or len(text) > rooms.MAX_SAVE:
                 continue
             try:
                 msg = json.loads(text)
@@ -149,6 +151,13 @@ async def mp_ws(ws: WebSocket, room_id: int):
                 last_touch = now
                 await run_in_threadpool(rooms.touch, r["id"])
             if msg["t"] == "ping":
+                continue
+            if msg["t"] == "save":   # 存档：服务器记下来，不转发（rooms.save_play）
+                if msg.get("end") or now - last_save >= 0.8:
+                    last_save = now
+                    await run_in_threadpool(rooms.save_play, u["id"], r["id"], msg)
+                continue
+            if len(text) > mp_bus.MAX_MSG:
                 continue
             msg["from"] = u["id"]
             await b.publish(r["id"], conn.id, json.dumps(msg, ensure_ascii=False))

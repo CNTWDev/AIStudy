@@ -6,6 +6,7 @@
    dock：传一个容器元素就变成「常驻」式，一直显示在游戏下方（闪电赛跑、星星守卫：答题就是操作）。
    答对：+经验值、撒花，马上出下一题；答错：冷冻 5 秒（瞎答更久），显示正确答案和思路。
    单词题可以点 🔊 听发音（浏览器自带的朗读）。
+   mount: 元素 —— 弹出式的题目盖在这个元素上（联网游戏：盖在游戏画面上），不传就盖住整个页面。
    sticky: true —— 关不掉（联网游戏倒下后答题复活：没有「回去玩」，点外面、按 Esc 都不关，由游戏答够了再 close(true)）。 */
 class ArenaQuiz {
   constructor(opts) {
@@ -14,12 +15,12 @@ class ArenaQuiz {
     this.base = opts.base || `/api/arena/${opts.matchId}`;
     this.isOpen = this.docked;
     const el = document.createElement('div');
-    el.className = 'aq' + (this.docked ? ' aq-docked' : '');
+    el.className = 'aq' + (this.docked ? ' aq-docked' : opts.mount ? ' aq-over' : '');
     el.hidden = !this.docked;
     el.innerHTML = `<div class="aq-card" role="dialog" aria-label="答题">
       <div class="aq-head"><span class="aq-topic"></span><span class="aq-streak"></span>${this.docked || opts.sticky ? '' : '<button class="aq-x" type="button" aria-label="回去玩">回去玩 ✕</button>'}</div>
       <div class="aq-body"></div></div>`;
-    (opts.dock || document.body).appendChild(el);
+    (opts.dock || opts.mount || document.body).appendChild(el);
     this.el = el; this.body = el.querySelector('.aq-body');
     const x = el.querySelector('.aq-x'); if (x) x.onclick = () => this.close();
     if (!this.docked) el.addEventListener('pointerdown', e => { if (e.target === el) this.close(); });

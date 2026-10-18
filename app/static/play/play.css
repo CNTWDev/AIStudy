@@ -12,14 +12,14 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 .pl-icon{width:40px;height:40px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-size:18px;cursor:pointer}
 .pl-icon.off{opacity:.4;filter:grayscale(1)}
 .pl-stage{position:relative;height:clamp(260px,56vh,540px);border-radius:24px;overflow:hidden;border:3px solid var(--pl-ink);box-shadow:0 6px 0 var(--pl-ink);background:#bfe6ff;touch-action:none}
-.pl-stage>canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.pl-stage>canvas{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;display:block}
 .pl-hud{position:absolute;left:0;right:0;top:0;padding:10px 12px;pointer-events:none;display:flex;gap:10px;align-items:flex-start;z-index:2}
 .pl-toast{position:absolute;left:50%;top:64px;transform:translate(-50%,-10px) scale(.9);opacity:0;background:var(--pl-ink);color:#fff;padding:8px 18px;border-radius:99px;font-weight:800;font-size:16px;pointer-events:none;transition:all .25s cubic-bezier(.2,.9,.3,1.4);white-space:nowrap;z-index:3}
 .pl-toast.on{opacity:1;transform:translate(-50%,0) scale(1)}.pl-toast.warn{background:#ff5d5d}.pl-toast.good{background:var(--pl-mint)}
-.pl-cd{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;pointer-events:none}
+.pl-cd{position:absolute;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;z-index:5;pointer-events:none}
 .pl-cd-n{font-size:96px;font-weight:900;color:#fff;-webkit-text-stroke:6px var(--pl-ink);paint-order:stroke;animation:plcd .7s cubic-bezier(.2,.9,.3,1.4)}
 @keyframes plcd{from{transform:scale(2.2);opacity:0}to{transform:scale(1);opacity:1}}
-.pl-over{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(43,35,64,.35);backdrop-filter:blur(2px);z-index:6;padding:12px;overflow:auto}
+.pl-over{position:absolute;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;background:rgba(43,35,64,.35);backdrop-filter:blur(2px);z-index:6;padding:12px;overflow:auto}
 .pl-panel{background:var(--pl-card);border:3px solid var(--pl-ink);box-shadow:0 6px 0 var(--pl-ink);border-radius:24px;padding:14px 18px;max-width:520px;width:100%;max-height:100%;overflow:auto;text-align:center;animation:plin .35s cubic-bezier(.2,.9,.3,1.3)}
 @keyframes plin{from{transform:translateY(20px) scale(.92);opacity:0}}
 .pl-me{width:56px;height:70px;display:block;margin:-4px auto 0}
@@ -50,7 +50,7 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 .pl-again{background:var(--pl-mint);border-color:var(--pl-ink);border-width:3px;box-shadow:0 4px 0 var(--pl-ink);font-weight:900}
 .pl-big{font-size:60px}
 /* 贴纸弹窗 */
-.pl-sticker-pop{position:fixed;inset:0;background:rgba(43,35,64,.55);display:flex;align-items:center;justify-content:center;z-index:60;padding:16px}
+.pl-sticker-pop{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(43,35,64,.55);display:flex;align-items:center;justify-content:center;z-index:60;padding:16px}
 .pl-sticker-card{background:var(--pl-card);border:3px solid var(--pl-ink);box-shadow:0 6px 0 var(--pl-ink);border-radius:26px;padding:20px;max-width:360px;width:100%;text-align:center;animation:plin .4s cubic-bezier(.2,.9,.3,1.4)}
 .pl-sticker{display:flex;flex-direction:column;align-items:center;margin:6px 0 12px}
 .pl-sticker .ico{font-size:64px;line-height:1.1;animation:plsticker 1s cubic-bezier(.2,.9,.3,1.4)}
@@ -71,8 +71,11 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 /* 常驻答题面板 */
 .pl-dock{min-height:120px}
 /* ===== 答题面板 ===== */
-.aq{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;background:rgba(43,35,64,.25);padding:10px;opacity:0;transition:opacity .2s}
+.aq{position:fixed;top:0;right:0;bottom:0;left:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;background:rgba(43,35,64,.25);padding:10px;opacity:0;transition:opacity .2s}
 .aq.on{opacity:1}
+/* 盖在游戏画面上的（联网游戏倒下答题）：只盖住画面，不管页面滚到哪都跟着画面 */
+.aq.aq-over{position:absolute;z-index:8;align-items:center;padding:8px}
+.aq.aq-over .aq-card{max-height:100%;max-width:480px;padding:10px 14px 12px}
 .aq-card{position:relative;background:var(--pl-card,#fff);border:3px solid var(--pl-ink);box-shadow:0 6px 0 var(--pl-ink);border-radius:26px;padding:12px 16px 16px;width:100%;max-width:520px;max-height:calc(100vh - 20px);overflow:auto;transform:translateY(30px);transition:transform .3s cubic-bezier(.2,.9,.3,1.3),background .3s}
 .aq.on .aq-card{transform:none}
 .aq-card.frozen{background:linear-gradient(180deg,#e3f4ff,#fff)}
