@@ -8,6 +8,7 @@
 - 什么时候能玩：家长选「随时」「做完一半任务」或「做完全部任务」（默认做完一半；今天没有任务就随时能玩）。
 """
 import random
+import time
 from datetime import datetime
 
 from .. import auth, db, explore
@@ -89,17 +90,24 @@ def _ts(s: str) -> datetime:
     return datetime.fromisoformat(s)
 
 
+def paused_seconds(st: dict) -> float:
+    """这一局暂停了多少秒（还在暂停的算到现在）。"""
+    at = st.get("paused_at")
+    return (st.get("paused_s") or 0) + (max(0.0, time.time() - at) if at else 0)
+
+
 def seconds_today(kid_id: int, max_seconds: dict | None = None) -> int:
     day = db.today().isoformat()
     now = _ts(db.now())
     total = 0
-    for m in db.q("SELECT game, started_at, ended_at, seconds FROM arena_matches WHERE user_id=? AND started_at>=?",
+    for m in db.q("SELECT game, started_at, ended_at, seconds, data FROM arena_matches WHERE user_id=? AND started_at>=?",
                   kid_id, day):
         if m["ended_at"]:
             total += m["seconds"] or 0
         else:
             cap = (max_seconds or {}).get(m["game"], 600)
-            total += int(min(cap, max(0, (now - _ts(m["started_at"])).total_seconds())))
+            paused = paused_seconds(db.jload(m["data"], {}) or {})
+            total += int(min(cap, max(0, (now - _ts(m["started_at"])).total_seconds() - paused)))
     return total
 
 

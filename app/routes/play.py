@@ -65,6 +65,11 @@ def arena_answer(request: Request, match_id: int, body: dict = Body(...)):
                         dont_know=bool(body.get("dont_know")))
 
 
+@router.post("/api/arena/{match_id}/pause")
+def arena_pause(request: Request, match_id: int, body: dict = Body(...)):
+    return arena.pause(kid_or_redirect(request), match_id, bool(body.get("on")))
+
+
 @router.post("/api/arena/{match_id}/end")
 def arena_end(request: Request, match_id: int, body: dict = Body(...)):
     return arena.end(kid_or_redirect(request), match_id, str(body.get("result") or ""), body.get("stats") or {})
@@ -89,8 +94,8 @@ def room_create(request: Request, body: dict = Body(...)):
 
 
 @router.get("/api/rooms/{room_id}")
-def room_get(request: Request, room_id: int):
-    return rooms.room_info(kid_or_redirect(request), room_id)
+def room_get(request: Request, room_id: int, world: int = 0):
+    return rooms.room_info(kid_or_redirect(request), room_id, world or None)
 
 
 @router.post("/api/rooms/{room_id}/enter")

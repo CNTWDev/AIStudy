@@ -19,6 +19,17 @@
     })(t0);
   }
 
+  const nick = document.getElementById('bd-nick');   // 还没起昵称：起好就刷新，榜上马上换成新昵称
+  if (nick) nick.addEventListener('submit', async e => {
+    e.preventDefault();
+    const err = nick.querySelector('.bd-nick-err');
+    const r = await fetch('/api/arena/nickname', {method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({nickname: nick.nickname.value})});
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) { err.textContent = d.error || d.detail || '这个昵称不行，换一个试试'; return; }
+    location.reload();
+  });
+
   if (window.BD_PARTY && !still) {
     const box = document.createElement('div'), colors = ['#ffd23f', '#ff6b9a', '#4dc3ff', '#6bdb7a', '#b388ff', '#ff9f1c'];
     box.className = 'bd-confetti';

@@ -214,7 +214,7 @@ def board(kid: dict | None, metric: str = "streak", scope: str = "all", game: st
             "top": top, "mine": mine, "ahead": ahead, "to_top": to_top, "moved": moved, "week": week, "top_n": TOP,
             "on_board": bool(kid) and on_board(kid), "counts": me, "mine_value": me.get(key, 0) if kid else 0,
             "game": game, "games": games(), "is_game": metric in GAME, "is_up": metric in UP,
-            "people": len(ranked), "joined": len(_entries()), "kid": bool(kid)}
+            "people": len(ranked), "joined": len(_entries()), "kid": bool(kid), "me_name": auth.public_name(kid) if kid else ""}
 
 
 def nudge(kid: dict, park: bool = False) -> str:

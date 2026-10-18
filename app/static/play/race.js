@@ -583,6 +583,7 @@
     quiz: 'dock', tempo: 140, rules,
     keys: '电脑键盘：1–4 选答案，Enter 确定',
     setup: boot, ready, begin,
+    pause(on, ms) { if (!on && S && S.wall0) S.wall0 += ms; },   // 暂停的时间不算：起跑时刻往后挪
     onAnswer: res => onAnswer(res), onXP: res => onXP(res),
   });
 })();

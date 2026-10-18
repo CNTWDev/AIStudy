@@ -61,7 +61,7 @@
     const frame = ts => {
       if (!running) return;
       const dt = Math.min(0.1, (ts - last) / 1000 || 0); last = ts;
-      if (!paused) {
+      if (!paused && !Play.frozen) {   // Play.frozen：外壳暂停了整个游戏
         acc += dt;
         let n = 0;
         while (acc >= STEP && n < 6) { update(STEP); acc -= STEP; n++; }
@@ -334,7 +334,9 @@
 
   // ---------------------------------------------------------------- 界面小部件
   Play.ui = {
-    countdown(el, onDone) {   // 3 · 2 · 1 · 开始！
+    countdown(el, onDone, cancel) {   // 3 · 2 · 1 · 开始！（cancel：停掉这个元素上正在倒数的）
+      clearTimeout(el._cd);
+      if (cancel) { el.hidden = true; return; }
       const seq = ['3', '2', '1', '开始！'];
       let i = 0;
       el.hidden = false;
@@ -342,7 +344,7 @@
         if (i >= seq.length) { el.hidden = true; onDone && onDone(); return; }
         el.innerHTML = `<span class="pl-cd-n">${seq[i]}</span>`;
         Play.sfx.play(i === 3 ? 'go' : 'tick');
-        i++; setTimeout(next, i === 4 ? 600 : 700);
+        i++; el._cd = setTimeout(next, i === 4 ? 600 : 700);
       };
       next();
     },

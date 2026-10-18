@@ -2,13 +2,15 @@
    - 自己的角色自己的设备算（走、放泡泡、被困、捡道具、救队友），每秒发 15 次位置；
    - 泡泡什么时候炸、炸到哪、砖块掉什么、怪兽怎么走，都由开房间的设备算，再发给别的设备（'boom'、'w' 消息）；
    - 被泡泡炸到或被怪兽碰到：困在泡泡里。队友跑过来碰一下就救出来（不算倒下），不然答题自救（外壳 shell.js）。
-   - 怪兽全打败，开房间的设备报过关。
+   - 怪兽全打败（有「找星星」任务的关还要把砖块里的 ⭐ 全捡到），开房间的设备报过关。
+   - 地图大小跟着关卡（越往后越大）；铁甲小龙（k）要炸两次；怪兽速度乘关卡的 mspeed。
    - 刷新 / 换设备：存档里有自己（位置、道具、是不是被困着）和地图（炸开的砖块、地上的道具、怪兽、泡泡），接着玩。 */
 (function () {
-  const T = 40, COLS = 17, ROWS = 11, MW = COLS * T, MH = ROWS * T, HB = 14;
+  const T = 40, HB = 14;
+  let COLS = 17, ROWS = 11, MW = COLS * T, MH = ROWS * T;
   const FUSE = 2.6, FLAME = 0.5;
-  const MON = {s: {kind: 'slime', speed: 48}, b: {kind: 'bat', speed: 86}, g: {kind: 'ghost', speed: 44, ghost: true}};
-  const ITEMS = {fire: '🔥', bub: '🫧', shoe: '👟'};
+  const MON = {s: {kind: 'slime', speed: 48}, b: {kind: 'bat', speed: 86}, g: {kind: 'ghost', speed: 44, ghost: true}, k: {kind: 'boss', speed: 40, hp: 2}};
+  const ITEMS = {fire: '🔥', bub: '🫧', shoe: '👟', star: '⭐'};
   const ROLE_COLOR = {red: '#ff5d6c', blue: '#4d8dff', yellow: '#f5b700', green: '#2fbf71'};
   const SCENES = {
     candy: {floor: ['#ffe8f2', '#fff4f9'], wall: '#ff8fbf', wallHi: '#ffc4dd', wallLo: '#d9659a', box: '#c98b55', boxHi: '#e4ad78', ribbon: '#ff5d8f'},
@@ -20,7 +22,7 @@
   };
 
   let sh, mp, loop, fx, g = null, scene = 'candy', bubbles = new Map(), flames = [], items = new Map(), mons = [], monTracks = new Map();
-  let me = null, peers = new Map(), t = 0, clockT = 0, snapT = 0, ended = true, bubN = 0, rng = Math.random, lastDir = null, saveT = 0, winT = 0;
+  let stars = 0, me = null, peers = new Map(), t = 0, clockT = 0, snapT = 0, ended = true, bubN = 0, rng = Math.random, lastDir = null, saveT = 0, winT = 0;
 
   // ---------------------------------------------------------------- 地图
   const key = (r, c) => `${r},${c}`;
@@ -28,13 +30,16 @@
   const ctr = n => n * T + T / 2;
   function build(lv) {
     g = lv.map.map(r => r.split('')); scene = (lv.world && lv.world.scene) || 'candy';
+    ROWS = g.length; COLS = g[0].length; MW = COLS * T; MH = ROWS * T;
+    stars = lv.map.reduce((n, r) => n + r.split('*').length - 1, 0);
+    const sp = lv.mspeed || 1;
     bubbles = new Map(); flames = []; items = new Map(); mons = []; monTracks = new Map();
     const starts = {};
     let id = 0;
     for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
       const ch = g[r][c];
       if ('1234'.includes(ch)) { starts[ch] = {r, c}; g[r][c] = '.'; }
-      if (MON[ch]) { mons.push({id: id++, kind: ch, x: ctr(c), y: ctr(r), dir: [0, 0], alive: true, speed: MON[ch].speed}); g[r][c] = '.'; }
+      if (MON[ch]) { mons.push({id: id++, kind: ch, x: ctr(c), y: ctr(r), dir: [0, 0], alive: true, speed: MON[ch].speed * sp, hp: MON[ch].hp || 1, inv: 0}); g[r][c] = '.'; }
     }
     return starts;
   }
@@ -43,7 +48,7 @@
     if (r < 0 || c < 0 || r >= ROWS || c >= COLS) return true;
     const ch = g[r][c];
     if (ch === '#') return true;
-    if (ch === '+' && !ghost) return true;
+    if ((ch === '+' || ch === '*') && !ghost) return true;
     const b = bubbleAt(r, c);
     return !!(b && !(b.passMe && !ghost));
   }
@@ -83,7 +88,7 @@
     if (!me.trapped) control(dt);
     checkHurt();
     clockT -= dt;
-    if (clockT <= 0) { clockT = 0.25; sh.hudClock(`⏱ ${mp.elapsed().toFixed(0)} 秒 · 👾 ${mons.filter(m => m.alive).length} 只`); }
+    if (clockT <= 0) { clockT = 0.25; sh.hudClock(`⏱ ${mp.elapsed().toFixed(0)} 秒 · 👾 ${mons.filter(m => m.alive).length} 只${stars ? ` · ⭐ ${stars - starsLeft()}/${stars}` : ''}`); }
   }
   function overlapsCell(r, c) {
     return me.x + HB > c * T && me.x - HB < c * T + T && me.y + HB > r * T && me.y - HB < r * T + T;
@@ -111,7 +116,9 @@
       Play.sfx.play('shield'); mp.toast(`你救了${p.info.name}！`, 'good');
     }
   }
+  function starsLeft() { let n = 0; for (const row of g) for (const ch of row) if (ch === '*') n++; for (const it of items.values()) if (it === 'star') n++; return n; }
   function apply(it) {
+    if (it === 'star') { Play.sfx.play('star'); mp.toast(`⭐ 找到一颗星星！还差 ${starsLeft()} 颗`, 'good'); return; }
     if (it === 'fire') me.power = Math.min(6, me.power + 1);
     if (it === 'bub') me.max = Math.min(5, me.max + 1);
     if (it === 'shoe') me.shoe = Math.min(3, me.shoe + 1);
@@ -144,9 +151,9 @@
     if (!w || !w.g || w.g.length !== ROWS) return;
     g = w.g.map(r => r.split(''));
     items = new Map((w.it || []).filter(([, it]) => ITEMS[it]));
-    for (const [id, x, y, alive] of w.m || []) {
+    for (const [id, x, y, alive, hp] of w.m || []) {
       const m = mons.find(o => o.id === id); if (!m) continue;
-      Object.assign(m, {x, y, alive: !!alive, dir: [0, 0], decided: undefined});
+      Object.assign(m, {x, y, alive: !!alive, hp: hp || 1, dir: [0, 0], decided: undefined});
       const tr = monTracks.get(id); if (tr) { tr.clear(); tr.push({x, y}); }
     }
     bubbles = new Map();
@@ -159,15 +166,19 @@
     for (const m of mons) {
       if (!m.alive) continue;
       monMove(m, dt);
-      if (flames.some(f => f.r === cellOf(m.y) && f.c === cellOf(m.x))) {
+      if (m.inv > 0) m.inv -= dt;
+      else if (flames.some(f => f.r === cellOf(m.y) && f.c === cellOf(m.x)) && --m.hp > 0) {   // 铁甲小龙：第一次只掉盔甲
+        m.inv = FLAME + 0.2; Play.sfx.play('hurt');
+        fx.text(m.x, m.y - 20, '再炸一次！', {size: 18, color: '#ff7a00'});
+      } else if (m.hp <= 0) {
         m.alive = false; Play.sfx.play('boom');
         fx.burst(m.x, m.y, {n: 20, colors: ['#b8f2a6', '#fff', '#ffd23f'], speed: 260, shape: 'star', size: 6});
         fx.text(m.x, m.y - 20, '打败！', {size: 20, color: '#ff7a00'});
       }
     }
     snapT -= dt;
-    if (snapT <= 0) { snapT = 0.1; mp.net.send({t: 'w', m: mons.map(m => [m.id, Math.round(m.x), Math.round(m.y), m.alive ? 1 : 0])}); }
-    if (!mons.some(m => m.alive) && !ended) {
+    if (snapT <= 0) { snapT = 0.1; mp.net.send({t: 'w', m: mons.map(m => [m.id, Math.round(m.x), Math.round(m.y), m.alive ? 1 : 0, m.hp])}); }
+    if (!mons.some(m => m.alive) && !starsLeft() && !ended) {
       winT += dt;
       if (winT > 1) { ended = true; mp.finish('win', {score: mons.length}); }
     }
@@ -181,10 +192,10 @@
         const r = b.r + dr * i, c = b.c + dc * i;
         if (g[r][c] === '#') break;
         cells.push([r, c]);
-        if (g[r][c] === '+') {
+        if (g[r][c] === '+' || g[r][c] === '*') {
           if (!blocks.some(x => x[0] === r && x[1] === c)) {
             const roll = rng();
-            blocks.push([r, c, roll < 0.12 ? 'fire' : roll < 0.24 ? 'bub' : roll < 0.33 ? 'shoe' : 0]);
+            blocks.push([r, c, g[r][c] === '*' ? 'star' : roll < 0.12 ? 'fire' : roll < 0.24 ? 'bub' : roll < 0.33 ? 'shoe' : 0]);
           }
           break;
         }
@@ -253,20 +264,29 @@
         c.fillStyle = sc.wallLo; Play.roundRect(c, x + 1, y + 3, T - 2, T - 3, 8); c.fill();
         c.fillStyle = sc.wall; Play.roundRect(c, x + 1, y, T - 2, T - 5, 8); c.fill();
         c.fillStyle = sc.wallHi; Play.roundRect(c, x + 6, y + 4, T - 18, 6, 3); c.fill();
-      } else if (ch === '+') {
+      } else if (ch === '+' || ch === '*') {
         c.fillStyle = sc.box; Play.roundRect(c, x + 3, y + 3, T - 6, T - 6, 5); c.fill();
         c.fillStyle = sc.boxHi; c.fillRect(x + 6, y + 6, T - 12, 4);
         c.fillStyle = sc.ribbon; c.fillRect(x + T / 2 - 3, y + 3, 6, T - 6); c.fillRect(x + 3, y + T / 2 - 3, T - 6, 6);
+        if (ch === '*') {   // 藏着星星的砖块：画一颗一闪一闪的星星
+          c.fillStyle = 'rgba(255,255,255,.9)'; c.beginPath(); c.arc(x + T / 2, y + T / 2, 11, 0, 7); c.fill();
+          star5(c, x + T / 2, y + T / 2 + 0.5, 9 + Math.sin(t * 5 + q) * 1.2); c.fillStyle = '#ffc21a'; c.fill(); c.strokeStyle = '#d98a00'; c.lineWidth = 1.5; c.stroke();
+        }
       }
     }
     // 人和怪兽按上下排序画
     const list = [];
-    for (const m of mons) if (m.alive) list.push({y: m.y, draw: () => Art.monster(c, m.x, m.y + 14, {kind: MON[m.kind].kind, t: t + m.id, scale: 0.5, facing: m.dir[0] > 0 ? 1 : -1})});
+    for (const m of mons) if (m.alive) list.push({y: m.y, draw: () => Art.monster(c, m.x, m.y + 14, {kind: MON[m.kind].kind, t: t + m.id, scale: m.kind === 'k' ? 0.24 : 0.5, hurt: m.hp < (MON[m.kind].hp || 1), facing: m.dir[0] > 0 ? 1 : -1})});
     for (const pr of peers.values()) { const p = pr.track.get(['x', 'y']); if (p) list.push({y: p.y, draw: () => drawPlayer(c, p.x, p.y, pr.info, p.f || 1, p.mv, p.d, false)}); }
     if (me && mp) list.push({y: me.y, draw: () => drawPlayer(c, me.x, me.y, mp.me, me.face, me.mv, me.trapped, true)});
     list.sort((a, b) => a.y - b.y).forEach(o => o.draw());
     fx.draw(c);
     c.restore();
+  }
+  function star5(c, x, y, r) {   // 五角星
+    c.beginPath();
+    for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+    c.closePath();
   }
   function drawItem(c, x, y, it) {
     c.fillStyle = 'rgba(255,255,255,.85)'; c.beginPath(); c.arc(x, y + Math.sin(t * 4) * 2, 14, 0, 7); c.fill();
@@ -307,6 +327,7 @@
     quiz: 'revive', tempo: 132,
     rules: ['2～4 个人一队，在格子地图上<b>放泡泡</b>：泡泡过一会儿炸成十字，炸开砖块、打败怪兽。',
             '砖块里会掉道具：🔥 炸得更远、🫧 多放一个泡泡、👟 跑得更快。',
+            '有的关有任务：带 ⭐ 的砖块里藏着星星，要全捡到；铁甲小龙要炸两次。',
             '被泡泡炸到、被怪兽碰到就会<b>困在泡泡里</b>：队友跑过来碰一下马上救出来！',
             '没人救就答题自救：答对出来；答错多欠一道（最多欠 3 道）；「这题不会」不加。',
             '打败所有怪兽就过关；在目标时间内过关、被困答题不超过 2 次，还能多拿星星。'],
@@ -346,8 +367,9 @@
       net.on('boom', m => { if (!mp.host) applyBoom(m); });
       net.on('w', m => {
         if (mp.host) return;
-        for (const [id, x, y, alive] of m.m) {
+        for (const [id, x, y, alive, hp] of m.m) {
           const mo = mons.find(o => o.id === id); if (!mo) continue;
+          if (hp) mo.hp = hp;
           if (mo.alive && !alive) { fx.burst(mo.x, mo.y, {n: 20, colors: ['#b8f2a6', '#fff', '#ffd23f'], speed: 260, shape: 'star', size: 6}); Play.sfx.play('boom'); }
           mo.alive = !!alive;
           if (!monTracks.has(id)) monTracks.set(id, new MpNet.Track(100));
@@ -374,7 +396,7 @@
     },
     end() { ended = true; if (loop) loop.stop(); if (mp) mp.net.stopStreams(); },
     save: () => me && {x: Math.round(me.x), y: Math.round(me.y), face: me.face, power: me.power, max: me.max, shoe: me.shoe, trapped: me.trapped ? 1 : 0},
-    saveWorld: () => g && {g: g.map(r => r.join('')), it: [...items], m: mons.map(m => [m.id, Math.round(m.x), Math.round(m.y), m.alive ? 1 : 0]),
+    saveWorld: () => g && {g: g.map(r => r.join('')), it: [...items], m: mons.map(m => [m.id, Math.round(m.x), Math.round(m.y), m.alive ? 1 : 0, m.hp]),
                            b: [...bubbles.values()].map(b => [b.id, b.r, b.c, b.p, b.owner, +(mp && mp.host ? b.fuse : FUSE - (t - (b.born || t))).toFixed(2)])},
     loadWorld: w => loadWorld(w),
     peerView: id => { const p = peers.get(id); return p && p.raw && {x: Math.round(p.raw.x), y: Math.round(p.raw.y)}; },
