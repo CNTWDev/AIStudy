@@ -1,40 +1,52 @@
 {% extends "base.html" %}
+{% block title %}排行榜 · {{ SITE }}{% endblock %}
 {% block body %}
-{% if not game %}<a href="/records" class="back">← 记录</a>{% endif %}
-{% set game = b.metric in ('game', 'game_all') %}
-{% if game %}<a href="/arena" class="back">← 乐园</a>{% endif %}
-<div class="ph"><h1>🏆 {{ '乐园榜' if game else '打卡榜' }}</h1></div>
-<p class="muted small" style="margin:4px 0 10px">{% if game %}在乐园的游戏里答对了几道题（只数答对的）。每个人的题都按自己的水平出，比的是肯不肯答题。「本周答对」每周一重新数。{% else %}比的是每天坚持，不比谁做得多、做得对。做完今天的第 1 节就算打卡。{% endif %}</p>
+{% set game = b.is_game %}
+{% set q = '&scope=' ~ b.scope %}
+{% set gi = b.games|selectattr('id', 'equalto', b.game)|first if b.game else None %}
+{% if gi %}<a href="/arena/{{ gi.id }}" class="back">← {{ gi.name }}</a>{% elif game %}<a href="/arena" class="back">← 乐园</a>{% elif viewer_kid %}<a href="/records" class="back">← 记录</a>{% endif %}
+<div class="ph"><h1>🏆 {{ (gi.icon ~ ' ' ~ gi.name ~ '榜') if gi else '乐园榜' if game else '学习榜' }}</h1></div>
+<p class="muted small" style="margin:4px 0 10px">{% if gi %}在{{ gi.name }}里答对了几道题。{% elif game %}在乐园所有游戏里答对了几道题，加在一起算。每款游戏自己的榜在那款游戏里面。{% endif %}{% if game %}每个人的题都按自己的水平出，比的是肯不肯答题，不比关卡和分数。只数答对的。「本周答对」每周一重新数。{% else %}比的是每天坚持，不比谁做得多、做得对。做完今天的第 1 节就算打卡。{% endif %}</p>
 <div class="subnav" style="margin:8px 0">
-{% for m, n in b.metrics.items() if (m in ('game', 'game_all')) == game %}<a class="{{ 'on' if b.metric == m }}" href="/boards?metric={{ m }}&scope={{ b.scope }}">{{ n }}</a>{% endfor %}
+{% for m, n in b.metrics.items() if (m in ('game', 'game_all')) == game %}<a class="{{ 'on' if b.metric == m }}" href="/boards?metric={{ m }}{{ q }}{{ '&game=' ~ b.game if b.game }}">{{ n }}</a>{% endfor %}
 </div>
 <div class="subnav" style="margin:0 0 12px">
-<a class="{{ 'on' if b.scope == 'all' }}" href="/boards?metric={{ b.metric }}&scope=all">🌏 全站</a>
-{% if b.city_ok %}<a class="{{ 'on' if b.scope == 'city' }}" href="/boards?metric={{ b.metric }}&scope=city">📍 {{ b.city }}</a>{% endif %}
+<a class="{{ 'on' if b.scope == 'all' }}" href="/boards?metric={{ b.metric }}&scope=all{{ '&game=' ~ b.game if b.game }}">🌏 全站</a>
+{% if b.city_ok %}<a class="{{ 'on' if b.scope == 'city' }}" href="/boards?metric={{ b.metric }}&scope=city{{ '&game=' ~ b.game if b.game }}">📍 {{ b.city }}</a>{% endif %}
 </div>
 <div class="card board">
 {% for r in b.top %}
   <div class="brow{{ ' me' if r.me }}"><span class="bk">{{ ['🥇','🥈','🥉'][r.rank - 1] if r.rank <= 3 else r.rank }}</span><b class="grow">{{ r.name }}{% if r.me %} <small>（我）</small>{% endif %}</b><span class="bv">{{ r.value }} {{ b.unit }}</span></div>
 {% else %}
-  <div class="empty"><div class="e">🌱</div><b>榜上还没有人</b>打开上榜的小伙伴多了，这里就热闹了。</div>
+  <div class="empty"><div class="e">🌱</div>
+  {% if not b.joined %}<b>榜上还没有人</b>上排行榜要家长打开，默认是关着的。家长在家长页点孩子的「编辑资料」，勾上「上排行榜」就行，榜上只显示昵称。
+  {% elif game %}<b>这{{ '一款游戏' if b.game else '周' if b.metric == 'game' else '里' }}还没有人答对题</b>上榜的 {{ b.joined }} 个小伙伴{{ '这周' if b.metric == 'game' else '' }}还没在{{ '这款游戏' if b.game else '乐园' }}里答对题。去玩一局，你就是第 1 名。
+  {% else %}<b>还没有人打卡</b>上榜的 {{ b.joined }} 个小伙伴还没有打卡的天数。做完今天的第 1 节就上榜了。{% endif %}
+  {% if parent_id and not b.joined %}<p style="margin:10px 0 0"><a class="btn sm" href="/parent">去家长页打开</a></p>{% endif %}
+  </div>
 {% endfor %}
 {% if b.mine and b.mine.rank > b.top|length %}
   <div class="brow gap">⋯</div>
   <div class="brow me"><span class="bk">{{ b.mine.rank }}</span><b class="grow">{{ b.mine.name }} <small>（我）</small></b><span class="bv">{{ b.mine.value }} {{ b.unit }}</span></div>
 {% endif %}
 </div>
+{% if b.kid %}
 <div class="card">
 {% if b.mine %}
-  {% if b.mine.rank == 1 %}<b>🎉 你在第 1 名！</b>{{ '' if game else '每天做完第 1 节，就能一直保持。' }}
+  {% if b.mine.rank == 1 %}<b>🎉 {{ '你' if viewer_kid and viewer_kid.role == 'kid' else viewer_kid.name }}在第 1 名！</b>{{ '' if game else '每天做完第 1 节，就能一直保持。' }}
   {% elif b.ahead %}<b>{% if game %}再答对 {{ b.ahead }} 道，就能超过前面一位。{% else %}再坚持 {{ b.ahead }} 天，就能超过前面一位。{% endif %}</b>
   {% endif %}
 {% elif game %}
-  <b>你这周在乐园答对了 {{ b.counts.game }} 道题，一共答对了 {{ b.counts.game_all }} 道。</b>
+  <b>{% if b.game %}这款游戏{% if b.metric == 'game' %}这周{% endif %}答对了 {{ b.mine_value }} 道。{% else %}这周在乐园答对了 {{ b.counts.game }} 道题，一共答对了 {{ b.counts.game_all }} 道。{% endif %}</b>
 {% elif b.metric == 'streak' and not b.counts.streak %}
-  <b>这个月你已经打卡 {{ b.counts.month }} 天。</b>今天做完第 1 节，连续打卡就从 1 天重新开始。
+  <b>这个月已经打卡 {{ b.counts.month }} 天。</b>今天做完第 1 节，连续打卡就从 1 天重新开始。
 {% else %}
-  <b>你{{ b.metrics[b.metric] }} {{ b.counts[b.metric] }} 天。</b>
+  <b>{{ b.metrics[b.metric] }} {{ b.counts[b.metric] }} 天。</b>
 {% endif %}
-{% if not b.on_board %}<p class="muted small" style="margin:6px 0 0">你还没上榜。想上榜的话，请爸爸妈妈在家长页打开「上排行榜」。榜上只显示你的游戏昵称。</p>{% endif %}
+{% if not b.on_board %}<p class="muted small" style="margin:6px 0 0">{% if parent_id %}{{ viewer_kid.name }}还没上榜。<a href="/parent/kids/{{ viewer_kid.id }}/edit">在「编辑资料」里打开「上排行榜」</a>，榜上只显示昵称。{% else %}你还没上榜。想上榜的话，请爸爸妈妈在家长页打开「上排行榜」。榜上只显示你的游戏昵称。{% endif %}</p>{% endif %}
 </div>
+{% elif parent_id %}
+<p class="muted small">在家长页选一个孩子，就能看到这个孩子的名次。</p>
+{% endif %}
+<p class="muted small">已经上榜的小伙伴：{{ b.joined }} 个。</p>
 {% endblock %}

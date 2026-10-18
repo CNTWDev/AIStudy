@@ -15,6 +15,7 @@
   {% if not readonly %}<a class="buddy {{ 'yay' if all_done }}" href="/settings#mascot" title="换一个小伙伴">{{ mascot_svg(mascot_of(user), 46) }}</a>{% endif %}
   <div class="hi">{{ t.day[5:7]|int }} 月 {{ t.day[8:]|int }} 日 · 星期{{ td.wd if td else '' }}
     <span class="hstat" title="连续学习天数"><span class="flame">🔥</span> 连续 <b>{{ streak }}</b> 天</span>
+    <a class="hstat hlink" href="/boards" title="学习榜：比每天坚持">🏆 学习榜</a>
     <span class="hstat" title="累计得到的星星">⭐ <b>{{ stars }}</b></span>
     {% if day.cards %}<span class="hstat" title="哪天没来得及做完第 1 节，会自动用一张补上，连续天数不断">🧊 <b>{{ day.cards }}</b></span>{% endif %}</div>
   {% if nx %}

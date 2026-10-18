@@ -6,7 +6,7 @@ from fastapi import APIRouter
 from fastapi import Body, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, RedirectResponse
 from starlette.concurrency import run_in_threadpool
-from .. import arena, auth, db, engine, sprint, streak
+from .. import arena, auth, boards, db, engine, sprint, streak
 from ..arena import bus, rooms
 from ..web import (
     kid_or_redirect,
@@ -31,7 +31,7 @@ def arena_game(request: Request, game: str):
     if a["locked"] and not rooms.playing(room):   # 还不能玩：回乐园首页，那里写着为什么、去做任务
         return RedirectResponse("/arena?locked=1", 303)
     return render(request, "arena_game.html", g=g, game=game, a=a, me=rooms.member(k), room=room,
-                  lobby=rooms.lobby(k, game) if g.multi else None)
+                  lobby=rooms.lobby(k, game) if g.multi else None, gb=boards.board(dict(k), "game", "all", game))
 
 
 @router.post("/api/arena/start")

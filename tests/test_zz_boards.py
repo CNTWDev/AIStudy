@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from fastapi.testclient import TestClient
 
-from app import auth, boards, db
+from app import arena, auth, boards, db
 from app.main import app
 
 
@@ -50,6 +50,8 @@ def test_boards():
         names = [x["name"] for x in r["top"]]
         assert names[0] == "火箭" and "甲甲甲" not in names and hidden not in [x["id"] for x in r["top"]]
         assert r["mine"]["value"] == 2 and r["ahead"] == 2   # 第 3 名（广州 3 天），再 2 天超过前面一位
+        r = boards.board(kid, "best")   # 最长连续：断之前连着 6 天
+        assert r["mine"]["value"] == 6 and r["top"][0]["id"] == b
         r = boards.board(kid, "total")
         assert r["top"][0]["id"] == b and r["top"][0]["value"] == 8 and r["mine"]["rank"] == 1
         # 城市榜：杭州上榜的不到 5 个，不开
@@ -68,7 +70,8 @@ def test_boards():
         # 页面：孩子能看；没上榜的孩子看到怎么上榜
         c.post("/login", data={"email": "bd-h@x.com", "password": "secret1"})
         page = c.get("/boards?metric=month").text
-        assert "火箭" in page and "爸爸妈妈" in page and "甲甲甲" not in page
+        assert "火箭" in page and "爸爸妈妈" in page and "甲甲甲" not in page and "学习榜" in page
+        assert "/boards" in c.get("/records").text
 
 
 def test_parent_turns_board_on():
@@ -109,3 +112,33 @@ def test_game_board():
         page = c.get("/boards?metric=game").text
         assert "乐园榜" in page and "本周答对" in page and "一共答对" in page and "连续打卡" not in page
         assert "/boards?metric=game" in c.get("/arena").text
+        # 单款游戏：在那款游戏里答对的才算
+        arena.set_game_unlock(a, "free")
+        mid = db.insert("INSERT INTO arena_matches(user_id, game, mode, started_at) VALUES(?,?,?,?)", a, "bubble", "team", monday + "T08:00:00")
+        for i in range(2):
+            db.run("INSERT INTO arena_answers(user_id, match_id, kp_id, family, level, correct, created_at) VALUES(?,?,?,?,?,?,?)",
+                   a, mid, f"y{i}", "add", 1, 1, monday + "T09:00:00")
+        boards.refresh()
+        r = boards.board(dict(auth.get_user(a)), "game", "all", "bubble")
+        assert r["mine"]["rank"] == 1 and r["mine"]["value"] == 2 and [x["id"] for x in r["top"]] == [a]
+        assert boards.board(dict(auth.get_user(a)), "game")["mine"]["value"] == 5
+        page = c.get("/arena/bubble").text
+        assert "泡泡堂榜" in page and "第 1 名" in page and "/boards?metric=game&game=bubble" in page
+        assert "泡泡堂榜" in c.get("/boards?metric=game&game=bubble").text
+
+
+def test_empty_board_explains_and_admin_can_view():
+    """没人上榜：写明白要家长打开；家长没选孩子、管理员也能看榜。"""
+    with TestClient(app) as c:
+        boards.refresh()
+        pid, k = _family("em")
+        c.cookies.clear()
+        c.post("/login", data={"email": "bd-p-em@x.com", "password": "secret1"})
+        page = c.get("/boards").text
+        assert "学习榜" in page and "上榜的小伙伴" in page and "在家长页选一个孩子" in page
+        assert "家长打开" in page or "上榜的小伙伴" in page
+        auth.create_user("bd-admin@x.com", "secret1", "管理员", "admin")
+        c.cookies.clear()
+        c.post("/login", data={"email": "bd-admin@x.com", "password": "secret1"})
+        r = c.get("/boards?metric=game")
+        assert r.status_code == 200 and "乐园榜" in r.text and pid and k

@@ -657,3 +657,6 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .brow:last-child{border-bottom:0}.brow .bk{width:30px;text-align:center;font-weight:800;font-size:17px}
 .brow .bv{font-weight:800;white-space:nowrap}.brow.me{background:var(--brand-2);border-radius:12px}.brow.gap{justify-content:center;color:var(--muted)}
 .brow small{font-weight:400;color:var(--muted)}
+.board-cta{display:flex;align-items:center;gap:12px;padding:12px 14px;margin:12px 0;border-radius:16px;border:2px solid var(--brand);background:var(--brand-2);color:var(--ink);text-decoration:none}
+.board-cta .i{font-size:28px}.board-cta b{display:block;font-size:16px}.board-cta small{color:var(--muted);font-size:12px}.board-cta .go{font-weight:800;white-space:nowrap}
+.hero .hlink{text-decoration:none}

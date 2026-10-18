@@ -1,23 +1,24 @@
 """打卡榜和乐园榜（docs/DESIGN.md 5.29）：比坚持，不比水平。
 
-- 三个榜：连续打卡天数、本月打卡天数（每月 1 号重新数）、累计打卡天数。打卡沿用 app/streak.py 的规则
+- 学习榜四个：连续打卡天数、最长连续天数、本月打卡天数（每月 1 号重新数）、累计打卡天数。打卡沿用 app/streak.py 的规则
   （做完第 1 节才算；补签卡能保住连续，但补上的那天不加天数）。
 - 两个范围：全站、我所在的城市（家长账号上的 city，「省·市」）。一个城市上榜的孩子少于 CITY_MIN 个就不单独开城市榜，
   免得别人猜出是谁。
 - 只有家长打开了「上排行榜」的孩子才在榜上（users.settings.board，默认不上），榜上只显示昵称（auth.public_name）。
 - 乐园榜「本周答对」：这周（周一起）在乐园所有游戏里答对了几道题。每个人的题都按自己的水平出（app/arena/sources.py），
   预期答对的比例大家一样，比的是肯不肯答题，不是会多少；每周一重新数。还有「一共答对」（从开始玩到现在）。
+  两个都能只看一款游戏（这款游戏里答对几道）。单款游戏也不比关卡、分数、时间。
   只数答对的，不数答了几道：乱点答错不算，刷不上去。
-- 不上榜的孩子也能看榜，只是没有自己的名次。
+- 不上榜的孩子也能看榜，只是没有自己的名次；家长、管理员也能看（同样只看到昵称）。
 - 按分数、正确率、通关数的跨家庭排名不做（比的是年龄和水平，小的孩子永远在后面）。
 """
 import time
-from datetime import timedelta
+from datetime import date, timedelta
 
 from . import auth, db, streak
 
-METRICS = {"streak": "连续打卡", "month": "本月打卡", "total": "累计打卡", "game": "本周答对", "game_all": "一共答对"}
-UNITS = {"streak": "天", "month": "天", "total": "天", "game": "道", "game_all": "道"}
+METRICS = {"streak": "连续打卡", "best": "最长连续", "month": "本月打卡", "total": "累计打卡", "game": "本周答对", "game_all": "一共答对"}
+UNITS = {"streak": "天", "best": "天", "month": "天", "total": "天", "game": "道", "game_all": "道"}
 GAME = ("game", "game_all")   # 乐园榜：只数答对的（乱点刷不上去）
 TOP = 10
 CITY_MIN = 5
@@ -81,13 +82,40 @@ def _monday() -> str:
     return (t - timedelta(days=t.weekday())).isoformat()
 
 
+def _best(counted: dict[str, bool], used: set[str]) -> int:
+    """最长连续：和连续打卡一样数，补签卡补上的日子不断也不加。"""
+    days = sorted(d for d, ok in counted.items() if ok)
+    if not days:
+        return 0
+    d, end = date.fromisoformat(days[0][:10]), db.today()
+    best = n = 0
+    while d <= end:
+        k = d.isoformat()
+        if counted.get(k):
+            n += 1
+            best = max(best, n)
+        elif k not in used:
+            n = 0
+        d += timedelta(days=1)
+    return best
+
+
 def _counts(kid_id: int, today: str, month: str) -> dict:
     counted = streak._days(kid_id)
     days = [d for d, ok in counted.items() if ok]
-    game = db.one("SELECT COALESCE(SUM(CASE WHEN created_at>=? THEN correct ELSE 0 END), 0) AS w, COALESCE(SUM(correct), 0) AS a "
-                  "FROM arena_answers WHERE user_id=?", _monday(), kid_id)
-    return {"streak": streak.streak(kid_id), "month": sum(1 for d in days if d.startswith(month) and d <= today),
-            "total": len(days), "game": int(game["w"] or 0), "game_all": int(game["a"] or 0)}
+    monday = _monday()
+    out = {"streak": streak.streak(kid_id), "best": _best(counted, streak._used(kid_id)),
+           "month": sum(1 for d in days if d.startswith(month) and d <= today), "total": len(days), "game": 0, "game_all": 0}
+    # 乐园：按游戏分开数，加起来就是所有游戏的
+    for r in db.q("SELECT m.game, COALESCE(SUM(CASE WHEN a.created_at>=? THEN a.correct ELSE 0 END), 0) AS w, "
+                  "COALESCE(SUM(a.correct), 0) AS a FROM arena_answers a LEFT JOIN arena_matches m ON m.id=a.match_id "
+                  "WHERE a.user_id=? GROUP BY m.game", monday, kid_id):
+        w, a = int(r["w"] or 0), int(r["a"] or 0)
+        out["game"] += w
+        out["game_all"] += a
+        if r["game"]:
+            out[f"game:{r['game']}"], out[f"game_all:{r['game']}"] = w, a
+    return out
 
 
 def _entries() -> list[dict]:
@@ -112,36 +140,47 @@ def refresh() -> None:
     _cache.clear()
 
 
-def _rank(rows: list[dict], metric: str) -> list[dict]:
+def _rank(rows: list[dict], key: str) -> list[dict]:
     """名次：天数一样名次一样（1、1、3）。0 天的不排。"""
-    rows = sorted((r for r in rows if r[metric] > 0), key=lambda r: (-r[metric], r["id"]))
+    rows = sorted((r for r in rows if r.get(key, 0) > 0), key=lambda r: (-r[key], r["id"]))
     out, prev, rank = [], None, 0
     for i, r in enumerate(rows, 1):
-        if r[metric] != prev:
-            rank, prev = i, r[metric]
-        out.append({"id": r["id"], "name": r["name"], "value": r[metric], "rank": rank})
+        if r[key] != prev:
+            rank, prev = i, r[key]
+        out.append({"id": r["id"], "name": r["name"], "value": r[key], "rank": rank})
     return out
 
 
-def board(kid: dict, metric: str = "streak", scope: str = "all") -> dict:
-    """孩子看的打卡榜：前 TOP 名、我的名次、离前一名还差几天。scope：all 全站 / city 我的城市。"""
+def games() -> list[dict]:
+    """乐园榜能单独看的游戏（玩的时候要答题的都算）。"""
+    from .arena.games import GAMES
+    return [{"id": g.id, "name": g.name, "icon": g.icon} for g in GAMES.values()]
+
+
+def board(kid: dict | None, metric: str = "streak", scope: str = "all", game: str = "") -> dict:
+    """排行榜：前 TOP 名、我的名次、离前一名还差多少。scope：all 全站 / city 我的城市。
+    game：乐园榜只看这一款游戏。kid 为 None：家长、管理员来看，没有「我」。"""
     metric = metric if metric in METRICS else "streak"
+    gids = {g["id"] for g in games()}
+    game = game if metric in GAME and game in gids else ""
+    key = f"{metric}:{game}" if game else metric
     rows = _entries()
-    city = city_of(kid)
+    city = city_of(kid) if kid else ""
     in_city = [r for r in rows if city and r["city"] == city]
     city_ok = len(in_city) >= CITY_MIN
     if scope == "city" and city_ok:
         rows = in_city
     else:
         scope = "all"
-    ranked = _rank(rows, metric)
-    mine = next((r for r in ranked if r["id"] == kid["id"]), None)
+    ranked = _rank(rows, key)
+    mine = next((r for r in ranked if kid and r["id"] == kid["id"]), None)
     ahead = None
     if mine:
         higher = [r["value"] for r in ranked if r["value"] > mine["value"]]
         ahead = min(higher) - mine["value"] + 1 if higher else None
-    me_counts = _counts(kid["id"], db.today().isoformat(), db.today().isoformat()[:7])
-    top = [{**r, "me": r["id"] == kid["id"]} for r in ranked[:TOP]]
+    me_counts = _counts(kid["id"], db.today().isoformat(), db.today().isoformat()[:7]) if kid else {}
+    top = [{**r, "me": bool(kid) and r["id"] == kid["id"]} for r in ranked[:TOP]]
     return {"metric": metric, "metrics": METRICS, "unit": UNITS[metric], "scope": scope, "city": city_label(city), "city_ok": city_ok,
-            "top": top, "mine": mine, "ahead": ahead, "on_board": on_board(kid), "counts": me_counts,
-            "people": len(ranked)}
+            "top": top, "mine": mine, "ahead": ahead, "on_board": bool(kid) and on_board(kid), "counts": me_counts,
+            "mine_value": me_counts.get(key, 0) if kid else 0, "game": game, "games": games(), "is_game": metric in GAME,
+            "people": len(ranked), "joined": len(_entries()), "kid": bool(kid)}

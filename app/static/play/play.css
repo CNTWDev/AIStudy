@@ -234,3 +234,9 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 .ah-wallbox>summary h2::after{content:" ›";color:var(--faint);display:inline-block;transition:transform .2s}.ah-wallbox[open]>summary h2::after{transform:rotate(90deg)}
 .ah-wallbox>summary h2 small{font-size:14px;color:var(--muted);font-weight:600}
 .ah-sec h2{white-space:nowrap}
+.ah-board{background:#fff3c4}.ah-board .i{font-size:24px}
+@media (prefers-color-scheme:dark){.ah-board{background:#4a3d12;color:#fff3c4}}
+.gboard{display:block;margin:14px 0;padding:10px 14px;border:3px solid var(--pl-ink);border-radius:18px;box-shadow:0 4px 0 var(--pl-ink);background:#fff8dc;color:var(--pl-ink);text-decoration:none}
+.gboard .gb-h{display:flex;justify-content:space-between;gap:8px;margin-bottom:4px;font-size:15px}.gboard .gb-h span{font-weight:800;white-space:nowrap}
+.gboard .brow{padding:6px 4px}
+@media (prefers-color-scheme:dark){.gboard{background:#3a3218;color:#fff3c4}}
