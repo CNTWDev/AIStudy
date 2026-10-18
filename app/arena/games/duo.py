@@ -26,7 +26,7 @@ class Duo(Game):
     players, freeze, max_seconds = (2, 2), False, 900   # 谁倒下谁答题：答错不冷冻，改成「多欠一道题」
     roles = {"fire": ("小火苗", "🔥"), "water": ("小水滴", "💧")}
     stars = (("clear", "一起过关"), ("gems", "宝石全拿到"), ("time", "进入目标时间"))
-    worlds = (("森林神殿", "forest"), ("水晶洞穴", "cave"), ("火山之巅", "lava"))
+    worlds = (("森林神殿", "forest"), ("水晶洞穴", "cave"), ("火山之巅", "lava"), ("冰雪宫殿", "ice"))
 
     def check(self, lv, name):
         rows = lv.get("map") or []

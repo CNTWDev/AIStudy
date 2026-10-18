@@ -31,6 +31,10 @@ STICKERS = {
     "boss": ("🐲", "屠龙勇士", "在星星守卫里打败大怪兽"),
     "mp1": ("🫶", "好搭档", "和家里的兄弟姐妹一起打通一关联网游戏"),
     "mp_clean": ("🛟", "一次都没倒下", "联网游戏里两个人谁都没倒下就过关"),
+    "mp_world": ("🗺️", "一起闯过一个世界", "和兄弟姐妹一起打通一款联网游戏的一个世界"),
+    "mp_streak3": ("🤜", "默契三连", "联网游戏连着 3 关都是谁都没倒下就过关"),
+    "mp_quiz": ("🧠", "答题零失误", "过关的这一局，两个人倒下答的题全答对了（至少 3 题）"),
+    "mp_stars": ("🌠", "默契之星", "和同一个搭档在联网游戏里一共拿到 50 颗星"),
     "mp_all": ("🏯", "默契大师", "一款联网游戏的全部关卡一起打通"),
     "done_first": ("✅", "先学后玩", "做完今天全部任务以后来乐园"),
     "days7": ("📅", "坚持一周", "连续学习 7 天"),
@@ -130,6 +134,35 @@ def after_match(kid_id: int, game_keys: list[str], st: dict, status: dict, focus
     if status.get("total") and status.get("done", 0) >= status["total"]:
         keys.append("done_first")
     return give(kid_id, keys + learning_keys(kid_id))
+
+
+def after_run(game, team: str, session_id: int, rep: dict, before: dict, after: dict) -> list[str]:
+    """一起过了一关（联网游戏）：给全队的贴纸。一路上都有：第一次过关、打通一个世界、连着几关没人倒下、
+    倒下答的题全答对、星星攒够、全部打通。比的是「我们」和上次的「我们」。"""
+    if not game.multi:
+        return []
+    keys = ["mp1"]
+    if rep["deaths"] == 0:
+        keys.append("mp_clean")
+        last = db.q("SELECT result, data FROM game_sessions WHERE game=? AND team=? AND ended_at IS NOT NULL AND id<>? "
+                    "ORDER BY id DESC LIMIT 2", game.id, team, session_id)
+        if len(last) == 2 and all(r["result"] == "win" and (db.jload(r["data"], {}) or {}).get("deaths") == 0 for r in last):
+            keys.append("mp_streak3")
+    if after["worlds_done"] > before["worlds_done"]:
+        keys.append("mp_world")
+    answers = [r["correct"] for r in db.q("SELECT a.correct FROM arena_answers a JOIN arena_matches m ON m.id=a.match_id "
+                                          "WHERE m.session_id=?", session_id)]
+    if len(answers) >= 3 and all(answers):
+        keys.append("mp_quiz")
+    from .games import GAMES
+    multi = [g.id for g in GAMES.values() if g.multi]
+    stars = db.one(f"SELECT COALESCE(SUM(stars), 0) AS n FROM game_runs WHERE team=? AND game IN ({','.join('?' * len(multi))})",
+                   team, *multi)["n"]
+    if stars >= 50:
+        keys.append("mp_stars")
+    if after["cleared"] == after["total"]:
+        keys.append("mp_all")
+    return keys
 
 
 def avatar(kid: dict) -> str:

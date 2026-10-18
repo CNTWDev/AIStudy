@@ -207,6 +207,8 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 .pm-arr:disabled{opacity:.3;cursor:default}
 .pm-row{display:flex;align-items:center;justify-content:center;margin:8px 0 6px;padding:10px 6px;border-radius:16px;background:#dff4ff}
 .pm-row.pm-sunset{background:#ffe3c2}.pm-row.pm-candy{background:#ffe0f2}.pm-row.pm-night{background:#d9d6ff}.pm-row.pm-lava{background:#ffd2bf}
+.pm-row.pm-day,.pm-row.pm-forest,.pm-row.pm-jungle{background:#e1f5d6}.pm-row.pm-cave{background:#e6e0ff}.pm-row.pm-desert{background:#fbe8c4}
+.pm-row.pm-snow,.pm-row.pm-ice,.pm-row.pm-cloud{background:#eef4ff}.pm-row.pm-sea{background:#d4f1f4}.pm-row.pm-volcano{background:#ffd2bf}
 .pm-path{flex:1 1 4px;max-width:14px;height:4px;border-radius:2px;background:var(--pl-ink);opacity:.35}
 .pm-lv{flex:none;width:44px;height:52px;border-radius:14px;border:2.5px solid var(--pl-ink);background:#fff;color:var(--pl-ink);font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;box-shadow:0 3px 0 var(--pl-ink);padding:0}
 .pm-lv b{font-size:17px;font-weight:900;line-height:1}.pm-lv span{font-size:10px;color:#e0a000;letter-spacing:-1px;line-height:1}

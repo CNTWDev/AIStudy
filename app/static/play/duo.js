@@ -14,6 +14,7 @@
     forest: {bg: ['#2f4a3a', '#5d7b5a'], stone: '#8d8a6a', edge: '#6d6a4f', moss: '#7fb24a', brick: 'rgba(0,0,0,.08)'},
     cave: {bg: ['#2c2547', '#4b3f78'], stone: '#7c74a6', edge: '#5b5482', moss: '#9fd8ff', brick: 'rgba(0,0,0,.1)'},
     lava: {bg: ['#3a1a1a', '#7a3324'], stone: '#8a6a5a', edge: '#5f463b', moss: '#ffb36b', brick: 'rgba(0,0,0,.12)'},
+    ice: {bg: ['#1f3550', '#4f7ea8'], stone: '#a9c4dc', edge: '#7d9bb8', moss: '#e8f6ff', brick: 'rgba(0,30,60,.08)'},
   };
   const POOL = {F: ['#ff9a3d', '#ff4d2e', '#ffd46b'], W: ['#5ab8ff', '#2f6fdc', '#c9ecff'], G: ['#7be36b', '#2fa04a', '#d4ffb0']};
 

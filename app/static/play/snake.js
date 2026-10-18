@@ -10,6 +10,15 @@
   const AI_COLORS = [['#9b7bff', '#6a4fd8'], ['#ffb347', '#e0832a'], ['#4fc3ff', '#2a8fd0'], ['#ff6b6b', '#d04545'], ['#c0c0c0', '#8a8a8a'], ['#ffd23f', '#d9a800']];
   const FOOD_COLORS = ['#ff6b6b', '#ffd23f', '#7bdff2', '#b8f2a6', '#c3a6ff', '#ff9ff3'];
 
+  // 每个世界一个场景：场地外、场地、格子线、闪闪的小点（星星、雪花、气泡、火星）
+  const SCENES = {
+    day: {out: '#8fd17a', field: '#b8eb9f', grid: 'rgba(0,80,0,.07)'},
+    night: {out: '#1d1f4a', field: '#2a2f6e', grid: 'rgba(255,255,255,.06)', sparkle: '#fff'},
+    desert: {out: '#d9a35b', field: '#f3d39a', grid: 'rgba(120,70,0,.08)'},
+    snow: {out: '#a9c8e6', field: '#eef6ff', grid: 'rgba(40,90,150,.08)', sparkle: '#9fc4ea'},
+    sea: {out: '#145a7a', field: '#1f7fa6', grid: 'rgba(255,255,255,.07)', sparkle: '#bff0ff'},
+    volcano: {out: '#3a1d1d', field: '#5b2b25', grid: 'rgba(255,160,90,.08)', sparkle: '#ffb36b'},
+  };
   let sh, mp, loop, fx, lv = null, t = 0, ended = true, clockT = 0, snapT = 0;
   let me = null, peer = null, foods = new Map(), ais = [], foodN = 0, rng = Math.random, pointer = null, cam = {x: 0, y: 0};
 
@@ -210,8 +219,8 @@
   function render() {
     const st = sh.stage, c = st.ctx;
     st.begin();
-    const night = lv && lv.world && lv.world.scene === 'night';
-    c.fillStyle = night ? '#1d1f4a' : '#8fd17a'; c.fillRect(0, 0, st.W, st.H);
+    const sc = SCENES[lv && lv.world && lv.world.scene] || SCENES.day;
+    c.fillStyle = sc.out; c.fillRect(0, 0, st.W, st.H);
     if (!lv) return;
     const [W, H] = lv.size, focus = me && (me.alive || !peer) ? me : peer || me;
     const k = Math.max(st.W / Math.max(W, 1100), st.H / Math.max(H, 650), 0.62);   // 比例：一屏看得到周围一大片
@@ -220,11 +229,11 @@
     c.save();
     c.translate(st.W / 2 + sx, st.H / 2 + sy); c.scale(k, k); c.translate(-cam.x, -cam.y);
     // 场地
-    c.fillStyle = night ? '#2a2f6e' : '#b8eb9f'; c.fillRect(0, 0, W, H);
-    c.strokeStyle = night ? 'rgba(255,255,255,.06)' : 'rgba(0,80,0,.07)'; c.lineWidth = 2;
+    c.fillStyle = sc.field; c.fillRect(0, 0, W, H);
+    c.strokeStyle = sc.grid; c.lineWidth = 2;
     for (let x = 0; x <= W; x += 60) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, H); c.stroke(); }
     for (let y = 0; y <= H; y += 60) { c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke(); }
-    if (night) { c.fillStyle = '#fff'; for (let i = 0; i < 80; i++) { c.globalAlpha = 0.3 + 0.5 * Math.abs(Math.sin(t + i)); c.fillRect((i * 337) % W, (i * 211) % H, 2, 2); } c.globalAlpha = 1; }
+    if (sc.sparkle) { c.fillStyle = sc.sparkle; for (let i = 0; i < 80; i++) { c.globalAlpha = 0.3 + 0.5 * Math.abs(Math.sin(t + i)); c.fillRect((i * 337) % W, (i * 211) % H, 2, 2); } c.globalAlpha = 1; }
     c.strokeStyle = '#ff6b6b'; c.lineWidth = 8; c.strokeRect(0, 0, W, H);
     for (const f of foods.values()) {
       const r = 3 + f.v * 1.6 + Math.sin(t * 4 + f.id) * 0.8;

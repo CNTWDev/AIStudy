@@ -356,8 +356,14 @@ def finish(kid: dict, room_id, device: str, session_id, result: str, report: dic
                    new_best=win and (a["best"] != b["best"] if g.record else stars > b["stars"]),
                    unlocked=progress.unlock_of(unlocked) if unlocked else None, next=nxt,
                    all_clear=after["cleared"] == after["total"], progress=after)
+        world = g.world_of(n)
+        ws = [w for w in after["worlds"] if w["n"] == world["n"]]
+        if ws and win:   # 这个世界：刚打通了，或者还差几关
+            left = sum(1 for lv in after["levels"] if lv["world"] == world["n"] and not lv["cleared"])
+            out["world"] = {"name": ws[0]["name"], "n": world["n"], "left": left,
+                            "done": after["worlds_done"] > before["worlds_done"]}
         if win:
-            keys = g.run_stickers(rep, before, after)
+            keys = g.run_stickers(rep, before, after) + awards.after_run(g, s["team"], s["id"], rep, before, after)
             out["stickers"] = {uid: awards.give(int(uid), keys) for uid in s["team"].split(",")} if keys else {}
             db.run("UPDATE game_rooms SET level=? WHERE id=?", nxt or n, r["id"])
     sessions.close(s["id"], result, rep["seconds"], stars, {**rep, "checks": checks})

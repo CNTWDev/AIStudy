@@ -22,71 +22,31 @@ def test_levels_load():
         assert g.stars[0][0] == "clear" and len(g.stars) == 3
 
 
-SOLID = set("#FWG")
+def test_duo_levels_solvable():
+    """双人闯关每一关：两个人轮流走、踩按钮、推拉杆、坐升降台，能一起走到门口，每颗宝石都拿得到（tests/duo_solver.py）；
+    越往后越要配合：最后一个世界的关比第一个世界的步数多、换人次数多。"""
+    from duo_solver import solve
+    res = [solve(lv) for lv in games.get("duo").levels]
+    for lv, r in zip(games.get("duo").levels, res):
+        assert r["ok"] and r["gems_ok"], (lv["n"], lv["name"], r)
+    first, last = res[:4], res[-4:]
+    assert min(r["steps"] for r in last) > max(r["steps"] for r in first)
+    assert min(r["switches"] for r in last) > max(r["switches"] for r in first)
+    assert len({tuple(lv["map"]) for lv in games.get("duo").levels}) == len(res)   # 没有重复的地图
 
 
-def _reach(lv, role):
-    """双人闯关：不管机关（门当作开着、桥当作有、升降台两头连通），这个角色能走到哪些格子。
-    跳：最多往上 2 格、往旁边 3 格；不能站在会害死自己的池子上。"""
-    g = lv["map"]
-    R, C = len(g), len(g[0])
-    kill = "WG" if role == "fire" else "FG"
-    floors, lifts = set(), []
-    for o in lv.get("objects", []):
-        if o["k"] == "bridge":
-            floors |= {(o["y"], c) for c in range(o["x"], o["x"] + o["w"])}
-        if o["k"] == "lift":
-            lifts.append(o)
-            floors |= {(row, c) for c in range(o["x"], o["x"] + o["w"]) for row in (o["y"], o["to"])}
-
-    def solid(r, c):
-        return r < 0 or c < 0 or r >= R or c >= C or g[r][c] in SOLID
-
-    def floor(r, c):
-        return solid(r + 1, c) or (r + 1, c) in floors
-
-    def ok(r, c):
-        return not solid(r, c) and floor(r, c) and not (r + 1 < R and g[r + 1][c] in kill and (r + 1, c) not in floors)
-
-    def fall(r, c):
-        while not solid(r, c):
-            if floor(r, c):
-                return (r, c) if ok(r, c) else None
-            r += 1
-        return None
-
-    start = next((r, c) for r in range(R) for c in range(C) if g[r][c] == ("1" if role == "fire" else "2"))
-    seen, todo = {start}, [start]
-    while todo:
-        r, c = todo.pop()
-        nxt = []
-        for d in (-1, 1):
-            if not solid(r, c + d):
-                nxt.append(fall(r, c + d))
-            for k in (1, 2):
-                if any(solid(r - i, c) for i in range(1, k + 1)):
-                    break
-                for i in range(1, 4):
-                    if solid(r - k, c + d * i):
-                        break
-                    nxt.append(fall(r - k, c + d * i))
-        for o in lifts:
-            if o["x"] <= c < o["x"] + o["w"] and r in (o["y"] - 1, o["to"] - 1):
-                nxt.append((o["to"] - 1 if r == o["y"] - 1 else o["y"] - 1, c))
-        for p in nxt:
-            if p and p not in seen:
-                seen.add(p)
-                todo.append(p)
-    return seen
-
-
-def test_duo_levels_reachable():
-    """每一关：火苗能走到自己的门和所有火宝石，水滴也一样（机关要两个人配合，这里只查地形有没有画错）。"""
-    for lv in games.get("duo").levels:
-        for role, door, gem in (("fire", "D", "f"), ("water", "E", "w")):
-            got = _reach(lv, role)
-            want = [(r, c) for r, row in enumerate(lv["map"]) for c, ch in enumerate(row) if ch in (door, gem)]
-            assert all(p in got for p in want), (lv["name"], role, [p for p in want if p not in got])
+def test_generated_levels():
+    """泡泡堂、贪吃蛇：手做的关卡后面由程序生成，每次生成的一样，越往后越难。"""
+    for gid in ("bubble", "snake"):
+        g = games.get(gid)
+        assert len(g.levels) == g.count == 24 == len(g.worlds) * g.per_world   # 一个世界 4 关，每个世界都有场景
+        again = type(g)()
+        assert [lv.get("map") or lv.get("size") for lv in again.levels] == [lv.get("map") or lv.get("size") for lv in g.levels]
+        assert len({lv["name"] for lv in g.levels}) == 24
+    bub = games.get("bubble").levels
+    assert bub[-1]["monsters"] > bub[8]["monsters"] >= bub[7]["monsters"]
+    snk = games.get("snake").levels
+    assert all(a["target"] < b["target"] and a["ai_aggr"] <= b["ai_aggr"] for a, b in zip(snk, snk[1:]))
 
 
 def test_bubble_levels_starts_are_safe():
@@ -181,7 +141,7 @@ def test_rooms_and_finish():
         assert r2["stars"] == 3 and r2["new_best"] and r2["prev_best"] == par + 5
         prog = progress.progress(games.get("duo"), progress.team_key((b, a)))   # 谁先谁后都是同一队
         assert prog["levels"][0]["stars"] == 3 and prog["levels"][0]["best"] == par - 5 and prog["upto"] == 2
-        assert len(prog["worlds"]) == 2   # 8 关只有两个世界有关卡
+        assert len(prog["worlds"]) == 4
         # 没过关也记一局，不扣星星
         play = _start(c, rid, 2)
         assert _finish(c, rid, play, "lose", seconds=40).json()["stars"] == 0
@@ -215,6 +175,38 @@ def test_rooms_and_finish():
         assert c.get(f"/api/rooms/{rid}").json()["host"]
         c.post(f"/api/rooms/{rid}/leave", json=B)
         assert db.one("SELECT status FROM game_rooms WHERE id=?", rid)["status"] == "closed"
+
+
+def _right(it):
+    a = it["answer"]
+    return str(a[0] if isinstance(a, list) else a)
+
+
+def test_team_milestones():
+    """一路上的奖励：每过一关告诉还差几关打通这个世界；连着 3 关没人倒下、打通一个世界、倒下答的题全答对都有贴纸。"""
+    with TestClient(app) as c:
+        _, a, b = _family("m")
+        _login(c, "mp-b-m@x.com")
+        rid = c.post("/api/rooms", json={**B, "game": "snake"}).json()["id"]
+        _login(c, "mp-a-m@x.com")
+        c.post(f"/api/rooms/{rid}/enter", json=A)
+        _login(c, "mp-b-m@x.com")
+        keys = lambda r: {x["key"] for x in r["stickers"][str(a)]}
+        r = _finish(c, rid, _start(c, rid, 1, B), dev=B, seconds=30, deaths=1).json()
+        assert r["world"] == {"name": "草地", "n": 1, "left": 3, "done": False} and "mp_streak3" not in keys(r)
+        r = _finish(c, rid, _start(c, rid, 2, B), dev=B, seconds=30).json()
+        assert "mp_clean" in keys(r) and "mp_streak3" not in keys(r)
+        # 第 3 关：两个人倒下答的 3 道题全答对
+        play = _start(c, rid, 3, B)
+        m = c.post("/api/arena/start", json={"game": "snake", "session": play["session"]}).json()["match_id"]
+        for _ in range(3):
+            q = c.get(f"/api/arena/{m}/q").json()["item"]
+            it = db.jload(db.one("SELECT data FROM arena_matches WHERE id=?", m)["data"], {})["pending"]["item"]
+            assert c.post(f"/api/arena/{m}/a", json={"item_id": q["id"], "answer": _right(it)}).json()["correct"]
+        r = _finish(c, rid, play, dev=B, seconds=30).json()
+        assert "mp_quiz" in keys(r) and "mp_streak3" not in keys(r)   # 第 1 关倒下过：还不算三连
+        r = _finish(c, rid, _start(c, rid, 4, B), dev=B, seconds=30).json()
+        assert {"mp_streak3", "mp_world"} <= keys(r) and r["world"]["done"]
 
 
 def test_devices():
