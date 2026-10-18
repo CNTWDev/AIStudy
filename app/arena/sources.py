@@ -1,7 +1,10 @@
 """游戏的题从哪来：几种「题源」，每种都能按孩子的水平出 20 秒内答得完的短题。
 
+题不让孩子选，每个孩子出自己的题：pick 按这个孩子在学的科目、每个知识点的掌握度（个性化学习系统的记录）
+挑题源和知识点，难度按他自己的 θ 定。一起玩的孩子各答各的题，高中生和小学生一起玩也各自答得上。
+
 一种题源要回答四个问题：
-- weight(kid, ctx)：这个孩子能不能用、混合出题时占多少（0 = 不能用）；
+- weight(kid, ctx)：这个孩子能不能用、出题时占多少（0 = 不能用）；
 - pick(kid, ctx, target, rng)：出一道题，答对概率尽量接近目标；
 - record(kid, item, correct, ...)：答完怎么记进学习记录（掌握度、生词本）；
 - 每道题都带 dim（能力维度，存 θ）、family / level（难度 b 的校准单位）和 p（出题时预测的答对概率，公平看板用）。
@@ -388,28 +391,18 @@ def _reshuffle(it: dict, rng: random.Random) -> dict:
 SOURCES: dict[str, Source] = {s.id: s for s in (MathSource(), WordSource(), BankSource())}
 
 
-def available(kid: dict, ctx: Ctx | None = None) -> list[dict]:
-    """孩子能选的题源（游戏开始前选「出什么题」），第一项是「混合」。"""
+def weights(kid: dict, ctx: Ctx | None = None) -> dict[str, float]:
+    """这个孩子每种题源占多少（0 的不出）。"""
     ctx = ctx or Ctx(kid)
-    out = []
-    for s in SOURCES.values():
-        w = s.weight(kid, ctx)
-        if w > 0:
-            out.append({"id": s.id, "name": s.name, "icon": s.icon, "desc": s.desc, "weight": round(w, 2)})
-    if len(out) > 1:
-        out.insert(0, {"id": "mix", "name": "混合", "icon": "🎲", "desc": "按你在学的科目混着出", "weight": 0})
-    return out
+    return {k: w for k, s in SOURCES.items() if (w := s.weight(kid, ctx)) > 0}
 
 
-def pick(kid: dict, src: str, target: float, rng: random.Random, ctx: Ctx | None = None, mode: str = "game") -> dict:
+def pick(kid: dict, target: float, rng: random.Random, ctx: Ctx | None = None, mode: str = "game") -> dict:
+    """给这个孩子出一道题（游戏、冲刺都用它）：target 是目标答对率；mode = sprint 时也出听音题。"""
     ctx = ctx or Ctx(kid)
     ctx["mode"] = mode
-    if src in SOURCES and SOURCES[src].weight(kid, ctx) > 0:
-        s = SOURCES[src]
-    else:
-        ws = [(s, s.weight(kid, ctx)) for s in SOURCES.values()]
-        ws = [(s, w) for s, w in ws if w > 0] or [(SOURCES["math"], 1.0)]
-        s = rng.choices([s for s, _ in ws], weights=[w for _, w in ws])[0]
+    ws = weights(kid, ctx) or {"math": 1.0}
+    s = SOURCES[rng.choices(list(ws), weights=list(ws.values()))[0]]
     it = s.pick(kid, ctx, min(0.92, target + s.target_shift), rng)
     it["src"] = s.id
     return it
@@ -427,7 +420,7 @@ def key(it: dict) -> str:
     return f"w:{it['word'].lower()}" if it.get("word") else it["id"]
 
 
-def next_item(kid: dict, st: dict, src: str, target: float, rng: random.Random, mode: str = "game") -> dict:
+def next_item(kid: dict, st: dict, target: float, rng: random.Random, mode: str = "game") -> dict:
     """这一次（st 是这次快练 / 这一局的状态，调用方负责存）的下一题。"""
     n = st.get("n", 0)
     st["n"] = n + 1
@@ -438,7 +431,7 @@ def next_item(kid: dict, st: dict, src: str, target: float, rng: random.Random, 
     ctx = Ctx(kid)
     seen = st.setdefault("seen", [])
     for _ in range(PICK_TRIES):
-        it = pick(kid, src, target, rng, ctx, mode)
+        it = pick(kid, target, rng, ctx, mode)
         if key(it) not in seen:
             break
     seen.append(key(it))

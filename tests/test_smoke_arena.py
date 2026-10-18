@@ -107,9 +107,9 @@ def test_match_flow():
         st = arena.status(dict(kid))
         assert st["need"] == (st["total"] + 1) // 2 and not st["unlocked"]
         arena.set_game_unlock(kid["id"], "free")
-        start = c.post("/api/arena/start", json={"game": "stickman", "src": "math"}).json()
+        start = c.post("/api/arena/start", json={"game": "stickman"}).json()
         mid = start["match_id"]
-        assert start["src"] == "math" and start["avatar"] == "mint"
+        assert start["avatar"] == "mint"
 
         q = c.get(f"/api/arena/{mid}/q").json()["item"]
         assert "answer" not in q and q["q"]
@@ -202,8 +202,8 @@ def test_levels_and_avatars_are_deterministic():
         assert not need or need in awards.STICKERS, a
 
 
-def test_word_and_bank_sources():
-    """英语单词题：四个选项、答案在选项里、判分对；能开一局「认单词」并答题、记进生词本。"""
+def test_word_and_bank_sources(monkeypatch):
+    """英语单词题：四个选项、答案在选项里、判分对；学英语的孩子游戏里会出到单词题，答错记进生词本。"""
     with TestClient(app) as c:
         c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
         c.post("/admin/users/create", data={"email": "wp@x.com", "password": "secret1", "name": "单词妈妈", "role": "parent"})
@@ -215,8 +215,10 @@ def test_word_and_bank_sources():
                                           "game_unlock": "free"})
         kid = dict(db.one("SELECT * FROM users WHERE email='wk@x.com'"))
         assert arena.game_unlock(kid) == "free"
-        ids = [x["id"] for x in arena.question_sources(kid)]
-        assert "words" in ids and "math" in ids
+        ws = sources.weights(kid)
+        assert "words" in ws and "math" in ws
+        rng = random.Random(1)
+        assert {sources.pick(kid, 0.75, rng)["src"] for _ in range(40)} >= {"words", "math"}   # 按自己的科目混着出
         src, ctx, rng = sources.SOURCES["words"], sources.Ctx(kid), random.Random(5)
         for _ in range(30):
             it = src.pick(kid, ctx, 0.8, rng)
@@ -231,7 +233,8 @@ def test_word_and_bank_sources():
         c.get("/logout")
 
         c.post("/login", data={"email": "wk@x.com", "password": "secret1"})
-        mid = c.post("/api/arena/start", json={"game": "race", "src": "words"}).json()["match_id"]
+        monkeypatch.setattr(sources, "weights", lambda kid, ctx=None: {"words": 1.0})   # 下面这局只出单词题
+        mid = c.post("/api/arena/start", json={"game": "race"}).json()["match_id"]
         q = c.get(f"/api/arena/{mid}/q").json()["item"]
         it = _pending(mid)
         assert it["src"] == "words" and (it["type"] == "fill" or len(q["options"]) == 4)
@@ -240,7 +243,6 @@ def test_word_and_bank_sources():
         assert db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=?", kid["id"])["n"] >= 1   # 答错的词进生词本
         end = c.post(f"/api/arena/{mid}/end", json={"result": "lose", "stats": {"finish_s": 80}}).json()
         assert end["answered"] == 1
-        assert c.post("/api/arena/start", json={"game": "defense", "src": "nope"}).status_code in (200, 400)
 
 
 def test_focus_index():
