@@ -1,8 +1,11 @@
 {% extends "base.html" %}
+{% from "_admin.html" import admin_nav %}
 {% block body %}
-<p class="small"><a href="/admin?tab=families">← 家庭与账号</a></p>
-<h1>{{ u.name }} <span class="pill">{{ '自学者' if is_self_learner(u) else {'admin': '管理员', 'parent': '家长', 'kid': '孩子'}[u.role] }}</span>
-  {% if u.status == 'disabled' %}<span class="pill st-weak">已停用</span>{% elif u.status == 'pending' %}<span class="pill st-learning">待审批</span>{% elif u.status == 'rejected' %}<span class="pill st-weak">未通过</span>{% endif %}</h1>
+<h1>管理后台</h1>
+{{ admin_nav('selfs' if is_self_learner(u) else 'families') }}
+<p class="small">{% if parent %}<a href="/admin/families/{{ parent.id }}">← {{ parent.name }} 家</a>{% elif is_self_learner(u) %}<a href="/admin?tab=selfs">← 全部自学者</a>{% elif u.role == 'parent' %}<a href="/admin/families/{{ u.id }}">← {{ u.name }} 家</a>{% else %}<a href="/admin?tab=families">← 全部家庭</a>{% endif %}</p>
+<h2>{{ u.name }} <span class="pill">{{ '自学者' if is_self_learner(u) else {'admin': '管理员', 'parent': '家长', 'kid': '孩子'}[u.role] }}</span>
+  {% if u.status == 'disabled' %}<span class="pill st-weak">已停用</span>{% elif u.status == 'pending' %}<span class="pill st-learning">待审批</span>{% elif u.status == 'rejected' %}<span class="pill st-weak">未通过</span>{% endif %}</h2>
 {% if msg %}<div class="hint">{{ msg }}{% if link %}<br><input type="text" readonly value="{{ link }}" onclick="this.select()" style="margin-top:6px">{% endif %}</div>{% endif %}
 <p class="muted small">注册 {{ u.created_at[:10] }}{% if inviter %} · 由 {{ inviter.name }}（{{ inviter.email }}）邀请{% endif %}
   {% if parent %} · 家长：<a href="/admin/users/{{ parent.id }}">{{ parent.name }}</a>{% endif %}</p>
@@ -18,6 +21,26 @@
 </form>
 
 {% include "_account_security.html" %}
+
+{% if u.role == 'kid' %}
+<form class="card" method="post" action="/admin/users/{{ u.id }}/family"
+      onsubmit="return confirm(this.elements.to.value === 'self' ? '改为自学者后，家长就看不到也管不了这个账号了。确定？' : '换到这个家庭后，新家长能看到并管理这个账号，原来的家长就看不到了。确定？')">
+  <h3>所属家庭</h3>
+  <p class="small">现在：{% if parent %}<a href="/admin/families/{{ parent.id }}">{{ parent.name }} 家</a>（{{ parent.email }}）{% else %}自学者，没有家长{% endif %}</p>
+  <p class="muted small">可以把这个学习账号挂到另一个家庭，或改为自学者。学习记录、错题、坚持天数、游戏进度、隐私设置都跟着账号走，登录邮箱和密码不变；
+    新家长立刻能看到并管理，原来的家长看不到了；正在联网房间里的会先退出。每次调整都记在安全日志里。</p>
+  {% if parent and not is_adult(u.grade) %}<div class="hint">这是{{ stage_label(u.grade) }}的孩子。改为自学者等于去掉家长监护，课程和每天时长都由孩子自己设，请先和家长确认。</div>{% endif %}
+  <div class="row">
+    <div class="grow"><label>调整为</label><select name="to" required>
+      <option value="">选一个…</option>
+      {% if parent %}<option value="self">自学者（没有家长）</option>{% endif %}
+      {% for f in families if not parent or f.id != parent.id %}<option value="{{ f.id }}">{{ f.name }} 家（{{ f.email }}）</option>{% endfor %}
+    </select></div>
+    <div class="grow"><label>输入账号名字「{{ u.name }}」确认</label><input type="text" name="confirm" required autocomplete="off"></div>
+  </div>
+  <div style="margin-top:12px"><button class="btn">调整</button></div>
+</form>
+{% endif %}
 
 <div class="card">
   <h3>账号状态</h3>

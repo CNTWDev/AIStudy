@@ -1,7 +1,9 @@
 {% extends "base.html" %}
+{% from "_admin.html" import admin_nav %}
 {% block body %}
-<a href="/admin?tab=system" class="small">← 管理</a>
-<h1>📰 每日新闻</h1>
+<h1>管理后台</h1>
+{{ admin_nav('news') }}
+<h2>📰 每日新闻</h2>
 {% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
 <p class="muted small">每天早上 {{ hour }} 点以后，后台从下面的新闻源里抓最近一两天的新闻，由 AI 当编辑给小学、中学各选一条，
 再按孩子的级别改写成英文短文（每个级别写一次，所有孩子共用）。孩子读的是改写稿，页面上写明来源并给原文链接；

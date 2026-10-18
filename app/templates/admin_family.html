@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% from "_admin.html" import admin_nav, status_pill with context %}
+{% block body %}
+<h1>管理后台</h1>
+{{ admin_nav('families') }}
+<p class="small"><a href="/admin?tab=families">← 全部家庭</a></p>
+{% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
+
+<div class="card">
+  <div class="row">
+    <div class="grow grow-w"><h2 style="margin:0">{{ p.name }} 家 {{ status_pill(p) }}</h2>
+      <div class="muted small">家长账号 {{ p.email }} · 注册 {{ p.created_at[:10] }} · 最近活动 {{ (p.last_active_at or p.last_login_at or '—')[:10] }}
+        {% if inviter %} · 由 {{ inviter.name }} 邀请{% endif %} · 城市 {{ city or '未填' }}</div></div>
+    <div class="small">
+      <a class="btn ghost sm" href="/admin/users/{{ p.id }}">家长账号管理</a>
+      {% if p.id != me.id and p.status == 'active' %}<form method="post" action="/admin/users/{{ p.id }}/admin" style="display:inline"><input type="hidden" name="on" value="{{ '' if p.is_admin else '1' }}"><input type="hidden" name="back" value="family"><button class="btn ghost sm">{{ '取消管理员' if p.is_admin else '设为管理员' }}</button></form>{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">孩子（{{ kids|length }}）</h3>
+  {% if kids %}
+  <div class="tw"><table>
+    <tr><th>孩子</th><th>年级 / 课程</th><th>今天</th><th>坚持</th><th>本周</th><th>待复习 / 生词</th><th>薄弱点</th><th>系统发现</th><th></th></tr>
+    {% for k in kids %}
+    <tr>
+      <td class="nw"><b><a href="/admin/users/{{ k.u.id }}">{{ k.u.name }}</a></b> {{ status_pill(k.u) }}<div class="muted small">{{ k.u.email }}</div></td>
+      <td class="small">{{ stage_label(k.u.grade) }}<br><span class="muted">{% for c in k.packs %}{{ c.pack.subject_name }}{{ '、' if not loop.last }}{% else %}未选教材{% endfor %}</span></td>
+      <td class="small nw">{{ k.today_done }}/{{ k.today.plan|length }} 项<br><span class="muted">{{ k.today.minutes }} 分钟</span></td>
+      <td class="small nw">连续 {{ k.streak }} 天</td>
+      <td class="small nw">{{ k.week_days }} 天<br><span class="muted">{{ k.week_min }} 分钟</span></td>
+      <td class="small nw">{{ k.due }} / {{ k.words }}</td>
+      <td class="small tx">{{ k.weak_n }}{% if k.weak %}<br><span class="muted">{{ k.weak[0].name }}</span>{% endif %}</td>
+      <td class="small tx">{% for i in k.insights[:2] %}<div>🔍 {{ i.title }}</div>{% else %}<span class="muted">—</span>{% endfor %}</td>
+      <td class="small nw"><a href="/admin/kids/{{ k.u.id }}">学习报告</a></td>
+    </tr>
+    {% endfor %}
+  </table></div>
+  {% else %}<p class="muted small">还没有添加孩子。</p>{% endif %}
+</div>
+
+{% if kids %}
+<div class="card">
+  <h3 style="margin-top:0">家长定的规矩</h3>
+  <p class="muted small">这些由家长在家长页「编辑资料」里设，这里只看不改。</p>
+  <div class="tw"><table class="small">
+    <tr><th>孩子</th><th>昵称</th><th>每天游戏</th><th>什么时候能玩</th><th>公开房间</th><th>上排行榜</th></tr>
+    {% for k in kids %}{% set gm = game_minutes(k.u) %}
+    <tr><td class="nw">{{ k.u.name }}</td><td class="nw">{{ k.u.nickname or '—' }}</td>
+      <td class="nw">{{ '不玩' if gm == 0 else ('不限时' if gm < 0 else gm ~ ' 分钟') }}</td>
+      <td class="tx">{{ UNLOCK_CHOICES[game_unlock(k.u)] }}</td>
+      <td class="nw">{{ '可以进' if public_rooms(k.u) else '关闭' }}</td>
+      <td class="nw">{{ '上榜' if on_board(k.u) else '不上' }}</td></tr>
+    {% endfor %}
+  </table></div>
+</div>
+{% endif %}
+{% endblock %}
