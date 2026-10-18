@@ -81,6 +81,21 @@ def public_name(user: dict) -> str:
     return (user.get("nickname") or "").strip() or f"小玩家{user['id']}"
 
 
+def is_private(user: dict) -> bool:
+    """隐私模式（家长在孩子资料里打开，默认关）：不上任何排行榜，不进全站的公开房间（家里的、用密码约好的房间照样能进）。
+    以前家长单独关过「公开房间」的，也算打开了隐私模式。"""
+    st = db.jload(user.get("settings"), {}) or {}
+    return bool(st.get("private", st.get("public_rooms") is False))
+
+
+def set_private(user_id: int, on: bool) -> None:
+    u = db.one("SELECT settings FROM users WHERE id=?", user_id)
+    st = db.jload(u["settings"], {}) if u else {}
+    st["private"] = bool(on)
+    st.pop("public_rooms", None)
+    db.run("UPDATE users SET settings=? WHERE id=?", db.jdump(st), user_id)
+
+
 def _sha(s: str) -> str:
     return hashlib.sha256(s.encode()).hexdigest()
 

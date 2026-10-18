@@ -658,3 +658,10 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .brow:last-child{border-bottom:0}.brow .bk{width:30px;text-align:center;font-weight:800;font-size:17px}
 .brow .bv{font-weight:800;white-space:nowrap}.brow.me{background:var(--brand-2);border-radius:12px}.brow.gap{justify-content:center;color:var(--muted)}
 .brow small{font-weight:400;color:var(--muted)}
+.hero .hlink{text-decoration:none}
+.goals{margin:6px 0 0;padding-left:20px}.goals li{margin:3px 0}
+/* 今天页上的一条：学习榜离下一个目标还差多少 */
+.bd-strip{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 14px;border-radius:18px;border:3px solid #2b2340;box-shadow:0 4px 0 #2b2340;background:linear-gradient(135deg,#fff1c1,#ffe0ef);color:#3a2a00;text-decoration:none;font-weight:800}
+.bd-strip .i{font-size:26px;animation:bdbob 1.6s ease-in-out infinite}.bd-strip .go{margin-left:auto;font-weight:900;white-space:nowrap}
+@media (prefers-color-scheme:dark){.bd-strip{background:linear-gradient(135deg,#4a3d12,#3a2540);color:#fff3c4}}
+@keyframes bdbob{50%{transform:translateY(-5px) rotate(-6deg)}}

@@ -15,6 +15,7 @@
   {% if not readonly %}<a class="buddy {{ 'yay' if all_done }}" href="/settings#mascot" title="换一个小伙伴">{{ mascot_svg(mascot_of(user), 46) }}</a>{% endif %}
   <div class="hi">{{ t.day[5:7]|int }} 月 {{ t.day[8:]|int }} 日 · 星期{{ td.wd if td else '' }}
     <span class="hstat" title="连续学习天数"><span class="flame">🔥</span> 连续 <b>{{ streak }}</b> 天</span>
+    <a class="hstat hlink" href="/boards" title="学习榜：比每天坚持">🏆 学习榜</a>
     <span class="hstat" title="累计得到的星星">⭐ <b>{{ stars }}</b></span>
     {% if day.cards %}<span class="hstat" title="哪天没来得及做完第 1 节，会自动用一张补上，连续天数不断">🧊 <b>{{ day.cards }}</b></span>{% endif %}</div>
   {% if nx %}
@@ -41,6 +42,7 @@
   <div class="base-line {{ 'ok' if day.base }}">{% if day.base %}🛡️ 连续天数保住啦{% elif day.sections|length > 1 %}🛡️ 做完第 1 节就保住连续天数{% else %}🛡️ 做完第 1 项就保住连续天数{% endif %}</div>
   {% else %}<div class="base-line">🛡️ 今天学满 10 分钟就保住连续天数</div>{% endif %}
 </div>
+{% if board_tip and not readonly %}<a class="bd-strip" href="/boards"><span class="i">🏆</span><span>{{ board_tip }}</span><span class="go">学习榜 ›</span></a>{% endif %}
 
 {% if settled.used %}<div class="note-bar ice">🧊 {{ '昨天' if settled.used|length == 1 else '前几天' }}没做完第 1 节，自动用了 {{ settled.used|length }} 张补签卡，连续 {{ streak }} 天保住了！今天做完第 1 节就能接着往上涨。</div>{% endif %}
 {% if settled.earned %}<div class="note-bar ice">🧊 连续 {{ streak }} 天！得到 1 张补签卡。哪天状态不好没做完第 1 节，它会帮你保住连续天数。</div>{% endif %}

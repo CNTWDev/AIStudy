@@ -45,13 +45,12 @@
   <h3 style="margin-top:0">家长定的规矩</h3>
   <p class="muted small">这些由家长在家长页「编辑资料」里设，这里只看不改。</p>
   <div class="tw"><table class="small">
-    <tr><th>孩子</th><th>昵称</th><th>每天游戏</th><th>什么时候能玩</th><th>公开房间</th><th>上排行榜</th></tr>
+    <tr><th>孩子</th><th>昵称</th><th>每天游戏</th><th>什么时候能玩</th><th>隐私模式</th></tr>
     {% for k in kids %}{% set gm = game_minutes(k.u) %}
     <tr><td class="nw">{{ k.u.name }}</td><td class="nw">{{ k.u.nickname or '—' }}</td>
       <td class="nw">{{ '不玩' if gm == 0 else ('不限时' if gm < 0 else gm ~ ' 分钟') }}</td>
       <td class="tx">{{ UNLOCK_CHOICES[game_unlock(k.u)] }}</td>
-      <td class="nw">{{ '可以进' if public_rooms(k.u) else '关闭' }}</td>
-      <td class="nw">{{ '上榜' if on_board(k.u) else '不上' }}</td></tr>
+      <td class="nw">{{ '打开（不上榜、不进公开房间）' if is_private(k.u) else '关（上榜、能进公开房间）' }}</td></tr>
     {% endfor %}
   </table></div>
 </div>

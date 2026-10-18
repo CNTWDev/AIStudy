@@ -30,7 +30,7 @@ templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
-                             stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock, public_rooms=arena.public_rooms, on_board=boards.on_board, PROVINCES=boards.PROVINCES, city_label=boards.city_label,
+                             stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock, is_private=auth.is_private, PROVINCES=boards.PROVINCES, city_label=boards.city_label,
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES,
                              trend_words=records.trend_words, tts_info=tts_web.client_info, qview=itemtypes.view,
                              qfig=figures.present)
@@ -339,7 +339,7 @@ def _save_learning(kid_id: int, form, grade: str, old_grade, games: bool = True)
     if games and form.get("game_unlock"):
         arena.set_game_unlock(kid_id, form.get("game_unlock"))
     if games and form.get("game_minutes") is not None:
-        arena.set_public_rooms(kid_id, bool(form.get("public_rooms")))
+        auth.set_private(kid_id, bool(form.get("private")))
         nick = (form.get("nickname") or "").strip()
         k = db.one("SELECT * FROM users WHERE id=?", kid_id)
         if nick and nick != (k["nickname"] or ""):
@@ -347,7 +347,6 @@ def _save_learning(kid_id: int, form, grade: str, old_grade, games: bool = True)
                 auth.set_nickname(dict(k), nick)
             except ValueError as e:
                 raise HTTPException(400, str(e))
-        boards.set_on_board(kid_id, bool(form.get("board")))
         if k["parent_id"] and form.get("province") is not None:
             boards.set_city(k["parent_id"], form.get("province") or "", form.get("city") or "")
     old = {e["pack_id"]: e["stage"] for e in enrollments(kid_id)}
