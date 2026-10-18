@@ -161,6 +161,12 @@ def test_match_flow():
         c.post("/login", data={"email": "gk@x.com", "password": "secret1"})
         r = c.post("/api/arena/start", json={"game": "stickman"})
         assert r.status_code == 403 and "家长" in r.json()["error"]
+        # 不能玩的时候：游戏卡片点不进去，直接打开游戏页面回到乐园首页（那里写着为什么）
+        hub = c.get("/arena").text
+        assert 'href="/arena/stickman"' not in hub and "data-locked" in hub and "家长设置了暂时不玩游戏" in hub
+        r = c.get("/arena/stickman", follow_redirects=False)
+        assert r.status_code == 303 and r.headers["location"] == "/arena?locked=1"
+        assert "ah-lock shake" in c.get("/arena?locked=1").text
         c.get("/logout")
 
         # 管理后台的公平看板

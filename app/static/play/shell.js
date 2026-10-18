@@ -110,7 +110,12 @@
     // ---------------------------------------------------------------- 进房间（打开页面、加入、刷新、换设备）
     async function enter(p) {
       Play.sfx.unlock();
-      try { room = await p; } catch (e) { sh.toast(e.message, 'warn'); if (multi && !room) showLobby(); return; }
+      try { room = await p; } catch (e) {
+        sh.toast(e.message, 'warn');
+        if (multi && !room) showLobby();
+        else if (!room) panel.innerHTML += `<p class="pl-locked">${esc(e.message || '没打开，过一会儿再试试。')}</p><a class="btn block" href="/arena">回乐园</a>`;
+        return;
+      }
       clearInterval(poll);
       if (room.elsewhere) return askTake(room.elsewhere);
       afterEnter();
@@ -260,7 +265,9 @@
         `<button type="button" class="pl-src${s.id === sh.src ? ' on' : ''}" data-src="${s.id}" title="${esc(s.desc)}"><span>${s.icon}</span>${esc(s.name)}</button>`).join('')}</div>`;
       if (room.host) h += `<button type="button" class="btn lg block pl-go mp-start">${LV.length ? `开始第 ${room.level} 关！` : '开始！'}<small>（今天还能玩 ${Math.floor((data.left || 0) / 60)} 分钟）</small></button>`;
       else h += `<p class="mp-note">等 <b>${esc(nameOf(room.members.find(m => m.host).id))}</b> 选关、点开始。</p>`;
-      h += `<p class="pl-locked">${locked ? esc(multi ? `${locked.name}：${locked.locked}` : locked.locked) : ''}</p>` + rulesHtml();
+      h += `<p class="pl-locked">${locked ? esc(multi ? `${locked.name}：${locked.locked}` : locked.locked) : ''}</p>`;
+      if (locked && locked.id === me0.id && data.need) h += `<a class="btn block" href="/today">去做任务</a>`;
+      h += rulesHtml();
       if (multi) h += `<div class="mp-foot"><button type="button" class="btn sm ghost mp-leave">退出房间</button></div>`;
       panel.innerHTML = h;
       faces(panel); drawRoomBits();

@@ -2,11 +2,11 @@
 {% block title %}{{ g.name }} · {{ SITE }}{% endblock %}
 {% block body %}
 {# 所有游戏一个页面（单机、联网都一样）：外壳 shell.js，联网连接 net.js，玩法 <游戏>.js；服务器 app/arena/（rooms.py、games/） #}
-<link rel="stylesheet" href="/static/play/play.css">
-<link rel="stylesheet" href="/static/play/mp.css">
-{% if g.css %}<link rel="stylesheet" href="/static/play/{{ game }}.css">{% endif %}
+<link rel="stylesheet" href="/static/play/play.css?v={{ ASSET_V }}">
+<link rel="stylesheet" href="/static/play/mp.css?v={{ ASSET_V }}">
+{% if g.css %}<link rel="stylesheet" href="/static/play/{{ game }}.css?v={{ ASSET_V }}">{% endif %}
 {% set info = {'game': g.describe(), 'me': me, 'room': room, 'lobby': lobby, 'sources': a.sources, 'avatar': a.avatar, 'left': a.status.left,
-               'locked': a.locked, 'ghost': a.ghost, 'level': a.level.level} %}
+               'locked': a.locked, 'need': a.status.need, 'ghost': a.ghost, 'level': a.level.level} %}
 <div id="pl" class="pl pl-{{ game }}{{ ' pl-mp' if g.multi }}" data-info='{{ info|tojson }}'>
   <div class="pl-top">
     <a href="/arena" class="pl-back" aria-label="回乐园">‹</a>
@@ -25,10 +25,10 @@
   <div class="pl-ctrl"></div>
   <div class="pl-dock" hidden></div>
 </div>
-<script src="/static/play/engine.js"></script>
-<script src="/static/play/art.js"></script>
-<script src="/static/play/quiz.js"></script>
-{% if g.multi %}<script src="/static/play/net.js"></script>{% endif %}
-<script src="/static/play/shell.js"></script>
-<script src="/static/play/{{ game }}.js"></script>
+<script src="/static/play/engine.js?v={{ ASSET_V }}"></script>
+<script src="/static/play/art.js?v={{ ASSET_V }}"></script>
+<script src="/static/play/quiz.js?v={{ ASSET_V }}"></script>
+{% if g.multi %}<script src="/static/play/net.js?v={{ ASSET_V }}"></script>{% endif %}
+<script src="/static/play/shell.js?v={{ ASSET_V }}"></script>
+<script src="/static/play/{{ game }}.js?v={{ ASSET_V }}"></script>
 {% endblock %}
