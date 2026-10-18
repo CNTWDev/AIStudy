@@ -10,6 +10,7 @@ from ..web import (
     _records_ctx,
     _save_learning,
     account_action,
+    adult_brief,
     catalog,
     course_choices,
     enrollments,
@@ -26,7 +27,8 @@ router = APIRouter()
 def parent_home(request: Request):
     p = auth.require_parent(request)
     request.session.pop("as_kid", None)
-    kids = [kid_brief(k) for k in db.q("SELECT * FROM users WHERE parent_id=? ORDER BY id", p["id"])]
+    kids = [adult_brief(k) if auth.self_managed(k) else kid_brief(k)
+            for k in db.q("SELECT * FROM users WHERE parent_id=? ORDER BY id", p["id"])]
     return render(request, "parent.html", kids=kids)
 
 
@@ -40,14 +42,14 @@ def kid_new_page(request: Request):
 @router.get("/parent/kids/{kid_id}/edit", response_class=HTMLResponse)
 def kid_edit_page(request: Request, kid_id: int):
     p = auth.require_parent(request)
-    k = auth.kid_of(p, kid_id)
+    k = auth.kid_of(p, kid_id, account_only=True)
     return _kid_form(request, k)
 
 
 @router.post("/parent/kids/{kid_id}/account")
 async def kid_account(request: Request, kid_id: int):
     p = auth.require_parent(request)
-    k = auth.kid_of(p, kid_id)
+    k = auth.kid_of(p, kid_id, account_only=True)
     res = account_action(request, p, k, await request.form())
     return _kid_form(request, auth.get_user(k["id"]), **res)
 
@@ -74,12 +76,15 @@ async def kid_save(request: Request):
     other = auth.by_email(email)
     old_grade = None
     if kid_id:
-        k = auth.kid_of(p, int(kid_id))
+        k = auth.kid_of(p, int(kid_id), account_only=True)
         old_grade = k["grade"]
         if other and other["id"] != k["id"]:
             raise HTTPException(400, "这个邮箱已被别的账号使用")
-        db.run("UPDATE users SET email=?, name=?, grade=?, school=?, daily_minutes=? WHERE id=?",
-               email, name, grade, form.get("school") or "", minutes, k["id"])
+        if not auth.self_managed(k):
+            db.run("UPDATE users SET email=?, name=?, grade=?, school=?, daily_minutes=? WHERE id=?",
+                   email, name, grade, form.get("school") or "", minutes, k["id"])
+        else:  # 成人成员：家长只管账号，学校、每天时长由本人定
+            db.run("UPDATE users SET email=?, name=?, grade=? WHERE id=?", email, name, grade, k["id"])
         if pw:
             auth.set_password(k["id"], pw)
             auth.log_event("password_set_by_parent", user_id=k["id"], email=email, detail=f"by {p['email']}", request=request)
@@ -95,7 +100,9 @@ async def kid_save(request: Request):
                                       school=form.get("school") or "", daily_minutes=minutes)
         except ValueError as e:
             raise HTTPException(400, str(e))
-    _save_learning(kid_id, form, grade, old_grade)
+    # 学习安排只给未成年的孩子：成人成员由本人在「我的课程」里安排。成人改回孩子年级的这一次，表单里没有学习安排，先不动原来的课程
+    if not is_adult(grade) and not (old_grade and is_adult(old_grade)):
+        _save_learning(kid_id, form, grade, old_grade)
     return RedirectResponse("/parent", 303)
 
 

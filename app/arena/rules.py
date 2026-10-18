@@ -10,8 +10,9 @@
 import random
 import time
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
-from .. import auth, db, explore
+from .. import auth, config, db, explore
 from ..catalog import is_adult
 
 DEFAULT_GAME_MINUTES = 20
@@ -80,14 +81,17 @@ def set_game_unlock(kid_id: int, rule) -> None:
 
 
 def public_rooms(kid: dict) -> bool:
-    """能不能进全站的公开房间（和别的家庭的孩子一起玩）。家长打开隐私模式（auth.is_private）以后只能进家里的和用密码进的房间。"""
-    return not auth.is_private(kid)
+    """能不能进全站的公开房间（和别的家庭的孩子一起玩）。家长打开隐私模式（auth.is_private）以后只能进家里的和用密码进的房间。
+    成人也不进公开房间（不和陌生的孩子同场），家里的和用密码约好的房间照样能进。"""
+    return auth.with_other_kids(kid)
 
 
 # ------------------------------------------------------------------ 今天能不能玩、能玩多久
 
 def _ts(s: str) -> datetime:
-    return datetime.fromisoformat(s)
+    """存的时间一般带时区（db.now）；没带时区的（老数据、手写的）按站点时区算，免得和带时区的相减出错。"""
+    t = datetime.fromisoformat(s)
+    return t if t.tzinfo else t.replace(tzinfo=ZoneInfo(config.TIMEZONE))
 
 
 def paused_seconds(st: dict) -> float:

@@ -43,8 +43,8 @@ def _settings(u: dict) -> dict:
 
 
 def on_board(kid: dict) -> bool:
-    """默认上榜；家长打开隐私模式（auth.is_private）就不上任何榜。"""
-    return not auth.is_private(kid)
+    """默认上榜；家长打开隐私模式（auth.is_private）就不上任何榜。家里的成人成员不上孩子的榜。"""
+    return auth.with_other_kids(kid)
 
 
 def norm_city(province: str, city: str) -> str:
