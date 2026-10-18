@@ -4,7 +4,7 @@
 - PostgreSQL：用数据库自带的 LISTEN / NOTIFY 在进程之间转发（不用另装 Redis）。每个进程一条监听连接、一条发送连接，
   每条消息都绕数据库走一圈（同一进程里的也一样），路径只有一条，简单可靠。延迟几毫秒。
 - SQLite（开发、测试，只有一个进程）：直接在进程里转发。
-消息是 JSON 文本，NOTIFY 一条最多 8000 字节，前端每条只有几十字节（位置、事件），超过 2000 的直接丢掉。
+消息是 JSON 文本，NOTIFY 一条最多 8000 字节。前端每条大多只有几十字节（位置、事件），最大的是重连时补发的整个世界（几 KB），超过 6000 的直接丢掉。
 """
 import asyncio
 import itertools
@@ -16,7 +16,8 @@ from ... import db
 
 log = logging.getLogger("aistudy.mp")
 CHANNEL = "aistudy_mp"
-MAX_MSG = 2000
+MAX_MSG = 6000
+MAX_NOTIFY = 7900   # PostgreSQL NOTIFY 的上限是 8000 字节（转义以后可能比原文长）
 _ids = itertools.count(1)
 
 
@@ -111,6 +112,9 @@ class PgBus(LocalBus):
 
     async def publish(self, room: int, sender: int, text: str):
         payload = json.dumps({"r": room, "s": sender, "t": self.tag, "m": text}, ensure_ascii=False)
+        if len(payload.encode()) > MAX_NOTIFY:
+            log.warning("mp: 消息太长，丢掉（%d 字节）", len(payload.encode()))
+            return
         async with self.lock:
             try:
                 await self._ensure()

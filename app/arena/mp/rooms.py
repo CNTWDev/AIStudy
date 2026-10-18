@@ -6,6 +6,7 @@
 - 谁死了谁做题、题按他自己的水平出：前端用他自己的乐园对局（matches.py，game=<游戏 id>，不冷冻）出题判分。
 - 开房间的孩子报过关（两个人的设备都在场时由他统一报），服务器检查、记纪录、算星星、发贴纸。
 """
+import time
 from datetime import datetime, timedelta
 
 from ... import db
@@ -15,6 +16,8 @@ from .base import get
 
 ROOM_ALIVE_S = 90          # 房间多久没动静就当作没人了（页面开着时每 20 秒报一次）
 MIN_SECONDS = 5            # 少于这个时间的过关不算（防止乱报）
+PLAY_ALIVE_S = 600         # 存档多久没更新就不接着玩了（两个人都走开了）
+MAX_SAVE = 16000           # 一次存档最多多少字节
 
 
 def family_of(kid: dict):
@@ -120,9 +123,9 @@ def join(kid: dict, room_id) -> dict:
 def leave(kid: dict, room_id) -> None:
     r = member_room(kid, room_id)
     if r["host_id"] == kid["id"]:
-        db.run("UPDATE mp_rooms SET status='closed' WHERE id=?", r["id"])
+        db.run("UPDATE mp_rooms SET status='closed', play=NULL WHERE id=?", r["id"])
     else:
-        db.run("UPDATE mp_rooms SET guest_id=NULL, status='open' WHERE id=?", r["id"])
+        db.run("UPDATE mp_rooms SET guest_id=NULL, status='open', play=NULL WHERE id=?", r["id"])
 
 
 def _locked(u: dict) -> str:
@@ -142,7 +145,7 @@ def room_info(kid: dict, room_id) -> dict:
         members.append({**member(guest), "role": other_role(r["game"], r["host_role"]), "host": False, "locked": _locked(guest)})
     return {"id": r["id"], "game": r["game"], "status": r["status"], "level": r["level"], "members": members,
             "me": next(m for m in members if m["id"] == kid["id"]), "host": kid["id"] == r["host_id"],
-            "progress": progress(r["game"], host["id"], guest["id"]) if guest else None}
+            "progress": progress(r["game"], host["id"], guest["id"]) if guest else None, "play": play_for(kid, r)}
 
 
 def set_role(kid: dict, room_id, role: str) -> dict:
@@ -194,6 +197,65 @@ def invites(kid: dict) -> list[dict]:
     return out
 
 
+# ------------------------------------------------------------------ 存档：刷新、换设备后接着玩
+# 游戏还是各台设备自己算（服务器不模拟），但每台设备每 2 秒通过 WebSocket 存一次档（{"t": "save"}，不转发）：
+# 这一关和随机种子、玩了多少秒、我自己的状态（位置、长度、道具……，游戏自己定）、我还欠几道题、倒下几次、我的答题对局；
+# 开房间的那台再加上共享的世界（砖块、豆子、怪兽、宝石……）。重新进来时房间信息里带着它（play_for），前端从这里接着玩；
+# 对方还在玩的话，再向对方要一份最新的世界（mpshell.js 的 need_world）。
+
+def _int(v, lo, hi, default=0):
+    try:
+        return max(lo, min(hi, int(v)))
+    except (TypeError, ValueError):
+        return default
+
+
+def save_play(kid_id: int, room_id: int, msg: dict) -> None:
+    r = db.one("SELECT id, host_id, guest_id, play, status FROM mp_rooms WHERE id=?", room_id)
+    if not r or r["status"] == "closed" or kid_id not in (r["host_id"], r["guest_id"]):
+        return
+    host = kid_id == r["host_id"]
+    play = db.jload(r["play"], None) or {}
+    n, seed = _int(msg.get("n"), 0, 999), _int(msg.get("seed"), 0, 2 ** 31)
+    if msg.get("end"):   # 这一关结束了
+        if play.get("seed") == seed:
+            db.run("UPDATE mp_rooms SET play=NULL WHERE id=?", room_id)
+        return
+    if not n:
+        return
+    if play.get("n") != n or play.get("seed") != seed:
+        if not host:     # 新的一关只认开房间的人（对方晚到的旧存档不能把它盖回去）
+            return
+        play = {"n": n, "seed": seed, "players": {}, "world": None}
+    try:
+        el = max(0.0, min(3600.0, float(msg.get("el") or 0)))
+    except (TypeError, ValueError):
+        el = 0.0
+    play["players"][str(kid_id)] = {"me": msg.get("me"), "need": _int(msg.get("need"), 0, 3), "deaths": _int(msg.get("deaths"), 0, 999),
+                                    "match": _int(msg.get("match"), 0, 2 ** 62) or None, "el": el, "at": time.time()}
+    if host and msg.get("w") is not None:
+        play["world"] = msg.get("w")
+    db.run("UPDATE mp_rooms SET play=? WHERE id=?", db.jdump(play), room_id)
+
+
+def play_for(kid: dict, r: dict) -> dict | None:
+    """重新进房间的人拿到的存档：没有、或者两个人都走开太久了，就是 None。"""
+    play = db.jload(r.get("play"), None)
+    if not play or not play.get("players"):
+        return None
+    ps = play["players"]
+    if time.time() - max(p.get("at", 0) for p in ps.values()) > PLAY_ALIVE_S:
+        return None
+    mine = ps.get(str(kid["id"])) or {}
+    other = next((p for k, p in ps.items() if k != str(kid["id"])), {})
+    match = mine.get("match")
+    if match and not db.one("SELECT id FROM arena_matches WHERE id=? AND user_id=? AND ended_at IS NULL", match, kid["id"]):
+        match = None
+    return {"n": play["n"], "seed": play["seed"], "el": max(p.get("el", 0) for p in ps.values()), "world": play.get("world"),
+            "me": mine.get("me"), "need": mine.get("need", 0), "deaths": mine.get("deaths", 0),
+            "peer_deaths": other.get("deaths", 0), "match": match}
+
+
 # ------------------------------------------------------------------ 过关
 
 def finish(kid: dict, room_id, n, report: dict) -> dict:
@@ -222,7 +284,7 @@ def finish(kid: dict, room_id, n, report: dict) -> dict:
     keys = ["mp1"] + (["mp_clean"] if rep["deaths"] == 0 else []) + (["mp_all"] if after["cleared"] == len(g.levels) else [])
     stickers = {str(uid): awards.give(uid, keys) for uid in (a, b)}
     nxt = lv["n"] + 1 if lv["n"] < len(g.levels) else None
-    db.run("UPDATE mp_rooms SET level=? WHERE id=?", nxt or lv["n"], r["id"])
+    db.run("UPDATE mp_rooms SET level=?, play=NULL WHERE id=?", nxt or lv["n"], r["id"])
     return {"n": lv["n"], **rep, "stars": stars, "checks": checks, "value": value, "prev_best": prev,
             "new_best": not prev or better, "best": value if (not prev or better) else prev,
             "next": nxt, "progress": after, "stickers": stickers}

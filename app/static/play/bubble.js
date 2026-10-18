@@ -2,7 +2,8 @@
    - 自己的角色自己的设备算（走、放泡泡、被困、捡道具、救队友），每秒发 15 次位置；
    - 泡泡什么时候炸、炸到哪、砖块掉什么、怪兽怎么走，都由开房间的设备算，再发给另一台（'boom'、'w' 消息）；
    - 被泡泡炸到或被怪兽碰到：困在泡泡里。队友跑过来碰一下就救出来（不算倒下），不然答题自救（外壳 mpshell.js）。
-   - 怪兽全打败，开房间的设备报过关。 */
+   - 怪兽全打败，开房间的设备报过关。
+   - 刷新 / 换设备：存档里有自己（位置、道具、是不是被困着）和地图（炸开的砖块、地上的道具、怪兽、泡泡），接着玩。 */
 (function () {
   const T = 40, COLS = 17, ROWS = 11, MW = COLS * T, MH = ROWS * T, HB = 14;
   const FUSE = 2.6, FLAME = 0.5;
@@ -130,6 +131,20 @@
       mp.toast(mp.peer ? `被困住了！等${mp.peer.name}来救，或者答题自救` : '被困住了！答题自救', 'warn');
       mp.die();
     }
+  }
+
+  const pick = (o, ks) => Object.fromEntries(ks.filter(k => typeof o[k] === 'number').map(k => [k, o[k]]));
+  function loadWorld(w) {   // 重连：换成存档 / 队友那里的地图
+    if (!w || !w.g || w.g.length !== ROWS) return;
+    g = w.g.map(r => r.split(''));
+    items = new Map((w.it || []).filter(([, it]) => ITEMS[it]));
+    for (const [id, x, y, alive] of w.m || []) {
+      const m = mons.find(o => o.id === id); if (!m) continue;
+      Object.assign(m, {x, y, alive: !!alive, dir: [0, 0], decided: undefined});
+      const tr = monTracks.get(id); if (tr) { tr.clear(); tr.push({x, y}); }
+    }
+    bubbles = new Map();
+    for (const [id, r, c, p, owner, fuse] of w.b || []) bubbles.set(id, {id, r, c, p, owner, fuse: Math.max(0.3, fuse), born: t - (FUSE - Math.max(0.3, fuse)), passMe: false});
   }
 
   // ---------------------------------------------------------------- 开房间的设备：泡泡爆炸、砖块、怪兽
@@ -305,7 +320,10 @@
       const mine = starts[ctx.roleIndex(ctx.me.role) === 0 ? '1' : '2'], other = starts[mine === starts['1'] ? '2' : '1'];
       me = {x: ctr(mine.c), y: ctr(mine.r), face: 1, mv: false, trapped: false, inv: 0, power: 1, max: 1, shoe: 0};
       peerTrack = new MpNet.Track(100); peerRaw = {x: ctr(other.c), y: ctr(other.r), f: 1}; peerTrack.push(Object.assign({}, peerRaw));
-      if (ctx.level.tip) mp.toast(ctx.level.tip.split('。')[0], 'good');
+      const rs = ctx.resume;
+      if (rs && rs.world) loadWorld(rs.world);
+      if (rs && rs.me) Object.assign(me, pick(rs.me, ['x', 'y', 'face', 'power', 'max', 'shoe']), {trapped: !!rs.me.trapped, inv: rs.me.trapped ? 0 : 2});
+      if (ctx.level.tip && !rs) mp.toast(ctx.level.tip.split('。')[0], 'good');
       const net = ctx.net;
       net.off('s', 'bub', 'boom', 'w', 'pick', 'save');
       net.on('s', m => { peerRaw = m; peerTrack.push(m); });
@@ -344,5 +362,11 @@
       if (!info.rescued) { fx.ring(me.x, me.y, {color: '#fff', width: 4, grow: 300, life: 0.4}); Play.sfx.play('power'); }
     },
     end() { ended = true; if (loop) loop.stop(); if (mp) mp.net.stopStreams(); },
+    save: () => me && {x: Math.round(me.x), y: Math.round(me.y), face: me.face, power: me.power, max: me.max, shoe: me.shoe, trapped: me.trapped ? 1 : 0},
+    saveWorld: () => g && {g: g.map(r => r.join('')), it: [...items], m: mons.map(m => [m.id, Math.round(m.x), Math.round(m.y), m.alive ? 1 : 0]),
+                           b: [...bubbles.values()].map(b => [b.id, b.r, b.c, b.p, b.owner, +(mp && mp.host ? b.fuse : FUSE - (t - (b.born || t))).toFixed(2)])},
+    loadWorld: w => loadWorld(w),
+    peerView: () => peerRaw && {x: Math.round(peerRaw.x), y: Math.round(peerRaw.y)},
+    loadMe(v) { if (me && v && !me.trapped && boxFree(v.x, v.y)) { me.x = v.x; me.y = v.y; } },
   });
 })();
