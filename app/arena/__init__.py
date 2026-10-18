@@ -2,7 +2,7 @@
 
 乐园是一个小小的游戏平台：游戏只写玩法，其余的都由平台提供，单机、两人联网、全家一起玩是同一套（docs/DESIGN.md 5.26）。
 分层（从下往上）：
-- fair.py      能力值 θ 和难度 b（IRT / Elo 在线校准）、按目标答对率选级别。只管数学。
+- （能力值 θ 和难度 b 在 app/ability.py：全站共用一个水平，练习和游戏的作答都算。）
 - sources.py   题从哪来：数学口算（现场生成）、英语单词和课本术语、题库里的短选择题；答完怎么记进学习记录。
 - rules.py     经验值、冷冻、每天能玩多久、学习换游戏时间、什么时候解锁。
 - awards.py    贴纸、角色、乐园等级（只奖励真实发生的事）。
@@ -18,7 +18,7 @@
 """
 from .awards import AVATARS, STICKERS, set_avatar
 from .board import fairness, kid_band
-from .fair import elo_step, logit, pick_level, prior_b, sigmoid
+from ..ability import elo_step, logit, pick_level, prior_b, sigmoid
 from .errors import ArenaError
 from .games import GAMES
 from .matches import answer, end, hub, parent_summary, question, start, status
