@@ -5,7 +5,7 @@
 {% if report_for %}<a href="/parent" class="back">← 家长页</a>{% endif %}
 <div class="ph"><h1>{{ k.name }} 的学习记录</h1></div>
 <div class="statline st4" style="margin-top:14px">
-  <div><b>🔥 {{ streak }}</b><span>连续打卡（天）</span></div>
+  <div><b>🔥 {{ streak }}</b><span>连续打卡（天）{% if not report_for %} · <a href="/boards">🏆 打卡榜</a>{% endif %}</span></div>
   <div><b>{{ cal|selectattr('level')|list|length }}</b><span>近 12 周学习的天数</span></div>
   <div><b>{{ tot.n or 0 }}</b><span>做题 · 正确率 {{ ((tot.ok or 0) * 100 / tot.n)|int if tot.n else 0 }}%</span></div>
   <div><b>{{ words }} / {{ mistakes }}</b><span>生词 / 错题</span></div>
