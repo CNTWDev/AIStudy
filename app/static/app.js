@@ -374,12 +374,20 @@ const Speak = {
     return new Promise(res => {
       const u = new SpeechSynthesisUtterance(text);
       u.lang = lang === 'zh' ? 'zh-CN' : 'en-US';
+      const v = Speak.voice(lang); if (v) u.voice = v;
       u.pitch = ({M: .75, F: 1.15, C: 1.4})[role] || 1;  // 浏览器自带的声音分不出男女，用音高区分对话里的人
       u.rate = ({word: .7, sentence: .8, passage: .85})[use] * (Speak.slow ? .85 : 1);
       Speak._end = res; Speak.playing = true;
       u.onend = u.onerror = () => { Speak.playing = false; if (Speak._end === res) Speak._end = null; res(my === Speak.n); };
       speechSynthesis.speak(u);
     });
+  },
+  /* 只设 lang 时，有的浏览器（中文系统）会用默认的中文声音念英语，所以明确挑一个这门语言的声音，优先本机的 */
+  voice(lang) {
+    const want = lang === 'zh' ? /^zh[-_](CN|Hans)/i : /^en[-_]US/i, base = lang === 'zh' ? /^zh/i : /^en/i;
+    const vs = speechSynthesis.getVoices();
+    const pick = re => vs.find(v => re.test(v.lang) && v.localService) || vs.find(v => re.test(v.lang));
+    return pick(want) || pick(base) || null;
   },
   setSlow(on) { Speak.slow = on; if (Speak.audio) Speak.audio.playbackRate = on ? .85 : 1; },
 };
