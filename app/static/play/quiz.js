@@ -5,7 +5,8 @@
      quiz.open();   // 弹出式（火柴人：左下角「答题」按钮）
    dock：传一个容器元素就变成「常驻」式，一直显示在游戏下方（闪电赛跑、星星守卫：答题就是操作）。
    答对：+经验值、撒花，马上出下一题；答错：冷冻 5 秒（瞎答更久），显示正确答案和思路。
-   单词题可以点 🔊 听发音（浏览器自带的朗读）。 */
+   单词题可以点 🔊 听发音（浏览器自带的朗读）。
+   sticky: true —— 关不掉（联网游戏倒下后答题复活：没有「回去玩」，点外面、按 Esc 都不关，由游戏答够了再 close(true)）。 */
 class ArenaQuiz {
   constructor(opts) {
     this.o = opts; this.item = null; this.frozenUntil = 0; this.busy = false; this.streak = 0;
@@ -16,7 +17,7 @@ class ArenaQuiz {
     el.className = 'aq' + (this.docked ? ' aq-docked' : '');
     el.hidden = !this.docked;
     el.innerHTML = `<div class="aq-card" role="dialog" aria-label="答题">
-      <div class="aq-head"><span class="aq-topic"></span><span class="aq-streak"></span>${this.docked ? '' : '<button class="aq-x" type="button" aria-label="回去玩">回去玩 ✕</button>'}</div>
+      <div class="aq-head"><span class="aq-topic"></span><span class="aq-streak"></span>${this.docked || opts.sticky ? '' : '<button class="aq-x" type="button" aria-label="回去玩">回去玩 ✕</button>'}</div>
       <div class="aq-body"></div></div>`;
     (opts.dock || document.body).appendChild(el);
     this.el = el; this.body = el.querySelector('.aq-body');
@@ -34,14 +35,14 @@ class ArenaQuiz {
     this.o.onOpen && this.o.onOpen();
     if (this.frozen) this.showFreeze(); else if (!this.item) this.load(); else this.render();
   }
-  close() {
-    if (!this.isOpen || this.docked) return;
+  close(force) {
+    if (!this.isOpen || this.docked || (this.o.sticky && force !== true)) return;
     this.isOpen = false; this.el.classList.remove('on'); this.el.hidden = true; clearInterval(this.timer);
     document.removeEventListener('keydown', this._key, true);
     this.o.onClose && this.o.onClose();
   }
   /* 一局结束：不再拿新题（常驻模式的 close() 不关面板，所以单独停）。 */
-  stop() { this.stopped = true; clearInterval(this.timer); this.close(); }
+  stop() { this.stopped = true; clearInterval(this.timer); this.close(true); }
   destroy() { clearInterval(this.timer); document.removeEventListener('keydown', this._key, true); this.el.remove(); }
   async load() {
     if (this.stopped) return;

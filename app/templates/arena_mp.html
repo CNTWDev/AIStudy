@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ g.name }} · {{ SITE }}{% endblock %}
+{% block body %}
+{# 联网游戏（两个人各用一台设备）：外壳 mpshell.js，连接 net.js，玩法 <游戏>.js；服务器 app/arena/mp/ #}
+<link rel="stylesheet" href="/static/play/play.css">
+<link rel="stylesheet" href="/static/play/mp.css">
+{% set info = {'game': game, 'g': {'name': g.name, 'icon': g.icon}, 'lobby': lobby, 'me': me} %}
+<div id="pl" class="pl pl-mp pl-{{ game }}" data-info='{{ info|tojson }}'>
+  <div class="pl-top">
+    <a href="/arena" class="pl-back" aria-label="回乐园">‹</a>
+    <b class="pl-name">{{ g.icon }} {{ g.name }}</b>
+    <span class="pl-chip">两人联网</span>
+    <button type="button" class="pl-icon" data-music aria-label="背景音乐">🎵</button><button type="button" class="pl-icon" data-sfx aria-label="音效">🔊</button>
+  </div>
+  <div class="pl-stage">
+    <canvas aria-label="{{ g.name }}"></canvas>
+    <div class="pl-hud"></div>
+    <div class="pl-toast" aria-live="polite"></div>
+    <div class="pl-cd" hidden></div>
+    <div class="pl-over pl-start"><div class="pl-panel"></div></div>
+    <div class="pl-over pl-end" hidden><div class="pl-panel"><div class="pl-sum"></div><div class="pl-row"></div></div></div>
+  </div>
+  <div class="pl-ctrl"></div>
+</div>
+<script src="/static/play/engine.js"></script>
+<script src="/static/play/art.js"></script>
+<script src="/static/play/quiz.js"></script>
+<script src="/static/play/net.js"></script>
+<script src="/static/play/mpshell.js"></script>
+<script src="/static/play/{{ game }}.js"></script>
+{% endblock %}

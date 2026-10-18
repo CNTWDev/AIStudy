@@ -12,6 +12,7 @@
     ctx.setTransform(s * dpr, 0, 0, s * dpr, 0, 0);
     const av = me.dataset.avatar, g = cv.dataset.preview, ground = 128;
     const theme = {stickman: 'sunset', race: 'day', defense: 'candy'}[g] || 'day';
+    if (multi(ctx, g, W, H, t, av)) return;
     Play.scene.sky(ctx, W, H, theme);
     Play.scene.drawClouds(ctx, W, theme, t * (g === 'race' ? 4 : 1));
     Play.scene.hills(ctx, W, H, ground, theme, g === 'race' ? t * 60 : 0);
@@ -33,6 +34,50 @@
       const k = (t * 0.8) % 1;
       Art.orb(ctx, 90 + (W * 0.6 - 90) * k, ground - 70 - Math.sin(k * Math.PI) * 40, 8, '#ffd23f', t);
     }
+  }
+
+  /* 联网游戏的小预览（双人闯关、泡泡堂、贪吃蛇）：自己画，不用草地背景。 */
+  function multi(ctx, g, W, H, t, av) {
+    if (g === 'duo') {
+      ctx.fillStyle = '#3c5a45'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#8d8a6a'; ctx.fillRect(0, 118, W, 32); ctx.fillStyle = '#7fb24a'; ctx.fillRect(0, 118, W, 4);
+      const pool = (x, c) => { ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(x, 132); for (let i = 0; i <= 8; i++) ctx.lineTo(x + i * 6, 121 + Math.sin(t * 4 + i) * 2); ctx.lineTo(x + 48, 132); ctx.fill(); };
+      pool(W * 0.42, '#ff6b3d'); pool(W * 0.62, '#3d9bff');
+      const kid = (x, fire) => {
+        const y = 118 - Math.abs(Math.sin(t * 3 + (fire ? 0 : 1))) * 14;
+        ctx.fillStyle = fire ? '#ff7a2f' : '#3a8fff'; Play.roundRect(ctx, x - 9, y - 22, 18, 20, 6); ctx.fill();
+        ctx.fillStyle = fire ? '#ffb347' : '#7cc8ff'; ctx.beginPath(); ctx.arc(x, y - 30, 11, 0, 7); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x - 4, y - 30, 3, 0, 7); ctx.arc(x + 4, y - 30, 3, 0, 7); ctx.fill();
+      };
+      kid(W * 0.28, true); kid(W * 0.36, false);
+      ctx.fillStyle = '#c4532e'; Play.roundRect(ctx, W - 70, 62, 22, 56, 9); ctx.fill();
+      ctx.fillStyle = '#2f6fdc'; Play.roundRect(ctx, W - 42, 62, 22, 56, 9); ctx.fill();
+      return true;
+    }
+    if (g === 'bubble') {
+      const T = 30;
+      for (let r = 0; r * T < H; r++) for (let c = 0; c * T < W; c++) { ctx.fillStyle = (r + c) % 2 ? '#ffe8f2' : '#fff4f9'; ctx.fillRect(c * T, r * T, T, T); }
+      ctx.fillStyle = '#ff8fbf';
+      for (let r = 1; r * T < H; r += 2) for (let c = 1; c * T < W; c += 2) { Play.roundRect(ctx, c * T + 2, r * T + 2, T - 4, T - 4, 6); ctx.fill(); }
+      const k = (t * 0.6) % 1, bx = W * 0.5, by = 2 * T + T / 2;
+      if (k < 0.7) { ctx.globalAlpha = 0.75; ctx.fillStyle = '#4d8dff'; ctx.beginPath(); ctx.arc(bx, by, 11 + Math.sin(t * 12) * 1.5, 0, 7); ctx.fill(); ctx.globalAlpha = 1; }
+      else { ctx.fillStyle = '#5ad1ff'; ctx.fillRect(bx - 2.5 * T, by - 10, 5 * T, 20); ctx.fillRect(bx - 10, by - 2.5 * T, 20, 5 * T); }
+      Art.hero(ctx, W * 0.3, 2 * T + 28, {avatar: av, pose: 'run', t: t * 1.5, scale: 0.22});
+      Art.monster(ctx, W * 0.75, 2 * T + 26, {kind: 'slime', t, scale: 0.45});
+      return true;
+    }
+    if (g === 'snake') {
+      ctx.fillStyle = '#b8eb9f'; ctx.fillRect(0, 0, W, H);
+      const dots = ['#ff6b6b', '#ffd23f', '#7bdff2', '#c3a6ff'];
+      for (let i = 0; i < 18; i++) { ctx.fillStyle = dots[i % 4]; ctx.beginPath(); ctx.arc((i * 73) % W, 15 + (i * 41) % (H - 30), 4, 0, 7); ctx.fill(); }
+      const worm = (x0, y0, ph, c1, c2) => {
+        for (let i = 16; i >= 0; i--) { ctx.fillStyle = i % 4 < 2 ? c1 : c2; ctx.beginPath(); ctx.arc(x0 - i * 9, y0 + Math.sin(t * 3 + ph - i * 0.45) * 14, i ? 8 : 10, 0, 7); ctx.fill(); }
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x0 + 3, y0 + Math.sin(t * 3 + ph) * 14 - 4, 3, 0, 7); ctx.fill();
+      };
+      worm(W * 0.55 + Math.sin(t) * 10, 55, 0, '#3fcf6e', '#1f9e4c'); worm(W * 0.8 + Math.sin(t + 1) * 10, 100, 1.5, '#ff7fb8', '#e04b8f');
+      return true;
+    }
+    return false;
   }
 
   let t0 = performance.now();
