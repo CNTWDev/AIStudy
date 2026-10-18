@@ -1,10 +1,6 @@
 {% extends "base.html" %}
 {% import "_ui.html" as ui %}
-{% macro status_pill(u) -%}
-{% if u.status == 'pending' %}<span class="pill st-learning">待审批</span>{% elif u.status == 'disabled' %}<span class="pill st-weak">已停用</span>{% elif u.status == 'rejected' %}<span class="pill st-weak">未通过</span>{% endif %}
-{%- if u.locked_until and u.locked_until > now %} <span class="pill st-weak">锁定中</span>{% endif %}
-{%- if u.is_admin %} <span class="pill">管理员</span>{% endif %}
-{%- endmacro %}
+{% from "_admin.html" import admin_nav, status_pill with context %}
 {% macro user_actions(u, back) -%}
 {% if u.id != me.id %}
   {% if u.status == 'pending' %}
@@ -18,38 +14,32 @@
 {% endif %}
 <a class="btn ghost sm" href="/admin/users/{{ u.id }}">账号管理</a>
 {%- endmacro %}
-{% macro kid_table(kids, first='孩子') %}
-  <div class="tw" style="margin-top:8px"><table>
-    <tr><th>{{ first }}</th><th>年级 / 教材</th><th>今天</th><th>坚持</th><th>本周</th><th>待复习 / 生词</th><th>薄弱点</th><th>系统发现</th><th></th></tr>
-    {% for k in kids %}
-    <tr>
-      <td class="nw"><b><a href="/admin/users/{{ k.u.id }}">{{ k.u.name }}</a></b> {{ status_pill(k.u) }}<div class="muted small">{{ k.u.email }}</div></td>
-      <td class="small">{{ stage_label(k.u.grade) }}<br><span class="muted">{% for p in k.packs %}{{ p.pack.subject_name }}{{ '、' if not loop.last }}{% else %}未选教材{% endfor %}</span></td>
-      <td class="small nw">{{ k.today_done }}/{{ k.today.plan|length }} 项<br><span class="muted">{{ k.today.minutes }} 分钟</span></td>
-      <td class="small nw">连续 {{ k.streak }} 天</td>
-      <td class="small nw">{{ k.week_days }} 天<br><span class="muted">{{ k.week_min }} 分钟</span></td>
-      <td class="small nw">{{ k.due }} / {{ k.words }}</td>
-      <td class="small tx">{{ k.weak_n }}{% if k.weak %}<br><span class="muted">{{ k.weak[0].name }}</span>{% endif %}</td>
-      <td class="small tx">{% for i in k.insights[:2] %}<div>🔍 {{ i.title }}</div>{% else %}<span class="muted">—</span>{% endfor %}</td>
-      <td class="small nw"><a href="/admin/kids/{{ k.u.id }}">报告</a></td>
-    </tr>
-    {% endfor %}
+{% macro family_table(rows) %}
+  <div class="tw"><table>
+    <tr><th>家庭</th><th>城市</th><th>孩子</th><th>近 7 天在学</th><th>最近活动</th><th>注册</th></tr>
+    {% for f in rows %}
+    <tr><td class="nw"><b><a href="/admin/families/{{ f.p.id }}">{{ f.p.name }}</a></b> {{ status_pill(f.p) }}<div class="muted small">{{ f.p.email }}{% if f.p.inviter_name %} · 由 {{ f.p.inviter_name }} 邀请{% endif %}</div></td>
+      <td class="small nw">{{ city_label(f.p.city) or '—' }}</td>
+      <td class="small tx">{% for k in f.kids %}{{ k.name }}<span class="muted">（{{ stage_label(k.grade) }}）</span>{{ '、' if not loop.last }}{% else %}<span class="muted">还没添加</span>{% endfor %}</td>
+      <td class="small nw">{{ f.active }}/{{ f.kids|length }}</td>
+      <td class="small muted nw">{{ (f.last or '—')[:10] }}</td>
+      <td class="small muted nw">{{ f.p.created_at[:10] }}</td></tr>
+    {% else %}<tr><td colspan="6" class="muted small">没有找到。</td></tr>{% endfor %}
   </table></div>
 {% endmacro %}
 {% block body %}
 <h1>管理后台</h1>
-<p class="small"><a href="/admin/curricula">教材与知识点</a> · <a href="/admin/operations">后台任务与 AI 调用</a></p>
-<nav class="subnav">{% for key, label in tabs %}<a href="{{ '/admin/curricula' if key == 'curricula' else '/admin?tab=' ~ key }}" class="{{ 'on' if tab == key }}">{{ label }}{% if key == 'overview' and stats.pending %} <span class="badge">{{ stats.pending }}</span>{% endif %}</a>{% endfor %}</nav>
+{{ admin_nav(tab, stats.pending) }}
 {% if msg %}<div class="hint">{{ msg }}{% if link %}<br><input type="text" readonly value="{{ link }}" onclick="this.select()" style="margin-top:6px">{% endif %}</div>{% endif %}
 
 {% if tab == 'overview' %}
 <div class="stats">
-  <div class="stat"><b>{{ stats.families }}</b><span>家庭</span></div>
-  <div class="stat"><b>{{ stats.kids }}</b><span>孩子</span></div>
-  {% if stats.selfs %}<div class="stat"><b>{{ stats.selfs }}</b><span>自学者</span></div>{% endif %}
+  <a class="stat" href="/admin?tab=families"><b>{{ stats.families }}</b><span>家庭</span></a>
+  <a class="stat" href="/admin?tab=families"><b>{{ stats.kids }}</b><span>孩子</span></a>
+  <a class="stat" href="/admin?tab=selfs"><b>{{ stats.selfs }}</b><span>自学者</span></a>
   <div class="stat"><b>{{ stats.active_kids }}</b><span>近 7 天在学</span></div>
   <div class="stat"><b>{{ stats.pending }}</b><span>待审批</span></div>
-  <div class="stat"><b>{{ stats.invites_open }}</b><span>可用邀请码</span></div>
+  <a class="stat" href="/admin?tab=invites"><b>{{ stats.invites_open }}</b><span>可用邀请码</span></a>
 </div>
 <div class="card">
   <h3>待审批的注册申请</h3>
@@ -62,13 +52,18 @@
   {% else %}<p class="muted small">没有待审批的申请。</p>{% endfor %}
 </div>
 <div class="card">
-  <h3>最近加入的家庭</h3>
-  <div class="tw"><table>{% for u in recent %}
-    <tr><td class="tx"><b>{{ u.name }}</b> <span class="muted small">{{ u.email }}</span> {{ status_pill(u) }}</td>
-      <td class="small nw">{{ '由 ' ~ u.inviter_name ~ ' 邀请' if u.inviter_name else ('申请注册' if u.apply_note or u.status in ('pending','rejected') else '—') }}</td>
-      <td class="small muted nw">{{ u.created_at[:10] }}</td></tr>
+  <h3>最近加入的家庭 <a class="small" href="/admin?tab=families" style="font-weight:normal">全部家庭 →</a></h3>
+  {{ family_table(recent) }}
+</div>
+{% if recent_selfs %}
+<div class="card">
+  <h3>最近加入的自学者 <a class="small" href="/admin?tab=selfs" style="font-weight:normal">全部自学者 →</a></h3>
+  <div class="tw"><table>{% for u in recent_selfs %}
+    <tr><td class="tx"><b><a href="/admin/users/{{ u.id }}">{{ u.name }}</a></b> <span class="muted small">{{ u.email }}</span> {{ status_pill(u) }}</td>
+      <td class="small nw">{{ stage_label(u.grade) }}</td><td class="small muted nw">注册 {{ u.created_at[:10] }}</td></tr>
   {% endfor %}</table></div>
 </div>
+{% endif %}
 
 {% elif tab == 'stats' %}
 <div class="stats">
@@ -99,27 +94,11 @@
 
 {% elif tab == 'families' %}
 <form class="row" method="get" action="/admin" style="margin-bottom:10px"><input type="hidden" name="tab" value="families">
-  <div class="grow"><input type="text" name="q" value="{{ q }}" placeholder="按家长名字或邮箱搜索"></div><div><button class="btn ghost">搜索</button></div></form>
-{% for f in families %}
+  <div class="grow"><input type="text" name="q" value="{{ q }}" placeholder="按家长称呼、邮箱、城市或孩子名字搜索"></div><div><button class="btn ghost">搜索</button></div></form>
 <div class="card">
-  <div class="row">
-    <div class="grow grow-w"><h3 style="margin:0"><a href="/admin/users/{{ f.p.id }}">{{ f.p.name }}</a> {{ status_pill(f.p) }}</h3>
-      <div class="muted small">{{ f.p.email }} · 注册 {{ f.p.created_at[:10] }} · 最近活动 {{ (f.p.last_active_at or f.p.last_login_at or '—')[:10] }}
-        {% if f.p.inviter_name %} · 由 {{ f.p.inviter_name }} 邀请{% endif %}{% if f.invited %} · 邀请了 {{ f.invited|length }} 个家庭{% endif %}</div></div>
-    <div class="small">{{ user_actions(f.p, 'families') }}
-      {% if f.p.id != me.id and f.p.status == 'active' %}<form method="post" action="/admin/users/{{ f.p.id }}/admin" style="display:inline"><input type="hidden" name="on" value="{{ '' if f.p.is_admin else '1' }}"><button class="btn ghost sm">{{ '取消管理员' if f.p.is_admin else '设为管理员' }}</button></form>{% endif %}</div>
-  </div>
-  {% if f.kids %}
-  {{ kid_table(f.kids) }}
-  {% else %}<p class="muted small">还没有添加孩子。</p>{% endif %}
+  <p class="muted small" style="margin-top:0">一个家庭 = 一个家长账号和他添加的孩子。点家庭进去看每个孩子的学习情况、家长定的游戏和排行榜设置。</p>
+  {{ family_table(families) }}
 </div>
-{% else %}<div class="card muted">没有找到。</div>{% endfor %}
-{% if selfs %}
-<div class="card">
-  <h3 style="margin:0">自学者 <span class="muted small">自己注册、自己选课的学习账号，没有家长</span></h3>
-  {{ kid_table(selfs, '自学者') }}
-</div>
-{% endif %}
 <form class="card" method="post" action="/admin/users/create">
   <h3>直接创建账号</h3>
   <p class="muted small">家长账号：添加孩子、查看和安排孩子的学习。管理员账号：只管理网站，不带孩子。</p>
@@ -131,6 +110,23 @@
   </div>
   <div style="margin-top:12px"><button class="btn">创建</button></div>
 </form>
+{% elif tab == 'selfs' %}
+<form class="row" method="get" action="/admin" style="margin-bottom:10px"><input type="hidden" name="tab" value="selfs">
+  <div class="grow"><input type="text" name="q" value="{{ q }}" placeholder="按名字或邮箱搜索"></div><div><button class="btn ghost">搜索</button></div></form>
+<div class="card">
+  <p class="muted small" style="margin-top:0">自学者：自己注册、自己选课的学习账号，没有家长。在账号页可以把自学者挂到某个家庭下。</p>
+  <div class="tw"><table>
+    <tr><th>自学者</th><th>年级</th><th>在学</th><th>近 7 天</th><th>最近活动</th><th></th></tr>
+    {% for s in selfs %}
+    <tr><td class="nw"><b><a href="/admin/users/{{ s.u.id }}">{{ s.u.name }}</a></b> {{ status_pill(s.u) }}<div class="muted small">{{ s.u.email }}</div></td>
+      <td class="small nw">{{ stage_label(s.u.grade) }}</td>
+      <td class="small tx">{{ s.packs|join('、') or '未选课程' }}</td>
+      <td class="small nw">{{ '学过' if s.active else '—' }}</td>
+      <td class="small muted nw">{{ (s.u.last_active_at or s.u.last_login_at or '—')[:10] }}</td>
+      <td class="small nw"><a href="/admin/kids/{{ s.u.id }}">报告</a></td></tr>
+    {% else %}<tr><td colspan="6" class="muted small">没有自学者。</td></tr>{% endfor %}
+  </table></div>
+</div>
 
 {% elif tab == 'invites' %}
 <form class="card row" method="post" action="/admin/invites/create">
@@ -157,8 +153,8 @@
   </table></div>
 </div>
 
-{% elif tab == 'tree' %}
 <div class="card">
+  <h3 style="margin-top:0">邀请关系</h3>
   <p class="muted small">谁邀请了谁。最左边一层是管理员直接创建、自己申请或第一批注册的家庭。</p>
   {% for n in tree %}
   <div style="padding:6px 0 6px {{ n.depth * 24 }}px;border-bottom:1px solid var(--line)">
@@ -370,7 +366,7 @@ $('#bpf').onsubmit = async e => {
 <div class="card">
   <h3 style="margin-top:0">管理员账号</h3>
   {% for u in admins %}<div class="small">{{ u.name }} · {{ u.email }}{% if u.role == 'parent' %} <span class="muted">（同时是家长）</span>{% endif %}</div>{% endfor %}
-  <p class="muted small">在「家庭与孩子」页底部可以创建新的管理员账号。</p>
+  <p class="muted small">在「家庭」页底部可以创建新的管理员账号。</p>
 </div>
 <div class="card">
   <div class="tw"><table class="kv">

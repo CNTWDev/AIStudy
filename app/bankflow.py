@@ -18,7 +18,7 @@ import threading
 import time
 from datetime import timedelta
 
-from . import bank, db, itemtypes, llm
+from . import ability, bank, db, itemtypes, llm
 from .catalog import catalog
 
 log = logging.getLogger("aistudy.bankflow")
@@ -198,9 +198,8 @@ def _logit(k: float, n: float) -> float:
 
 
 def level(r) -> int:
-    """一道题的难度级别（1-5）：校准过的用校准值，没有就用出题时 AI 估的难度（1-3 → 2-4）。"""
-    lv = r["level"] if "level" in r.keys() else None
-    return lv or min(5, max(1, (r["difficulty"] or 2) + 1))
+    """一道题的难度级别（1-5），全站一个算法（见 app/ability.py 的 bank_level）。"""
+    return ability.bank_level(r)
 
 
 # ------------------------------------------------------------------ 后台任务

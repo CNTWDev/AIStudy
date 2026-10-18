@@ -9,6 +9,7 @@
 - 一项里面也只往前看几步（kick）：混合练习每次取题，后台备后面 LOOKAHEAD 道；某一道没有现成题，不停下来等，
   往后挪、后台去出，孩子先做别的；答错要「再来一道」的那个点马上备。学习页一打开就在后台出练习题，孩子看讲解时就在出。
 - 真要等（题库空、AI 也还没出好），前端放一张今天要复习的单词小卡（/api/filler），等的也是学习。
+- 游戏、快练抽到的知识点没有新的快答题：后台出一批（quick），这次先出别的，不让孩子等。
 
 备下的题存进公共题库，和现场出的一样复用。
 """
@@ -43,6 +44,21 @@ def kick(user_id: int, kp_id: str, n: int = 3, purpose: str = "practice", grade:
     if teach and not has_teach(kp_id):
         _start((user_id, kp_id, "teach"), n, grade, uses)
     _start((user_id, kp_id, purpose), n, grade, uses)
+
+
+QUICK_PER_DAY = 12   # 游戏、快练里每个孩子每天最多给几个知识点补快答题（每次一批 5 道，存进题库以后都能用）
+_quick_used: dict[tuple, int] = {}
+
+
+def quick(user_id: int, kp_id: str, grade: str = "") -> None:
+    """游戏、快练里抽到的知识点没有这个孩子没做过的快答题：后台出一批（这次先出别的知识点）。
+    每天有上限：孩子玩得多也不会无限请 AI；上限按进程计（重启清零），只是兜底。"""
+    k = (user_id, db.today().isoformat())
+    with _lock:
+        if (user_id, kp_id, "quick") in _running or _quick_used.get(k, 0) >= QUICK_PER_DAY:
+            return
+        _quick_used[k] = _quick_used.get(k, 0) + 1
+    kick(user_id, kp_id, n=1, purpose="quick", grade=grade)
 
 
 def _start(key, n, grade, uses):

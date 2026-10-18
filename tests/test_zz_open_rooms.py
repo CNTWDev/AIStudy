@@ -46,7 +46,7 @@ def test_public_and_code_rooms():
         _kid("pa", name="姐姐甲")
         _kid("pb", name="弟弟乙")
         pc_parent, pc = _kid("pc", name="丙丙")
-        arena.set_public_rooms(pc, False)
+        auth.set_private(pc, True)
 
         # 没有兄弟姐妹也能开公开房间；先要起昵称
         _login(c, "pa")
@@ -137,7 +137,7 @@ def test_four_players_and_no_joining_mid_game():
 
 
 def test_new_team_opens_levels_everyone_reached():
-    """几个人第一次凑成一队：每个人都打过的关直接能选（不用从第 1 关打起）。"""
+    """几个人第一次凑成一队：队里打得最远的人打到的关都能选（不用从第 1 关打起），每个人过的关都记在自己身上。"""
     g = games.get("snake")
     a, b, c = (_kid(f"rc{i}")[1] for i in range(3))
     for n in (1, 2, 3):
@@ -145,8 +145,9 @@ def test_new_team_opens_levels_everyone_reached():
     progress.record(g, progress.team_key((c,)), 1, True, 1, 30)
     progress.record(g, progress.team_key((b, c)), 2, True, 1, 30)
     assert progress.reach(g, a) == 3 and progress.reach(g, c) == 2
-    assert progress.progress(g, progress.team_key((a, b, c)))["upto"] == 3   # 三个人都打过第 2 关
-    assert progress.progress(g, progress.team_key((a, c)))["upto"] == 3
+    assert progress.progress(g, progress.team_key((a, b, c)))["upto"] == 4   # 打得最远的打到第 3 关：开到第 4 关
+    assert progress.progress(g, progress.team_key((a, c)))["upto"] == 4
+    assert progress.progress(g, progress.team_key((c,)))["upto"] == 3       # 和别人一起过的关也算自己的
 
 
 def test_levels_for_more_players():
@@ -176,11 +177,14 @@ def test_parent_sets_nickname_and_public_rooms():
         pid = auth.create_user("or-pp@x.com", "secret1", "家长", "parent")
         k = auth.create_user("or-pk@x.com", "secret1", "小可", "kid", parent_id=pid, grade="G3")
         c.post("/login", data={"email": "or-pp@x.com", "password": "secret1"})
-        assert "公开房间" in c.get(f"/parent/kids/{k}/edit").text
+        assert "公开房间" in c.get(f"/parent/kids/{k}/edit").text and arena.public_rooms(dict(auth.get_user(k)))
         base = {"id": str(k), "name": "小可", "email": "or-pk@x.com", "grade": "G3", "daily_minutes": "60", "game_minutes": "20"}
         assert c.post("/parent/kids/save", data={**base, "nickname": "小可爱"}).status_code == 400   # 带了真名
-        c.post("/parent/kids/save", data={**base, "nickname": "星星"})
+        c.post("/parent/kids/save", data={**base, "nickname": "星星", "private": "1"})
         u = auth.get_user(k)
         assert u["nickname"] == "星星" and not arena.public_rooms(dict(u))
-        c.post("/parent/kids/save", data={**base, "nickname": "星星", "public_rooms": "1"})
+        c.post("/parent/kids/save", data={**base, "nickname": "星星"})
         assert arena.public_rooms(dict(auth.get_user(k)))
+        # 以前单独关过公开房间的：算打开了隐私模式
+        db.run("UPDATE users SET settings=? WHERE id=?", db.jdump({"public_rooms": False}), k)
+        assert auth.is_private(dict(auth.get_user(k)))

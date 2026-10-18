@@ -1,7 +1,9 @@
 {% extends "base.html" %}
+{% from "_admin.html" import admin_nav %}
 {% block body %}
-<a href="/admin?tab=system" class="small">← 管理</a>
-<h1>📚 书库</h1>
+<h1>管理后台</h1>
+{{ admin_nav('library') }}
+<h2>📚 书库</h2>
 {% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
 <p class="muted small">只放公有领域的书。原文由服务器从古腾堡 / 维基文库下载（也可以命令行 <code>python -m app.cli library fetch</code>），整理好存在 data/library/。
 服务器访问不了某个来源时，可以在别处下载 txt（UTF-8 或 GBK），在下面上传。书单在 content/library.json。</p>

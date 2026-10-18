@@ -29,6 +29,12 @@ def test_kid_picks_mascot():
         today = c.get("/today").text
         assert 'data-tone="kid"' in today and 'href="/static/brand/hive.svg"' in today  # 没选过：默认蜂巢宝宝
         assert "选一个你最喜欢的小伙伴" in today
+        # 孩子风格（DESIGN 5.30）：孩子的页面套一层，游戏页用自己的样子
+        assert 'data-skin="kid"' in today and 'data-skin="kid"' in c.get("/subjects").text
+        from app import arena
+        arena.set_game_unlock(db.one("SELECT id FROM users WHERE email='bk@x.com'")["id"], "free")
+        game = c.get("/arena/stickman").text
+        assert 'id="pl"' in game and "data-skin" not in game
         page = c.get("/settings").text
         assert "选一个陪你学习的小伙伴" in page and page.count('name="mascot"') == 5
 
@@ -45,7 +51,7 @@ def test_kid_picks_mascot():
 
         # 家长：同一套颜色，成人口吻
         c.post("/login", data={"email": "bp@x.com", "password": "secret1"})
-        assert 'data-tone="adult"' in c.get("/parent").text
+        assert 'data-tone="adult"' in (page := c.get("/parent").text) and "data-skin" not in page
         assert "我的图标" in c.get("/settings").text
 
 

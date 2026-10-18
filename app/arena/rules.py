@@ -11,7 +11,7 @@ import random
 import time
 from datetime import datetime
 
-from .. import db, explore
+from .. import auth, db, explore
 from ..catalog import is_adult
 
 DEFAULT_GAME_MINUTES = 20
@@ -80,12 +80,8 @@ def set_game_unlock(kid_id: int, rule) -> None:
 
 
 def public_rooms(kid: dict) -> bool:
-    """能不能进全站的公开房间（和别的家庭的孩子一起玩）。家长可以关掉；关掉以后只能进家里的和用密码进的房间。"""
-    return bool(_settings(kid).get("public_rooms", True))
-
-
-def set_public_rooms(kid_id: int, on: bool) -> None:
-    _save_setting(kid_id, "public_rooms", bool(on))
+    """能不能进全站的公开房间（和别的家庭的孩子一起玩）。家长打开隐私模式（auth.is_private）以后只能进家里的和用密码进的房间。"""
+    return not auth.is_private(kid)
 
 
 # ------------------------------------------------------------------ 今天能不能玩、能玩多久

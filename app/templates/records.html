@@ -10,6 +10,7 @@
   <div><b>{{ tot.n or 0 }}</b><span>做题 · 正确率 {{ ((tot.ok or 0) * 100 / tot.n)|int if tot.n else 0 }}%</span></div>
   <div><b>{{ words }} / {{ mistakes }}</b><span>生词 / 错题</span></div>
 </div>
+{% if not report_for %}<a class="bd-strip" href="/boards"><span class="i">🏆</span><span>学习榜：连续打卡、本周进步，看看你排第几</span><span class="go">去看 ›</span></a>{% endif %}
 {% if trend %}{{ trend_ui.accuracy(trend, link=not report_for) }}{% endif %}
 <div class="card">
   <div class="card-h"><span class="ico">📅</span><h3>每天学习 <span class="muted small" style="font-weight:400">近 12 周</span></h3></div>

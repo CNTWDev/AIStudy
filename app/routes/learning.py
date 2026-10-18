@@ -3,7 +3,7 @@ from ..content import content
 from fastapi import APIRouter
 from fastapi import Body, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from .. import arena, auth, bank, db, engine, evidence, explore, insights, itemtypes, llm, mix, prefetch, recall, records, sitecfg, sprint, streak, trace
+from .. import arena, auth, bank, boards, db, engine, evidence, explore, insights, itemtypes, llm, mix, prefetch, recall, records, sitecfg, sprint, streak, trace
 from datetime import date
 from ..web import (
     GRADES,
@@ -93,7 +93,7 @@ def today(request: Request):
     play = arena.status(k)
     exams = [x for x in (engine.exam_view(k["id"], e, m) for e in enrollments(k["id"])) if x and x["days_left"] >= 0]
     day = streak.today_state(k, t["plan"], t["minutes"], sprint.points_today(k["id"]))
-    return render(request, "today.html", t=t, play=play, day=day, settled=settled, exams=exams,
+    return render(request, "today.html", t=t, play=play, day=day, settled=settled, exams=exams, board_tip=boards.nudge(dict(k)),
                   goals=streak.GOALS, sprint_best=sprint.best_day(k["id"]), play_locked=arena.locked_reason(play),
                   due=len(engine.due_cards(k["id"], 99)), progress_ask=engine.progress_prompt(k), streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
                   stars=engine.total_stars(k["id"]), rec=rec, auto=engine.day_summary(rec),

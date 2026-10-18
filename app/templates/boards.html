@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}排行榜 · {{ SITE }}{% endblock %}
+{% block body %}
+{# 排行榜（app/boards.py；设计 /mnt/project-files/aistudy/docs/排行榜呈现设计.md）：
+   领奖台（突出优秀）→ 我的名次和差多少（量化提升）→ 我这一周和上周比（鼓励进步）→ 榜上之星。样式和乐园、快练一样是孩子风格。 #}
+<link rel="stylesheet" href="/static/play/play.css?v={{ ASSET_V }}">
+{% set game = b.is_game %}
+{% set q = '&scope=' ~ b.scope ~ ('&game=' ~ b.game if b.game else '') %}
+{% set gi = b.games|selectattr('id', 'equalto', b.game)|first if b.game else None %}
+{% set verb = '答对' if game else '坚持' %}
+{% set who = '你' if not parent_id else (viewer_kid.name if viewer_kid else '') %}
+{% set sign = '+' if b.is_up else '' %}
+<div class="bd {{ 'bd-park' if game else 'bd-learn' }}">
+<div class="bd-hero">
+  {% if gi %}<a href="/arena/{{ gi.id }}" class="bd-back">‹</a>{% elif game %}<a href="/arena" class="bd-back">‹</a>{% elif viewer_kid %}<a href="/records" class="bd-back">‹</a>{% endif %}
+  <div class="grow">
+    <h1>🏆 {{ (gi.icon ~ ' ' ~ gi.name ~ '榜') if gi else '乐园榜' if game else '学习榜' }}</h1>
+    <p>{% if b.is_up %}比上周同一天多{{ '答对' if game else '打卡' }}了多少。原来排第几都没关系，比上周多一点就能拿金牌！{% elif game %}比一比谁答对的题多。题都按自己的水平出，肯答就能往前冲！{% else %}比一比谁每天都坚持。做完今天的第 1 节就算打卡！{% endif %}</p>
+  </div>
+</div>
+<div class="bd-tabs">
+{% for m, n in b.metrics.items() if (m in ('game', 'game_all', 'game_up')) == game %}<a class="{{ 'on' if b.metric == m }}{{ ' up' if m in ('up', 'game_up') }}" href="/boards?metric={{ m }}{{ q }}">{{ '🚀 ' if m in ('up', 'game_up') }}{{ n }}</a>{% endfor %}
+</div>
+{% if b.city_ok %}<div class="bd-scope"><a class="{{ 'on' if b.scope == 'all' }}" href="/boards?metric={{ b.metric }}&scope=all{{ '&game=' ~ b.game if b.game }}">🌏 全站</a><a class="{{ 'on' if b.scope == 'city' }}" href="/boards?metric={{ b.metric }}&scope=city{{ '&game=' ~ b.game if b.game }}">📍 {{ b.city }}</a></div>{% endif %}
+
+{# ① 领奖台 #}
+{% set podium = (b.top|selectattr('rank', 'le', 3)|list)[:3] %}
+{% if podium %}
+<div class="bd-podium">
+{% for r in podium %}
+  {# 站位按名单顺序（第一个站中间最高），奖牌按名次（并列的一样） #}
+  <div class="pod s{{ loop.index }} p{{ r.rank }}{{ ' me' if r.me }}" style="--d:{{ (3 - loop.index) * 0.15 + 0.1 }}s">
+    {% if r.rank == 1 %}<span class="crown">👑</span>{% endif %}
+    <canvas data-av="{{ r.avatar or 'mint' }}" data-pose="win" aria-hidden="true"></canvas>
+    <b class="nm">{{ r.name }}{% if r.me %}<i>我</i>{% endif %}</b>
+    <span class="val">{{ sign }}{{ r.value }} {{ b.unit }}</span>
+    <div class="stand"><span>{{ ['🥇','🥈','🥉'][r.rank - 1] }}</span></div>
+  </div>
+{% endfor %}
+</div>
+{% endif %}
+
+{# ② 我的名次 #}
+{% if b.kid %}
+<div class="bd-card bd-me">
+{% if b.mine %}
+  <div class="bd-rank"><small>第</small><b data-count="{{ b.mine.rank }}">{{ b.mine.rank }}</b><small>名</small></div>
+  <div class="grow">
+    <div class="bd-me-h"><b>{{ who }}的名次</b>
+      {% if b.moved == 'new' %}<span class="bd-badge new">🎉 新上榜</span>{% elif b.moved and b.moved > 0 %}<span class="bd-badge up">⬆ 前进 {{ b.moved }} 名</span>{% endif %}</div>
+    {% if b.mine.rank == 1 %}<p class="bd-goal">🎉 第 1 名！{{ '多玩多答，保住它！' if game else '每天做完第 1 节，就能一直保持！' }}</p>
+    {% elif b.ahead %}
+      <p class="bd-goal">再{{ verb }} <b>{{ b.ahead }}</b> {{ b.unit }}，超过前面一位</p>
+      <div class="bd-bar"><i style="--w:{{ (100 * b.mine.value / (b.mine.value + b.ahead))|round|int }}%"></i></div>
+    {% endif %}
+    {% if b.to_top %}<p class="bd-goal sm">再{{ verb }} <b>{{ b.to_top }}</b> {{ b.unit }}，冲进前 {{ b.top_n }} 名 🔥</p>
+    {% elif b.mine.rank <= b.top_n and b.mine.rank > 1 %}<p class="bd-goal sm">⭐ 已经在前 {{ b.top_n }} 名，保住它！</p>{% endif %}
+  </div>
+{% elif b.on_board %}
+  <div class="bd-rank off"><b>？</b></div>
+  <div class="grow"><b>{% if b.is_up %}这周比上周同一天多{{ '答对一道题' if game else '打卡一天' }}，就上进步榜！{% elif game %}玩一局，答对一道题就上榜！{% else %}做完今天的第 1 节，就上榜了！{% endif %}</b></div>
+{% else %}
+  <p class="muted small" style="margin:0">{% if parent_id %}{{ viewer_kid.name }}开了隐私模式，不上榜。<a href="/parent/kids/{{ viewer_kid.id }}/edit">在「编辑资料」里可以关掉</a>，榜上只显示昵称。{% else %}你开了隐私模式，不上榜。想上榜的话，请爸爸妈妈在家长页把隐私模式关掉。{% endif %}</p>
+{% endif %}
+</div>
+
+{# ③ 我这一周：只和上周同一天的自己比；少了不说少多少 #}
+{% set w = b.week %}
+<div class="bd-card bd-week{{ ' better' if w.now > w.prev }}">
+  <div class="bd-vs">
+    <div class="me-now"><span>这周</span><b data-count="{{ w.now }}">{{ w.now }}</b><small>{{ '道' if game else '天' }}</small></div>
+    <div class="vs">VS</div>
+    <div class="me-was"><span>上周这时候</span><b>{{ w.prev }}</b><small>{{ '道' if game else '天' }}</small></div>
+  </div>
+  {% if w.now > w.prev %}<p class="bd-cheer">🎉 比上周的自己多{{ '答对' if game else '打卡' }} <b>{{ w.now - w.prev }}</b> {{ '道' if game else '天' }}，真棒！</p>
+  {% elif w.now == w.prev and w.now %}<p class="bd-cheer calm">💪 和上周一样稳，再多一点就是进步！</p>
+  {% else %}<p class="bd-cheer calm">💪 这周还有 {{ w.left }} 天，{{ '玩一局就能答对好几道！' if game else '每天做完第 1 节就算打卡！' }}</p>{% endif %}
+</div>
+{% elif parent_id %}
+<p class="muted small">在家长页选一个孩子，就能看到这个孩子的名次。</p>
+{% endif %}
+
+{# ④ 榜上之星 #}
+{% set rest = b.top[podium|length:] %}
+{% if rest or not b.top or (b.mine and b.mine.rank > b.top|length) %}
+<div class="bd-card bd-list board">
+  {% if rest %}<div class="bd-list-h">⭐ 榜上之星</div>{% endif %}
+  {% for r in rest %}
+  <div class="bd-row{{ ' me' if r.me }}{{ ' more' if loop.index + podium|length > 10 }}" style="--d:{{ loop.index0 * 0.04 }}s"><span class="rk">{{ r.rank }}</span><b class="grow">{{ r.name }}{% if r.me %} <i>我</i>{% endif %}</b><span class="val">{{ sign }}{{ r.value }} {{ b.unit }}</span></div>
+  {% endfor %}
+  {% if b.top|length > 10 %}<button type="button" class="btn ghost sm" onclick="this.closest('.board').classList.add('all');this.remove()">看前 {{ b.top|length }} 名</button>{% endif %}
+  {% if not b.top %}
+  <div class="empty"><div class="e">🌱</div>
+  {% if not b.joined %}<b>榜上还没有人</b>开了隐私模式的孩子不上榜。
+  {% elif b.is_up %}<b>这周还没有人比上周进步</b>比上周同一天多{{ '答对一道题' if game else '打卡一天' }}，你就是第 1 名！
+  {% elif game %}<b>还没有人答对题</b>去玩一局，你就是第 1 名！
+  {% else %}<b>还没有人打卡</b>做完今天的第 1 节就上榜了！{% endif %}
+  </div>
+  {% endif %}
+  {% if b.mine and b.mine.rank > b.top|length %}
+  <div class="bd-row gap">⋯</div>
+  <div class="bd-row me"><span class="rk">{{ b.mine.rank }}</span><b class="grow">{{ b.mine.name }} <i>我</i></b><span class="val">{{ sign }}{{ b.mine.value }} {{ b.unit }}</span></div>
+  {% endif %}
+</div>
+{% endif %}
+<p class="muted small" style="text-align:center">榜上的小伙伴：{{ b.joined }} 个 · 只显示昵称</p>
+</div>
+<script>window.BD_PARTY = {{ (b.kid and ((b.mine and b.mine.rank <= 3) or b.moved == 'new' or (b.moved is number and b.moved > 0) or (b.week and b.week.now > b.week.prev))) and true or false }};</script>
+<script src="/static/play/engine.js?v={{ ASSET_V }}"></script>
+<script src="/static/play/art.js?v={{ ASSET_V }}"></script>
+<script src="/static/play/boards.js?v={{ ASSET_V }}"></script>
+{% endblock %}
