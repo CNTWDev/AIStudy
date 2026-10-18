@@ -88,7 +88,7 @@
   <a href="/review"><span class="qi">🔁</span><span><b>复习</b><small>{% if due %}有 {{ due }} 张卡到期{% else %}今天的卡都复习完了{% endif %}</small></span></a>
   <a href="/words"><span class="qi">🔤</span><span><b>单词本</b><small>查过的词都在这</small></span></a>
   {% if play.base %}<a href="/arena" class="qplay {{ 'lock' if play_locked }}"><span class="qi">🎮</span><span style="flex:1;min-width:0"><b>乐园</b>
-    <small>{% if play.need %}再完成 {{ play.need }} 项任务就能玩{% elif play.left > 0 %}今天还能玩 {{ (play.left / 60)|int }} 分钟{% if play.can_bonus_all %} · 全做完再 +10{% endif %}{% else %}今天玩够啦，明天见{% endif %}</small>
+    <small>{% if play.need %}再完成 {{ play.need }} 项任务就能玩{% elif play.unlimited %}今天不限时{% elif play.left > 0 %}今天还能玩 {{ (play.left / 60)|int }} 分钟{% if play.can_bonus_all %} · 全做完再 +10{% endif %}{% else %}今天玩够啦，明天见{% endif %}</small>
     {% if play.need %}<span class="pbar"><i style="width:{{ (100 * play.done / (play.done + play.need))|round }}%"></i></span>{% endif %}</span></a>{% endif %}
   {% if total and day.sprint_open %}<a href="/sprint" class="qsprint"><span class="qi">⚡</span><span><b>冲刺</b><small>{% if day.sprint_points %}今天 {{ day.sprint_points }} 分{% if sprint_best %} · 纪录 {{ sprint_best }}{% endif %}{% else %}连对 ×2 ×3，换 ⭐{% endif %}</small></span></a>{% endif %}
 </div>

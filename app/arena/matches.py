@@ -69,12 +69,12 @@ def start(kid: dict, game: str, session=None, resume=None) -> dict:
         old = db.one("SELECT id, data FROM arena_matches WHERE id=? AND user_id=? AND session_id=? AND ended_at IS NULL", resume, kid["id"], sid) \
             if resume else None
         if old:
-            return {"match_id": old["id"], "seconds_left": st["left"], "avatar": awards.avatar(kid), "ghost": ghost(kid["id"]) if game == "race" else None, "target": g.target}
+            return {"match_id": old["id"], "seconds_left": st["left"], "unlimited": st["unlimited"], "avatar": awards.avatar(kid), "ghost": ghost(kid["id"]) if game == "race" else None, "target": g.target}
     for m in db.q("SELECT id, game, started_at FROM arena_matches WHERE user_id=? AND ended_at IS NULL", kid["id"]):
         _close(m["id"], m["started_at"], "quit", {}, GAMES[m["game"]].max_seconds if m["game"] in GAMES else 600)
     mid = db.insert("INSERT INTO arena_matches(user_id, game, mode, started_at, data, session_id) VALUES(?,?,?,?,?,?)",
                     kid["id"], game, "solo" if not g.multi else "team", db.now(), db.jdump({"streak": 0, "fast_wrongs": 0}), sid)
-    return {"match_id": mid, "seconds_left": st["left"], "avatar": awards.avatar(kid),
+    return {"match_id": mid, "seconds_left": st["left"], "unlimited": st["unlimited"], "avatar": awards.avatar(kid),
             "ghost": ghost(kid["id"]) if game == "race" else None, "target": g.target}
 
 
@@ -195,7 +195,7 @@ def end(kid: dict, match_id, result: str, stats: dict | None = None) -> dict:
     new = awards.after_match(kid["id"], get(m["game"]).match_stickers(result, clean), st, st_now, f)
     return {"result": result, "seconds": secs, "answered": answered, "right": right,
             "accuracy": round(right / answered * 100) if answered else 0, "xp": st.get("xp", 0), "focus": f["index"],
-            "best_streak": st.get("best_streak", 0), "seconds_left": st_now["left"], "tips": tips,
+            "best_streak": st.get("best_streak", 0), "seconds_left": st_now["left"], "unlimited": st_now["unlimited"], "tips": tips,
             "topics": topics[:4], "stickers": new, "level": awards.level(kid["id"])}
 
 
