@@ -104,7 +104,7 @@ def question(kid: dict, run_id, rng: random.Random | None = None) -> dict:
     st, now = r["state"], time.time()
     pend = st.get("pending")
     if not pend or now - pend["issued"] > PENDING_KEEP_S:
-        pend = {"item": sources.pick(kid, "mix", TARGET, rng or random.Random()), "issued": now}
+        pend = {"item": sources.pick(kid, TARGET, rng or random.Random()), "issued": now}
         st["pending"] = pend
         _save(r["id"], st)
     return {"item": sources.public(pend["item"])}

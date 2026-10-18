@@ -27,9 +27,6 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 .pl-how{text-align:left;margin:10px 0 0;font-size:13.5px}.pl-how summary{cursor:pointer;color:var(--muted);font-weight:700;text-align:center}
 .pl-rules{text-align:left;font-size:13.5px;margin:6px 0 0;padding-left:20px;line-height:1.5}.pl-rules b{color:var(--pl-pink)}
 .pl-label{font-size:13px;color:var(--muted);font-weight:700;margin:4px 0 6px;width:100%}
-.pl-srcs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:0 0 12px}
-.pl-src{border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:6px 12px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;display:flex;gap:4px;align-items:center}
-.pl-src.on{border-color:var(--pl-ink);background:var(--pl-sun);color:#3a2a00;box-shadow:0 3px 0 var(--pl-ink)}
 .pl-go{font-size:20px;font-weight:900;background:var(--pl-pink);border-color:var(--pl-ink);border-width:3px;box-shadow:0 5px 0 var(--pl-ink);color:#fff;flex-direction:column;gap:0}
 .pl-go:hover{background:#ff5591;border-color:var(--pl-ink)}.pl-go:active{transform:translateY(3px);box-shadow:0 2px 0 var(--pl-ink)}
 .pl-go small{font-size:12px;font-weight:600;opacity:.9}
@@ -139,7 +136,7 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
   .aq-pad button{min-height:38px;font-size:18px}.aq-opt{min-height:46px;font-size:15px;padding:6px 8px}
   .pl-btn{min-width:52px;min-height:52px}.pl-btn.big{min-width:62px;min-height:62px}
   .pl-panel{padding:8px 14px}.pl-me,.pl-start .pl-label{display:none}.pl-title{font-size:18px;margin:0 0 4px}
-  .pl-srcs{margin:0 0 8px}.pl-src{padding:4px 10px;font-size:13px}.pl-go{font-size:18px;min-height:0;padding:6px 12px}
+  .pl-go{font-size:18px;min-height:0;padding:6px 12px}
   .pl-stats b{font-size:20px}.pl-tips{margin:4px 0}
 }
 @media (max-width:420px){.aq-q{font-size:26px}.aq-opt{font-size:15px;min-height:52px;padding:8px}.aq-pad button{min-height:46px}}
