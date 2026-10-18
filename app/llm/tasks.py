@@ -123,6 +123,10 @@ def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=
         "practice": f"生成 {n} 道练习题，难度从易到难（1,2,3）。",
         "diagnose": "生成 1 道诊断题，只测这一个知识点的核心，难度 2，最好是选择题或填空题，便于自动判分。",
         "preview": f"生成 {n} 道预习用的入门题，难度都为 1，题干尽量短，并在 hint 里给出思路。",
+        # 快答题：游戏、快练里用，每道 20 秒内答完（app/bank.py 的 is_quick 会再筛一遍）
+        "quick": (f"生成 {n} 道快答题，每道 20 秒内能答完：只用 mcq（四个选项）或 num（答案是一个数）；"
+                  "题干不超过 60 个字，每个选项不超过 20 个字；不要图、不要阅读材料、不要代码；难度 1、2、3 都要有；"
+                  "每道从不同角度考（概念辨析、判断对错、简单应用、常见易错点），不要出只换了数字的同一道题。"),
         # 融合题：新知识里带着旧知识（以前学过的、更低年级的、别的学科的），一道题把它们串起来练
         "combine": (f"生成 {n} 道融合题，难度 2：做这道题必须用到上面这个知识点，同时也必须用到下面这些以前学过的知识点"
                     "（缺了哪一个都做不出来），但题目要自然，像一道真实的应用题，不要把几道小题硬拼在一起。"
@@ -132,7 +136,7 @@ def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=
     user = (
         f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n"
         f"诊断思路参考：{kp.get('probe','')}\n关键词：{', '.join(kp.get('terms', []))}\n\n"
-        f"{purpose_txt}\n优先用 mcq/num/fill（能自动判分），short 最多 1 道。不要照搬教材原文。"
+        f"{purpose_txt}\n{'' if purpose == 'quick' else '优先用 mcq/num/fill（能自动判分），short 最多 1 道。'}不要照搬教材原文。"
         f"答案必须正确且唯一，请自己检查一遍。\n输出格式：{_item_schema(pack, kp)}{_traps_note(kp)}{_figs_note(kp, pack)}"
     )
     data = ask_json("items", _tutor(grade) + "你也是严谨的出题人。", user, user_id=user_id, effort="medium", cache=False)

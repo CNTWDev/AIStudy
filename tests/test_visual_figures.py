@@ -7,7 +7,6 @@ from fastapi.testclient import TestClient
 from PIL import Image
 
 from app import bank, db, figures, itemtypes, papers
-from app.arena import sources
 from app.catalog import catalog
 from app.figures import photo
 from app.llm import tasks
@@ -101,7 +100,7 @@ def test_item_with_figure():
     plain = {"type": "num", "q": "1+1=?", "answer": 2}
     assert bank.item_hash(plain) == bank.fingerprint("num", "1+1=?", "", 2)
     # 游戏里不出带图的题
-    assert not sources._short({"q": "如图", "options": ["1", "2", "3", "4"], "fig": it["fig"]})
+    assert not bank.is_quick("mcq", {"q": "如图", "options": ["1", "2", "3", "4"], "fig": it["fig"]})
 
 
 def test_ai_items_keep_good_figures(monkeypatch):

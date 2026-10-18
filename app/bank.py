@@ -104,6 +104,14 @@ def set_fig(item_id: str, fig: dict | None):
     db.run("UPDATE items SET data=?, qhash=?, updated_at=? WHERE id=?", db.jdump(data), item_hash(it), db.now(), item_id)
 
 
+def is_quick(kind: str, d: dict) -> bool:
+    """适合 20 秒内答完的快答题（游戏、快练、冲刺用）：短选择题或短计算题，不带图、录音、阅读材料、代码。"""
+    opts = d.get("options") or []
+    fits = len(opts) == 4 and all(len(str(o)) <= 36 for o in opts) if kind == "mcq" else kind == "num"
+    return (len(str(d.get("q", ""))) <= 90 and fits
+            and not d.get("code") and not d.get("passage") and not d.get("fig") and not d.get("audio"))
+
+
 def candidates(user_id: int, kp_id: str) -> list:
     """这个知识点能用的题：自己的，加上同一概念在别的教材里、语言相同的知识点的题。
     孩子自己标记过有问题的题不再出现；别的孩子的试卷原题不出现。"""
