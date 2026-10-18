@@ -4,7 +4,7 @@
   共享的东西由他那台设备算。房主走了，由最早进来的人接任；人都走了房间就关了。
 - 单机游戏每个孩子每款游戏一个房间，一直留着（刷新、换设备回来接着玩）。联网游戏开房间时选一种（kind）：
   family 家里：只有同一个家里的兄弟姐妹能看到、能进，乐园首页会提示「X 在等你」；
-  public 公开：全站的孩子在这款游戏的大厅里都能看到、能进（家长关掉了「公开房间」的孩子看不到、进不去）；
+  public 公开：全站的孩子在这款游戏的大厅里都能看到、能进（家长打开隐私模式的孩子看不到、进不去）；
   code 密码：大厅里不显示，报房间号和 4 位密码的人才能进（两个认识的人约好一起玩）。
   公开和密码房间里只显示昵称（auth.public_name），真名不出现；一局开始以后不能再进人，等这一关打完。
 - 设备：一个账号在一个房间里同一时间只有一台设备在玩（room_members.device，前端每个页面一个设备号，刷新不变）。
@@ -166,7 +166,7 @@ def create(kid: dict, game: str, role: str = "", device: str = "", kind: str = "
     if kind == "family" and not siblings(kid):
         raise ArenaError("家里还没有别的小伙伴的账号。可以开一个公开房间，或者开密码房间约认识的小伙伴。", 403)
     if kind == "public" and not rules.public_rooms(kid):
-        raise ArenaError("爸爸妈妈没有打开公开房间，可以开家里的房间或者密码房间", 403)
+        raise ArenaError("爸爸妈妈打开了隐私模式，不能进公开房间。可以开家里的房间或者密码房间", 403)
     if kind != "family":
         _need_nickname(kid)
     _leave_multi(kid)
@@ -197,7 +197,7 @@ def _check_join(kid: dict, r: dict, pin) -> None:
     if kind == "family" and r["family_id"] != family_of(kid):
         raise ArenaError("只能加入自己家里的房间", 403)
     if kind == "public" and not rules.public_rooms(kid):
-        raise ArenaError("爸爸妈妈没有打开公开房间", 403)
+        raise ArenaError("爸爸妈妈打开了隐私模式，不能进公开房间", 403)
     if kind == "code" and not _pin_ok(kid, r, pin):
         raise ArenaError("房间号或密码不对", 403)
     if kind != "family":

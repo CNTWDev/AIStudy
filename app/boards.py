@@ -4,7 +4,7 @@
   （做完第 1 节才算；补签卡能保住连续，但补上的那天不加天数）。
 - 两个范围：全站、我所在的城市（家长账号上的 city，「省·市」）。一个城市上榜的孩子少于 CITY_MIN 个就不单独开城市榜，
   免得别人猜出是谁。
-- 只有家长打开了「上排行榜」的孩子才在榜上（users.settings.board，默认不上），榜上只显示昵称（auth.public_name）。
+- 孩子默认在榜上，家长打开隐私模式（auth.is_private）就不上任何榜；榜上只显示昵称（auth.public_name）。
 - 乐园榜「本周答对」：这周（周一起）在乐园所有游戏里答对了几道题。每个人的题都按自己的水平出（app/arena/sources.py），
   预期答对的比例大家一样，比的是肯不肯答题，不是会多少；每周一重新数。还有「一共答对」（从开始玩到现在）。
   两个都能只看一款游戏（这款游戏里答对几道）。单款游戏也不比关卡、分数、时间。
@@ -37,14 +37,8 @@ def _settings(u: dict) -> dict:
 
 
 def on_board(kid: dict) -> bool:
-    return bool(_settings(kid).get("board"))
-
-
-def set_on_board(kid_id: int, on: bool) -> None:
-    u = db.one("SELECT settings FROM users WHERE id=?", kid_id)
-    st = db.jload(u["settings"], {}) if u else {}
-    st["board"] = bool(on)
-    db.run("UPDATE users SET settings=? WHERE id=?", db.jdump(st), kid_id)
+    """默认上榜；家长打开隐私模式（auth.is_private）就不上任何榜。"""
+    return not auth.is_private(kid)
 
 
 def norm_city(province: str, city: str) -> str:

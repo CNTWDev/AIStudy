@@ -19,7 +19,7 @@
   <div class="brow{{ ' me' if r.me }}"><span class="bk">{{ ['🥇','🥈','🥉'][r.rank - 1] if r.rank <= 3 else r.rank }}</span><b class="grow">{{ r.name }}{% if r.me %} <small>（我）</small>{% endif %}</b><span class="bv">{{ r.value }} {{ b.unit }}</span></div>
 {% else %}
   <div class="empty"><div class="e">🌱</div>
-  {% if not b.joined %}<b>榜上还没有人</b>上排行榜要家长打开，默认是关着的。家长在家长页点孩子的「编辑资料」，勾上「上排行榜」就行，榜上只显示昵称。
+  {% if not b.joined %}<b>榜上还没有人</b>开了隐私模式的孩子不上榜。
   {% elif game %}<b>这{{ '一款游戏' if b.game else '周' if b.metric == 'game' else '里' }}还没有人答对题</b>上榜的 {{ b.joined }} 个小伙伴{{ '这周' if b.metric == 'game' else '' }}还没在{{ '这款游戏' if b.game else '乐园' }}里答对题。去玩一局，你就是第 1 名。
   {% else %}<b>还没有人打卡</b>上榜的 {{ b.joined }} 个小伙伴还没有打卡的天数。做完今天的第 1 节就上榜了。{% endif %}
   {% if parent_id and not b.joined %}<p style="margin:10px 0 0"><a class="btn sm" href="/parent">去家长页打开</a></p>{% endif %}
@@ -43,7 +43,7 @@
 {% else %}
   <b>{{ b.metrics[b.metric] }} {{ b.counts[b.metric] }} 天。</b>
 {% endif %}
-{% if not b.on_board %}<p class="muted small" style="margin:6px 0 0">{% if parent_id %}{{ viewer_kid.name }}还没上榜。<a href="/parent/kids/{{ viewer_kid.id }}/edit">在「编辑资料」里打开「上排行榜」</a>，榜上只显示昵称。{% else %}你还没上榜。想上榜的话，请爸爸妈妈在家长页打开「上排行榜」。榜上只显示你的游戏昵称。{% endif %}</p>{% endif %}
+{% if not b.on_board %}<p class="muted small" style="margin:6px 0 0">{% if parent_id %}{{ viewer_kid.name }}开了隐私模式，不上榜。<a href="/parent/kids/{{ viewer_kid.id }}/edit">在「编辑资料」里可以关掉</a>，榜上只显示昵称。{% else %}你开了隐私模式，不上榜。想上榜的话，请爸爸妈妈在家长页把隐私模式关掉。榜上只显示你的游戏昵称。{% endif %}</p>{% endif %}
 </div>
 {% elif parent_id %}
 <p class="muted small">在家长页选一个孩子，就能看到这个孩子的名次。</p>
