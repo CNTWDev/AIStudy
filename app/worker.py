@@ -23,6 +23,7 @@ def main(once=False):
     content.load()
     methods.load()
     engine.load_seed_items(config.SEED_DIR)
+    engine.load_seed_lessons(config.SEED_DIR)
     bank.sync()
     evidence.ensure_current()
     next_bank = next_news = 0.0

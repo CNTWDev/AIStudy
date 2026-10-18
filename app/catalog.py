@@ -84,6 +84,8 @@ class Pack:
     levels: list = field(default_factory=list)        # course 自己的级别 [{id, label, year}]
     chapters: bool = True                             # 能不能按章报进度；按能力分的（剑桥英语等）写 "progress": "none"
     selection: dict = field(default_factory=dict)    # 家长选课用的短名称、核对提示
+    copyright: str = ""                               # 自编教材的版权声明，显示在知识点页底部
+    open_review: str = ""                             # "ai"：简答题由 AI 点评和追问，不让学员自评（app/coach.py）
 
     @property
     def lang(self) -> str:
@@ -268,7 +270,8 @@ class Catalog:
             strands=d.get("strands", []), tracks=meta.get("tracks", []), default_track=meta.get("default_track", ""),
             school_types=meta.get("school_types", []), system=system, kind=kind, teach_lang=teach, item_lang=item,
             prompt_note=meta.get("prompt_note", ""), levels=levels, chapters=meta.get("progress") != "none",
-            selection=meta.get("selection") or {},
+            selection=meta.get("selection") or {}, copyright=meta.get("copyright", ""),
+            open_review=meta.get("open_review", ""),
         )
 
     def _load_meta(self, meta_dir):

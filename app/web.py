@@ -10,7 +10,7 @@ from fastapi.responses import RedirectResponse
 
 from fastapi.templating import Jinja2Templates
 
-from . import arena, auth, bankpapers, boards, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, sprint, streak, trace
+from . import arena, auth, bankpapers, boards, coach, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, sprint, streak, trace
 
 from . import figures
 
@@ -293,7 +293,7 @@ def _kid_form_packs(form, grade: str, old: dict, grade_changed: bool) -> list[tu
 def course_choices(school_type='', grade=None):
     order = {subject: i for i, subject in enumerate(('chinese', 'math', 'english', 'science', 'physics', 'chemistry', 'biology', 'history', 'geography', 'economics'))}
     return dict(sorted(catalog.by_subject(school_type).items(), key=lambda kv:
-                       (0 if is_adult(grade) and any(p.system == 'cert' for p in kv[1]) else 1,
+                       (0 if is_adult(grade) and any(is_adult(p.stages[0]) for p in kv[1] if p.stages) else 1,
                         order.get(kv[1][0].subject, 99))))
 
 
@@ -372,7 +372,10 @@ def require_self_learner(request: Request):
     return u
 
 def _public_item(it: dict) -> dict:
-    return {k: v for k, v in itemtypes.public(it).items() if k not in ("tol", "source")}
+    out = {k: v for k, v in itemtypes.public(it).items() if k not in ("tol", "source")}
+    if itemtypes.of(it).self_rated and coach.on(it, it.get("kp_id", "")):
+        out["coach"] = True  # 开放题由 AI 点评和追问，不让学员自评（app/coach.py）
+    return out
 
 _answer_display = engine.answer_display
 

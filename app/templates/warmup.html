@@ -48,7 +48,7 @@ function show() {
     const p = it.probe;
     const body = extra => Object.assign({item_id: it.id, kp_id: p.kp, mode: 'probe', probe: {depth: p.depth, from: p.from}}, extra);
     renderItem(box, it, {
-      submit: (answer, self, ms) => api('/api/answer', body(self ? {self, ms} : {answer, ms})),
+      submit: (answer, self, ms, extra) => api('/api/answer', body(self ? {self, ms} : {answer, ms, ...extra})),
       dontKnow: () => api('/api/answer', body({dont_know: true})),
       onDone: res => {
         if (res.correct) right++; else found++;

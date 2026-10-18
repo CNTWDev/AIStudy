@@ -161,6 +161,8 @@ MOCK = {
                "simple_en": "something that shows what others are like", "synonyms": ["sample", "instance"], "other_meanings": ["榜样"],
                "example": "Give me an example.", "example_zh": "给我举个例子。", "pinyin": "lì zi"},
     "explain": {"meaning": "这句话的意思是……", "structure": "主干：……", "points": [{"text": "example", "note": "例子"}]},
+    "review": {"verdict": "partial", "points": [{"hit": True, "note": "示例：说到了主要矛盾"}, {"hit": False, "note": "示例：没有提到第二层后果"}],
+               "feedback": "示例点评：主要矛盾抓得准，但还没想到留下的人会怎么反应。", "followup": "示例追问：如果最好的人先走了，会怎样？"},
     "sentence": {"ok": True, "praise": "用法正确！", "issue": "", "corrected": "", "better": "This is a good example.", "score": 4},
     "passage": {"title": "A Small Seed", "body": "A small seed fell on the ground.\n\nIt rained, and the seed began to grow.",
                 "questions": [{"q": "What fell on the ground?", "options": ["A leaf", "A seed", "A stone", "A bird"],

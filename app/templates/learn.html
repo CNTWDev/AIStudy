@@ -3,7 +3,7 @@
 {% set st = me.status if me else 'unknown' %}
 <a href="/map/{{ pack.id }}" class="small">← {{ pack.subject_name }}知识地图</a>
 <h1>{{ kp.name }}</h1>
-<p class="muted small"><span class="for-grownups">{% if kp.name_en %}{{ kp.name_en }} · {% endif %}</span>{{ stage_label(kp.stage) }}<span class="for-grownups"> · {{ strand }}</span> {% if kp.hot %}· <span style="color:var(--warn)">考试常考</span>{% endif %}
+<p class="muted small"><span class="for-grownups">{% if kp.name_en %}{{ kp.name_en }} · {% endif %}</span>{{ stage_label(kp.stage) }}<span class="for-grownups"> · {{ strand }}</span> {% if kp.hot %}· <span style="color:var(--warn)">{{ '重点' if pack.kind == 'course' else '考试常考' }}</span>{% endif %}{% if kp.evidence %} · <span class="pill" title="这条规律的证据有多强：研究共识 / 经典案例 / 经验之谈">{{ kp.evidence }}</span>{% endif %}
  · <span class="pill st-{{ st }}">{{ STATUS_LABEL[st] }}</span></p>
 
 {% if ev %}<div class="evline small">
@@ -19,11 +19,14 @@
 {% endif %}
 
 <ol class="steps">
-  <li><b>看懂它</b><div>{{ kp.desc }}</div>
+  <li><b>{{ '难题' if kp.think else '看懂它' }}</b><div>{{ kp.desc }}</div>
+    {% if kp.sources %}<div class="small muted" style="margin-top:4px">出处：{{ kp.sources|join('；') }}</div>{% endif %}
     {% if kp.terms %}<div class="small" style="margin-top:4px">{{ '🔑 ' if simple else '关键词：' }}{% for t in kp.terms %}<span class="pill">{{ t }}</span> {% endfor %}</div>{% endif %}
-    {% if not readonly %}<div id="teach" style="margin-top:8px"><button class="btn ghost sm" id="teachbtn">{{ ASSISTANT_ICON }} {{ '讲给我听' if simple else '让' ~ ASSISTANT ~ '一步步讲给我听' }}</button></div>{% endif %}</li>
+    {% if kp.think and not readonly %}<div class="think" style="margin-top:8px"><div class="small">✍️ {{ kp.think }}</div>
+      <textarea id="thinktxt" style="min-height:70px" placeholder="先别看讲解，写下你自己的判断和理由"></textarea></div>{% endif %}
+    {% if not readonly %}<div id="teach" style="margin-top:8px"><button class="btn ghost sm" id="teachbtn">{% if kp.think %}写好了，看看不同的想法{% else %}{{ ASSISTANT_ICON }} {{ '讲给我听' if simple else '让' ~ ASSISTANT ~ '一步步讲给我听' }}{% endif %}</button></div>{% endif %}</li>
   <li id="ctxli" style="display:none">{% if simple %}<details><summary><b>🌍 学它有什么用？</b></summary><div id="ctx" class="ctxbox"></div></details>{% else %}<b>它从哪来、用在哪</b><div id="ctx" class="ctxbox"></div>{% endif %}</li>
-  <li><b>记住方法</b><div>{{ kp.method }}</div></li>
+  <li><b>{{ '拆这个难题的方法' if kp.think else '记住方法' }}</b><div>{{ kp.method }}</div></li>
   {% if bridges %}<li><b>🔗 和别的学科连起来</b>
     {% for b in bridges %}<div class="bridge small">{% if b.mine %}<a href="/learn/{{ b.kp.id }}">{{ b.kp.name }}</a>{% else %}{{ b.kp.name }}{% endif %}
       <span class="muted">{{ b.subject }} · {{ b.label }}{% if b.note %}：{{ b.note }}{% endif %}{% if b.type == 'same' %}（{{ b.edition }}）{% endif %}</span>
@@ -31,7 +34,7 @@
   {% if readonly %}<li><b>做题和总结</b><div class="muted small">孩子用自己的账号登录后在这里练习。</div></li>{% else %}
   <li><b>动手做 3 题</b> <span class="muted small for-grownups">从简单的开始；错了会自动进错题本</span>
     <div id="items" class="card" style="margin-top:8px"><button class="btn" id="start">开始做题</button></div></li>
-  <li><b>用一句话总结</b> <span class="muted small for-grownups">（会变成复习卡片）</span>
+  <li><b>{{ '对照一开始的判断，写下现在的想法' if kp.think else '用一句话总结' }}</b> <span class="muted small for-grownups">（会变成复习卡片）</span>
     <textarea id="summary" style="min-height:60px" placeholder="{{ '这个知识点就是……' if simple else '用自己的话说：这个知识点就是……' }}"></textarea>
     <div class="row" style="margin-top:8px"><button class="btn" id="finish">完成这一项</button></div></li>{% endif %}
 </ol>
@@ -46,20 +49,26 @@
     {% else %}<p class="muted small">后面暂时没有了。</p>{% endfor %}</div>
 </div>
 {% if simple %}</details>{% endif %}
+{% if pack.copyright %}<p class="muted small">{{ pack.copyright }}</p>{% endif %}
 {% if not readonly %}<script>
 const KP = {{ kp.id|tojson }}, TASK = {{ task|tojson }};
 window.ASK_CTX = {kp: KP};
 let items = [], idx = 0, right = 0, wrongStreak = 0, lastAnswer = null;
 $('#teachbtn').onclick = async () => {
+  // 难题课：先写下自己的判断，再看讲解；最后的总结从这一句接着写
+  const think = $('#thinktxt');
+  if (think && think.value.trim().length < 10) { think.placeholder = '先写一两句你自己的判断，再看讲解'; think.focus(); return; }
+  if (think) { think.readOnly = true; if (!$('#summary').value) $('#summary').value = '一开始我认为：' + think.value.trim() + '\n现在我认为：'; }
   $('#teach').innerHTML = '<span class="loading">' + {{ (ASSISTANT ~ '正在准备')|tojson }} + '</span>';
   try {
     const t = await api('/api/teach/' + KP);
     $('#teach').innerHTML = '<div class="card" style="margin:0">' +
       (t.bridge && t.bridge.length ? '<div class="hint" style="margin-top:0">🔗 先连一连：' + t.bridge.map(b => `你在${esc(b.subject)}学过「${esc(b.name)}」${b.note ? '，' + esc(b.note) : ''}`).join('；') + '</div>' : '') +
-      (t.steps || []).map((s, i) => `<p><b>${i + 1}. ${esc(s.title)}</b><br>${esc(s.text)}</p>`).join('') +
-      (t.example ? `<p><b>例子：</b>${esc(t.example.q)}<br><span class="muted">→ ${esc(t.example.a)}</span></p>` : '') +
+      (t.steps || []).map((s, i) => `<p><b>${i + 1}. ${esc(s.title)}</b><br>${esc(s.text).replace(/\n/g, '<br>')}</p>`).join('') +
+      (t.example ? `<p><b>{{ '再想一步' if kp.think else '例子' }}：</b>${esc(t.example.q)}<br><span class="muted">→ ${esc(t.example.a)}</span></p>` : '') +
       (t.terms && t.terms.length ? '<p class="small">' + t.terms.map(x => `<span class="pill">${esc(x.en)} = ${esc(x.zh)}</span>`).join(' ') + '</p>' : '') +
-      (t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '') + '</div>';
+      (t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '') +
+      (t.action ? `<p><b>本周试一试：</b>${esc(t.action)}</p>` : '') + '</div>';
   } catch (e) { $('#teach').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
 };
 async function loadItems() {
@@ -87,7 +96,7 @@ function show() {
     `<div class="muted small">第 ${idx + 1}/${items.length} 题<span class="for-grownups"> · 难度 ${'★'.repeat(it.difficulty || 1)}</span></div>`;
   $('#items').appendChild(box);
   renderItem(box, it, {
-    submit: (answer, self, ms) => { lastAnswer = answer; return api('/api/answer', base(self ? {self, ms} : {answer, ms})); },
+    submit: (answer, self, ms, extra) => { lastAnswer = answer; return api('/api/answer', base(self ? {self, ms} : {answer, ms, ...extra})); },
     dontKnow: () => api('/api/answer', base({dont_know: true})),
     onDone: res => {
       Run.hit(!!res.correct); Combo.hit(!!res.correct, box); celebrate(res, box);
@@ -113,7 +122,7 @@ function show() {
 $('#start').onclick = loadItems;
 // 知识背景和用处：让孩子知道学这个有什么用（AI 生成，按知识点缓存；没配置 AI 就不显示）
 let CTX = null;
-api('/api/context/' + KP).then(c => {
+if (!{{ (kp.think or '')|tojson }}) api('/api/context/' + KP).then(c => {
   if (!c || !c.story) return; CTX = c;
   $('#ctx').innerHTML = `<p>📖 ${esc(c.story)}</p>` + ((c.uses || []).length ? `<p>🔧 ${c.uses.map(esc).join('<br>🔧 ')}</p>` : '') +
     (c.fun ? `<p class="small muted">💡 ${esc(c.fun)}</p>` : '');

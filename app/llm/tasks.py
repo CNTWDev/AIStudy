@@ -39,7 +39,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 3, "context": 2, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 3, "context": 2, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -248,6 +248,33 @@ def sentence_feedback(word: str, meaning: str, sentence: str, lang: str, grade: 
         '输出：{"ok":true/false,"praise":"..","issue":"没有问题时为空","corrected":"..","better":"..","score":1-5}'
     )
     return ask_json("sentence", _tutor(grade), user, user_id=user_id, effort="low", max_tokens=1200, cache=False)
+
+
+def review_open(item: dict, kp: dict, pack, grade: str, rounds: list[dict], last: bool, user_id=None) -> dict:
+    """开放题的点评和追问（app/coach.py）。rounds：学员每一轮的回答，以及上一轮的追问。"""
+    points = item.get("points") or []
+    talk = []
+    for i, r in enumerate(rounds):
+        if i:
+            talk.append(f"你的追问：{rounds[i - 1].get('followup', '')}")
+        talk.append(f"学员第 {i + 1} 次回答：{r['answer']}")
+    user = (
+        f"{_audience(grade, pack)}\n知识点：{kp['name']}。{kp.get('desc', '')}\n"
+        f"{('课程说明：' + pack.prompt_note) if pack.prompt_note else ''}\n\n"
+        f"开放题：{item.get('q', '')}\n参考思路（只给你看）：{item.get('model', '')}\n"
+        "评分要点：\n" + "\n".join(f"{i + 1}. {p}" for i, p in enumerate(points)) + "\n\n"
+        + "\n".join(talk) + "\n\n"
+        "请像一位有经验的教练一样点评学员到目前为止的回答（把几轮回答合起来看）：\n"
+        "- points：逐条判断每个评分要点有没有做到（hit），note 用一句话说依据，尽量引用学员自己的话；"
+        "学员用了不同但同样站得住的思路，也算做到。\n"
+        "- verdict：要点基本都做到、推理站得住为 good；做到一部分为 partial；方向不对或几乎没做到为 miss。\n"
+        "- feedback：两到四句。先说想得好的地方（具体，不空夸），再说最关键的缺口；不要直接把参考思路说出来。\n"
+        + ("- 这是最后一轮：followup 留空，feedback 最后用一两句点明还没想到的关键点。\n" if last else
+           "- followup：verdict 不是 good 时，提一个追问，针对最关键的缺口，让学员自己想到（问「你考虑过……吗」「如果……会怎样」），"
+           "不要把答案藏在问题里；verdict 为 good 时留空。\n")
+        + '输出：{"verdict":"good|partial|miss","points":[{"hit":true,"note":".."}],"feedback":"..","followup":".."}'
+    )
+    return ask_json("review", _tutor(grade), user, user_id=user_id, effort="medium", max_tokens=1500, cache=False)
 
 
 def make_passage(lang: str, grade: str, topic: str, length: str, review_words: list[str], user_id=None) -> dict:

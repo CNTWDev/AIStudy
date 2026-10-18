@@ -749,6 +749,13 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 [data-skin=kid] .flb-prog{border:2px solid var(--k-ink)}
 [data-skin=kid] .flowbar.done .flb-go{border:2px solid var(--k-ink);box-shadow:var(--k-drop-sm)}
 @media (prefers-reduced-motion:reduce){[data-skin=kid] .opt.right,[data-skin=kid] .opt.wrong{animation:none}[data-skin=kid] :is(.btn,.opt,a.card,.tile):active{transform:none}}
+/* 开放题的 AI 点评和追问（app/coach.py） */
+.coach-checks{list-style:none;padding:0;margin:10px 0 0}
+.coach-checks li{padding:6px 0;border-top:1px dashed var(--line)}
+.coach-checks li:first-child{border-top:0}
+.coach-checks li.miss{color:var(--muted)}
+.coach-fu{margin-top:12px}
+.coach-fu .ans{margin-top:8px}
 /* ===== 登录页（docs/DESIGN.md 5.31）：中性的成人口吻；上面介绍 + 登录注册，下面「这里能学什么」只展示不选课 ===== */
 .auth{display:grid;gap:8px 40px;margin-top:12px}
 @media (min-width:820px){.auth{grid-template-columns:minmax(0,1fr) 380px;grid-template-areas:"intro box" "how box" "show show";grid-template-rows:auto 1fr auto;align-items:start;margin-top:40px}

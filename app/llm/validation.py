@@ -8,6 +8,7 @@ REQUIRED = {
     'sentence': {'ok': bool}, 'passage': {'body': str, 'questions': list},
     'context': {'story': str}, 'verify': {'ok': bool}, 'ask': {'reply': str},
     'book_guide': {'gist': str}, 'news_write': {'body': str, 'questions': list},
+    'review': {'verdict': str, 'points': list},
 }
 
 

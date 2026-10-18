@@ -100,6 +100,13 @@
    "icon": "📜",
    "tone": "warn",
    "domain": "finance"
+  },
+  {
+   "id": "ceo",
+   "name": "CEO 专项课",
+   "icon": "🧭",
+   "tone": "learn",
+   "domain": "management"
   }
  ]
 }

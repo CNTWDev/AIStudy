@@ -66,7 +66,7 @@ async function show() {
     t.probe ? {probe: {depth: t.probe.depth, from: t.probe.from}} : {}, extra);
   let lastAnswer = null;
   renderItem(box, it, {
-    submit: (answer, self, ms) => { lastAnswer = answer; return api('/api/answer', base(self ? {self, ms} : {answer, ms})); },
+    submit: (answer, self, ms, extra) => { lastAnswer = answer; return api('/api/answer', base(self ? {self, ms} : {answer, ms, ...extra})); },
     dontKnow: () => api('/api/answer', base({dont_know: true})),
     onDone: async res => {
       answered++; if (res.correct) right++;
