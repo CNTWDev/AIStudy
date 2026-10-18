@@ -749,3 +749,48 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 [data-skin=kid] .flb-prog{border:2px solid var(--k-ink)}
 [data-skin=kid] .flowbar.done .flb-go{border:2px solid var(--k-ink);box-shadow:var(--k-drop-sm)}
 @media (prefers-reduced-motion:reduce){[data-skin=kid] .opt.right,[data-skin=kid] .opt.wrong{animation:none}[data-skin=kid] :is(.btn,.opt,a.card,.tile):active{transform:none}}
+/* ===== 登录页（docs/DESIGN.md 5.31）：中性的成人口吻；上面介绍 + 登录注册，下面「这里能学什么」只展示不选课 ===== */
+.auth{display:grid;gap:8px 40px;margin-top:12px}
+@media (min-width:820px){.auth{grid-template-columns:minmax(0,1fr) 380px;grid-template-areas:"intro box" "how box" "show show";grid-template-rows:auto 1fr auto;align-items:start;margin-top:40px}
+.auth-intro{grid-area:intro;padding-top:8px}.auth-how{grid-area:how;margin-top:8px}.auth-box{grid-area:box}.auth-show{grid-area:show}}
+.auth-eyebrow{margin:0;color:var(--brand-ink);font-weight:700;font-size:14px;letter-spacing:.5px}
+.auth-intro h1{font-size:30px;margin:6px 0 10px}
+.auth-how{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:12px;align-content:start}
+.auth-how li{display:grid;gap:2px;padding-left:16px;border-left:3px solid var(--brand-3)}
+.auth-how b{font-size:15px}.auth-how span{color:var(--muted);font-size:14px}
+.auth-card{padding-top:14px}.auth-card h2{margin:4px 0 4px}
+.auth-tabs{margin-bottom:4px}
+.auth-card:has(input[name=authtab][value=login]:checked) .pane-register,
+.auth-card:has(input[name=authtab][value=register]:checked) .pane-login{display:none}
+.auth-foot{margin:10px 4px 0}
+.who-pick{display:grid;gap:8px}
+.who-pick label{display:block;margin:0;cursor:pointer}
+.who-pick input{position:absolute;opacity:0;pointer-events:none}
+.who-pick span{display:grid;gap:2px;padding:10px 14px;border:1.5px solid var(--line);border-radius:14px;transition:border-color .15s,background .15s}
+.who-pick small{color:var(--muted);font-size:13px;font-weight:400;line-height:1.5}
+.who-pick label:hover span{border-color:var(--brand-3)}
+.who-pick input:checked+span{border-color:var(--brand);background:var(--brand-2)}
+.who-pick input:focus-visible+span{box-shadow:var(--ring)}
+.pane-register:has(input[name=who][value=self]:checked) .for-parent,
+.pane-register:not(:has(input[name=who][value=self]:checked)) .for-self,
+.pane-register:not(:has(input[name=who])) :is(.for-parent,.for-self){display:none}
+.pane-register label .small{font-weight:400;margin-left:4px}
+.auth-show{margin-top:24px;padding-top:8px;border-top:1px solid var(--line)}
+.auth-show h2{margin:20px 0 4px}.auth-show h3{margin:22px 0 10px}.auth-show h3 .small{font-weight:400;margin-left:6px}
+.course-grid{display:grid;gap:10px;align-items:start}
+@media (min-width:560px){.course-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:820px){.course-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.course{background:var(--card);border:1px solid var(--line);border-radius:16px;transition:border-color .15s}
+.course:hover,.course[open]{border-color:var(--brand-3)}
+.course>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:12px 34px 12px 14px;position:relative;border-radius:16px}
+.course>summary::-webkit-details-marker{display:none}
+.course>summary::after{content:"";position:absolute;right:16px;top:50%;width:8px;height:8px;border-right:2px solid var(--faint);border-bottom:2px solid var(--faint);transform:translateY(-70%) rotate(45deg);transition:transform .2s}
+.course:not([open])>summary::after{transform:translateY(-50%) rotate(-45deg)}
+.c-ico{font-size:24px;width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:var(--line-2);flex:none}
+.c-t{display:grid;min-width:0}.c-t b{font-size:15px;line-height:1.4}.c-t small{color:var(--muted);font-size:12.5px;line-height:1.5;display:flex;flex-wrap:wrap;column-gap:10px}.c-t small span{white-space:nowrap}
+.c-pack{padding:4px 14px 12px;border-top:1px solid var(--line-2)}
+.c-ph{margin:8px 0 4px}
+.c-pack ol{list-style:none;padding:0;margin:0;font-size:14px}
+.c-pack li{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed var(--line-2)}
+.c-pack li i{font-style:normal;color:var(--faint);font-size:12px;white-space:nowrap}
+.c-ed{margin:6px 0 0;font-size:12px;line-height:1.5}

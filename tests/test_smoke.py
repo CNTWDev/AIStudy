@@ -34,6 +34,11 @@ def test_full_flow(monkeypatch):
         assert "管理员" in c.post("/admin/users/create", data={"email": "p@x.com", "password": "secret1",
                                                                "name": "爸爸", "role": "parent"}).text
         c.get("/logout")
+        # 登录页：成人口吻，注册分「给孩子用 / 自己学」，下面只展示课程大纲（从课程目录生成）
+        page = c.get("/login").text
+        assert "这里能学什么" in page and "基金从业资格考试" in page and "物理" in page
+        assert 'value="self"' in page and "小明妈妈" not in page
+        assert 'value="register" checked' in c.get("/login?tab=register").text
         r = c.post("/login", data={"email": "p@x.com", "password": "secret1"})
         assert "家长页" in r.text and 'href="/admin"' not in r.text
         # 姐姐：IGCSE 物理 + 剑桥英语 + 统编语文；弟弟：上海英语 + 统编语文 + 上海数学
