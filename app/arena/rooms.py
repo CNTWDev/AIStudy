@@ -118,6 +118,14 @@ def _leave_multi(kid: dict) -> None:
         _remove(_room(r["id"]), kid["id"])
 
 
+def _frontier(room_id: int) -> None:
+    """房间里的人变了：选中的关跳到这队能打的最远一关（房主还能往回选），大家接着往下打。"""
+    r = db.one("SELECT game FROM game_rooms WHERE id=?", room_id)
+    g = GAMES.get(r["game"]) if r else None
+    if g and g.levels:
+        db.run("UPDATE game_rooms SET level=? WHERE id=?", progress.progress(g, team_of(room_id))["upto"], room_id)
+
+
 def _remove(r: dict, kid_id: int) -> None:
     db.run("DELETE FROM room_members WHERE room_id=? AND user_id=?", r["id"], kid_id)
     rest = _members(r["id"])
@@ -126,8 +134,10 @@ def _remove(r: dict, kid_id: int) -> None:
         sessions.close(s["id"], "quit")
     if not rest:
         db.run("UPDATE game_rooms SET status='closed' WHERE id=?", r["id"])
-    elif r["host_id"] == kid_id:   # 房主走了：最早进来的人接任
-        db.run("UPDATE game_rooms SET host_id=? WHERE id=?", rest[0]["user_id"], r["id"])
+    else:
+        if r["host_id"] == kid_id:   # 房主走了：最早进来的人接任
+            db.run("UPDATE game_rooms SET host_id=? WHERE id=?", rest[0]["user_id"], r["id"])
+        _frontier(r["id"])
 
 
 def _free_role(g: Game, taken: list[str]) -> str:
@@ -164,6 +174,7 @@ def create(kid: dict, game: str, role: str = "", device: str = "", kind: str = "
     rid = db.insert("INSERT INTO game_rooms(game, family_id, host_id, multi, level, status, created_at, seen_at, kind, pin) "
                     "VALUES(?,?,?,?,?,?,?,?,?,?)", game, family_of(kid), kid["id"], 1, 1, "open", db.now(), db.now(), kind, pin)
     _add(rid, kid["id"], role if role in g.roles else _free_role(g, []), device)
+    _frontier(rid)
     return room_info(kid, rid)
 
 
@@ -210,6 +221,7 @@ def enter(kid: dict, room_id, device: str = "", pin: str = "") -> dict:
             raise ArenaError("他们正在打这一关，等打完了再进", 409)
         _leave_multi(kid)
         _add(r["id"], kid["id"], _free_role(g, [x["role"] for x in ms]), device)
+        _frontier(r["id"])
         touch(r["id"])
         return room_info(kid, r["id"])
     if m["device"] and m["device"] != device and m["seen_at"] and m["seen_at"] >= _ago(PLAYING_S):

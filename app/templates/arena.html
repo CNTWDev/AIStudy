@@ -15,6 +15,7 @@
       {% if S.bonus_lit %}<span>🌟 点亮 {{ S.lit }} 个 +{{ S.bonus_lit }}</span>{% endif %}
       {% if a.week.focus %}<span title="100 = 平时的你，越高越投入">💎 本周专注值 {{ a.week.focus }}</span>{% endif %}
       <span>🏅 贴纸 {{ a.wall|selectattr('got')|list|length }}/{{ a.wall|length }}</span>
+      <a href="/boards?metric=game">🏆 本周答对 {{ a.week.right }} 道 · 乐园榜</a>
     </div>
   </div>
 </div>
