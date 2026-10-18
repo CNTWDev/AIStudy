@@ -293,7 +293,7 @@ def _kid_form_packs(form, grade: str, old: dict, grade_changed: bool) -> list[tu
 def course_choices(school_type='', grade=None):
     order = {subject: i for i, subject in enumerate(('chinese', 'math', 'english', 'science', 'physics', 'chemistry', 'biology', 'history', 'geography', 'economics'))}
     return dict(sorted(catalog.by_subject(school_type).items(), key=lambda kv:
-                       (0 if is_adult(grade) and any(p.system == 'cert' for p in kv[1]) else 1,
+                       (0 if is_adult(grade) and any(is_adult(p.stages[0]) for p in kv[1] if p.stages) else 1,
                         order.get(kv[1][0].subject, 99))))
 
 

@@ -106,17 +106,37 @@ def due_cards(user_id: int, limit=50, group: str | None = None):
 # ------------------------------------------------------------------ 题库
 
 def load_seed_items(seed_dir):
-    """把 seed/items_*.json 导入题库（幂等）。"""
+    """把 seed/items_*.json 导入题库（幂等）。题目写了 "verified": true（人工写、人工审过的）就不再让 AI 校对。"""
     n = 0
     for path in sorted(seed_dir.glob("items_*.json")):
         for it in json.loads(path.read_text(encoding="utf-8")):
             kps = it.get("kp") or []
             if not kps:
                 continue
-            data = {k: v for k, v in it.items() if k not in ("id", "kp", "kid", "difficulty", "type")}
-            db.run("INSERT INTO items(id,kp_id,kp_ids,type,difficulty,data,source,created_at) VALUES(?,?,?,?,?,?,?,?) "
+            data = {k: v for k, v in it.items() if k not in ("id", "kp", "kid", "difficulty", "type", "verified")}
+            db.run("INSERT INTO items(id,kp_id,kp_ids,type,difficulty,data,source,verified,created_at) VALUES(?,?,?,?,?,?,?,?,?) "
                    "ON CONFLICT(id) DO NOTHING",
-                   it["id"], kps[0], db.jdump(kps), it["type"], it.get("difficulty", 2), db.jdump(data), "seed", db.now())
+                   it["id"], kps[0], db.jdump(kps), it["type"], it.get("difficulty", 2), db.jdump(data), "seed",
+                   1 if it.get("verified") else 0, db.now())
+            n += 1
+    return n
+
+
+def load_seed_lessons(seed_dir):
+    """把 seed/teach_*.json 里人工写的讲义导入为作者版讲义（幂等）：同一个知识点只留这一篇，
+    AI 讲义和旧版作者讲义换下。管理员下架过的这一版不再自动上架。"""
+    n = 0
+    for path in sorted(seed_dir.glob("teach_*.json")):
+        for lesson in json.loads(path.read_text(encoding="utf-8")).get("lessons", []):
+            kp = catalog.kp(lesson.get("kp", ""))
+            if not kp:
+                continue
+            body = {k: v for k, v in lesson.items() if k != "kp"}
+            old = db.one("SELECT id, status FROM contents WHERE qhash=?", bank.fingerprint("teach", kp["id"], bank.kp_lang(kp["id"]), body))
+            if old and old["status"] != "active":
+                continue
+            cid = old["id"] if old else bank.save_content("teach", body, kp["id"], bank.kp_lang(kp["id"]), title=kp["name"], origin="author")
+            db.run("UPDATE contents SET status='retired' WHERE kind='teach' AND kp_id=? AND status='active' AND id<>?", kp["id"], cid)
             n += 1
     return n
 
