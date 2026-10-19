@@ -2,10 +2,10 @@
 
 - 房间里放 1～N 个人（game_rooms + room_members，N 是游戏登记的 players）。开房间的人是房主：选关、开局、报结果，
   共享的东西由他那台设备算。房主走了，由最早进来的人接任；人都走了房间就关了。
-- 单机游戏每个孩子每款游戏一个房间，一直留着（刷新、换设备回来接着玩）。联网游戏开房间时选一种（kind）：
-  family 家里：只有同一个家里的兄弟姐妹能看到、能进，乐园首页会提示「X 在等你」；
-  public 公开：全站的孩子在这款游戏的大厅里都能看到、点一下就进（家长打开隐私模式的孩子看不到、进不去）；默认开这种；
-  code 密码：全站的孩子在大厅里都能看到（带 🔒），点了输 4 位密码就进（两个认识的人约好一起玩，不用报房间号）。
+- 单机游戏每个孩子每款游戏一个房间，一直留着（刷新、换设备回来接着玩）。联网游戏开房间只有两种模式：
+  公开（默认）：全站的孩子在这款游戏的大厅里都能看到。可以不设密码（kind public，点一下就进；
+  家长打开隐私模式的孩子看不到、进不去），也可以设 4 位密码（kind code，带 🔒，点了输密码就进，不用报房间号）；
+  家里（kind family）：只有同一个家里的兄弟姐妹能看到、能进，乐园首页会提示「X 在等你」。
   房间不用起名字，自动叫「房主的房间」（家里的用名字，公开和密码的用昵称）。
   公开和密码房间里只显示昵称（auth.public_name），真名不出现；一局开始以后不能再进人，等这一关打完。
 - 设备：一个账号在一个房间里同一时间只有一台设备在玩（room_members.device，前端每个页面一个设备号，刷新不变）。
@@ -19,6 +19,7 @@ import time
 from datetime import datetime, timedelta
 
 from .. import auth, db
+from ..catalog import is_adult
 from . import awards, progress, rules, sessions
 from .errors import ArenaError
 from .games import GAMES, Game, get
@@ -155,8 +156,9 @@ def _need_nickname(kid: dict) -> None:
         raise ArenaError("和别的小伙伴一起玩，先给自己起个昵称", 409, need_nick=True)
 
 
-def create(kid: dict, game: str, role: str = "", device: str = "", kind: str = "family") -> dict:
-    """单机：回到我这款游戏的房间（没有就开一个）。联网：开一个新房间（kind：家里 / 公开 / 密码），等小伙伴加入。"""
+def create(kid: dict, game: str, role: str = "", device: str = "", kind: str = "family", pin: str = "") -> dict:
+    """单机：回到我这款游戏的房间（没有就开一个）。联网：开一个新房间（kind：家里 / 公开 / 公开带密码），等小伙伴加入。
+    带密码的房间用房主自己定的 4 位密码，没定就随机一个。"""
     g = get(game)
     if not g.multi:
         r = db.one("SELECT id FROM game_rooms WHERE game=? AND host_id=? AND status<>'closed' ORDER BY id DESC", game, kid["id"])
@@ -172,11 +174,11 @@ def create(kid: dict, game: str, role: str = "", device: str = "", kind: str = "
     if kind == "family" and not siblings(kid):
         raise ArenaError("家里还没有别的小伙伴的账号。可以开一个公开房间，或者开密码房间约认识的小伙伴。", 403)
     if kind == "public" and not rules.public_rooms(kid):
-        raise ArenaError("爸爸妈妈打开了隐私模式，不能进公开房间。可以开家里的房间或者密码房间", 403)
+        raise ArenaError("爸爸妈妈打开了隐私模式，公开房间要设个密码。也可以开家里的房间", 403)
     if kind != "family":
         _need_nickname(kid)
     _leave_multi(kid)
-    pin = f"{secrets.randbelow(10000):04d}" if kind == "code" else ""
+    pin = (pin if pin.isdigit() and len(pin) == 4 else f"{secrets.randbelow(10000):04d}") if kind == "code" else ""
     rid = db.insert("INSERT INTO game_rooms(game, family_id, host_id, multi, level, status, created_at, seen_at, kind, pin) "
                     "VALUES(?,?,?,?,?,?,?,?,?,?)", game, family_of(kid), kid["id"], 1, 1, "open", db.now(), db.now(), kind, pin)
     _add(rid, kid["id"], role if role in g.roles else _free_role(g, []), device)
@@ -203,7 +205,7 @@ def _check_join(kid: dict, r: dict, pin) -> None:
     if kind == "family" and r["family_id"] != family_of(kid):
         raise ArenaError("只能加入自己家里的房间", 403)
     if kind == "public" and not rules.public_rooms(kid):
-        raise ArenaError("爸爸妈妈打开了隐私模式，不能进公开房间", 403)
+        raise ArenaError("爸爸妈妈打开了隐私模式，只能进带密码的公开房间", 403)
     if kind == "code" and not _pin_ok(kid, r, pin):
         raise ArenaError("密码不对", 403, need_pin=True)
     if kind != "family":
@@ -360,6 +362,7 @@ def lobby(kid: dict, game: str) -> dict:
                           "host": member(dict(hu), r["kind"] != "family") if hu and r["host_id"] != kid["id"] else None})
     teams = {str(s["id"]): progress.progress(g, progress.team_key((kid["id"], s["id"]))) for s in sibs} if g.total and g.multi else {}
     return {"siblings": sibs, "rooms": rooms, "locked": _locked(kid), "teams": teams, "public_ok": public_ok,
+            "adult": is_adult(kid.get("grade")),
             "nickname": (kid.get("nickname") or "").strip()}
 
 

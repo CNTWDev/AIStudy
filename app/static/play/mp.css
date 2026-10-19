@@ -55,3 +55,7 @@
 .mp-pin{border:2px dashed var(--pl-ink);border-radius:14px;padding:8px;margin:8px 0;font-size:16px}
 .mp-pin b{font-size:22px;letter-spacing:2px}.mp-pin small{display:block;font-size:12px;color:var(--muted)}
 .mp-mems.many .mp-amp{display:none}.mp-mems.many{gap:6px}.mp-mems.many .mp-mem b{font-size:14px}
+.mp-pin-set{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:6px 0 0;font-weight:800}
+.mp-pin-set label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.mp-pin-set input[type=checkbox]{width:20px;height:20px}
+.mp-pin-mine{width:170px;font:inherit;font-size:16px;text-align:center;border:2px solid var(--line);border-radius:12px;padding:6px 8px;background:var(--card);color:var(--ink)}

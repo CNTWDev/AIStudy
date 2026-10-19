@@ -94,6 +94,9 @@ def test_public_and_code_rooms():
         assert c.post(f"/api/rooms/{cid}/enter", json={**_dev("pb"), "pin": wrong}).status_code == 403
         room = c.post(f"/api/rooms/{cid}/enter", json={**_dev("pb"), "pin": pin}).json()
         assert len(room["members"]) == 2 and room["kind"] == "code"
+        # 公开房间设密码时，房主可以自己定
+        own = c.post("/api/rooms", json={**_dev("pb"), "game": "bubble", "kind": "code", "pin": "2468"}).json()
+        assert own["pin"] == "2468"
         assert pc_parent
 
 

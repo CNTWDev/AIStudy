@@ -1,5 +1,5 @@
 /* 所有游戏共用的外壳（docs/DESIGN.md 5.26）：单机、两人联网、全家一起玩是同一套，区别只是房间里有几个人。
-   外壳管：大厅（联网：谁在等我、开家里 / 公开 / 密码房间、起昵称）、房间（谁在、角色、闯关地图、出什么题）、开局倒计时、答题面板、
+   外壳管：大厅（联网：谁在等我、开公开 / 家里的房间、起昵称）、房间（谁在、角色、闯关地图、出什么题）、开局倒计时、答题面板、
    倒下答题复活（联网）、暂停（谁都能暂停、谁都能继续）、存档和刷新 / 换设备接着玩、状态条和表情（联网）、结算（星星、纪录、解锁、个人战报、贴纸）。
    游戏只写玩法：
      PlayShell.init({
@@ -80,25 +80,30 @@
     const roomApi = (what, body) => post(`/api/rooms/${room.id}/${what}`, body);
 
     // ---------------------------------------------------------------- 大厅（联网）
-    // 房间分三种（app/arena/rooms.py）：家里（只有家里人）、公开（全站的小伙伴点一下就进）、密码（大家都看得到，输密码才能进）
+    // 开房间只有两种模式（app/arena/rooms.py）：公开（默认，全站都看得到；可以设 4 位密码，设了就是 kind code）、家里（只有家里人）
     // 大厅里列的都是能进的房间，点一下就进；房间名自动起，不用填
-    const KIND = {public: {icon: '🌏', name: '公开'}, family: {icon: '🏠', name: '家里'}, code: {icon: '🔒', name: '密码'}};
-    let kind = null;
+    const KIND = {public: '🌏 公开', code: '🌏 公开 · 🔒 要密码', family: '🏠 家里'};
+    const MODE = {public: {icon: '🌏', name: '公开'}, family: {icon: '🏠', name: '家里'}};
+    let kind = null, pinOn = false, pinVal = '';
     function showLobby() {
       state = 'lobby'; over.hidden = false; room = null;
       if (net) { net.close(); net = null; }
       const sibs = lobby.siblings, waiting = lobby.rooms.filter(r => !r.mine && r.host);
-      const kinds = ['public', 'family', 'code'].filter(k => (k !== 'family' || sibs.length) && (k !== 'public' || lobby.public_ok));
+      const kinds = ['public', 'family'].filter(k => k !== 'family' || sibs.length);
       if (!kinds.includes(kind)) kind = kinds[0];
+      const pinMust = !lobby.public_ok;   // 隐私模式：公开房间一定要设密码
+      if (pinMust) pinOn = true;
       let h = `<div class="pl-title">${esc(G.icon)} ${esc(G.name)}</div>`;
       h += `<div class="pl-label">${waiting.length ? `🎈 正在等人的房间（${waiting.length}）：` : '🎈 还没有人开房间，你来开一个吧！'}</div>`;
       h += `<div class="mp-rooms">${waiting.map(r => `<div class="mp-invite k-${r.kind}"><canvas class="mp-face" data-av="${esc(r.host.avatar)}"></canvas>
-          <div class="grow"><b>${esc(r.name)}</b><small>${KIND[r.kind].icon} ${KIND[r.kind].name} · ${r.role ? `${roleOf(r.role).icon} ${esc(roleOf(r.role).name)} · ` : ''}${TOTAL ? `第 ${r.level} 关 · ` : ''}${r.count}/${r.max} 人</small>
+          <div class="grow"><b>${esc(r.name)}</b><small>${KIND[r.kind]} · ${r.role ? `${roleOf(r.role).icon} ${esc(roleOf(r.role).name)} · ` : ''}${TOTAL ? `第 ${r.level} 关 · ` : ''}${r.count}/${r.max} 人</small>
           ${r.locked ? `<div class="mp-pin-row" hidden><input class="mp-pin-in" inputmode="numeric" maxlength="4" placeholder="4 位密码"><button type="button" class="btn mp-pin-go" data-id="${r.id}">进去</button></div>` : ''}</div>
           <button type="button" class="btn lg pl-go mp-join" data-id="${r.id}" data-locked="${r.locked ? 1 : ''}">${r.locked ? '🔒 加入' : '加入！'}</button></div>`).join('')}</div>`;
       h += `<div class="pl-label">${waiting.length ? '或者自己开一个房间：' : '开一个房间：'}</div>
-        <div class="mp-kinds">${kinds.map(k => `<button type="button" class="mp-kind${k === kind ? ' on' : ''}" data-kind="${k}">${KIND[k].icon} ${KIND[k].name}</button>`).join('')}</div>
-        <p class="mp-hint mp-kind-hint">${kindHint(kind, sibs)}</p>`;
+        <div class="mp-kinds">${kinds.map(k => `<button type="button" class="mp-kind${k === kind ? ' on' : ''}" data-kind="${k}">${MODE[k].icon} ${MODE[k].name}</button>`).join('')}</div>`;
+      if (kind === 'public') h += `<div class="mp-pin-set"><label><input type="checkbox" class="mp-pin-on"${pinOn ? ' checked' : ''}${pinMust ? ' disabled' : ''}> 🔒 设个密码</label>
+          ${pinOn ? `<input class="mp-pin-mine" inputmode="numeric" maxlength="4" placeholder="4 位数字，不填就随机" value="${esc(pinVal)}">` : ''}</div>`;
+      h += `<p class="mp-hint mp-kind-hint">${kindHint(kind, sibs, pinMust)}</p>`;
       h += G.roles.length ? `<div class="pl-label">我想当：</div>
           <div class="mp-roles">${G.roles.map(v => `<button type="button" class="mp-role" data-role="${v.id}"><span>${v.icon}</span>${esc(v.name)}</button>`).join('')}</div>`
         : `<button type="button" class="btn lg block pl-go mp-role" data-role="">开一个房间</button>`;
@@ -119,7 +124,14 @@
       });
       panel.querySelectorAll('.mp-pin-in').forEach(i => i.onkeydown = e => { if (e.key === 'Enter') i.parentNode.querySelector('.mp-pin-go').click(); });
       panel.querySelectorAll('.mp-kind').forEach(b => b.onclick = () => { kind = b.dataset.kind; Play.sfx.play('click'); showLobby(); });
-      panel.querySelectorAll('.mp-role').forEach(b => b.onclick = () => withNick(kind !== 'family', () => enter(post('/api/rooms', {game: G.id, role: b.dataset.role, kind}))));
+      const pinBox = panel.querySelector('.mp-pin-on'), pinIn = panel.querySelector('.mp-pin-mine');
+      if (pinBox) pinBox.onchange = () => { pinOn = pinBox.checked; Play.sfx.play('click'); showLobby(); if (pinOn) panel.querySelector('.mp-pin-mine').focus(); };
+      if (pinIn) pinIn.oninput = () => { pinVal = pinIn.value.replace(/\D/g, '').slice(0, 4); pinIn.value = pinVal; };
+      panel.querySelectorAll('.mp-role').forEach(b => b.onclick = () => {
+        const locked = kind === 'public' && pinOn;
+        if (locked && pinVal && pinVal.length !== 4) { sh.toast('密码是 4 位数字，不填就随机一个', 'warn'); return; }
+        withNick(kind !== 'family', () => enter(post('/api/rooms', {game: G.id, role: b.dataset.role, kind: locked ? 'code' : kind, pin: locked ? pinVal : ''})));
+      });
       panel.querySelector('.mp-nick-edit').onclick = () => askNick();
       clearInterval(poll);
       poll = setInterval(async () => {   // 有人开房间了就显示出来
@@ -128,10 +140,12 @@
       }, 3000);
       preview();
     }
-    function kindHint(k, sibs) {
+    function kindHint(k, sibs, pinMust) {
       if (k === 'family') return `只有家里人能进。开好以后，让${sibs.map(s => esc(s.name)).join('、')}在自己的平板或电脑上打开 乐园 → ${esc(G.name)}，点「加入」。`;
-      if (k === 'public') return '全站的小伙伴都能看到，点「加入」就进来，不用密码。';
-      return '大家都能看到，但要输 4 位密码才能进。开好以后把密码告诉想一起玩的小伙伴。';
+      if (pinMust) return lobby.adult ? '大人开公开房间要设密码，只和认识的人一起玩。开好以后把密码告诉他们。'
+        : '爸爸妈妈开了隐私模式，公开房间要设密码。开好以后把密码告诉想一起玩的小伙伴。';
+      if (pinOn) return '全站的小伙伴都能看到，输对密码才能进。开好以后把密码告诉想一起玩的小伙伴。';
+      return '全站的小伙伴都能看到，点「加入」就进来。';
     }
     function joinRoom(id, pin) {
       const wrap = () => enter(post(`/api/rooms/${id}/enter`, pin ? {pin} : {}), () => askNick(wrap));
