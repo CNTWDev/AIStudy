@@ -112,6 +112,11 @@ $$('form.tabpane').forEach(f => f.addEventListener('submit', e => setTimeout(() 
   if (e.defaultPrevented) return;
   const b = f.querySelector('button[data-busy]') || f.querySelector('button:not([type=button])');
   if (b) { b.setAttribute('aria-busy', 'true'); if (b.dataset.busy) b.textContent = b.dataset.busy; }
+  // 写短文要半分钟：小伙伴在按钮下面写给你看（seek，DESIGN 5.34）
+  if (f.dataset.pane === 'ai' && b) {
+    const box = document.createElement('div'); box.style.marginTop = '12px'; b.after(box);
+    seek(box, 'passage', {delay: 0, topic: f.topic.value.trim(), lang: (f.querySelector('input[name=lang]:checked') || {}).value});
+  }
 })));
 // 链接：自动补 https://，先在本地检查一下
 const urlIn = $('#url'), urlErr = $('#urlerr');

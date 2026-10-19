@@ -2,7 +2,7 @@
 
 from fastapi.testclient import TestClient
 
-from app import db, engine, mix, prefetch
+from app import bank, db, engine, mix, prefetch
 from app.catalog import catalog
 from app.main import app
 
@@ -108,3 +108,8 @@ def test_learn_page_kicks_prefetch(monkeypatch):
         assert c.get(f"/learn/{kp}").status_code == 200
         assert len(engine.items_for(kid, kp, n=3, ai=False)) == 3   # 测试里后台出题是同步跑完的
         assert prefetch.has_teach(kp)
+        # 「为什么学」的导入也一起写好：一进学习页先要的就是它（DESIGN 5.34）；AI 写的老版本不算有
+        assert prefetch.has_kp_content("context", kp)
+        db.run("UPDATE contents SET status='retired' WHERE kind='context' AND kp_id=?", kp)
+        bank.save_content("context", {"story": "老故事"}, kp, "", "G3")
+        assert not prefetch.has_kp_content("context", kp)

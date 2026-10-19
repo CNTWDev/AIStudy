@@ -23,7 +23,7 @@ async function start(resume) {
   $('#intro').style.display = 'none'; $('#stage').style.display = ''; next();
 }
 async function next() {
-  $('#box').innerHTML = '<span class="loading">正在准备下一题</span>';
+  seek($('#box'), 'items', {compact: true, delay: 0});
   let r;
   try { r = await waitWith($('#box'), api(`/api/diag/${sid}/next`)); } catch (e) { $('#box').innerHTML = `<div class="err">${esc(e.message)}</div><button class="btn" onclick="next()">重试</button>`; return; }
   if (r.done) { location.href = r.report; return; }

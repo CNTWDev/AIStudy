@@ -364,6 +364,7 @@ def api_context(request: Request, kp_id: str):
         raise HTTPException(404)
     if not llm.enabled():
         return {}
+    prefetch.wait(k["id"], kp_id, "context")  # 打开学习页时后台已经在写：等它，不重复写
     try:
         return _drawn(bank.context(kp, k["grade"], user_id=k["id"]))
     except llm.LLMError:

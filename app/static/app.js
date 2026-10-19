@@ -842,7 +842,7 @@ async function waitWith(box, promise, kp) {
     let f = null;
     try { f = await api('/api/filler?' + new URLSearchParams({kp: kp || '', skip: skip.join(',')})); } catch (e) { return; }
     if (ready) { if (shown) showNext(); return; }  // 取小卡的工夫题已经好了：不再换新卡
-    if (!f || (!f.card && !f.remember)) { if (shown && tail()) tail().innerHTML = '<p class="loading small" style="text-align:center">题马上就来</p>'; return; }
+    if (!f || (!f.card && !f.remember)) { if (shown && tail()) tail().innerHTML = `<p class="loading small" style="text-align:center">${esc(AI.name)}马上把题拿来</p>`; return; }
     shown = true;
     if (f.card) {
       card = f.card; skip.push(f.card);
@@ -850,7 +850,7 @@ async function waitWith(box, promise, kp) {
       box.innerHTML = `<div class="fillcard"><div class="muted small">等题的工夫，复习一个${f.kind === 'term' ? '术语' : '单词'}</div>` +
         `<div class="face">${esc(q.q)}${q.hint ? `<div class="muted small">${esc(q.hint)}</div>` : ''}</div>` +
         q.options.map(o => `<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join('') +
-        `<div class="fbbox"></div><div class="fillnext">${ready ? '' : '<p class="loading small" style="text-align:center">题在准备</p>'}</div></div>`;
+        `<div class="fbbox"></div><div class="fillnext">${ready ? '' : `<p class="loading small" style="text-align:center">${esc(AI.name)}还在挑题</p>`}</div></div>`;
       $$('.opt', box).forEach(b => b.onclick = async () => {
         $$('.opt', box).forEach(x => x.disabled = true);
         let res = {};
@@ -862,7 +862,7 @@ async function waitWith(box, promise, kp) {
       });
     } else {
       box.innerHTML = `<div class="fillcard"><div class="muted small">等题的工夫，先记一记</div><div class="hint">📌 ${esc(f.remember)}</div>` +
-        `<div class="fillnext">${ready ? '' : '<p class="loading small" style="text-align:center">题在准备</p>'}</div></div>`;
+        `<div class="fillnext">${ready ? '' : `<p class="loading small" style="text-align:center">${esc(AI.name)}还在挑题</p>`}</div></div>`;
       if (ready) showNext();
     }
   };
@@ -873,6 +873,62 @@ async function waitWith(box, promise, kp) {
   // 小卡在屏幕上：下面出「题来了 →」，孩子可以答完这张再点，也可以直接去做题
   return new Promise(res => { go = () => res(r); showNext(); });
 }
+
+/* 等 AI 写内容时，小伙伴出来「翻书」（docs/DESIGN.md 5.34）：以前只有一行灰色小字「正在准备…」，孩子找不到，直接点了下一步。
+   现在 box 里是小伙伴 + 一句它在干什么 + 一串它正在做的事（按写这份内容的真实步骤），一步步打勾，最后一步等内容好了才算完。
+   刚打开就有的（库里现成的）不闪：350 毫秒内好了就什么都不显示。等的时候没有题要想，所以小伙伴可以动；内容一出来就停。
+   用法：const s = seek(box, 'story', {domain})；内容好了 s.stop()，返回 true 表示刚才确实等过（可以让内容淡入）。
+   compact：一行的小版本（题这种通常很快、或者后面还有等题小卡接着的）。 */
+const SEEK_SRC = {  // 「为什么学」第一步去哪翻：先按学科，再按学科领域
+  math: ['📜', '翻古代的算书和数学家的手稿'], science: ['🔭', '翻科学家几百年来的实验笔记'], zh: ['📜', '翻古人的诗文和老字典'],
+  language: ['🗺️', '翻世界各地的书、信和老报纸'], humanities: ['🏛️', '翻史书和博物馆里的老物件'], computing: ['💾', '翻计算机先驱们的笔记'],
+  social: ['🏛️', '翻史书、地图和各国的老档案'], finance: ['📈', '翻经典案例和行业里的老账本'], '': ['📜', '翻几千年的书和资料'],
+  geography: ['🗺️', '翻探险家的地图和航海日志'], economics: ['📈', '翻企业家的复盘和经典案例'], ceo: ['📈', '翻企业家的复盘和经典案例'],
+};
+const SEEK = {
+  story: o => ({t: '正在帮你翻几千年的书', sub: '找这个知识点是怎么来的，找到就放在这里',
+    steps: [SEEK_SRC[o.lang === 'zh' ? 'zh' : o.subject] || SEEK_SRC[o.domain] || SEEK_SRC[''], ['🧑‍🔬', '找当年是谁、被什么难题卡住了'], ['🏙️', '看看今天生活里哪里用得上'], ['🎨', '挑一个最好懂的故事，画成故事条']]}),
+  teach: () => ({t: '正在把它讲成几小步', sub: '讲好了就在这里展开',
+    steps: [['📚', '翻一翻大家都是怎么讲它的'], ['💡', '找一个最好懂的讲法'], ['🧩', '拆成几小步，配上例子和图'], ['✅', '从头检查一遍']]}),
+  worked: () => ({t: '正在挑一道例题，做给你看', steps: [['📝', '挑一道最典型的题'], ['✍️', '一步一步写清楚'], ['✅', '检查一遍']]}),
+  items: () => ({t: '正在按你的水平挑题', steps: [['📊', '看看你哪里稳、哪里还不稳'], ['🎯', '挑难度刚好的题'], ['✅', '核对答案和解析']]}),
+  passage: o => ({t: '正在给你写一篇短文', sub: '写好了会自动打开，大约半分钟',
+    steps: [['🧭', o.topic ? `围绕「${o.topic}」找素材` : '挑一个你会喜欢的话题'], ...(o.lang === 'en' ? [['🔤', '把你最近要复习的生词放进去']] : []),
+      ['📏', '按你的年级调好长短和难度'], ['❓', '出几道读完做的小题']]}),
+};
+const SEEK_AT = [0, 2600, 6000, 10500, 15500];  // 第几毫秒走到第几步；最后一步一直等到内容好了
+let seekN = 0;
+function seekFace() {  // 同一页可能放几次小伙伴：SVG 里的 id 每次换个后缀
+  const n = ++seekN, f = (window.AI && AI.face) || '🙋';
+  return f.startsWith('<svg') ? f.replace(/id="([\w-]+)"/g, `id="$1-s${n}"`).replace(/url\(#([\w-]+)\)/g, `url(#$1-s${n})`) : `<span class="seek-emo">${esc(f)}</span>`;
+}
+function seek(box, kind, o) {
+  o = o || {};
+  const spec = SEEK[kind](o), name = (window.AI && AI.name) || '';
+  const title = o.title || name + spec.t;
+  let shown = false, stopped = false;
+  const timers = [];
+  const show = () => {
+    if (stopped) return;
+    shown = true;
+    if (o.compact) {
+      box.innerHTML = `<div class="seek compact" role="status"><span class="seek-face">${seekFace()}<i class="seek-lens" aria-hidden="true">🔍</i></span><span class="loading">${esc(title)}</span></div>`;
+      return;
+    }
+    box.innerHTML = `<div class="seek" role="status" aria-live="polite"><div class="seek-hd"><span class="seek-face">${seekFace()}<i class="seek-lens" aria-hidden="true">🔍</i></span>` +
+      `<div><b class="seek-t">${esc(title)}</b>${spec.sub ? `<div class="seek-sub">${esc(spec.sub)}</div>` : ''}</div></div>` +
+      `<ol class="seek-trail">${spec.steps.map(([ico, txt]) => `<li><span class="seek-ico" aria-hidden="true">${ico}</span><span>${esc(txt)}</span></li>`).join('')}</ol>` +
+      `<div class="seek-long small muted" hidden>这次要翻的书有点多，再等一下下</div></div>`;
+    const lis = $$('.seek-trail li', box);
+    const at = i => { if (stopped) return; lis.forEach((li, j) => { li.className = j < i ? 'done' : j === i ? 'cur' : ''; }); };
+    lis.forEach((_, i) => timers.push(setTimeout(() => at(i), SEEK_AT[i] || SEEK_AT[SEEK_AT.length - 1] + i * 4000)));
+    timers.push(setTimeout(() => { const l = $('.seek-long', box); if (l && !stopped) l.hidden = false; }, 25000));
+  };
+  if (o.delay === 0) show(); else timers.push(setTimeout(show, o.delay ?? 350));
+  return {stop() { stopped = true; timers.forEach(clearTimeout); return shown; }};
+}
+/* 内容来了：等过的就轻轻淡入，接上刚才的等待 */
+function seekIn(el, waited) { if (waited && el) { el.classList.remove('seek-in'); void el.offsetWidth; el.classList.add('seek-in'); } }
 
 /* 学习时长自动记录：页面在前台、最近有操作（读文章时放宽到 3 分钟）才计时；每 30 秒报一次，离开页面时用 sendBeacon 补报。
    只有孩子自己的账号计时，家长查看不算。 */

@@ -19,6 +19,8 @@ def test_learn_page_is_step_cards():
         # 一次只显示一张：第一张是导入，其余的先藏着
         assert page.count('<section class="card lcard"') == 5 and page.count('" hidden>') >= 4
         assert 'id="guess"' in page and '<details class="kp-around">' in page
+        # 等导入时小伙伴「翻书」（DESIGN 5.34）：名字用配置的小伙伴名，不再是一行「正在准备」小字
+        assert "window.AI = {name: " in page and "seek($('#ctx'), 'story'" in page and "正在准备" not in page
 
         # 导入带引子问题；没有引子问题的老版本换成新的一次
         kp = catalog.kp("MATH-PRE-UNIT")
