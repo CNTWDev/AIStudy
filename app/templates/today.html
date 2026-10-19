@@ -11,8 +11,14 @@
 {# 视觉重心：页面只有一个主角——「下一项」和那颗大按钮；任务清单是第二层；复习/单词本/乐园、心情打卡是第三层；
    地图、前方、纪录、这一周这些「看看自己」的内容放到最下面的安静区，不抢眼。 #}
 {% set all_done = total and done == total %}
-<div class="card hero focus {{ 'alldone' if all_done }}">
-  {% if not readonly %}<a class="buddy {{ 'yay' if all_done }}" href="/settings#mascot" title="换一个小伙伴">{{ mascot_svg(mascot_of(user), 46) }}</a>{% endif %}
+{# 小伙伴（问{{ ASSISTANT }} 的那个形象，和 base.html 的 window.AI 同一个）：孩子的今天页上它站在主卡旁边说一句话；成人、家长查看不出现 #}
+{% set kidface = tone == 'kid' %}
+{% macro face(size) %}{% if ASSISTANT_ICON == '🙋' %}{{ mascot_svg(mascot_of(user), size) }}{% else %}<span class="face-emo" style="font-size:{{ (size * 0.8)|int }}px">{{ ASSISTANT_ICON }}</span>{% endif %}{% endmacro %}
+<div class="card hero focus {{ 'alldone' if all_done }} {{ 'has-coach' if kidface and not readonly }}">
+  {% if kidface and not readonly %}<a class="coach {{ 'yay' if all_done }}" href="/settings#mascot" title="换一个小伙伴">
+    <span class="say"><b>{{ ASSISTANT }}</b>{% if nx and done == 0 %}准备好了吗？我陪你一起开始！{% elif nx and not day.base %}已经做完 {{ done }} 项，接着来！{% elif nx %}真稳！后面每项都多一颗 ⭐{% elif all_done and not t.checked_in %}我就知道你行 💪{% elif all_done %}今天辛苦啦，明天见！{% else %}我在这儿，有不懂的随时问我{% endif %}</span>
+    <span class="cface">{{ face(92) }}</span></a>{% endif %}
+  <div class="hero-main">
   <div class="hi">{{ t.day[5:7]|int }} 月 {{ t.day[8:]|int }} 日 · 星期{{ td.wd if td else '' }}
     <span class="hstat" title="连续学习天数"><span class="flame">🔥</span> 连续 <b>{{ streak }}</b> 天</span>
     <a class="hstat hlink" href="/boards" title="学习榜：比每天坚持">🏆 学习榜</a>
@@ -41,6 +47,7 @@
   </div>
   <div class="base-line {{ 'ok' if day.base }}">{% if day.base %}🛡️ 连续天数保住啦{% elif day.sections|length > 1 %}🛡️ 做完第 1 节就保住连续天数{% else %}🛡️ 做完第 1 项就保住连续天数{% endif %}</div>
   {% else %}<div class="base-line">🛡️ 今天学满 10 分钟就保住连续天数</div>{% endif %}
+  </div>
 </div>
 {% if rethink and not readonly %}<a class="bd-strip" href="/thinking"><span class="i">🧭</span><span>{{ rethink }} 道题到了换个条件再想的时候</span><span class="go">去想想 ›</span></a>{% endif %}
 {% if board_tip and not readonly %}<a class="bd-strip" href="/boards"><span class="i">🏆</span><span>{{ board_tip }}</span><span class="go">学习榜 ›</span></a>{% endif %}
@@ -63,8 +70,8 @@
 </a>
 {% endfor %}
 
+{# 布局：从上到下一块一块排，每块整行、高度跟着内容走（以前左右两栏各自变高，一边总留一大片空） #}
 <div class="today-main">
-<div class="tm-list">
 <div class="card tasks">
   <div class="card-h"><h3>今天的任务 <span class="muted small">{{ done }}/{{ total }}</span></h3>{% if not readonly %}<button class="linkbtn" id="rebuild" title="按最新的情况重新排一遍今天的任务">↻ 重新安排</button>{% endif %}</div>
   <div class="steplist">
@@ -83,9 +90,7 @@
   </div>
   {% if total and not all_done %}<p class="tiny faint" style="margin:10px 0 0">{% if readonly %}不会的题点「这道题还不会」就行，坚持比做对更重要：每完成一项得一颗 ⭐。 {% else %}做完一项得一颗 ⭐ · {% endif %}<a href="/progress">{{ '学习进度和考试日期' if is_adult(me.grade) else '学校学到哪了？' }}</a></p>{% endif %}
 </div>
-</div>
 
-<div class="tm-side">
 {% if not readonly %}
 <div class="quick">
   <a href="/review"><span class="qi">🔁</span><span><b>复习</b><small>{% if due %}有 {{ due }} 张卡到期{% else %}今天的卡都复习完了{% endif %}</small></span></a>
@@ -98,20 +103,24 @@
 {% endif %}
 
 <div class="card daylog" id="daylog">
-  <div class="card-h"><h3>📝 一日记录</h3><a class="small" href="/day/{{ t.day }}">看详细 →</a></div>
-  <p class="small muted" style="margin:-6px 0 10px" title="页面开着、你在做题或读书才计时，发呆、切到别的应用都不算">⏱ 今天学了 <b><span id="todaymins">{{ t.minutes }}</span></b> 分钟 · 完成 {{ done }}/{{ total }} 项{% if rec.attempts %} · 做题 {{ rec.attempts|length }}（对 {{ rec.right }}）{% endif %}</p>
-  {% if auto.text %}<div class="autosum">
-    <div class="tiny faint" style="margin-bottom:4px">✨ 今天学到的（自动整理）</div>
+  <div class="card-h"><h3>📝 一日记录 <span class="muted small" title="页面开着、你在做题或读书才计时，发呆、切到别的应用都不算">⏱ <span id="todaymins">{{ t.minutes }}</span> 分钟 · 完成 {{ done }}/{{ total }} 项{% if rec.attempts %} · 做题 {{ rec.attempts|length }}（对 {{ rec.right }}）{% endif %}</span></h3><a class="small" href="/day/{{ t.day }}">看详细 →</a></div>
+  {% if auto.text %}<div class="autosum {{ 'with-face' if kidface }}">
+    {% if kidface %}<span class="as-face">{{ face(52) }}</span>{% endif %}
+    <div class="as-body">
+    <div class="tiny faint">✨ {{ '今天学到的 · ' ~ ASSISTANT ~ '帮你整理' if kidface else '今天学到的（自动整理）' }}</div>
     <p style="margin:0">{{ auto.text }}</p>
-    {% if auto.got or auto.todo %}<div class="chips" style="margin-top:8px">{% for k in auto.got %}<a class="chip" href="/learn/{{ k.id }}">✅ {{ k.name }}</a>{% endfor %}{% for k in auto.todo %}<a class="chip" href="/learn/{{ k.id }}">🔁 {{ k.name }}</a>{% endfor %}</div>{% endif %}
+    {% if auto.got %}<div class="as-g"><span class="as-l">✅ 练会了 {{ auto.got|length }}</span><div class="chips">{% for k in auto.got %}<a class="chip" href="/learn/{{ k.id }}">{{ k.name }}</a>{% endfor %}</div></div>{% endif %}
+    {% if auto.todo %}<div class="as-g"><span class="as-l">🔁 再练练 {{ auto.todo|length }}</span><div class="chips">{% for k in auto.todo %}<a class="chip" href="/learn/{{ k.id }}">{{ k.name }}</a>{% endfor %}</div></div>{% endif %}
+    </div>
   </div>{% elif not readonly %}<p class="tiny faint" style="margin:0 0 8px">✨ 今天学到的会出现在这里</p>{% endif %}
   {% if readonly %}{% if rec.mood or t.reflection %}<p>心情：{{ rec.mood }} {% if t.reflection %}「{{ t.reflection }}」{% endif %}</p>{% endif %}{% else %}
-  <label style="margin-top:8px">今天心情怎么样？</label>
+  <div class="dl-mood">
+  <label>今天心情怎么样？</label>
   <div class="moods">{% for m, n in [('😄','超开心'),('🙂','还不错'),('😐','一般'),('😣','有点难'),('😴','好累')] %}<button data-m="{{ m }}" class="{{ 'sel' if rec.mood == m }}" title="{{ n }}" aria-label="{{ n }}">{{ m }}</button>{% endfor %}</div>
-  <div class="ig" style="margin-top:10px"><input type="text" id="refl" value="{{ t.reflection }}" placeholder="想说点什么？" aria-label="想说点什么（选填）" maxlength="200"><button class="btn soft sm" id="savenote">保存</button></div>
+  <div class="ig"><input type="text" id="refl" value="{{ t.reflection }}" placeholder="想说点什么？" aria-label="想说点什么（选填）" maxlength="200"><button class="btn soft sm" id="savenote">保存</button></div>
+  </div>
   <p class="small" id="checked" style="margin:10px 0 0" {{ '' if t.checked_in else 'hidden' }}>✅ 今天已经打卡啦</p>
   {% endif %}
-</div>
 </div>
 </div>
 

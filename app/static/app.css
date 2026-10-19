@@ -385,14 +385,10 @@ a.card.arena-game{display:flex;align-items:center;gap:14px}.arena-game .grow{dis
 
 /* ===== beejoy：小伙伴形象 ===== */
 .mascot{flex:none;display:block}
-/* 今天页：小伙伴趴在卡片上沿，轻轻上下飞；全部完成时蹦一下 */
-.hero .buddy{position:absolute;top:-22px;right:18px;filter:drop-shadow(0 4px 6px rgba(43,33,24,.15));animation:bob 3.2s ease-in-out infinite}
-.hero .buddy.yay{animation:yay .9s cubic-bezier(.3,1.6,.5,1) 2,bob 3.2s ease-in-out 1.8s infinite}
 @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-5px) rotate(3deg)}}
 @keyframes yay{0%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-16px) scale(1.12) rotate(-8deg)}}
 .hero .pick{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;background:var(--brand-2);color:var(--brand-ink);border-radius:99px;padding:3px 10px 3px 4px;margin-top:8px}
 .hero .pick .mascot{width:22px;height:22px}
-@media (min-width:640px){.hero .buddy{right:auto;left:74px;top:-24px}}
 /* 「我的账号」：选形象 */
 .mascots{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;margin-top:10px}
 .mascots label{margin:0;position:relative;cursor:pointer}
@@ -411,12 +407,10 @@ transition:border-color .15s,background .15s,transform .12s;height:100%}
 /* 孩子：数字和英文用圆体，标题更圆润 */
 [data-tone=kid] h1,[data-tone=kid] .hero .big-line{font-family:var(--f-round),-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
 /* 成人：同一套颜色和组件，收一点「童趣」——小伙伴不在卡片上飞，乐园渐变也不出现 */
-[data-tone=adult] .hero .buddy{display:none}
 [data-tone=adult]{--radius:16px}
-@media (prefers-reduced-motion:reduce){.hero .buddy,.hero .buddy.yay{animation:none}}
 /* 深色底上，小伙伴身上的深色线条（触角、b 的竖）会看不见：加一圈浅色描边，像贴纸 */
 @media (prefers-color-scheme:dark){.mascot{filter:drop-shadow(0 0 .6px #f3ecdd) drop-shadow(0 0 .6px #f3ecdd)}
-.hero .buddy{filter:none}.hero .buddy .mascot{filter:drop-shadow(0 0 .6px #f3ecdd) drop-shadow(0 0 .6px #f3ecdd) drop-shadow(0 4px 6px rgba(0,0,0,.4))}}
+}
 #askbtn .mascot{width:26px;height:26px;filter:none}@media (max-width:480px){#askbtn .mascot{width:36px;height:36px}}
 #askbtn{background:var(--card);color:var(--ink);border:2.5px solid var(--brand);box-shadow:0 6px 18px rgba(43,33,24,.18)}#askbtn:hover .mascot{transform:rotate(-8deg) scale(1.08)}#askbtn .mascot{transition:transform .2s}
 /* 每天的正确率曲线（记录页、家长页）：坐标是百分比，图随宽度铺开 */
@@ -559,7 +553,7 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .tracebtn{margin-top:10px}
 /* 今天页的视觉重心：一张「下一项」主卡 + 一颗大按钮；清单第二层；快捷入口和打卡第三层；「看看我的进步」放最下面、压低存在感 */
 .hero.focus{display:block;padding:20px 20px 16px;border:2px solid var(--brand-3);box-shadow:var(--shadow-lg)}
-.hero.focus .hi{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:13.5px;padding-right:60px}
+.hero.focus .hi{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:13.5px}
 .hero.focus .hstat{white-space:nowrap;color:var(--ink)}
 .hero.focus .nx-l{margin-top:14px;font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--brand-ink)}
 .hero.focus .nx-t{font-size:24px;font-weight:800;line-height:1.3;margin:2px 0 4px}
@@ -572,12 +566,40 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .hero.focus .hprog .dots i.cur{background:var(--sun-2);box-shadow:inset 0 0 0 1.5px var(--brand)}
 .hero.focus .hprog b{font-size:14px;font-variant-numeric:tabular-nums}
 .hero.focus .base-line{margin:6px 0 0;font-size:12.5px}
-.hero.focus .buddy{top:-20px;right:16px;left:auto}
 .hero.focus.alldone{border-color:var(--ok)}
 @media (min-width:640px){.hero.focus{padding:24px 28px 18px}.hero.focus .nx-t{font-size:28px}.hero.focus .go{display:inline-flex;width:auto;min-width:280px;padding:15px 36px}}
-.today-main{display:grid;grid-template-columns:1fr;gap:0 16px;align-items:stretch}
-.tm-list,.tm-side{display:flex;flex-direction:column;gap:12px;min-width:0;margin:14px 0}.tm-list>*,.tm-side>*{margin:0!important}.tm-list>.tasks,.tm-side>.daylog{flex:1}
-@media (min-width:820px){.today-main{grid-template-columns:minmax(0,1fr) 290px}.today-main .quick{grid-template-columns:1fr;gap:12px}.today-main .quick a.qplay{grid-column:auto}}
+/* 今天页：一块一块从上往下排，每块整行、高度跟内容走，不再左右两栏各自变高（DESIGN 5.35） */
+.today-main{display:flex;flex-direction:column;gap:14px;margin:14px 0}.today-main>*{margin:0!important}
+@media (min-width:760px){.today-main .quick{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}.today-main .quick a.qplay{grid-column:auto}}
+/* 一日记录：小伙伴把今天学到的整理成一段话 + 两组知识点；心情一行 */
+.daylog .card-h h3 .small{font-weight:600;margin-left:6px}
+.autosum.with-face{display:flex;gap:12px;align-items:flex-start}
+.autosum .as-face{flex:none;margin-top:2px}.autosum .as-body{flex:1;min-width:0}
+.autosum .as-g{display:flex;gap:4px 10px;align-items:baseline;margin-top:10px}
+.autosum .as-l{flex:none;font-size:13px;font-weight:700;color:var(--muted);min-width:5.6em}
+.autosum .as-g .chips{margin:0;gap:6px}.autosum .chip{font-size:13px;padding:3px 10px}
+@media (max-width:560px){.autosum .as-g{flex-direction:column;gap:6px}.autosum .as-face{display:none}}
+.dl-mood{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:14px}.dl-mood>label{margin:0}
+.dl-mood .ig{flex:1;min-width:220px}
+/* 小伙伴站在主卡旁边说一句（只孩子、只自己看时）。只在进页面时招一下手，之后不动：想事情的时候页面不动（5.30） */
+.hero.has-coach{display:grid;grid-template-columns:minmax(0,1fr);gap:0 18px}
+.hero .coach{display:flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none;margin:0 0 6px;order:-1}
+.hero .coach .cface{flex:none;order:-1}.hero .coach .cface .mascot{width:56px;height:56px}
+.hero .coach .say{position:relative;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:7px 12px;font-size:14px;font-weight:650;line-height:1.45}
+.hero .coach .say b{display:block;font-size:11.5px;color:var(--brand-ink);letter-spacing:.5px}
+.hero .coach .say::before{content:"";position:absolute;left:-8px;top:50%;margin-top:-6px;border:6px solid transparent;border-right:8px solid var(--line);border-left:0}
+.hero .coach .cface{animation:wave .9s cubic-bezier(.3,1.6,.5,1) .3s 1 both}.hero .coach.yay .cface{animation:yay .9s cubic-bezier(.3,1.6,.5,1) .3s 2 both}
+.face-emo{display:block;line-height:1}
+@keyframes wave{0%,100%{transform:none}30%{transform:rotate(-10deg) translateY(-4px)}60%{transform:rotate(8deg)}}
+@media (min-width:640px){.hero.has-coach{grid-template-columns:minmax(0,1fr) 230px;align-items:end}
+.hero .hero-main{grid-column:1;grid-row:1;min-width:0}
+.hero .coach{grid-column:2;grid-row:1;order:0;flex-direction:column;align-items:center;gap:6px;margin:0;text-align:center}
+.hero .coach .cface{order:0}.hero .coach .cface .mascot{width:104px;height:104px}.hero .coach .cface .face-emo{font-size:84px!important}
+.hero .coach .say::before{left:50%;top:auto;bottom:-8px;margin:0 0 0 -6px;border:6px solid transparent;border-top:8px solid var(--line);border-bottom:0}}
+[data-skin=kid] .hero .coach .say{border-color:var(--k-ink);box-shadow:0 3px 0 var(--k-ink)}
+[data-skin=kid] .hero .coach .say::before{border-right-color:var(--k-ink)}
+@media (min-width:640px){[data-skin=kid] .hero .coach .say::before{border-right-color:transparent;border-top-color:var(--k-ink)}}
+@media (prefers-reduced-motion:reduce){.hero .coach .cface{animation:none!important}}
 .tasks .card-h h3 .small{font-weight:600;margin-left:4px}
 .step.next{padding:12px 12px;margin:4px -6px}.step.next .t{font-size:16.5px}
 .quick a.qsprint{border:2px solid color-mix(in srgb,var(--sun) 55%,transparent);background:linear-gradient(135deg,var(--sun-2),var(--card) 70%)}
