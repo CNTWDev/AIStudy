@@ -66,7 +66,7 @@ a.card:hover,.card.link:hover{transform:translateY(-2px);box-shadow:var(--shadow
 .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.grow{flex:1;min-width:0}
 /* 放名字、说明的那一块：窄屏放不下时自己占一行，别被旁边的按钮挤成竖排 */
 .grow-w{flex:1 1 14em}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;align-items:start}
 .cols{display:grid;grid-template-columns:1fr;gap:0 14px}@media (min-width:760px){.cols{grid-template-columns:1fr 1fr}.cols>.card{margin:7px 0}}
 /* 按钮：主按钮实心，次按钮描边，再次按钮浅底；按下有反馈 */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1.5px solid var(--brand);background:var(--brand);color:var(--on-brand);border-radius:var(--r-sm);
@@ -167,6 +167,7 @@ a.col:hover .track{outline:2px solid var(--brand-3)}
 .statline b{display:block;font-size:22px;line-height:1.2;font-variant-numeric:tabular-nums}.statline>div>span{font-size:12px;color:var(--muted)}
 .kp{display:flex;gap:10px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:14px;margin:8px 0;background:var(--card);color:var(--ink);transition:border-color .15s,transform .12s}
 a.kp:hover{border-color:var(--brand-3);color:var(--ink);transform:translateX(2px)}
+.kp-more>summary{cursor:pointer;color:var(--muted);padding:4px 2px;list-style-position:inside}
 .kp .n{flex:1;min-width:0}.kp.hot .n::after{content:"高频";font-size:11px;margin-left:6px;color:var(--warn)}
 .stage-h{display:flex;align-items:center;gap:8px}.stage-h.cur{color:var(--brand-ink)}
 .steps{counter-reset:s;padding:0;list-style:none}.steps li{counter-increment:s;position:relative;padding-left:40px;margin:12px 0}
