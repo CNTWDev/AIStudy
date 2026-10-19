@@ -42,10 +42,10 @@
 {% if simple %}<details class="kp-around"><summary class="quiet-h">🧭 前后的知识点</summary>{% endif %}
 <div class="grid">
   <div class="card"><div class="card-h"><span class="ico">⬅️</span><h3>往回：要先会的</h3></div>
-    {% for p in pre %}{% set s2 = p.m.status if p.m else 'unknown' %}<a class="kp" href="/learn/{{ p.id }}"><span class="n">{{ p.name }} <span class="muted small">{{ stage_label(p.stage) }}<span class="for-grownups"> · {{ p.strength }}</span></span></span><span class="pill st-{{ s2 }}">{{ STATUS_LABEL[s2] }}</span></a>
+    {% for p in pre %}{% if loop.index == 7 %}<details class="kp-more"><summary class="small">还有 {{ loop.length - 6 }} 个</summary>{% endif %}{% set s2 = p.m.status if p.m else 'unknown' %}<a class="kp" href="/learn/{{ p.id }}"><span class="n">{{ p.name }} <span class="muted small">{{ stage_label(p.stage) }}<span class="for-grownups"> · {{ p.strength }}</span></span></span><span class="pill st-{{ s2 }}">{{ STATUS_LABEL[s2] }}</span></a>{% if loop.last and loop.length > 6 %}</details>{% endif %}
     {% else %}<p class="muted small">这是起点，不用先会别的。</p>{% endfor %}</div>
   <div class="card"><div class="card-h"><span class="ico">➡️</span><h3>往前：学会后可以学</h3></div>
-    {% for p in post %}{% set s2 = p.m.status if p.m else 'unknown' %}<a class="kp" href="/learn/{{ p.id }}"><span class="n">{{ p.name }} <span class="muted small">{{ stage_label(p.stage) }}</span></span><span class="pill st-{{ s2 }}">{{ STATUS_LABEL[s2] }}</span></a>
+    {% for p in post %}{% if loop.index == 7 %}<details class="kp-more"><summary class="small">还有 {{ loop.length - 6 }} 个</summary>{% endif %}{% set s2 = p.m.status if p.m else 'unknown' %}<a class="kp" href="/learn/{{ p.id }}"><span class="n">{{ p.name }} <span class="muted small">{{ stage_label(p.stage) }}</span></span><span class="pill st-{{ s2 }}">{{ STATUS_LABEL[s2] }}</span></a>{% if loop.last and loop.length > 6 %}</details>{% endif %}
     {% else %}<p class="muted small">后面暂时没有了。</p>{% endfor %}</div>
 </div>
 {% if simple %}</details>{% endif %}
