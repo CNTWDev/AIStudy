@@ -90,7 +90,7 @@ def game_lobby(request: Request, game: str):
 @router.post("/api/rooms")
 def room_create(request: Request, body: dict = Body(...)):
     return rooms.create(kid_or_redirect(request), str(body.get("game") or ""), str(body.get("role") or ""), _dev(body),
-                        str(body.get("kind") or "family"))
+                        str(body.get("kind") or "family"), str(body.get("pin") or ""))
 
 
 @router.get("/api/rooms/{room_id}")

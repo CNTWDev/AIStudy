@@ -42,8 +42,9 @@ def _settings(kid: dict) -> dict:
 
 
 def game_minutes(kid: dict) -> int:
-    """每天能玩几分钟（UNLIMITED = 不限时）。成人学习者默认不玩（不显示乐园），家长明确设置过的以设置为准。"""
-    default = 0 if is_adult(kid.get("grade")) else DEFAULT_GAME_MINUTES
+    """每天能玩几分钟（UNLIMITED = 不限时）。自己设置过的以设置为准。没设置过：孩子 DEFAULT_GAME_MINUTES；
+    家里的成人成员不限时（和家里人一起玩，自己管自己）；没有家庭的成人自学者默认不玩（不显示乐园，在「我的课程」里可以打开）。"""
+    default = (UNLIMITED if kid.get("parent_id") else 0) if is_adult(kid.get("grade")) else DEFAULT_GAME_MINUTES
     try:
         m = int(_settings(kid).get("game_minutes", default))
         return m if m >= 0 else UNLIMITED

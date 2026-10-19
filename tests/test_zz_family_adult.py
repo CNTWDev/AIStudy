@@ -65,3 +65,6 @@ def test_family_adult_manages_own_learning():
         mom, child = dict(mom), dict(auth.get_user(auth.create_user("fa-c@x.com", "secret1", "二宝", "kid", parent_id=pa, grade="G3")))
         assert not boards.on_board(mom) and not rules.public_rooms(mom)
         assert boards.on_board(child) and rules.public_rooms(child)
+        # 家里的成人成员默认能玩乐园（不限时）；没有家庭的成人自学者默认不玩
+        assert rules.game_minutes(mom) == rules.UNLIMITED and rules.game_minutes(child) > 0
+        assert rules.game_minutes({"grade": mom["grade"], "parent_id": None, "settings": None}) == 0
