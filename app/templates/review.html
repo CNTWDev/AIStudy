@@ -6,6 +6,7 @@
 <div class="card flash" id="flash"><span class="loading">加载中</span></div>
 <script>
 let cards = [], i = 0, known = 0;
+const again = new Set();  // 这一轮已经排到最后再来一次的卡：每张只再来一次，不然一直答不出就绕不出去
 const KIND = {word: '生词', term: '术语', mistake: '错题', kp: '知识点', phrase: '短语'};
 const GROUP = {{ group|tojson }}, TASK = {words: 'words', mistakes: 'mistakes', other: 'review'}[GROUP];
 const RUNKIND = {words: 'words', mistakes: 'mistakes'}[GROUP] || 'review';
@@ -14,10 +15,11 @@ const post = (c, body) => api('/api/review/' + c.id + '/answer', body);
 function head(c, extra) {
   return `<div class="muted small">${KIND[c.kind] || c.kind}${c.kp_name ? ' · ' + esc(c.kp_name) : ''}${extra || ''} · 还剩 ${cards.length - i} 张</div>`;
 }
+function retry(c) { if (!again.has(c.id)) { again.add(c.id); cards.push(c); } }
 function nextBtn(box, res, c) {
   Run.hit(!!res.correct);
   if (res.correct) { known++; cheer(box); }
-  else if (c.kind !== 'mistake' && c.kind !== 'kp') cards.push(c);  // 生词答错：这一轮最后再来一次
+  else if (c.kind !== 'mistake' && c.kind !== 'kp') retry(c);  // 生词答错：这一轮最后再来一次
   const b = document.createElement('button'); b.className = 'btn'; b.style.marginTop = '12px'; b.textContent = '下一张 →';
   b.onclick = () => { i++; show(); };
   box.appendChild(b); b.focus();
@@ -120,7 +122,7 @@ function showSelf(box, c) {
   $$('#flash [data-g]').forEach(b => b.onclick = async () => {
     await api('/api/review/' + c.id, {grade: b.dataset.g});
     Run.hit(b.dataset.g === 'good');
-    if (b.dataset.g === 'again') cards.push(c); else if (b.dataset.g === 'good') { known++; cheer($('#flash')); }
+    if (b.dataset.g === 'again') retry(c); else if (b.dataset.g === 'good') { known++; cheer($('#flash')); }
     i++; show();
   });
 }
