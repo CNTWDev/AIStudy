@@ -4,7 +4,7 @@
 <h1>热身 🧠</h1>
 <p class="muted small">{% if simple %}凭第一感觉答，不会就点「不会」 👍{% else %}几道小题，有新有旧，凭第一感觉答就好。不会就点「不会」，记下来以后慢慢补上，答错也没关系。{% endif %}</p>
 <div class="daybar"><span id="wbar" style="width:0%"></span></div>
-<div id="wbox" class="card"><span class="loading">正在准备题目</span></div>
+<div id="wbox" class="card"><span class="loading">{{ ASSISTANT }}正在按你的水平挑题</span></div>
 <script>
 let items = [], idx = 0, right = 0, lit = 0, found = 0;
 function bar() { $('#wbar').style.width = (items.length ? 100 * idx / items.length : 0) + '%'; }

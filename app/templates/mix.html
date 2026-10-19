@@ -5,7 +5,7 @@
 <p class="muted small">{% if simple %}新的旧的混着练，错了的过一会儿还会再来 👍{% else %}今天学的、最近学的、以前学的混在一起练，有的还会换个问法再问一次。做错的题过几题会换一道同类的再来，这次做对就好。{% endif %}</p>
 <p class="small for-grownups mixparts">这一组 {{ total }} 题：{% for r, n in parts.items() if n %}<span class="pill mixrole-{{ r }}">{{ {'new':'新学的','recent':'最近学的','past':'以前学过的','cross':'换个问法','preview':'预习'}[r] }} {{ n }}</span> {% endfor %}</p>
 <div class="daybar"><span id="mbar" style="width:0%"></span></div>
-<div id="mbox" class="card"><span class="loading">正在准备题目</span></div>
+<div id="mbox" class="card"><span class="loading">{{ ASSISTANT }}正在按你的水平挑题</span></div>
 <script>
 const SET = {{ set_id }}, KIDS_DONE = {{ 'true' if done else 'false' }};
 let queue = [], total = {{ total }}, answered = {{ answered }}, right = {{ right }}, ended = false, loading = null, serverDone = false, seenNew = new Set(), lastKp = "";
@@ -35,7 +35,7 @@ function teachBtn(box, kp) {
   const d = document.createElement('div'); d.className = 'small'; d.style.margin = '4px 0 8px';
   d.innerHTML = `<button class="btn ghost sm">📘 先看看怎么做</button>`;
   d.querySelector('button').onclick = async () => {
-    d.innerHTML = '<span class="loading">正在准备讲解</span>';
+    seek(d, 'teach', {compact: true, delay: 0});
     try {
       const t = await api('/api/teach/' + kp);
       d.innerHTML = '<div class="card" style="margin:0">' + (t.steps || []).map((s, i) => `<p><b>${i + 1}. ${esc(s.title)}</b><br>${esc(s.text)}</p>`).join('') +
@@ -49,7 +49,7 @@ async function show() {
   bar();
   if (!queue.length) {
     if (!serverDone) {
-      $('#mbox').innerHTML = '<span class="loading">正在准备下一题</span>';
+      seek($('#mbox'), 'items', {compact: true, delay: 0});
       try { await waitWith($('#mbox'), fetchMore(), lastKp); } catch (e) { $('#mbox').innerHTML = `<div class="err">${esc(e.message)}</div>`; return; }
       return show();
     }

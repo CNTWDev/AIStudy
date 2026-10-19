@@ -34,7 +34,7 @@
 {% if not think %}
 <section class="card lcard" data-step="why">
   <div class="ldo">{{ '这一步：先听个故事，想想为什么要学它' if not simple else '先听个故事 📖' }}</div>
-  <div id="ctx" class="ctxbox"><span class="loading">正在准备</span></div>
+  <div id="ctx" class="ctxbox"></div>
   {% if not simple %}{{ bridges_box() }}{% endif %}
   <div class="lacts"><button class="btn lg block lnext">带着这个问题，往下学 →</button></div>
 </section>
@@ -134,14 +134,24 @@ const Steps = {
   },
 };
 // ---- 导入：当时遇到了什么麻烦、生活里用在哪，落到一个问题上（AI 生成，按知识点缓存；没有就跳过这一步）
+// 还在写的时候小伙伴在卡片里「翻书」（seek）；孩子的「往下学」先锁着，故事出来才能点，免得没看就跳过。等太久（30 秒）就放行
 let CTX = null;
-if ($('#ctx')) api('/api/context/' + KP).then(c => {
-  if (!c || !c.story) { if ($('.lbridges', Steps.sec('why'))) { $('#ctx').innerHTML = ''; } else Steps.drop('why'); return; }
+if ($('#ctx')) {
+  const look = seek($('#ctx'), 'story', {{ {'subject': pack.subject, 'domain': pack.domain, 'lang': pack.lang}|tojson }});
+  const nb = $('.lnext', Steps.sec('why')), label = nb.textContent;
+  const unlock = text => { nb.disabled = false; nb.textContent = text || label; };
+  if (!Steps.free) { nb.disabled = true; nb.textContent = '等' + AI.name + '找到故事…'; setTimeout(() => nb.disabled && unlock('先往下学 →'), 30000); }
+  const none = () => { look.stop(); unlock(); if ($('.lbridges', Steps.sec('why'))) { $('#ctx').innerHTML = ''; } else Steps.drop('why'); };
+  api('/api/context/' + KP).then(c => {
+  if (!c || !c.story) return none();
   CTX = c;
-  $('#ctx').innerHTML = `<p class="lstory">📖 ${esc(c.story)}</p>` + qFig(c.fig) + (c.question ? `<div class="lq">🤔 ${esc(c.question)}</div>` : '') +
+  const waited = look.stop(); unlock();
+  $('#ctx').innerHTML = (waited ? `<div class="seek-found small">${esc(AI.name)}找到了一个故事 👇</div>` : '') + `<p class="lstory">📖 ${esc(c.story)}</p>` + qFig(c.fig) + (c.question ? `<div class="lq">🤔 ${esc(c.question)}</div>` : '') +
     ((c.uses || []).length ? `<p class="small">🔧 ${c.uses.map(esc).join('<br>🔧 ')}</p>` : '') +
     (c.fun ? `<p class="small muted">💡 ${esc(c.fun)}</p>` : '');
-}).catch(() => Steps.drop('why'));
+  seekIn($('#ctx'), waited);
+  }).catch(none);
+}
 // ---- 讲解（AI，按知识点存在题库）：第一步里「讲给我听」展开讲解，方法这一步用它的例题「看我做一遍」
 let teachP = null;
 const getTeach = () => teachP || (teachP = api('/api/teach/' + KP).catch(e => { teachP = null; throw e; }));
@@ -151,9 +161,10 @@ $('#teachbtn').onclick = async () => {
   const think = $('#thinktxt');
   if (think && think.value.trim().length < 10) { think.placeholder = '先写一两句你自己的判断，再看讲解'; think.focus(); return; }
   if (think) { think.readOnly = true; if (!$('#summary').value) $('#summary').value = '一开始我认为：' + think.value.trim() + '\n现在我认为：'; }
-  $('#teach').innerHTML = '<span class="loading">' + {{ (ASSISTANT ~ '正在准备')|tojson }} + '</span>';
+  const look = seek($('#teach'), 'teach', {delay: 0});
   try {
     const t = await getTeach();
+    seekIn($('#teach'), look.stop());
     $('#teach').innerHTML = '<div class="lteach">' +
       (t.bridge && t.bridge.length ? '<div class="hint" style="margin-top:0">🔗 先连一连：' + t.bridge.map(b => `你在${esc(b.subject)}学过「${esc(b.name)}」${b.note ? '，' + esc(b.note) : ''}`).join('；') + '</div>' : '') +
       (t.steps || []).map((s, i) => `<p><b>${i + 1}. ${esc(s.title)}</b><br>${esc(s.text).replace(/\n/g, '<br>')}</p>` + qFig(s.fig)).join('') +
@@ -161,16 +172,17 @@ $('#teachbtn').onclick = async () => {
       (t.terms && t.terms.length ? '<p class="small">' + t.terms.map(x => `<span class="pill">${esc(x.en)} = ${esc(x.zh)}</span>`).join(' ') + '</p>' : '') +
       (THINK && t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '') +
       (t.action ? `<p><b>本周试一试：</b>${esc(t.action)}</p>` : '') + '</div>';
-  } catch (e) { $('#teach').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+  } catch (e) { look.stop(); $('#teach').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
   if (think) $('.lacts', Steps.sec('see')).hidden = false;
 };
 function showWorked() {
   const w = $('#worked'); if (!w || w.dataset.done) return; w.dataset.done = '1';
-  w.innerHTML = '<span class="loading small">正在准备例题</span>';
+  const look = seek(w, 'worked');
   getTeach().then(t => {
+    seekIn(w, look.stop());
     w.innerHTML = (t.example ? `<div class="lworked"><b>✍️ 看我做一遍</b><div>${esc(t.example.q)}</div>${qFig(t.example.fig)}<div class="lworked-a">${esc(t.example.a).replace(/\n/g, '<br>')}</div></div>` : '') +
       (t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '');
-  }).catch(() => { w.innerHTML = ''; });
+  }).catch(() => { look.stop(); w.innerHTML = ''; });
 }
 // ---- 练题。题在打开页面时就去取（孩子的题后台已经备好），第一题先拿来「猜一猜」，学完做题时揭晓
 let items = [], idx = 0, right = 0, wrong = 0, wrongStreak = 0, lastAnswer = null, guess = null, started = false, itemsP = null;
@@ -180,9 +192,11 @@ function setupGuess() {
   let settled = false;
   const reveal = () => { settled = true; $('#seebody').hidden = false; $('.lacts', Steps.sec('see')).hidden = false; };
   $('#seebody').hidden = true; $('.lacts', Steps.sec('see')).hidden = true;
-  g.hidden = false; g.innerHTML = '<span class="loading small">先准备一道小题让你猜猜</span>';
-  setTimeout(() => { if (!settled && !g.dataset.ready) { g.hidden = true; reveal(); } }, 5000);  // 题一时出不来：不等，直接看
+  g.hidden = false;
+  const look = seek(g, 'items', {compact: true, delay: 0, title: AI.name + '正在挑一道小题，让你先猜猜'});
+  setTimeout(() => { if (!settled && !g.dataset.ready) { look.stop(); g.hidden = true; reveal(); } }, 5000);  // 题一时出不来：不等，直接看
   fetchItems().then(r => {
+    look.stop();
     const it = (r.items || [])[0];
     if (settled) { g.hidden = true; return; }
     if (!it || it.probe || it.widget !== 'choice') { g.hidden = true; reveal(); return; }
@@ -197,20 +211,21 @@ function setupGuess() {
       reveal();
     });
     $('.lskip', g).onclick = () => { g.hidden = true; reveal(); };
-  }).catch(() => { g.hidden = true; reveal(); });
+  }).catch(() => { look.stop(); g.hidden = true; reveal(); });
 }
 async function loadItems() {
   started = true;
-  $('#items').innerHTML = '<span class="loading">正在准备题目</span>';
+  const look = seek($('#items'), 'items', {compact: true, delay: 0});
   $('.lacts', Steps.sec('practice')).hidden = true;
   try {
     const r = await waitWith($('#items'), fetchItems(), KP);
+    look.stop();
     itemsP = null;  // 「再来 3 题」重新取
     items = r.items; idx = 0; right = 0;
     if (items.length) Run.start('practice', {total: items.length, mount: $('#items')});
     if (!items.length) { $('#items').innerHTML = '<p>' + (r.llm ? '题目还没准备好，等一会儿再试试。' : '这个知识点还没有题。') + '</p><p class="muted small">可以先按上面的方法自己练一练。</p>'; $('.lacts', Steps.sec('practice')).hidden = false; return; }
     show();
-  } catch (e) { itemsP = null; $('#items').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+  } catch (e) { look.stop(); itemsP = null; $('#items').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
 }
 function show() {
   if (idx >= items.length) {

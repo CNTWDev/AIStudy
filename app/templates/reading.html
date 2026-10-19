@@ -18,7 +18,7 @@
 {% if can_listen %}<p class="small" id="ltoggle" style="margin:-4px 0 8px"><button class="linkbtn" id="lfirst" type="button">🎧 换成先听后读（练听力）</button></p>{% endif %}
 <div class="card reader" id="reader" lang="{{ 'en' if r.lang == 'en' else 'zh-CN' }}">{% for p in paras %}<p>{{ p }}</p>{% endfor %}</div>
 {% if dup and not r.finished_at %}<div class="note-bar">📌 今天写的这篇还没读完，先读完它吧（每天一篇就够）。
-  <form method="post" action="/reading/new" style="display:inline"><input type="hidden" name="mode" value="ai"><input type="hidden" name="lang" value="{{ r.lang }}"><input type="hidden" name="again" value="1">
+  <form method="post" action="/reading/new" style="display:inline" onsubmit="const b = document.createElement('div'); this.closest('.note-bar').after(b); seek(b, 'passage', {delay: 0, lang: {{ r.lang|tojson|forceescape }}})"><input type="hidden" name="mode" value="ai"><input type="hidden" name="lang" value="{{ r.lang }}"><input type="hidden" name="again" value="1">
   <button class="linkbtn" data-busy="正在写…">不喜欢这篇？换一篇</button></form></div>{% endif %}
 {% if done_views is not none %}
 <div class="card" id="qs"><h3 style="margin-top:0">✅ 这篇读完了{% if r.mode == 'listen' %} · 🎧 先听后读{% endif %}{% if done_views %} · 小题答对 {{ done_views|selectattr('mine_right')|list|length }}/{{ done_views|length }}{% endif %}</h3>
@@ -109,7 +109,7 @@ async function lookup(q, ctx, el) {
   $('#expl').onclick = () => explain(ctx);
   $('#chk').onclick = async () => {
     const s = $('#mysent').value.trim(); if (!s) return;
-    $('#sentfb').innerHTML = '<span class="loading">AI 正在看</span>';
+    $('#sentfb').innerHTML = '<span class="loading">' + AI.name + '正在看</span>';
     try { const f = await api('/api/sentence', {word: r.word || q, meaning: r.meaning, sentence: s, lang: LANG});
       $('#sentfb').innerHTML = `<div class="fb ${f.ok ? 'ok' : 'no'}">${esc(f.praise)}${f.issue ? '<br>⚠️ ' + esc(f.issue) : ''}${f.corrected ? '<br>改正：' + esc(f.corrected) : ''}${f.better ? '<br><span class="muted">示范：' + esc(f.better) + '</span>' : ''}</div>`;
     } catch (e) { $('#sentfb').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
@@ -119,7 +119,7 @@ function manualSave(q, ctx) { return `<p class="small">AI 暂时不能用。你�
 function bindManual(q, ctx) { const b = $('#msave'); if (b) b.onclick = async () => { await api('/api/cards', {kind: 'word', front: q, back: $('#mmean').value, extra: {context: ctx, lang: LANG}}); b.textContent = '已收藏 ✓'; b.disabled = true; }; }
 async function explain(sentence) {
   const box = $('#explbox') || (openSheet('<div id="explbox"></div>'), $('#explbox'));
-  box.innerHTML = '<span class="loading">AI 正在拆这句话</span>';
+  box.innerHTML = '<span class="loading">' + AI.name + '正在拆这句话</span>';
   try { const e = await api('/api/explain', {sentence, lang: LANG});
     box.innerHTML = `<div class="card" style="margin:8px 0"><p class="small muted">${esc(sentence)}</p><p><b>意思：</b>${esc(e.meaning)}</p><p><b>结构：</b>${esc(e.structure)}</p>${(e.points || []).map(p => `<p class="small">• <b>${esc(p.text)}</b>：${esc(p.note)}</p>`).join('')}</div>`;
   } catch (er) { box.innerHTML = `<div class="err">${esc(er.message)}</div>`; }

@@ -37,12 +37,15 @@ _slots = threading.BoundedSemaphore(MAX_THREADS)
 # ------------------------------------------------------------------ 页面上提前一步
 
 def kick(user_id: int, kp_id: str, n: int = 3, purpose: str = "practice", grade: str = "", uses=None, teach=False) -> None:
-    """后台给这个孩子把这个知识点的题备够 n 道（题库够了就什么都不做）；teach=True 同时把讲解写好（另起一份，先好先用）。
-    同一个孩子同一个点同一种用途，同时只出一份。"""
-    if MODE == "off" or not llm.enabled() or not catalog.kp(kp_id):
+    """后台给这个孩子把这个知识点的题备够 n 道（题库够了就什么都不做）；teach=True 同时把讲解和「为什么学」的导入写好
+    （各另起一份，先好先用；学习页一打开先要的就是导入，免得孩子一进来就等）。同一个孩子同一个点同一种用途，同时只出一份。"""
+    kp = catalog.kp(kp_id)
+    if MODE == "off" or not llm.enabled() or not kp:
         return
     if teach and not has_teach(kp_id):
         _start((user_id, kp_id, "teach"), n, grade, uses)
+    if teach and not kp.get("think") and not has_kp_content("context", kp_id):  # 难题课没有导入这一步
+        _start((user_id, kp_id, "context"), n, grade, uses)
     _start((user_id, kp_id, purpose), n, grade, uses)
 
 
@@ -77,8 +80,8 @@ def _run(key, n, grade, uses):
     user_id, kp_id, purpose = key
     try:
         with _slots:
-            if purpose == "teach":
-                bank.teach(catalog.kp(kp_id), grade or catalog.default_grade, user_id=user_id)
+            if purpose in ("teach", "context"):
+                getattr(bank, purpose)(catalog.kp(kp_id), grade or catalog.default_grade, user_id=user_id)
             else:
                 ensure(user_id, kp_id, n, purpose, grade, uses)
     except Exception:  # noqa: BLE001  后台备题失败不影响做题：到时候没题就照常现场出
@@ -92,7 +95,13 @@ def _run(key, n, grade, uses):
 
 def has_teach(kp_id: str) -> bool:
     """库里有这个知识点的讲解了（bank.teach 会直接用，不用再写）。只查不计用量。"""
-    return bool(db.one("SELECT id FROM contents WHERE kind='teach' AND status='active' AND kp_id=?", kp_id))
+    return has_kp_content("teach", kp_id)
+
+
+def has_kp_content(kind: str, kp_id: str) -> bool:
+    """库里有这个知识点能直接用的讲解 / 导入：人写的，或 AI 写的当前版本（老版本 bank 打开时会换新，等于没有）。只查不计用量。"""
+    return any(r["origin"] != "ai" or db.jload(r["body"], {}).get("v", 1) >= bank.KP_CONTENT_V[kind]
+               for r in db.q("SELECT origin, body FROM contents WHERE kind=? AND status='active' AND kp_id=?", kind, kp_id))
 
 
 def wait(user_id: int, kp_id: str, purpose: str = "practice", timeout: float = 90) -> None:
