@@ -180,33 +180,50 @@ def save_content(kind: str, body: dict, kp_id="", lang="", grade="", topic="", t
                      origin, db.jdump(meta or {}), h, 1, created_by, now, now)
 
 
-def teach(kp: dict, grade: str, user_id=None) -> dict:
-    """分步讲解：库里有就直接用，没有再生成并存下。"""
-    c = find_content("teach", kp["id"], grade=grade)
-    if c:
-        return {**c["body"], "content_id": c["id"]}
-    body = llm.teach(kp, catalog.packs[kp["pack"]], grade, user_id=user_id)
-    cid = save_content("teach", body, kp["id"], kp_lang(kp["id"]), grade, title=kp["name"], meta=gen_meta("teach"),
-                       created_by=user_id)
-    return {**body, "content_id": cid}
+# 讲解和导入是教材的一部分：每个知识点生成一次存进 contents，所有人共用（不按人、不按次生成）。
+# 版本号变了（比如加了配图、导入改成讲真实的来历），老的那份在下一次有人打开时换新一次，之后照样共用。
+KP_CONTENT_V = {"teach": 2, "context": 2}
 
 
-def context(kp: dict, grade: str, user_id=None) -> dict:
-    c = find_content("context", kp["id"], grade=grade)
-    # 学习页第一步用它做导入（当时遇到了什么麻烦 + 一个引子问题）；没有引子问题的是老版本，换成新的一次
-    if c and (c["body"].get("question") or not llm.enabled()):
+def _kp_content(kind: str, kp: dict, grade: str, make, user_id=None) -> dict:
+    c = find_content(kind, kp["id"], grade=grade)
+    # 人写的（教材作者、管理员改过的）一直用；AI 写的老版本才换
+    if c and (c.get("origin") != "ai" or c["body"].get("v", 1) >= KP_CONTENT_V[kind] or not llm.enabled()):
         return {**c["body"], "content_id": c["id"]}
     try:
-        body = llm.kp_context(kp, catalog.packs[kp["pack"]], grade, user_id=user_id)
+        body = _keep_figs(make())
     except llm.LLMError:
         if c:
             return {**c["body"], "content_id": c["id"]}
         raise
+    body["v"] = KP_CONTENT_V[kind]
     if c:
-        db.run("UPDATE contents SET status='retired' WHERE id=?", c["id"])
-    cid = save_content("context", body, kp["id"], kp_lang(kp["id"]), grade, title=kp["name"], meta=gen_meta("context"),
-                       created_by=user_id)
+        db.run("UPDATE contents SET status='retired', updated_at=? WHERE id=?", db.now(), c["id"])
+    cid = save_content(kind, body, kp["id"], kp_lang(kp["id"]), grade, title=kp["name"], meta=gen_meta(kind), created_by=user_id)
     return {**body, "content_id": cid}
+
+
+def _keep_figs(body: dict) -> dict:
+    """讲解、导入里的配图：检查画图说明，画不出来的去掉（文字照用）。存的是说明，显示时再画（figures.present）。"""
+    from . import figures
+    for part in [body, body.get("example"), *(body.get("steps") or [])]:
+        if isinstance(part, dict) and "fig" in part:
+            fig = figures.normalize(part["fig"])
+            if fig:
+                part["fig"] = fig
+            else:
+                part.pop("fig")
+    return body
+
+
+def teach(kp: dict, grade: str, user_id=None) -> dict:
+    """分步讲解（带例题和配图）：库里有就直接用，没有再生成并存下。"""
+    return _kp_content("teach", kp, grade, lambda: llm.teach(kp, catalog.packs[kp["pack"]], grade, user_id=user_id), user_id)
+
+
+def context(kp: dict, grade: str, user_id=None) -> dict:
+    """「为什么学」的导入：真实的来历、生活里的用处、引子问题和一张故事条。"""
+    return _kp_content("context", kp, grade, lambda: llm.kp_context(kp, catalog.packs[kp["pack"]], grade, user_id=user_id), user_id)
 
 
 def passage(user_id: int, lang: str, grade: str, topic: str, length: str, review_words: list[str]) -> tuple[dict, int]:

@@ -27,4 +27,17 @@ def test_learn_page_is_step_cards():
         ctx = c.get("/api/context/MATH-PRE-UNIT").json()
         assert ctx["question"] and ctx["content_id"] != old
         assert db.one("SELECT status FROM contents WHERE id=?", old)["status"] == "retired"
-        assert c.get("/api/context/MATH-PRE-UNIT").json()["content_id"] == ctx["content_id"]
+        assert c.get("/api/context/MATH-PRE-UNIT").json()["content_id"] == ctx["content_id"]  # 之后大家共用这一份
+        # 导入配一张故事条，讲解的例题配图：存的是画图说明，给页面时画成 SVG
+        assert ctx["fig"]["kind"] == "story" and "<svg" in ctx["fig"]["svg"]
+        stored = db.jload(db.one("SELECT body FROM contents WHERE id=?", ctx["content_id"])["body"], {})
+        assert stored["fig"]["kind"] == "story" and "svg" not in stored["fig"] and stored["v"] == bank.KP_CONTENT_V["context"]
+        t = c.get("/api/teach/MATH-PRE-UNIT").json()
+        assert "<svg" in t["example"]["fig"]["svg"]
+        # 画不出来的图去掉，文字照用
+        assert "fig" not in bank._keep_figs({"steps": [{"title": "a", "text": "b", "fig": {"kind": "story", "beats": []}}]})["steps"][0]
+        # 人写的讲解（教材作者）不因为版本号换掉
+        kp2 = catalog.kp("MATH-PRE-UNIT")
+        db.run("UPDATE contents SET status='retired' WHERE kind='teach' AND kp_id=?", kp2["id"])
+        mine = bank.save_content("teach", {"steps": [{"title": "作者", "text": "人写的"}]}, kp2["id"], "", "G6", origin="author")
+        assert c.get("/api/teach/MATH-PRE-UNIT").json()["content_id"] == mine
