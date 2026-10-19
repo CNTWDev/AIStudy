@@ -49,6 +49,7 @@
     {% else %}<p class="muted small">后面暂时没有了。</p>{% endfor %}</div>
 </div>
 {% if simple %}</details>{% endif %}
+{% if pack.thinking_moves and not readonly %}<p class="small"><a href="/thinking">🧭 值得再想的问题 · 我的思考方式</a></p>{% endif %}
 {% if pack.copyright %}<p class="muted small">{{ pack.copyright }}</p>{% endif %}
 {% if not readonly %}<script>
 const KP = {{ kp.id|tojson }}, TASK = {{ task|tojson }};

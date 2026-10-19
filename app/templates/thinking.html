@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block body %}
+{% if again %}
+<a href="/thinking" class="small">← 值得再想的问题</a>
+<h1>🔄 换个条件再想一次</h1>
+<p class="muted small">「{{ kp.name }}」。上次你的结论是：{{ again.conclusion }}</p>
+<div id="ibox" class="card"></div>
+<script>
+const IT = {{ item|tojson }};
+renderItem($('#ibox'), IT, {
+  submit: (answer, self, ms, extra) => api('/api/answer', Object.assign({item_id: IT.id, kp_id: IT.kp_id, answer, ms}, extra || {})),
+  onDone: () => { $('#ibox').insertAdjacentHTML('beforeend', '<div class="row" style="margin-top:12px"><a class="btn" href="/thinking">回到值得再想的问题</a></div>'); }
+});
+</script>
+{% else %}
+<h1>🧭 思考</h1>
+<p class="muted small">没有标准答案的问题，想完以后过几天会换一个条件再问你一次：条件变了，结论还站得住吗？</p>
+<h2>值得再想的问题</h2>
+{% if due %}
+<div class="stack" style="display:grid;gap:10px">
+{% for d in due %}
+  <a class="tile" href="/thinking/{{ d.id }}" style="display:block">
+    <div class="small muted">{{ d.kp_name }}</div>
+    <div><b>{{ d.q }}</b></div>
+    {% if d.twist %}<div class="small" style="margin-top:6px">🔄 这次换个条件：{{ d.twist }}</div>{% endif %}
+  </a>
+{% endfor %}
+</div>
+{% else %}
+<p class="muted">现在没有到期的问题。{% if upcoming %}下一个在 {{ upcoming[0].next_due }}。{% endif %}</p>
+{% endif %}
+{% for p in profile %}
+<h2>我的思考方式 · {{ p.pack }}</h2>
+<p class="muted small">想过 {{ p.discussions }} 道题。「自己想到」是第一段话里就用到的，「追问后想到」是被挑战以后才用到的。</p>
+<div class="tw"><table class="nums">
+  <tr><th>思考方式</th><th>自己想到</th><th>追问后想到</th></tr>
+  {% for m in p.moves %}
+  <tr><td>{% if m.kp %}<a href="/learn/{{ m.kp }}">{{ m.name }}</a>{% else %}{{ m.name }}{% endif %}</td><td>{{ m.self or '·' }}</td><td>{{ m.prompted or '·' }}</td></tr>
+  {% endfor %}
+</table></div>
+{% endfor %}
+{% endif %}
+{% endblock %}

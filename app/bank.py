@@ -119,7 +119,9 @@ def candidates(user_id: int, kp_id: str) -> list:
     kps = [kp_id] + [k["id"] for k in catalog.equivalents(kp_id) if kp_lang(k["id"]) == lang]
     marks = ",".join("?" * len(kps))
     return db.q(
-        "SELECT i.*, (SELECT COUNT(*) FROM attempts a WHERE a.item_id=i.id AND a.user_id=?) AS done, "
+        # 思辨题不判对错、不进 attempts：想完一次（discussions.done）也算做过
+        "SELECT i.*, (SELECT COUNT(*) FROM attempts a WHERE a.item_id=i.id AND a.user_id=?) "
+        "+ (SELECT COUNT(*) FROM discussions d WHERE d.item_id=i.id AND d.user_id=? AND d.done=1) AS done, "
         "(SELECT COUNT(*) FROM attempts a WHERE a.item_id=i.id AND a.user_id=? AND a.correct=1) AS ok, "
         # 同型组里做过几次（换了数字的同一道题算做过）
         "(SELECT COUNT(*) FROM attempts a JOIN items j ON j.id=a.item_id WHERE a.user_id=? AND j.near_key=i.near_key) AS gdone, "
@@ -129,7 +131,7 @@ def candidates(user_id: int, kp_id: str) -> list:
         "AND i.id NOT IN (SELECT target_id FROM flags WHERE user_id=? AND target='item') "
         # 试卷原题来自某个孩子的卷子，只给这个孩子自己用
         "AND (i.source<>'paper' OR i.id IN (SELECT pi.item_id FROM paper_items pi JOIN papers p ON p.id=pi.paper_id WHERE p.user_id=?))",
-        user_id, user_id, user_id, kp_id, *kps, *kps, user_id, user_id)
+        user_id, user_id, user_id, user_id, kp_id, *kps, *kps, user_id, user_id)
 
 
 def flagged_by(user_id: int) -> set:

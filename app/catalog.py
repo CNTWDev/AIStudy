@@ -86,6 +86,7 @@ class Pack:
     selection: dict = field(default_factory=dict)    # 家长选课用的短名称、核对提示
     copyright: str = ""                               # 自编教材的版权声明，显示在知识点页底部
     open_review: str = ""                             # "ai"：简答题由 AI 点评和追问，不让学员自评（app/coach.py）
+    thinking_moves: list = field(default_factory=list)  # 这门课看重的思考方式 [{id, name, desc}]；列了才出思辨题（app/discuss.py）
 
     @property
     def lang(self) -> str:
@@ -271,8 +272,21 @@ class Catalog:
             school_types=meta.get("school_types", []), system=system, kind=kind, teach_lang=teach, item_lang=item,
             prompt_note=meta.get("prompt_note", ""), levels=levels, chapters=meta.get("progress") != "none",
             selection=meta.get("selection") or {}, copyright=meta.get("copyright", ""),
-            open_review=meta.get("open_review", ""),
+            open_review=meta.get("open_review", ""), thinking_moves=self._moves(meta, d),
         )
+
+    def _moves(self, meta, d) -> list:
+        """thinking_moves 可以直接写 {id, name, desc}，也可以写本包里知识点的 id（用它的名称和说明，学员能点开那一课）。"""
+        kps = {k["id"]: k for k in d.get("kps", [])}
+        out = []
+        for m in meta.get("thinking_moves") or []:
+            if isinstance(m, str) and m in kps:
+                out.append({"id": m, "name": kps[m]["name"], "desc": kps[m].get("desc", ""), "kp": m})
+            elif isinstance(m, dict) and m.get("id") and m.get("name"):
+                out.append({"desc": "", **m})
+            else:
+                self.errors.append(f"{meta['id']}: thinking_moves 里的 {m} 不是本包的知识点，也不是 {{id, name}}")
+        return out
 
     def _load_meta(self, meta_dir):
         f = meta_dir / "stages.json"

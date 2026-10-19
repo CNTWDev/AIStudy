@@ -54,6 +54,7 @@ type = "mock"
 #         items 出题 / passage 写阅读短文 / paper 试卷拍照解析（要看图片）/ ask 问小艾 /
 #         context 知识背景和用处 / news_pick 每日新闻选题 / news_write 新闻按年级改写 /
 #         review 开放题点评和追问（CEO 专项课这类课）
+#         discuss / discuss_close 思辨题的陪练和收尾（没有标准答案的题，见 app/discuss.py）
 # effort 可选 low / medium / high（只对 anthropic 有效，越高越准越慢越贵）
 #
 # [tasks.lookup]

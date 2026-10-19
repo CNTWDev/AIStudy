@@ -162,6 +162,8 @@ def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="", exclu
     rows = [r for r in bank.candidates(user_id, kp_id) if r["id"] not in exclude]
     if purpose == "quick":
         rows = [r for r in rows if bank.is_quick(r["type"], db.jload(r["data"], {}))]
+    if purpose == "diagnose":  # 摸底、找根源、热身要的是对错：没有标准答案的思辨题不拿来判
+        rows = [r for r in rows if itemtypes.of(r["type"]).judge != "open"]
     fresh = [r for r in rows if r["done"] == 0 and not r["gdone"]]
     # 同型组里做过别的题（换了数字的同一道题）：排在新题后面；做错过的那组，先出同组没做过的，再出原题
     twins = [r for r in rows if r["done"] == 0 and r["gdone"]]
@@ -192,7 +194,8 @@ def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="", exclu
                                      purpose=purpose, user_id=user_id)
             have = {p["id"] for p in picked} | bank.flagged_by(user_id) | exclude
             saved = [it for it in save_items(kp_id, new, purpose=purpose, grade=grade, meta=bank.gen_meta("items", purpose=purpose))
-                     if it["id"] not in have and (purpose != "quick" or bank.is_quick(it["type"], it))]
+                     if it["id"] not in have and (purpose != "quick" or bank.is_quick(it["type"], it))
+                     and (purpose != "diagnose" or itemtypes.of(it).judge != "open")]
             # 题目内容和别的知识点的题一样时，存的是那道旧题：这次也记在正在学的知识点上
             if lack_figs:
                 saved.sort(key=lambda it: not it.get("fig"))
@@ -429,7 +432,7 @@ def diag_next(user_id: int, sid: int, grade: str):
         if any(d["kp"] == nxt["kp"] for d in state["done"]):
             continue
         # 摸底只用判得出对错的题；开放题（简答）没有一句话的标准答案，这个点改成让学员自己说会不会
-        items = [i for i in items_for(user_id, nxt["kp"], n=1, purpose="diagnose", grade=grade) if not itemtypes.of(i).self_rated]
+        items = [i for i in items_for(user_id, nxt["kp"], n=1, purpose="diagnose", grade=grade) if itemtypes.auto(i)]
         cur = {**nxt, "item": items[0] if items else None, "n": len(state["done"]) + 1}
         state["current"] = cur
         db.run("UPDATE diag_sessions SET state=? WHERE id=?", db.jdump(state), sid)

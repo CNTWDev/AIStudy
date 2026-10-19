@@ -5,7 +5,7 @@ import re
 
 from fastapi import HTTPException
 
-from . import coach, db, engine, explore, itemtypes, trace
+from . import coach, db, discuss, engine, explore, itemtypes, trace
 from .catalog import catalog
 
 
@@ -14,7 +14,8 @@ def submit(user_id: int, body: dict):
     request_id = body.get("request_id")
     if request_id is not None and (not isinstance(request_id, str) or not re.fullmatch(r"[A-Za-z0-9_-]{16,100}", request_id)):
         raise HTTPException(400, "作答标识不正确")
-    semantic = {k: body[k] for k in ("item_id", "kp_id", "mode", "answer", "self", "dont_know", "probe", "review_id") if k in body}
+    semantic = {k: body[k] for k in ("item_id", "kp_id", "mode", "answer", "self", "dont_know", "probe", "review_id",
+                                     "discussion_id", "conclusion", "action", "rethink") if k in body}
     fingerprint = hashlib.sha256(json.dumps(semantic, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
     if request_id:
         receipt = db.one("SELECT * FROM answer_receipts WHERE user_id=? AND request_id=?", user_id, request_id)
@@ -23,7 +24,7 @@ def submit(user_id: int, body: dict):
                 raise HTTPException(409, "这次作答已提交，请开始下一题")
             return db.jload(receipt["response"], {})
     result = _answer(user_id, body)
-    if request_id and not result.get("reveal") and not (result.get("coach") and not result.get("done")):
+    if request_id and not result.get("reveal") and not (result.get("coach") and not result.get("done")) and not result.get("discuss"):
         db.run("INSERT INTO answer_receipts(user_id,request_id,fingerprint,response,created_at) VALUES(?,?,?,?,?)",
                user_id, request_id, fingerprint, db.jdump(result), db.now())
     return result
@@ -49,6 +50,9 @@ def _answer(user_id, body):
     mode = body.get("mode") or "practice"
     if mode not in ("practice", "preview", "probe"):
         raise HTTPException(400, "作答模式不正确")
+    if itemtypes.of(it).judge == "open":  # 思辨题：不判对错，AI 陪着想（app/discuss.py）
+        u = db.one("SELECT grade FROM users WHERE id=?", user_id)
+        return discuss.handle(user_id, it, kp_id, body, u["grade"] if u else "")
     if body.get("dont_know"):  # 「这道题还不会」：不算错，给讲解，进错题本，过几天再练
         engine.record_attempt(user_id, it, kp_id, mode, False, "", dont_know=True)
         if mode == "probe":
