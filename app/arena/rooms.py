@@ -4,8 +4,9 @@
   共享的东西由他那台设备算。房主走了，由最早进来的人接任；人都走了房间就关了。
 - 单机游戏每个孩子每款游戏一个房间，一直留着（刷新、换设备回来接着玩）。联网游戏开房间时选一种（kind）：
   family 家里：只有同一个家里的兄弟姐妹能看到、能进，乐园首页会提示「X 在等你」；
-  public 公开：全站的孩子在这款游戏的大厅里都能看到、能进（家长打开隐私模式的孩子看不到、进不去）；
-  code 密码：大厅里不显示，报房间号和 4 位密码的人才能进（两个认识的人约好一起玩）。
+  public 公开：全站的孩子在这款游戏的大厅里都能看到、点一下就进（家长打开隐私模式的孩子看不到、进不去）；默认开这种；
+  code 密码：全站的孩子在大厅里都能看到（带 🔒），点了输 4 位密码就进（两个认识的人约好一起玩，不用报房间号）。
+  房间不用起名字，自动叫「房主的房间」（家里的用名字，公开和密码的用昵称）。
   公开和密码房间里只显示昵称（auth.public_name），真名不出现；一局开始以后不能再进人，等这一关打完。
 - 设备：一个账号在一个房间里同一时间只有一台设备在玩（room_members.device，前端每个页面一个设备号，刷新不变）。
   所有改房间的请求都带设备号，不是当前那台的一律拒绝（409 moved），那台就知道「已经换到另一台设备上了」。
@@ -204,7 +205,7 @@ def _check_join(kid: dict, r: dict, pin) -> None:
     if kind == "public" and not rules.public_rooms(kid):
         raise ArenaError("爸爸妈妈打开了隐私模式，不能进公开房间", 403)
     if kind == "code" and not _pin_ok(kid, r, pin):
-        raise ArenaError("房间号或密码不对", 403)
+        raise ArenaError("密码不对", 403, need_pin=True)
     if kind != "family":
         _need_nickname(kid)
 
@@ -298,7 +299,9 @@ def room_info(kid: dict, room_id, world=None) -> dict:
                 "stage": {**(g.for_team(g.stage(s["level"], progress.progress(g, s["team"])), _size(s["team"])) if s["level"] else {}),
                           **g.team_setup(s["team"])},
                 "resume": sessions.resume_for(s, kid["id"])}
+    host = users.get(r["host_id"])
     return {"id": r["id"], "game": r["game"], "kind": r["kind"] if r["multi"] else "", "pin": r["pin"], "level": r["level"], "members": members,
+            "name": room_name(host, public) if host and r["multi"] else "",
             "me": next(m for m in members if m["id"] == kid["id"]), "host": kid["id"] == r["host_id"], "full": full,
             "progress": prog, "play": play, "preview": {**lv, "world": g.world_of(lv["n"])} if lv else None}
 
@@ -320,32 +323,40 @@ def playing(room_id) -> bool:
     return bool(r and r["session_id"] and sessions.live(r["session_id"]))
 
 
-LOBBY_PUBLIC = 20          # 大厅里最多列几个公开房间
+LOBBY_PUBLIC = 20          # 大厅里最多列几个别的家庭的房间（公开、密码）
+
+
+def room_name(host: dict, public: bool) -> str:
+    """房间名自动起：「房主的房间」（公开、密码房间用昵称，家里的用名字）。"""
+    return f"{auth.public_name(host) if public else host['name']}的房间"
 
 
 def lobby(kid: dict, game: str) -> dict:
-    """进一款联网游戏时看到的：家里的小伙伴、谁开了房间在等我（家里的、全站公开的）、和每个小伙伴一起打到哪了。
-    密码房间不列出来，报房间号和密码才能进。"""
+    """进一款联网游戏时看到的：家里的小伙伴、我能进的房间（家里的、全站公开的、全站的密码房间）、和每个小伙伴一起打到哪了。
+    看到的都能进：满了的、正在打的不列；密码房间带 locked，点了要输密码。"""
     g = get(game)
     sibs = siblings(kid)
     public_ok = rules.public_rooms(kid)
     rooms = []
     if g.multi and family_of(kid):
         rows = db.q("SELECT * FROM game_rooms WHERE game=? AND multi=1 AND status<>'closed' AND seen_at>=? "
-                    "AND ((kind='family' AND family_id=?) OR kind='public' OR id IN (SELECT room_id FROM room_members WHERE user_id=?)) "
+                    "AND ((kind='family' AND family_id=?) OR kind IN ('public', 'code') OR id IN (SELECT room_id FROM room_members WHERE user_id=?)) "
                     "ORDER BY id DESC", game, _ago(ROOM_ALIVE_S), family_of(kid), kid["id"])
         for r in rows:
             ms = _members(r["id"])
             ids = [m["user_id"] for m in ms]
             mine = kid["id"] in ids
-            if r["kind"] == "public" and not mine and (not public_ok or sum(x["kind"] == "public" for x in rooms) >= LOBBY_PUBLIC):
+            if r["kind"] == "public" and not mine and not public_ok:
+                continue
+            if r["kind"] != "family" and not mine and sum(x["kind"] != "family" for x in rooms) >= LOBBY_PUBLIC:
                 continue
             if not mine and (len(ms) >= g.players[1] or sessions.live(r["session_id"])):
                 continue
             host = next((m for m in ms if m["user_id"] == r["host_id"]), {})
             hu = db.one("SELECT * FROM users WHERE id=?", r["host_id"])
             rooms.append({"id": r["id"], "kind": r["kind"], "mine": mine, "level": r["level"], "role": host.get("role", ""),
-                          "count": len(ms), "max": g.players[1],
+                          "count": len(ms), "max": g.players[1], "locked": r["kind"] == "code",
+                          "name": room_name(dict(hu), r["kind"] != "family") if hu else "",
                           "host": member(dict(hu), r["kind"] != "family") if hu and r["host_id"] != kid["id"] else None})
     teams = {str(s["id"]): progress.progress(g, progress.team_key((kid["id"], s["id"]))) for s in sibs} if g.total and g.multi else {}
     return {"siblings": sibs, "rooms": rooms, "locked": _locked(kid), "teams": teams, "public_ok": public_ok,

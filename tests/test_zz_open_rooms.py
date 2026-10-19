@@ -66,6 +66,7 @@ def test_public_and_code_rooms():
         lob = c.get("/api/games/bubble/lobby").json()
         row = next(x for x in lob["rooms"] if x["id"] == rid)
         assert row["kind"] == "public" and row["host"]["name"] == "火箭" and row["count"] == 1 and row["max"] == 4
+        assert row["name"] == "火箭的房间" and not row["locked"]
         assert "姐姐甲" not in c.get("/api/games/bubble/lobby").text
         r = c.post(f"/api/rooms/{rid}/enter", json=_dev("pb"))
         assert r.status_code == 409 and r.json()["need_nick"]
@@ -86,7 +87,9 @@ def test_public_and_code_rooms():
         cid, pin = room["id"], room["pin"]
         assert room["kind"] == "code" and len(pin) == 4 and pin.isdigit()
         _login(c, "pb")
-        assert cid not in [x["id"] for x in c.get("/api/games/snake/lobby").json()["rooms"]]
+        row = next(x for x in c.get("/api/games/snake/lobby").json()["rooms"] if x["id"] == cid)   # 大家都看得到，带锁
+        assert row["locked"] and row["name"] == "云朵的房间" and "pin" not in row
+        assert c.post(f"/api/rooms/{cid}/enter", json=_dev("pb")).json().get("need_pin")
         wrong = f"{(int(pin) + 1) % 10000:04d}"
         assert c.post(f"/api/rooms/{cid}/enter", json={**_dev("pb"), "pin": wrong}).status_code == 403
         room = c.post(f"/api/rooms/{cid}/enter", json={**_dev("pb"), "pin": pin}).json()
