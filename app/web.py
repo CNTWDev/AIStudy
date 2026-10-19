@@ -10,7 +10,7 @@ from fastapi.responses import RedirectResponse
 
 from fastapi.templating import Jinja2Templates
 
-from . import arena, auth, bankpapers, boards, coach, config, db, engine, evidence, explore, insights, itemtypes, llm, papers, records, sitecfg, sprint, streak, trace
+from . import arena, auth, bankpapers, boards, coach, config, db, engine, evidence, explore, focus, insights, itemtypes, llm, papers, records, sitecfg, sprint, streak, trace
 
 from . import figures
 
@@ -178,7 +178,7 @@ def kid_brief(k) -> dict:
             "weak": [catalog.kp(w["kp_id"]) for w in weak[:5]], "weak_n": len(weak),
             "due": len(engine.due_cards(k["id"], 500)), "weekly": records.weekly(k["id"]),
             "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='word'", k["id"])["n"],
-            "arena": arena.parent_summary(k), "trend": records.accuracy_trend(k["id"], 14), "school": _school_progress(k)}
+            "arena": arena.parent_summary(k), "focus": focus.parent_summary(k), "trend": records.accuracy_trend(k["id"], 14), "school": _school_progress(k)}
 
 
 def adult_brief(k) -> dict:

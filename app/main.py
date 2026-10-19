@@ -75,9 +75,9 @@ async def _sprint_error(request: Request, exc: sprint.SprintError):
     return JSONResponse({"error": str(exc)}, status_code=exc.status)
 
 
-from .routes import accounts, admin, curricula, family, learning, play, papers, reading, records
+from .routes import accounts, admin, curricula, family, focus, learning, play, papers, reading, records
 
-for router_module in (accounts, admin, curricula, family, learning, play, papers, reading, records):
+for router_module in (accounts, admin, curricula, family, focus, learning, play, papers, reading, records):
     app.include_router(router_module.router)
 
 

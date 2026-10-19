@@ -308,9 +308,10 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
         ms = int(ms) if ms and 500 <= int(ms) <= 30 * 60000 else None  # 做题用时（毫秒），太短/太长的不算
     except (TypeError, ValueError):
         ms = None
-    db.run("INSERT INTO attempts(user_id,item_id,kp_id,mode,correct,answer,dont_know,ms,created_at) VALUES(?,?,?,?,?,?,?,?,?)",
+    p_exp = ability.expect(user_id, kp_id, item) if calibrate else None  # 「会的题突然错了」是走神的信号（app/focus.py）
+    db.run("INSERT INTO attempts(user_id,item_id,kp_id,mode,correct,answer,dont_know,ms,p_exp,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)",
            user_id, item["id"] if item else None, kp_id, mode, 1 if correct else 0, str(answer)[:500],
-           1 if dont_know else 0, ms, db.now())
+           1 if dont_know else 0, ms, p_exp, db.now())
     if item and item.get("id"):  # 游戏里限时作答，用时不算进题目的平均用时
         bank.record(item["id"], correct, dont_know, None if mode in QUICK_MODES else ms)
     if calibrate:   # 先更新 θ：第一次用到这个知识点时，θ 从这条证据之前的掌握状态起步
