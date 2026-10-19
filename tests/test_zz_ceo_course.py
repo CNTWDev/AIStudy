@@ -127,3 +127,15 @@ def test_open_answer_falls_back_to_self_rating(monkeypatch):
         r = c.post("/api/answer", json={"item_id": iid, "kp_id": kp, "answer": "我的想法是这样"}).json()
         assert r["reveal"] and r["answer"]  # AI 出错：退回对照参考答案自评
         assert c.post("/api/answer", json={"item_id": iid, "kp_id": kp, "answer": "我的想法是这样", "self": "ok"}).json()["correct"]
+
+
+def test_diagnosis_skips_open_questions(monkeypatch):
+    """摸底不拿开放题判对错（以前学员写了想法会直接判错、进错题本）。"""
+    with TestClient(app) as c:
+        uid = _ceo_learner(c)
+        iid, kp = _short_item()
+        row = engine._item_row_to_dict(db.one("SELECT * FROM items WHERE id=?", iid))
+        monkeypatch.setattr(engine, "items_for", lambda *a, **k: [row])
+        sid = db.insert("INSERT INTO diag_sessions(user_id,pack_id,state,created_at) VALUES(?,?,?,?)", uid, "ceo-core",
+                        db.jdump({"queue": [{"kp": kp, "depth": 0, "from": None}], "done": [], "current": None}), db.now())
+        assert engine.diag_next(uid, sid, "ADULT")["item"] is None  # 改成自己说会不会

@@ -428,7 +428,8 @@ def diag_next(user_id: int, sid: int, grade: str):
         nxt = state["queue"].pop(0)
         if any(d["kp"] == nxt["kp"] for d in state["done"]):
             continue
-        items = items_for(user_id, nxt["kp"], n=1, purpose="diagnose", grade=grade)
+        # 摸底只用判得出对错的题；开放题（简答）没有一句话的标准答案，这个点改成让学员自己说会不会
+        items = [i for i in items_for(user_id, nxt["kp"], n=1, purpose="diagnose", grade=grade) if not itemtypes.of(i).self_rated]
         cur = {**nxt, "item": items[0] if items else None, "n": len(state["done"]) + 1}
         state["current"] = cur
         db.run("UPDATE diag_sessions SET state=? WHERE id=?", db.jdump(state), sid)
