@@ -155,7 +155,7 @@ function renderItem(box, item, opts) {
   html += `<div class="qacts">` +
     `<button class="btn submit">${W === 'discuss' ? '说说我的想法' : W === 'self' ? (item.coach ? '提交，看点评' : '看参考答案') : '提交'}</button>` +
     (item.hint ? `<button class="btn soft hintbtn">💡 提示</button>` : '') +
-    (opts.dontKnow && W !== 'discuss' ? `<button class="linkbtn dkbtn">🤔 这道题还不会</button>` : '') + `</div>` +
+    (opts.dontKnow && W !== 'discuss' ? `<button class="linkbtn dkbtn">🤔 ${esc(opts.dkLabel || '这道题还不会')}</button>` : '') + `</div>` +
     `<div class="hintbox"></div><div class="fbbox"></div></div>`;
   box.innerHTML = html;
   box.classList.add('askable'); box.dataset.askItem = item.item_id || item.id || ''; delete box.dataset.answered;
@@ -177,6 +177,7 @@ function renderItem(box, item, opts) {
     dk.disabled = true;
     try {
       const res = await opts.dontKnow();
+      if (!res) return;  // 返回空：页面自己接着走（小测直接下一题），这里不再显示讲解
       $$('.opt', box).forEach(b => b.disabled = true);
       $$('.submit,.hintbtn,.dkbtn', box).forEach(b => b.remove());
       $('.fbbox', box).innerHTML = feedback(res, {choice: W === 'choice'});
