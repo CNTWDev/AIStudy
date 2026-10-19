@@ -25,3 +25,11 @@ def test_selection_menu_ask_passes_selected_text():
     js = (ROOT / "static" / "app.js").read_text(encoding="utf-8")
     assert "Ask.open(t)" in js
     assert "Ask.sel ||" in js
+
+
+def test_review_wrong_card_comes_back_only_once():
+    """单词复习答错/想不起来：这一轮最后再来一次，只来一次。
+    以前每次答错都塞回队尾，只有 1 个词时一直点「想不起来」就永远做不完。"""
+    html = (ROOT / "templates" / "review.html").read_text(encoding="utf-8")
+    assert "cards.push(c)" in html and html.count("cards.push(") == 1
+    assert "again.has(c.id)" in html
