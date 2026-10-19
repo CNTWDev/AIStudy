@@ -80,41 +80,46 @@
     const roomApi = (what, body) => post(`/api/rooms/${room.id}/${what}`, body);
 
     // ---------------------------------------------------------------- 大厅（联网）
-    // 房间分三种（app/arena/rooms.py）：家里（只有家里人）、公开（全站的小伙伴都能进）、密码（报房间号和密码才能进）
-    const KIND = {family: {icon: '🏠', name: '家里'}, public: {icon: '🌏', name: '公开'}, code: {icon: '🔑', name: '密码'}};
+    // 房间分三种（app/arena/rooms.py）：家里（只有家里人）、公开（全站的小伙伴点一下就进）、密码（大家都看得到，输密码才能进）
+    // 大厅里列的都是能进的房间，点一下就进；房间名自动起，不用填
+    const KIND = {public: {icon: '🌏', name: '公开'}, family: {icon: '🏠', name: '家里'}, code: {icon: '🔒', name: '密码'}};
     let kind = null;
     function showLobby() {
       state = 'lobby'; over.hidden = false; room = null;
       if (net) { net.close(); net = null; }
       const sibs = lobby.siblings, waiting = lobby.rooms.filter(r => !r.mine && r.host);
-      const kinds = ['family', 'public', 'code'].filter(k => (k !== 'family' || sibs.length) && (k !== 'public' || lobby.public_ok));
+      const kinds = ['public', 'family', 'code'].filter(k => (k !== 'family' || sibs.length) && (k !== 'public' || lobby.public_ok));
       if (!kinds.includes(kind)) kind = kinds[0];
       let h = `<div class="pl-title">${esc(G.icon)} ${esc(G.name)}</div>`;
-      h += waiting.map(r => `<div class="mp-invite${r.kind === 'family' ? '' : ' open'}"><canvas class="mp-face" data-av="${esc(r.host.avatar)}"></canvas>
-          <div class="grow"><b>${esc(r.host.name)}</b> ${r.kind === 'family' ? '开了房间在等你' : '开了公开房间'}<small>${r.role ? `${roleOf(r.role).icon} ${esc(roleOf(r.role).name)} · ` : ''}${TOTAL ? `第 ${r.level} 关 · ` : ''}${r.count}/${r.max} 人</small></div>
-          <button type="button" class="btn lg pl-go mp-join" data-id="${r.id}">加入！</button></div>`).join('');
+      h += `<div class="pl-label">${waiting.length ? `🎈 正在等人的房间（${waiting.length}）：` : '🎈 还没有人开房间，你来开一个吧！'}</div>`;
+      h += `<div class="mp-rooms">${waiting.map(r => `<div class="mp-invite k-${r.kind}"><canvas class="mp-face" data-av="${esc(r.host.avatar)}"></canvas>
+          <div class="grow"><b>${esc(r.name)}</b><small>${KIND[r.kind].icon} ${KIND[r.kind].name} · ${r.role ? `${roleOf(r.role).icon} ${esc(roleOf(r.role).name)} · ` : ''}${TOTAL ? `第 ${r.level} 关 · ` : ''}${r.count}/${r.max} 人</small>
+          ${r.locked ? `<div class="mp-pin-row" hidden><input class="mp-pin-in" inputmode="numeric" maxlength="4" placeholder="4 位密码"><button type="button" class="btn mp-pin-go" data-id="${r.id}">进去</button></div>` : ''}</div>
+          <button type="button" class="btn lg pl-go mp-join" data-id="${r.id}" data-locked="${r.locked ? 1 : ''}">${r.locked ? '🔒 加入' : '加入！'}</button></div>`).join('')}</div>`;
       h += `<div class="pl-label">${waiting.length ? '或者自己开一个房间：' : '开一个房间：'}</div>
         <div class="mp-kinds">${kinds.map(k => `<button type="button" class="mp-kind${k === kind ? ' on' : ''}" data-kind="${k}">${KIND[k].icon} ${KIND[k].name}</button>`).join('')}</div>
         <p class="mp-hint mp-kind-hint">${kindHint(kind, sibs)}</p>`;
       h += G.roles.length ? `<div class="pl-label">我想当：</div>
           <div class="mp-roles">${G.roles.map(v => `<button type="button" class="mp-role" data-role="${v.id}"><span>${v.icon}</span>${esc(v.name)}</button>`).join('')}</div>`
         : `<button type="button" class="btn lg block pl-go mp-role" data-role="">开一个房间</button>`;
-      h += `<details class="mp-code"><summary>🔑 有房间号和密码？</summary><div class="mp-code-row">
-          <input class="mp-code-id" inputmode="numeric" placeholder="房间号" maxlength="8"><input class="mp-code-pin" inputmode="numeric" placeholder="4 位密码" maxlength="4">
-          <button type="button" class="btn mp-code-go">进去</button></div></details>`;
       h += `<p class="mp-nick">我的昵称：<b>${esc(lobby.nickname || '还没起')}</b> <button type="button" class="btn sm ghost mp-nick-edit">${lobby.nickname ? '改一改' : '起一个'}</button>
           <small>和别的家庭的小伙伴一起玩时，大家只看到昵称。</small></p>`;
       if (lobby.locked) h += `<p class="pl-locked">${esc(lobby.locked)}</p>`;
       panel.innerHTML = h + rulesHtml();
       faces(panel);
-      panel.querySelectorAll('.mp-join').forEach(b => b.onclick = () => joinRoom(b.dataset.id));
+      panel.querySelectorAll('.mp-join').forEach(b => b.onclick = () => {
+        if (!b.dataset.locked) { joinRoom(b.dataset.id); return; }
+        const row = b.parentNode.querySelector('.mp-pin-row');   // 密码房间：就地输密码
+        row.hidden = false; b.hidden = true; row.querySelector('input').focus();
+      });
+      panel.querySelectorAll('.mp-pin-go').forEach(b => b.onclick = () => {
+        const pin = b.parentNode.querySelector('input').value.trim();
+        if (!/^\d{4}$/.test(pin)) { sh.toast('密码是 4 位数字', 'warn'); return; }
+        joinRoom(b.dataset.id, pin);
+      });
+      panel.querySelectorAll('.mp-pin-in').forEach(i => i.onkeydown = e => { if (e.key === 'Enter') i.parentNode.querySelector('.mp-pin-go').click(); });
       panel.querySelectorAll('.mp-kind').forEach(b => b.onclick = () => { kind = b.dataset.kind; Play.sfx.play('click'); showLobby(); });
       panel.querySelectorAll('.mp-role').forEach(b => b.onclick = () => withNick(kind !== 'family', () => enter(post('/api/rooms', {game: G.id, role: b.dataset.role, kind}))));
-      panel.querySelector('.mp-code-go').onclick = () => {
-        const id = panel.querySelector('.mp-code-id').value.trim(), pin = panel.querySelector('.mp-code-pin').value.trim();
-        if (!/^\d+$/.test(id) || !/^\d{4}$/.test(pin)) { sh.toast('房间号是数字，密码是 4 位数字', 'warn'); return; }
-        joinRoom(id, pin);
-      };
       panel.querySelector('.mp-nick-edit').onclick = () => askNick();
       clearInterval(poll);
       poll = setInterval(async () => {   // 有人开房间了就显示出来
@@ -125,8 +130,8 @@
     }
     function kindHint(k, sibs) {
       if (k === 'family') return `只有家里人能进。开好以后，让${sibs.map(s => esc(s.name)).join('、')}在自己的平板或电脑上打开 乐园 → ${esc(G.name)}，点「加入」。`;
-      if (k === 'public') return '全站的小伙伴都能在大厅里看到、点「加入」。';
-      return '大厅里看不到。开好以后会有房间号和密码，告诉你想一起玩的小伙伴。';
+      if (k === 'public') return '全站的小伙伴都能看到，点「加入」就进来，不用密码。';
+      return '大家都能看到，但要输 4 位密码才能进。开好以后把密码告诉想一起玩的小伙伴。';
     }
     function joinRoom(id, pin) {
       const wrap = () => enter(post(`/api/rooms/${id}/enter`, pin ? {pin} : {}), () => askNick(wrap));
@@ -302,11 +307,11 @@
             ${m.id === me0.id ? '<small class="mp-dot on">我</small>' : `<small class="mp-dot" data-dot="${m.id}">…</small>`}
             ${m.locked ? `<small class="mp-lock">🔒 ${esc(m.locked)}</small>` : ''}</div>`;
         const names = room.kind === 'family' ? lobby.siblings.filter(s => !room.members.some(m => m.id === s.id)).map(s => s.name).join('或') || '队友' : '小伙伴';
-        const how = room.kind === 'code' ? '告诉他房间号和密码' : `让${esc(names)}在自己的设备上打开 乐园 → ${esc(G.name)}`;
+        const how = room.kind === 'code' ? '告诉他密码' : `让${esc(names)}在自己的设备上打开 乐园 → ${esc(G.name)}`;
         const empty = `<div class="mp-mem empty"><div class="mp-wait">⏳</div><b>等${esc(names)}进来</b><small>${how}</small></div>`;
         const cards = room.members.map(card).concat(Array(Math.max(0, G.players[0] - room.members.length)).fill(empty));
         h += `<div class="mp-mems${room.members.length > 2 ? ' many' : ''}">${cards.join('<span class="mp-amp">＋</span>')}</div>`;
-        if (room.kind === 'code') h += `<div class="mp-pin">🔑 房间号 <b>${room.id}</b> · 密码 <b>${esc(room.pin)}</b><small>告诉想一起玩的小伙伴，在大厅点「有房间号和密码？」输进去</small></div>`;
+        if (room.kind === 'code') h += `<div class="mp-pin">🔒 密码 <b>${esc(room.pin)}</b><small>告诉想一起玩的小伙伴：在大厅里点「${esc(room.name)}」，输这个密码就进来了</small></div>`;
         else if (room.kind === 'public') h += `<p class="mp-hint">🌏 公开房间：全站的小伙伴都能进来，大家只看到昵称。</p>`;
         const more = G.players[1] - room.members.length;
         if (room.full && more > 0) h += `<p class="mp-hint">还能再进 ${more} 个人，人多怪兽也多。开始以后就不能进人了。</p>`;

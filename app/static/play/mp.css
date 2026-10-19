@@ -42,14 +42,14 @@
 .pl-end .pl-row .grow{flex:1;align-self:center;margin:0}
 @media (max-width:560px){.mp-mems{flex-wrap:wrap}.mp-amp{display:none}.mp-em{width:34px;height:34px;font-size:17px}}
 /* 房间分三种：家里 / 公开 / 密码；昵称 */
-.mp-invite.open{background:#e6f4ff;color:#12324d}
+.mp-invite.k-public{background:#e6f4ff;color:#12324d}.mp-invite.k-code{background:#f1e8ff;color:#2b1a4d}
+.mp-rooms{max-height:300px;overflow-y:auto;margin:0 0 6px}.mp-rooms .mp-invite{animation:none}.mp-rooms .mp-invite.k-family{animation:plpulse 1.4s infinite}
+.mp-pin-row{display:flex;gap:6px;margin-top:6px}.mp-pin-row input{flex:1;min-width:0;font-size:16px;letter-spacing:4px}
 .mp-roles{flex-wrap:wrap}
 .mp-kinds{display:flex;gap:8px;justify-content:center;margin:0 0 4px}
 .mp-kind{flex:1;max-width:130px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:8px 6px;font:inherit;font-weight:800;cursor:pointer}
 .mp-kind.on{border-color:var(--pl-ink);box-shadow:0 3px 0 var(--pl-ink);background:var(--pl-sun);color:#3a2a00}
 .mp-kind-hint{margin:2px 0 10px}
-.mp-code{margin:12px 0 4px;text-align:left}.mp-code summary{cursor:pointer;font-weight:800}
-.mp-code-row{display:flex;gap:6px;margin-top:8px}.mp-code-row input{flex:1;min-width:0;font-size:16px}
 .mp-nick{font-size:13.5px;margin:10px 0 0}.mp-nick small{display:block;color:var(--muted)}
 .mp-nick-in{width:100%;font-size:18px;text-align:center;margin:4px 0}
 .mp-pin{border:2px dashed var(--pl-ink);border-radius:14px;padding:8px;margin:8px 0;font-size:16px}
