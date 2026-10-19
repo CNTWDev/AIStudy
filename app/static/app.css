@@ -893,3 +893,19 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .seek-found{color:var(--brand-ink);font-weight:700;margin-bottom:4px}
 .seek-in{animation:seekin .45s ease-out}@keyframes seekin{from{opacity:0;transform:translateY(8px)}}
 [data-tone=adult] :is(.seek-lens,.seek-face .mascot){animation:none}
+/* 一口气（app.js 的 Focus，DESIGN 5.36）：顶上一条细进度；结束卡复用「下一项」那张卡的样子 */
+.fzbar{display:flex;align-items:center;gap:8px;margin:6px 0 10px;padding:6px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-size:13px;color:var(--muted)}
+.fzbar .fz-t{white-space:nowrap}
+.fzbar .fz-track{flex:1;min-width:60px;height:8px;border-radius:99px;background:var(--line-2,var(--line));overflow:hidden}
+.fzbar .fz-track i{display:block;height:100%;width:0;background:var(--sun,var(--brand));border-radius:99px}
+.fzbar .fz-n{font-variant-numeric:tabular-nums;white-space:nowrap}
+.fzbar .fz-pause{padding:0 4px;font-size:16px;line-height:1}
+.fzbar.due{color:var(--ink)}.fzbar.due .fz-track i{background:var(--ok)}
+.fz-line{display:flex;gap:2px;height:10px;margin:12px 0 8px}
+.fz-line i{min-width:3px;border-radius:99px;background:var(--line-2,var(--line))}
+.fz-line i.on{background:var(--sun,var(--brand))}
+.fz-say{margin:4px 0;font-size:15px}.fz-news{margin:0 0 10px;color:var(--brand-ink);font-weight:600;font-size:14px}
+.fz-sheet .fs-end{margin-top:8px}
+.fz-back{margin:0 0 10px}
+.fz-on .runbar .row>span:first-child,.fz-on .runbar .rpb{display:none}
+.q.fz-nudge,.fz-nudge .q{outline:3px solid var(--sun,var(--brand));outline-offset:4px;border-radius:12px;transition:outline-color .4s}

@@ -212,9 +212,11 @@ function renderItem(box, item, opts) {
       $('.fbbox', box).innerHTML = feedback(res, {choice: W === 'choice', mine: W === 'choice' ? '' : answer});
       btn.remove(); if (dk) dk.remove();
       if (res.correct) cheer(box);
+      Focus.rt(!!res.correct, took());
       opts.onDone && opts.onDone(res);
     } catch (e) { btn.disabled = false; $('.fbbox', box).innerHTML = `<div class="err">${esc(e.message)}</div>`; }
   };
+  Focus.onRender(box, item);
 }
 /* 开放题的一轮 AI 点评（app/coach.py）。追问没结束时只说想到了哪些、还差几点，不给答案；
    学员回答追问，再点评一轮；结束时逐条对照要点，再给参考思路 */
@@ -371,6 +373,7 @@ function _ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); 
 const Flow = {
   done(st) {
     if (!st || !st.total) { location.href = '/today'; return; }
+    if (Focus.gate(() => Flow.done(st))) return;  // 这口气也到点了：先收尾、休息，再弹下一项
     _ls('secs:' + st.day, st.secs_done);  // 今天页不再重复弹「第 n 节完成」
     $$('.flow-sheet,.flow-pill').forEach(x => x.remove());
     const nx = st.next, sec = st.section;
@@ -655,6 +658,7 @@ const Run = {
       else ($('main h1') || document.body).insertAdjacentElement('afterend', el);
     }
     Run.el = el;
+    Focus.ensure({reading: kind === 'read'});
     api('/api/records/' + kind).then(r => { Run.pb = r.pb; Run.ghost = r.ghost; Run.draw(); }).catch(() => {});
     if (!Run.bound) {
       Run.bound = true;
@@ -673,6 +677,7 @@ const Run = {
   mmss(ms) { const s = Math.floor(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; },
   hit(ok) {
     if (!Run.on) return;
+    Focus.hit(ok);
     Run.n++; if (ok) { Run.right++; Run.combo++; Run.best = Math.max(Run.best, Run.combo); } else Run.combo = 0;
     Run.draw();
   },
@@ -826,6 +831,228 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) Away.since = Date.now();
   else if (Away.since) { Away.ms += Date.now() - Away.since; Away.since = 0; }
 });
+
+/* ---------- 一口气（app/focus.py，DESIGN 5.36）：学习切成一段一段，长度按自己能撑住的时间一点点加长 ----------
+   · 今天清单里的页面、做一组题的页面自动开始；换页面接着算（sessionStorage 记着这口气），去乐园、回今天页就停。
+   · 离开（切走 / 2 分钟没动）每次记一笔；回来按离开多久分档：15 秒内不说，2 分钟内一句话，更久在题上方提醒先重读题。
+   · 走神不让孩子自己记，从作答里自己看：反应时比自己平时忽快忽慢、答得太快又错、错了以后越点越快、离开。
+     有点晃 → 下一题读出来；一直掉线、又做了一半以上 → 在下一道答对的题后提前收尾（算完成，档位不加）。
+   · 到了目标时间，在一道题答完、一项任务做完时结束（读书时不打断，悄悄开始下一口气），弹结束卡：
+     在线 / 掉线的一条线、一句只说好的话、下一口气多长；可以休息（小学跟着动一动），休息完叫名字回来。 */
+const Focus = {
+  b: null, on: false, starting: false, resting: false, due: false, early: false, ending: false, reading: false,
+  active: 0, away: 0, run: 0, longest: 0, n: 0, right: 0, segs: [], score: 0, state: 'on',
+  last: Date.now(), tick: Date.now(), hiddenAt: 0, idleAt: 0, wrongAt: 0, prevWrong: false, title: '',
+  IDLE: 120000,
+  adult() { return document.body.dataset.tone === 'adult'; },
+  async ensure(opts) {
+    if (!document.body.dataset.kid || /^\/(today|arena|diagnose)/.test(location.pathname)) return;
+    if (opts && opts.reading) Focus.reading = true;
+    if (Focus.on || Focus.starting) return;
+    Focus.starting = true;
+    let b = null;
+    try { b = await api('/api/focus/start', {resume: Focus._saved()}); } catch (e) {}
+    Focus.starting = false;
+    if (!b || !b.id) return;
+    Focus.adopt(b);
+    if (!Focus.bound) Focus.bind();
+  },
+  _saved() { try { return sessionStorage.getItem('fz') || ''; } catch (e) { return ''; } },
+  adopt(b) {
+    Object.assign(Focus, {b, on: true, due: false, early: false, ending: false, active: b.active_ms || 0, away: b.away_ms || 0,
+                          longest: b.longest_ms || 0, run: 0, n: b.n_items || 0, right: b.n_right || 0, segs: b.segs || [],
+                          score: 0, state: 'on', last: Date.now(), tick: Date.now()});
+    try { sessionStorage.setItem('fz', b.id); } catch (e) {}
+    document.body.classList.add('fz-on');  // 有了一口气的进度条，做一组题的「⏱ 专注」计时就不重复显示
+    Focus.mount(); if (Focus.el) delete Focus.el.dataset.k; Focus.draw();
+  },
+  bind() {
+    Focus.bound = true;
+    ['pointerdown', 'keydown', 'scroll', 'touchstart', 'wheel', 'input'].forEach(e => addEventListener(e, Focus.poke, {passive: true, capture: true}));
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        Focus.hiddenAt = Date.now(); Focus.title = document.title;
+        if (Focus.on && !Focus.resting) document.title = Focus.adult() ? '⏸ 等你回来' : '⏸ 这口气在等你';
+        Focus.sync(true);
+      } else {
+        if (Focus.title) { document.title = Focus.title; Focus.title = ''; }
+        const ms = Focus.hiddenAt ? Date.now() - Focus.hiddenAt : 0; Focus.hiddenAt = 0;
+        Focus.tick = Focus.last = Date.now();
+        if (ms) Focus.back('away', ms);
+      }
+    });
+    addEventListener('pagehide', () => Focus.sync(true));
+    setInterval(Focus.step, 1000);
+    setInterval(() => Focus.sync(false), 15000);
+  },
+  poke() {
+    const now = Date.now();
+    if (Focus.idleAt) { const ms = now - Focus.idleAt; Focus.idleAt = 0; Focus.back('idle', ms); }
+    Focus.last = now;
+  },
+  step() {
+    const now = Date.now(), dt = Math.min(now - Focus.tick, 5000); Focus.tick = now;
+    if (!Focus.on || Focus.resting || Focus.ending || document.hidden) return;
+    if (Speak.playing) Focus.last = now;  // 在听朗读也算在
+    const idle = Focus.reading ? 180000 : Focus.IDLE;
+    if (now - Focus.last >= idle) { if (!Focus.idleAt) Focus.idleAt = Focus.last; return; }
+    Focus.active += dt; Focus.run += dt; Focus.longest = Math.max(Focus.longest, Focus.run);
+    Focus.seg(dt, Focus.state !== 'off');
+    if (!Focus.due && Focus.active >= Focus.b.target_ms) {
+      Focus.due = true;
+      if (Focus.reading) Focus.end('target');  // 读书时不打断：悄悄记下，接着下一口气
+    }
+    Focus.draw();
+  },
+  seg(ms, on) { const s = Focus.segs, l = s[s.length - 1]; if (l && !!l[1] === on) l[0] += ms; else s.push([ms, on ? 1 : 0]); },
+  what() {
+    if (Date.now() - Focus.wrongAt < 20000) return 'after_wrong';
+    if ($('.seek')) return 'waiting';
+    if (Focus.reading || $('.reader')) return 'reading';
+    return 'item';
+  },
+  task() { const t = $('.flb-t'); return (t ? t.textContent.replace(/^(第 \d+ 项：|✓ 做完了：)/, '') : (($('main h1') || {}).textContent || document.title)).trim().slice(0, 60); },
+  /* 离开后回来：记一笔，按离开多久分档提醒 */
+  back(kind, ms) {
+    if (!Focus.on || Focus.resting || ms < 3000) return;
+    const body = JSON.stringify({block: Focus.b.id, ms, kind, what: Focus.what(), task: Focus.task()});
+    if (navigator.sendBeacon) navigator.sendBeacon('/api/focus/leave', new Blob([body], {type: 'application/json'}));
+    if (ms <= 15000) return;
+    Focus.away += ms; Focus.run = 0; Focus.score += 1; Focus.judge();
+    Focus.seg(Math.min(ms, 60000), false);
+    const kid = !Focus.adult();
+    if (ms <= 120000) { toast(kid ? '回来啦，接着做 👍' : '欢迎回来，接着这一题', 2000); return; }
+    const q = $$('.q.qc').filter(x => !x.closest('[data-answered]')).pop();
+    const m = Math.round(ms / 60000);
+    const note = `<div class="hint fz-back">${kid ? `刚才停了 ${m} 分钟。先把题再读一遍，再答 📖` : `刚才离开了 ${m} 分钟，先把题目再读一遍。`}</div>`;
+    if (q && !$('.fz-back', q)) { q.insertAdjacentHTML('afterbegin', note); q.scrollIntoView({block: 'center', behavior: 'smooth'}); }
+    else toast(kid ? `刚才停了 ${m} 分钟，接着来` : `离开了 ${m} 分钟，接着来`, 2600);
+  },
+  /* 一道题答完（renderItem）：从用时和对错看在不在线；只跟自己平时比 */
+  rt(ok, ms) {
+    if (!Focus.on) return;
+    if (!Run.on) { Focus.n++; if (ok) Focus.right++; }
+    const bl = Focus.b.baseline; let pts = 0;
+    if (ms > 0 && bl) { const z = (Math.log(ms) - bl.med) / bl.mad; if (Math.abs(z) > 2.5) pts += 0.5; }
+    if (!ok && ms > 0 && ms < 2500) pts += 1;                                        // 快到读不完题又错了
+    if (!ok && Focus.prevWrong && bl && ms > 0 && ms < 0.5 * Math.exp(bl.med)) pts += 1;  // 错了以后越点越快
+    Focus.score = 0.6 * Focus.score + pts;
+    Focus.prevWrong = !ok; if (!ok) Focus.wrongAt = Date.now();
+    Focus.judge();
+    Focus.boundary(ok);
+  },
+  hit(ok) { if (!Focus.on) return; Focus.n++; if (ok) Focus.right++; Focus.boundary(ok); },
+  judge() {
+    Focus.state = Focus.score >= 1.2 ? 'off' : Focus.score >= 0.6 ? 'wobble' : 'on';
+    if (Focus.state === 'off' && Focus.active >= 0.5 * Focus.b.target_ms) Focus.early = true;
+  },
+  /* 新的一题出来：有点晃就把题读出来（换个方式把注意力拉回来），不说「你走神了」 */
+  onRender(box, item) {
+    if (!Focus.on || Focus.state === 'on' || !item || !item.q) return;
+    box.classList.add('fz-nudge'); setTimeout(() => box.classList.remove('fz-nudge'), 2400);
+    say(String(item.q).replace(/\$|\\\(|\\\)/g, '').slice(0, 300));
+  },
+  /* 一道题、一张卡做完：到点了就收尾；一直掉线就在答对的这题后提前收尾 */
+  boundary(ok) {
+    if (Focus.ending || Focus.reading) return;
+    if (Focus.due) setTimeout(() => Focus.end('target'), 1400);
+    else if (Focus.early && ok) setTimeout(() => Focus.end('early'), 1400);
+  },
+  /* 一项任务做完要弹「下一项」时：这口气也到点了就先收尾，休息完再弹 */
+  gate(fn) {
+    if (!Focus.on || !Focus.due || Focus.reading) return false;
+    Focus.end('target', fn); return true;
+  },
+  payload(extra) {
+    return Object.assign({id: Focus.b.id, active_ms: Focus.active, away_ms: Focus.away, longest_ms: Focus.longest,
+                          n_items: Focus.n, n_right: Focus.right, segs: Focus.segs}, extra || {});
+  },
+  sync(leaving) {
+    if (!Focus.on) return;
+    const body = JSON.stringify(Focus.payload());
+    if (leaving && navigator.sendBeacon) navigator.sendBeacon('/api/focus/sync', new Blob([body], {type: 'application/json'}));
+    else fetch('/api/focus/sync', {method: 'POST', headers: {'Content-Type': 'application/json'}, body, keepalive: true}).catch(() => {});
+  },
+  async end(ended, then) {
+    if (!Focus.on || Focus.ending) return;
+    Focus.ending = true;
+    let r = null;
+    try { r = await api('/api/focus/end', Focus.payload({ended})); } catch (e) {}
+    try { sessionStorage.removeItem('fz'); } catch (e) {}
+    Focus.on = false;
+    const again = async () => { await Focus.ensure(); then && then(); };
+    if (!r || !r.segs) { Focus.ending = false; return again(); }
+    if (Focus.reading) { if (r.held) toast(Focus.adult() ? '又专注了一段 ✓' : '🔥 一口气撑住了，接着读', 2400); Focus.ending = false; return again(); }
+    Focus.card(r, ended, again);
+  },
+  line(segs) {
+    const tot = segs.reduce((a, s) => a + s[0], 0) || 1;
+    return `<div class="fz-line" aria-hidden="true">${segs.map(s => `<i class="${s[1] ? 'on' : ''}" style="flex:${(s[0] / tot).toFixed(4)}"></i>`).join('')}</div>`;
+  },
+  card(r, ended, again) {
+    const kid = !Focus.adult(), b = Focus.b;
+    const head = r.held ? (kid ? '🔥 这一口气撑住了！' : '这一段完成 ✓') : ended === 'early' ? (kid ? '✓ 先歇一下' : '先歇一下') : (kid ? '✓ 这一口气做完了' : '这一段完成');
+    const rest = b.move ? `🤸 动一动 ${Math.round(b.rest_s / 60)} 分钟` : `☕ 休息 ${Math.round(b.rest_s / 60)} 分钟`;
+    const m = document.createElement('div'); m.className = 'flow-sheet fz-sheet'; m.setAttribute('role', 'dialog');
+    m.innerHTML = `<div class="fs-card"><div class="fs-h"><b>${head}</b><span>${r.minutes} 分钟${r.n_items ? ' · ' + r.n_items + ' 道题' : ''}</span></div>
+      ${Focus.line(r.segs)}<p class="fz-say">${esc(r.sentence)}</p>${r.news ? `<p class="fz-news">${esc(r.news)}</p>` : ''}
+      <div class="fs-end"><button type="button" class="btn lg fz-rest-go">${rest}</button><button type="button" class="btn ghost fz-next">${kid ? '接着下一口气 →' : '继续 →'}</button></div></div>`;
+    document.body.appendChild(m);
+    if (r.held && kid) confetti();
+    $('.fz-next', m).onclick = () => { m.remove(); Focus.ending = false; again(); };
+    $('.fz-rest-go', m).onclick = () => Focus.rest($('.fs-card', m), b, () => { m.remove(); Focus.ending = false; again(); });
+  },
+  /* 休息：小学跟着动一动；时间到叫名字（最多 3 次，隔 30 秒），点「我回来了」就停。成人不叫。 */
+  rest(card, b, done) {
+    Focus.resting = true;
+    const kid = !Focus.adult();
+    const tips = b.move ? ['原地开合跳 10 下 🙆', '高抬腿 20 下 🏃', '伸个大懒腰，够够天花板 🙌', '转转脖子和肩膀 🔄', '看看窗外最远的地方 🌳']
+                        : ['站起来走一走 🚶', '看看窗外最远的地方 🌳', '喝几口水 💧', '转转脖子和肩膀 🔄', '闭上眼睛深呼吸 3 次 😌'];
+    let left = b.rest_s, i = 0, calls = 0, callT = null;
+    const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    card.classList.add('resting');
+    card.innerHTML = `<div class="big">${b.move ? '🤸' : '☕'}</div><b>${b.move ? '动一动' : '休息一下'}</b><div class="rest-t">${mmss(left)}</div><p class="rest-tip">${tips[0]}</p><button type="button" class="btn ghost block">${kid ? '我回来了 →' : '继续 →'}</button>`;
+    const t = $('.rest-t', card), tip = $('.rest-tip', card);
+    const call = () => {
+      if (!kid || calls >= 3) return;
+      calls++;
+      say(`${(window.ME && window.ME.call) || ''}，休息好了，回来接着学吧`, 'zh');
+      callT = setTimeout(call, 30000);
+    };
+    const timer = setInterval(() => {
+      left--;
+      if (left > 0) { t.textContent = mmss(left); if (left % 20 === 0) tip.textContent = tips[++i % tips.length]; return; }
+      clearInterval(timer); t.textContent = kid ? '时间到！' : '休息好了'; call();
+    }, 1000);
+    $('button', card).onclick = () => { clearInterval(timer); clearTimeout(callT); Speak.stop(); Focus.resting = false; Focus.last = Focus.tick = Date.now(); done(); };
+  },
+  /* 进度条：🔥 这一口气 ▓▓▓░░ 2:13 / 5:00 · ☕ 休息 */
+  mount() {
+    if (Focus.el && document.body.contains(Focus.el)) return;
+    const el = document.createElement('div'); el.className = 'fzbar'; el.setAttribute('role', 'status');
+    el.innerHTML = `<span class="fz-ico" aria-hidden="true">🔥</span><span class="fz-t">${Focus.adult() ? '本段' : '这一口气'}</span><span class="fz-track"><i></i></span><span class="fz-n"></span><button type="button" class="linkbtn fz-pause" title="休息一下，回来接着这口气">☕</button>`;
+    const at = $('.flowbar') || $('#runbar');
+    if (at) at.insertAdjacentElement('afterend', el); else ($('main h1') || $('main') || document.body).insertAdjacentElement($('main h1') ? 'afterend' : 'afterbegin', el);
+    Focus.el = el;
+    $('.fz-pause', el).onclick = () => {
+      if (!Focus.on || Focus.resting) return;
+      const m = document.createElement('div'); m.className = 'flow-sheet fz-sheet'; m.innerHTML = '<div class="fs-card"></div>';
+      document.body.appendChild(m); Focus.sync(false);
+      Focus.rest($('.fs-card', m), Focus.b, () => m.remove());
+    };
+  },
+  /* 只按整分钟跳一格，不一秒一秒地走：读题、想题的时候页面不动（DESIGN 5.30） */
+  draw() {
+    const el = Focus.el; if (!el || !Focus.b) return;
+    const m = Math.floor(Focus.active / 60000), tm = Math.round(Focus.b.target_ms / 60000), key = Focus.due ? 'due' : m;
+    if (el.dataset.k === String(key)) return;
+    el.dataset.k = key;
+    $('.fz-track i', el).style.width = Math.min(100, 100 * m / tm) + '%';
+    el.classList.toggle('due', Focus.due);
+    $('.fz-n', el).textContent = Focus.due ? (Focus.adult() ? '到了，做完这题' : '到啦，做完这题就歇') : `${m} / ${tm} 分钟`;
+  },
+};
+document.addEventListener('DOMContentLoaded', () => { if ($('.flowbar')) Focus.ensure(); });
 
 /* 等题时不干等（app/prefetch.py）：题大多提前备好了；真要等，超过 1 秒就在 box 里放一张今天要复习的单词小卡
    （看意思四选一，答了照常算复习），没有单词就放这个知识点「记住」的那一句。题好了，小卡下面出现「题来了 →」，孩子点了才换，不硬切。

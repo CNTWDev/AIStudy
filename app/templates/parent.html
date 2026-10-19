@@ -32,6 +32,11 @@
   </a>
   {% if k.insights %}<div class="pfound"><b class="small">🔍 系统发现</b>
     {% for f in k.insights %}<div class="finding sev{{ f.severity }}"><b class="small">{{ f.title }}</b>{% if not f.for_kid %} <span class="pill">只给家长看</span>{% endif %}<div class="small muted">{{ f.detail }}</div></div>{% endfor %}</div>{% endif %}
+  {% if k.focus %}{% set f = k.focus %}{# 一口气（app/focus.py）：现在每口气多长、今天撑住几口、离开几次、在哪类内容上容易离开 #}
+  <p class="small pfocus">🔥 一口气：现在每口气 {{ f.target_min }} 分钟{% if f.measuring %}（第一周先量节奏，还有 {{ f.days_left }} 天，先不加长）{% endif %}
+    · 今天 {{ f.blocks }} 口气，撑住 {{ f.held }} 口{% if f.longest_min %}，最长一口气{{ f.longest_min }}分钟{% endif %}
+    · 离开 {{ f.leaves }} 次{% if f.leaves %}，共{{ f.away_min }}分钟{% endif %}{% if f.slips %} · 会的题突然错了 {{ f.slips }} 次{% endif %}
+    {% if f.where %}<br><span class="muted">这一周离开多在：{% for w in f.where %}{{ w.task }}（{{ w.n }} 次{% if w.what %}，多是{{ w.what }}{% endif %}）{{ '；' if not loop.last }}{% endfor %}。{% if f.where|selectattr('what', 'equalto', '在等题')|list %}在等题时离开的算系统的问题，不算孩子的。{% endif %}</span>{% endif %}</p>{% endif %}
   {% if k.weak %}<p class="small">最需要补：{% for w in k.weak %}<span class="pill st-weak">{{ w.name }}</span> {% endfor %}</p>{% endif %}
   <div class="pacts">
     <a class="btn sm" href="/parent/kids/{{ k.u.id }}">学习报告</a>

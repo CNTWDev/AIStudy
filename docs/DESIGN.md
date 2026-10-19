@@ -716,6 +716,19 @@ FastAPI 应用（app/main.py）
 - 小伙伴（和 5.34 同一个：`ASSISTANT_NAME` / `ASSISTANT_ICON`，没设图标用孩子选的形象）站在主卡右边（手机上在主卡顶上），气泡里按进度说一句：还没开始「准备好了吗？我陪你一起开始！」、做了几项「已经做完 N 项，接着来！」、第 1 节做完「真稳！后面每项都多一颗 ⭐」、全做完「我就知道你行 💪」。一日记录里整理的那段话也由它出面（手机上收掉头像，只留名字）。点它去换形象。
 - 动：进页面时招一下手（全做完时蹦两下），然后不动；以前那只一直上下飞的小伙伴去掉了（5.30：想事情的时候页面不动）。成人、家长查看都不出现小伙伴。
 
+### 5.36 一口气：学习切成一段一段，长度一点点加长（`app/focus.py`、`app.js` 的 `Focus`）
+
+讨论稿：`docs/心流专注与单词概念-讨论稿.md`（在共享文件夹）。专注不靠专门的「专注力小游戏」练（练什么只涨什么），而是在真实学习里一点点延长。
+
+- **哪里有**：今天清单里的页面、做一组题的页面（`Run.start`）自动开始；换页面接着算（`sessionStorage` 记着这口气的 id，30 分钟没消息算走了）。今天页、乐园、诊断不算。所有学习者都有，成人用成人口吻、休息时不叫名字。
+- **多长**：按学段起步和封顶（小学 5→20 分钟，初中 10→25，高中 15→40，成人 15→45；`focus.profile`）。第一周只量不加；第一周大多撑不住就起步短一档。之后连续撑住 3 口加一档（小学 1 分钟，其他 2 分钟），连续 2 口没撑住退一档（最短 3 分钟）；掉线后提前收尾的那口不加不减。档位不单独存，每次从 `focus_blocks` 重放（`focus.level_from`）。
+- **撑住**：到了目标时间，中间没有离开超过 15 秒。
+- **离开**：切到别的页面 / 应用，或页面开着 2 分钟没动（读书时 3 分钟），每次记一笔（`focus_leaves`：多久、当时在做什么、哪项任务）。离开时标签名变成「⏸ 这口气在等你」。回来按离开多久分档：15 秒内不说；2 分钟内一句「回来啦，接着做」；更久在当前题上方提醒「先把题再读一遍，再答」。
+- **走神不让孩子自己记**（自我记录反人性、执行不好），系统从作答里看：反应时比自己平时（`focus.baseline`，最近 300 道的对数用时）忽快忽慢、答得快到读不完题又错、错了以后越点越快、离开。几个信号合成一个分数：有点晃 → 下一题出来时读出来、题卡亮一下；一直掉线、又做了一半以上 → 在下一道答对的题后提前收尾（算完成）。从来不说「你走神了」。「会的题突然错了」用 `attempts.p_exp`（答之前估计的答对概率，`ability.expect`）事后算，给家长看。
+- **结束**：到了目标时间，在一道题答完、一项任务做完时收尾（`Focus.gate` 挡在「下一项」卡前面）；读书时不打断，悄悄开始下一口气。结束卡：在线 / 掉线的一条线、一句只说好的话（不打分、不出百分比）、下一口气多长；可以休息（小学「动一动 2 分钟」跟着做动作，其他「休息 5 分钟」），时间到用朗读叫名字（游戏昵称，没有就用名字）回来，最多 3 次、隔 30 秒，点「我回来了」就停。进度条旁的 ☕ 随时能休息，休息不算离开。
+- **页面不动**：进度条只按整分钟跳一格，不一秒一秒走（5.30）。有了这条进度条，做一组题的「⏱ 专注」计时不再重复显示。
+- **家长页**：现在每口气多长（第一周在量节奏）、今天几口气撑住几口、最长一口气、离开几次共多久、这一周离开多在哪项任务和什么情况（刚答错 / 在等题……），会的题突然错了几次。在等题时离开的算系统的问题。
+
 ## 6. AI 抽象层与使用原则
 
 - **配置和代码分离**：提供方、模型、密钥、每日上限、按任务路由都在 `config/llm.toml`（模板 `config/llm.example.toml`），改完重启服务生效，不用改代码。值可以写成 `"${环境变量}"`。
@@ -734,7 +747,7 @@ FastAPI 应用（app/main.py）
 
 ## 7. 数据表
 
-`users`（家长/孩子；`settings.method` 是学习方式）· `enrollments`（孩子选的教材包和当前学段）· `events`（学习事件：所有学习证据，掌握度按它重放）· `mastery`（掌握度，带模型指纹）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· 乐园：`arena_ability` / `arena_calib` / `arena_matches` / `arena_answers` / `arena_ledger` / `arena_awards`（贴纸）/ `game_rooms` / `room_members`（房间、成员、在用的设备）/ `game_sessions`（每一局，`state` 是玩的时候的存档）/ `game_runs`（每支队伍每关的最好成绩）· `traces`（追根：每次测了什么、根在哪）· `streak_freezes`（补签卡）· `sprint_runs`（冲刺）· `mix_sets`（每门课每天一组混合练习）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
+`users`（家长/孩子；`settings.method` 是学习方式）· `focus_blocks` / `focus_leaves`（一口气和每次离开，5.36）· `enrollments`（孩子选的教材包和当前学段）· `events`（学习事件：所有学习证据，掌握度按它重放）· `mastery`（掌握度，带模型指纹）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· 乐园：`arena_ability` / `arena_calib` / `arena_matches` / `arena_answers` / `arena_ledger` / `arena_awards`（贴纸）/ `game_rooms` / `room_members`（房间、成员、在用的设备）/ `game_sessions`（每一局，`state` 是玩的时候的存档）/ `game_runs`（每支队伍每关的最好成绩）· `traces`（追根：每次测了什么、根在哪）· `streak_freezes`（补签卡）· `sprint_runs`（冲刺）· `mix_sets`（每门课每天一组混合练习）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
 
 ## 8. 后续路线
 

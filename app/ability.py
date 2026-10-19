@@ -124,13 +124,26 @@ def start(kid_id: int, dim: str, prior_p: float | None = None) -> tuple[float, i
     return logit(prior_p if prior_p is not None else 0.5), 0
 
 
+def _now(kid_id: int, dim: str, item: dict | None, scale: tuple[str, int]) -> tuple[float, int, float, int]:
+    family, level = scale
+    given = item or {}   # 出题时已经算好的起点（arena/sources.py 按学段、题族先验估的）
+    theta, n = stored_ability(kid_id, dim) or ((given["theta"], 0) if given.get("theta") is not None else start(kid_id, dim))
+    b, nb = stored_b(family, level) or ((given["b"], 0) if given.get("b") is not None else (prior_b(level), 0))
+    return theta, n, b, nb
+
+
+def expect(kid_id: int, dim: str, item: dict | None) -> float | None:
+    """答之前估计的答对概率；还没在这个维度上答过 3 道的不估（估了也不准）。"""
+    scale = scale_of(item)
+    if not scale or not dim:
+        return None
+    theta, n, b, _ = _now(kid_id, dim, item, scale)
+    return round(sigmoid(theta - b), 3) if n >= 3 else None
+
+
 def observe(kid_id: int, dim: str, item: dict | None, correct: bool, scale: tuple[str, int] | None = None) -> float | None:
     """一次作答：θ 和这道题所在（题族, 级别）的难度各挪一步。点「不会」按答错算。"""
     scale = scale or scale_of(item)
     if not scale or not dim:
         return None
-    family, level = scale
-    given = item or {}   # 出题时已经算好的起点（arena/sources.py 按学段、题族先验估的）
-    theta, n = stored_ability(kid_id, dim) or ((given["theta"], 0) if given.get("theta") is not None else start(kid_id, dim))
-    b, nb = stored_b(family, level) or ((given["b"], 0) if given.get("b") is not None else (prior_b(level), 0))
-    return update(kid_id, dim, family, level, correct, theta, n, b, nb)
+    return update(kid_id, dim, *scale, correct, *_now(kid_id, dim, item, scale))
