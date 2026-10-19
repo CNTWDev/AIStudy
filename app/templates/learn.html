@@ -18,28 +18,75 @@
 <div class="hint">🧱 {{ '先补：' if simple else '先打地基：这个知识点要用到 ' }}{% for p in weak_pre %}<a href="/learn/{{ p.id }}">{{ p.name }}</a>{{ '、' if not loop.last }}{% endfor %}{% if not simple %}。如果下面的题做不出来，先去补它。{% endif %}</div>
 {% endif %}
 
-<ol class="steps">
-  <li><b>{{ '难题' if kp.think else '看懂它' }}</b><div>{{ kp.desc }}</div>
-    {% if kp.sources %}<div class="small muted" style="margin-top:4px">出处：{{ kp.sources|join('；') }}</div>{% endif %}
-    {% if kp.terms %}<div class="small" style="margin-top:4px">{{ '🔑 ' if simple else '关键词：' }}{% for t in kp.terms %}<span class="pill">{{ t }}</span> {% endfor %}</div>{% endif %}
-    {% if kp.think and not readonly %}<div class="think" style="margin-top:8px"><div class="small">✍️ {{ kp.think }}</div>
-      <textarea id="thinktxt" style="min-height:70px" placeholder="先别看讲解，写下你自己的判断和理由"></textarea></div>{% endif %}
-    {% if not readonly %}<div id="teach" style="margin-top:8px"><button class="btn ghost sm" id="teachbtn">{% if kp.think %}写好了，看看不同的想法{% else %}{{ ASSISTANT_ICON }} {{ '讲给我听' if simple else '让' ~ ASSISTANT ~ '一步步讲给我听' }}{% endif %}</button></div>{% endif %}</li>
-  <li id="ctxli" style="display:none">{% if simple %}<details><summary><b>🌍 学它有什么用？</b></summary><div id="ctx" class="ctxbox"></div></details>{% else %}<b>它从哪来、用在哪</b><div id="ctx" class="ctxbox"></div>{% endif %}</li>
-  <li><b>{{ '拆这个难题的方法' if kp.think else '记住方法' }}</b><div>{{ kp.method }}</div></li>
-  {% if bridges %}<li><b>🔗 和别的学科连起来</b>
-    {% for b in bridges %}<div class="bridge small">{% if b.mine %}<a href="/learn/{{ b.kp.id }}">{{ b.kp.name }}</a>{% else %}{{ b.kp.name }}{% endif %}
-      <span class="muted">{{ b.subject }} · {{ b.label }}{% if b.note %}：{{ b.note }}{% endif %}{% if b.type == 'same' %}（{{ b.edition }}）{% endif %}</span>
-      {% if b.status in ('mastered', 'learning') %}<span class="pill st-{{ b.status }}">{{ STATUS_LABEL[b.status] }}</span>{% endif %}</div>{% endfor %}</li>{% endif %}
-  {% if readonly %}<li><b>做题和总结</b><div class="muted small">孩子用自己的账号登录后在这里练习。</div></li>{% else %}
-  <li><b>动手做 3 题</b> <span class="muted small for-grownups">从简单的开始；错了会自动进错题本</span>
-    <div id="items" class="card" style="margin-top:8px"><button class="btn" id="start">开始做题</button></div></li>
-  <li><b>{{ '对照一开始的判断，写下现在的想法' if kp.think else '用一句话总结' }}</b> <span class="muted small for-grownups">（会变成复习卡片）</span>
-    <textarea id="summary" style="min-height:60px" placeholder="{{ '这个知识点就是……' if simple else '用自己的话说：这个知识点就是……' }}"></textarea>
-    <div class="row" style="margin-top:8px"><button class="btn" id="finish">完成这一项</button></div></li>{% endif %}
-</ol>
+{# 一步一张卡（DESIGN 5.32）：先导入「为什么学」，再看懂、记方法、练题、总结；一次只看一张，每张一个主按钮 #}
+{% set think = kp.think %}
+{% macro bridges_box() %}{% if bridges %}<div class="lbridges"><b class="small">🔗 和别的学科连起来</b>
+  {% for b in bridges %}<div class="bridge small">{% if b.mine %}<a href="/learn/{{ b.kp.id }}">{{ b.kp.name }}</a>{% else %}{{ b.kp.name }}{% endif %}
+    <span class="muted">{{ b.subject }} · {{ b.label }}{% if b.note %}：{{ b.note }}{% endif %}{% if b.type == 'same' %}（{{ b.edition }}）{% endif %}</span>
+    {% if b.status in ('mastered', 'learning') %}<span class="pill st-{{ b.status }}">{{ STATUS_LABEL[b.status] }}</span>{% endif %}</div>{% endfor %}</div>{% endif %}{% endmacro %}
+{% if think %}{% set steps = [('see', '难题'), ('method', '拆题方法'), ('practice', '练题'), ('sum', '现在的想法')] %}
+{% else %}{% set steps = [('why', '为什么学'), ('see', '看懂'), ('method', '方法'), ('practice', '练 3 题'), ('sum', '总结')] %}{% endif %}
+{% if readonly %}{% set steps = steps[:-1] %}{% endif %}
 
-{% if simple %}<details class="kp-around"><summary class="quiet-h">🧭 前后的知识点</summary>{% endif %}
+<ol class="lbar" id="lbar">{% for id, label in steps %}<li data-step="{{ id }}"{% if loop.first %} class="cur"{% endif %}><button type="button">{{ label }}</button></li>{% endfor %}</ol>
+
+<div class="lflow">
+{% if not think %}
+<section class="card lcard" data-step="why">
+  <div class="ldo">{{ '这一步：先听个故事，想想为什么要学它' if not simple else '先听个故事 📖' }}</div>
+  <div id="ctx" class="ctxbox"><span class="loading">正在准备</span></div>
+  {% if not simple %}{{ bridges_box() }}{% endif %}
+  <div class="lacts"><button class="btn lg block lnext">带着这个问题，往下学 →</button></div>
+</section>
+{% endif %}
+
+<section class="card lcard" data-step="see"{% if not think %} hidden{% endif %}>
+  {% if not think %}<a href="#" class="lback">← 上一步</a>{% endif %}
+  <div class="ldo">{% if think %}这一步：先写下你自己的判断，再看不同的想法{% elif simple %}先猜一猜，再看懂 🤔{% else %}这一步：先猜一下，再看它到底是什么{% endif %}</div>
+  {% if not think and not readonly %}<div id="guess" hidden></div>{% endif %}
+  <div id="seebody">
+    <div class="lcore">{{ kp.desc }}</div>
+    {% if kp.sources %}<div class="small muted">出处：{{ kp.sources|join('；') }}</div>{% endif %}
+    {% if kp.terms %}<div class="small" style="margin-top:6px">{{ '🔑 ' if simple else '关键词：' }}{% for t in kp.terms %}<span class="pill">{{ t }}</span> {% endfor %}</div>{% endif %}
+    {% if think and not readonly %}<div class="think" style="margin-top:10px"><div class="small">✍️ {{ kp.think }}</div>
+      <textarea id="thinktxt" style="min-height:70px" placeholder="先别看讲解，写下你自己的判断和理由"></textarea></div>{% endif %}
+    {% if not readonly %}<div id="teach" style="margin-top:10px">{% if think %}<button class="btn lg block" id="teachbtn">写好了，看看不同的想法</button>{% else %}<button class="linkbtn" id="teachbtn">{{ ASSISTANT_ICON }} {{ '讲给我听' if simple else '还不太懂？让' ~ ASSISTANT ~ '一步步讲给我听' }}</button>{% endif %}</div>{% endif %}
+  </div>
+  <div class="lacts"{% if think and not readonly %} hidden{% endif %}><button class="btn lg block lnext">{{ '想好了，下一步 →' if think else '看懂了，下一步 →' }}</button></div>
+</section>
+
+<section class="card lcard" data-step="method" hidden>
+  <a href="#" class="lback">← 上一步</a>
+  <div class="ldo">{{ '这一步：用这个方法把难题拆开' if think else ('记住方法，看一遍例题 ✍️' if simple else '这一步：记住方法，跟着例题走一遍') }}</div>
+  <div class="lmethod">{{ kp.method }}</div>
+  {% if not think %}<div id="worked"></div>{% endif %}
+  {% if think or simple %}{{ bridges_box() }}{% endif %}
+  <div class="lacts"><button class="btn lg block lnext">{{ '记住了，去练题 →' if think else '记住了，去练 3 题 →' }}</button></div>
+</section>
+
+<section class="card lcard" data-step="practice" hidden>
+  <a href="#" class="lback">← 上一步</a>
+  {% if readonly %}<div class="muted small">做题和总结：孩子用自己的账号登录后在这里练习。</div>{% else %}
+  <div class="ldo">{{ '自己做 3 题 💪' if simple else '这一步：自己做题，错了先看解析，卡住可以回看方法' }}</div>
+  <span class="muted small for-grownups">从简单的开始；错了会自动进错题本</span>
+  <div id="items"></div>
+  <details class="lpeek"><summary class="small">📖 回看方法</summary><div class="small">{{ kp.method }}</div></details>
+  <div class="lacts" hidden><button class="btn lg block lnext">{{ '去写现在的想法 →' if think else '去总结 →' }}</button></div>{% endif %}
+</section>
+
+{% if not readonly %}
+<section class="card lcard" data-step="sum" hidden>
+  <a href="#" class="lback">← 上一步</a>
+  <div class="ldo">{{ '这一步：对照一开始的判断，写下现在的想法' if think else ('用一句话说说 ✏️' if simple else '这一步：用自己的话说一句，它会变成以后的复习卡') }}</div>
+  {% if not think %}<div class="lstarts"><span class="small muted">挑个开头：</span>{% for s0 in ['它的意思是', '做题时先', '最容易错的是'] %}<button type="button" class="chip">{{ s0 }}……</button>{% endfor %}</div>{% endif %}
+  <textarea id="summary" style="min-height:80px" placeholder="{{ '这个知识点就是……' if simple else '用自己的话说：这个知识点就是……' }}"></textarea>
+  <div id="sumnote" class="small muted"></div>
+  <div class="lacts"><button class="btn lg block" id="finish">完成这一项 ✓</button></div>
+</section>
+{% endif %}
+</div>
+
+<details class="kp-around"><summary class="quiet-h">🧭 前后的知识点{% if not simple %}<span class="muted small">：要先会的 {{ pre|length }} 个 · 学会后可以学 {{ post|length }} 个</span>{% endif %}</summary>
 <div class="grid">
   <div class="card"><div class="card-h"><span class="ico">⬅️</span><h3>往回：要先会的</h3></div>
     {% for p in pre %}{% if loop.index == 7 %}<details class="kp-more"><summary class="small">还有 {{ loop.length - 6 }} 个</summary>{% endif %}{% set s2 = p.m.status if p.m else 'unknown' %}<a class="kp" href="/learn/{{ p.id }}"><span class="n">{{ p.name }} <span class="muted small">{{ stage_label(p.stage) }}<span class="for-grownups"> · {{ p.strength }}</span></span></span><span class="pill st-{{ s2 }}">{{ STATUS_LABEL[s2] }}</span></a>{% if loop.last and loop.length > 6 %}</details>{% endif %}
@@ -48,13 +95,57 @@
     {% for p in post %}{% if loop.index == 7 %}<details class="kp-more"><summary class="small">还有 {{ loop.length - 6 }} 个</summary>{% endif %}{% set s2 = p.m.status if p.m else 'unknown' %}<a class="kp" href="/learn/{{ p.id }}"><span class="n">{{ p.name }} <span class="muted small">{{ stage_label(p.stage) }}</span></span><span class="pill st-{{ s2 }}">{{ STATUS_LABEL[s2] }}</span></a>{% if loop.last and loop.length > 6 %}</details>{% endif %}
     {% else %}<p class="muted small">后面暂时没有了。</p>{% endfor %}</div>
 </div>
-{% if simple %}</details>{% endif %}
+</details>
 {% if pack.thinking_moves and not readonly %}<p class="small"><a href="/thinking">🧭 值得再想的问题 · 我的思考方式</a></p>{% endif %}
 {% if pack.copyright %}<p class="muted small">{{ pack.copyright }}</p>{% endif %}
-{% if not readonly %}<script>
-const KP = {{ kp.id|tojson }}, TASK = {{ task|tojson }};
+<script>
+const KP = {{ kp.id|tojson }}, TASK = {{ task|tojson }}, THINK = {{ (kp.think or '')|tojson }};
 window.ASK_CTX = {kp: KP};
-let items = [], idx = 0, right = 0, wrongStreak = 0, lastAnswer = null;
+// ---- 一步一张卡：进度条 + 上一步 / 下一步；孩子按顺序走（只能回看走过的），成人每一步都能点。今天内回来从上次那一步接着走
+const Steps = {
+  key: 'learnstep:' + KP + ':' + new Date().toDateString(), free: document.body.dataset.tone !== 'kid', max: 0, cur: 0,
+  ids() { return $$('#lbar li').map(li => li.dataset.step); },
+  sec(id) { return $(`.lcard[data-step="${id}"]`); },
+  go(i, scroll) {
+    const ids = this.ids(); i = Math.max(0, Math.min(i, ids.length - 1));
+    this.cur = i; this.max = Math.max(this.max, i);
+    ids.forEach((id, j) => { this.sec(id).hidden = j !== i; });
+    $$('#lbar li').forEach((li, j) => { li.className = j === i ? 'cur' : j <= this.max ? 'done' : '';
+      $('button', li).disabled = !this.free && j > this.max; });
+    try { localStorage.setItem(this.key, JSON.stringify({id: ids[i], max: ids[this.max]})); } catch (e) {}
+    if (scroll) $('#lbar').scrollIntoView({behavior: 'smooth', block: 'start'});
+    this.onEnter && this.onEnter(ids[i]);
+  },
+  to(id) { const i = this.ids().indexOf(id); if (i >= 0) this.go(i, true); },
+  next() { this.go(this.cur + 1, true); },
+  drop(id) {  // 这一步没有内容（比如还没有背景故事）：去掉它
+    const li = $(`#lbar li[data-step="${id}"]`); if (!li) return;
+    const was = this.ids()[this.cur]; li.remove(); this.sec(id).remove();
+    const i = this.ids().indexOf(was); this.max = Math.max(0, this.max - 1); this.go(i < 0 ? 0 : i);
+  },
+  init() {
+    $$('#lbar li').forEach((li, j) => $('button', li).onclick = () => this.go(j, true));
+    $$('.lcard .lnext').forEach(b => b.onclick = () => this.next());
+    $$('.lcard .lback').forEach(a => a.onclick = e => { e.preventDefault(); this.go(this.cur - 1, true); });
+    let saved = null; try { saved = JSON.parse(localStorage.getItem(this.key) || 'null'); } catch (e) {}
+    const ids = this.ids();
+    if (saved && ids.includes(saved.id)) { this.max = Math.max(ids.indexOf(saved.max), ids.indexOf(saved.id)); this.go(ids.indexOf(saved.id)); }
+    else this.go(0);
+  },
+};
+// ---- 导入：当时遇到了什么麻烦、生活里用在哪，落到一个问题上（AI 生成，按知识点缓存；没有就跳过这一步）
+let CTX = null;
+if ($('#ctx')) api('/api/context/' + KP).then(c => {
+  if (!c || !c.story) { if ($('.lbridges', Steps.sec('why'))) { $('#ctx').innerHTML = ''; } else Steps.drop('why'); return; }
+  CTX = c;
+  $('#ctx').innerHTML = `<p class="lstory">📖 ${esc(c.story)}</p>` + (c.question ? `<div class="lq">🤔 ${esc(c.question)}</div>` : '') +
+    ((c.uses || []).length ? `<p class="small">🔧 ${c.uses.map(esc).join('<br>🔧 ')}</p>` : '') +
+    (c.fun ? `<p class="small muted">💡 ${esc(c.fun)}</p>` : '');
+}).catch(() => Steps.drop('why'));
+// ---- 讲解（AI，按知识点存在题库）：第一步里「讲给我听」展开讲解，方法这一步用它的例题「看我做一遍」
+let teachP = null;
+const getTeach = () => teachP || (teachP = api('/api/teach/' + KP).catch(e => { teachP = null; throw e; }));
+{% if not readonly %}
 $('#teachbtn').onclick = async () => {
   // 难题课：先写下自己的判断，再看讲解；最后的总结从这一句接着写
   const think = $('#thinktxt');
@@ -62,38 +153,82 @@ $('#teachbtn').onclick = async () => {
   if (think) { think.readOnly = true; if (!$('#summary').value) $('#summary').value = '一开始我认为：' + think.value.trim() + '\n现在我认为：'; }
   $('#teach').innerHTML = '<span class="loading">' + {{ (ASSISTANT ~ '正在准备')|tojson }} + '</span>';
   try {
-    const t = await api('/api/teach/' + KP);
-    $('#teach').innerHTML = '<div class="card" style="margin:0">' +
+    const t = await getTeach();
+    $('#teach').innerHTML = '<div class="lteach">' +
       (t.bridge && t.bridge.length ? '<div class="hint" style="margin-top:0">🔗 先连一连：' + t.bridge.map(b => `你在${esc(b.subject)}学过「${esc(b.name)}」${b.note ? '，' + esc(b.note) : ''}`).join('；') + '</div>' : '') +
       (t.steps || []).map((s, i) => `<p><b>${i + 1}. ${esc(s.title)}</b><br>${esc(s.text).replace(/\n/g, '<br>')}</p>`).join('') +
-      (t.example ? `<p><b>{{ '再想一步' if kp.think else '例子' }}：</b>${esc(t.example.q)}<br><span class="muted">→ ${esc(t.example.a)}</span></p>` : '') +
+      (THINK && t.example ? `<p><b>再想一步：</b>${esc(t.example.q)}<br><span class="muted">→ ${esc(t.example.a)}</span></p>` : '') +
       (t.terms && t.terms.length ? '<p class="small">' + t.terms.map(x => `<span class="pill">${esc(x.en)} = ${esc(x.zh)}</span>`).join(' ') + '</p>' : '') +
-      (t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '') +
+      (THINK && t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '') +
       (t.action ? `<p><b>本周试一试：</b>${esc(t.action)}</p>` : '') + '</div>';
   } catch (e) { $('#teach').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+  if (think) $('.lacts', Steps.sec('see')).hidden = false;
 };
+function showWorked() {
+  const w = $('#worked'); if (!w || w.dataset.done) return; w.dataset.done = '1';
+  w.innerHTML = '<span class="loading small">正在准备例题</span>';
+  getTeach().then(t => {
+    w.innerHTML = (t.example ? `<div class="lworked"><b>✍️ 看我做一遍</b><div>${esc(t.example.q)}</div><div class="lworked-a">${esc(t.example.a).replace(/\n/g, '<br>')}</div></div>` : '') +
+      (t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '');
+  }).catch(() => { w.innerHTML = ''; });
+}
+// ---- 练题。题在打开页面时就去取（孩子的题后台已经备好），第一题先拿来「猜一猜」，学完做题时揭晓
+let items = [], idx = 0, right = 0, wrong = 0, wrongStreak = 0, lastAnswer = null, guess = null, started = false, itemsP = null;
+const fetchItems = () => itemsP || (itemsP = api(`/api/practice/${KP}?n=3&purpose=${TASK === 'preview' ? 'preview' : 'practice'}`));
+function setupGuess() {
+  const g = $('#guess'); if (!g) return;
+  let settled = false;
+  const reveal = () => { settled = true; $('#seebody').hidden = false; $('.lacts', Steps.sec('see')).hidden = false; };
+  $('#seebody').hidden = true; $('.lacts', Steps.sec('see')).hidden = true;
+  g.hidden = false; g.innerHTML = '<span class="loading small">先准备一道小题让你猜猜</span>';
+  setTimeout(() => { if (!settled && !g.dataset.ready) { g.hidden = true; reveal(); } }, 5000);  // 题一时出不来：不等，直接看
+  fetchItems().then(r => {
+    const it = (r.items || [])[0];
+    if (settled) { g.hidden = true; return; }
+    if (!it || it.probe || it.widget !== 'choice') { g.hidden = true; reveal(); return; }
+    g.dataset.ready = '1';
+    g.innerHTML = `<div class="small muted">先猜一猜，猜错没关系，学完做题时揭晓</div><div class="q qc">${qStem(it)}<div class="qc-opts">${it.options.map((o, i) => qOpt(o, i)).join('')}</div></div>` +
+      `<button class="linkbtn small lskip">不猜了，直接看</button>`;
+    $$('.opt', g).forEach(b => b.onclick = () => {
+      guess = {id: it.id, i: +b.dataset.i};
+      $$('.opt', g).forEach(x => { x.disabled = true; x.classList.toggle('sel', x === b); });
+      $('.lskip', g).remove();
+      g.insertAdjacentHTML('beforeend', `<p class="small">记下了：你猜 <b>${QKEYS[guess.i]}</b>。看看下面，做题时揭晓 👇</p>`);
+      reveal();
+    });
+    $('.lskip', g).onclick = () => { g.hidden = true; reveal(); };
+  }).catch(() => { g.hidden = true; reveal(); });
+}
 async function loadItems() {
+  started = true;
   $('#items').innerHTML = '<span class="loading">正在准备题目</span>';
+  $('.lacts', Steps.sec('practice')).hidden = true;
   try {
-    const r = await waitWith($('#items'), api(`/api/practice/${KP}?n=3&purpose=${TASK === 'preview' ? 'preview' : 'practice'}`), KP);
+    const r = await waitWith($('#items'), fetchItems(), KP);
+    itemsP = null;  // 「再来 3 题」重新取
     items = r.items; idx = 0; right = 0;
     if (items.length) Run.start('practice', {total: items.length, mount: $('#items')});
-    if (!items.length) { $('#items').innerHTML = '<p>' + (r.llm ? '题目还没准备好，等一会儿再试试。' : '这个知识点还没有题。') + '</p><p class="muted small">可以先按上面的方法自己练一练。</p>'; return; }
+    if (!items.length) { $('#items').innerHTML = '<p>' + (r.llm ? '题目还没准备好，等一会儿再试试。' : '这个知识点还没有题。') + '</p><p class="muted small">可以先按上面的方法自己练一练。</p>'; $('.lacts', Steps.sec('practice')).hidden = false; return; }
     show();
-  } catch (e) { $('#items').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+  } catch (e) { itemsP = null; $('#items').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
 }
 function show() {
   if (idx >= items.length) {
     $('#items').innerHTML = `<p class="done-score"><b>${'⭐'.repeat(right)}${'☆'.repeat(items.length - right)} ${right}/${items.length}</b> ${right === items.length ? '太棒了 🎉' : '继续加油！💪'}</p>` +
       (CTX && CTX.next ? `<div class="hint">🚀 ${esc(CTX.next)}</div>` : '') +
-      `<div class="row"><button class="btn" onclick="$('#finish').scrollIntoView({behavior:'smooth',block:'center'});$('#summary').focus()">写一句总结 ↓</button><button class="btn ghost sm" onclick="loadItems()">再来 3 题</button></div>`; Run.finish(); return;
+      `<div class="row"><button class="btn ghost sm" onclick="loadItems()">再来 3 题</button></div>`;
+    $('.lacts', Steps.sec('practice')).hidden = false; $('.lpeek').open = false;
+    if (wrong) $('#sumnote').textContent = `做错的 ${wrong} 题已经放进错题本，过几天会再来。`;
+    Run.finish(); return;
   }
   const it = items[idx];
   const box = document.createElement('div');
   // 穿插的「以前学过的」题：记在它自己的知识点上，答完顺便摸清过去
   const p = it.probe, kp = p ? p.kp : KP;
+  const g = guess && guess.id === it.id ? guess : null;
   const base = extra => Object.assign({item_id: it.id, kp_id: kp, request_id: it.request_id}, p ? {mode: 'probe', probe: {depth: p.depth, from: p.from}} : {}, extra);
   $('#items').innerHTML = (p ? `<div class="probe-tag">🔀 以前学过的<span class="for-grownups">：${esc(p.name)}</span></div>` : '') +
+    (g ? `<div class="hint lguess">🤔 开头你猜的是 <b>${QKEYS[g.i]}</b>，学完了再做一次</div>` : '') +
     `<div class="muted small">第 ${idx + 1}/${items.length} 题<span class="for-grownups"> · 难度 ${'★'.repeat(it.difficulty || 1)}</span></div>`;
   $('#items').appendChild(box);
   renderItem(box, it, {
@@ -102,9 +237,13 @@ function show() {
     onDone: res => {
       Run.hit(!!res.correct); Combo.hit(!!res.correct, box); celebrate(res, box);
       if (p) { if (res.correct) right++; }
-      else if (res.correct) { right++; wrongStreak = 0; } else wrongStreak++;
+      else if (res.correct) { right++; wrongStreak = 0; } else { wrong++; wrongStreak++; }
+      if (g && res.answer_index != null) {
+        const was = g.i === +res.answer_index;
+        box.insertAdjacentHTML('beforeend', `<div class="small lguess-r">${res.correct ? (was ? '开头就猜对了，现在也做对了 👍' : '开头猜错了，现在做对了，这就是刚学会的 🎉') : (was ? '开头猜对了，这次没做对，看看解析' : '看看解析，再回看一下方法')}</div>`);
+      }
       const nx = document.createElement('div'); nx.className = 'row'; nx.style.marginTop = '10px';
-      nx.innerHTML = `<button class="btn">下一题 →</button>` + (wrongStreak >= 2 && !res.trace && {{ pre|length }} ? `<a class="btn ghost" href="#" onclick="window.scrollTo(0,document.body.scrollHeight);return false">🧱 退一步：先练要用到的基础</a>` : '');
+      nx.innerHTML = `<button class="btn">${idx + 1 < items.length ? '下一题 →' : '看看结果 →'}</button>` + (wrongStreak >= 2 && !res.trace && {{ pre|length }} ? `<a class="btn ghost" href="#" onclick="$('.kp-around').open=true;$('.kp-around').scrollIntoView({behavior:'smooth'});return false">🧱 退一步：先练要用到的基础</a>` : '');
       nx.querySelector('.btn').onclick = () => { idx++; show(); };
       box.appendChild(nx);
       // 今天第二次卡在这个点（或点了「还不会」）：当场追根，几道小题找出是哪块基础没打牢（app/trace.py）
@@ -120,19 +259,18 @@ function show() {
     }
   });
 }
-$('#start').onclick = loadItems;
-// 知识背景和用处：让孩子知道学这个有什么用（AI 生成，按知识点缓存；没配置 AI 就不显示）
-let CTX = null;
-if (!{{ (kp.think or '')|tojson }}) api('/api/context/' + KP).then(c => {
-  if (!c || !c.story) return; CTX = c;
-  $('#ctx').innerHTML = `<p>📖 ${esc(c.story)}</p>` + ((c.uses || []).length ? `<p>🔧 ${c.uses.map(esc).join('<br>🔧 ')}</p>` : '') +
-    (c.fun ? `<p class="small muted">💡 ${esc(c.fun)}</p>` : '');
-  $('#ctxli').style.display = '';
-}).catch(() => {});
+$$('.lstarts .chip').forEach(c => c.onclick = () => { const t = $('#summary'); t.value = (t.value ? t.value.replace(/\s*$/, '\n') : '') + c.textContent.replace(/…+$/, ''); t.focus(); });
 $('#finish').onclick = async () => {
   $('#finish').disabled = true;
+  try { localStorage.removeItem(Steps.key); } catch (e) {}
   try { const r = await api('/api/learn/done', {kp_id: KP, summary: $('#summary').value}); if (r.flow && r.flow.total) return Flow.done(r.flow); } catch (e) {}
   location.href = '/today';
 };
-</script>{% endif %}
+if (!THINK) setupGuess();
+Steps.onEnter = id => { if (id === 'method') showWorked(); if (id === 'practice' && !started) loadItems(); };
+{% else %}
+Steps.onEnter = id => { if (id === 'method' && $('#worked')) getTeach().then(t => { $('#worked').innerHTML = t.example ? `<div class="lworked"><b>✍️ 例题</b><div>${esc(t.example.q)}</div><div class="lworked-a">${esc(t.example.a)}</div></div>` : ''; }).catch(() => {}); };
+{% endif %}
+Steps.init();
+</script>
 {% endblock %}

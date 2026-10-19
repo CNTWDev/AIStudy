@@ -193,9 +193,17 @@ def teach(kp: dict, grade: str, user_id=None) -> dict:
 
 def context(kp: dict, grade: str, user_id=None) -> dict:
     c = find_content("context", kp["id"], grade=grade)
-    if c:
+    # 学习页第一步用它做导入（当时遇到了什么麻烦 + 一个引子问题）；没有引子问题的是老版本，换成新的一次
+    if c and (c["body"].get("question") or not llm.enabled()):
         return {**c["body"], "content_id": c["id"]}
-    body = llm.kp_context(kp, catalog.packs[kp["pack"]], grade, user_id=user_id)
+    try:
+        body = llm.kp_context(kp, catalog.packs[kp["pack"]], grade, user_id=user_id)
+    except llm.LLMError:
+        if c:
+            return {**c["body"], "content_id": c["id"]}
+        raise
+    if c:
+        db.run("UPDATE contents SET status='retired' WHERE id=?", c["id"])
     cid = save_content("context", body, kp["id"], kp_lang(kp["id"]), grade, title=kp["name"], meta=gen_meta("context"),
                        created_by=user_id)
     return {**body, "content_id": cid}

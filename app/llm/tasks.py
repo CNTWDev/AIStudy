@@ -39,7 +39,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 3, "context": 2, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 3, "context": 3, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -212,13 +212,15 @@ def kp_context(kp: dict, pack, grade: str, user_id=None) -> dict:
     """知识背景和实用反馈：这个知识点从哪来、生活里用在哪、一个有意思的小事实。按知识点+年级缓存。"""
     user = (
         f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n\n"
-        "给学生讲讲这个知识点的「背景」和「用处」，让他觉得学这个有意思、有用：\n"
-        "- story：它是怎么来的 / 谁发现的 / 为什么需要它，2-3 句，像讲小故事；\n"
+        "这段话放在学习的最前面做导入：先让学生知道为什么要学，再去学知识点本身。\n"
+        "- story：当时人们遇到了什么麻烦、什么难题，才有了这个知识；或者生活里一个真实的、有意义的问题正需要它。"
+        "2-4 句，像讲故事，讲出难处和冲突，让人好奇，先不讲知识点的答案；\n"
+        "- question：从故事里引出的一个问题，学完这个知识点就能回答，一句话，不给答案；\n"
         "- uses：生活里或以后学习中用在哪，2-3 条，每条一句话、具体到场景；\n"
         "- fun：一个让人「哇」的小事实，一句话；\n"
         "- next：学会它以后可以去学什么、能解决什么问题，一句话。\n"
         "内容必须准确，不确定的历史细节宁可不写。不要照搬教材原文。\n"
-        '输出：{"story":"..","uses":[".."],"fun":"..","next":".."}'
+        '输出：{"story":"..","question":"..","uses":[".."],"fun":"..","next":".."}'
     )
     return ask_json("context", _tutor(grade), user, user_id=user_id, effort="low", cache=False)  # 存在题库 contents 里
 
