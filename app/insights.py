@@ -43,6 +43,11 @@ def _detect(user_id: int, paused: engine.Paused) -> list[dict]:
     shaky = evidence.needs_work(user_id, m)
     shaky |= {a["kp_id"] for a in att if not a["correct"] and a["mode"] != "exam"}
     shaky = {k for k in shaky if catalog.kp(k) and k not in paused.kps}
+    model = evidence.profile(user_id).mastery
+
+    def fix(p):  # 根还没学过、或学了还不行：先打基础；已经学过、练得也还行（只差隔天、换题再对）：换一道小题确认，不再从头学
+        st = m.get(p) or {}
+        return "check" if st.get("attempts") and st.get("status") == "learning" and not model.needs_work(st) else "backfill"
     roots: dict[str, list[str]] = defaultdict(list)
     for k in shaky:
         for p, _ in catalog.ancestors(k, depth=3):
@@ -51,7 +56,7 @@ def _detect(user_id: int, paused: engine.Paused) -> list[dict]:
     for p, kids in sorted(roots.items(), key=lambda kv: -len(kv[1])):
         if len(kids) >= 2:
             names = "、".join(_name(k) for k in kids[:3])
-            out.append({"kind": "root", "key": p, "kp_id": p, "severity": 3, "action": "backfill", "for_kid": 1,
+            out.append({"kind": "root", "key": p, "kp_id": p, "severity": 3, "action": fix(p), "for_kid": 1,
                         "title": f"可能是「{_name(p)}」没打牢",
                         "detail": f"{names}{'等' if len(kids) > 3 else ''}都要用到它，先把它练熟，后面会顺很多"})
         if sum(1 for x in out if x["kind"] == "root") >= 3:
@@ -140,7 +145,7 @@ def _detect(user_id: int, paused: engine.Paused) -> list[dict]:
         path = " → ".join(f"{'✓' if c['correct'] else '✗'}{'中文版' if c['kind'] == 'lang' else c['name']}" for c in r["chain"])
         if r["result"] == "root" and m.get(r["root"]["kp"], {}).get("status") != "mastered":
             out.append({"kind": "trace", "key": f"{r['kp']}>{r['root']['kp']}", "kp_id": r["root"]["kp"], "severity": 3,
-                        "action": "backfill", "for_kid": 1, "title": f"「{r['name']}」卡住，根在「{r['root']['name']}」",
+                        "action": fix(r["root"]["kp"]), "for_kid": 1, "title": f"「{r['name']}」卡住，根在「{r['root']['name']}」",
                         "detail": f"{r['day']} 找根时发现的：✗{r['name']} → {path}"})
         elif r["result"] == "lang" and m.get(r["kp"], {}).get("status") != "mastered":
             out.append({"kind": "trace_lang", "key": r["kp"], "kp_id": None, "severity": 2, "action": "", "for_kid": 1,
@@ -176,8 +181,8 @@ def refresh(user_id: int) -> list[dict]:
             k = (f["kind"], f["key"])
             seen.add(k)
             if k in open_rows:
-                t.run("UPDATE insights SET title=?, detail=?, severity=?, updated_at=? WHERE id=?",
-                      f["title"], f["detail"], f["severity"], now, open_rows[k]["id"])
+                t.run("UPDATE insights SET title=?, detail=?, severity=?, action=?, updated_at=? WHERE id=?",
+                      f["title"], f["detail"], f["severity"], f["action"], now, open_rows[k]["id"])
             else:
                 t.run("INSERT INTO insights(user_id,kind,key,kp_id,title,detail,severity,for_kid,action,created_at,updated_at) "
                       "VALUES(?,?,?,?,?,?,?,?,?,?,?)", user_id, f["kind"], f["key"], f["kp_id"], f["title"], f["detail"],
