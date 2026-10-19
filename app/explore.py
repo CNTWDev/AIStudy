@@ -130,10 +130,11 @@ def candidates(user_id: int, mastery: dict | None = None, near_kp: str | None = 
     unknown = lambda k: mastery.get(k, {}).get("status") in (None, "unknown")  # noqa: E731
     guessed = lambda k: mastery.get(k, {}).get("source") == "inferred" and mastery[k].get("status") != "weak"  # noqa: E731
     recent = _recent(user_id)
+    paused = engine.Paused(user_id).kps   # 退掉的课：排着的往回追、到期复查都先停下
     out, seen = [], set()
 
     def add(k, reason, depth=0, frm=""):
-        if k not in seen and k in catalog.kps and k not in recent:
+        if k not in seen and k in catalog.kps and k not in recent and k not in paused:
             seen.add(k)
             out.append({"kp": k, "reason": reason, "depth": depth, "from": frm})
 
@@ -203,7 +204,7 @@ def candidates(user_id: int, mastery: dict | None = None, near_kp: str | None = 
                    else "以前猜你会，确认一下" if guessed(k) else "考试常考" if hot else "以前学过，看看还记得吗")
             scored.append((score, e["pack_id"], k, why))
     # 学会很久了、按遗忘规律快忘了的：穿插一两道（复习任务里没排到的）
-    for v in evidence.due_checks(user_id, mastery, limit=4):
+    for v in [v for v in evidence.due_checks(user_id, mastery, limit=len(mastery)) if v["kp_id"] not in paused][:4]:
         k = v["kp_id"]
         if catalog.kp(k):
             scored.append((3 + (3 if k in today_near else 0) + random.random(), catalog.kp_pack[k], k,

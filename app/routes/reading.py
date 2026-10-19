@@ -31,7 +31,10 @@ def words(request: Request, kind: str = "word"):
             it = recall._item(c["extra"].get("item_id"))
             c["view"] = itemtypes.view(it, c["extra"].get("my_answer")) if it else None
         cards.sort(key=lambda c: (bool(c["extra"].get("passed")), c["due"]))  # 要重做的在前，过关的在后
-    return render(request, "words.html", cards=cards,
+    paused = engine.Paused(k["id"])   # 退掉的课留下的：还在本子里，收在最下面，不叫回来复习
+    stop = [c for c in cards if paused.card(c)]
+    cards = [c for c in cards if c not in stop]
+    return render(request, "words.html", cards=cards, paused=stop,
                   sents=[{**dict(s), "fb": db.jload(s["feedback"], {})} for s in sents], kind=kind, counts=counts,
                   today_iso=db.today().isoformat())
 
