@@ -93,14 +93,41 @@ def schedule_card(user_id: int, c, grade: str, due=None, extra=None, fmt="recall
 CARD_GROUPS = {"words": ("word", "phrase", "term"), "mistakes": ("mistake",), "other": ("kp",)}
 
 
+class Paused:
+    """退掉的课（或换掉的方向）留下的内容：记录都留着，只是不再出现在每天的学习里；重新选回这门课就接着来。
+    kps：报过名的教材里、现在不在学的知识点（同一概念在在学的教材里有的、给在学的课打地基的，照常出）。
+    lists：还在给这个人用的词表（在学科目的、家长安排的单词任务）；别的词表来的单词卡暂停。"""
+
+    def __init__(self, user_id: int):
+        from . import explore, ladder
+        rows = [dict(e) for e in db.q("SELECT * FROM enrollments WHERE user_id=?", user_id) if e["pack_id"] in catalog.packs]
+        active = [e for e in rows if e["active"]]
+        user = db.one("SELECT grade FROM users WHERE id=?", user_id)
+        concepts = ladder.enrolled_concepts(active)
+        keep = {k for f in ladder.foundations(dict(user or {}), active) for k in ladder.range_of(f, concepts)}
+        self.kps = {k for e in rows for k in catalog.packs[e["pack_id"]].kp_ids
+                    if catalog.concept_id(k) not in concepts and k not in keep}
+        self.lists = {wl["id"] for wl in explore.word_lists(user_id)} | {t["ref"] for t in tracks(user_id) if t["kind"] == "words"}
+
+    def card(self, c) -> bool:
+        if c["kp_id"]:
+            return c["kp_id"] in self.kps
+        extra = c["extra"] if isinstance(c["extra"], dict) else db.jload(c["extra"], {}) or {}
+        name = extra.get("list") if c["kind"] in ("word", "phrase") else None
+        # 阅读时自己收藏的词不属于哪个词表、词表已经没有了的，一直留着
+        from .content import content
+        return bool(name) and name in content.word_lists and name not in self.lists
+
+
 def due_cards(user_id: int, limit=50, group: str | None = None):
-    if group in CARD_GROUPS:
-        kinds = CARD_GROUPS[group]
-        marks = ",".join("?" * len(kinds))
-        return db.q(f"SELECT * FROM cards WHERE user_id=? AND due<=? AND kind IN ({marks}) ORDER BY box, due LIMIT ?",
-                    user_id, db.today().isoformat(), *kinds, limit)
-    return db.q("SELECT * FROM cards WHERE user_id=? AND due<=? ORDER BY box, due LIMIT ?",
-                user_id, db.today().isoformat(), limit)
+    """今天该复习的卡片。退掉的课的卡片暂停（见 Paused），不算进来。"""
+    kinds = CARD_GROUPS.get(group) or ()
+    marks = f" AND kind IN ({','.join('?' * len(kinds))})" if kinds else ""
+    rows = db.q(f"SELECT * FROM cards WHERE user_id=? AND due<=?{marks} ORDER BY box, due", user_id, db.today().isoformat(), *kinds)
+    if not rows:
+        return rows
+    paused = Paused(user_id)
+    return [c for c in rows if not paused.card(c)][:limit]
 
 
 # ------------------------------------------------------------------ 题库

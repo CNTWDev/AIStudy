@@ -60,6 +60,11 @@ class Ctx(dict):
             if e["pack_id"] in catalog.packs])
 
     @property
+    def paused(self) -> engine.Paused:
+        """退掉的课留下的卡片不出（engine.Paused）。"""
+        return self.get_or("paused", lambda: engine.Paused(self.kid["id"]))
+
+    @property
     def subjects(self) -> set:
         return {catalog.packs[e["pack_id"]].subject for e in self.packs}
 
@@ -235,9 +240,9 @@ class WordSource(Source):
         return 1.2 if "english" in ctx.subjects else 0.6
 
     def _my_cards(self, ctx: Ctx) -> list:
-        return ctx.get_or("word_cards", lambda: db.q(
-            "SELECT id, front, back, kind, kp_id, due FROM cards WHERE user_id=? AND kind IN ('word','term') AND LENGTH(back)<=24 "
-            "ORDER BY due LIMIT 60", ctx.kid["id"]))
+        return ctx.get_or("word_cards", lambda: [c for c in db.q(
+            "SELECT id, front, back, kind, kp_id, due, extra FROM cards WHERE user_id=? AND kind IN ('word','term') AND LENGTH(back)<=24 "
+            "ORDER BY due", ctx.kid["id"]) if not ctx.paused.card(c)][:60])
 
     KNOWN_DAYS = 3
 

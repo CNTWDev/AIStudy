@@ -147,9 +147,10 @@ def due(user_id: int) -> list[dict]:
     rows = db.q("SELECT d.*, i.data, i.type FROM discussions d JOIN items i ON i.id=d.item_id "
                 "WHERE d.user_id=? AND d.done=1 AND d.next_due<>'' AND d.next_due<=? ORDER BY d.next_due",
                 user_id, db.today().isoformat())
+    paused = engine.Paused(user_id).kps   # 退掉的课先不再问，选回来接着排
     out = []
     for r in rows:
-        if not catalog.kp(r["kp_id"]):
+        if not catalog.kp(r["kp_id"]) or r["kp_id"] in paused:
             continue
         it = db.jload(r["data"], {})
         n = db.one("SELECT COUNT(*) AS n FROM discussions WHERE user_id=? AND item_id=? AND done=1", user_id, r["item_id"])["n"]
@@ -160,8 +161,9 @@ def due(user_id: int) -> list[dict]:
 
 
 def upcoming(user_id: int) -> list[dict]:
-    return db.q("SELECT next_due FROM discussions WHERE user_id=? AND done=1 AND next_due>? ORDER BY next_due",
-                user_id, db.today().isoformat())
+    paused = engine.Paused(user_id).kps
+    return [r for r in db.q("SELECT kp_id, next_due FROM discussions WHERE user_id=? AND done=1 AND next_due>? ORDER BY next_due",
+                            user_id, db.today().isoformat()) if r["kp_id"] not in paused]
 
 
 def profile(user_id: int) -> list[dict]:

@@ -1,5 +1,37 @@
 {% extends "base.html" %}
 {% import "_ui.html" as ui %}
+{% macro mcard(c, paused=False) %}
+{% set kp = catalog.kp(c.kp_id) if c.kp_id else None %}
+<div class="card mcard">
+  <div class="mc-head">
+    <span class="grow muted small">{% if kp %}{{ kp.name }} · {% endif %}{{ c.created_at[5:10] }} 记下</span>
+    {% if paused %}<span class="pill">暂停</span>
+    {% elif c.extra.passed and c.due >= '9999' %}<span class="pill st-mastered">🏅 已掌握</span>
+    {% elif c.extra.passed %}<span class="pill st-mastered">🏅 {{ c.extra.passed[5:] }} 过关 · {{ c.due[5:] }} 回头看</span>
+    {% elif c.due <= today_iso %}<span class="pill st-weak">今天要重做</span>
+    {% else %}<span class="pill st-learning">{% if c.extra.variant %}下次换一道同类题{% elif c.extra.streak %}已隔天做对 {{ c.extra.streak }} 次{% else %}要重做{% endif %} · {{ c.due[5:] }}</span>{% endif %}
+    {% if not readonly %}<button class="linkbtn" title="从本子里删掉" onclick="if(confirm('删除？'))api('/api/cards/{{ c.id }}/delete',{}).then(()=>this.closest('.card').remove())">删除</button>{% endif %}
+  </div>
+  {% if c.view %}{{ ui.question(c.view) }}
+  {% else %}<div class="qc"><div class="qc-stem">{{ c.front }}</div>
+    <dl class="qc-ans">{% if c.extra.my_answer %}<div><dt>我的答案</dt><dd>{{ c.extra.my_answer }}</dd></div>{% endif %}
+      <div><dt>答案</dt><dd class="qc-explain">{{ c.back }}</dd></div></dl></div>{% endif %}
+</div>
+{% endmacro %}
+{% macro wcard(c, paused=False) %}
+<div class="card" style="padding:12px">
+  <div class="row"><b class="grow">{{ c.front }}</b>{% if paused %}<span class="pill">暂停</span>{% elif c.extra.passed %}<span class="pill">🏅 {{ c.extra.passed[5:] }} 过关</span>{% else %}<span class="pill">第 {{ c.box }} 轮 · {{ c.due[5:] }} 复习</span>{% endif %}
+    {% if not readonly %}<button class="linkbtn" title="从本子里删掉" onclick="if(confirm('删除？'))api('/api/cards/{{ c.id }}/delete',{}).then(()=>this.closest('.card').remove())">删除</button>{% endif %}</div>
+  <div class="small" style="white-space:pre-wrap">{{ c.back }}</div>
+  {% if c.extra.context %}<div class="small muted">原句：{{ c.extra.context }}</div>{% endif %}
+  {% if c.kind == 'word' and not readonly %}<div class="row" style="margin-top:6px"><input type="text" placeholder="用 {{ c.front }} 造个句子" class="grow sent"><button class="btn soft sm mk" data-w="{{ c.front }}" data-m="{{ c.back.split('\n')[0] }}" data-l="{{ c.extra.lang or 'en' }}">让{{ ASSISTANT }}看看</button></div><div class="fbx"></div>{% endif %}
+</div>
+{% endmacro %}
+{% macro paused_list(cards, one) %}
+{% if cards %}<details class="card" style="margin-top:12px"><summary>已经不学的课 <b>{{ cards|length }}</b></summary>
+<p class="muted small">这些是已经去掉的课留下的，先不叫你回来复习；重新选上这门课，就接着复习。</p>
+{% for c in cards %}{{ one(c, True) }}{% endfor %}</details>{% endif %}
+{% endmacro %}
 {% block body %}
 <a href="/review" class="back">← 复习</a>
 <h1>我的本子</h1>
@@ -16,34 +48,15 @@
 {% else %}<div class="empty card"><div class="e">✍️</div><b>还没有造句</b>在生词本里给单词造个句子，{{ ASSISTANT }}会帮你看看。</div>{% endfor %}
 {% elif kind == 'mistake' %}
 <p class="muted small for-grownups">做错的题、点了「这道题还不会」的题都在这里，到时间会叫你回来重做：隔天做对 2 次，换一道同类的新题，也做对就过关；过关 3 周后再回头看一眼，还会就真的掌握了。</p>
-{% set td = today_iso %}
 {% for c in cards %}
-{% set kp = catalog.kp(c.kp_id) if c.kp_id else None %}
-<div class="card mcard">
-  <div class="mc-head">
-    <span class="grow muted small">{% if kp %}{{ kp.name }} · {% endif %}{{ c.created_at[5:10] }} 记下</span>
-    {% if c.extra.passed and c.due >= '9999' %}<span class="pill st-mastered">🏅 已掌握</span>
-    {% elif c.extra.passed %}<span class="pill st-mastered">🏅 {{ c.extra.passed[5:] }} 过关 · {{ c.due[5:] }} 回头看</span>
-    {% elif c.due <= td %}<span class="pill st-weak">今天要重做</span>
-    {% else %}<span class="pill st-learning">{% if c.extra.variant %}下次换一道同类题{% elif c.extra.streak %}已隔天做对 {{ c.extra.streak }} 次{% else %}要重做{% endif %} · {{ c.due[5:] }}</span>{% endif %}
-    {% if not readonly %}<button class="linkbtn" title="从本子里删掉" onclick="if(confirm('删除？'))api('/api/cards/{{ c.id }}/delete',{}).then(()=>this.closest('.card').remove())">删除</button>{% endif %}
-  </div>
-  {% if c.view %}{{ ui.question(c.view) }}
-  {% else %}<div class="qc"><div class="qc-stem">{{ c.front }}</div>
-    <dl class="qc-ans">{% if c.extra.my_answer %}<div><dt>我的答案</dt><dd>{{ c.extra.my_answer }}</dd></div>{% endif %}
-      <div><dt>答案</dt><dd class="qc-explain">{{ c.back }}</dd></div></dl></div>{% endif %}
-</div>
-{% else %}<div class="empty card"><div class="e">🎯</div><b>错题本是空的</b>做错的题、点了「这道题还不会」的题，都会自动放进来。</div>{% endfor %}
+{{ mcard(c) }}
+{% else %}{% if not paused %}<div class="empty card"><div class="e">🎯</div><b>错题本是空的</b>做错的题、点了「这道题还不会」的题，都会自动放进来。</div>{% endif %}{% endfor %}
+{{ paused_list(paused, mcard) }}
 {% else %}
 {% for c in cards %}
-<div class="card" style="padding:12px">
-  <div class="row"><b class="grow">{{ c.front }}</b>{% if c.extra.passed %}<span class="pill">🏅 {{ c.extra.passed[5:] }} 过关</span>{% else %}<span class="pill">第 {{ c.box }} 轮 · {{ c.due[5:] }} 复习</span>{% endif %}
-    {% if not readonly %}<button class="linkbtn" title="从本子里删掉" onclick="if(confirm('删除？'))api('/api/cards/{{ c.id }}/delete',{}).then(()=>this.closest('.card').remove())">删除</button>{% endif %}</div>
-  <div class="small" style="white-space:pre-wrap">{{ c.back }}</div>
-  {% if c.extra.context %}<div class="small muted">原句：{{ c.extra.context }}</div>{% endif %}
-  {% if c.kind == 'word' and not readonly %}<div class="row" style="margin-top:6px"><input type="text" placeholder="用 {{ c.front }} 造个句子" class="grow sent"><button class="btn soft sm mk" data-w="{{ c.front }}" data-m="{{ c.back.split('\n')[0] }}" data-l="{{ c.extra.lang or 'en' }}">让{{ ASSISTANT }}看看</button></div><div class="fbx"></div>{% endif %}
-</div>
-{% else %}<div class="empty card"><div class="e">🗒️</div><b>这里还是空的</b>阅读时点词收藏、做错的题，都会自动放进来。</div>{% endfor %}
+{{ wcard(c) }}
+{% else %}{% if not paused %}<div class="empty card"><div class="e">🗒️</div><b>这里还是空的</b>阅读时点词收藏、做错的题，都会自动放进来。</div>{% endif %}{% endfor %}
+{{ paused_list(paused, wcard) }}
 {% endif %}
 <script>
 $$('.mk').forEach(b => b.onclick = async () => {

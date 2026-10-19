@@ -26,16 +26,23 @@ def _name(kp_id: str) -> str:
 
 
 def detect(user_id: int) -> list[dict]:
+    """退掉的课里的问题不报（engine.Paused）：选回这门课再接着找。"""
+    paused = engine.Paused(user_id)
+    return [f for f in _detect(user_id, paused) if f.get("kp_id") not in paused.kps]
+
+
+def _detect(user_id: int, paused: engine.Paused) -> list[dict]:
     m = engine.get_mastery(user_id)
     since = _since(WINDOW_DAYS)
     out: list[dict] = []
     att = db.q("SELECT kp_id, correct, dont_know, ms, mode, created_at FROM attempts WHERE user_id=? AND created_at>=?",
                user_id, since)
+    att = [a for a in att if a["kp_id"] not in paused.kps]
 
     # 1. 共同的薄弱前置：好几个没掌握的知识点都要用到同一个前置，它多半是「根」
     shaky = evidence.needs_work(user_id, m)
     shaky |= {a["kp_id"] for a in att if not a["correct"] and a["mode"] != "exam"}
-    shaky = {k for k in shaky if catalog.kp(k)}
+    shaky = {k for k in shaky if catalog.kp(k) and k not in paused.kps}
     roots: dict[str, list[str]] = defaultdict(list)
     for k in shaky:
         for p, _ in catalog.ancestors(k, depth=3):
@@ -78,7 +85,8 @@ def detect(user_id: int) -> list[dict]:
                             "title": f"「{_name(k)}」会做，但还不熟", "detail": f"平均 {int(avg / 1000)} 秒一题，多练两次就快了"})
 
     # 5. 总记不住的词 / 卡片
-    hard = db.q("SELECT front, kind, kp_id, lapses FROM cards WHERE user_id=? AND lapses>=2 ORDER BY lapses DESC LIMIT 8", user_id)
+    hard = [c for c in db.q("SELECT front, kind, kp_id, extra, lapses FROM cards WHERE user_id=? AND lapses>=2 ORDER BY lapses DESC",
+                            user_id) if not paused.card(c)][:8]
     words = [c["front"] for c in hard if c["kind"] in ("word", "phrase", "term")]
     if words:
         out.append({"kind": "forget_words", "key": "words", "kp_id": None, "severity": 2, "action": "words", "for_kid": 1,
@@ -109,7 +117,7 @@ def detect(user_id: int) -> list[dict]:
                     "for_kid": 1, "title": f"查了好几次的词已经放进单词本", "detail": "、".join(added[:6])})
 
     # 7. 学会过，但按遗忘模型估算，现在记得的概率已经掉到目标保持率（默认 85%）以下：该复查了
-    for v in [v for v in evidence.due_checks(user_id, m, limit=6) if catalog.kp(v["kp_id"])][:2]:
+    for v in [v for v in evidence.due_checks(user_id, m, limit=len(m)) if catalog.kp(v["kp_id"]) and v["kp_id"] not in paused.kps][:2]:
         days = int(evidence.days_since(v["last_ev"]))
         out.append({"kind": "decay", "key": v["kp_id"], "kp_id": v["kp_id"], "severity": 1, "action": "check", "for_kid": 1,
                     "title": f"「{_name(v['kp_id'])}」好久没练了",
@@ -118,7 +126,8 @@ def detect(user_id: int) -> list[dict]:
     # 8. 考试会做却丢分（原卷错、重做对）
     careless = db.q("SELECT i.kp_id, COUNT(*) AS n FROM paper_items i JOIN papers p ON p.id=i.paper_id "
                     "WHERE p.user_id=? AND i.orig IN ('wrong','partial') AND i.correct=1 AND i.kp_id IS NOT NULL "
-                    "GROUP BY i.kp_id ORDER BY n DESC LIMIT 3", user_id)
+                    "GROUP BY i.kp_id ORDER BY n DESC", user_id)
+    careless = [r for r in careless if r["kp_id"] not in paused.kps][:3]
     if careless:
         names = "、".join(_name(r["kp_id"]) for r in careless)
         out.append({"kind": "careless", "key": ",".join(r["kp_id"] for r in careless), "kp_id": None, "severity": 2,
@@ -127,7 +136,7 @@ def detect(user_id: int) -> list[dict]:
 
     # 10. 追根当场找到的（几道小题一路往回测出来的，比 1 的统计推断更直接）
     from . import trace
-    for r in trace.recent(user_id, days=WINDOW_DAYS):
+    for r in [r for r in trace.recent(user_id, days=WINDOW_DAYS) if r["kp"] not in paused.kps]:
         path = " → ".join(f"{'✓' if c['correct'] else '✗'}{'中文版' if c['kind'] == 'lang' else c['name']}" for c in r["chain"])
         if r["result"] == "root" and m.get(r["root"]["kp"], {}).get("status") != "mastered":
             out.append({"kind": "trace", "key": f"{r['kp']}>{r['root']['kp']}", "kp_id": r["root"]["kp"], "severity": 3,
