@@ -106,7 +106,8 @@ def due_cards(user_id: int, limit=50, group: str | None = None):
 # ------------------------------------------------------------------ 题库
 
 def load_seed_items(seed_dir):
-    """把 seed/items_*.json 导入题库（幂等）。题目写了 "verified": true（人工写、人工审过的）就不再让 AI 校对。"""
+    """把 seed/items_*.json 导入题库（幂等）。题目写了 "verified": true（人工写、人工审过的）就不再让 AI 校对。
+    文件里改了的预置题（题型、内容、难度）跟着更新，作答统计保留。"""
     n = 0
     for path in sorted(seed_dir.glob("items_*.json")):
         for it in json.loads(path.read_text(encoding="utf-8")):
@@ -115,7 +116,8 @@ def load_seed_items(seed_dir):
                 continue
             data = {k: v for k, v in it.items() if k not in ("id", "kp", "kid", "difficulty", "type", "verified")}
             db.run("INSERT INTO items(id,kp_id,kp_ids,type,difficulty,data,source,verified,created_at) VALUES(?,?,?,?,?,?,?,?,?) "
-                   "ON CONFLICT(id) DO NOTHING",
+                   "ON CONFLICT(id) DO UPDATE SET type=excluded.type, difficulty=excluded.difficulty, data=excluded.data, "
+                   "verified=excluded.verified WHERE items.source='seed' AND (items.data<>excluded.data OR items.type<>excluded.type)",
                    it["id"], kps[0], db.jdump(kps), it["type"], it.get("difficulty", 2), db.jdump(data), "seed",
                    1 if it.get("verified") else 0, db.now())
             n += 1

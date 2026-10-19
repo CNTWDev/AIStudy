@@ -26,8 +26,8 @@ def test_ceo_pack_and_seed_files():
         assert it["kp"][0] in catalog.kps
         if it["type"] == "mcq":
             assert len(it["options"]) == 4 and itemtypes.TYPES["mcq"].check(it, it["answer"])
-        else:
-            assert it["type"] == "short" and it["model"] and it["points"]
+        else:  # 经营决策没有标准答案：开放题都是思辨题
+            assert it["type"] == "discuss" and len(it["perspectives"]) >= 3 and it["moves"] and it["twists"]
     assert len({it["answer"] for it in items if it["type"] == "mcq"}) == 4  # 正确选项不总在同一个位置
 
 
@@ -68,15 +68,28 @@ def _ceo_learner(c):
     return uid if isinstance(uid, int) else db.one("SELECT id FROM users WHERE email=?", email)["id"]
 
 
+SHORT = {"q": "公司的 AI 已经能写出初级程序员八成的代码，研发总监建议明年不再招应届生。你同意吗？",
+         "model": "主要矛盾是人才梯队，不只是成本。", "points": ["指出主要矛盾", "说出第二层后果", "区分可逆和不可逆", "给出做法"]}
+
+
 def _short_item():
-    items = json.loads((config.SEED_DIR / "items_ceo-core.json").read_text(encoding="utf-8"))
-    it = next(x for x in items if x["type"] == "short")
-    return it["id"], it["kp"][0]
+    """开了 AI 点评（open_review）的课里的一道简答题。CEO 专项课的开放题都是思辨题，这里借它的知识点。"""
+    kp = "CEO-C-R-01"
+    iid = "Q-T-SHORT-" + uuid.uuid4().hex[:6]
+    db.run("INSERT INTO items(id,kp_id,kp_ids,type,difficulty,data,source,verified,created_at) VALUES(?,?,?,?,?,?,?,?,?)",
+           iid, kp, db.jdump([kp]), "short", 3, db.jdump(SHORT), "seed", 1, db.now())
+    db.run("INSERT INTO item_kps(item_id,kp_id) VALUES(?,?)", iid, kp)
+    return iid, kp
 
 
-def test_open_answer_ai_review_and_followups():
+def _open_review(monkeypatch):
+    monkeypatch.setattr(catalog.packs["ceo-core"], "open_review", "ai")
+
+
+def test_open_answer_ai_review_and_followups(monkeypatch):
     """开放题：AI 点评 → 追问两次 → 最后一轮收尾，按结论记掌握；不再让学员自评。"""
     with TestClient(app) as c:
+        _open_review(monkeypatch)
         uid = _ceo_learner(c)
         iid, kp = _short_item()
         row = engine._item_row_to_dict(db.one("SELECT * FROM items WHERE id=?", iid))
@@ -102,6 +115,7 @@ def test_open_answer_ai_review_and_followups():
 def test_open_answer_good_on_first_round(monkeypatch):
     from app import coach, evidence
     with TestClient(app) as c:
+        _open_review(monkeypatch)
         uid = _ceo_learner(c)
         iid, kp = _short_item()
         monkeypatch.setattr(coach.llm, "review_open", lambda *a, **k: {
@@ -118,6 +132,7 @@ def test_open_answer_good_on_first_round(monkeypatch):
 def test_open_answer_falls_back_to_self_rating(monkeypatch):
     from app import coach
     with TestClient(app) as c:
+        _open_review(monkeypatch)
         _ceo_learner(c)
         iid, kp = _short_item()
 
@@ -139,3 +154,14 @@ def test_diagnosis_skips_open_questions(monkeypatch):
         sid = db.insert("INSERT INTO diag_sessions(user_id,pack_id,state,created_at) VALUES(?,?,?,?)", uid, "ceo-core",
                         db.jdump({"queue": [{"kp": kp, "depth": 0, "from": None}], "done": [], "current": None}), db.now())
         assert engine.diag_next(uid, sid, "ADULT")["item"] is None  # 改成自己说会不会
+
+
+def test_seed_items_follow_the_file():
+    """预置题改了（比如简答题改成思辨题），重启后题库跟着改，作答统计保留。"""
+    with TestClient(app):
+        iid = json.loads((config.SEED_DIR / "items_ceo-core.json").read_text(encoding="utf-8"))[0]["id"]
+        db.run("UPDATE items SET type='short', data='{}', n_attempts=7 WHERE id=?", iid)
+        engine.load_seed_items(config.SEED_DIR)
+        row = db.one("SELECT type, data, n_attempts FROM items WHERE id=?", iid)
+        assert row["type"] != "short" or row["data"] != "{}"
+        assert db.jload(row["data"], {}).get("q") and row["n_attempts"] == 7
