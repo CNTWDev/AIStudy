@@ -815,3 +815,31 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .dsc-views li:first-child{border-top:0}
 .dsc-views li.near b{color:var(--learn,var(--ink))}
 .dsc-near{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;background:var(--ok-2);margin-bottom:4px}
+
+/* ===== 知识点学习页：一步一张卡（learn.html，见 docs/DESIGN.md 5.32） ===== */
+.lbar{display:flex;gap:6px;margin:16px 0 10px;padding:0;list-style:none}
+.lbar li{flex:1;min-width:0}
+.lbar button{width:100%;background:none;border:0;padding:0;cursor:pointer;color:var(--faint);font:inherit;font-size:12px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbar button::before{content:"";display:block;height:8px;border-radius:99px;background:var(--line-2);box-shadow:inset 0 0 0 1px var(--line);margin-bottom:5px}
+.lbar .done button{color:var(--muted)}.lbar .done button::before{background:var(--ok);box-shadow:none}
+.lbar .cur button{color:var(--ink);font-weight:700}.lbar .cur button::before{background:var(--brand);box-shadow:none}
+.lbar button:disabled{cursor:default}
+.lcard{margin-top:6px}
+.lcard .lback{display:inline-block;font-size:13px;margin-bottom:8px}
+.ldo{background:var(--brand-2);color:var(--brand-ink);border-radius:12px;padding:8px 12px;font-size:14px;font-weight:700;margin:0 0 14px}
+.lcore{font-size:19px;font-weight:700;line-height:1.55;padding:12px 14px;background:var(--bg);border-radius:14px;margin:0 0 10px}
+.lstory{font-size:17px;line-height:1.75;margin-top:0}
+.lq{font-size:17px;font-weight:700;padding:12px 14px;border-radius:14px;background:var(--sky-2);margin:4px 0 12px}
+.lmethod{font-size:16px;line-height:1.75}
+.lworked{margin:12px 0;padding:12px 14px;border-radius:14px;background:var(--bg);border:1px dashed var(--line)}
+.lworked-a{margin-top:6px;color:var(--muted)}
+.lteach{margin-top:4px;padding-top:10px;border-top:1px dashed var(--line)}
+.lbridges{margin-top:12px}
+.lacts{margin-top:18px}
+.lpeek{margin-top:10px}.lpeek>summary{cursor:pointer;color:var(--brand-ink)}.lpeek>div{margin-top:6px;padding:10px 12px;background:var(--bg);border-radius:12px}
+.lguess{margin-top:0}.lguess-r{margin-top:8px;font-weight:600}
+.lstarts{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:8px}.lstarts .chip{cursor:pointer}
+#guess{margin-bottom:12px}#guess .lskip{margin-top:4px}
+.kp-around{margin-top:22px}
+[data-skin=kid] .lcard{border:var(--k-edge) solid var(--k-ink);box-shadow:0 6px 0 var(--k-ink)}
+#teachbtn.linkbtn{color:var(--brand-ink);padding-left:0}.kp-around>summary{cursor:pointer}
