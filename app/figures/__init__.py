@@ -12,11 +12,12 @@ import json
 import logging
 
 from .base import KINDS, FigError, Kind, register
-from . import plane, solid, graph, chart, clock, scale, circuit, lab, photo  # noqa: F401  各种图在 import 时登记
+from . import plane, solid, graph, chart, clock, scale, circuit, lab, photo, story  # noqa: F401  各种图在 import 时登记
 
 log = logging.getLogger(__name__)
 
-__all__ = ["KINDS", "FigError", "Kind", "register", "normalize", "present", "describe", "prompt_for", "drawable_for", "wanted_for"]
+__all__ = ["KINDS", "FigError", "Kind", "register", "normalize", "present", "describe", "prompt_for", "drawable_for", "wanted_for",
+           "kinds_prompt"]
 
 
 def normalize(raw) -> dict | None:
@@ -82,6 +83,10 @@ def wanted_for(kp: dict, subject: str) -> list[Kind]:
     return [k for k in drawable_for(subject) if any(c.lower() in text for c in k.cues)]
 
 
+def kinds_prompt(kinds) -> str:
+    return "\n".join("- " + k.prompt for k in kinds)
+
+
 def prompt_for(subject: str) -> str:
     """出题提示词里的配图说明：只列这个学科用得上的图。"""
     kinds = drawable_for(subject)
@@ -92,5 +97,5 @@ def prompt_for(subject: str) -> str:
         '在这道题里加 "fig"：{"kind": 种类, …画图说明…, "alt": "一句话描述这张图"}。程序会按说明画出准确的图，'
         "所以坐标、数值必须和题目一致；题干里写「如图」，不要再用文字重复描述图；图上标的数量如果就是答案，不要标出来。"
         "几何图里题目给出的长度、角度、平行、垂直请写进 checks，程序会核对图和题对得上，对不上的题会被丢掉。不需要图的题不要加。\n"
-        "各种图的写法：\n" + "\n".join("- " + k.prompt for k in kinds)
+        "各种图的写法：\n" + kinds_prompt(kinds)
     )

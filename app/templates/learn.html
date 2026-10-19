@@ -138,7 +138,7 @@ let CTX = null;
 if ($('#ctx')) api('/api/context/' + KP).then(c => {
   if (!c || !c.story) { if ($('.lbridges', Steps.sec('why'))) { $('#ctx').innerHTML = ''; } else Steps.drop('why'); return; }
   CTX = c;
-  $('#ctx').innerHTML = `<p class="lstory">📖 ${esc(c.story)}</p>` + (c.question ? `<div class="lq">🤔 ${esc(c.question)}</div>` : '') +
+  $('#ctx').innerHTML = `<p class="lstory">📖 ${esc(c.story)}</p>` + qFig(c.fig) + (c.question ? `<div class="lq">🤔 ${esc(c.question)}</div>` : '') +
     ((c.uses || []).length ? `<p class="small">🔧 ${c.uses.map(esc).join('<br>🔧 ')}</p>` : '') +
     (c.fun ? `<p class="small muted">💡 ${esc(c.fun)}</p>` : '');
 }).catch(() => Steps.drop('why'));
@@ -156,7 +156,7 @@ $('#teachbtn').onclick = async () => {
     const t = await getTeach();
     $('#teach').innerHTML = '<div class="lteach">' +
       (t.bridge && t.bridge.length ? '<div class="hint" style="margin-top:0">🔗 先连一连：' + t.bridge.map(b => `你在${esc(b.subject)}学过「${esc(b.name)}」${b.note ? '，' + esc(b.note) : ''}`).join('；') + '</div>' : '') +
-      (t.steps || []).map((s, i) => `<p><b>${i + 1}. ${esc(s.title)}</b><br>${esc(s.text).replace(/\n/g, '<br>')}</p>`).join('') +
+      (t.steps || []).map((s, i) => `<p><b>${i + 1}. ${esc(s.title)}</b><br>${esc(s.text).replace(/\n/g, '<br>')}</p>` + qFig(s.fig)).join('') +
       (THINK && t.example ? `<p><b>再想一步：</b>${esc(t.example.q)}<br><span class="muted">→ ${esc(t.example.a)}</span></p>` : '') +
       (t.terms && t.terms.length ? '<p class="small">' + t.terms.map(x => `<span class="pill">${esc(x.en)} = ${esc(x.zh)}</span>`).join(' ') + '</p>' : '') +
       (THINK && t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '') +
@@ -168,7 +168,7 @@ function showWorked() {
   const w = $('#worked'); if (!w || w.dataset.done) return; w.dataset.done = '1';
   w.innerHTML = '<span class="loading small">正在准备例题</span>';
   getTeach().then(t => {
-    w.innerHTML = (t.example ? `<div class="lworked"><b>✍️ 看我做一遍</b><div>${esc(t.example.q)}</div><div class="lworked-a">${esc(t.example.a).replace(/\n/g, '<br>')}</div></div>` : '') +
+    w.innerHTML = (t.example ? `<div class="lworked"><b>✍️ 看我做一遍</b><div>${esc(t.example.q)}</div>${qFig(t.example.fig)}<div class="lworked-a">${esc(t.example.a).replace(/\n/g, '<br>')}</div></div>` : '') +
       (t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '');
   }).catch(() => { w.innerHTML = ''; });
 }
@@ -269,7 +269,7 @@ $('#finish').onclick = async () => {
 if (!THINK) setupGuess();
 Steps.onEnter = id => { if (id === 'method') showWorked(); if (id === 'practice' && !started) loadItems(); };
 {% else %}
-Steps.onEnter = id => { if (id === 'method' && $('#worked')) getTeach().then(t => { $('#worked').innerHTML = t.example ? `<div class="lworked"><b>✍️ 例题</b><div>${esc(t.example.q)}</div><div class="lworked-a">${esc(t.example.a)}</div></div>` : ''; }).catch(() => {}); };
+Steps.onEnter = id => { if (id === 'method' && $('#worked')) getTeach().then(t => { $('#worked').innerHTML = t.example ? `<div class="lworked"><b>✍️ 例题</b><div>${esc(t.example.q)}</div>${qFig(t.example.fig)}<div class="lworked-a">${esc(t.example.a)}</div></div>` : ''; }).catch(() => {}); };
 {% endif %}
 Steps.init();
 </script>

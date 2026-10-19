@@ -39,7 +39,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 3, "context": 3, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -194,6 +194,16 @@ def make_variant(item: dict, kp: dict, pack, grade: str) -> dict | None:
     return None
 
 
+def _teach_figs(pack) -> str:
+    """讲解里的配图：用这个学科出题能画的那几种图（app/figures），程序按说明画，画不出的图丢掉、文字照用。"""
+    from .. import figures
+    kinds = figures.drawable_for(pack.subject) if pack is not None else []
+    if not kinds:
+        return ""
+    return ("配图：看图比看字好懂的步骤（比如刻度、图形、坐标图、电路、实验装置）和例题，加 \"fig\"：{\"kind\": 种类, …画图说明…, \"alt\": \"一句话描述\"}，"
+            "程序会按说明画出准确的图，数值要和文字一致；整份讲解配 1-2 张就够，不需要的不加。各种图的写法：\n" + figures.kinds_prompt(kinds) + "\n")
+
+
 def teach(kp: dict, pack, grade: str, user_id=None, known: list[str] | None = None) -> dict:
     """known：孩子在别的学科 / 教材里已经学过、和这个知识点相关的内容（跨学科融合：讲的时候拿来衔接）。"""
     bridge = ("学生在其它学科已经学过这些相关内容：" + "；".join(known[:4]) +
@@ -202,27 +212,38 @@ def teach(kp: dict, pack, grade: str, user_id=None, known: list[str] | None = No
         f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n"
         f"已有学习方法：{kp.get('method','')}\n{bridge}\n"
         f"请把这个知识点拆成 3-4 个很小的步骤教给学生，每步一两句话，配一个{'工作中的实际' if _adult(grade) else '生活化的小'}例子；"
+        "example 是一道带完整步骤的例题（a 里一步一步写出怎么做，每步一行）；"
         "最后给一个「一句话记住」。如有英文术语，给出英文和中文。\n"
-        '输出：{"steps":[{"title":"..","text":".."}],"example":{"q":"..","a":".."},"remember":"..","terms":[{"en":"..","zh":".."}]}'
+        f"{_teach_figs(pack)}"
+        '输出：{"steps":[{"title":"..","text":"..","fig":可选}],"example":{"q":"..","a":"..","fig":可选},"remember":"..","terms":[{"en":"..","zh":".."}]}'
     )
     return ask_json("teach", _tutor(grade), user, user_id=user_id, effort="medium", cache=False)  # 存在题库 contents 里
 
 
 def kp_context(kp: dict, pack, grade: str, user_id=None) -> dict:
-    """知识背景和实用反馈：这个知识点从哪来、生活里用在哪、一个有意思的小事实。按知识点+年级缓存。"""
+    """「为什么学」的导入：按知识点挑一种角度（来历 / 卡住的难题 / 身边的怪现象 / 真实场合）讲成小故事，接到生活里，配一张故事条。
+    每个知识点生成一次存进 contents，所有人共用（bank.context）。"""
+    from .. import figures
     user = (
         f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n\n"
-        "这段话放在学习的最前面做导入：先让学生知道为什么要学，再去学知识点本身。\n"
-        "- story：当时人们遇到了什么麻烦、什么难题，才有了这个知识；或者生活里一个真实的、有意义的问题正需要它。"
-        "2-4 句，像讲故事，讲出难处和冲突，让人好奇，先不讲知识点的答案；\n"
+        "这段话放在学习的最前面做导入：先让学生知道这个知识为什么会出现、为什么值得学，再去学知识点本身。\n"
+        "先判断这个知识点适合哪种导入角度，选最能让人「想学」的一种（angle 填它的名字）：\n"
+        "  1. 来历：当年谁、在什么时代背景下、被什么麻烦逼着，想出了这个办法 / 发现了这个规律（单位、定律、发现、发明）；\n"
+        "  2. 卡住的难题：没有它，一件大家很想做的事就是做不成，直到有了它才解决（抽象的工具类，比如方程、函数、矩阵、编程概念）；\n"
+        "  3. 身边的怪现象：生活里天天见、却说不清为什么的现象，学完就能解释（自然现象、生物、化学变化）；\n"
+        "  4. 真实场合：在真实的交流或工作里，不会它会闹出什么误会、办不成什么事（语言、写作、管理类）。\n"
+        "- story：按选的角度讲成一个小故事，3-5 句：有具体的人或场景、有当时的处境（时代背景写准）、有卡住的难处、有转折；"
+        "最后接到学生今天的生活里，让人有体感。先不讲知识点的答案，留下悬念。"
+        "不要编考试、做题、实验课作业这类场景；口吻贴合学生的年龄（孩子要具体有画面，成人可以讲行业和代价）；\n"
         "- question：从故事里引出的一个问题，学完这个知识点就能回答，一句话，不给答案；\n"
-        "- uses：生活里或以后学习中用在哪，2-3 条，每条一句话、具体到场景；\n"
+        "- uses：生活里用在哪，2-3 条，每条一句话、具体到场景；\n"
         "- fun：一个让人「哇」的小事实，一句话；\n"
-        "- next：学会它以后可以去学什么、能解决什么问题，一句话。\n"
-        "内容必须准确，不确定的历史细节宁可不写。不要照搬教材原文。\n"
-        '输出：{"story":"..","question":"..","uses":[".."],"fun":"..","next":".."}'
+        "- next：学会它以后可以去学什么、能解决什么问题，一句话；\n"
+        "- fig：把 story 画成故事条，写法：" + figures.KINDS["story"].prompt + "\n"
+        "内容必须准确，年份、人物、数字不确定的宁可不写。不要照搬教材原文。\n"
+        '输出：{"angle":"来历","story":"..","question":"..","uses":[".."],"fun":"..","next":"..","fig":{"kind":"story","beats":[..]}}'
     )
-    return ask_json("context", _tutor(grade), user, user_id=user_id, effort="low", cache=False)  # 存在题库 contents 里
+    return ask_json("context", _tutor(grade), user, user_id=user_id, effort="medium", cache=False)  # 存在题库 contents 里
 
 
 def lookup(query: str, context: str, lang: str, grade: str, user_id=None) -> dict:

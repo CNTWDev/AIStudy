@@ -267,7 +267,21 @@ def api_teach(request: Request, kp_id: str):
     bridge = [{"subject": b["subject"], "name": b["kp"]["name"], "label": b["label"], "note": b["note"]}
               for b in engine.bridges(k["id"], kp_id) if b["status"] in ("mastered", "learning")][:3]
     prefetch.wait(k["id"], kp_id, "teach")
-    return {**bank.teach(kp, k["grade"], user_id=k["id"]), "bridge": bridge}
+    return {**_drawn(bank.teach(kp, k["grade"], user_id=k["id"])), "bridge": bridge}
+
+
+def _drawn(body: dict) -> dict:
+    """讲解、导入里存的是画图说明，给页面时画成 SVG（figures.present，同一份说明画过就缓存）。"""
+    from .. import figures
+    body = {**body, "steps": [dict(s) for s in body.get("steps") or []]}
+    if isinstance(body.get("example"), dict):
+        body["example"] = dict(body["example"])
+    for part in [body, body.get("example"), *body["steps"]]:
+        if isinstance(part, dict) and part.get("fig"):
+            part["fig"] = figures.present(part)
+    if not body["steps"]:
+        body.pop("steps")
+    return body
 
 
 @router.get("/api/practice/{kp_id}")
@@ -351,7 +365,7 @@ def api_context(request: Request, kp_id: str):
     if not llm.enabled():
         return {}
     try:
-        return bank.context(kp, k["grade"], user_id=k["id"])
+        return _drawn(bank.context(kp, k["grade"], user_id=k["id"]))
     except llm.LLMError:
         return {}
 
