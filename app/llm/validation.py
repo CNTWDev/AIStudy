@@ -9,6 +9,7 @@ REQUIRED = {
     'context': {'story': str}, 'verify': {'ok': bool}, 'ask': {'reply': str},
     'book_guide': {'gist': str}, 'news_write': {'body': str, 'questions': list},
     'review': {'verdict': str, 'points': list},
+    'discuss': {'steelman': str, 'challenge': str}, 'discuss_close': {'shift': str},
 }
 
 
@@ -42,6 +43,9 @@ def validate(task, data):
                     isinstance(answer, list) and bool(answer) and all(isinstance(x, str) and x.strip() for x in answer))
             elif kind == 'short':
                 valid = isinstance(item.get('model'), str) and bool(item['model'].strip())
+            elif kind == 'discuss':
+                views = item.get('perspectives')
+                valid = isinstance(views, list) and len(views) >= 2 and all(isinstance(v, dict) and v.get('view') for v in views)
             if not valid:
                 raise LLMError('AI 题目或答案格式不正确，已暂停使用，请重试')
     return data

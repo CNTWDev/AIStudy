@@ -39,7 +39,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 3, "context": 2, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 3, "context": 2, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -66,13 +66,16 @@ def _item_schema(pack=None, kp=None) -> str:
     from .. import audio, figures, itemtypes
     figs = figures.prompt_for(pack.subject) if pack is not None else ""
     aud = audio.prompt_for(pack, kp) if kp is not None else ""
+    discuss = bool(pack is not None and getattr(pack, "thinking_moves", None))  # 思辨题只给列了思考方式的课
+    types = [t.id for t in itemtypes.TYPES.values() if discuss or t.judge != "open"]
+    moves = ("\n思辨题的 moves 只能用这些 id：" + "；".join(f"{m['id']} {m['name']}" for m in pack.thinking_moves)) if discuss else ""
     return (
-        '{"items":[{"type":"' + "|".join(itemtypes.TYPES) + '","difficulty":1-3,"q":"题干","zh":"中文翻译(可选)",'
+        '{"items":[{"type":"' + "|".join(types) + '","difficulty":1-3,"q":"题干","zh":"中文翻译(可选)",'
         '"code":"题目里的一段代码(可选，编程类题目才用)",' + ('"fig":{"kind":"..."}(可选，见下),' if figs else "")
         + ('"audio":{"lines":[...]}(见下),' if aud else "")
         + '"options":["仅选择题"],"answer":"见下","unit":"单位(可选)",'
         '"tol":"允许误差(可选)","model":"参考答案","points":["得分要点"],'
-        '"hint":"一句提示，不直接给答案","explain":"中文讲解，2-3句"}]}\n各题型：' + itemtypes.schema_text() + figs + aud
+        '"hint":"一句提示，不直接给答案","explain":"中文讲解，2-3句"}]}\n各题型：' + itemtypes.schema_text(discuss) + moves + figs + aud
     )
 
 
@@ -117,6 +120,17 @@ def _traps_note(kp: dict) -> str:
             + "；".join(f"{p['id']}={p['name']}" for p in pre))
 
 
+def _mix_note(pack, purpose: str) -> str:
+    """题型搭配：能自动判分的优先；列了思考方式的课（没有标准答案的问题多）可以出一道思辨题，不出简答题。"""
+    if purpose == "quick":
+        return ""
+    if purpose == "diagnose" and getattr(pack, "thinking_moves", None):
+        return "只出 mcq/num/fill（能自动判分）。"
+    if getattr(pack, "thinking_moves", None):
+        return "优先用 mcq（能自动判分），discuss 最多 1 道，不出 short。"
+    return "优先用 mcq/num/fill（能自动判分），short 最多 1 道。"
+
+
 def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=None, uses=None) -> list[dict]:
     uses = uses or []
     purpose_txt = {
@@ -136,8 +150,8 @@ def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=
     user = (
         f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n"
         f"诊断思路参考：{kp.get('probe','')}\n关键词：{', '.join(kp.get('terms', []))}\n\n"
-        f"{purpose_txt}\n{'' if purpose == 'quick' else '优先用 mcq/num/fill（能自动判分），short 最多 1 道。'}不要照搬教材原文。"
-        f"答案必须正确且唯一，请自己检查一遍。\n输出格式：{_item_schema(pack, kp)}{_traps_note(kp)}{_figs_note(kp, pack)}"
+        f"{purpose_txt}\n{_mix_note(pack, purpose)}不要照搬教材原文。"
+        f"有答案的题，答案必须正确且唯一，请自己检查一遍。\n输出格式：{_item_schema(pack, kp)}{_traps_note(kp)}{_figs_note(kp, pack)}"
     )
     data = ask_json("items", _tutor(grade) + "你也是严谨的出题人。", user, user_id=user_id, effort="medium", cache=False)
     return _normalized(data.get("items", []) if isinstance(data, dict) else data)
@@ -275,6 +289,60 @@ def review_open(item: dict, kp: dict, pack, grade: str, rounds: list[dict], last
         + '输出：{"verdict":"good|partial|miss","points":[{"hit":true,"note":".."}],"feedback":"..","followup":".."}'
     )
     return ask_json("review", _tutor(grade), user, user_id=user_id, effort="medium", max_tokens=1500, cache=False)
+
+
+def _discuss_context(item: dict, kp: dict, pack, grade: str, twist: str) -> str:
+    views = "\n".join(f"{i + 1}. {p.get('view', '')}；成立条件：{p.get('holds_when', '')}；风险：{p.get('risk', '')}"
+                      for i, p in enumerate(item.get("perspectives") or []))
+    moves = "\n".join(f"- {m['id']} {m['name']}：{m.get('desc', '')[:80]}" for m in pack.thinking_moves)
+    return (f"{_audience(grade, pack)}\n知识点：{kp['name']}。{kp.get('desc', '')}\n"
+            f"{('课程说明：' + pack.prompt_note) if pack.prompt_note else ''}\n\n"
+            f"思辨题：{item.get('q', '')}\n" + (f"这次换了一个条件再想：{twist}\n" if twist else "")
+            + f"这道题没有标准答案。几种成熟的看法（只给你参考，不要整段复述，也不要说哪种是标准答案）：\n{views}\n\n"
+            f"这门课看重的思考方式：\n{moves}\n\n")
+
+
+def _talk(turns: list[dict]) -> str:
+    out = []
+    for t in turns:
+        if t.get("who") == "me":
+            out.append(f"学员：{t.get('text', '')}")
+        else:
+            out.append("你：" + " ".join(x for x in (t.get("steelman"), t.get("answer"), t.get("challenge")) if x))
+    return "\n".join(out)
+
+
+_NO_VERDICT = "不判对错，不打分，不说「正确」「错误」「差一点」「标准答案」。像一位有经验、尊重对方的同行在讨论，不像阅卷老师。\n"
+
+
+def discuss_turn(item: dict, kp: dict, pack, grade: str, twist: str, turns: list[dict], user_id=None) -> dict:
+    """思辨题的一轮（app/discuss.py）：回应学员最新的一段话。"""
+    user = (_discuss_context(item, kp, pack, grade, twist) + "对话：\n" + _talk(turns) + "\n\n"
+            "请回应学员最新的一段话：\n"
+            "- steelman：一两句，把学员的观点说得更清楚、更有力，尽量引用学员自己的话；如果有比常见说法更进一步的地方，具体指出来。\n"
+            "- answer：学员如果提了问题，直接、坦率地给出你的看法，并说清楚它取决于什么条件；没提问题就留空。\n"
+            "- challenge：一个最值得想的挑战，以问题结尾：一个反例，一个换了条件的情况，或者学员还没站过的位置"
+            "（几种看法里学员还没碰到的那一种）。挑战是为了让学员想得更深，不是暗示有一个标准答案。\n"
+            "- moves：学员最新这段话里真正用到的思考方式 [{\"id\":\"..\",\"note\":\"一句话依据，引用学员的话\"}]，没有就给空列表，不要凑。\n"
+            + _NO_VERDICT +
+            '输出：{"steelman":"..","answer":"..","challenge":"..","moves":[{"id":"..","note":".."}]}')
+    return ask_json("discuss", _tutor(grade), user, user_id=user_id, effort="medium", max_tokens=1500, cache=False)
+
+
+def discuss_close(item: dict, kp: dict, pack, grade: str, twist: str, turns: list[dict], conclusion: str, action: str,
+                  user_id=None) -> dict:
+    """思辨题收尾：学员写了自己的结论和动作以后，帮他看清想法的变化和这个结论的边界。"""
+    user = (_discuss_context(item, kp, pack, grade, twist) + "对话：\n" + _talk(turns) + "\n\n"
+            f"学员最后写的结论：{conclusion}\n学员打算在公司里做的一件事：{action or '（没写）'}\n\n"
+            "请：\n"
+            "- shift：两三句，对照学员的第一段话和最后的结论，说他的想法变了什么、守住了什么（没变也可以是好事）。\n"
+            "- near：学员的结论和上面哪几种看法接近（编号列表，从 1 开始；都不接近就给空列表）。\n"
+            "- own：学员的结论里有没有几种看法都没覆盖、但站得住的东西，有就一句话说出来，没有留空。\n"
+            "- watch：一句话，在什么情况下学员的这个结论会出问题，值得留意。\n"
+            "- moves：整段对话里学员真正用到的思考方式，格式同上。\n"
+            + _NO_VERDICT +
+            '输出：{"shift":"..","near":[1],"own":"..","watch":"..","moves":[{"id":"..","note":".."}]}')
+    return ask_json("discuss_close", _tutor(grade), user, user_id=user_id, effort="medium", max_tokens=1500, cache=False)
 
 
 def make_passage(lang: str, grade: str, topic: str, length: str, review_words: list[str], user_id=None) -> dict:

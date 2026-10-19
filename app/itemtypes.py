@@ -1,7 +1,11 @@
 """题型注册表：一种题型的所有规则都在这里——怎么判对错、怎么显示答案、证据算哪种题型、
 蒙对的概率、AI 出的题怎么整理、前端用哪种输入控件。
 
-加一种题型：写一个 ItemType 子类，登记到 TYPES；前端只认 widget（choice / text / self），
+每种题型说明自己怎么判（judge）：auto 程序判对错（选择、填空、计算），self 对照参考答案判（简答，
+开了 AI 点评的课由 AI 对照要点判，见 app/coach.py），open 没有标准答案、不判对错（思辨题，见 app/discuss.py）。
+各处按 judge 决定能不能拿这道题判对错（摸底、找根源、游戏都只用 auto），不按学科写特例。
+
+加一种题型：写一个 ItemType 子类，登记到 TYPES；前端只认 widget（choice / text / self / discuss），
 新的输入方式才需要在 app/static/app.js 的 renderItem 里加一个分支。
 题目都可以带 code 字段（一段代码，前端按代码块显示），编程课的读代码、填代码题用现有题型就行。
 题目也都可以带 fig 字段（一张图：程序按「画图说明」画的图，或原卷上裁下来的图），见 app/figures/；
@@ -22,7 +26,8 @@ class ItemType:
     label = ""
     fmt = "other"       # 交叉验证时算哪种题型：choice 选择 / recall 回忆 / calc 计算 / explain 表述
     widget = "text"     # 前端输入控件
-    self_rated = False  # 孩子对照参考答案自己判
+    judge = "auto"      # auto 程序判对错 / self 对照参考答案判 / open 没有标准答案，不判对错
+    self_rated = False  # = judge == "self"（旧名，各处还在用）
     schema = ""         # 给 AI 出题时的格式说明
 
     def check(self, item: dict, answer) -> bool | None:
@@ -107,7 +112,7 @@ class Number(ItemType):
 
 
 class Short(ItemType):
-    id, label, fmt, widget, self_rated = "short", "简答题", "explain", "self", True
+    id, label, fmt, widget, judge, self_rated = "short", "简答题", "explain", "self", "self", True
     schema = "short：不给 answer，给 model（参考答案）和 points（得分要点列表）"
 
     def check(self, item, answer):
@@ -131,9 +136,38 @@ class Short(ItemType):
         return it
 
 
-TYPES: dict[str, ItemType] = {t.id: t for t in (Choice(), Fill(), Number(), Short())}
+class Discuss(ItemType):
+    """思辨题：没有标准答案的问题（经营决策、历史评价、伦理、议论文立意……）。题里不写答案，写几种都有道理的看法和
+    各自成立的条件（perspectives），这道题用得上的思考方式（moves，取自课程包的 thinking_moves），
+    和过几天换一个条件再问的问题（twists）。不判对错：AI 回应学员的论证、挑战它、回答反问，
+    最后学员自己写结论（app/discuss.py）。只有课程包列了 thinking_moves 的课才出这种题。"""
+    id, label, fmt, widget, judge = "discuss", "思辨题", "explain", "discuss", "open"
+    schema = ('discuss：没有标准答案的问题，不给 answer，给 perspectives（3-4 种都有道理的看法，每种 '
+              '{"view":"看法和做法","holds_when":"在什么条件下成立","risk":"用错条件或用过头会怎样"}）、'
+              'moves（用得上的思考方式 id）、twists（2-3 个换一个关键条件再问的问题）')
+
+    def check(self, item, answer):
+        return None
+
+    def display(self, item):
+        return "\n".join(f"{p.get('view', '')}（{p.get('holds_when', '')}）" for p in item.get("perspectives") or [])
+
+    def guess(self, item):
+        return 0.0
+
+    def normalize(self, it, raw):
+        views = [p for p in raw.get("perspectives") or [] if isinstance(p, dict) and p.get("view")]
+        if len(views) < 2:
+            return None
+        it.pop("answer", None)
+        return {**it, "perspectives": views, "moves": [str(m) for m in raw.get("moves") or []][:4],
+                "twists": [str(t) for t in raw.get("twists") or [] if str(t).strip()][:3]}
+
+
+TYPES: dict[str, ItemType] = {t.id: t for t in (Choice(), Fill(), Number(), Short(), Discuss())}
 FALLBACK = TYPES["short"]
-FIELDS = ("q", "zh", "code", "fig", "audio", "options", "answer", "unit", "tol", "model", "points", "explain", "hint", "traps")
+FIELDS = ("q", "zh", "code", "fig", "audio", "options", "answer", "unit", "tol", "model", "points", "explain", "hint", "traps",
+          "perspectives", "moves", "twists")
 
 
 def of(item: dict | str) -> ItemType:
@@ -144,9 +178,14 @@ def fmt(type_id: str | None) -> str:
     return TYPES[type_id].fmt if type_id in TYPES else "other"
 
 
+def auto(item: dict) -> bool:
+    """程序能判对错的题：摸底、找根源、游戏这些要立刻知道对错的地方只用这种。"""
+    return of(item).judge == "auto"
+
+
 def check(item: dict, answer) -> bool | None:
     t = of(item)
-    if not t.self_rated and (answer is None or str(answer).strip() == ""):
+    if t.judge == "auto" and (answer is None or str(answer).strip() == ""):
         return False
     return t.check(item, answer)
 
@@ -176,12 +215,13 @@ def public(item: dict) -> dict:
     """给前端的：加上 widget，去掉答案。"""
     t = of(item)
     # traps（错项指向哪个前置）会暴露哪些选项是错的，不给前端
-    out = {k: v for k, v in item.items() if k not in ("answer", "model", "points", "explain", "traps", "fig", "audio")}
+    out = {k: v for k, v in item.items() if k not in ("answer", "model", "points", "explain", "traps", "fig", "audio",
+                                                       "perspectives", "twists")}
     if item.get("fig"):
         out["fig"] = figures.present(item)  # 画好的图（画图说明里可能有答案，比如 checks，不给前端）
     if item.get("audio"):
         out["audio"] = audio.present(item)
-    return {**out, "widget": t.widget, "self_rated": t.self_rated}
+    return {**out, "widget": t.widget, "self_rated": t.self_rated, "judge": t.judge}
 
 
 def reveal(item: dict) -> dict:
@@ -221,5 +261,6 @@ def view(item: dict, mine=None, with_answer=True) -> dict:
     return v
 
 
-def schema_text() -> str:
-    return "；".join(t.schema for t in TYPES.values())
+def schema_text(discuss=False) -> str:
+    """给 AI 出题的各题型格式。思辨题只在课程包列了 thinking_moves 的课里出。"""
+    return "；".join(t.schema for t in TYPES.values() if discuss or t.judge != "open")

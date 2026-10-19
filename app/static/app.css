@@ -801,3 +801,16 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .c-pack li{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed var(--line-2)}
 .c-pack li i{font-style:normal;color:var(--faint);font-size:12px;white-space:nowrap}
 .c-ed{margin:6px 0 0;font-size:12px;line-height:1.5}
+/* 思辨题（app/discuss.py）：没有对错，AI 陪着想 */
+.dsc-tip{margin:6px 0}
+.dsc-twist{margin:8px 0}
+.dsc-moves{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+.dsc-move{font-size:12px;padding:2px 10px;cursor:default}.dsc-move:hover{border-color:var(--line);background:var(--card)}.dsc-move:active{transform:none}
+.dsc-ctl{margin-top:10px}
+.dsc-ctl .ans{margin-top:8px}
+.dsc-mine{margin-top:6px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--card) 70%,transparent)}
+.dsc-views{list-style:none;padding:0;margin:8px 0 0}
+.dsc-views li{padding:10px 0;border-top:1px dashed var(--line)}
+.dsc-views li:first-child{border-top:0}
+.dsc-views li.near b{color:var(--learn,var(--ink))}
+.dsc-near{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;background:var(--ok-2);margin-bottom:4px}

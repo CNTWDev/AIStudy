@@ -67,7 +67,7 @@ def quiz(user_id: int, c) -> dict:
 
 def _kp_item(user_id: int, kp_id: str) -> dict | None:
     """知识点卡：题库里这个知识点的题，没做过的优先，做错过的其次（不现场让 AI 出题，复习要快）。"""
-    rows = [r for r in bank.candidates(user_id, kp_id) if r["type"] in itemtypes.TYPES]
+    rows = [r for r in bank.candidates(user_id, kp_id) if r["type"] in itemtypes.TYPES and itemtypes.of(r["type"]).judge != "open"]
     if not rows:
         return None
     rows.sort(key=lambda r: (r["done"] > 0 and r["ok"] > 0, r["done"] > 0, random.random()))
@@ -260,6 +260,8 @@ def _variant(user_id: int, c, ex: dict) -> dict | None:
     orig = _item(ex.get("item_id")) or {}
     near = db.one("SELECT near_key FROM items WHERE id=?", orig.get("id")) if orig else None
     for candidate in bank.candidates(user_id, c["kp_id"]):
+        if itemtypes.of(candidate["type"]).judge == "open":  # 复习要判对错，思辨题另有「换条件再想」（app/discuss.py）
+            continue
         it = bank.row_to_item(candidate)
         r = db.one("SELECT near_key FROM items WHERE id=?", it["id"])
         if it["id"] != orig.get("id") and not (near and near["near_key"] and r and r["near_key"] == near["near_key"]):

@@ -143,6 +143,9 @@ function renderItem(box, item, opts) {
   let html = `<div class="q qc">` + qStem(item);
   if (W === 'choice') {
     html += `<div class="qc-opts">${item.options.map((o, i) => qOpt(o, i)).join('')}</div>`;
+  } else if (W === 'discuss') {  // 思辨题：没有标准答案，AI 陪着想（app/discuss.py）
+    html += (item.twist ? `<div class="hint dsc-twist">🔄 这次换个条件：${esc(item.twist)}</div>` : '') +
+      `<div class="muted small dsc-tip">这道题没有标准答案。写下你的判断和理由，也可以反问。</div><textarea class="ans" placeholder="我会怎么判断、怎么做，为什么……"></textarea>`;
   } else if (W === 'self') {
     html += `<textarea class="ans" placeholder="${item.coach ? '写下你的判断和理由，AI 会按要点点评，再追问你一两句' : '先自己写一写（写关键词也行）'}"></textarea>`;
   } else {
@@ -150,9 +153,9 @@ function renderItem(box, item, opts) {
       (item.unit ? `<span class="muted">${esc(item.unit)}</span>` : '') + `</div>`;
   }
   html += `<div class="qacts">` +
-    `<button class="btn submit">${W === 'self' ? (item.coach ? '提交，看点评' : '看参考答案') : '提交'}</button>` +
+    `<button class="btn submit">${W === 'discuss' ? '说说我的想法' : W === 'self' ? (item.coach ? '提交，看点评' : '看参考答案') : '提交'}</button>` +
     (item.hint ? `<button class="btn soft hintbtn">💡 提示</button>` : '') +
-    (opts.dontKnow ? `<button class="linkbtn dkbtn">🤔 这道题还不会</button>` : '') + `</div>` +
+    (opts.dontKnow && W !== 'discuss' ? `<button class="linkbtn dkbtn">🤔 这道题还不会</button>` : '') + `</div>` +
     `<div class="hintbox"></div><div class="fbbox"></div></div>`;
   box.innerHTML = html;
   box.classList.add('askable'); box.dataset.askItem = item.item_id || item.id || ''; delete box.dataset.answered;
@@ -188,7 +191,8 @@ function renderItem(box, item, opts) {
     if (W === 'choice' && chosen === null) { alert('先选一个答案'); return; }
     btn.disabled = true;
     try {
-      const res = await opts.submit(answer, undefined, took());
+      const res = await opts.submit(answer, undefined, took(), W === 'discuss' && item.rethink ? {rethink: item.rethink} : undefined);
+      if (res.discuss) { btn.remove(); ans.readOnly = true; discussRound(box, res, opts, took); return; }
       if (res.coach) { btn.remove(); if (dk) dk.remove(); ans.readOnly = true; coachRound(box, res, opts, took); return; }
       if (res.reveal) {
         $('.fbbox', box).innerHTML = `<div class="fb dk">` + qAns({answer: res.answer, points: res.points}).replace('<dt>答案</dt>', '<dt>参考答案</dt>') +
@@ -241,6 +245,65 @@ function coachRound(box, res, opts, took) {
       fu.closest('.qacts').remove(); ta.readOnly = true;
       coachRound(box, r, opts, took);
     } catch (e) { fu.disabled = false; fb.insertAdjacentHTML('beforeend', `<div class="err">${esc(e.message)}</div>`); }
+  };
+}
+/* 思辨题的一轮（app/discuss.py）：AI 先把你的观点说得更有力、回答你的反问，再提一个挑战；
+   你可以接着说，也可以随时写下结论。收尾时对照几种看法和各自成立的条件，记下这次用到的思考方式。不判对错 */
+function discussRound(box, res, opts, took) {
+  const fb = $('.fbbox', box);
+  const moveChip = m => `<span class="chip dsc-move" title="${esc(m.note || '')}">${esc(m.name)}${m.how ? (m.how === 'self' ? ' · 自己想到' : ' · 追问后想到') : ''}</span>`;
+  if (res.done) {
+    const views = (res.perspectives || []).map(p => `<li class="${p.near ? 'near' : ''}">${p.near ? '<span class="dsc-near">你的结论接近这一种</span>' : ''}` +
+      `<div><b>${esc(p.view)}</b></div><div class="small">成立的条件：${esc(p.holds_when || '')}</div>` +
+      (p.risk ? `<div class="small muted">用错了会怎样：${esc(p.risk)}</div>` : '') + '</li>').join('');
+    fb.insertAdjacentHTML('beforeend', `<div class="fb dk pop dsc-end"><div class="fb-v">🧭 你的结论</div>` +
+      `<div class="dsc-mine">${esc(res.conclusion)}${res.action ? `<div class="small">回到公司要做的事：${esc(res.action)}</div>` : ''}</div>` +
+      (res.shift ? `<div style="margin-top:10px">${esc(res.shift)}</div>` : '') +
+      (res.own ? `<div style="margin-top:8px">✨ 你自己的东西：${esc(res.own)}</div>` : '') +
+      (res.watch ? `<div style="margin-top:8px">⚠️ 值得留意：${esc(res.watch)}</div>` : '') +
+      (views ? `<div class="fb-v" style="margin-top:14px">几种都有道理的看法</div><ul class="dsc-views">${views}</ul>` : '') +
+      (res.moves && res.moves.length ? `<div class="dsc-moves">这次用到的思考方式：${res.moves.map(moveChip).join('')}</div>` : '') +
+      (res.next ? `<div class="fb-note">📅 ${esc(res.next.due)} 换一个条件再问你：${esc(res.next.twist)}</div>` : '') + '</div>');
+    opts.onDone && opts.onDone({...res, correct: true});  // 想完就算完成这一题（计数用），不是「答对」
+    return;
+  }
+  let h = '';
+  if (res.ai) {
+    h = `<div class="fb dk pop dsc-turn">` + (res.steelman ? `<div>💡 ${esc(res.steelman)}</div>` : '') +
+      (res.answer ? `<div style="margin-top:8px"><b>你问的：</b>${esc(res.answer)}</div>` : '') +
+      (res.moves_now && res.moves_now.length ? `<div class="dsc-moves">你用到了：${res.moves_now.map(moveChip).join('')}</div>` : '') +
+      (res.challenge ? `<div class="fb-v" style="margin-top:10px">🤔 ${esc(res.challenge)}</div>` : '') + '</div>';
+  } else {
+    h = `<div class="fb dk dsc-turn"><div class="small">写下你现在的结论，再看看几种都有道理的看法。</div></div>`;
+  }
+  h += `<div class="dsc-ctl">` + (res.can_continue ? `<textarea class="ans dsc-more" placeholder="接着说：同意、反驳、补充，或者反问"></textarea>` +
+    `<div class="qacts"><button class="btn sm dsc-go">接着说</button><button class="btn ghost sm dsc-end-btn">我想好了，写结论</button></div>` : '') +
+    `<div class="dsc-close" ${res.can_continue ? 'hidden' : ''}><textarea class="ans dsc-c" placeholder="我现在的结论是……"></textarea>` +
+    `<input type="text" class="ans dsc-a" placeholder="回到公司，我会做的一件事（可以不写）"><div class="qacts"><button class="btn sm dsc-done">写好了</button></div></div></div>`;
+  fb.insertAdjacentHTML('beforeend', h);
+  const ctl = fb.lastElementChild;
+  const err = e => ctl.insertAdjacentHTML('beforeend', `<div class="err">${esc(e.message)}</div>`);
+  const go = $('.dsc-go', ctl), endb = $('.dsc-end-btn', ctl), close = $('.dsc-close', ctl);
+  if (go) go.onclick = async () => {
+    const ta = $('.dsc-more', ctl);
+    if (ta.value.trim().length < 4) { alert('先写下你的想法'); return; }
+    go.disabled = true;
+    try {
+      const r = await opts.submit(ta.value, undefined, took(), {discussion_id: res.discussion_id});
+      ta.readOnly = true; go.closest('.qacts').remove(); close.remove();
+      discussRound(box, r, opts, took);
+    } catch (e) { go.disabled = false; err(e); }
+  };
+  if (endb) endb.onclick = () => { close.hidden = false; endb.closest('.qacts').remove(); const ta = $('.dsc-more', ctl); if (ta) ta.remove(); $('.dsc-c', ctl).focus(); };
+  $('.dsc-done', ctl).onclick = async () => {
+    const c = $('.dsc-c', ctl).value.trim();
+    if (c.length < 4) { alert('写下你现在的结论'); return; }
+    const b = $('.dsc-done', ctl); b.disabled = true;
+    try {
+      const r = await opts.submit('', undefined, took(), {discussion_id: res.discussion_id, conclusion: c, action: $('.dsc-a', ctl).value.trim()});
+      ctl.remove();
+      discussRound(box, r, opts, took);
+    } catch (e) { b.disabled = false; err(e); }
   };
 }
 /* 做完一道题后可以标记「这道题有问题」：题库里的题会被很多孩子反复用，坏题要能被发现 */

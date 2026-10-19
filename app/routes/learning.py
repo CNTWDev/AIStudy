@@ -96,7 +96,9 @@ def today(request: Request):
     play = arena.status(k)
     exams = [x for x in (engine.exam_view(k["id"], e, m) for e in enrollments(k["id"])) if x and x["days_left"] >= 0]
     day = streak.today_state(k, t["plan"], t["minutes"], sprint.points_today(k["id"]))
+    from .. import discuss
     return render(request, "today.html", t=t, play=play, day=day, settled=settled, exams=exams, board_tip=boards.nudge(dict(k)),
+                  rethink=len(discuss.due(k["id"])),
                   goals=streak.GOALS, sprint_best=sprint.best_day(k["id"]), play_locked=arena.locked_reason(play),
                   due=len(engine.due_cards(k["id"], 99)), progress_ask=engine.progress_prompt(k), streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
                   stars=engine.total_stars(k["id"]), rec=rec, auto=engine.day_summary(rec),
@@ -636,3 +638,25 @@ def delete_card(request: Request, card_id: int):
     return {"ok": True}
 
 
+
+
+# ------------------------------------------------------------------ 思辨题：换条件再想、我的思考方式（app/discuss.py）
+
+@router.get("/thinking", response_class=HTMLResponse)
+def thinking(request: Request):
+    from .. import discuss
+    k = kid_or_redirect(request, manage=True)
+    return render(request, "thinking.html", due=discuss.due(k["id"]), upcoming=discuss.upcoming(k["id"]),
+                  profile=discuss.profile(k["id"]))
+
+
+@router.get("/thinking/{did}", response_class=HTMLResponse)
+def thinking_again(request: Request, did: int):
+    from .. import discuss
+    k = kid_or_redirect(request, manage=True)
+    d = next((x for x in discuss.due(k["id"]) if x["id"] == did), None)
+    if not d:
+        return RedirectResponse("/thinking", status_code=303)
+    it = engine._item_row_to_dict(db.one("SELECT * FROM items WHERE id=?", d["item_id"]))
+    item = {**_public_item({**it, "kp_id": d["kp_id"]}), "twist": d["twist"], "rethink": did}
+    return render(request, "thinking.html", again=d, item=item, kp=catalog.kp(d["kp_id"]))
