@@ -571,7 +571,7 @@ const Ask = {
   },
   ctx() {
     const b = Ask.current();
-    const sel = (window.getSelection() || '').toString().trim();
+    const sel = Ask.sel || (window.getSelection() || '').toString().trim();
     const h1 = $('main h1');
     let text = sel;
     if (!text && b) text = ($('.q > div', b) || b).innerText;
@@ -579,10 +579,12 @@ const Ask = {
     return {path: location.pathname, title: h1 ? h1.innerText : document.title, text: text.slice(0, 1500),
             item_id: b ? b.dataset.askItem : '', kp_id: (window.ASK_CTX || {}).kp || '', answered: !!(b && b.dataset.answered)};
   },
-  label(c) { return c.item_id ? '这道题：' + c.text.replace(/\s+/g, ' ').slice(0, 40) : (c.text && getSelection().toString() ? '选中的：' + c.text.slice(0, 40) : '这个页面：' + c.title); },
-  open() {
+  label(c) { return c.item_id ? '这道题：' + c.text.replace(/\s+/g, ' ').slice(0, 40) : (Ask.sel ? '选中的：' + c.text.slice(0, 40) : '这个页面：' + c.title); },
+  sel: '',  // 划词菜单「问…」带过来的选中文字：焦点一进输入框选区就没了，所以先记下
+  open(sel) {
+    Ask.sel = typeof sel === 'string' ? sel : '';
     $('#askpanel').classList.add('on');
-    const c = Ask.ctx(), key = c.item_id || c.path;
+    const c = Ask.ctx(), key = c.item_id || c.path + (Ask.sel ? '#' + Ask.sel : '');
     if (key !== Ask.key) { Ask.key = key; Ask.tid = null; $('#askmsgs').innerHTML = ''; Ask.say('ai', `我是${$('#askbtn').dataset.name} ${$('#askbtn').dataset.icon} 哪里不明白就问我。我不会直接告诉你答案，但会陪你一步一步想出来！`); }
     $('#askctx').textContent = '📎 ' + Ask.label(c);
     $('#askq').focus();
@@ -604,9 +606,9 @@ const Ask = {
 document.addEventListener('DOMContentLoaded', () => {
   if (!$('#askbtn')) return;
   document.addEventListener('pointerdown', e => { const b = e.target.closest && e.target.closest('.askable'); if (b) Ask.focus = b; }, true);
-  $('#askbtn').onclick = Ask.open;
+  $('#askbtn').onclick = () => Ask.open();
   $('#askclose').onclick = () => $('#askpanel').classList.remove('on');
-  $('#asknew').onclick = () => { Ask.key = ''; Ask.open(); };
+  $('#asknew').onclick = () => { Ask.key = ''; Ask.open(Ask.sel); };
   $('#askform').onsubmit = e => { e.preventDefault(); Ask.send(); };
   $$('#askchips button').forEach(b => b.onclick = () => Ask.send(b.textContent));
 });
@@ -794,7 +796,7 @@ const SelMenu = {
         else if (b.dataset.a === 'tr') QuickLook.translate(t);
         else if (b.dataset.a === 'add') { api('/api/collect', {text: t, context: QuickLook.ctx, page: location.pathname}).then(() => toast('➕ 已加入复习')).catch(err => toast(err.message)); }
         else if (b.dataset.a === 'say') say(t);
-        else if (b.dataset.a === 'ask' && window.Ask && $('#askbtn')) Ask.open();
+        else if (b.dataset.a === 'ask' && $('#askbtn')) Ask.open(t);  // Ask 是顶层 const，不在 window 上
       };
     }
     const word = QuickLook.isWord(text);
