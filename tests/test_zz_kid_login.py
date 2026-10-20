@@ -103,3 +103,26 @@ def test_kid_changes_own_pin_and_old_kids_keep_working():
         c.get("/logout")
         assert c.post("/login", data={"email": "klold", "password": "oldpass1"}).url.path == "/today"
         assert auth.get_user(old)["login"] == "klold"
+
+
+def test_add_kid_errors_stay_on_the_form():
+    """填错了回到表单上提示，不先建账号，也不把 JSON 原样甩给浏览器（Safari 显示成乱码）。"""
+    with TestClient(app) as c:
+        _parent(c, "err")
+        base = {"name": "小雨", "login": "klxy", "password": "2580", "grade": "G3", "daily_minutes": "60",
+                "game_minutes": "20", "game_unlock": "half", "nickname": "小雨", "private": "", "province": "", "city": "",
+                "school": "", "preset": "", "method": "", "subj_math": "", "subj_english": ""}
+        r = c.post("/parent/kids/save", data=base)
+        assert r.status_code == 200 and "text/html" in r.headers["content-type"]
+        assert "昵称别用自己的名字" in r.text and 'value="klxy"' in r.text
+        assert auth.by_login("klxy") is None  # 账号没建
+        r = c.post("/parent/kids/save", data=dict(base, nickname="闪电小队长"))
+        assert "小雨 的账号开好了" in r.text
+        # 别的表单提交出错：浏览器拿到一个页面，页面脚本拿到 JSON
+        kid = auth.by_login("klxy")
+        r = c.post(f"/parent/kids/{kid['id']}/tracks", data={}, headers={"accept": "text/html,application/xhtml+xml"})
+        assert "text/html" in r.headers["content-type"] and "<h1>" in r.text
+        assert c.post(f"/parent/kids/{kid['id']}/tracks", data={}).headers["content-type"].startswith("application/json")
+        # 学习安排没选词表：回到安排页，在上面提示
+        r = c.post(f"/parent/kids/{kid['id']}/tracks", data={"kind": "words", "ref": ""})
+        assert r.url.path.endswith("/plan") and "请选择词表" in r.text

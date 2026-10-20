@@ -63,12 +63,15 @@ def my_courses(request: Request):
 async def my_courses_save(request: Request):
     u = require_self_managed(request)
     form = await request.form()
-    _check_exam_dates(form)
     grade = form.get("grade") or u["grade"]
-    if grade not in GRADES:
-        raise HTTPException(400, "年级不对")
-    if u["parent_id"] and not is_adult(grade):
-        raise HTTPException(400, "家里的成人成员年级选大学或「成人」；要改成孩子账号，请家长在家长页改年级。")
+    try:  # 填错的地方回到表单上提示
+        _check_exam_dates(form)
+        if grade not in GRADES:
+            raise ValueError("年级不对")
+        if u["parent_id"] and not is_adult(grade):
+            raise ValueError("家里的成人成员年级选大学或「成人」；要改成孩子账号，请家长在家长页改年级。")
+    except ValueError as e:
+        return _kid_form(request, u, self_mode=True, msg=str(e))
     minutes = max(15, min(240, int(form.get("daily_minutes") or u["daily_minutes"] or 60)))
     db.run("UPDATE users SET name=?, grade=?, daily_minutes=? WHERE id=?",
            (form.get("name") or "").strip()[:40] or u["name"], grade, minutes, u["id"])

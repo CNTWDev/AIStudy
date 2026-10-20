@@ -45,7 +45,8 @@ def test_family_adult_manages_own_learning():
                                         "game_minutes": "-1", "game_unlock": "free"})
         assert r.status_code == 200
         assert [e["pack_id"] for e in db.q("SELECT pack_id FROM enrollments WHERE user_id=? AND active=1", mom["id"])] == ["ceo-core"]
-        assert c.post("/me/courses", data={"name": "妈妈", "grade": "G5"}).status_code == 400
+        assert "请家长在家长页改年级" in c.post("/me/courses", data={"name": "妈妈", "grade": "G5"}).text
+        assert auth.get_user(mom["id"])["grade"] == "ADULT"
         assert "/me/courses" in c.get("/today").text
 
         # 家长改成人成员的资料：只动账号，不动 TA 的课程和每天时长

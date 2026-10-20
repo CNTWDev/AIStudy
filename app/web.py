@@ -338,7 +338,7 @@ def _check_exam_dates(form) -> None:
             try:
                 date.fromisoformat(form.get(key).strip())
             except ValueError:
-                raise HTTPException(400, "考试日期格式不对")
+                raise ValueError("考试日期格式不对")
 
 def _save_learning(kid_id: int, form, grade: str, old_grade, by_parent: bool = True) -> None:
     """保存学习安排：学习方式、游戏、每门课的教材 / 方向 / 考试日期、学校模板。家长编辑孩子和「我的课程」（自己安排学习的人）共用；

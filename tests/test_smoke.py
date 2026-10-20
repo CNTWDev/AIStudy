@@ -1069,7 +1069,7 @@ def test_adult_exam_course():
         assert c.get("/today").url.path == "/me/courses"  # 还没选课
         assert c.get("/parent").status_code == 403
         assert c.post("/me/courses", data={"name": "妈妈", "grade": "ADULT", "subj_fund_law": "fund-law",
-                                           "exam_fund-law": "2026-02-30"}).status_code == 400
+                                           "exam_fund-law": "2026-02-30"}).text.count("考试日期格式不对") == 1
         r = c.post("/me/courses", data={"name": "妈妈", "grade": "ADULT", "daily_minutes": "45", "subj_fund_law": "fund-law",
                                         "exam_fund-law": ""})
         assert r.url.path == "/today"
@@ -1106,7 +1106,7 @@ def test_adult_exam_course():
         types = [t["type"] for t in plan]
         assert plan[0]["title"].startswith("设定考试日期") and "diagnose" not in types and "exam" not in types, types
         assert "考试日期" in c.get("/progress").text
-        assert c.post("/progress/fund-law", data={"exam_date": "2026-13-40"}).status_code == 400
+        assert "考试日期格式不对" in c.post("/progress/fund-law", data={"exam_date": "2026-13-40"}).text
 
         # 离考试 60 天：103 个考点要在 46 天里学完 → 每天 3 个，按大纲顺序
         day = (db.today() + timedelta(days=60)).isoformat()
