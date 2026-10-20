@@ -4,7 +4,7 @@ import json
 from fastapi import APIRouter
 from fastapi import Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from .. import auth, brand, config, db, sitecfg
+from .. import auth, brand, config, db, mailer, sitecfg
 from ..catalog import SUBJECTS, SYSTEMS, catalog, is_adult, stage_label
 from ..library import CATALOG as BOOKS
 from ..web import (
@@ -63,14 +63,31 @@ def _showcase() -> dict:
 
 
 def _login_page(request: Request, **ctx):
-    return render(request, "login.html", mode=_reg_mode(), showcase=_showcase(), **ctx)
+    return render(request, "login.html", mode=_reg_mode(), showcase=_showcase(), has_accts=bool(auth.device_accounts(request)), **ctx)
+
+
+def _pick_page(request: Request, accts: list, **ctx):
+    """这台设备上登录过的账号：点头像，孩子输 4 位数字、大人输密码（docs/DESIGN.md §5.37）。
+    列表里有孩子就用孩子的样式和口吻；只有大人时用大人的样式。"""
+    tone = "kid" if any(auth.uses_pin(u) for u in accts) else "adult"
+    return render(request, "login_pick.html", accts=accts, tone=tone, **ctx)
 
 
 @router.get("/login", response_class=HTMLResponse)
-def login_page(request: Request, invite: str = "", tab: str = ""):
+def login_page(request: Request, invite: str = "", tab: str = "", full: str = ""):
     if auth.current_user(request):
         return RedirectResponse("/", 303)
+    accts = [] if (full or invite or tab) else auth.device_accounts(request)
+    if accts:
+        return _pick_page(request, accts)
     return _login_page(request, invite=invite, show_register=bool(invite) or tab == "register")
+
+
+def _signed_in(request: Request, u):
+    auth.login(request, u)
+    resp = RedirectResponse("/", 303)
+    auth.remember_device(request, resp, u)
+    return resp
 
 
 @router.post("/login")
@@ -78,8 +95,27 @@ def login(request: Request, email: str = Form(...), password: str = Form(...)):
     u, err = auth.authenticate(email, password, request)
     if not u:
         return _login_page(request, error=err, email=email)
-    auth.login(request, u)
-    return RedirectResponse("/", 303)
+    return _signed_in(request, u)
+
+
+@router.post("/login/pick")
+def login_pick(request: Request, uid: int = Form(...), password: str = Form("")):
+    """在记住了的设备上点头像登录：只认这台设备上登录过的账号（别人在别的设备上看不到、也试不了）。"""
+    accts = auth.device_accounts(request)
+    u = next((a for a in accts if a["id"] == uid), None)
+    if not u:
+        return RedirectResponse("/login?full=1", 303)
+    u, err = auth.authenticate("", password, request, u=u)
+    if not u:
+        return _pick_page(request, accts, pick=uid, error=err, locked=err == auth.LOCKED_KID)
+    return _signed_in(request, u)
+
+
+@router.post("/login/forget")
+def login_forget(request: Request, uid: int = Form(...)):
+    """不在这台设备上显示这个账号了（比如来家里玩的小朋友、借用过的电脑）。"""
+    auth.forget_device(request, uid)
+    return RedirectResponse("/login", 303)
 
 
 @router.post("/register")
@@ -144,7 +180,7 @@ def reset_submit(request: Request, token: str, password: str = Form(...), passwo
         auth.consume_reset(token, password)
     except ValueError as e:
         return render(request, "reset.html", target=u, token=token, error=str(e))
-    auth.log_event("password_reset", user_id=u["id"], email=u["email"], request=request)
+    auth.log_event("password_reset", user_id=u["id"], email=auth.account_name(u), request=request)
     return render(request, "message.html", title="密码已重设", text="请用新密码登录。", link="/login")
 
 
@@ -152,7 +188,40 @@ def reset_submit(request: Request, token: str, password: str = Form(...), passwo
 def settings_page(request: Request, msg: str = "", err: str = "", force: str = ""):
     u = auth.require_user(request)
     return render(request, "settings.html", sessions=auth.sessions_of(u["id"]), this_sid=auth.current_session_hash(request),
-                  msg=msg, err=err)
+                  msg=msg, err=err, mail_kinds={k: (name, mailer.wants(u, k)) for k, name in mailer.KINDS.items()},
+                  mail_on=mailer.settings().enabled)
+
+
+@router.post("/settings/mail")
+async def settings_mail(request: Request):
+    u = auth.require_parent(request)
+    form = await request.form()
+    for kind in mailer.KINDS:
+        mailer.set_wants(u["id"], kind, bool(form.get(kind)))
+    return _back(msg="邮件通知已保存")
+
+
+@router.get("/mail/unsub", response_class=HTMLResponse)
+def mail_unsub_page(request: Request, t: str = ""):
+    """邮件里的「不想再收」：先确认一下（有的邮箱会自动打开信里的链接，不能一打开就退订）。"""
+    who = mailer.read_unsub_token(t)
+    if not who:
+        return render(request, "message.html", title="链接不对", text="这个退订链接不完整或已经失效。可以登录后在「我的账号」里关掉邮件通知。", link="/settings")
+    u = auth.get_user(who[0])
+    return render(request, "mail_unsub.html", token=t, kind_name=mailer.KINDS[who[1]], email=u["email"] if u else "",
+                  done=bool(u) and not mailer.wants(u, who[1]))
+
+
+@router.post("/mail/unsub", response_class=HTMLResponse)
+def mail_unsub(request: Request, t: str = ""):
+    """确认退订；邮箱客户端的「一键退订」（RFC 8058）也是 POST 到这里。"""
+    who = mailer.read_unsub_token(t)
+    if not who or not auth.get_user(who[0]):
+        raise HTTPException(404, "这个退订链接不完整或已经失效")
+    mailer.set_wants(who[0], who[1], False)
+    auth.log_event("mail_unsub", user_id=who[0], detail=who[1], request=request)
+    return render(request, "message.html", title="已退订", text=f"以后不再发「{mailer.KINDS[who[1]]}」。想再收，登录后在「我的账号」里打开。",
+                  link="/settings", link_label="去「我的账号」")
 
 
 @router.post("/settings/mascot")
@@ -164,20 +233,19 @@ def settings_mascot(request: Request, mascot: str = Form(...)):
 
 
 @router.post("/settings/profile")
-def settings_profile(request: Request, name: str = Form(...), email: str = Form(...)):
+def settings_profile(request: Request, name: str = Form(...), email: str = Form("")):
     u = auth.require_user(request)
     if u["role"] == "kid" and not auth.self_managed(u):
-        return _back(err="孩子账号的名字和邮箱由家长修改")
+        return _back(err="孩子账号的名字和登录名由家长修改")
     try:
-        email = auth.validate_email(email)
+        # 有登录名的（家里的成员）邮箱可以不填；其他人用邮箱登录，必须有
+        email = auth.validate_email(email) if (email.strip() or not u["login"]) else None
+        auth.check_free(email, None, u["id"])
     except ValueError as e:
         return _back(err=str(e))
-    other = auth.by_email(email)
-    if other and other["id"] != u["id"]:
-        return _back(err="这个邮箱已被别的账号使用")
     db.run("UPDATE users SET name=?, email=? WHERE id=?", (name or "").strip()[:40] or u["name"], email, u["id"])
     if email != u["email"]:
-        auth.log_event("email_change", user_id=u["id"], email=email, detail=f"from {u['email']}", request=request)
+        auth.log_event("email_change", user_id=u["id"], email=email or "", detail=f"from {u['email']}", request=request)
     return _back(msg="已保存")
 
 

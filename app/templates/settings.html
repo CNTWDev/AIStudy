@@ -21,20 +21,40 @@
 <form class="card" method="post" action="/settings/profile">
   <h3>基本信息</h3>
   {% if user.role == 'kid' and not self_managed(user) %}
-  <p>{{ user.name }} · {{ user.email }}</p><p class="muted small for-grownups">名字和邮箱由家长修改。</p>
+  <p>{{ user.name }} · 登录名 <b>{{ user.login or user.email }}</b></p><p class="muted small for-grownups">名字和登录名由家长修改。</p>
   {% else %}
   <label>称呼</label><input type="text" name="name" value="{{ user.name }}" required>
-  <label>登录邮箱</label><input type="email" name="email" value="{{ user.email }}" required>
+  {% if user.login %}<p class="small" style="margin:8px 0 0">登录名 <b>{{ user.login }}</b> <span class="muted">（家长改）</span></p>
+  <label>邮箱 <span class="muted small">选填，填了也能用邮箱登录</span></label><input type="email" name="email" value="{{ user.email or '' }}">
+  {% else %}<label>登录邮箱</label><input type="email" name="email" value="{{ user.email }}" required>{% endif %}
   <div style="margin-top:12px"><button class="btn">保存</button></div>
   {% endif %}
 </form>
 <form class="card" method="post" action="/password">
+  {% if uses_pin(user) %}
+  <h3>换我的 4 位数字</h3>
+  <label>原来的数字</label><input type="password" name="old" required inputmode="numeric" maxlength="4" autocomplete="current-password">
+  <label>新的数字</label><input type="password" name="new" required inputmode="numeric" pattern="\d{4}" minlength="4" maxlength="4" autocomplete="new-password">
+  <p class="muted small" style="margin:6px 0 0">选一个自己记得住、别人猜不到的，别用 1234。</p>
+  {% else %}
   <h3>修改密码</h3>
   <label>旧密码</label><input type="password" name="old" required autocomplete="current-password">
   <label>新密码（至少 6 位）</label><input type="password" name="new" required minlength="6" autocomplete="new-password">
+  {% endif %}
   <div style="margin-top:12px"><button class="btn">保存</button></div>
   <p class="muted small for-grownups">改密码后，其他设备上的登录会自动退出。</p>
 </form>
+{% if user.role == 'parent' %}
+<form class="card" method="post" action="/settings/mail">
+  <h3>邮件通知</h3>
+  <p class="muted small">发到登录邮箱 {{ user.email }}。</p>
+  {% for kind, (name, on) in mail_kinds.items() %}
+  <label class="row" style="gap:8px;font-weight:400"><input type="checkbox" name="{{ kind }}" value="1" {{ 'checked' if on }} style="width:auto">{{ name }}<span class="muted small">{% if kind == 'weekly' %}每周一早上，讲每个孩子上周学了几天、进步在哪、系统发现的问题{% endif %}</span></label>
+  {% endfor %}
+  {% if not mail_on %}<p class="muted small">网站还没开通发信，开通后才会收到。</p>{% endif %}
+  <div style="margin-top:12px"><button class="btn">保存</button></div>
+</form>
+{% endif %}
 {% if simple %}<details class="quiet-box"><summary class="quiet-h">⚙️ 更多</summary>{% endif %}
 <div class="card">
   <h3>登录中的设备</h3>

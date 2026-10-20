@@ -8,14 +8,15 @@ from app.main import app
 
 def _kid(tag, pid=None, name="孩子"):
     pid = pid or auth.create_user(f"or-p-{tag}@x.com", "secret1", "家长", "parent")
-    k = auth.create_user(f"or-{tag}@x.com", "secret1", name, "kid", parent_id=pid, grade="G5")
+    k = auth.create_user(f"or-{tag}@x.com", "2580", name, "kid", parent_id=pid, grade="G5")
     arena.set_game_unlock(k, "free")
     return pid, k
 
 
 def _login(c, tag):
     c.cookies.clear()
-    assert c.post("/login", data={"email": f"or-{tag}@x.com", "password": "secret1"}).status_code in (200, 303)
+    pw = "2580" if auth.uses_pin(auth.by_email(f"or-{tag}@x.com")) else "secret1"   # 孩子用 4 位数字
+    assert c.post("/login", data={"email": f"or-{tag}@x.com", "password": pw}).status_code in (200, 303)
 
 
 def _dev(tag):
@@ -181,7 +182,7 @@ def test_parent_sets_nickname_and_public_rooms():
     with TestClient(app) as c:
         c.cookies.clear()
         pid = auth.create_user("or-pp@x.com", "secret1", "家长", "parent")
-        k = auth.create_user("or-pk@x.com", "secret1", "小可", "kid", parent_id=pid, grade="G3")
+        k = auth.create_user("or-pk@x.com", "2580", "小可", "kid", parent_id=pid, grade="G3")
         c.post("/login", data={"email": "or-pp@x.com", "password": "secret1"})
         assert "公开房间" in c.get(f"/parent/kids/{k}/edit").text and arena.public_rooms(dict(auth.get_user(k)))
         base = {"id": str(k), "name": "小可", "email": "or-pk@x.com", "grade": "G3", "daily_minutes": "60", "game_minutes": "20"}

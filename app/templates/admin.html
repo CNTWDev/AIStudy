@@ -45,7 +45,7 @@
   <h3>待审批的注册申请</h3>
   {% for u in pending %}
   <div class="row" style="border-bottom:1px solid var(--line);padding:8px 0">
-    <div class="grow"><b>{{ u.name }}</b> <span class="muted small">{{ u.email }} · {{ u.created_at[:16]|replace('T',' ') }}</span>
+    <div class="grow"><b>{{ u.name }}</b> <span class="muted small">{{ account_name(u) }} · {{ u.created_at[:16]|replace('T',' ') }}</span>
       {% if u.apply_note %}<div class="small">说明：{{ u.apply_note }}</div>{% endif %}</div>
     <div>{{ user_actions(u, 'overview') }}</div>
   </div>
@@ -59,7 +59,7 @@
 <div class="card">
   <h3>最近加入的自学者 <a class="small" href="/admin?tab=selfs" style="font-weight:normal">全部自学者 →</a></h3>
   <div class="tw"><table>{% for u in recent_selfs %}
-    <tr><td class="tx"><b><a href="/admin/users/{{ u.id }}">{{ u.name }}</a></b> <span class="muted small">{{ u.email }}</span> {{ status_pill(u) }}</td>
+    <tr><td class="tx"><b><a href="/admin/users/{{ u.id }}">{{ u.name }}</a></b> <span class="muted small">{{ account_name(u) }}</span> {{ status_pill(u) }}</td>
       <td class="small nw">{{ stage_label(u.grade) }}</td><td class="small muted nw">注册 {{ u.created_at[:10] }}</td></tr>
   {% endfor %}</table></div>
 </div>
@@ -118,7 +118,7 @@
   <div class="tw"><table>
     <tr><th>自学者</th><th>年级</th><th>在学</th><th>近 7 天</th><th>最近活动</th><th></th></tr>
     {% for s in selfs %}
-    <tr><td class="nw"><b><a href="/admin/users/{{ s.u.id }}">{{ s.u.name }}</a></b> {{ status_pill(s.u) }}<div class="muted small">{{ s.u.email }}</div></td>
+    <tr><td class="nw"><b><a href="/admin/users/{{ s.u.id }}">{{ s.u.name }}</a></b> {{ status_pill(s.u) }}<div class="muted small">{{ account_name(s.u) }}</div></td>
       <td class="small nw">{{ stage_label(s.u.grade) }}</td>
       <td class="small tx">{{ s.packs|join('、') or '未选课程' }}</td>
       <td class="small nw">{{ '学过' if s.active else '—' }}</td>
@@ -145,7 +145,7 @@
       <td class="nw"><code>{{ i.code }}</code></td>
       <td class="small nw">{{ i.creator_name or '命令行' }}</td>
       <td class="small tx">{{ i.note }}</td>
-      <td class="small nw">{{ i.used }}/{{ i.max_uses }}{% for u in used_by.get(i.code, []) %}<br>→ {{ u.name }} <span class="muted">{{ u.email }}</span>{% endfor %}</td>
+      <td class="small nw">{{ i.used }}/{{ i.max_uses }}{% for u in used_by.get(i.code, []) %}<br>→ {{ u.name }} <span class="muted">{{ account_name(u) }}</span>{% endfor %}</td>
       <td class="small nw">{% if i.used >= i.max_uses %}已用完{% elif i.expires_at and i.expires_at < now %}已过期{% else %}可用至 {{ (i.expires_at or '')[:10] }}{% endif %}</td>
       <td>{% if not dead %}<form method="post" action="/admin/invites/{{ i.code }}/delete"><button class="btn ghost sm">作废</button></form>{% endif %}</td>
     </tr>
@@ -158,7 +158,7 @@
   <p class="muted small">谁邀请了谁。最左边一层是管理员直接创建、自己申请或第一批注册的家庭。</p>
   {% for n in tree %}
   <div style="padding:6px 0 6px {{ n.depth * 24 }}px;border-bottom:1px solid var(--line)">
-    {% if n.depth %}<span class="muted">└ </span>{% endif %}<b>{{ n.u.name }}</b> <span class="muted small">{{ n.u.email }}</span> {{ status_pill(n.u) }}
+    {% if n.depth %}<span class="muted">└ </span>{% endif %}<b>{{ n.u.name }}</b> <span class="muted small">{{ account_name(n.u) }}</span> {{ status_pill(n.u) }}
     <span class="small muted">{% if n.kids %} · 孩子：{% for k in n.kids %}{{ k.name }}（{{ stage_label(k.grade) }}）{{ '、' if not loop.last }}{% endfor %}{% endif %}{% if n.n_invited %} · 邀请了 {{ n.n_invited }} 家{% endif %}</span>
   </div>
   {% else %}<p class="muted small">还没有账号。</p>{% endfor %}
@@ -365,7 +365,7 @@ $('#bpf').onsubmit = async e => {
 </form>
 <div class="card">
   <h3 style="margin-top:0">管理员账号</h3>
-  {% for u in admins %}<div class="small">{{ u.name }} · {{ u.email }}{% if u.role == 'parent' %} <span class="muted">（同时是家长）</span>{% endif %}</div>{% endfor %}
+  {% for u in admins %}<div class="small">{{ u.name }} · {{ account_name(u) }}{% if u.role == 'parent' %} <span class="muted">（同时是家长）</span>{% endif %}</div>{% endfor %}
   <p class="muted small">在「家庭」页底部可以创建新的管理员账号。</p>
 </div>
 <div class="card">
@@ -379,6 +379,14 @@ $('#bpf').onsubmit = async e => {
     <tr><td>朗读</td><td>{% if tts_status[0] %}<b>可用</b> · {{ tts_status[1] }}{% else %}<b>未开启</b> · {{ tts_status[1] }}{% endif %}
       <div class="muted small">已缓存 {{ tts_stats.ready }} 段 · {{ tts_stats.chars }} 字 · {{ (tts_stats.bytes / 1048576)|round(1) }} MB · 共播放 {{ tts_stats.hits }} 次 · 今天新生成 {{ tts_stats.today_chars }} 字</div>
       <div class="muted small">在服务器 config/tts.toml 修改后重启</div></td></tr>
+    <tr><td>邮件</td><td>{% if mail_status[0] %}<b>可用</b> · {{ mail_status[1] }}{% else %}<b>未开启</b> · {{ mail_status[1] }}{% endif %}
+      <div class="muted small">在服务器 config/mail.toml 修改后重启（配置步骤见 docs/MAIL.md）</div>
+      {% if mail_status[0] %}<form method="post" action="/admin/mail/test" class="row" style="margin-top:6px"><input type="email" name="to" value="{{ me.email }}" required style="width:auto">
+        <button class="btn ghost sm">发一封测试邮件</button></form>{% endif %}
+      {% if mail_recent %}<details class="small" style="margin-top:6px"><summary>最近发的信</summary>
+        {% for m in mail_recent %}<div>{{ m.created_at[5:16]|replace('T',' ') }} · {{ m.to_addr }} · {{ m.subject }} ·
+          <b>{{ {'sent': '已发出', 'queued': '等着发', 'failed': '没发出去'}[m.status] or m.status }}</b>{% if m.error %} <span class="muted">（{{ m.error }}）</span>{% endif %}</div>{% endfor %}
+      </details>{% endif %}</td></tr>
     <tr><td>数据库迁移</td><td class="small">{% for m in migrations %}{{ m.name }}：{{ '已执行' if m.applied_at else '待执行' }}<br>{% endfor %}</td></tr>
   </table></div>
 </div>

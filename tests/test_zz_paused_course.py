@@ -7,9 +7,9 @@ from app.catalog import catalog
 from app.main import app
 
 
-def _login(c, email):
+def _login(c, email, pw="secret1"):
     c.get("/logout")
-    c.post("/login", data={"email": email, "password": "secret1"})
+    c.post("/login", data={"email": email, "password": pw})
 
 
 def test_dropped_course_pauses_cards_and_resumes():
@@ -20,7 +20,7 @@ def test_dropped_course_pauses_cards_and_resumes():
             _login(c, "admin@x.com")
         c.post("/admin/users/create", data={"email": "pausep@x.com", "password": "secret1", "name": "停爸", "role": "parent"})
         _login(c, "pausep@x.com")
-        base = {"name": "停娃", "email": "pausek@x.com", "password": "secret1", "grade": "G8", "daily_minutes": "90",
+        base = {"name": "停娃", "email": "pausek@x.com", "password": "2580", "grade": "G8", "daily_minutes": "90",
                 "subj_math": "math-shanghai", "subj_english": "eng-cambridge"}
         c.post("/parent/kids/save", data={**base, "subj_physics": "phy-cambridge"})
         kid = dict(db.one("SELECT * FROM users WHERE email='pausek@x.com'"))
@@ -44,7 +44,7 @@ def test_dropped_course_pauses_cards_and_resumes():
         ctx = sources.Ctx(kid)
         assert not [w for w in sources.WordSource()._my_cards(ctx) if is_phy(w)]   # 游戏、快练里的单词题
         # 记录还在：错题本里收在「已经不学的课」里
-        _login(c, "pausek@x.com")
+        _login(c, "pausek@x.com", "2580")
         page = c.get("/words?kind=mistake").text
         assert "已经不学的课" in page and "暂停" in page
         assert db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='mistake'", kid["id"])["n"] >= 1

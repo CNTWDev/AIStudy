@@ -14,7 +14,9 @@
   <h3>基本信息</h3>
   <div class="row">
     <div class="grow"><label>{{ '名字' if u.role == 'kid' else '称呼' }}</label><input type="text" name="name" value="{{ u.name }}" required></div>
-    <div class="grow"><label>登录邮箱</label><input type="email" name="email" value="{{ u.email }}" required></div>
+    {% if u.role == 'kid' %}<div class="grow"><label>登录名</label><input type="text" name="login" value="{{ u.login or '' }}" maxlength="16" {{ 'required' if uses_pin(u) }}></div>
+    <div class="grow"><label>邮箱 <span class="muted small">选填</span></label><input type="email" name="email" value="{{ u.email or '' }}"></div>
+    {% else %}<div class="grow"><label>登录邮箱</label><input type="email" name="email" value="{{ u.email }}" required></div>{% endif %}
   </div>
   <div style="margin-top:12px"><button class="btn">保存</button>
     {% if u.role == 'kid' %}<span class="muted small">年级、教材等学习安排由{{ '本人在「我的课程」里' if self_managed(u) else '家长在家长页' }}修改。</span>{% endif %}</div>
@@ -27,7 +29,7 @@
       onsubmit="return confirm(this.elements.to.value === 'self' ? '改为自学者后，家长就看不到也管不了这个账号了。确定？' : '换到这个家庭后，新家长能看到并管理这个账号，原来的家长就看不到了。确定？')">
   <h3>所属家庭</h3>
   <p class="small">现在：{% if parent %}<a href="/admin/families/{{ parent.id }}">{{ parent.name }} 家</a>（{{ parent.email }}）{% else %}自学者，没有家长{% endif %}</p>
-  <p class="muted small">可以把这个学习账号挂到另一个家庭，或改为自学者。学习记录、错题、坚持天数、游戏进度、隐私设置都跟着账号走，登录邮箱和密码不变；
+  <p class="muted small">可以把这个学习账号挂到另一个家庭，或改为自学者。学习记录、错题、坚持天数、游戏进度、隐私设置都跟着账号走，登录名、邮箱和密码不变；
     新家长立刻能看到并管理，原来的家长看不到了；正在联网房间里的会先退出。每次调整都记在安全日志里。</p>
   {% if parent and not is_adult(u.grade) %}<div class="hint">这是{{ stage_label(u.grade) }}的孩子。改为自学者等于去掉家长监护，课程和每天时长都由孩子自己设，请先和家长确认。</div>{% endif %}
   <div class="row">
@@ -61,7 +63,7 @@
 <div class="card">
   <h3>孩子</h3>
   <div class="tw"><table>{% for k in kids %}
-    <tr><td class="nw"><a href="/admin/users/{{ k.id }}">{{ k.name }}</a></td><td class="small muted nw">{{ k.email }}</td><td class="small nw">{{ stage_label(k.grade) }}</td>
+    <tr><td class="nw"><a href="/admin/users/{{ k.id }}">{{ k.name }}</a></td><td class="small muted nw">{{ account_name(k) }}</td><td class="small nw">{{ stage_label(k.grade) }}</td>
       <td class="small nw">最近登录 {{ (k.last_login_at or '—')[:10] }}</td><td class="small nw"><a href="/admin/kids/{{ k.id }}">报告</a></td></tr>
   {% endfor %}</table></div>
 </div>

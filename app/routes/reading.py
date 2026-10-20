@@ -271,7 +271,7 @@ def tools_token(request: Request, kid: int = Form(0), action: str = Form("new"),
         auth.revoke_api_token(target["id"], token_hash)
         return RedirectResponse(f"/tools?kid={kid}", 303)
     token = auth.create_api_token(target["id"])
-    auth.log_event("api_token_create", user_id=target["id"], email=target["email"], detail=f"by {u['email']}", request=request)
+    auth.log_event("api_token_create", user_id=target["id"], email=auth.account_name(target), detail=f"by {auth.account_name(u)}", request=request)
     return _tools_render(request, kid, token)  # 连接码只在这一次页面里显示，不放进网址
 
 

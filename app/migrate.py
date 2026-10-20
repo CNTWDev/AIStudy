@@ -56,6 +56,19 @@ def pending() -> list[str]:
 
 
 def upgrade(verbose: bool = False) -> list[str]:
+    if db.IS_PG:
+        return _upgrade(verbose)
+    # SQLite 重建表（改列约束只能这样）时要先在事务外关掉外键：开着的话 DROP TABLE 会按 ON DELETE CASCADE 连带删掉别的表的数据。
+    # 见 https://sqlite.org/lang_altertable.html#otheralter；迁移完再打开。
+    c = db._sqlite_conn()
+    c.execute("PRAGMA foreign_keys=OFF")
+    try:
+        return _upgrade(verbose)
+    finally:
+        c.execute("PRAGMA foreign_keys=ON")
+
+
+def _upgrade(verbose: bool) -> list[str]:
     applied = []
     with db.tx(write=True) as t:
         if db.IS_PG:

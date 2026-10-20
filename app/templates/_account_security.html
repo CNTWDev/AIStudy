@@ -1,21 +1,22 @@
 {# 登录与安全：家长管孩子、管理员管家长共用。需要 acct（目标账号）、acct_url（表单提交地址）、acct_sessions、acct_force（临时密码默认要求下次登录改） #}
+{% set pin = uses_pin(acct) %}{% set secret = '4 位数字' if pin else '密码' %}
 <div class="card" id="account">
   <h3>登录与安全</h3>
   {% if shown_pw %}
-  <div class="hint">新密码：<b style="font-size:1.2em;letter-spacing:1px">{{ shown_pw }}</b><br>
-    <span class="small">只显示这一次，请现在抄下来告诉{{ '孩子' if acct.role == 'kid' else '对方' }}。{% if acct.must_change_pw %}对方用它登录后，会被要求马上改成自己的密码。{% endif %}</span></div>
+  <div class="hint">新{{ ' 4 位数字' if pin else '密码' }}：<b style="font-size:1.2em;letter-spacing:1px">{{ shown_pw }}</b><br>
+    <span class="small">只显示这一次，请现在抄下来告诉{{ '孩子' if acct.role == 'kid' else '对方' }}。{% if acct.must_change_pw %}对方用它登录后，会被要求马上改成自己的{{ secret }}。{% endif %}</span></div>
   {% endif %}
-  <p class="small">登录邮箱 <b>{{ acct.email }}</b> · 最近登录 {{ (acct.last_login_at or '从未登录')[:16]|replace('T', ' ') }} · 在 {{ acct_sessions }} 台设备上登录中
-    {% if acct.locked_until and acct.locked_until > now %}<br><span class="pill st-weak">密码输错太多次，暂时锁定中</span>{% endif %}
+  <p class="small">{% if acct.login %}登录名 <b>{{ acct.login }}</b>{% if acct.email %} · 邮箱 {{ acct.email }}{% endif %}{% else %}登录邮箱 <b>{{ acct.email }}</b>{% endif %} · 最近登录 {{ (acct.last_login_at or '从未登录')[:16]|replace('T', ' ') }} · 在 {{ acct_sessions }} 台设备上登录中
+    {% if acct.locked_until and acct.locked_until > now %}<br><span class="pill st-weak">{{ '数字输错太多次，锁住了，点下面「解除锁定」' if pin else '密码输错太多次，暂时锁定中' }}</span>{% endif %}
     {% if acct.must_change_pw %}<br><span class="pill st-learning">正在使用临时密码，下次登录需要改密码</span>{% endif %}</p>
   <form method="post" action="{{ acct_url }}">
     <input type="hidden" name="action" value="password">
-    <label>重置密码</label>
+    <label>重置{{ secret }}</label>
     <div class="row">
-      <div class="grow"><input type="text" name="password" minlength="6" autocomplete="off" placeholder="输入新密码；留空则自动生成一个"></div>
-      <div><button class="btn">重置密码</button></div>
+      <div class="grow">{% if pin %}<input type="text" name="password" inputmode="numeric" pattern="\d{4}" maxlength="4" autocomplete="off" placeholder="输入新的 4 位数字；留空则自动生成">{% else %}<input type="text" name="password" minlength="6" autocomplete="off" placeholder="输入新密码；留空则自动生成一个">{% endif %}</div>
+      <div><button class="btn">重置{{ secret }}</button></div>
     </div>
-    <label style="display:flex;gap:8px;align-items:center;font-weight:normal"><input type="checkbox" name="force" value="1" style="width:auto" {{ 'checked' if acct_force }}> 下次登录时要求{{ '孩子' if acct.role == 'kid' else '对方' }}改成自己的密码</label>
+    <label style="display:flex;gap:8px;align-items:center;font-weight:normal"><input type="checkbox" name="force" value="1" style="width:auto" {{ 'checked' if acct_force }}> 下次登录时要求{{ '孩子' if acct.role == 'kid' else '对方' }}改成自己的{{ secret }}</label>
     <p class="muted small">重置后，这个账号在其他设备上的登录会全部退出。</p>
   </form>
   <div class="row small">

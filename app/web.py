@@ -30,7 +30,7 @@ templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 
 templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
-                             stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, self_managed=auth.self_managed, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock, is_private=auth.is_private, PROVINCES=boards.PROVINCES, city_label=boards.city_label,
+                             stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, self_managed=auth.self_managed, uses_pin=auth.uses_pin, account_name=auth.account_name, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock, is_private=auth.is_private, PROVINCES=boards.PROVINCES, city_label=boards.city_label,
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES,
                              trend_words=records.trend_words, tts_info=tts_web.client_info, qview=itemtypes.view,
                              qfig=figures.present)
@@ -131,25 +131,25 @@ def _reg_mode() -> str:
 def account_action(request: Request, actor, target, form) -> dict:
     """家长管孩子账号、管理员管其他账号共用：重置密码 / 解除锁定 / 退出所有设备。返回给模板的 msg、shown_pw。"""
     action = form.get("action") or ""
-    who = f"by {actor['email']}"
+    who = f"by {auth.account_name(actor)}"
     if action == "password":
         pw = (form.get("password") or "").strip()
         generated = not pw
-        pw = pw or auth.temp_password()
+        pw = pw or auth.temp_password(target)
         try:
             auth.set_password(target["id"], pw, must_change=bool(form.get("force")))
         except ValueError as e:
             return {"msg": str(e)}
-        auth.log_event("password_reset_by_" + actor["role"], user_id=target["id"], email=target["email"], detail=who, request=request)
-        return {"msg": f"已重置 {target['name']} 的密码，其他设备上的登录已退出。" + ("" if generated else "新密码就是你刚才输入的。"),
+        auth.log_event("password_reset_by_" + actor["role"], user_id=target["id"], email=auth.account_name(target), detail=who, request=request)
+        return {"msg": f"已重置 {target['name']} 的{'数字' if auth.uses_pin(target) else '密码'}，其他设备上的登录已退出。" + ("" if generated else ("新的数字" if auth.uses_pin(target) else "新密码") + "就是你刚才输入的。"),
                 "shown_pw": pw if generated else ""}
     if action == "unlock":
         auth.unlock(target["id"])
-        auth.log_event("unlock", user_id=target["id"], email=target["email"], detail=who, request=request)
+        auth.log_event("unlock", user_id=target["id"], email=auth.account_name(target), detail=who, request=request)
         return {"msg": "已解除锁定，可以重新登录了"}
     if action == "signout":
         n = auth.signout_all(target["id"])
-        auth.log_event("signout_all", user_id=target["id"], email=target["email"], detail=who, request=request)
+        auth.log_event("signout_all", user_id=target["id"], email=auth.account_name(target), detail=who, request=request)
         return {"msg": f"已让 {target['name']} 在 {n} 台设备上退出登录"}
     raise HTTPException(400, "不认识的操作")
 

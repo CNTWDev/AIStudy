@@ -322,14 +322,18 @@ setup_config() {
     cp "$APP_DIR/config/tts.example.toml" "$APP_DIR/config/tts.toml"
     ok "已生成 config/tts.toml（朗读：要用时填写 Cartesia 的 api_key 和声音）"
   fi
+  if [[ ! -f "$APP_DIR/config/mail.toml" ]]; then
+    cp "$APP_DIR/config/mail.example.toml" "$APP_DIR/config/mail.toml"
+    ok "已生成 config/mail.toml（发邮件给家长：要用时填写发信服务的 SMTP 账号，见 docs/MAIL.md）"
+  fi
 }
 
 fix_permissions() {
   id "$SERVICE_USER" >/dev/null 2>&1 || useradd --system --home-dir "$APP_DIR" --shell /usr/sbin/nologin "$SERVICE_USER" 2>/dev/null \
     || useradd -r -d "$APP_DIR" -s /sbin/nologin "$SERVICE_USER"
   chown -R "$SERVICE_USER:$SERVICE_USER" "$APP_DIR/data"
-  chown "root:$SERVICE_USER" "$(ENV_FILE)" "$APP_DIR/config/llm.toml" "$APP_DIR/config/tts.toml"
-  chmod 640 "$(ENV_FILE)" "$APP_DIR/config/llm.toml" "$APP_DIR/config/tts.toml"
+  chown "root:$SERVICE_USER" "$(ENV_FILE)" "$APP_DIR/config/llm.toml" "$APP_DIR/config/tts.toml" "$APP_DIR/config/mail.toml"
+  chmod 640 "$(ENV_FILE)" "$APP_DIR/config/llm.toml" "$APP_DIR/config/tts.toml" "$APP_DIR/config/mail.toml"
 }
 
 # ---------------------------------------------------------------- Python 依赖
@@ -485,6 +489,7 @@ summary() {
   echo
   echo "  AI 配置：  sudo nano $APP_DIR/config/llm.toml   填 api_key 后执行  sudo systemctl restart $APP_NAME $APP_NAME-worker"
   echo "  朗读配置：sudo nano $APP_DIR/config/tts.toml   （可选，不填就用浏览器自带的声音）"
+  echo "  邮件配置：sudo nano $APP_DIR/config/mail.toml  （可选，给家长发每周学习报告；步骤见 docs/MAIL.md）"
   echo "  检查配置：sudo $APP_DIR/install.sh check --llm"
   echo "  以后升级：sudo $APP_DIR/install.sh upgrade"
   echo "  数据备份：$APP_DIR/data/backups（每次升级前自动备份）"

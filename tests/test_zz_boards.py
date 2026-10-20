@@ -17,7 +17,7 @@ def _days(kid, offsets):
 def _family(tag, city=("浙江", "杭州市"), name="孩子"):
     pid = auth.create_user(f"bd-p-{tag}@x.com", "secret1", "家长", "parent")
     boards.set_city(pid, *city)
-    k = auth.create_user(f"bd-{tag}@x.com", "secret1", name, "kid", parent_id=pid, grade="G4")
+    k = auth.create_user(f"bd-{tag}@x.com", "2580", name, "kid", parent_id=pid, grade="G4")
     return pid, k
 
 
@@ -66,7 +66,7 @@ def test_boards():
         assert [x["rank"] for x in r["top"]] == [1, 2, 3, 3, 3]
 
         # 页面：孩子能看；没上榜的孩子看到怎么上榜
-        c.post("/login", data={"email": "bd-h@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "bd-h@x.com", "password": "2580"})
         page = c.get("/boards?metric=month").text
         assert "火箭" in page and "隐私模式" in page and "甲甲甲" not in page and "学习榜" in page
         assert "/boards" in c.get("/records").text
@@ -76,7 +76,7 @@ def test_parent_privacy_mode():
     with TestClient(app) as c:
         c.cookies.clear()
         pid = auth.create_user("bd-pp@x.com", "secret1", "家长", "parent")
-        k = auth.create_user("bd-pk@x.com", "secret1", "小可", "kid", parent_id=pid, grade="G3")
+        k = auth.create_user("bd-pk@x.com", "2580", "小可", "kid", parent_id=pid, grade="G3")
         c.post("/login", data={"email": "bd-pp@x.com", "password": "secret1"})
         assert "隐私模式" in c.get(f"/parent/kids/{k}/edit").text
         base = {"id": str(k), "name": "小可", "email": "bd-pk@x.com", "grade": "G3", "daily_minutes": "60", "game_minutes": "20"}
@@ -107,7 +107,7 @@ def test_game_board():
         assert r["unit"] == "道" and mine["value"] == 3 and r["ahead"] is not None
         assert next(x for x in r["top"] if x["id"] == b)["value"] == 5
         assert boards.board(dict(auth.get_user(a)), "game_all")["mine"]["value"] == 4   # 一共答对：上周以前的也算
-        c.post("/login", data={"email": "bd-ga@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "bd-ga@x.com", "password": "2580"})
         page = c.get("/boards?metric=game").text
         assert "乐园榜" in page and "本周答对" in page and "一共答对" in page and "连续打卡" not in page
         assert "/boards?metric=game" in c.get("/arena").text
@@ -163,7 +163,7 @@ def test_progress_and_rank_moves():
         assert boards.nudge(dict(auth.get_user(me))) == ""
         auth.set_private(me, False)
         boards.refresh()
-        c.post("/login", data={"email": "bd-pr@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "bd-pr@x.com", "password": "2580"})
         page = c.get("/boards?metric=total").text
         assert "上周这时候" in page and "bd-podium" in page and "bd-rank" in page
 
@@ -174,7 +174,7 @@ def test_board_asks_for_nickname():
         boards.refresh()
         _, k = _family("nn", name="张三丰")
         c.cookies.clear()
-        c.post("/login", data={"email": "bd-nn@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "bd-nn@x.com", "password": "2580"})
         page = c.get("/boards").text
         assert "给自己起个昵称" in page and f"小玩家{k}" in page and "nm\">张三丰" not in page
         assert c.post("/api/arena/nickname", json={"nickname": "三丰"}).status_code == 400   # 不能用名字

@@ -185,7 +185,7 @@ def _setup(c):
     c.get("/logout")
     for n in ("1", "2"):
         c.post("/login", data={"email": f"figp{n}@x.com", "password": "secret1"})
-        c.post("/parent/kids/save", data={"name": "娃", "email": f"figk{n}@x.com", "password": "secret1", "grade": "G3",
+        c.post("/parent/kids/save", data={"name": "娃", "email": f"figk{n}@x.com", "password": "2580", "grade": "G3",
                                           "daily_minutes": "60", "subj_math": "math-shanghai"})
         c.get("/logout")
 
@@ -200,7 +200,7 @@ def _jpg():
 def test_paper_figures_cropped_and_private():
     with TestClient(app) as c:
         _setup(c)
-        c.post("/login", data={"email": "figk1@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "figk1@x.com", "password": "2580"})
         r = c.post("/api/papers", data={"pack_id": "math-shanghai"}, files=[("photos", ("p1.jpg", _jpg(), "image/jpeg"))])
         assert r.status_code == 200, r.text
         pid = r.json()["id"]
@@ -228,10 +228,10 @@ def test_paper_figures_cropped_and_private():
         url2 = f"/fig/{rows[0]['item_id']}/{fig2['file']}"
         assert c.get(url2).status_code == 200
         c.get("/logout")
-        c.post("/login", data={"email": "figk2@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "figk2@x.com", "password": "2580"})
         assert c.get(url2).status_code == 404
         c.get("/logout")
-        c.post("/login", data={"email": "figk1@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "figk1@x.com", "password": "2580"})
         assert c.post(f"/api/papers/{pid}/fig", json={"pi": pi, "remove": True}).status_code == 200
         assert "fig" not in papers.rows(pid)[0]["item"]
         assert c.get(url2).status_code == 404

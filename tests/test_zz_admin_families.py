@@ -16,7 +16,7 @@ def test_family_pages_and_moves():
         _admin(c)
         pa = auth.create_user("af-pa@x.com", "secret1", "甲家长", "parent")
         pb = auth.create_user("af-pb@x.com", "secret1", "乙家长", "parent")
-        kid = auth.create_user("af-k@x.com", "secret1", "小甲", "kid", parent_id=pa, grade="G4")
+        kid = auth.create_user("af-k@x.com", "2580", "小甲", "kid", parent_id=pa, grade="G4")
         solo = auth.create_user("af-s@x.com", "secret1", "自学者甲", "kid", grade="U1")
         db.run("INSERT INTO days(user_id, day, plan, minutes, checked_in) VALUES(?,?,?,?,?)", kid, db.today().isoformat(), "[]", 20, 1)
 

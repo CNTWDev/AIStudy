@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block body %}<div class="card"><h1>不再收「{{ kind_name }}」</h1>
+{% if done %}<p>{{ email }} 已经退订了，以后不会再收到这种邮件。</p><a class="btn ghost" href="/settings">去「我的账号」</a>
+{% else %}<p>确认以后，{{ email }} 不再收到「{{ kind_name }}」。以后想再收，登录后在「我的账号」里打开。</p>
+<form method="post" action="/mail/unsub?t={{ token|urlencode }}"><button class="btn">确认退订</button></form>{% endif %}
+</div>{% endblock %}

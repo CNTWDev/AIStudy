@@ -1,0 +1,36 @@
+# beejoy 的发信配置：给家长发邮件（每周学习报告……）。完整步骤（开通发信服务、在域名里加 SPF/DKIM/DMARC）见 docs/MAIL.md。
+# 使用方法：复制为 config/mail.toml（install.sh 会自动复制），填好下面的 SMTP 账号，然后重启服务：
+#     sudo systemctl restart aistudy aistudy-worker
+# 检查配置：  sudo /opt/aistudy/install.sh check
+# 发一封试试：管理后台「站点设置」里「发一封测试邮件」，或  python -m app.cli mail-test 你的邮箱
+#
+# config/mail.toml 里有密码，已被 .gitignore 忽略，不会提交到 git。任何值都可以写成 "${环境变量名}"。
+# 邮件里的链接（看完整记录、退订）用 .env 里的 PUBLIC_URL，例如 PUBLIC_URL=https://beejoy.ai，没填就不带链接。
+
+# 提供方：smtp（任何支持 SMTP 的发信服务）/ none（关闭，什么都不发）
+provider = "none"
+
+# 发件人：必须是发信服务里验证过的地址
+from = "BeeJoy <report@mail.beejoy.ai>"
+# 家长直接回信时回到哪个邮箱（可选）
+# reply_to = "hello@beejoy.ai"
+
+# 每天最多发几封（防止程序出错时一下子发出一大堆）
+daily_limit = 500
+
+[smtp]
+# 阿里云邮件推送：smtpdm.aliyun.com，465 + ssl；用户名是发信地址，密码是在控制台给这个发信地址设置的 SMTP 密码
+# Amazon SES（东京）：email-smtp.ap-northeast-1.amazonaws.com，465 + ssl
+# Resend：smtp.resend.com，465 + ssl，用户名 resend，密码是 API Key
+# 不要用 25 端口：云服务器一般都封了 25
+host = "smtpdm.aliyun.com"
+port = 465
+security = "ssl"          # ssl（465）/ starttls（587）/ none
+username = ""             # 阿里云邮件推送：就是发信地址，例如 report@mail.beejoy.ai
+password = ""             # 或写 "${MAIL_PASSWORD}"
+timeout = 30              # 秒
+
+# 每周学习报告：周几、几点以后发（讲上一周的周一到周日）。1 = 周一
+[weekly]
+weekday = 1
+hour = 8

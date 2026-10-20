@@ -17,10 +17,10 @@ def _setup(c):
     c.post("/admin/users/create", data={"email": "trp@x.com", "password": "secret1", "name": "追爸", "role": "parent"})
     c.get("/logout")
     c.post("/login", data={"email": "trp@x.com", "password": "secret1"})
-    c.post("/parent/kids/save", data={"name": "追娃", "email": "trk@x.com", "password": "secret1", "grade": "G8",
+    c.post("/parent/kids/save", data={"name": "追娃", "email": "trk@x.com", "password": "2580", "grade": "G8",
                                       "daily_minutes": "90", "subj_physics": "phy-cambridge"})
     c.get("/logout")
-    c.post("/login", data={"email": "trk@x.com", "password": "secret1"})
+    c.post("/login", data={"email": "trk@x.com", "password": "2580"})
     return db.one("SELECT id FROM users WHERE email='trk@x.com'")["id"]
 
 
@@ -93,7 +93,7 @@ def test_trace_flow():
         page = c.get("/parent").text
         assert "根在「" in page and "按年级看摸清了多少" in page
         c.get("/logout")
-        c.post("/login", data={"email": "trk@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "trk@x.com", "password": "2580"})
 
         # 基础都没问题 → 是这个点本身没学会；「还不会」一次就可以追
         kp2 = "PHY-IG-6.2.3-01"
@@ -123,7 +123,7 @@ def test_trace_flow():
 def test_trace_language_step():
     """英文授课的物理：卡住的题没有中文翻译时，先用中文问一次；中文会 → 根在术语，术语卡今天复习。"""
     with TestClient(app) as c:
-        c.post("/login", data={"email": "trk@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "trk@x.com", "password": "2580"})
         kid = db.one("SELECT id FROM users WHERE email='trk@x.com'")["id"]
         db.run("DELETE FROM traces WHERE user_id=?", kid)  # 换一天的样子：今天还没追过
         kp = "PHY-IG-4.4-01"

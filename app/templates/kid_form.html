@@ -5,10 +5,22 @@
 {% set member_adult = k and not self_mode and self_managed(k) %}{# 家里的成人成员：家长只管账号，学习由本人在「我的课程」里安排 #}
 <form method="post" action="{{ '/me/courses' if self_mode else '/parent/kids/save' }}" class="card">
   {% if k and not self_mode %}<input type="hidden" name="id" value="{{ k.id }}">{% endif %}
-  <label>{{ '称呼' if self_mode else '名字' }}</label><input type="text" name="name" value="{{ k.name if k else '' }}" required placeholder="例如：姐姐">
-  {% if self_mode %}<p class="muted small" style="margin:4px 0 0">登录邮箱和密码在右上角「账号」里改。</p>{% else %}
-  <label>登录邮箱</label><input type="email" name="email" value="{{ k.email if k else '' }}" required>
-  {% if not k %}<label>密码（至少 6 位，孩子用它登录）</label><input type="text" name="password" required minlength="6" autocomplete="off">{% endif %}
+  {% set d = draft or {} %}
+  <label>{{ '称呼' if self_mode else '名字' }}</label><input type="text" name="name" id="kname" value="{{ k.name if k else d.name or '' }}" required placeholder="例如：姐姐">
+  {% if self_mode %}<p class="muted small" style="margin:4px 0 0">邮箱和密码在右上角「账号」里改。</p>{% else %}
+  {# 家里的成员用登录名登录：孩子记得住的小名，不用邮箱；孩子的密码是 4 位数字（docs/DESIGN.md §5.37） #}
+  <label>登录名 <span class="muted small">登录时输入，用孩子自己记得住的小名</span></label>
+  <input type="text" name="login" id="klogin" value="{{ (k.login or '') if k else d.login or '' }}" required maxlength="16" autocomplete="off" autocapitalize="off" placeholder="例如：果果、dudu">
+  {% if not k %}
+  <div id="pin-box"><label>4 位数字 <span class="muted small">孩子登录时输入，像开门的密码</span></label>
+    <input type="text" name="password" id="kpin" required inputmode="numeric" pattern="\d{4}" minlength="4" maxlength="4" autocomplete="off" placeholder="例如：2580">
+    <p class="muted small" style="margin:4px 0 0">可以和孩子一起选一个 TA 记得住、别人猜不到的，别用 1234、1111。</p></div>
+  <div id="pw-box" hidden><label>密码 <span class="muted small">至少 6 位，家里的大人用它登录</span></label>
+    <input type="text" name="password" required minlength="6" autocomplete="off" disabled></div>
+  {% elif uses_pin(k) %}<p class="muted small" style="margin:4px 0 0">{{ k.name }} 用登录名和 4 位数字登录。忘了数字、或者还在用以前的密码，在页面最下面「登录与安全」里重设一个 4 位数字。</p>{% endif %}
+  <details class="opt-email" {{ 'open' if (k and k.email) or d.email }}><summary class="small">邮箱（选填）</summary>
+    <input type="email" name="email" value="{{ (k.email or '') if k else d.email or '' }}" placeholder="孩子有邮箱再填；填了也能用邮箱登录">
+  </details>
   {% if k %}<label style="display:flex;gap:8px;align-items:center;font-weight:normal"><input type="checkbox" name="disabled" value="1" style="width:auto" {{ 'checked' if k.status == 'disabled' }}> 暂停这个账号（孩子暂时不能登录，学习记录保留）</label>{% endif %}
   {% endif %}
   <div class="row">
@@ -97,8 +109,18 @@ $('#method').onchange = _md; _md();
 const _games = () => { const box = $('#learning'); if (!box || $('#games')?.dataset.self) return;
   const adult = +($('#grade').selectedOptions[0]?.dataset.rank || 0) >= 13;
   box.hidden = adult; $$('#learning select, #learning input').forEach(x => x.disabled = adult);
-  if ($('#adult-note')) $('#adult-note').hidden = !adult; };
+  if ($('#adult-note')) $('#adult-note').hidden = !adult;
+  // 新加的成员：孩子设 4 位数字，成人成员设普通密码
+  if ($('#pin-box')) { $('#pin-box').hidden = adult; $('#pin-box input').disabled = adult;
+    $('#pw-box').hidden = !adult; $('#pw-box input').disabled = !adult; } };
 $('#grade').addEventListener('change', _games); _games();
+// 填完名字，自动给一个登录名（就用名字，重名加数字）；家长自己改过就不动
+if ($('#klogin') && !$('#klogin').value) {
+  let touched = false; $('#klogin').addEventListener('input', () => touched = true);
+  $('#kname').addEventListener('change', async () => { if (touched) return;
+    try { const r = await (await fetch('/parent/kids/login-suggest?name=' + encodeURIComponent($('#kname').value))).json();
+      if (!touched && r.login) $('#klogin').value = r.login; } catch (e) {} });
+}
 </script>
 <script src="/static/course-picker.js?v={{ ASSET_V }}" defer></script>
 {% if k and not self_mode %}{% include "_account_security.html" %}{% endif %}

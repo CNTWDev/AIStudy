@@ -34,9 +34,20 @@ def parent_home(request: Request):
 
 @router.get("/parent/kids/new", response_class=HTMLResponse)
 def kid_new_page(request: Request):
+    return _kid_new(request)
+
+
+def _kid_new(request: Request, draft: dict | None = None, msg: str = ""):
     auth.require_parent(request)
     return render(request, "kid_form.html", k=None, enrolled={}, tracks={}, exams={}, presets=catalog.presets,
-                  packs_by_subject=course_choices())
+                  packs_by_subject=course_choices(), draft=draft or {}, msg=msg)
+
+
+@router.get("/parent/kids/login-suggest")
+def login_suggest(request: Request, name: str = ""):
+    """添加孩子时，填完名字自动给一个登录名（就用名字，重名加数字）。"""
+    auth.require_parent(request)
+    return {"login": auth.suggest_login(name)}
 
 
 @router.get("/parent/kids/{kid_id}/edit", response_class=HTMLResponse)
@@ -59,50 +70,49 @@ async def kid_save(request: Request):
     p = auth.require_parent(request)
     form = await request.form()
     kid_id = form.get("id")
-    email = (form.get("email") or "").strip().lower()
     name = (form.get("name") or "").strip()
     grade = form.get("grade") or catalog.default_grade
     minutes = int(form.get("daily_minutes") or 60)
-    pw = form.get("password") or ""
+    pw = (form.get("password") or "").strip()
     if not name:
         raise HTTPException(400, "请填写孩子的名字")
     _check_exam_dates(form)
+    # 家里的成员都用登录名登录（孩子记得住的小名），邮箱选填；孩子的密码是 4 位数字，成人成员是普通密码
+    draft = {"name": name, "login": form.get("login") or "", "email": form.get("email") or "", "grade": grade}
     try:
-        email = auth.validate_email(email)
-        if pw:
-            auth.validate_pw(pw)
+        # 没填登录名（比如页面脚本没跑）：新加的就用名字起一个，编辑时保留原来的
+        raw = (form.get("login") or "").strip() or ((auth.get_user(int(kid_id)) or {}).get("login") if kid_id else None) or auth.suggest_login(name)
+        login = auth.validate_login(raw or "")
+        email = auth.validate_email(form.get("email")) if (form.get("email") or "").strip() else None
+        auth.check_free(email, login, int(kid_id) if kid_id else None)
     except ValueError as e:
-        raise HTTPException(400, str(e))
-    other = auth.by_email(email)
+        if kid_id:
+            raise HTTPException(400, str(e))
+        return _kid_new(request, draft=draft, msg=str(e))
     old_grade = None
     if kid_id:
         k = auth.kid_of(p, int(kid_id), account_only=True)
         old_grade = k["grade"]
-        if other and other["id"] != k["id"]:
-            raise HTTPException(400, "这个邮箱已被别的账号使用")
         if not auth.self_managed(k):
-            db.run("UPDATE users SET email=?, name=?, grade=?, school=?, daily_minutes=? WHERE id=?",
-                   email, name, grade, form.get("school") or "", minutes, k["id"])
+            db.run("UPDATE users SET login=?, email=?, name=?, grade=?, school=?, daily_minutes=? WHERE id=?",
+                   login, email, name, grade, form.get("school") or "", minutes, k["id"])
         else:  # 成人成员：家长只管账号，学校、每天时长由本人定
-            db.run("UPDATE users SET email=?, name=?, grade=? WHERE id=?", email, name, grade, k["id"])
-        if pw:
-            auth.set_password(k["id"], pw)
-            auth.log_event("password_set_by_parent", user_id=k["id"], email=email, detail=f"by {p['email']}", request=request)
+            db.run("UPDATE users SET login=?, email=?, name=?, grade=? WHERE id=?", login, email, name, grade, k["id"])
         status = "disabled" if form.get("disabled") else "active"
         if status != k["status"]:
             auth.set_status(k["id"], status)
         kid_id = k["id"]
     else:
-        if not pw:
-            raise HTTPException(400, "请给孩子设一个密码")
         try:
-            kid_id = auth.create_user(email, pw, name, "kid", parent_id=p["id"], grade=grade,
+            kid_id = auth.create_user(email, pw, name, "kid", parent_id=p["id"], grade=grade, login=login,
                                       school=form.get("school") or "", daily_minutes=minutes)
         except ValueError as e:
-            raise HTTPException(400, str(e))
+            return _kid_new(request, draft=draft, msg=str(e))
     # 学习安排只给未成年的孩子：成人成员由本人在「我的课程」里安排。成人改回孩子年级的这一次，表单里没有学习安排，先不动原来的课程
     if not is_adult(grade) and not (old_grade and is_adult(old_grade)):
         _save_learning(kid_id, form, grade, old_grade)
+    if not old_grade:  # 刚添加：给家长一张「登录卡」，照着告诉孩子怎么登录（4 位数字只在这一次显示）
+        return render(request, "kid_card.html", k=auth.get_user(kid_id), pin=pw)
     return RedirectResponse("/parent", 303)
 
 
