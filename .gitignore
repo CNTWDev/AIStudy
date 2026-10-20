@@ -7,5 +7,6 @@ venv/
 .pytest_cache/
 config/llm.toml
 config/tts.toml
+config/mail.toml
 *.sql.gz
 config/news.json

@@ -13,6 +13,7 @@
   python -m app.cli bank-maintain                    手动跑一轮题库流水线（改编入库、校对答案、校准难度；平时后台自动跑）
   python -m app.cli backup [目标目录]                 备份数据库（PostgreSQL 用 pg_dump）
   python -m app.cli tts-test [文字]                  朗读：不经过缓存真实调用一次，打印配置和厂商返回的原始报错
+  python -m app.cli mail-test 收件邮箱                发一封测试邮件，打印发信配置和服务商返回的原始报错
   python -m app.cli library fetch [--all|--retry] [书的id ...] 下载书库的公版原文（默认只下还没有的、坏了的，最近失败过的先跳过；
                                                      --retry 失败过的也马上重试；--all 全部重新下载）
   python -m app.cli library rebuild                    按新的整理规则重新整理已下载的书（不重新下载）
@@ -82,6 +83,12 @@ def check(with_llm: bool) -> int:
     from . import tts_web
     ok, why = tts_web.check()
     print(f"  [{' OK ' if ok else 'INFO'}] 朗读：{why}" + ("" if ok else "（用浏览器自带的声音）"))
+    from . import mailer
+    ok, why = mailer.check()
+    if mailer.settings().error:
+        print(f"  [WARN] 邮件还不能用：{why}（其余功能正常；填好 config/mail.toml 后重启服务）")
+    else:
+        print(f"  [{' OK ' if ok else 'INFO'}] 邮件：{why}")
     print("全部正常" if good else "有问题需要处理（见上面 [FAIL]）")
     return 0 if good else 1
 
@@ -117,6 +124,25 @@ def tts_test(text: str) -> int:
     except OSError as e:
         print(f"[FAIL] 缓存目录写不进去：{tts_web.TTS_DIR}（{e}）")
         return 1
+    return 0
+
+
+def mail_test(to: str) -> int:
+    from . import auth, mailer
+    s = mailer.settings()
+    print(f"配置文件：{s.source or mailer.MAIL_CONFIG_FILE}")
+    print(f"提供方：{s.provider}  服务器：{s.host}:{s.port}（{s.security}）  账号：{s.username or '(空)'}  发件人：{s.sender or '(空)'}")
+    try:
+        to = auth.validate_email(to)
+    except ValueError:
+        print("用法：python -m app.cli mail-test 收件邮箱")
+        return 2
+    try:
+        mailer.send_test(to)
+    except Exception as e:  # noqa: BLE001
+        print(f"[FAIL] 没发出去：{type(e).__name__}: {e}")
+        return 1
+    print(f"[ OK ] 已发给 {to}，去收件箱看看（也看看垃圾箱）")
     return 0
 
 
@@ -192,6 +218,8 @@ def main(argv) -> int:
         return check_curricula()
     if cmd == "tts-test":
         return tts_test(" ".join(args) or "Hello, this is a test.")
+    if cmd == "mail-test":
+        return mail_test(args[0] if args else "")
     if cmd == "library":
         from .library import library
         if args and args[0] == "rebuild":

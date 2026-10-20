@@ -5,7 +5,7 @@ import sys
 import threading
 import time
 
-from . import bank, bankflow, config, curriculum_admin, db, engine, evidence, news
+from . import bank, bankflow, config, curriculum_admin, db, engine, evidence, mailer, news
 from .catalog import catalog
 from .content import content
 from .methods import methods
@@ -26,22 +26,21 @@ def main(once=False):
     engine.load_seed_lessons(config.SEED_DIR)
     bank.sync()
     evidence.ensure_current()
-    next_bank = next_news = 0.0
+    # 每个后台任务多久跑一次（秒）；mail：到点写每周报告、发队列里的信（app/mailer.py）
+    jobs = [('bank', bankflow.run_once, bankflow.INTERVAL), ('news', news.run_daily, 20 * 60), ('mail', mailer.run, 2 * 60)]
+    due = {name: 0.0 for name, _, _ in jobs}
     try:
         while not stopped.is_set():
             curriculum_admin.refresh()
             now = time.monotonic()
-            for name, run, due in [('bank', bankflow.run_once, next_bank), ('news', news.run_daily, next_news)]:
-                if now < due or stopped.is_set():
+            for name, run, every in jobs:
+                if now < due[name] or stopped.is_set():
                     continue
                 try:
                     log.info('%s: %s', name, run())
                 except Exception:
                     log.exception('%s failed; retry on next scheduled run', name)
-                if name == 'bank':
-                    next_bank = now + bankflow.INTERVAL
-                else:
-                    next_news = now + 20 * 60
+                due[name] = now + every
             if once:
                 break
             stopped.wait(30)

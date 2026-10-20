@@ -90,11 +90,11 @@ def _week(user_id: int, start, end) -> dict:
                            user_id, start.isoformat(), end.isoformat())["n"]}
 
 
-def weekly(user_id: int) -> dict | None:
-    """每周进步卡：上周（周一到周日）和再上一周比。上周没学就不出卡。"""
+def weekly(user_id: int, last_mon=None) -> dict | None:
+    """每周进步卡：上周（周一到周日）和再上一周比。上周没学就不出卡。last_mon：指定哪一周（每周报告邮件用）。"""
     today = db.today()
-    this_mon = today - timedelta(days=today.weekday())
-    last_mon = this_mon - timedelta(days=7)
+    last_mon = last_mon or today - timedelta(days=today.weekday() + 7)
+    this_mon = last_mon + timedelta(days=7)
     w1, w0 = _week(user_id, last_mon, this_mon), _week(user_id, last_mon - timedelta(days=7), last_mon)
     if not (w1["days"] or w1["attempts"]):
         return None

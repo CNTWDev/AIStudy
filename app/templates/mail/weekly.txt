@@ -1,0 +1,32 @@
+{{ parent.name }}，你好：
+
+这是 {{ site }} 上周（{{ span }}）的学习报告。
+{% for k in kids %}
+
+【{{ k.name }}】
+上周学了 {{ k.days }} 天（共 7 天），一共 {{ k.minutes }} 分钟，做题 {{ k.attempts }} 道。{% if k.streak %}现在连续学习 {{ k.streak }} 天。{% endif %}
+{% if k.lines %}
+比再上一周进步的地方：
+{% for l in k.lines %}
+  · {{ l }}
+{% endfor %}
+{% endif %}
+{% if k.found %}
+系统发现的问题：
+{% for f in k.found %}
+  · {{ f.title }}{% if f.detail %}：{{ f.detail }}{% endif %}
+
+{% endfor %}
+{% endif %}
+{% if not k.days %}
+上周没有学习记录。孩子每天做完今天的第一项就算学了一天。
+{% endif %}
+{% if base %}
+完整记录：{{ base }}/parent/kids/{{ k.id }}
+{% endif %}
+{% endfor %}
+
+——
+这封信每周发一次。{% if unsub %}不想再收：{{ unsub }}{% endif %}
+
+也可以在网站「我的账号」里关掉「{{ kind_name }}」。

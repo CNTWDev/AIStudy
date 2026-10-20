@@ -2,7 +2,7 @@
 from fastapi import APIRouter
 from fastapi import Body, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
-from .. import arena, auth, bank, boards, bankflow, bankpapers, config, db, evidence, itemtypes, llm, papers, sitecfg, tts_web
+from .. import arena, auth, bank, boards, bankflow, bankpapers, config, db, evidence, itemtypes, llm, mailer, papers, sitecfg, tts_web
 from datetime import timedelta
 from urllib.parse import urlencode
 from ..web import (
@@ -121,7 +121,7 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
         ctx.update(reg_mode=sitecfg.registration(), reg_modes=sitecfg.REG_MODES, site={k: sitecfg.get(k) for k in sitecfg.DEFAULTS},
                    llm_status=llm.check(), migrations=migrate.status(), tts_status=tts_web.check(), tts_stats=tts_web.stats(),
                    tts_speeds=tts_web.service().s.speeds, tts_audition=tts_web.AUDITION_SPEEDS,
-                   version=_version(), db_dialect=db.DIALECT)
+                   version=_version(), db_dialect=db.DIALECT, mail_status=mailer.check(), mail_recent=mailer.recent(10))
     ctx["me"] = a
     return render(request, "admin.html", **ctx)
 
@@ -143,6 +143,17 @@ async def admin_settings(request: Request):
     auth.log_event("site_settings", user_id=a["id"], email=a["email"], detail=",".join(f"{k}={v}" for k, v in vals.items()),
                    request=request)
     return _admin_back("system", msg="站点设置已保存，立即生效")
+
+
+@router.post("/admin/mail/test")
+def admin_mail_test(request: Request, to: str = Form(...)):
+    a = auth.require_admin(request)
+    try:
+        mailer.send_test(auth.validate_email(to))
+    except Exception as e:  # noqa: BLE001  直接把原因给管理员看（认证失败、连不上、证书……）
+        return _admin_back("system", msg=f"测试邮件没发出去：{type(e).__name__}: {e}")
+    auth.log_event("mail_test", user_id=a["id"], email=a["email"], detail=to, request=request)
+    return _admin_back("system", msg=f"测试邮件已发给 {to}，去收件箱看看（也看看垃圾箱）")
 
 
 @router.post("/admin/users/create")
