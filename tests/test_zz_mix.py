@@ -33,7 +33,7 @@ def test_calendar_estimate():
         e = {"pack_id": "math-shanghai", "stage": "G3", "track": None}
         u = {"grade": "G3"}
         est = schoolyear.estimate(u, e, date(2026, 10, 17))
-        assert est["phase"] == "term" and est["current"]["key"] == "乘法"
+        assert est["phase"] == "term" and est["current"]["key"] == "二、用一位数乘"
         # 寒假：上册学完，下册还没开始，不推新课
         est = schoolyear.estimate(u, e, date(2027, 2, 1))
         assert est["phase"] == "vacation" and est["current"] is None

@@ -360,41 +360,42 @@ def test_daily_tasks_progress_and_tools(monkeypatch):
         def math_taught():   # 别的课（英语、语文……）也按校历推演了学过的，这里只看数学
             return {x["kp_id"] for x in db.q("SELECT kp_id FROM kp_taught WHERE user_id=?", kid_b) if x["kp_id"].startswith("MSH-")}
 
-        # 更新学校进度（按章）：口算学过了，正在学乘法 → 正在学的知识点 = 乘法这一章里第一个
+        # 更新学校进度（按章）：第一章学过了，正在学「用一位数乘」 → 正在学的知识点 = 这一章里的某一个
         # （有校历的课：家长点的章存成「比校历快 / 慢几章」，以后照样按日期往前走）
         assert "学到哪一章了" in c.get("/progress").text and "按校历" in c.get("/progress").text
-        r = c.post("/progress/math-shanghai", data={"stage": "G3", "chapter": "乘法", "done_ch": ["口算与估算"]})
+        r = c.post("/progress/math-shanghai", data={"stage": "G3", "chapter": "二、用一位数乘", "done_ch": ["一、两步四则运算与应用题"]})
         assert "进度已更新" in r.text
         e = db.one("SELECT * FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)
-        # 和校历估计的同一章：照日期推到这一章的第二个（10 月中旬）
-        assert e["progress_kp"] == "MSH-NUM-20"
-        assert math_taught() == {"MSH-NUM-16", "MSH-NUM-17", "MSH-NUM-20"}
+        # 和校历估计的同一章：照日期推到这一章的第一个（10 月中旬）
+        assert e["progress_kp"] == "MSH-NUM-16"
+        assert math_taught() == {"MSH-NUM-21", "MSH-APP-04", "MSH-NUM-16"}
         # 家长说学校慢一章 / 快一章：存成偏移，换到那一章的开头
         assert "已调整" in c.post("/progress/math-shanghai", data={"adjust": "-1"}).text
-        assert db.one("SELECT progress_kp FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["progress_kp"] == "MSH-NUM-16"
-        assert math_taught() == {"MSH-NUM-16"}
+        assert db.one("SELECT progress_kp FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["progress_kp"] == "MSH-NUM-21"
+        assert math_taught() == {"MSH-NUM-21"}
         # 正在学的知识点掌握了 → 换成这一章的下一个；这一章都会了就不排新的（下一章留给预习）
-        db.run("INSERT INTO mastery(user_id,kp_id,score,status) VALUES(?,?,?,?) ON CONFLICT(user_id,kp_id) DO UPDATE SET "
-               "status='mastered'", kid_b, "MSH-NUM-16", 0.95, "mastered")
+        for k in ("MSH-NUM-21", "MSH-APP-04"):
+            db.run("INSERT INTO mastery(user_id,kp_id,score,status) VALUES(?,?,?,?) ON CONFLICT(user_id,kp_id) DO UPDATE SET "
+                   "status='mastered'", kid_b, k, 0.95, "mastered")
         c.post("/api/plan/rebuild")
         assert db.one("SELECT progress_kp FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["progress_kp"] is None
-        db.run("DELETE FROM mastery WHERE user_id=? AND kp_id='MSH-NUM-16'", kid_b)
+        db.run("DELETE FROM mastery WHERE user_id=? AND kp_id IN ('MSH-NUM-21','MSH-APP-04')", kid_b)
         c.post("/progress/math-shanghai", data={"adjust": "+1"})   # 又回到校历估计的位置
-        assert db.one("SELECT progress_kp FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["progress_kp"] == "MSH-NUM-20"
+        assert db.one("SELECT progress_kp FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["progress_kp"] == "MSH-NUM-16"
         # 旧的按知识点报进度（老页面 / 接口）也还能用
-        r = c.post("/progress/math-shanghai", data={"stage": "G3", "current": "MSH-NUM-20",
-                                                   "taught": ["MSH-NUM-16", "MSH-NUM-17"]})
+        r = c.post("/progress/math-shanghai", data={"stage": "G3", "current": "MSH-NUM-17",
+                                                   "taught": ["MSH-NUM-21", "MSH-APP-04", "MSH-NUM-16"]})
         assert "进度已更新" in r.text
         e = db.one("SELECT * FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)
-        assert e["progress_kp"] == "MSH-NUM-20"
-        assert math_taught() == {"MSH-NUM-16", "MSH-NUM-17", "MSH-NUM-20"}
+        assert e["progress_kp"] == "MSH-NUM-17"
+        assert math_taught() == {"MSH-NUM-21", "MSH-APP-04", "MSH-NUM-16", "MSH-NUM-17"}
         plan = c.post("/api/plan/rebuild").json()["plan"]
         assert c.post("/api/progress/snooze").json()["ok"]  # 这周跳过：一周内不再提示
         assert "这周学校学了啥" not in c.get("/today").text
         # 正在学的不再是单独的任务：在每门课的混合练习里，作为「新学的」出好几次（每天 60 分钟排不下所有课：几门课轮着打头）
         assert any(t["type"] == "mix" for t in plan), [(t["type"], t.get("pack"), t["minutes"]) for t in plan]
         from app import mix
-        assert [s["kp"] for s in mix.build(kid_b, "math-shanghai", 12) if s["role"] == "new"].count("MSH-NUM-20") >= 2
+        assert [s["kp"] for s in mix.build(kid_b, "math-shanghai", 12) if s["role"] == "new"].count("MSH-NUM-17") >= 2
         # 再次只改学段：清空正在学，保留勾选
         c.post("/progress/math-shanghai", data={"stage": "G4"})
         assert db.one("SELECT stage FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["stage"] == "G4"
