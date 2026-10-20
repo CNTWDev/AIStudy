@@ -558,10 +558,11 @@ def test_site_settings_and_insights():
 
         kid_b = db.one("SELECT id FROM users WHERE email='b@x.com'")["id"]
         # 制造一些信号：两个薄弱点共用一个前置、同一知识点两次「还不会」、同一个词查了两次
+        sh = set(catalog.packs["math-shanghai"].kp_ids)
         root = next(k for k in catalog.packs["math-shanghai"].kp_ids
-                    if len([s for s in catalog.successors(k) if s["pack"] == "math-shanghai"]) >= 2
+                    if len([s for s in catalog.successors(k) if s["id"] in sh]) >= 2
                     and engine.get_mastery(kid_b).get(k, {}).get("status") != "mastered")
-        for s2 in [s for s in catalog.successors(root) if s["pack"] == "math-shanghai"][:2]:
+        for s2 in [s for s in catalog.successors(root) if s["id"] in sh][:2]:
             engine.set_mastery(kid_b, s2["id"], 0.2, "weak", "test")
         c.post("/login", data={"email": "b@x.com", "password": "secret1"})
         assert "问小星" in c.get("/today").text and "我家学习本" in c.get("/today").text
@@ -675,7 +676,7 @@ def test_explore_warmup_and_selection(monkeypatch):
         unk = lambda k: m.get(k, {}).get("status") in (None, "unknown")  # noqa: E731
         rng = [k for e in db.q("SELECT * FROM enrollments WHERE user_id=? AND active=1", kid) for k in explore.past_range(kid, e)]
         target = next(k for k in rng if unk(k) and any(unk(p["id"]) for p, _ in catalog.ancestors(k, depth=2)))
-        tpack = catalog.kps[target]["pack"]
+        tpack = explore.engine.pack_of(kid, target)
         it = explore.engine.items_for(kid, target, n=1, purpose="diagnose", grade="G8")[0]
         good = it["answer"] if it["type"] == "mcq" else (it["answer"][0] if isinstance(it["answer"], list) else it["answer"])
         r = c.post("/api/answer", json={"item_id": it["id"], "kp_id": target, "mode": "probe", "answer": good, "probe": {}}).json()

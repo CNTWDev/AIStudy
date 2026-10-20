@@ -133,8 +133,8 @@ def test_ai_items_keep_good_figures(monkeypatch):
     assert "改编题也必须带 fig" in seen["variant"]
     # 要看图的知识点（电路）：要求一组题里至少一半带图；不用看图的知识点不要求
     assert "至少一半要带 fig" in seen["items"] and "电路图" in tasks._figs_note(kp, pack)
-    plain = next(k for k in catalog.kps.values() if k["pack"] == "math-shanghai" and "口算" in k["name"])
-    assert tasks._figs_note(plain, catalog.packs["math-shanghai"]) == ""
+    plain = next(k for k in catalog.kps.values() if k["pack"] == "math-cn" and "口算" in k["name"])
+    assert tasks._figs_note(plain, catalog.packs["math-cn"]) == ""
 
 
 def test_items_for_tops_up_figures_once(monkeypatch):

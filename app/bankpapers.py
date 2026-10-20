@@ -39,7 +39,7 @@ def create(admin_id: int, pack_id: str, *, kind="real", stage="", title="", exam
     pages = [b for _, b in (images or [])]
     imgs = [(mt, base64.b64encode(b).decode()) for mt, b in (images or [])]
     # 真题会考到整套教材 / 大纲里的任何地方：候选知识点给到这个学段为止的全部
-    cands = [catalog.kps[k] for k in pack.kp_ids if stage_rank(catalog.kps[k]["stage"]) <= stage_rank(stage)]
+    cands = [kp for k in pack.kp_ids if stage_rank((kp := catalog.kp_in(pack.id, k))["stage"]) <= stage_rank(stage)]
     data = llm.parse_paper(pack, stage, cands, images=imgs, text=text, user_id=admin_id)
     qs = data.get("questions", [])
     if not qs:

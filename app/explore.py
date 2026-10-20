@@ -43,7 +43,7 @@ def past_range(user_id: int, e, taught: set | None = None) -> list[str]:
     taught = engine.taught_set(user_id) if taught is None else taught
     cur = stage_rank(e["stage"])
     return [k for k in catalog.ids_for(e["pack_id"], e["track"])
-            if stage_rank(catalog.kps[k]["stage"]) < cur or k in taught]
+            if stage_rank(catalog.stage_in(e["pack_id"], k)) < cur or k in taught]
 
 
 def coverage(user_id: int, mastery: dict | None = None) -> list[dict]:
@@ -60,7 +60,7 @@ def coverage(user_id: int, mastery: dict | None = None) -> list[dict]:
         # 按学段分开看：哪个年级的旧知识还没摸、哪里只是推断会、哪里薄弱（家长页显示）
         stages: dict[str, dict] = {}
         for k, m in zip(rng, st):
-            g = stages.setdefault(catalog.kps[k]["stage"], {"total": 0, "known": 0, "inferred": 0, "weak": 0})
+            g = stages.setdefault(catalog.stage_in(e["pack_id"], k), {"total": 0, "known": 0, "inferred": 0, "weak": 0})
             g["total"] += 1
             g["known"] += m.get("status") not in (None, "unknown")
             g["inferred"] += m.get("source") == "inferred"
@@ -419,8 +419,8 @@ def ahead(user_id: int, mastery: dict | None = None) -> list[dict]:
             nxt = engine.next_after(e["pack_id"], e["progress_kp"], mastery, taught, e["track"])
         if not nxt:
             cur = stage_rank(e["stage"])
-            nxt = next((catalog.kps[k] for k in catalog.ids_for(e["pack_id"], e["track"])
-                        if stage_rank(catalog.kps[k]["stage"]) in (cur, cur + 1) and k not in taught
+            nxt = next((kp for k in catalog.ids_for(e["pack_id"], e["track"])
+                        if stage_rank((kp := catalog.kp_in(e["pack_id"], k))["stage"]) in (cur, cur + 1) and k not in taught
                         and mastery.get(k, {}).get("status") in (None, "unknown")), None)
         if not nxt:
             continue

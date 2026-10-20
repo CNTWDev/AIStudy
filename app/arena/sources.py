@@ -130,7 +130,6 @@ class Source:
 
 # ------------------------------------------------------------------ 数学口算（现场生成）
 
-MATH_PACK = "math-shanghai"
 FAR_BEHIND = 3      # 比孩子低 3 个年级以上的口算，除非这个知识点查出薄弱，不再出
 
 
@@ -138,7 +137,7 @@ class MathSource(Source):
     id, name, icon, desc = "math", "口算和公式", "🔢", "口算、短计算、单位换算和代公式，数字现场生成"
 
     def _rank(self, ctx: Ctx) -> float:
-        e = next((e for e in ctx.packs if e["pack_id"] == MATH_PACK), None)
+        e = next((e for e in ctx.packs if catalog.packs[e["pack_id"]].subject == "math"), None)
         r = stage_rank(e["stage"]) if e else ctx.rank
         return r if r < 99 else 6.0
 
@@ -150,8 +149,8 @@ class MathSource(Source):
             kp = catalog.kps.get(kp_id)
             if not kp:
                 continue
-            if kp["pack"] != MATH_PACK:   # 别的学科的基本功（物理的单位、公式）：只给报了那门课的孩子，按正在学的算
-                if kp["pack"] not in enrolled:
+            if catalog.packs[kp["pack"]].subject != "math":   # 别的学科的基本功（物理的单位、公式）：只给报了那门课的孩子，按正在学的算
+                if not enrolled & set(catalog.kp_packs.get(kp_id, [])):
                     continue
                 r = rank
             elif stage_rank(kp["stage"]) > rank:
@@ -368,7 +367,7 @@ class BankSource(Source):
                 top = stage_rank(e["stage"])
                 top = top if top < 99 else ctx.rank
                 for k in catalog.ids_for(pack.id, e.get("track")):
-                    kp = catalog.kps[k]
+                    kp = catalog.kp_in(pack.id, k)
                     if kp.get("strand") in skip:
                         continue
                     r = stage_rank(kp["stage"])

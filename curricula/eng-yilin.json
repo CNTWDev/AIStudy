@@ -1,0 +1,230 @@
+{
+ "pack": {
+  "id": "eng-yilin",
+  "base": "eng-cn",
+  "subject": "english",
+  "edition": "译林版英语（三年级起点 · 2022 课标新版，小学 + 初中）",
+  "region": "江苏公办",
+  "system": "cn",
+  "kind": "textbook",
+  "school_types": [
+   "public"
+  ],
+  "stages": [
+   "G3",
+   "G4",
+   "G5",
+   "G6",
+   "G7",
+   "G8",
+   "G9"
+  ],
+  "version": 1,
+  "verified": "2026-10-20",
+  "publisher": "译林出版社",
+  "sources": [
+   "教育部《2024年义务教育国家课程教学用书目录（根据2022年版课程标准修订）》 https://jw.beijing.gov.cn/xxgk/2024zcwj/2024qtwj/202408/W020240905543232813376.pdf",
+   "江苏 2025 秋新教材投入使用 https://www.yzwb.net/news/jiangsu/nanjing/202508/t20250822_253531.html",
+   "译林教材培训 https://edu.yilin.com/index.php/NewsDetail/index?cat_id=2&id=81&nav_id=1"
+  ],
+  "notes": "江苏公办英语（三年级起，有的区一年级起另有一二年级用书）。已列出能读到新版目录的小学册次；初中七八年级新版的单元名已查到（This is me! / Hobbies …），但单元里的语法点还没核对，暂按课标主干的顺序排（「目录待核实」）。单元词表以后跟着目录放。",
+  "selection": {
+   "name": "译林版英语（江苏）",
+   "hint": "课本封面印「译林出版社」，三年级起点。2024 年以后的新版。",
+   "warning": "四下以后的目录还在核实。"
+  }
+ },
+ "books": [
+  {
+   "stage": "G3",
+   "term": "上",
+   "name": "三年级上册",
+   "status": "partial",
+   "sources": [
+    "https://www.renjiaoshe.com/jiaocai/2542.html",
+    "https://www.renjiaoshe.com/p/513604.html"
+   ],
+   "note": "单元名已对照目录；每个单元对应哪些知识点，是按单元话题和交际功能判断的，拿到课本后再核对。",
+   "units": [
+    {
+     "name": "Unit 1 Hello!",
+     "kps": [
+      "ESH-LIS-01"
+     ]
+    },
+    {
+     "name": "Unit 2 What's your name?",
+     "kps": [
+      "ESH-GRA-01",
+      "ESH-LIS-04"
+     ]
+    },
+    {
+     "name": "Unit 3 Are you Su Hai?",
+     "kps": [
+      "ESH-GRA-05"
+     ]
+    },
+    {
+     "name": "Unit 4 This is my friend",
+     "kps": [
+      "ESH-GRA-01"
+     ]
+    },
+    {
+     "name": "Unit 5 She's my mother",
+     "kps": [
+      "ESH-VOC-06",
+      "ESH-GRA-09"
+     ]
+    },
+    {
+     "name": "Unit 6 Is he your grandpa?",
+     "kps": [
+      "ESH-VOC-06",
+      "ESH-GRA-05"
+     ]
+    },
+    {
+     "name": "Unit 7 Happy Birthday!",
+     "kps": [
+      "ESH-VOC-05"
+     ]
+    },
+    {
+     "name": "Unit 8 I can do this for you",
+     "kps": [
+      "ESH-GRA-06"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G3",
+   "term": "下",
+   "name": "三年级下册",
+   "status": "partial",
+   "sources": [
+    "https://www.renjiaoshe.com/jiaocai/2543.html",
+    "https://www.dzkbw.org/book/5846.html"
+   ],
+   "note": "单元名已对照目录；每个单元对应哪些知识点，是按单元话题和交际功能判断的，拿到课本后再核对。",
+   "units": [
+    {
+     "name": "Unit 1 School things",
+     "kps": [
+      "ESH-GRA-02",
+      "ESH-GRA-11"
+     ]
+    },
+    {
+     "name": "Unit 2 Clean our classroom",
+     "kps": [
+      "ESH-GRA-13"
+     ]
+    },
+    {
+     "name": "Unit 3 School rules",
+     "kps": [
+      "ESH-GRA-13"
+     ]
+    },
+    {
+     "name": "Unit 4 Have fun after class",
+     "kps": [
+      "ESH-GRA-03"
+     ]
+    },
+    {
+     "name": "Unit 5 Fruit",
+     "kps": [
+      "ESH-VOC-04",
+      "ESH-GRA-12"
+     ]
+    },
+    {
+     "name": "Unit 6 On the farm",
+     "kps": [
+      "ESH-GRA-04",
+      "ESH-GRA-14"
+     ]
+    },
+    {
+     "name": "Unit 7 Animals",
+     "kps": [
+      "ESH-VOC-04"
+     ]
+    },
+    {
+     "name": "Unit 8 Colours",
+     "kps": [
+      "ESH-VOC-02"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G4",
+   "term": "上",
+   "name": "四年级上册",
+   "status": "partial",
+   "sources": [
+    "https://www.dzkbw.org/book/5847.html"
+   ],
+   "note": "单元名已对照目录；每个单元对应哪些知识点，是按单元话题和交际功能判断的，拿到课本后再核对。",
+   "units": [
+    {
+     "name": "Unit 1 Our school subjects",
+     "kps": [
+      "ESH-GRA-03",
+      "ESH-GRA-17"
+     ]
+    },
+    {
+     "name": "Unit 2 My day",
+     "kps": [
+      "ESH-VOC-11",
+      "ESH-GRA-15"
+     ]
+    },
+    {
+     "name": "Unit 3 My week",
+     "kps": [
+      "ESH-VOC-11",
+      "ESH-GRA-19"
+     ]
+    },
+    {
+     "name": "Unit 4 I like sport",
+     "kps": [
+      "ESH-GRA-20"
+     ]
+    },
+    {
+     "name": "Unit 5 Different toys, same fun",
+     "kps": [
+      "ESH-VOC-09"
+     ]
+    },
+    {
+     "name": "Unit 6 Weather",
+     "kps": [
+      "ESH-VOC-07"
+     ]
+    },
+    {
+     "name": "Unit 7 Seasons",
+     "kps": [
+      "ESH-VOC-07"
+     ]
+    },
+    {
+     "name": "Unit 8 What we wear",
+     "kps": [
+      "ESH-VOC-09"
+     ]
+    }
+   ]
+  }
+ ]
+}
