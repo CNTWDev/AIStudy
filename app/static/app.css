@@ -637,6 +637,12 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 
 /* Compact curriculum selection: expose only the chosen course and its matching guide. */
 .course-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:16px}
+/* 添加孩子：按学校模板默认排好的课，一行一门，后面「换」 */
+.course-sum{margin-top:12px}.course-sum-h{font-weight:600;margin-bottom:6px;line-height:1.5}
+.course-sum-list{display:grid;grid-template-columns:1fr auto;gap:6px 10px;font-size:15px;align-items:center}
+.course-sum-list .linkbtn,#login-edit{color:var(--brand-ink);font-weight:600}
+.kid-new{max-width:640px}
+.course-adjust{margin-top:10px}.course-adjust>summary{cursor:pointer;color:var(--brand-ink)}
 .course-choice{min-width:0;border:1px solid var(--line);border-radius:18px;padding:16px;background:var(--card)}
 .course-choice>label{font-size:18px;margin:0 0 8px}
 .course-info[hidden]{display:none}

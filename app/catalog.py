@@ -618,5 +618,42 @@ class Catalog:
     def preset(self, preset_id: str) -> dict | None:
         return next((p for p in self.presets if p["id"] == preset_id), None)
 
+    # 添加孩子时「在哪上学」：学校类型（和教材包的 school_types 同一套词）
+    SCHOOL_TYPES = {"public": "公办", "private": "民办双语", "international": "国际学校"}
+
+    @property
+    def regions(self) -> list[str]:
+        """有学校模板的地区（模板里写了 region 的），按模板顺序；其它地区家长逐科选。"""
+        return list(dict.fromkeys(p["region"] for p in self.presets if p.get("region")))
+
+    def match_preset(self, region: str, school_type: str, grade: str) -> dict | None:
+        """按 地区 + 学校类型 + 年级 找学校模板：先找这个地区的，再找各地通用的（国际学校）；
+        这个地区没有这类学校的模板（比如江苏的民办），就按同地区公办的教材起步。"""
+        g = stage_rank(grade)
+        def fits(p, st):
+            lo, hi = (p.get("grades") or [None, None])[0], (p.get("grades") or [None, None])[-1]
+            return (p.get("school_type") == st and (not lo or stage_rank(lo) <= g <= stage_rank(hi))
+                    and p.get("region", "") in (region, ""))
+        for st in dict.fromkeys((school_type, "public")):
+            hits = sorted((p for p in self.presets if fits(p, st)), key=lambda p: not p.get("region"))
+            if hits:
+                return hits[0]
+        return None
+
+    def default_courses(self, region: str, school_type: str, grade: str) -> tuple[dict | None, list[dict]]:
+        """添加孩子时按 地区 + 学校类型 + 年级 默认安排的课：模板里这个年级用得上的教材；
+        没有模板的地区先只排统编语文（全国通用），其余由家长逐科选。"""
+        preset = self.match_preset(region, school_type, grade)
+        choices = preset["packs"] if preset else {"chinese": "chn-tongbian"}
+        g, out = stage_rank(grade), []
+        for subj, choice in choices.items():
+            pid = choice["pack"] if isinstance(choice, dict) else choice
+            p = self.packs.get(pid)
+            if not p or p.standard or not p.stages or not (stage_rank(p.stages[0]) <= g <= stage_rank(p.stages[-1]) + 0.5):
+                continue
+            out.append({"subject": subj, "pack": pid, "track": choice.get("track", "") if isinstance(choice, dict) else "",
+                        "subject_name": p.subject_name, "name": self.selection_guide(p)["name"]})
+        return preset, out
+
 
 catalog = Catalog()

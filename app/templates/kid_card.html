@@ -15,7 +15,7 @@
     {% if pin_user %}<li>以后在这台设备上，点自己的头像，再输数字就行</li>{% endif %}
   </ol>
   {% if pin_user %}<p class="hint small kc-tip">第一次最好陪 {{ k.name }} 一起登录一次，让 TA 自己输一遍数字。几个孩子共用一台设备时，点右上角「账号」→「退出登录」，再点自己的头像就换过来了。</p>{% endif %}
-  <p class="muted small kc-tip">{{ '4 位数字' if pin_user else '密码' }}只在这里显示这一次。忘了也没关系，在家长页编辑 {{ k.name }}，在「登录与安全」里重设。</p>
+  <p class="muted small kc-tip">{{ '4 位数字' if pin_user else '密码' }}只在这里显示这一次。忘了也没关系，在家长页编辑 {{ k.name }}，在「登录与安全」里重设。登录名按名字自动起的，想换个更好记的，也在那里改。</p>
   <div class="row kc-actions" style="margin-top:12px"><a class="btn" href="/parent">回到家长页</a><button class="btn ghost" type="button" onclick="print()">打印这张卡</button></div>
 </div>
 {% endblock %}
