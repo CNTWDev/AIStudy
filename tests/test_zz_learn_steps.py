@@ -11,9 +11,9 @@ def test_learn_page_is_step_cards():
         if not auth.by_email("admin@x.com"):
             c.post("/register", data={"email": "admin@x.com", "password": "secret1", "name": "站长"})
         pa = auth.create_user("ls-p@x.com", "secret1", "家长", "parent")
-        auth.create_user("ls-k@x.com", "secret1", "小宝", "kid", parent_id=pa, grade="G6")
+        auth.create_user("ls-k@x.com", "2580", "小宝", "kid", parent_id=pa, grade="G6")
         c.post("/logout")
-        c.post("/login", data={"email": "ls-k@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "ls-k@x.com", "password": "2580"})
         page = c.get("/learn/MATH-PRE-UNIT").text
         assert page.index('data-step="why"') < page.index('data-step="see"') < page.index('data-step="method"')
         # 一次只显示一张：第一张是导入，其余的先藏着

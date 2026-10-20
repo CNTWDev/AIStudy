@@ -27,7 +27,7 @@ def _kid(email):
         c.post("/admin/users/create", data={"email": f"p-{email}", "password": "secret1", "name": "家长", "role": "parent"})
         c.get("/logout")
         c.post("/login", data={"email": f"p-{email}", "password": "secret1"})
-        c.post("/parent/kids/save", data={"name": "小冲", "email": email, "password": "secret1", "grade": "G3",
+        c.post("/parent/kids/save", data={"name": "小冲", "email": email, "password": "2580", "grade": "G3",
                                           "daily_minutes": "60", "subj_math": "math-shanghai", "game_minutes": "20",
                                           "game_unlock": "free"})
     return dict(db.one("SELECT * FROM users WHERE email=?", email))
@@ -92,7 +92,7 @@ def _right(it):
 def test_sprint_multiplier_and_points():
     kid = _kid("sp@x.com")
     with TestClient(app) as c:
-        c.post("/login", data={"email": "sp@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "sp@x.com", "password": "2580"})
         assert "冲刺" in c.get("/today").text
         r = c.post("/api/sprint/start")
         assert r.status_code == 403 and "任务" in r.json()["error"]     # 先做完今天的任务

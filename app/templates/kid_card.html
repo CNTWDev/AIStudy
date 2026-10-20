@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block body %}
+{# 家长刚添加完一个家人：照着这张卡告诉 TA 怎么登录。4 位数字只在这一次显示（存的是加密后的），忘了就在家长页重设。可以打印出来。 #}
+{% set pin_user = uses_pin(k) %}
+<div class="card kcard">
+  <div class="kc-top">{{ mascot_svg(mascot_of(k), 56) }}<div><h1 style="margin:0">{{ k.name }} 的账号开好了</h1>
+    <p class="muted small" style="margin:2px 0 0">照着下面这张卡告诉 {{ k.name }} 怎么登录。</p></div></div>
+  <dl>
+    <dt>登录名</dt><dd>{{ k.login }}</dd>
+    {% if pin_user %}<dt>4 位数字</dt><dd>{{ pin }}</dd>{% else %}<dt>密码</dt><dd>{{ pin }}</dd>{% endif %}
+  </dl>
+  <ol>
+    <li>打开 <b>{{ request.base_url.netloc }}</b></li>
+    <li>输入登录名「{{ k.login }}」和{{ '这 4 位数字' if pin_user else '密码' }}</li>
+    {% if pin_user %}<li>以后在这台设备上，点自己的头像，再输数字就行</li>{% endif %}
+  </ol>
+  {% if pin_user %}<p class="hint small kc-tip">第一次最好陪 {{ k.name }} 一起登录一次，让 TA 自己输一遍数字。几个孩子共用一台设备时，点右上角「账号」→「退出登录」，再点自己的头像就换过来了。</p>{% endif %}
+  <p class="muted small kc-tip">{{ '4 位数字' if pin_user else '密码' }}只在这里显示这一次。忘了也没关系，在家长页编辑 {{ k.name }}，在「登录与安全」里重设。</p>
+  <div class="row kc-actions" style="margin-top:12px"><a class="btn" href="/parent">回到家长页</a><button class="btn ghost" type="button" onclick="print()">打印这张卡</button></div>
+</div>
+{% endblock %}

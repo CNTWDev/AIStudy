@@ -25,7 +25,7 @@
     <tr><th>孩子</th><th>年级 / 课程</th><th>今天</th><th>坚持</th><th>本周</th><th>待复习 / 生词</th><th>薄弱点</th><th>系统发现</th><th></th></tr>
     {% for k in kids %}
     <tr>
-      <td class="nw"><b><a href="/admin/users/{{ k.u.id }}">{{ k.u.name }}</a></b> {{ status_pill(k.u) }}<div class="muted small">{{ k.u.email }}</div></td>
+      <td class="nw"><b><a href="/admin/users/{{ k.u.id }}">{{ k.u.name }}</a></b> {{ status_pill(k.u) }}<div class="muted small">{{ account_name(k.u) }}</div></td>
       <td class="small">{{ stage_label(k.u.grade) }}<br><span class="muted">{% for c in k.packs %}{{ c.pack.subject_name }}{{ '、' if not loop.last }}{% else %}未选教材{% endfor %}</span></td>
       <td class="small nw">{{ k.today_done }}/{{ k.today.plan|length }} 项<br><span class="muted">{{ k.today.minutes }} 分钟</span></td>
       <td class="small nw">连续 {{ k.streak }} 天</td>

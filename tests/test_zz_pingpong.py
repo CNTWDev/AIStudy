@@ -10,7 +10,8 @@ A, B = {"device": "pa"}, {"device": "pb"}
 
 def _login(c, email):
     c.cookies.clear()
-    assert c.post("/login", data={"email": email, "password": "secret1"}).status_code in (200, 303)
+    pw = "2580" if auth.uses_pin(auth.by_email(email)) else "secret1"   # 孩子用 4 位数字
+    assert c.post("/login", data={"email": email, "password": pw}).status_code in (200, 303)
 
 
 def test_registered():
@@ -23,8 +24,8 @@ def test_registered():
 def test_match_and_handicap():
     with TestClient(app) as c:
         pid = auth.create_user("pp-p@x.com", "secret1", "家长", "parent")
-        big = auth.create_user("pp-a@x.com", "secret1", "姐姐", "kid", parent_id=pid, grade="G8")
-        small = auth.create_user("pp-b@x.com", "secret1", "弟弟", "kid", parent_id=pid, grade="G3")
+        big = auth.create_user("pp-a@x.com", "2580", "姐姐", "kid", parent_id=pid, grade="G8")
+        small = auth.create_user("pp-b@x.com", "2580", "弟弟", "kid", parent_id=pid, grade="G3")
         for k in (big, small):
             arena.set_game_unlock(k, "free")
         _login(c, "pp-a@x.com")

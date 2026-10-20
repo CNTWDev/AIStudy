@@ -16,7 +16,7 @@ def test_family_adult_manages_own_learning():
         if not auth.by_email("admin@x.com"):
             c.post("/register", data={"email": "admin@x.com", "password": "secret1", "name": "站长"})
         pa = auth.create_user("fa-p@x.com", "secret1", "爸爸", "parent")
-        kid = auth.create_user("fa-k@x.com", "secret1", "小宝", "kid", parent_id=pa, grade="G12")
+        kid = auth.create_user("fa-k@x.com", "2580", "小宝", "kid", parent_id=pa, grade="G12")
         _login(c, "fa-p@x.com")
 
         # 家长添加一个成人成员：表单里没有学习安排（成人年级时隐藏、不提交），不替 TA 选课
@@ -62,7 +62,7 @@ def test_family_adult_manages_own_learning():
         assert db.q("SELECT 1 FROM enrollments WHERE user_id=? AND pack_id='math-shanghai' AND active=1", kid)
 
         # 成人不上孩子的榜、不进公开房间；还没成年的孩子照常
-        mom, child = dict(mom), dict(auth.get_user(auth.create_user("fa-c@x.com", "secret1", "二宝", "kid", parent_id=pa, grade="G3")))
+        mom, child = dict(mom), dict(auth.get_user(auth.create_user("fa-c@x.com", "2580", "二宝", "kid", parent_id=pa, grade="G3")))
         assert not boards.on_board(mom) and not rules.public_rooms(mom)
         assert boards.on_board(child) and rules.public_rooms(child)
         # 家里的成人成员默认能玩乐园（不限时）；没有家庭的成人自学者默认不玩

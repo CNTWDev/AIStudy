@@ -87,14 +87,14 @@ def test_match_flow():
         c.post("/admin/users/create", data={"email": "gp@x.com", "password": "secret1", "name": "游戏爸爸", "role": "parent"})
         c.get("/logout")
         c.post("/login", data={"email": "gp@x.com", "password": "secret1"})
-        c.post("/parent/kids/save", data={"name": "小火柴", "email": "gk@x.com", "password": "secret1", "grade": "G3",
+        c.post("/parent/kids/save", data={"name": "小火柴", "email": "gk@x.com", "password": "2580", "grade": "G3",
                                           "daily_minutes": "60", "subj_math": "math-shanghai", "game_minutes": "20"})
         kid = db.one("SELECT * FROM users WHERE email='gk@x.com'")
         assert arena.game_minutes(dict(kid)) == 20
         assert c.get("/arena").status_code in (400, 403)  # 家长不能替孩子玩
         c.get("/logout")
 
-        c.post("/login", data={"email": "gk@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "gk@x.com", "password": "2580"})
         assert "乐园" in c.get("/today").text   # 生成今天的任务
         hub = c.get("/arena").text
         assert "火柴人大战" in hub and "闪电赛跑" in hub and "星星守卫" in hub and "贴纸墙" in hub
@@ -158,7 +158,7 @@ def test_match_flow():
         c.post("/parent/kids/save", data={"id": kid["id"], "name": "小火柴", "email": "gk@x.com", "grade": "G3",
                                           "daily_minutes": "60", "subj_math": "math-shanghai", "game_minutes": "0"})
         c.get("/logout")
-        c.post("/login", data={"email": "gk@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "gk@x.com", "password": "2580"})
         r = c.post("/api/arena/start", json={"game": "stickman"})
         assert r.status_code == 403 and "家长" in r.json()["error"]
         # 不能玩的时候：游戏卡片点不进去，直接打开游戏页面回到乐园首页（那里写着为什么）
@@ -210,7 +210,7 @@ def test_word_and_bank_sources(monkeypatch):
         c.get("/logout")
         c.post("/login", data={"email": "wp@x.com", "password": "secret1"})
         subj = catalog.packs["eng-cambridge"].subject
-        c.post("/parent/kids/save", data={"name": "小单词", "email": "wk@x.com", "password": "secret1", "grade": "G8",
+        c.post("/parent/kids/save", data={"name": "小单词", "email": "wk@x.com", "password": "2580", "grade": "G8",
                                           "daily_minutes": "60", f"subj_{subj}": "eng-cambridge", "game_minutes": "20",
                                           "game_unlock": "free"})
         kid = dict(db.one("SELECT * FROM users WHERE email='wk@x.com'"))
@@ -232,7 +232,7 @@ def test_word_and_bank_sources(monkeypatch):
             assert "answer" not in pub and pub["q"]
         c.get("/logout")
 
-        c.post("/login", data={"email": "wk@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "wk@x.com", "password": "2580"})
         monkeypatch.setattr(sources, "weights", lambda kid, ctx=None: {"words": 1.0})   # 下面这局只出单词题
         mid = c.post("/api/arena/start", json={"game": "race"}).json()["match_id"]
         q = c.get(f"/api/arena/{mid}/q").json()["item"]
@@ -268,7 +268,7 @@ def test_unlimited_game_time():
         c.get("/logout")
         c.post("/login", data={"email": "up@x.com", "password": "secret1"})
         assert "不限时" in c.get("/parent/kids/new").text
-        c.post("/parent/kids/save", data={"name": "小不限", "email": "uk@x.com", "password": "secret1", "grade": "G3",
+        c.post("/parent/kids/save", data={"name": "小不限", "email": "uk@x.com", "password": "2580", "grade": "G3",
                                           "daily_minutes": "60", "subj_math": "math-shanghai", "game_minutes": "-1"})
         kid = dict(db.one("SELECT * FROM users WHERE email='uk@x.com'"))
         assert arena.game_minutes(kid) == arena.UNLIMITED
@@ -284,7 +284,7 @@ def test_unlimited_game_time():
         st = arena.status(kid)
         assert st["unlocked"] and st["left"] > 0 and arena.locked_reason(st) == ""
         c.get("/logout")
-        c.post("/login", data={"email": "uk@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "uk@x.com", "password": "2580"})
         hub = c.get("/arena").text
         assert "今天不限时" in hub and "今天还能玩" not in hub
         assert "今天不限时" in c.get("/today").text

@@ -15,10 +15,10 @@ def _setup(c):
     c.post("/admin/users/create", data={"email": "rvp@x.com", "password": "secret1", "name": "重爸", "role": "parent"})
     c.get("/logout")
     c.post("/login", data={"email": "rvp@x.com", "password": "secret1"})
-    c.post("/parent/kids/save", data={"name": "重娃", "email": "rvk@x.com", "password": "secret1", "grade": "G8",
+    c.post("/parent/kids/save", data={"name": "重娃", "email": "rvk@x.com", "password": "2580", "grade": "G8",
                                       "daily_minutes": "90", "subj_physics": "phy-cambridge"})
     c.get("/logout")
-    c.post("/login", data={"email": "rvk@x.com", "password": "secret1"})
+    c.post("/login", data={"email": "rvk@x.com", "password": "2580"})
     return db.one("SELECT id FROM users WHERE email='rvk@x.com'")["id"]
 
 

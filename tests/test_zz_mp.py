@@ -91,8 +91,8 @@ def test_star_rules():
 
 def _family(tag):
     pid = auth.create_user(f"mp-p-{tag}@x.com", "secret1", "家长", "parent")
-    a = auth.create_user(f"mp-a-{tag}@x.com", "secret1", "姐姐", "kid", parent_id=pid, grade="G8")
-    b = auth.create_user(f"mp-b-{tag}@x.com", "secret1", "弟弟", "kid", parent_id=pid, grade="G3")
+    a = auth.create_user(f"mp-a-{tag}@x.com", "2580", "姐姐", "kid", parent_id=pid, grade="G8")
+    b = auth.create_user(f"mp-b-{tag}@x.com", "2580", "弟弟", "kid", parent_id=pid, grade="G3")
     for k in (a, b):
         arena.set_game_unlock(k, "free")
     return pid, a, b
@@ -100,7 +100,8 @@ def _family(tag):
 
 def _login(c, email):
     c.cookies.clear()
-    assert c.post("/login", data={"email": email, "password": "secret1"}).status_code in (200, 303)
+    pw = "2580" if auth.uses_pin(auth.by_email(email)) else "secret1"   # 孩子用 4 位数字
+    assert c.post("/login", data={"email": email, "password": pw}).status_code in (200, 303)
 
 
 A, B = {"device": "da"}, {"device": "db"}
@@ -117,7 +118,7 @@ def _finish(c, rid, play, result="win", dev=A, **report):
 def test_rooms_and_finish():
     with TestClient(app) as c:
         _, a, b = _family("r")
-        lone = auth.create_user("mp-lone@x.com", "secret1", "独生", "kid", parent_id=auth.create_user("mp-lp@x.com", "secret1", "家长", "parent"))
+        lone = auth.create_user("mp-lone@x.com", "2580", "独生", "kid", parent_id=auth.create_user("mp-lp@x.com", "secret1", "家长", "parent"))
         _login(c, "mp-lone@x.com")
         assert c.get("/arena/duo").status_code == 200
         assert c.get("/api/games/duo/lobby").json()["siblings"] == []      # 页面据此提示「家里还没有别的小伙伴」

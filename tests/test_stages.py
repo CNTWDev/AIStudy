@@ -57,11 +57,11 @@ def test_stage_flow():
         c.post("/admin/users/create", data={"email": "lp@x.com", "password": "secret1", "name": "家长", "role": "parent"})
         c.get("/logout")
         c.post("/login", data={"email": "lp@x.com", "password": "secret1"})
-        c.post("/parent/kids/save", data={"name": "小闯", "email": "lk@x.com", "password": "secret1", "grade": "G3",
+        c.post("/parent/kids/save", data={"name": "小闯", "email": "lk@x.com", "password": "2580", "grade": "G3",
                                           "daily_minutes": "60", "subj_math": "math-shanghai", "game_minutes": "60",
                                           "game_unlock": "free"})
         c.get("/logout")
-        c.post("/login", data={"email": "lk@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "lk@x.com", "password": "2580"})
         kid = dict(db.one("SELECT * FROM users WHERE email='lk@x.com'"))
         assert "第 1 关" in c.get("/arena").text and c.get("/arena/stickman").status_code == 200
 

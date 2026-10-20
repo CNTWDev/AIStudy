@@ -21,11 +21,11 @@ def test_kid_picks_mascot():
         c.post("/admin/users/create", data={"email": "bp@x.com", "password": "secret1", "name": "蜜蜂爸爸", "role": "parent"})
         c.get("/logout")
         c.post("/login", data={"email": "bp@x.com", "password": "secret1"})
-        c.post("/parent/kids/save", data={"name": "小蜂", "email": "bk@x.com", "password": "secret1", "grade": "G4",
+        c.post("/parent/kids/save", data={"name": "小蜂", "email": "bk@x.com", "password": "2580", "grade": "G4",
                                           "daily_minutes": "60", "subj_math": "math-shanghai"})
         c.get("/logout")
 
-        c.post("/login", data={"email": "bk@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "bk@x.com", "password": "2580"})
         today = c.get("/today").text
         assert 'data-tone="kid"' in today and 'href="/static/brand/hive.svg"' in today  # 没选过：默认蜂巢宝宝
         assert "选一个你最喜欢的小伙伴" in today
