@@ -1,0 +1,174 @@
+{
+ "pack": {
+  "id": "math-suke",
+  "base": "math-cn",
+  "subject": "math",
+  "edition": "苏科版数学（初中 · 2022 课标新版）",
+  "region": "江苏公办",
+  "system": "cn",
+  "kind": "textbook",
+  "school_types": [
+   "public"
+  ],
+  "stages": [
+   "G7",
+   "G8",
+   "G9"
+  ],
+  "version": 1,
+  "verified": "2026-10-20",
+  "publisher": "江苏凤凰科学技术出版社",
+  "sources": [
+   "教育部《2024年义务教育国家课程教学用书目录（根据2022年版课程标准修订）》 https://jw.beijing.gov.cn/xxgk/2024zcwj/2024qtwj/202408/W020240905543232813376.pdf",
+   "江苏 2025 秋新教材投入使用 https://www.yzwb.net/news/jiangsu/nanjing/202508/t20250822_253531.html"
+  ],
+  "notes": "江苏公办初中数学（少数地区用人教版）。新版七上、七下、八上的章已对照目录；八下、九年级的新版目录还没公开，暂按课标主干的顺序排（「目录待核实」）。",
+  "selection": {
+   "name": "苏科版数学（江苏初中）",
+   "hint": "课本封面印「江苏凤凰科学技术出版社」。2024 年以后的新版。",
+   "warning": "八下和九年级的目录还在核实。"
+  }
+ },
+ "books": [
+  {
+   "stage": "G7",
+   "term": "上",
+   "name": "七年级上册",
+   "status": "verified",
+   "sources": [
+    "https://www.renjiaoshe.com/jiaocai/3270.html",
+    "https://www.sohu.com/a/1078253538_121948389"
+   ],
+   "units": [
+    {
+     "name": "第1章 数学与我们同行",
+     "kps": []
+    },
+    {
+     "name": "第2章 有理数",
+     "kps": [
+      "MSH-NUM-38",
+      "MSH-NUM-39"
+     ]
+    },
+    {
+     "name": "第3章 代数式",
+     "kps": [
+      "MSH-ALG-20",
+      "MSH-ALG-06"
+     ]
+    },
+    {
+     "name": "第4章 一元一次方程",
+     "kps": [
+      "MSH-ALG-03"
+     ]
+    },
+    {
+     "name": "第5章 走进几何世界",
+     "kps": []
+    },
+    {
+     "name": "第6章 平面图形的初步认识",
+     "kps": [
+      "MSH-GEO-23",
+      "MSH-GEO-26"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G7",
+   "term": "下",
+   "name": "七年级下册",
+   "status": "verified",
+   "sources": [
+    "https://www.renjiaoshe.com/jiaocai/3271.html",
+    "https://dzkbw.org/book/6716.html"
+   ],
+   "units": [
+    {
+     "name": "第7章 幂的运算",
+     "kps": [
+      "MSH-ALG-07"
+     ]
+    },
+    {
+     "name": "第8章 整式乘法",
+     "kps": [
+      "MSH-ALG-08"
+     ]
+    },
+    {
+     "name": "第9章 图形的变换",
+     "kps": [
+      "MSH-GEO-25"
+     ]
+    },
+    {
+     "name": "第10章 二元一次方程组",
+     "kps": [
+      "MSH-ALG-05"
+     ]
+    },
+    {
+     "name": "第11章 一元一次不等式",
+     "kps": [
+      "MSH-ALG-04"
+     ]
+    },
+    {
+     "name": "第12章 定义 命题 证明",
+     "kps": [
+      "MSH-GEO-30"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G8",
+   "term": "上",
+   "name": "八年级上册",
+   "status": "verified",
+   "sources": [
+    "https://www.renjiaoshe.com/jiaocai/3272.html",
+    "https://dzkbw.org/book/6717.html"
+   ],
+   "units": [
+    {
+     "name": "第13章 三角形",
+     "kps": [
+      "MSH-GEO-27",
+      "MSH-GEO-28",
+      "MSH-GEO-29"
+     ]
+    },
+    {
+     "name": "第14章 实数的初步认识",
+     "kps": [
+      "MSH-NUM-40"
+     ]
+    },
+    {
+     "name": "第15章 勾股定理",
+     "kps": [
+      "MSH-GEO-31"
+     ]
+    },
+    {
+     "name": "第16章 平面直角坐标系",
+     "kps": [
+      "MSH-FUN-01"
+     ]
+    },
+    {
+     "name": "第17章 一次函数",
+     "kps": [
+      "MSH-FUN-02",
+      "MSH-FUN-03"
+     ]
+    }
+   ]
+  }
+ ]
+}

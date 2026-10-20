@@ -53,7 +53,7 @@ def foundations(user: dict, enrolls: list) -> list[dict]:
         if pack.system not in systems:
             continue
         top = min(grade, stage_rank(e["stage"])) if grade < 99 else stage_rank(e["stage"])
-        own_low = min((stage_rank(catalog.kps[k]["stage"]) for k in catalog.ids_for(pack.id, e["track"])), default=1)
+        own_low = min((stage_rank(catalog.stage_in(pack.id, k)) for k in catalog.ids_for(pack.id, e["track"])), default=1)
         b = base.get(pack.subject)
         if b and b != pack.id:
             add(b, min(own_low, top), pack.id)        # 自己的教材从中途开始：更低的学段用基础教材补齐
@@ -67,7 +67,7 @@ def foundations(user: dict, enrolls: list) -> list[dict]:
 
 def range_of(f: dict, known_concepts: set) -> list[str]:
     """一份地基里算数的知识点：学段比 upto 低，同一概念在报名的教材里没有。"""
-    return [k for k in catalog.ids_for(f["pack_id"]) if stage_rank(catalog.kps[k]["stage"]) < f["upto"]
+    return [k for k in catalog.ids_for(f["pack_id"]) if stage_rank(catalog.stage_in(f["pack_id"], k)) < f["upto"]
             and catalog.concept_id(k) not in known_concepts]
 
 

@@ -75,7 +75,7 @@ def _scan_packs(c: Ctx) -> dict:
                                        "why": "学校马上要学，先看一眼", "minutes": 8, "pack": pack_id})
         # 往回巩固：学校学过、但系统里还没检测过的知识点，每天轮一个做个小检查
         unchecked = [k for k in pv["learned"] if c.mastery.get(k, {}).get("status") in (None, "unknown")
-                     and stage_rank(catalog.kps[k]["stage"]) >= stage_rank(stage) - 2]
+                     and stage_rank(catalog.stage_in(pack_id, k)) >= stage_rank(stage) - 2]
         if c.prefer_hot:
             unchecked = [k for k in unchecked if catalog.kps[k].get("hot")] or unchecked
         if unchecked:

@@ -55,6 +55,34 @@
    }
   },
   {
+   "id": "js-public-primary",
+   "name": "江苏公办小学（1–6 年级）",
+   "school_type": "public",
+   "grades": [
+    "G1",
+    "G6"
+   ],
+   "packs": {
+    "chinese": "chn-tongbian",
+    "math": "math-sujiao",
+    "english": "eng-yilin"
+   }
+  },
+  {
+   "id": "js-public-middle",
+   "name": "江苏公办初中（7–9 年级）",
+   "school_type": "public",
+   "grades": [
+    "G7",
+    "G9"
+   ],
+   "packs": {
+    "chinese": "chn-tongbian",
+    "math": "math-suke",
+    "english": "eng-yilin"
+   }
+  },
+  {
    "id": "sh-bilingual",
    "name": "上海民办双语学校（国家课程 + 剑桥英语）",
    "school_type": "private",

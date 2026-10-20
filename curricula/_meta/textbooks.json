@@ -178,8 +178,9 @@
       "sources": [
         "https://www.suzhou.gov.cn/szsrmzf/mszx/202608/15cfa67e4d9841128e27d99d4e344ea6.shtml"
       ],
-      "coverage": "有版本使用依据，整册目录待核实",
-      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+      "coverage": "已上线为目录包 curricula/math-sujiao.json：能读到的新版册次已列出，其余册「目录待核实」",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射",
+      "pack_id": "math-sujiao"
     },
     {
       "id": "sz-eng-primary",
@@ -191,8 +192,9 @@
       "sources": [
         "https://edu.yilin.com/index.php/NewsDetail/index?cat_id=2&id=81&nav_id=1"
       ],
-      "coverage": "有版本使用依据，整册目录待核实",
-      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+      "coverage": "已上线为目录包 curricula/eng-yilin.json：能读到的新版册次已列出，其余册「目录待核实」",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射",
+      "pack_id": "eng-yilin"
     },
     {
       "id": "sz-math-middle",
@@ -200,10 +202,15 @@
       "region": "苏州",
       "school_system": "6-3",
       "grades": "G7–G9",
-      "status": "pending",
-      "sources": [],
-      "coverage": "待取得当前官方选用及册次目录",
-      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+      "status": "partial",
+      "sources": [
+        "https://www.renjiaoshe.com/jiaocai/3270.html",
+        "https://www.renjiaoshe.com/jiaocai/3271.html",
+        "https://www.renjiaoshe.com/jiaocai/3272.html"
+      ],
+      "coverage": "已上线为目录包 curricula/math-suke.json：能读到的新版册次已列出，其余册「目录待核实」",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射",
+      "pack_id": "math-suke"
     },
     {
       "id": "sz-eng-middle",
@@ -215,8 +222,9 @@
       "sources": [
         "https://edu.yilin.com/index.php/NewsDetail/index?cat_id=2&id=81&nav_id=1"
       ],
-      "coverage": "有版本使用依据，整册目录待核实",
-      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+      "coverage": "已上线为目录包 curricula/eng-yilin.json：能读到的新版册次已列出，其余册「目录待核实」",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射",
+      "pack_id": "eng-yilin"
     },
     {
       "id": "sz-phy-middle",
@@ -515,77 +523,8 @@
       "sources": [],
       "coverage": "待取得当前官方选用及册次目录",
       "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
-    },
-    {
-      "id": "math-sujiao-g4-pilot",
-      "pack_id": "math-sujiao-g4-pilot",
-      "name": "苏教版数学 · 四上已核实主题（部分覆盖）",
-      "publisher": "江苏凤凰教育出版社",
-      "region": "苏州",
-      "school_system": "6-3",
-      "curriculum_standard": "2022",
-      "status": "partial",
-      "sources": [
-        "https://www.suzhou.gov.cn/szsrmzf/mszx/202608/15cfa67e4d9841128e27d99d4e344ea6.shtml"
-      ],
-      "coverage": "5个知识点、4个已核实主题；主题顺序不代表完整教材目录"
     }
   ],
-  "books": [
-    {
-      "id": "sz-math-g4-2026-upper",
-      "edition_id": "math-sujiao-g4-pilot",
-      "title": "数学 四年级上册（2026秋主题试点）",
-      "stage": "G4",
-      "term": "上",
-      "order": 1,
-      "status": "partial",
-      "sources": [
-        "https://www.suzhou.gov.cn/szsrmzf/mszx/202608/15cfa67e4d9841128e27d99d4e344ea6.shtml"
-      ],
-      "isbn": null
-    }
-  ],
-  "mappings": [
-    {
-      "book_id": "sz-math-g4-2026-upper",
-      "kp_id": "SZ-M4-PERIMETER",
-      "unit_id": "shape",
-      "unit_name": "周长与面积",
-      "order": 0,
-      "status": "partial"
-    },
-    {
-      "book_id": "sz-math-g4-2026-upper",
-      "kp_id": "SZ-M4-AREA",
-      "unit_id": "shape",
-      "unit_name": "周长与面积",
-      "order": 1,
-      "status": "partial"
-    },
-    {
-      "book_id": "sz-math-g4-2026-upper",
-      "kp_id": "SZ-M4-QUANTITY",
-      "unit_id": "quantity",
-      "unit_name": "乘法数量关系",
-      "order": 2,
-      "status": "partial"
-    },
-    {
-      "book_id": "sz-math-g4-2026-upper",
-      "kp_id": "SZ-M4-LARGE-NUMBER",
-      "unit_id": "large-number",
-      "unit_name": "多位数认识",
-      "order": 3,
-      "status": "partial"
-    },
-    {
-      "book_id": "sz-math-g4-2026-upper",
-      "kp_id": "SZ-M4-LARGE-CALC",
-      "unit_id": "large-calc",
-      "unit_name": "大数运算",
-      "order": 4,
-      "status": "partial"
-    }
-  ]
+  "books": [],
+  "mappings": []
 }

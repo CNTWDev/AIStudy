@@ -249,7 +249,8 @@ def learn(request: Request, kp_id: str, task: str = "practice"):
     m = engine.get_mastery(k["id"])
     pre = [{**p, "m": m.get(p["id"])} for p in catalog.prereqs(kp_id)]
     post = [{**s, "m": m.get(s["id"])} for s in catalog.successors(kp_id)]
-    pack = catalog.packs[kp["pack"]]
+    pack = catalog.packs[engine.pack_of(k["id"], kp_id)]
+    kp = catalog.kp_in(pack.id, kp_id)
     vocab = db.q("SELECT front, back FROM cards WHERE user_id=? AND kp_id=? AND kind='term'", k["id"], kp_id)
     if auth.current_user(request)["role"] == "kid":  # 孩子看讲解的工夫，后台把练习题和讲解备好，点「开始练习」不用等
         prefetch.kick(k["id"], kp_id, n=3, purpose="preview" if task == "preview" else "practice", grade=k["grade"], teach=True)

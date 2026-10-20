@@ -17,7 +17,7 @@ def kid_band(kid: dict) -> str:
     rank = stage_rank(kid.get("grade") or "G3")
     packs = [e["pack_id"] for e in db.q("SELECT pack_id FROM enrollments WHERE user_id=? AND active=1", kid["id"])
              if e["pack_id"] in catalog.packs]
-    ids = {k for p in packs for k in catalog.packs[p].kp_ids if stage_rank(catalog.kps[k]["stage"]) <= rank}
+    ids = {k for p in packs for k in catalog.packs[p].kp_ids if stage_rank(catalog.stage_in(p, k)) <= rank}
     if not ids:
         return BANDS[0][1]
     mastered = {r["kp_id"] for r in db.q("SELECT kp_id FROM mastery WHERE user_id=? AND status='mastered'", kid["id"])}

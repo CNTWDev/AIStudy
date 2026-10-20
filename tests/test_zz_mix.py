@@ -56,8 +56,8 @@ def test_ladder_foundations():
         sis = [{"pack_id": "phy-cambridge", "stage": "IGCSE", "track": None}]
         found = {f["pack_id"]: f for f in ladder.foundations({"grade": "G8"}, sis)}
         # 物理要用到科学和数学：没报的用基础教材，到孩子的年级为止
-        assert found["math-shanghai"]["upto"] == 8 and found["sci-shanghai"]["upto"] == 8
-        rng = ladder.range_of(found["math-shanghai"], ladder.enrolled_concepts(sis))
+        assert found["math-cn"]["upto"] == 8 and found["sci-shanghai"]["upto"] == 8
+        rng = ladder.range_of(found["math-cn"], ladder.enrolled_concepts(sis))
         assert rng and all(stage_rank(catalog.kps[k]["stage"]) < 8 for k in rng)
         # 小学生报的都是从一年级开始的教材：没有额外的地基
         bro = [{"pack_id": p, "stage": "G3", "track": None} for p in ("math-shanghai", "sci-shanghai", "eng-shanghai")]

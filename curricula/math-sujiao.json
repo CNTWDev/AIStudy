@@ -1,0 +1,331 @@
+{
+ "pack": {
+  "id": "math-sujiao",
+  "base": "math-cn",
+  "subject": "math",
+  "edition": "苏教版数学（六三学制 · 2022 课标新版）",
+  "region": "江苏公办",
+  "system": "cn",
+  "kind": "textbook",
+  "school_types": [
+   "public"
+  ],
+  "stages": [
+   "G1",
+   "G2",
+   "G3",
+   "G4",
+   "G5",
+   "G6"
+  ],
+  "version": 1,
+  "verified": "2026-10-20",
+  "publisher": "江苏凤凰教育出版社",
+  "sources": [
+   "教育部《2024年义务教育国家课程教学用书目录（根据2022年版课程标准修订）》 https://jw.beijing.gov.cn/xxgk/2024zcwj/2024qtwj/202408/W020240905543232813376.pdf",
+   "https://www.suzhou.gov.cn/szsrmzf/mszx/202608/15cfa67e4d9841128e27d99d4e344ea6.shtml",
+   "江苏 2025 秋新教材投入使用 https://www.yzwb.net/news/jiangsu/nanjing/202508/t20250822_253531.html"
+  ],
+  "notes": "江苏公办小学数学。新版 2024 秋一年级起逐年启用，2026 秋四到六年级上册换新。已列出能读到目录的新版册次；二下、四下、五六年级的新版目录还没公开，那几册的内容暂按课标主干的顺序排（「目录待核实」），拿到目录后补上即可，学生记录不受影响。",
+  "selection": {
+   "name": "苏教版数学（江苏小学）",
+   "hint": "课本封面印「江苏凤凰教育出版社」、六三学制。2024 年以后的新版。",
+   "warning": "二下、四下、五六年级的目录还在核实。"
+  }
+ },
+ "books": [
+  {
+   "stage": "G1",
+   "term": "上",
+   "name": "一年级上册",
+   "status": "verified",
+   "sources": [
+    "https://www.renjiaoshe.com/jiaocai/2436.html",
+    "https://www.dzkbw.org/book/4957.html",
+    "https://kebenwang.cn/book/465"
+   ],
+   "units": [
+    {
+     "name": "一、0~5的认识和加减法",
+     "kps": [
+      "MSH-NUM-01",
+      "MSH-NUM-02"
+     ]
+    },
+    {
+     "name": "二、6~9的认识和加减法",
+     "kps": [
+      "MSH-NUM-01",
+      "MSH-NUM-02"
+     ]
+    },
+    {
+     "name": "三、图形的初步认识（一）",
+     "kps": [
+      "MSH-GEO-01"
+     ]
+    },
+    {
+     "name": "四、10的认识和加减法",
+     "kps": [
+      "MSH-NUM-01",
+      "MSH-NUM-02"
+     ]
+    },
+    {
+     "name": "五、认识11~19",
+     "kps": [
+      "MSH-NUM-03"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G1",
+   "term": "下",
+   "name": "一年级下册",
+   "status": "verified",
+   "sources": [
+    "https://www.renjiaoshe.com/jiaocai/2437.html",
+    "https://www.dzkbw.org/book/4958.html"
+   ],
+   "units": [
+    {
+     "name": "一、进位加法和退位减法",
+     "kps": [
+      "MSH-NUM-04",
+      "MSH-NUM-05"
+     ]
+    },
+    {
+     "name": "二、图形的初步认识（二）",
+     "kps": [
+      "MSH-GEO-02"
+     ]
+    },
+    {
+     "name": "三、数据分类（一）",
+     "kps": [
+      "MCN-STA-01"
+     ]
+    },
+    {
+     "name": "四、认识20～99",
+     "kps": [
+      "MSH-NUM-06"
+     ]
+    },
+    {
+     "name": "五、两位数加、减整十数和一位数",
+     "kps": [
+      "MSH-NUM-07"
+     ]
+    },
+    {
+     "name": "六、简单的数量关系（一）",
+     "kps": [
+      "MSH-APP-01"
+     ]
+    },
+    {
+     "name": "七、观察物体（一）",
+     "kps": [
+      "MCN-GEO-01"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G2",
+   "term": "上",
+   "name": "二年级上册",
+   "status": "partial",
+   "sources": [
+    "https://www.dzkbw.org/book/4959.html"
+   ],
+   "units": [
+    {
+     "name": "一、1~6的表内乘法",
+     "kps": [
+      "MSH-NUM-09",
+      "MSH-NUM-10"
+     ]
+    },
+    {
+     "name": "二、1~6的表内除法",
+     "kps": [
+      "MSH-NUM-11",
+      "MSH-NUM-12"
+     ]
+    },
+    {
+     "name": "三、7~9的表内乘除法",
+     "kps": [
+      "MSH-NUM-10",
+      "MSH-NUM-12"
+     ]
+    },
+    {
+     "name": "四、认识三位数",
+     "kps": [
+      "MSH-NUM-14"
+     ]
+    },
+    {
+     "name": "五、两位数加、减两位数",
+     "kps": [
+      "MSH-NUM-08"
+     ]
+    },
+    {
+     "name": "六、有余数的除法",
+     "kps": [
+      "MSH-NUM-13"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G3",
+   "term": "上",
+   "name": "三年级上册",
+   "status": "partial",
+   "sources": [
+    "https://www.dzkbw.org/book/4961.html"
+   ],
+   "units": [
+    {
+     "name": "一、混合运算与数量关系（一）",
+     "kps": [
+      "MSH-NUM-21"
+     ]
+    },
+    {
+     "name": "二、两、三位数乘一位数",
+     "kps": [
+      "MSH-NUM-16",
+      "MSH-NUM-17"
+     ]
+    },
+    {
+     "name": "三、数据的收集与整理",
+     "kps": [
+      "MSH-STA-01"
+     ]
+    },
+    {
+     "name": "四、毫米、分米和千米",
+     "kps": [
+      "MSH-GEO-07"
+     ]
+    },
+    {
+     "name": "五、平移、旋转和轴对称",
+     "kps": [
+      "MCN-GEO-02"
+     ]
+    },
+    {
+     "name": "六、两、三位数除以一位数",
+     "kps": [
+      "MSH-NUM-18"
+     ]
+    },
+    {
+     "name": "七、数量关系的分析（一）",
+     "kps": [
+      "MSH-APP-04"
+     ]
+    },
+    {
+     "name": "八、观察物体（二）",
+     "kps": [
+      "MCN-GEO-01"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G3",
+   "term": "下",
+   "name": "三年级下册",
+   "status": "partial",
+   "sources": [
+    "https://www.dzkbw.org/book/7762.html"
+   ],
+   "units": [
+    {
+     "name": "一、角",
+     "kps": [
+      "MSH-GEO-06"
+     ]
+    },
+    {
+     "name": "二、加法数量关系",
+     "kps": []
+    },
+    {
+     "name": "三、两位数乘两位数",
+     "kps": [
+      "MSH-NUM-20"
+     ]
+    },
+    {
+     "name": "四、统计表和条形统计图(一)",
+     "kps": [
+      "MSH-STA-01"
+     ]
+    },
+    {
+     "name": "五、长方形和正方形",
+     "kps": [
+      "MSH-GEO-02"
+     ]
+    },
+    {
+     "name": "六、分数的初步认识",
+     "kps": [
+      "MSH-NUM-19"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G4",
+   "term": "上",
+   "name": "四年级上册（2026 秋新版，只有官方说明点名的主题）",
+   "status": "partial",
+   "sources": [
+    "https://www.suzhou.gov.cn/szsrmzf/mszx/202608/15cfa67e4d9841128e27d99d4e344ea6.shtml"
+   ],
+   "note": "整册目录还没公开；这里只列苏州市教育局 2026 秋教材说明里点名的主题，顺序不代表单元顺序。",
+   "units": [
+    {
+     "name": "周长与面积",
+     "kps": [
+      "MSH-GEO-09",
+      "MSH-GEO-10"
+     ]
+    },
+    {
+     "name": "乘法数量关系",
+     "kps": [
+      "MSH-APP-05"
+     ]
+    },
+    {
+     "name": "多位数的认识",
+     "kps": [
+      "MSH-NUM-23"
+     ]
+    },
+    {
+     "name": "大数的运算",
+     "kps": [
+      "MSH-NUM-24"
+     ]
+    }
+   ]
+  }
+ ]
+}
