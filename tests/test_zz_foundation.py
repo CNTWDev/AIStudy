@@ -59,12 +59,12 @@ def test_answer_failure_rolls_back_all_projections(learner, monkeypatch):
 
 
 def test_concept_transfer_requires_new_evidence_and_replays(learner):
-    evidence.record(learner, 'MSH-GEO-09', True, mode='practice', fmt='recall')
-    target = engine.get_mastery(learner)['SZ-M4-PERIMETER']
+    evidence.record(learner, 'MSH-GEO-31', True, mode='practice', fmt='recall')
+    target = engine.get_mastery(learner)['MATH-IG-6.1-01']
     assert target['attempts'] == 0 and target['status'] == 'learning' and target['score'] <= .65
-    assert not db.one('SELECT * FROM mastery WHERE user_id=? AND kp_id=?', learner, 'SZ-M4-PERIMETER')
-    evidence.record(learner, 'SZ-M4-PERIMETER', False, mode='practice', fmt='recall')
-    before = db.one('SELECT * FROM concept_mastery WHERE user_id=? AND concept_id=?', learner, catalog.concept_id('MSH-GEO-09'))
+    assert not db.one('SELECT * FROM mastery WHERE user_id=? AND kp_id=?', learner, 'MATH-IG-6.1-01')
+    evidence.record(learner, 'MATH-IG-6.1-01', False, mode='practice', fmt='recall')
+    before = db.one('SELECT * FROM concept_mastery WHERE user_id=? AND concept_id=?', learner, catalog.concept_id('MSH-GEO-31'))
     evidence.replay(learner)
     after = db.one('SELECT * FROM concept_mastery WHERE user_id=? AND concept_id=?', learner, before['concept_id'])
     assert after['attempts'] == 2 and after['score'] == pytest.approx(before['score'])

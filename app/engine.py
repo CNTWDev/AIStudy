@@ -373,7 +373,8 @@ def bridges(user_id: int, kp_id: str, mastery: dict | None = None, limit: int = 
         out.append({"kp": r["kp"], "type": t, "note": r["note"]})
     for b in out:
         p = catalog.packs[b["kp"]["pack"]]
-        b.update(label=BRIDGE_LABEL[b["type"]], subject=p.subject_name, edition=p.edition, mine=p.id in mine,
+        b.update(label=BRIDGE_LABEL[b["type"]], subject=p.subject_name, edition=p.edition,
+                 mine=bool(mine & set(catalog.kp_packs.get(b["kp"]["id"], []))),
                  status=mastery.get(b["kp"]["id"], {}).get("status", "unknown"))
     out.sort(key=lambda b: (b["status"] not in ("mastered", "learning"), not b["mine"]))
     return out[:limit]
@@ -420,6 +421,13 @@ def enroll_track(user_id: int, pack_id: str) -> str:
     """孩子在这套教材里选的方向（没选就是默认方向；没有方向的教材返回空）。"""
     r = db.one("SELECT track FROM enrollments WHERE user_id=? AND pack_id=?", user_id, pack_id)
     return catalog.packs[pack_id].track(r["track"] if r else "") if pack_id in catalog.packs else ""
+
+
+def pack_of(user_id: int, kp_id: str) -> str:
+    """这个孩子是在哪套教材里学这个知识点的：报名的课里有它就是那套（苏教、上海……），否则是知识点自己的家（主干）。"""
+    have = catalog.kp_packs.get(kp_id, [])
+    rows = db.q("SELECT pack_id FROM enrollments WHERE user_id=? ORDER BY active DESC", user_id)
+    return next((r["pack_id"] for r in rows if r["pack_id"] in have), catalog.kp_pack.get(kp_id, ""))
 
 
 def my_ids(user_id: int, pack_id: str) -> list[str]:
@@ -599,7 +607,7 @@ def set_progress(user_id: int, pack_id: str, current_kp: str | None, taught: lis
               current_kp if current_kp in pack.kp_ids else None, now, user_id, pack_id)
         if taught is not None:
             cur_stage = stage or (t.one("SELECT stage FROM enrollments WHERE user_id=? AND pack_id=?", user_id, pack_id) or {}).get("stage")
-            stage_ids = [k for k in pack.kp_ids if catalog.kps[k]["stage"] == cur_stage]
+            stage_ids = [k for k in pack.kp_ids if catalog.stage_in(pack_id, k) == cur_stage]
             if stage_ids:
                 marks = ",".join("?" * len(stage_ids))
                 t.run(f"DELETE FROM kp_taught WHERE user_id=? AND kp_id IN ({marks})", user_id, *stage_ids)
@@ -697,7 +705,7 @@ def progress_view(user_id: int, e) -> dict:
     ids = catalog.ids_for(pack.id, e["track"])
     taught = taught_set(user_id)
     cur = e["stage"]
-    learned = [k for k in ids if stage_rank(catalog.kps[k]["stage"]) < stage_rank(cur) or k in taught]
+    learned = [k for k in ids if stage_rank(catalog.stage_in(pack.id, k)) < stage_rank(cur) or k in taught]
     stale = not e["progress_at"] or e["progress_at"] < (db.today() - timedelta(days=PROGRESS_STALE_DAYS)).isoformat()
     from . import schoolyear
     u = db.one("SELECT * FROM users WHERE id=?", user_id)
@@ -705,8 +713,8 @@ def progress_view(user_id: int, e) -> dict:
     if est:   # 按校历推演：一个月没核对才提醒家长看一眼
         stale = not e["progress_at"] or e["progress_at"] < (db.today() - timedelta(days=CONFIRM_DAYS)).isoformat()
     return {"pack": pack, "estimate": est, "stage": cur, "current": catalog.kp(e["progress_kp"]) if e["progress_kp"] else None,
-            "learned": learned, "taught_here": [k for k in ids if catalog.kps[k]["stage"] == cur and k in taught],
-            "stage_kps": [catalog.kps[k] for k in ids if catalog.kps[k]["stage"] == cur], "track": pack.track_name(e["track"]),
+            "learned": learned, "taught_here": [k for k in ids if catalog.stage_in(pack.id, k) == cur and k in taught],
+            "stage_kps": [kp for k in ids if (kp := catalog.kp_in(pack.id, k))["stage"] == cur], "track": pack.track_name(e["track"]),
             "updated": e["progress_at"], "stale": stale, "chapters": _chapter_rows(e, taught)}
 
 
@@ -720,14 +728,14 @@ def _chapter_rows(e, taught: set) -> list[dict]:
 def next_after(pack_id: str, kp_id: str, mastery: dict, taught: set, track: str | None = None) -> dict | None:
     """进度之后的下一个知识点：优先同一条线（strand）里、本学段或下一学段、前置都已学过的。"""
     pack = catalog.packs[pack_id]
-    cur = catalog.kp(kp_id)
-    if not cur:
+    if not catalog.kp(kp_id):
         return None
+    cur = catalog.kp_in(pack_id, kp_id)
     ids = catalog.ids_for(pack.id, track)
     i = ids.index(kp_id) if kp_id in ids else -1
     rank = stage_rank(cur["stage"])
     for k in ids[i + 1:] + ids[:i]:
-        kp = catalog.kps[k]
+        kp = catalog.kp_in(pack_id, k)
         if kp.get("strand") != cur.get("strand") or k in taught or mastery.get(k, {}).get("status") not in (None, "unknown"):
             continue
         if not (rank <= stage_rank(kp["stage"]) <= rank + 1):

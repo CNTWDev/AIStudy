@@ -293,7 +293,7 @@ def _kid_form_packs(form, grade: str, old: dict, grade_changed: bool) -> list[tu
     out = []
     for subj in {p.subject for p in catalog.packs.values()}:
         pid = form.get(f"subj_{subj}") or ""
-        if pid in catalog.packs and catalog.packs[pid].subject == subj:
+        if pid in catalog.packs and catalog.packs[pid].subject == subj and not catalog.packs[pid].standard:
             keep = pid in old and not grade_changed
             out.append((pid, old[pid] if keep else catalog.default_stage(pid, grade),
                         catalog.packs[pid].track(form.get(f"track_{pid}"))))

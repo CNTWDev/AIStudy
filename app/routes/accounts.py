@@ -34,7 +34,7 @@ def _showcase() -> dict:
     """登录页「这里能学什么」：从课程目录直接生成（加一个教材包，这里自动多一门），只展示、不能选课。
     分中小学和成人两组；每门课能展开看板块（章）和知识点数。试点的零散包（知识点很少）不展示。"""
     groups = {"school": {}, "adult": {}}
-    for p in catalog.packs.values():
+    for p in catalog.courses():
         if len(p.kp_ids) < 20:
             continue
         adult = all(is_adult(s) for s in p.stages)
@@ -42,7 +42,8 @@ def _showcase() -> dict:
         for k in p.kp_ids:
             n[catalog.kps[k]["strand"]] = n.get(catalog.kps[k]["strand"], 0) + 1
         stages = [stage_label(s) for s in p.stages]
-        item = {"system": SYSTEM_SHORT.get(p.system) or SYSTEMS.get(p.system, {}).get("name", "").split("（")[0],
+        short = p.region.split("·")[-1].replace("公办", "") + "教材" if p.system == "cn" and p.region else SYSTEM_SHORT.get(p.system)
+        item = {"system": short or SYSTEMS.get(p.system, {}).get("name", "").split("（")[0],
                 "title": p.edition.split("（")[0], "edition": p.edition, "kps": len(p.kp_ids),
                 "stages": stages[0] if len(stages) == 1 else f"{stages[0]}–{stages[-1]}",
                 "strands": [{"name": s["name"], "n": n[s["id"]]} for s in p.strands if n.get(s["id"])]}

@@ -9,9 +9,9 @@
   "geography": ["science"]
  },
  "base_packs": {
-  "math": "math-shanghai",
+  "math": "math-cn",
   "science": "sci-shanghai",
-  "english": "eng-shanghai",
+  "english": "eng-cn",
   "chinese": "chn-tongbian",
   "physics": "phy-shanghai",
   "chemistry": "chem-shanghai",

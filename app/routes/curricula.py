@@ -40,9 +40,10 @@ def index(request: Request, q: str = '', subject: str = '', status: str = '', pa
     packs.sort(key=lambda p: (p.subject_name, p.edition))
     pack = draft.packs.get(pack_id)
     rows = []
+    in_pack = set(pack.kp_ids) if pack else set()
     mapped = {m['kp_id'] for m in doc['textbooks']['mappings'] if not book_id or m['book_id'] == book_id}
     for kp in draft.kps.values():
-        if pack_id and kp['pack'] != pack_id or subject and draft.packs[kp['pack']].subject != subject or stage and kp['stage'] != stage:
+        if pack_id and kp['id'] not in in_pack or subject and draft.packs[kp['pack']].subject != subject or stage and kp['stage'] != stage:
             continue
         if query and query not in (kp['id']+' '+kp['name']+' '+kp.get('desc', '')+' '+draft.packs[kp['pack']].edition+' '+draft.packs[kp['pack']].region).lower():
             continue

@@ -4,6 +4,8 @@
    IGCSE ≈ 9.5，IB DP1 = 11 …），不同学制之间才能比先后。加一个学制 / 年级只改这个文件。
 2. 教材包（curricula/*.json）：一个学科的一个版本（统编语文、上海英语、IGCSE 物理……），自带板块（strands）
    和知识点（kps）。包与包之间互不依赖，加一套教材就是放一个 JSON 文件。
+   - 国内公办分两层：课标主干（kind = standard，知识点的家）+ 目录包（pack.base 指向主干，books 写
+     「哪一册、哪一单元、按什么顺序教哪些点」）。同一个点在不同教材里学段不同，用 kp_in / stage_in 取。
    - tracks：同一套教材里的「方向」，比如剑桥英语的 0511 / 0510 / 0500、IGCSE 的 Core / Extended。
      知识点带 tracks 字段表示只属于这些方向；不带就是所有方向都学。
 3. 关联（curricula/_links/*.json）：跨教材、跨学科的知识融合，和教材包分开存放，增删不动教材本身。
@@ -43,7 +45,11 @@ GRADES = [f"G{i}" for i in range(1, 13)]
 SYSTEMS: dict[str, dict] = {}   # 学制 id -> {name, international, lang}
 SUBJECTS: dict[str, dict] = {"english": {"id": "english", "name": "英语", "lang": "en"},
                              "chinese": {"id": "chinese", "name": "语文", "lang": "zh"}}  # 加载 subjects.json 后覆盖
-PACK_KINDS = {"textbook": "审定教材", "syllabus": "考试大纲", "course": "自定课程"}
+PACK_KINDS = {"textbook": "审定教材", "syllabus": "考试大纲", "course": "自定课程", "standard": "课程标准主干"}
+TERM_RANK = {"上": 0, "下": 2}   # 章的先后：上册、不分册、下册
+# 目录包从主干继承的字段（目录包只管「哪一册、哪一单元、按什么顺序教哪些点」）
+EDITION_INHERITS = ("subject", "subject_name", "system", "teach_lang", "item_lang", "prompt_note", "progress",
+                    "tracks", "default_track")
 LINK_TYPES = {"uses": "要用到", "language": "另一种语言的说法", "context": "相关背景"}
 
 
@@ -87,6 +93,13 @@ class Pack:
     copyright: str = ""                               # 自编教材的版权声明，显示在知识点页底部
     open_review: str = ""                             # "ai"：简答题由 AI 点评和追问，不让学员自评（app/coach.py）
     thinking_moves: list = field(default_factory=list)  # 这门课看重的思考方式 [{id, name, desc}]；列了才出思辨题（app/discuss.py）
+    base: str = ""                                    # 目录包：建在哪个主干上（知识点、题、讲解都是主干的）
+    books: list = field(default_factory=list)        # 目录包的册次 [{stage, term, name, status, sources, units: [{name, kps}]}]
+
+    @property
+    def standard(self) -> bool:
+        """课程标准主干：知识点的家，孩子不直接选它，选的是建在它上面的某套教材（目录包）。"""
+        return self.kind == "standard"
 
     @property
     def lang(self) -> str:
@@ -156,16 +169,32 @@ class Catalog:
     def load(self, directory=None, *, register_meta=True):
         self._register_meta = register_meta
         directory = directory or config.CURRICULA_DIR
-        self.packs, self.kps, self.kp_pack, self.errors = {}, {}, {}, []
+        self.packs, self.kps, self.kp_pack, self.errors, self._meta = {}, {}, {}, [], {}
         self._load_meta(directory / "_meta")
+        self.views = {}
+        files = []
         for path in sorted(directory.glob("*.json")):
             try:
                 d = json.loads(path.read_text(encoding="utf-8"))
-                if not isinstance(d, dict) or not isinstance(d.get("pack"), dict) or not isinstance(d.get("kps"), list):
+                if not isinstance(d, dict) or not isinstance(d.get("pack"), dict) or not isinstance(d.get("kps", [] if d["pack"].get("base") else None), list):
                     raise ValueError("教材包必须包含 pack 对象和 kps 列表")
-                if not all(isinstance(d["pack"].get(k), str) and d["pack"][k] for k in ("id", "subject", "edition", "system")):
+                files.append((path, d))
+            except (ValueError, TypeError) as exc:
+                self.errors.append(f"{path.name}: {exc}")
+        # 主干和独立教材先加载，目录包（pack.base）后加载：它要用主干的知识点
+        for path, d in sorted(files, key=lambda f: bool(f[1]["pack"].get("base"))):
+            meta = d["pack"]
+            base = self.packs.get(meta.get("base", ""))
+            if meta.get("base"):
+                if not base or base.base:
+                    self.errors.append(f"{path.name}: 目录包的主干 {meta['base']} 不存在")
+                    continue
+                meta = {**{k: self._meta[base.id][k] for k in EDITION_INHERITS if k in self._meta[base.id]}, **meta}
+                d = {**d, "strands": base.strands + d.get("strands", [])}
+            try:
+                if not all(isinstance(meta.get(k), str) and meta[k] for k in ("id", "subject", "edition", "system")):
                     raise ValueError("教材包身份字段缺失")
-                for kp in d["kps"]:
+                for kp in d.get("kps", []):
                     if not isinstance(kp, dict) or not all(isinstance(kp.get(k), str) and kp[k] for k in ("id", "name", "stage", "strand")):
                         raise ValueError("知识点身份字段缺失")
                     if not isinstance(kp.get("prereqs", []), list) or not all(isinstance(x, str) or (isinstance(x, dict) and isinstance(x.get("id"), str)) for x in kp.get("prereqs", [])):
@@ -173,13 +202,12 @@ class Catalog:
             except (ValueError, TypeError) as exc:
                 self.errors.append(f"{path.name}: {exc}")
                 continue
-            meta = d["pack"]
             if meta["id"] in self.packs:
                 self.errors.append(f"{path.name}: 重复教材包 ID {meta['id']}")
                 continue
             pack = self._pack(meta, d)
             track_ids = {t["id"] for t in pack.tracks}
-            for kp in d["kps"]:
+            for kp in d.get("kps", []):
                 kp = dict(kp)
                 kp.setdefault("prereqs", [])
                 kp["prereqs"] = [p if isinstance(p, dict) else {"id": p, "strength": "必须"} for p in kp["prereqs"]]
@@ -195,9 +223,16 @@ class Catalog:
                 self.kps[kp["id"]] = kp
                 self.kp_pack[kp["id"]] = pack.id
                 pack.kp_ids.append(kp["id"])
+            if base:
+                self._edition(pack, base, d.get("books") or [])
             if not pack.stages:
-                pack.stages = sorted({self.kps[k]["stage"] for k in pack.kp_ids}, key=stage_rank)
+                pack.stages = sorted({self.kp_in(pack.id, k)["stage"] for k in pack.kp_ids}, key=stage_rank)
+            self._meta[pack.id] = meta
             self.packs[pack.id] = pack
+        self.kp_packs = {}   # 知识点 -> 用到它的教材（主干 + 各套目录）
+        for pack in self.packs.values():
+            for k in pack.kp_ids:
+                self.kp_packs.setdefault(k, []).append(pack.id)
         self.children = {}
         for kid, kp in self.kps.items():
             for p in kp["prereqs"]:
@@ -272,7 +307,7 @@ class Catalog:
             school_types=meta.get("school_types", []), system=system, kind=kind, teach_lang=teach, item_lang=item,
             prompt_note=meta.get("prompt_note", ""), levels=levels, chapters=meta.get("progress") != "none",
             selection=meta.get("selection") or {}, copyright=meta.get("copyright", ""),
-            open_review=meta.get("open_review", ""), thinking_moves=self._moves(meta, d),
+            open_review=meta.get("open_review", ""), thinking_moves=self._moves(meta, d), base=meta.get("base", ""),
         )
 
     def _moves(self, meta, d) -> list:
@@ -287,6 +322,65 @@ class Catalog:
             else:
                 self.errors.append(f"{meta['id']}: thinking_moves 里的 {m} 不是本包的知识点，也不是 {{id, name}}")
         return out
+
+    def _edition(self, pack: Pack, base: Pack, books: list) -> None:
+        """目录包：一套教材 = 册次 → 单元 → 按顺序教哪些知识点（主干里的，或这套书自己的）。
+        知识点在这套书里的学段、学期、单元取它第一次出现的位置；同一个点可以在后面的单元里再出现（螺旋上升）。
+        目录还没核实全时，目录里没出现的主干知识点放进后面第一本没列目录的册（「目录待核实」，按板块分章）；
+        上下册都列全了还没出现的点、比这套书开始的年级还早的点，不算这套书的内容。"""
+        own, view, out = list(pack.kp_ids), {}, []
+        allowed = set(base.kp_ids) | set(own)
+        for b in books:
+            stage, term = b.get("stage", ""), b.get("term", "")
+            if stage not in STAGE_RANK or not isinstance(b.get("units"), list):
+                self.errors.append(f"{pack.id}: 册次 {b.get('name') or stage} 的学段或单元不正确")
+                continue
+            book = {"stage": stage, "term": term, "name": b.get("name") or f"{STAGE_LABEL.get(stage, stage)}{term}册",
+                    "status": b.get("status", "partial"), "sources": b.get("sources", []), "units": []}
+            for u in b["units"]:
+                kps = [k for k in u.get("kps", []) if k in allowed]
+                for k in set(u.get("kps", [])) - allowed:
+                    self.errors.append(f"{pack.id}: {book['name']}「{u.get('name')}」里的 {k} 不在主干 {base.id} 或本包里")
+                for k in kps:
+                    view.setdefault(k, {**self.kps[k], "stage": stage, "term": term, "unit": u.get("name", "")})
+                book["units"].append({"name": u.get("name", ""), "key": u.get("key") or u.get("name", ""), "kps": kps})
+            if book["status"] in ("verified", "partial") and not book["sources"]:
+                self.errors.append(f"{pack.id}: {book['name']} 缺少目录来源")
+            out.append(book)
+        # 语音、阅读这类板块不归哪一个单元、每个单元都在练（strand.throughout）：目录列了这个年级的册，就记在这一学年
+        # 第一册的 throughout 里，算这一年的内容，但不占章（不参与按章推演学校进度）
+        throughout = {s["id"] for s in base.strands if s.get("throughout")}
+        for k in base.kp_ids + own:
+            kp = self.kps[k]
+            book = next((b for b in sorted(out, key=lambda b: TERM_RANK.get(b["term"], 1)) if b["stage"] == kp["stage"]), None)
+            if k in view or kp["strand"] not in throughout or not book:
+                continue
+            book.setdefault("throughout", []).append(k)
+            view[k] = {**kp, "stage": book["stage"], "term": book["term"], "unit": ""}
+        listed = {(b["stage"], t) for b in out for t in ((b["term"],) if b["term"] in TERM_RANK else TERM_RANK)}
+        open_slots = [(s, t) for s in sorted(set(pack.stages) or {b["stage"] for b in out}, key=stage_rank)
+                      for t in TERM_RANK if (s, t) not in listed]
+        first = min((stage_rank(s) for s in pack.stages or [b["stage"] for b in out]), default=0)
+        auto: dict[tuple, dict] = {}
+        for k in base.kp_ids + own:
+            rank = stage_rank(self.kps[k]["stage"])
+            slot = next((x for x in open_slots if stage_rank(x[0]) >= rank), None)
+            if k in view or not slot or rank < first:   # 比这套书开始的年级还早的：是地基（app/ladder.py），不是这套书的内容
+                continue
+            stage, term = slot
+            book = auto.setdefault(slot, {"stage": stage, "term": term, "name": f"{STAGE_LABEL.get(stage, stage)}{term}册（目录待核实）",
+                                          "status": "pending", "sources": [], "units": []})
+            strand = self.strand_name(base.id, self.kps[k]["strand"])
+            unit = next((u for u in book["units"] if u["name"] == strand), None)
+            if not unit:
+                unit = {"name": strand, "key": f"{stage}{term}:{self.kps[k]['strand']}", "kps": []}
+                book["units"].append(unit)
+            unit["kps"].append(k)
+            view[k] = {**self.kps[k], "stage": stage, "term": term, "unit": strand}
+        out = sorted(out + list(auto.values()), key=lambda b: (stage_rank(b["stage"]), TERM_RANK.get(b["term"], 1)))
+        order = list(dict.fromkeys(k for b in out for k in [x for u in b["units"] for x in u["kps"]] + b.get("throughout", [])))
+        order += [k for k in own if k not in view]   # 本包自己的点没进目录：按它自己写的学段
+        pack.kp_ids, pack.books, self.views[pack.id] = order, out, {**{k: self.kps[k] for k in own}, **view}
 
     def _load_meta(self, meta_dir):
         f = meta_dir / "stages.json"
@@ -354,6 +448,20 @@ class Catalog:
     def kp(self, kp_id: str) -> dict | None:
         return self.kps.get(kp_id)
 
+    def kp_in(self, pack_id: str, kp_id: str) -> dict | None:
+        """知识点在某套教材里的样子：学段、学期、单元按这套书的目录（同一个点，上海三年级教，苏教四年级教）。"""
+        return self.views.get(pack_id, {}).get(kp_id) or self.kps.get(kp_id)
+
+    def stage_in(self, pack_id: str, kp_id: str) -> str:
+        return self.kp_in(pack_id, kp_id)["stage"]
+
+    def courses(self) -> list[Pack]:
+        """能选的课：主干不直接选，选建在它上面的教材。"""
+        return [p for p in self.packs.values() if not p.standard]
+
+    def editions_of(self, pack_id: str) -> list[Pack]:
+        return [p for p in self.packs.values() if p.base == pack_id]
+
     def prereqs(self, kp_id: str, required_only=False) -> list[dict]:
         kp = self.kps.get(kp_id)
         if not kp:
@@ -403,7 +511,8 @@ class Catalog:
                  track: str | None = None) -> list[dict]:
         hi = stage_rank(max_stage) if max_stage else 999
         lo = stage_rank(min_stage) if min_stage else -1
-        return [self.kps[k] for k in self.ids_for(pack_id, track) if lo <= stage_rank(self.kps[k]["stage"]) <= hi]
+        kps = [self.kp_in(pack_id, k) for k in self.ids_for(pack_id, track)]
+        return [k for k in kps if lo <= stage_rank(k["stage"]) <= hi]
 
     # ---- 跨教材融合 ----
     def equivalents(self, kp_id: str) -> list[dict]:
@@ -428,11 +537,17 @@ class Catalog:
         pack = self.packs.get(pack_id)
         if not pack or not pack.chapters:
             return []
+        if any(b["stage"] == stage for b in pack.books):   # 目录包：按册次、单元
+            allowed = set(self.ids_for(pack_id, track))
+            return [{"key": u["key"], "name": u["name"], "kps": kps, "book": b["name"], "status": b["status"],
+                     "rank": TERM_RANK.get(b["term"], 1)}
+                    for b in pack.books if b["stage"] == stage for u in b["units"]
+                    if (kps := [k for k in u["kps"] if k in allowed])]
         explicit = []
         if hasattr(self, "textbooks"):
             explicit = self.textbooks.chapters(pack_id, stage, set(self.ids_for(pack_id, track)))
         mapped = {kid for ch in explicit for kid in ch["kps"]}
-        kps = [self.kps[k] for k in self.ids_for(pack_id, track) if self.kps[k]["stage"] == stage and k not in mapped]
+        kps = [kp for k in self.ids_for(pack_id, track) if (kp := self.kp_in(pack_id, k))["stage"] == stage and k not in mapped]
         by_unit = len({k.get("unit") for k in kps if k.get("unit")}) > 1
         coarse = by_unit and len({k.get("unit") for k in kps}) > 15  # 大纲分得很细（1.1、1.2…）：归到大题
         out: dict[str, dict] = {}
@@ -450,10 +565,9 @@ class Catalog:
             ch = out.setdefault(key, {"key": key, "name": name, "kps": [], "first": i, "terms": []})
             ch["kps"].append(kp["id"])
             ch["terms"].append(kp.get("term"))
-        term_rank = {"上": 0, "下": 2}
         for ch in out.values():
-            terms = [t for t in ch.pop("terms") if t in term_rank]
-            ch["rank"] = term_rank[max(sorted(set(terms)), key=terms.count)] if terms else 1  # 一样多时算上册
+            terms = [t for t in ch.pop("terms") if t in TERM_RANK]
+            ch["rank"] = TERM_RANK[max(sorted(set(terms)), key=terms.count)] if terms else 1  # 一样多时算上册
             ch["num"] = _chapter_num(ch["name"])
         chs = sorted(out.values(), key=lambda c: (c["rank"], c["first"]))
         # 章名里的序号不重复时按序号排（教材数据里的先后不一定是上课顺序）；有重复（第1节、第1节…）就保持原顺序
@@ -479,7 +593,7 @@ class Catalog:
 
     def by_subject(self, school_type: str = "") -> dict[str, list[Pack]]:
         out: dict[str, list[Pack]] = {}
-        for p in self.packs.values():
+        for p in self.courses():
             out.setdefault(p.subject_name, []).append(p)
         if school_type:  # 适合这类学校的教材排前面（其它的仍可选：转学、提前学）
             for lst in out.values():

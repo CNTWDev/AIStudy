@@ -1,0 +1,277 @@
+{
+ "pack": {
+  "id": "math-suke",
+  "base": "math-cn",
+  "subject": "math",
+  "edition": "苏科版数学（初中 · 2022 课标新版）",
+  "region": "江苏公办",
+  "system": "cn",
+  "kind": "textbook",
+  "school_types": [
+   "public"
+  ],
+  "stages": [
+   "G7",
+   "G8",
+   "G9"
+  ],
+  "version": 1,
+  "verified": "2026-10-20",
+  "publisher": "江苏凤凰科学技术出版社",
+  "sources": [
+   "教育部《2024年义务教育国家课程教学用书目录（根据2022年版课程标准修订）》 https://jw.beijing.gov.cn/xxgk/2024zcwj/2024qtwj/202408/W020240905543232813376.pdf",
+   "江苏 2025 秋新教材投入使用 https://www.yzwb.net/news/jiangsu/nanjing/202508/t20250822_253531.html"
+  ],
+  "notes": "江苏公办初中数学（少数地区用人教版）。新版七上到九上的章已对照目录（新版每学年重新从第 1 章编号）；九下新版 2027 春才出，暂按课标主干的顺序排（「目录待核实」）。",
+  "selection": {
+   "name": "苏科版数学（江苏初中）",
+   "hint": "课本封面印「江苏凤凰科学技术出版社」。2024 年以后的新版。",
+   "warning": "九年级下册新版还没出版，目录暂按课标顺序排。"
+  }
+ },
+ "books": [
+  {
+   "stage": "G7",
+   "term": "上",
+   "name": "七年级上册",
+   "status": "verified",
+   "sources": [
+    "https://www.renjiaoshe.com/jiaocai/3270.html",
+    "https://www.czsx.com.cn/sort.asp?AClassID=182&NClassID=4&GClassID=10"
+   ],
+   "units": [
+    {
+     "name": "第1章 数学与我们同行",
+     "kps": []
+    },
+    {
+     "name": "第2章 有理数",
+     "kps": [
+      "MSH-NUM-38",
+      "MSH-NUM-39"
+     ]
+    },
+    {
+     "name": "第3章 代数式",
+     "kps": [
+      "MSH-ALG-20",
+      "MSH-ALG-06"
+     ]
+    },
+    {
+     "name": "第4章 一元一次方程",
+     "kps": [
+      "MSH-ALG-03"
+     ]
+    },
+    {
+     "name": "第5章 走进几何世界",
+     "kps": [
+      "MCN-GEO-03"
+     ]
+    },
+    {
+     "name": "第6章 平面图形的初步认识",
+     "kps": [
+      "MSH-GEO-23",
+      "MSH-GEO-26"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G7",
+   "term": "下",
+   "name": "七年级下册",
+   "status": "verified",
+   "sources": [
+    "https://www.renjiaoshe.com/jiaocai/3271.html",
+    "https://www.czsx.com.cn/sort.asp?AClassID=182&NClassID=4&GClassID=25"
+   ],
+   "units": [
+    {
+     "name": "第7章 幂的运算",
+     "kps": [
+      "MSH-ALG-07"
+     ]
+    },
+    {
+     "name": "第8章 整式乘法",
+     "kps": [
+      "MSH-ALG-08"
+     ]
+    },
+    {
+     "name": "第9章 图形的变换",
+     "kps": [
+      "MSH-GEO-25"
+     ]
+    },
+    {
+     "name": "第10章 二元一次方程组",
+     "kps": [
+      "MSH-ALG-05"
+     ]
+    },
+    {
+     "name": "第11章 一元一次不等式",
+     "kps": [
+      "MSH-ALG-04"
+     ]
+    },
+    {
+     "name": "第12章 定义 命题 证明",
+     "kps": [
+      "MSH-GEO-30"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G8",
+   "term": "上",
+   "name": "八年级上册",
+   "status": "verified",
+   "sources": [
+    "https://www.renjiaoshe.com/jiaocai/3272.html",
+    "https://www.czsx.com.cn/sort.asp?AClassID=182&NClassID=4&GClassID=30"
+   ],
+   "units": [
+    {
+     "name": "第1章 三角形",
+     "kps": [
+      "MSH-GEO-27",
+      "MSH-GEO-28",
+      "MSH-GEO-29",
+      "MSH-GEO-30"
+     ]
+    },
+    {
+     "name": "第2章 实数的初步认识",
+     "kps": [
+      "MSH-NUM-40"
+     ]
+    },
+    {
+     "name": "第3章 勾股定理",
+     "kps": [
+      "MSH-GEO-31"
+     ]
+    },
+    {
+     "name": "第4章 平面直角坐标系",
+     "kps": [
+      "MSH-FUN-01"
+     ]
+    },
+    {
+     "name": "第5章 一次函数",
+     "kps": [
+      "MSH-FUN-02",
+      "MSH-FUN-03"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G8",
+   "term": "下",
+   "name": "八年级下册",
+   "status": "verified",
+   "sources": [
+    "https://www.czsx.com.cn/sort.asp?AClassID=182&NClassID=4&GClassID=40",
+    "https://www.szzx100.cn/Category_467/Index.aspx"
+   ],
+   "note": "2026 春新版；两个教研网站的章节目录一致。第 6、7 章课件里也写作「数据的收集、整理与描述」「概率」。",
+   "units": [
+    {
+     "name": "第6章 数据的收集、整理、描述",
+     "kps": [
+      "MCN-STA-02"
+     ]
+    },
+    {
+     "name": "第7章 认识概率",
+     "kps": [
+      "MSH-STA-05"
+     ]
+    },
+    {
+     "name": "第8章 四边形",
+     "kps": [
+      "MSH-GEO-32",
+      "MSH-GEO-33",
+      "MSH-GEO-34"
+     ]
+    },
+    {
+     "name": "第9章 因式分解",
+     "kps": [
+      "MSH-ALG-09"
+     ]
+    },
+    {
+     "name": "第10章 分式",
+     "kps": [
+      "MSH-ALG-10",
+      "MSH-ALG-12"
+     ]
+    },
+    {
+     "name": "第11章 二次根式",
+     "kps": [
+      "MSH-NUM-41"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G9",
+   "term": "上",
+   "name": "九年级上册",
+   "status": "partial",
+   "sources": [
+    "https://www.czsx.com.cn/sort.asp?AClassID=182&NClassID=4&GClassID=50",
+    "https://www.szzx100.cn/Category_468/Index.aspx"
+   ],
+   "note": "2026 秋新版；章名两个网站一致，部分节名只有一处。反比例函数从八下移到了这里。",
+   "units": [
+    {
+     "name": "第1章 一元二次方程",
+     "kps": [
+      "MSH-ALG-11",
+      "MSH-APP-09"
+     ]
+    },
+    {
+     "name": "第2章 反比例函数",
+     "kps": [
+      "MSH-FUN-02"
+     ]
+    },
+    {
+     "name": "第3章 圆",
+     "kps": [
+      "MSH-GEO-40",
+      "MCN-GEO-04",
+      "MSH-GEO-41",
+      "MSH-GEO-22"
+     ]
+    },
+    {
+     "name": "第4章 数据的集中趋势和离散程度",
+     "kps": [
+      "MSH-STA-06",
+      "MCN-STA-03"
+     ]
+    },
+    {
+     "name": "第5章 等可能条件下的概率",
+     "kps": [
+      "MSH-STA-05"
+     ]
+    }
+   ]
+  }
+ ]
+}

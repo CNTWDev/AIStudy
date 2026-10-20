@@ -1,0 +1,564 @@
+{
+ "pack": {
+  "id": "eng-yilin",
+  "base": "eng-cn",
+  "subject": "english",
+  "edition": "译林版英语（三年级起点 · 2022 课标新版，小学 + 初中）",
+  "region": "江苏公办",
+  "system": "cn",
+  "kind": "textbook",
+  "school_types": [
+   "public"
+  ],
+  "stages": [
+   "G3",
+   "G4",
+   "G5",
+   "G6",
+   "G7",
+   "G8",
+   "G9"
+  ],
+  "version": 1,
+  "verified": "2026-10-20",
+  "publisher": "译林出版社",
+  "sources": [
+   "教育部《2024年义务教育国家课程教学用书目录（根据2022年版课程标准修订）》 https://jw.beijing.gov.cn/xxgk/2024zcwj/2024qtwj/202408/W020240905543232813376.pdf",
+   "江苏 2025 秋新教材投入使用 https://www.yzwb.net/news/jiangsu/nanjing/202508/t20250822_253531.html",
+   "译林教材培训 https://edu.yilin.com/index.php/NewsDetail/index?cat_id=2&id=81&nav_id=1"
+  ],
+  "notes": "江苏公办英语（三年级起，有的区一年级起另有一二年级用书）。新版三上到四下、七上到八下的单元已对照目录；单元对应哪些知识点是按每单元的句型和 Grammar 课时判断的。五上、六上、九上（2026 秋新版）的单元名已查到，但单元里的句型和语法点网上还没有；五下、六下、九下新版 2027 春才出。这些册暂按课标主干的顺序排（「目录待核实」）。语音、阅读、写作、听说每个单元都在练，不归哪一个单元，记在每学年第一册的「贯穿各单元」里。",
+  "selection": {
+   "name": "译林版英语（江苏）",
+   "hint": "课本封面印「译林出版社」，三年级起点。2024 年以后的新版。",
+   "warning": "五、六、九年级的新版目录还在核实，暂按课标顺序排。"
+  }
+ },
+ "books": [
+  {
+   "stage": "G3",
+   "term": "上",
+   "name": "三年级上册",
+   "status": "verified",
+   "sources": [
+    "https://www.renjiaoshe.com/jiaocai/2542.html",
+    "https://www.renjiaoshe.com/p/513604.html",
+    "https://njzxxyy.com/forum.php?gid=688&showlist=1",
+    "https://yy.suyang123.com/xiaoxue/sannianji/njylb_2024shangce_listen1.html"
+   ],
+   "note": "单元名已对照目录；每个单元对应哪些知识点，是按单元话题和交际功能判断的，拿到课本后再核对。",
+   "units": [
+    {
+     "name": "Unit 1 Hello!",
+     "kps": [
+      "ESH-LIS-01"
+     ]
+    },
+    {
+     "name": "Unit 2 What's your name?",
+     "kps": [
+      "ESH-GRA-01",
+      "ESH-LIS-04"
+     ]
+    },
+    {
+     "name": "Unit 3 Are you Su Hai?",
+     "kps": [
+      "ESH-GRA-05"
+     ]
+    },
+    {
+     "name": "Unit 4 This is my friend",
+     "kps": [
+      "ESH-GRA-01"
+     ]
+    },
+    {
+     "name": "Unit 5 She's my mother",
+     "kps": [
+      "ESH-VOC-06",
+      "ESH-GRA-09"
+     ]
+    },
+    {
+     "name": "Unit 6 Is he your grandpa?",
+     "kps": [
+      "ESH-VOC-06",
+      "ESH-GRA-05"
+     ]
+    },
+    {
+     "name": "Unit 7 Happy Birthday!",
+     "kps": [
+      "ESH-VOC-05"
+     ]
+    },
+    {
+     "name": "Unit 8 I can do this for you",
+     "kps": [
+      "ESH-GRA-06"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G3",
+   "term": "下",
+   "name": "三年级下册",
+   "status": "verified",
+   "sources": [
+    "https://www.renjiaoshe.com/jiaocai/2543.html",
+    "https://www.dzkbw.org/book/5846.html",
+    "https://njzxxyy.com/forum.php?gid=688&showlist=1",
+    "https://yyld.51jiaoxi.com/sanxia/njylb/"
+   ],
+   "note": "单元名已对照目录；每个单元对应哪些知识点，是按单元话题和交际功能判断的，拿到课本后再核对。",
+   "units": [
+    {
+     "name": "Unit 1 School things",
+     "kps": [
+      "ESH-GRA-02",
+      "ESH-GRA-11"
+     ]
+    },
+    {
+     "name": "Unit 2 Clean our classroom",
+     "kps": [
+      "ESH-GRA-13"
+     ]
+    },
+    {
+     "name": "Unit 3 School rules",
+     "kps": [
+      "ESH-GRA-13"
+     ]
+    },
+    {
+     "name": "Unit 4 Have fun after class",
+     "kps": [
+      "ESH-GRA-03"
+     ]
+    },
+    {
+     "name": "Unit 5 Fruit",
+     "kps": [
+      "ESH-VOC-04",
+      "ESH-GRA-12"
+     ]
+    },
+    {
+     "name": "Unit 6 On the farm",
+     "kps": [
+      "ESH-GRA-04",
+      "ESH-GRA-14"
+     ]
+    },
+    {
+     "name": "Unit 7 Animals",
+     "kps": [
+      "ESH-VOC-04"
+     ]
+    },
+    {
+     "name": "Unit 8 Colours",
+     "kps": [
+      "ESH-VOC-02"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G4",
+   "term": "上",
+   "name": "四年级上册",
+   "status": "verified",
+   "sources": [
+    "https://www.dzkbw.org/book/5847.html",
+    "https://njzxxyy.com/forum.php?gid=688&showlist=1",
+    "https://yy.suyang123.com/xiaoxue/sinianji/njylb_shangce_listen1.html"
+   ],
+   "note": "单元名已对照目录；每个单元对应哪些知识点，是按单元话题和交际功能判断的，拿到课本后再核对。",
+   "units": [
+    {
+     "name": "Unit 1 Our school subjects",
+     "kps": [
+      "ESH-GRA-03",
+      "ESH-GRA-17"
+     ]
+    },
+    {
+     "name": "Unit 2 My day",
+     "kps": [
+      "ESH-VOC-11",
+      "ESH-GRA-15"
+     ]
+    },
+    {
+     "name": "Unit 3 My week",
+     "kps": [
+      "ESH-VOC-11",
+      "ESH-GRA-19"
+     ]
+    },
+    {
+     "name": "Unit 4 I like sport",
+     "kps": [
+      "ESH-GRA-20"
+     ]
+    },
+    {
+     "name": "Unit 5 Different toys, same fun",
+     "kps": [
+      "ESH-VOC-09"
+     ]
+    },
+    {
+     "name": "Unit 6 Weather",
+     "kps": [
+      "ESH-VOC-07"
+     ]
+    },
+    {
+     "name": "Unit 7 Seasons",
+     "kps": [
+      "ESH-VOC-07"
+     ]
+    },
+    {
+     "name": "Unit 8 What we wear",
+     "kps": [
+      "ESH-VOC-09"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G4",
+   "term": "下",
+   "name": "四年级下册",
+   "status": "verified",
+   "sources": [
+    "https://njzxxyy.com/forum.php?gid=688&showlist=1",
+    "https://yy.suyang123.com/xiaoxue/sinianji/njylb_xiace_listen1.html",
+    "https://yy.suyang123.com/xiaoxue/sinianji/njylb_xiace_listen2.html",
+    "https://www.sohu.com/a/991356091_122492121"
+   ],
+   "units": [
+    {
+     "name": "Unit 1 We're friends",
+     "kps": [
+      "ESH-GRA-14"
+     ]
+    },
+    {
+     "name": "Unit 2 Helping others at school",
+     "kps": [
+      "ESH-GRA-14"
+     ]
+    },
+    {
+     "name": "Unit 3 Road safety",
+     "kps": [
+      "ESH-GRA-13"
+     ]
+    },
+    {
+     "name": "Unit 4 Caring about others",
+     "kps": [
+      "ESH-LIS-06"
+     ]
+    },
+    {
+     "name": "Unit 5 Eating out",
+     "kps": [
+      "ESH-LIS-06",
+      "ESH-VOC-09"
+     ]
+    },
+    {
+     "name": "Unit 6 Jobs",
+     "kps": [
+      "ESH-VOC-10"
+     ]
+    },
+    {
+     "name": "Unit 7 Doing chores at home",
+     "kps": [
+      "ESH-GRA-16"
+     ]
+    },
+    {
+     "name": "Unit 8 In the kitchen",
+     "kps": [
+      "ESH-GRA-16"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G7",
+   "term": "上",
+   "name": "七年级上册",
+   "status": "verified",
+   "sources": [
+    "https://www.renjiaoshe.com/jiaocai/3354.html",
+    "https://www.renjiaoshe.com/kewen/88847.html",
+    "https://www.njzxxyy.com/forum.php?showlist=1&gid=689",
+    "https://www.renjiaoshe.com/p/553429.html"
+   ],
+   "note": "单元名两处一致；每单元的语法点来自一处 Grammar 课时资源。",
+   "units": [
+    {
+     "name": "Unit 1 This is me!",
+     "kps": [
+      "ESH-GRA-05",
+      "ESH-GRA-01"
+     ]
+    },
+    {
+     "name": "Unit 2 Hobbies",
+     "kps": [
+      "ESH-GRA-15",
+      "ESH-GRA-20"
+     ]
+    },
+    {
+     "name": "Unit 3 Welcome to our school!",
+     "kps": [
+      "ESH-GRA-09",
+      "ESH-GRA-18"
+     ]
+    },
+    {
+     "name": "Unit 4 School days",
+     "kps": [
+      "ESH-GRA-30",
+      "ESH-GRA-19"
+     ]
+    },
+    {
+     "name": "Unit 5 A healthy lifestyle",
+     "kps": [
+      "ESH-GRA-26",
+      "ESH-GRA-12"
+     ]
+    },
+    {
+     "name": "Unit 6 My clothes, my style",
+     "kps": [
+      "ESH-GRA-17",
+      "ESH-GRA-32"
+     ]
+    },
+    {
+     "name": "Unit 7 Be wise with money",
+     "kps": [
+      "ESH-GRA-26",
+      "ESH-GRA-14"
+     ]
+    },
+    {
+     "name": "Unit 8 Let's celebrate!",
+     "kps": [
+      "ESH-GRA-16"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G7",
+   "term": "下",
+   "name": "七年级下册",
+   "status": "verified",
+   "sources": [
+    "https://www.dzkbw.org/book/5857.html",
+    "https://www.renjiaoshe.com/jiaocai/3355.html",
+    "https://www.njzxxyy.com/forum.php?showlist=1&gid=689",
+    "https://zy.21cnjy.com/22252073"
+   ],
+   "note": "单元名三处一致；每单元的语法点来自一处 Grammar 课时资源。",
+   "units": [
+    {
+     "name": "Unit 1 Home",
+     "kps": [
+      "ESH-VOC-12"
+     ]
+    },
+    {
+     "name": "Unit 2 Neighbourhood",
+     "kps": [
+      "ESH-GRA-23"
+     ]
+    },
+    {
+     "name": "Unit 3 My hometown",
+     "kps": [
+      "ESH-GRA-27",
+      "ESH-GRA-30"
+     ]
+    },
+    {
+     "name": "Unit 4 Chinese folk art",
+     "kps": [
+      "ESH-GRA-10",
+      "ESH-GRA-28",
+      "ESH-GRA-18"
+     ]
+    },
+    {
+     "name": "Unit 5 Animal friends",
+     "kps": [
+      "ESH-GRA-33",
+      "ESH-GRA-25"
+     ]
+    },
+    {
+     "name": "Unit 6 Beautiful landscapes",
+     "kps": [
+      "ESH-GRA-29",
+      "ESH-GRA-40"
+     ]
+    },
+    {
+     "name": "Unit 7 Outdoor fun",
+     "kps": [
+      "ESH-GRA-21",
+      "ESH-GRA-22"
+     ]
+    },
+    {
+     "name": "Unit 8 Wonderland",
+     "kps": [
+      "ESH-GRA-22"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G8",
+   "term": "上",
+   "name": "八年级上册",
+   "status": "verified",
+   "sources": [
+    "https://www.dzkbw.org/book/5858.html",
+    "https://www.renjiaoshe.com/jiaocai/3356.html",
+    "https://www.njzxxyy.com/forum.php?showlist=1&gid=689",
+    "https://www.zxxk.com/soft/53771216.html"
+   ],
+   "note": "单元名三处一致；语法点来自 Grammar 课时资源，Unit 5 的语法还没查到。",
+   "units": [
+    {
+     "name": "Unit 1 Friendship",
+     "kps": [
+      "ESH-GRA-24"
+     ]
+    },
+    {
+     "name": "Unit 2 School life",
+     "kps": [
+      "ESH-GRA-36"
+     ]
+    },
+    {
+     "name": "Unit 3 To be a good learner",
+     "kps": [
+      "ESH-GRA-36",
+      "ESH-GRA-29"
+     ]
+    },
+    {
+     "name": "Unit 4 Hands-on fun",
+     "kps": [
+      "ESH-GRA-13",
+      "ESH-GRA-25"
+     ]
+    },
+    {
+     "name": "Unit 5 Wild animals",
+     "kps": []
+    },
+    {
+     "name": "Unit 6 Seasons",
+     "kps": [
+      "ESH-GRA-53"
+     ]
+    },
+    {
+     "name": "Unit 7 The natural world",
+     "kps": [
+      "ESH-GRA-53"
+     ]
+    },
+    {
+     "name": "Unit 8 Safe and sound",
+     "kps": [
+      "ESH-GRA-35"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G8",
+   "term": "下",
+   "name": "八年级下册",
+   "status": "verified",
+   "sources": [
+    "https://www.dzkbw.org/book/7764.html",
+    "https://www.njzxxyy.com/forum.php?showlist=1&gid=689",
+    "https://zy.21cnjy.com/25145240"
+   ],
+   "note": "单元名两处一致；语法点按课本目录页的页码对到单元，Unit 8 的语法还没查到。",
+   "units": [
+    {
+     "name": "Unit 1 Past and present",
+     "kps": [
+      "ESH-GRA-34"
+     ]
+    },
+    {
+     "name": "Unit 2 Amazing China",
+     "kps": [
+      "ESH-GRA-34"
+     ]
+    },
+    {
+     "name": "Unit 3 The world at one click",
+     "kps": [
+      "ESH-GRA-34",
+      "ESH-GRA-31"
+     ]
+    },
+    {
+     "name": "Unit 4 A good read",
+     "kps": [
+      "ESH-GRA-47",
+      "ESH-GRA-25"
+     ]
+    },
+    {
+     "name": "Unit 5 Good manners",
+     "kps": [
+      "ESH-GRA-47"
+     ]
+    },
+    {
+     "name": "Unit 6 Sunshine for all",
+     "kps": [
+      "ESH-GRA-47",
+      "ESH-GRA-53"
+     ]
+    },
+    {
+     "name": "Unit 7 Charities",
+     "kps": [
+      "ESH-GRA-41"
+     ]
+    },
+    {
+     "name": "Unit 8 A green world",
+     "kps": []
+    }
+   ]
+  }
+ ]
+}

@@ -53,9 +53,34 @@ def baseline():
     return {'schema_version': 1, 'packs': packs, 'textbooks': textbooks, 'concepts': concepts, 'links': links}
 
 
+def _split_override(doc, packs, pid, old):
+    """拆成「主干 + 目录」以前存下的整包覆盖（比如改过上海数学某个点的讲法）：改过的知识点落到主干，
+    新加的点留在这套书自己的包里，家长选课用的名称提示保留。"""
+    edition = copy.deepcopy(doc['packs'][pid])
+    base = edition['pack']['base']
+    spine = copy.deepcopy(packs.get(base) or doc['packs'][base])
+    known = {kp['id']: i for i, kp in enumerate(spine['kps'])}
+    own = []
+    for kp in old.get('kps', []):
+        if kp['id'] in known:
+            spine['kps'][known[kp['id']]] = {k: v for k, v in kp.items() if k not in ('term', 'unit')}
+        else:
+            own.append(kp)
+    edition['pack'].update({k: v for k, v in old['pack'].items() if k not in ('base', 'kind', 'stages')})
+    if own:
+        edition['kps'] = edition.get('kps', []) + own
+        edition['strands'] = edition.get('strands', []) + [s for s in old.get('strands', []) if s['id'] not in {x['id'] for x in spine['strands']}]
+    return edition, spine
+
+
 def effective(overrides):
     doc = baseline()
-    doc['packs'].update(copy.deepcopy(overrides['packs']))
+    packs = copy.deepcopy(overrides['packs'])
+    for pid, old in list(packs.items()):
+        if doc['packs'].get(pid, {}).get('pack', {}).get('base') and not old['pack'].get('base'):
+            packs[pid], spine = _split_override(doc, packs, pid, old)
+            packs[spine['pack']['id']] = spine
+    doc['packs'].update(packs)
     meta = doc['textbooks']
     for key in ('editions', 'books'):
         entries = {e['id']: e for e in meta.get(key, [])}
@@ -93,9 +118,12 @@ def validate_document(doc):
             strands = [s['id'] for s in pack.get('strands', [])]
             if len(strands) != len(set(strands)):
                 errors.append(f'{pid}: 板块 ID 重复')
+            if pid not in result.packs:   # 加载时已报错（比如目录包的主干不存在）
+                continue
+            strands = [s['id'] for s in result.packs[pid].strands]   # 目录包还能用主干的板块
             if not result.packs[pid].stages:
                 errors.append(f'{pid}: 请先设置学段或添加知识点')
-            for kp in pack['kps']:
+            for kp in pack.get('kps', []):
                 if kp['stage'] not in result.packs[pid].stages:
                     errors.append(f"{kp['id']}: 学段不在教材范围内")
                 if kp['strand'] not in strands:
@@ -206,8 +234,8 @@ def apply_edit(overrides, doc, action, form):
         if pid not in doc['packs']:
             raise ValueError('教材不存在')
         pack = copy.deepcopy(doc['packs'][pid])
-        old_kp = next((kp for p in doc['packs'].values() for kp in p['kps'] if kp['id'] == key), None)
-        if old_kp and not any(kp['id'] == key for kp in pack['kps']):
+        old_kp = next((kp for p in doc['packs'].values() for kp in p.get('kps', []) if kp['id'] == key), None)
+        if old_kp and not any(kp['id'] == key for kp in pack.get('kps', [])):
             raise ValueError('知识点 ID 已用于其他教材，不能移动或覆盖')
         kp = copy.deepcopy(old_kp or {'id': key})
         kp.update({name: text(form, name, name in ('name', 'stage', 'strand'), 12000 if name in ('desc', 'method', 'probe') else 300) for name in ('name', 'name_en', 'stage', 'strand', 'term', 'unit', 'desc', 'method', 'probe')})
@@ -217,7 +245,7 @@ def apply_edit(overrides, doc, action, form):
         kp['prereqs'] = [{'id': identifier(k), 'strength': '必须'} for k in lines(form.get('required'))] + [{'id': identifier(k), 'strength': '有帮助'} for k in lines(form.get('helpful'))]
         if key in {x['id'] for x in kp['prereqs']}:
             raise ValueError('知识点不能把自己作为前置')
-        pack['kps'] = [kp if k['id'] == key else k for k in pack['kps']] if old_kp else pack['kps'] + [kp]
+        pack['kps'] = [kp if k['id'] == key else k for k in pack.get('kps', [])] if old_kp else pack.get('kps', []) + [kp]
         overrides['packs'][pid] = pack
     elif action == 'edition':
         entry = copy.deepcopy(next((e for e in doc['textbooks']['editions'] if e['id'] == key), {'id': key}))
@@ -233,7 +261,7 @@ def apply_edit(overrides, doc, action, form):
             raise ValueError('册次学段不存在')
         overrides['books'][key] = entry
     elif action == 'mapping':
-        if not any(k['id'] == key for p in doc['packs'].values() for k in p['kps']):
+        if not any(k['id'] == key for p in doc['packs'].values() for k in p.get('kps', [])):
             raise ValueError('知识点不存在')
         entries = []
         if form.get('book_id'):
@@ -316,11 +344,12 @@ def restore_draft(actor_id, expected, revision):
             if pid not in target['packs']:
                 data['packs'][pid] = pack
             else:
-                missing = [kp for kp in pack['kps'] if kp['id'] not in {k['id'] for k in target['packs'][pid]['kps']}]
+                missing = [kp for kp in pack.get('kps', []) if kp['id'] not in {k['id'] for k in target['packs'][pid].get('kps', [])}]
                 if missing:
                     copy_pack = copy.deepcopy(target['packs'][pid])
-                    copy_pack['kps'] += missing
-                    for strand in pack['strands']:
+                    copy_pack['kps'] = copy_pack.get('kps', []) + missing
+                    copy_pack.setdefault('strands', [])
+                    for strand in pack.get('strands', []):
                         if strand['id'] not in {s['id'] for s in copy_pack['strands']}:
                             copy_pack['strands'].append(strand)
                     copy_pack['pack']['stages'] = list(dict.fromkeys(copy_pack['pack']['stages'] + pack['pack']['stages']))

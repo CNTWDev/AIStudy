@@ -153,7 +153,8 @@ def check_curricula() -> int:
           f"概念 {len(catalog.concepts)} 个，关联 {len(catalog.links)} 条，学校模板 {len(catalog.presets)} 个")
     for p in catalog.packs.values():
         tr = f"，方向：{' / '.join(t['id'] for t in p.tracks)}" if p.tracks else ""
-        print(f"  {p.id:16} {p.subject_name} · {p.edition}（{len(p.kp_ids)} 个点{tr}）")
+        base = f"，建在主干 {p.base} 上，{sum(b['status'] != 'pending' for b in p.books)}/{len(p.books)} 册目录已核对" if p.base else ""
+        print(f"  {p.id:16} {p.subject_name} · {p.edition}（{len(p.kp_ids)} 个点{tr}{base}）")
     for e in catalog.errors:
         print("  [FAIL]", e)
     print("校验通过" if not catalog.errors else f"有 {len(catalog.errors)} 个问题")

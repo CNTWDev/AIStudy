@@ -21,7 +21,7 @@ def candidates(pack_id: str, stage: str) -> list[dict]:
     """给 AI 选的候选知识点：当前学段往前两段、往后一段。"""
     r = stage_rank(stage)
     pack = catalog.packs[pack_id]
-    return [catalog.kps[k] for k in pack.kp_ids if r - 2 <= stage_rank(catalog.kps[k]["stage"]) <= r + 1]
+    return [kp for k in pack.kp_ids if r - 2 <= stage_rank((kp := catalog.kp_in(pack.id, k))["stage"]) <= r + 1]
 
 
 _normalize = itemtypes.normalize
