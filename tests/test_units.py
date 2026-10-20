@@ -188,3 +188,10 @@ def test_tables_scroll_instead_of_squeezing():
             assert re.search(r'<div class="tw[^"]*"[^>]*>\s*$', html[:m.start()]), f"{f.name}: <table> 没有套 <div class=\"tw\">"
     css = (root / "static" / "app.css").read_text(encoding="utf-8")
     assert "table{display:block" not in css.replace(" ", "")
+
+
+def test_migration_versions_unique():
+    """两个分支各加一个同号迁移，合并后启动会报 UNIQUE constraint failed：编号必须不重复。"""
+    from app import migrate
+    versions = [v for v, _ in migrate._files()]
+    assert len(versions) == len(set(versions)), sorted(v for v in versions if versions.count(v) > 1)
