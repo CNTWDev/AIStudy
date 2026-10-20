@@ -20,9 +20,9 @@ def _monday_9am():
     return datetime.combine(mon, datetime.min.time()).replace(hour=9, tzinfo=now.tzinfo), mon
 
 
-def _login(c, email):
+def _login(c, email, pw="secret1"):
     c.post("/logout")
-    c.post("/login", data={"email": email, "password": "secret1"})
+    c.post("/login", data={"email": email, "password": pw})
 
 
 def _ours(pid):
@@ -34,9 +34,9 @@ def test_weekly_report_queue_send_retry_unsub(monkeypatch):
     nine, mon = _monday_9am()
     last_mon = mon - timedelta(days=7)
     pa = auth.create_user("mail-p@x.com", "secret1", "爸爸", "parent")
-    kid = auth.create_user("mail-k@x.com", "secret1", "小明", "kid", parent_id=pa, grade="G5")
+    kid = auth.create_user("mail-k@x.com", "2580", "小明", "kid", parent_id=pa, grade="G5")
     adult = auth.create_user("mail-m@x.com", "secret1", "妈妈", "kid", parent_id=pa, grade="ADULT")
-    newbie = auth.create_user("mail-n@x.com", "secret1", "新来的", "kid", parent_id=pa, grade="G3")
+    newbie = auth.create_user("mail-n@x.com", "2580", "新来的", "kid", parent_id=pa, grade="G3")
     old = (last_mon - timedelta(days=30)).isoformat() + "T08:00:00+08:00"
     db.run("UPDATE users SET created_at=? WHERE id IN (?,?)", old, kid, adult)  # newbie 是这周才加的：不进上周的报告
     for i, m in enumerate((20, 35, 0)):
@@ -100,7 +100,7 @@ def test_weekly_report_queue_send_retry_unsub(monkeypatch):
         reports.queue_weekly(nine)
         assert len(_ours(pa)) == 1
         # 孩子不能改家长的邮件设置
-        _login(c, "mail-k@x.com")
+        _login(c, "mail-k@x.com", "2580")   # 孩子用 4 位数字
         assert c.post("/settings/mail", data={}).status_code == 403
 
 
