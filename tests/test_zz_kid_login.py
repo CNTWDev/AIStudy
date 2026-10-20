@@ -17,7 +17,8 @@ def test_parent_adds_kid_without_email():
     with TestClient(app) as c:
         _parent(c, "a")
         page = c.get("/parent/kids/new").text
-        assert 'name="login"' in page and "4 位数字" in page and 'type="email" name="email" value="" required' not in page
+        # 添加时只问名字；登录名按名字自动起，写在登录卡上（编辑页能改）
+        assert 'name="login"' not in page and "4 位数字" in page and 'name="email"' not in page
         assert c.get("/parent/kids/login-suggest", params={"name": "果 果"}).json() == {"login": "果果"}
         # 太好猜的数字、不是 4 位的都不行；表单保留填过的内容
         r = c.post("/parent/kids/save", data={"name": "果果", "login": "果果", "password": "1234", "grade": "G8"})
@@ -114,7 +115,7 @@ def test_add_kid_errors_stay_on_the_form():
                 "school": "", "preset": "", "method": "", "subj_math": "", "subj_english": ""}
         r = c.post("/parent/kids/save", data=base)
         assert r.status_code == 200 and "text/html" in r.headers["content-type"]
-        assert "昵称别用自己的名字" in r.text and 'value="klxy"' in r.text
+        assert "昵称别用自己的名字" in r.text and 'value="小雨"' in r.text
         assert auth.by_login("klxy") is None  # 账号没建
         r = c.post("/parent/kids/save", data=dict(base, nickname="闪电小队长"))
         assert "小雨 的账号开好了" in r.text
@@ -126,3 +127,35 @@ def test_add_kid_errors_stay_on_the_form():
         # 学习安排没选词表：回到安排页，在上面提示
         r = c.post(f"/parent/kids/{kid['id']}/tracks", data={"kind": "words", "ref": ""})
         assert r.url.path.endswith("/plan") and "请选择词表" in r.text
+
+
+def test_add_kid_short_form_defaults_courses():
+    """添加孩子只问名字、年级、在哪上学、4 位数字；课按 地区 + 学校类型 + 年级 自动排好（DESIGN §5.38）。"""
+    from app.catalog import catalog
+    with TestClient(app) as c:
+        pid = _parent(c, "short")
+        page = c.get("/parent/kids/new").text
+        assert 'name="region"' in page and 'name="school_type"' in page and 'name="school"' not in page
+        assert 'name="nickname"' not in page and 'name="game_minutes"' not in page and 'name="email"' not in page
+        r = c.get("/parent/kids/defaults", params={"region": "江苏", "school_type": "public", "grade": "G3"}).json()
+        assert r["preset"] == "js-public-primary" and [x["pack"] for x in r["courses"]] == ["chn-tongbian", "math-sujiao", "eng-yilin"]
+        assert c.get("/parent/kids/defaults", params={"region": "江苏", "school_type": "private", "grade": "G3"}).json()["preset"] == "js-public-primary"
+        assert c.get("/parent/kids/defaults", params={"region": "其它", "school_type": "international", "grade": "G8"}).json()["preset"] == "intl-cambridge"
+        other = c.get("/parent/kids/defaults", params={"region": "其它", "school_type": "public", "grade": "G3"}).json()
+        assert other["preset"] == "" and [x["pack"] for x in other["courses"]] == ["chn-tongbian"] and "统编语文" in other["title"]
+        # 页面脚本按默认填好选择框后提交；服务器自己重新匹配模板（不信页面传来的），记下学校类型和省份
+        _, courses = catalog.default_courses("上海", "public", "G3")
+        data = {"name": "小树", "password": "3691", "grade": "G3", "region": "上海", "school_type": "public",
+                "preset": "intl-cambridge", **{f"subj_{x['subject']}": x["pack"] for x in courses}}
+        assert "小树 的账号开好了" in c.post("/parent/kids/save", data=data).text
+        k = auth.by_login("小树")
+        assert k["preset"] == "sh-public-primary" and k["school_type"] == "public" and k["daily_minutes"] == 40
+        assert sorted(e["pack_id"] for e in db.q("SELECT pack_id FROM enrollments WHERE user_id=? AND active=1", k["id"])) == \
+            sorted(x["pack"] for x in courses)
+        assert auth.get_user(pid)["city"] == "上海"
+        # 再加一个：地区按家里记下的省份预选好，课也预填好
+        page = c.get("/parent/kids/new").text
+        assert 'value="上海" checked' in page and "按上海公办小学" in page
+        # 填错：留在表单上，选好的课和地区都保留
+        r = c.post("/parent/kids/save", data={**data, "name": "小树苗", "login": "", "password": "1234", "subj_math": ""})
+        assert "太好猜" in r.text and 'value="小树苗"' in r.text and 'value="上海" checked' in r.text and 'value="math-shanghai" selected' not in r.text

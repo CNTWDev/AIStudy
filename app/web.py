@@ -299,6 +299,12 @@ def _kid_form_packs(form, grade: str, old: dict, grade_changed: bool) -> list[tu
                         catalog.packs[pid].track(form.get(f"track_{pid}"))))
     return out
 
+def default_minutes(grade: str) -> int:
+    """添加孩子时每天学多久的推荐值（以后家长可改）：低年级短一些，和「一口气」坐得住的长度相称。kid_new.html 里的脚本同一套数。"""
+    r = stage_rank(grade)
+    return 30 if r <= 2 else 40 if r <= 4 else 45 if r <= 6 else 60 if r <= 9 else 90
+
+
 def course_choices(school_type='', grade=None):
     order = {subject: i for i, subject in enumerate(('chinese', 'math', 'english', 'science', 'physics', 'chemistry', 'biology', 'history', 'geography', 'economics'))}
     return dict(sorted(catalog.by_subject(school_type).items(), key=lambda kv:
@@ -372,8 +378,9 @@ def _save_learning(kid_id: int, form, grade: str, old_grade, by_parent: bool = T
         engine.seed_vocab(kid_id, pid, config.SEED_DIR)
     if by_parent:  # 学校模板只在家长的表单里
         preset = catalog.preset(form.get("preset") or "")
-        db.run("UPDATE users SET preset=?, school_type=? WHERE id=?", preset["id"] if preset else "",
-               preset["school_type"] if preset else "", kid_id)
+        # 学校类型：添加孩子时家长直接选的（模板可能是同地区公办的，按家长选的记）；编辑页按模板
+        st = form.get("school_type") if form.get("school_type") in catalog.SCHOOL_TYPES else (preset["school_type"] if preset else "")
+        db.run("UPDATE users SET preset=?, school_type=? WHERE id=?", preset["id"] if preset else "", st, kid_id)
     engine.today_plan(kid_id, rebuild=True)
 
 def require_self_managed(request: Request):

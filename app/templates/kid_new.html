@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block body %}
+{# 添加孩子：只问系统真正用得上、家长一下就答得出的几项（docs/DESIGN.md §5.38）。
+   其余（每天多久、乐园、排行榜、学习方式、邮箱）先用推荐值，以后在孩子的设置里改。 #}
+<h1>添加孩子</h1>
+{% if msg %}<div class="hint" role="alert">{{ msg }}</div>{% endif %}
+{% set d = draft or {} %}
+<form method="post" action="/parent/kids/save" class="card kid-new">
+  {# 三个名字各管一件事：名字 = 家里人怎么称呼（只在家里看得到）；登录名 = 只用来登录，按名字自动起，写在登录卡上；
+     昵称 = 排行榜、公开房间里别人看到的，孩子第一次去那里时自己起。添加时只问名字。 #}
+  <label for="kname">名字 <span class="muted small">家里人怎么称呼 TA，只在家里看得到</span></label>
+  <input type="text" name="name" id="kname" value="{{ d.name or '' }}" required maxlength="40" placeholder="例如：果果">
+
+  <label for="grade">年级</label>
+  <select name="grade" id="grade">{% for g in GRADES %}<option value="{{ g }}" data-rank="{{ stage_rank(g) }}" {{ 'selected' if (d.grade or catalog.default_grade) == g }}>{{ stage_label(g) }}</option>{% endfor %}</select>
+  <p class="hint small" id="adult-note" hidden>家里的大人年级选「成人」或大学：登录后在「我的课程」里自己选课，学习记录只有 TA 自己能看。</p>
+
+  <div id="learning">
+    <label>在哪上学</label>
+    <div class="seg full" role="radiogroup" aria-label="地区">
+      {% for r in regions %}<label><input type="radio" name="region" value="{{ r }}" {{ 'checked' if d.region == r }}><span>{{ r }}</span></label>{% endfor %}
+      <label><input type="radio" name="region" value="其它" {{ 'checked' if d.region == '其它' }}><span>其它地区</span></label>
+    </div>
+    <div class="seg full" role="radiogroup" aria-label="学校类型" style="margin-top:8px">
+      {% for v, n in school_types.items() %}<label><input type="radio" name="school_type" value="{{ v }}" {{ 'checked' if (d.school_type or 'public') == v }}><span>{{ n }}</span></label>{% endfor %}
+    </div>
+    <input type="hidden" name="preset" id="preset-id" value="{{ d.preset or '' }}">
+    <div class="hint course-sum" id="course-sum" aria-live="polite">
+      <div class="course-sum-h" id="course-sum-h">{{ sum_title }}</div>
+      <div class="course-sum-list" id="course-sum-list"></div>
+      <p class="muted small" id="course-sum-note" style="margin:8px 0 0">不确定也没关系，先这样用。孩子做几天题，系统会按做题情况对准学校进度；以后在孩子的设置里随时改。</p>
+    </div>
+    <details class="course-adjust" id="adjust">
+      <summary class="small">逐科调整教材</summary>
+      <p class="muted small">学段按年级自动对应。找不到孩子课本那一版时，选「暂不安排」，以后再补。</p>
+      {% include "_course_grid.html" %}
+    </details>
+  </div>
+
+  <div id="pin-box"><label for="kpin">4 位数字 <span class="muted small">孩子登录时输入，像开门的密码</span></label>
+    <input type="text" name="password" id="kpin" required inputmode="numeric" pattern="\d{4}" minlength="4" maxlength="4" autocomplete="off" placeholder="例如：2580">
+    <p class="muted small" style="margin:4px 0 0">和孩子一起选一个 TA 记得住、别人猜不到的，别用 1234、1111。</p></div>
+  <div id="pw-box" hidden><label for="kpw">密码 <span class="muted small">至少 6 位，家里的大人用它登录</span></label>
+    <input type="text" name="password" id="kpw" required minlength="6" autocomplete="off" disabled></div>
+
+  <div style="margin-top:18px"><button class="btn block">添加，给我登录卡</button></div>
+  <p class="muted small" id="defaults-note" style="margin:12px 0 0">每天学多久、乐园游戏、排行榜先用推荐设置：每天学 <span id="dm">{{ default_minutes }}</span> 分钟，游戏每天最多 20 分钟、做完一半任务后能玩。以后在孩子的设置里随时改。</p>
+  <p style="margin:12px 0 0"><a class="btn ghost" href="/parent">取消</a></p>
+</form>
+<script>
+(() => {
+  const grade = $('#grade'), sum = $('#course-sum-list');
+  const minutesFor = r => r <= 2 ? 30 : r <= 4 ? 40 : r <= 6 ? 45 : r <= 9 ? 60 : 90;  // 和 web.default_minutes 一致
+  const rank = () => +(grade.selectedOptions[0]?.dataset.rank || 0);
+  // 已选的课列成一张小清单；每门后面「换」打开逐科调整
+  const short = t => t.split('（')[0];
+  const renderSum = () => {
+    const rows = $$('.course-select').filter(s => s.value).map(s =>
+      `<span>${s.closest('.course-choice').querySelector('label').textContent} · ${short(s.selectedOptions[0].textContent)}</span>` +
+      `<button type="button" class="linkbtn small" data-subj="${s.id}">换</button>`);
+    sum.innerHTML = rows.join('') || '<span class="muted">还没有安排课，点下面「逐科调整教材」选。</span>';
+    $$('button[data-subj]', sum).forEach(b => b.onclick = () => { $('#adjust').open = true; const s = document.getElementById(b.dataset.subj); s.scrollIntoView({block: 'center'}); s.focus(); });
+  };
+  // 选了地区、学校类型、年级：服务器按学校模板给出默认的课，家长再按需要换
+  const pick = name => $(`input[name=${name}]:checked`)?.value || '';
+  const fill = async () => {
+    if (!pick('region')) { $('#course-sum-h').textContent = '选好在哪上学，这里列出要学的课'; sum.innerHTML = ''; return; }
+    const q = new URLSearchParams({region: pick('region'), school_type: pick('school_type'), grade: grade.value});
+    let r; try { r = await (await fetch('/parent/kids/defaults?' + q)).json(); } catch (e) { return; }
+    $('#preset-id').value = r.preset || '';
+    $('#course-sum-h').textContent = r.title;
+    $$('.course-select').forEach(s => s.value = '');
+    r.courses.forEach(c => { const s = $(`.course-choice[data-subject="${c.subject}"] .course-select`); if (!s) return;
+      s.value = c.pack; s.dispatchEvent(new Event('change'));
+      const t = document.getElementById('track-' + c.pack); if (t && c.track) t.value = c.track; });
+    $$('.course-select').forEach(s => s.dispatchEvent(new Event('change')));
+    renderSum();
+  };
+  $$('input[name=region], input[name=school_type]').forEach(x => x.addEventListener('change', fill));
+  $$('.course-select').forEach(s => s.addEventListener('change', renderSum));
+  // 成人成员：不问学校，课程由本人安排；4 位数字换成普通密码
+  const adultSwitch = () => { const adult = rank() >= 13;
+    $('#learning').hidden = adult; $$('#learning select, #learning input').forEach(x => x.disabled = adult);
+    $('#adult-note').hidden = !adult; $('#defaults-note').hidden = adult;
+    $('#pin-box').hidden = adult; $('#kpin').disabled = adult; $('#pw-box').hidden = !adult; $('#kpw').disabled = !adult;
+    $('#dm').textContent = minutesFor(rank()); };
+  grade.addEventListener('change', () => { adultSwitch(); if (rank() < 13) fill(); });
+  adultSwitch(); renderSum();
+})();
+</script>
+<script src="/static/course-picker.js?v={{ ASSET_V }}" defer></script>
+{% endblock %}

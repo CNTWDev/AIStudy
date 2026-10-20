@@ -6,6 +6,8 @@ from fastapi import HTTPException, Request
 from .. import auth, db, engine
 from ..web import (
     _check_exam_dates,
+    GRADES,
+    default_minutes,
     _kid_form,
     _records_ctx,
     _save_learning,
@@ -38,9 +40,38 @@ def kid_new_page(request: Request):
 
 
 def _kid_new(request: Request, draft: dict | None = None, msg: str = ""):
+    """添加孩子：名字、年级、在哪上学、4 位数字；课按学校模板默认排好，家长可逐科换。"""
+    p = auth.require_parent(request)
+    d = dict(draft or {})
+    if "region" not in d:  # 地区先按家里填过的城市、或者上一个孩子的学校模板猜
+        prov = (p["city"] or "").split("·")[0]
+        last = db.one("SELECT preset FROM users WHERE parent_id=? AND preset<>'' ORDER BY id DESC LIMIT 1", p["id"])
+        d["region"] = prov if prov in catalog.regions else ((catalog.preset(last["preset"]) or {}).get("region", "") if last else "")
+    grade = d.get("grade") or catalog.default_grade
+    if d.get("courses") is None:
+        preset, courses = catalog.default_courses(d["region"], d.get("school_type") or "public", grade) if d["region"] else (None, [])
+        d["courses"], d["preset"] = {c["pack"]: c["track"] for c in courses}, preset["id"] if preset else ""
+    return render(request, "kid_new.html", k=None, draft=d, msg=msg,
+                  enrolled=d["courses"], tracks=d["courses"], exams={}, self_mode=False,
+                  packs_by_subject=course_choices(d.get("school_type") or "", grade), regions=catalog.regions,
+                  school_types=catalog.SCHOOL_TYPES, default_minutes=default_minutes(grade),
+                  sum_title=_courses_title(d["region"], d.get("school_type") or "public", grade) if d["region"] else "选好在哪上学，这里列出要学的课")
+
+
+def _courses_title(region: str, school_type: str, grade: str) -> str:
+    preset = catalog.match_preset(region, school_type, grade)
+    if preset:
+        return f"按{preset['name'].split('（')[0]} · {stage_label(grade)}，先安排这几门："
+    return f"{region if region in catalog.regions else '其它地区'}的{stage_label(grade)}教材还在整理：先安排统编语文，其它科目在下面逐科选。"
+
+
+@router.get("/parent/kids/defaults")
+def kid_defaults(request: Request, region: str = "", school_type: str = "public", grade: str = ""):
+    """添加孩子时选了地区、学校类型、年级：按学校模板给出默认的课（页面据此预填，家长再按需要换）。"""
     auth.require_parent(request)
-    return render(request, "kid_form.html", k=None, enrolled={}, tracks={}, exams={}, presets=catalog.presets,
-                  packs_by_subject=course_choices(), draft=draft or {}, msg=msg)
+    grade = grade if grade in GRADES else catalog.default_grade
+    preset, courses = catalog.default_courses(region, school_type, grade)
+    return {"preset": preset["id"] if preset else "", "title": _courses_title(region, school_type, grade), "courses": courses}
 
 
 @router.get("/parent/kids/login-suggest")
@@ -72,10 +103,12 @@ async def kid_save(request: Request):
     kid_id = form.get("id")
     name = (form.get("name") or "").strip()
     grade = form.get("grade") or catalog.default_grade
-    minutes = int(form.get("daily_minutes") or 60)
+    minutes = int(form.get("daily_minutes") or default_minutes(grade))
     pw = (form.get("password") or "").strip()
     # 家里的成员都用登录名登录（孩子记得住的小名），邮箱选填；孩子的密码是 4 位数字，成人成员是普通密码
-    draft = {"name": name, "login": form.get("login") or "", "email": form.get("email") or "", "grade": grade}
+    draft = {"name": name, "login": form.get("login") or "", "email": form.get("email") or "", "grade": grade,
+             "region": form.get("region") or "", "school_type": form.get("school_type") or "public",
+             "courses": {pid: form.get(f"track_{pid}") or "" for key in form.keys() if key.startswith("subj_") and (pid := form.get(key))}}
     # 填错的地方都回到表单上提示（保留填过的内容），先全部检查完再建账号：不能账号建好了才报错
     try:
         if not name:
@@ -98,8 +131,8 @@ async def kid_save(request: Request):
         k = auth.kid_of(p, int(kid_id), account_only=True)
         old_grade = k["grade"]
         if not auth.self_managed(k):
-            db.run("UPDATE users SET login=?, email=?, name=?, grade=?, school=?, daily_minutes=? WHERE id=?",
-                   login, email, name, grade, form.get("school") or "", minutes, k["id"])
+            db.run("UPDATE users SET login=?, email=?, name=?, grade=?, daily_minutes=? WHERE id=?",
+                   login, email, name, grade, minutes, k["id"])
         else:  # 成人成员：家长只管账号，学校、每天时长由本人定
             db.run("UPDATE users SET login=?, email=?, name=?, grade=? WHERE id=?", login, email, name, grade, k["id"])
         status = "disabled" if form.get("disabled") else "active"
@@ -109,9 +142,15 @@ async def kid_save(request: Request):
     else:
         try:
             kid_id = auth.create_user(email, pw, name, "kid", parent_id=p["id"], grade=grade, login=login,
-                                      school=form.get("school") or "", daily_minutes=minutes)
+                                      daily_minutes=minutes)
         except ValueError as e:
             return _kid_new(request, draft=draft, msg=str(e))
+    if not old_grade and form.get("region"):  # 新添加的孩子：学校模板按 地区 + 学校类型 + 年级 在服务器上重新匹配，不信页面传来的
+        preset = catalog.match_preset(form.get("region"), form.get("school_type") or "public", grade)
+        form = {**{key: form.get(key) for key in form.keys()}, "preset": preset["id"] if preset else ""}
+        if form["region"] in catalog.regions and not p["city"]:  # 家里还没填城市：先记上省份（城市排行榜用），以后可以改
+            from .. import boards
+            boards.set_city(p["id"], form["region"], "")
     # 学习安排只给未成年的孩子：成人成员由本人在「我的课程」里安排。成人改回孩子年级的这一次，表单里没有学习安排，先不动原来的课程
     if not is_adult(grade) and not (old_grade and is_adult(old_grade)):
         _save_learning(kid_id, form, grade, old_grade)

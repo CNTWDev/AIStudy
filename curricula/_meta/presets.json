@@ -1,9 +1,10 @@
 {
- "_doc": "学校模板：家长给孩子选「学校类型」时，按这里预填每门课的教材和方向；家长仍可逐科修改。packs 的键是学科 subject。引用的教材包必须存在（check 会校验）。",
+ "_doc": "学校模板：家长给孩子选「学校类型」时，按这里预填每门课的教材和方向；家长仍可逐科修改。packs 的键是学科 subject。引用的教材包必须存在（check 会校验）。region：适用地区，添加孩子时家长选「在哪上学」，按 地区 + 学校类型 + 年级 自动匹配模板；不写 = 各地都适用（比如国际学校）。",
  "presets": [
   {
    "id": "sh-public-primary",
    "name": "上海公办小学（1–5 年级）",
+   "region": "上海",
    "school_type": "public",
    "grades": [
     "G1",
@@ -19,6 +20,7 @@
   {
    "id": "sh-public-middle",
    "name": "上海公办初中（6–9 年级）",
+   "region": "上海",
    "school_type": "public",
    "grades": [
     "G6",
@@ -38,6 +40,7 @@
   {
    "id": "sh-public-high",
    "name": "上海公办高中",
+   "region": "上海",
    "school_type": "public",
    "grades": [
     "G10",
@@ -57,6 +60,7 @@
   {
    "id": "js-public-primary",
    "name": "江苏公办小学（1–6 年级）",
+   "region": "江苏",
    "school_type": "public",
    "grades": [
     "G1",
@@ -71,6 +75,7 @@
   {
    "id": "js-public-middle",
    "name": "江苏公办初中（7–9 年级）",
+   "region": "江苏",
    "school_type": "public",
    "grades": [
     "G7",
@@ -85,6 +90,7 @@
   {
    "id": "sh-bilingual",
    "name": "上海民办双语学校（国家课程 + 剑桥英语）",
+   "region": "上海",
    "school_type": "private",
    "grades": [
     "G1",

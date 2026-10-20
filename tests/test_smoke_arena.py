@@ -267,7 +267,6 @@ def test_unlimited_game_time():
         c.post("/admin/users/create", data={"email": "up@x.com", "password": "secret1", "name": "不限爸爸", "role": "parent"})
         c.get("/logout")
         c.post("/login", data={"email": "up@x.com", "password": "secret1"})
-        assert "不限时" in c.get("/parent/kids/new").text
         c.post("/parent/kids/save", data={"name": "小不限", "email": "uk@x.com", "password": "2580", "grade": "G3",
                                           "daily_minutes": "60", "subj_math": "math-shanghai", "game_minutes": "-1"})
         kid = dict(db.one("SELECT * FROM users WHERE email='uk@x.com'"))
