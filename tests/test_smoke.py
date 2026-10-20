@@ -366,9 +366,9 @@ def test_daily_tasks_progress_and_tools(monkeypatch):
         r = c.post("/progress/math-shanghai", data={"stage": "G3", "chapter": "二、用一位数乘", "done_ch": ["一、两步四则运算与应用题"]})
         assert "进度已更新" in r.text
         e = db.one("SELECT * FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)
-        # 和校历估计的同一章：照日期推到这一章的第一个（10 月中旬）
-        assert e["progress_kp"] == "MSH-NUM-16"
-        assert math_taught() == {"MSH-NUM-21", "MSH-APP-04", "MSH-NUM-16"}
+        # 和校历估计的同一章：照日期推到这一章的第二个（10 月中旬）
+        assert e["progress_kp"] == "MSH-NUM-17"
+        assert math_taught() == {"MSH-NUM-21", "MSH-APP-04", "MSH-NUM-16", "MSH-NUM-17"}
         # 家长说学校慢一章 / 快一章：存成偏移，换到那一章的开头
         assert "已调整" in c.post("/progress/math-shanghai", data={"adjust": "-1"}).text
         assert db.one("SELECT progress_kp FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["progress_kp"] == "MSH-NUM-21"
@@ -381,7 +381,7 @@ def test_daily_tasks_progress_and_tools(monkeypatch):
         assert db.one("SELECT progress_kp FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["progress_kp"] is None
         db.run("DELETE FROM mastery WHERE user_id=? AND kp_id IN ('MSH-NUM-21','MSH-APP-04')", kid_b)
         c.post("/progress/math-shanghai", data={"adjust": "+1"})   # 又回到校历估计的位置
-        assert db.one("SELECT progress_kp FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["progress_kp"] == "MSH-NUM-16"
+        assert db.one("SELECT progress_kp FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid_b)["progress_kp"] == "MSH-NUM-17"
         # 旧的按知识点报进度（老页面 / 接口）也还能用
         r = c.post("/progress/math-shanghai", data={"stage": "G3", "current": "MSH-NUM-17",
                                                    "taught": ["MSH-NUM-21", "MSH-APP-04", "MSH-NUM-16"]})
