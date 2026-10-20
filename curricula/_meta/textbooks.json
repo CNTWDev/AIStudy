@@ -165,8 +165,9 @@
       "sources": [
         "https://www.suzhou.gov.cn/szsrmzf/bmwj/202406/0c5c7cb5dbe849c58f359fbd2c2dcb5a.shtml"
       ],
-      "coverage": "有版本使用依据，整册目录待核实",
-      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射"
+      "coverage": "已上线为目录包 curricula/chn-tongbian-63.json：小学一至五年级与五四学制同册，七年级按修订版核对，六、八、九年级目录待核实",
+      "next_action": "核对适用区县/学校、教材版权页、修订年份、上下册目录，再录入知识点映射",
+      "pack_id": "chn-tongbian-63"
     },
     {
       "id": "sz-math-primary",

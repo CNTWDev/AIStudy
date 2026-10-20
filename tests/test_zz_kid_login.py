@@ -138,7 +138,7 @@ def test_add_kid_short_form_defaults_courses():
         assert 'name="region"' in page and 'name="school_type"' in page and 'name="school"' not in page
         assert 'name="nickname"' not in page and 'name="game_minutes"' not in page and 'name="email"' not in page
         r = c.get("/parent/kids/defaults", params={"region": "江苏", "school_type": "public", "grade": "G3"}).json()
-        assert r["preset"] == "js-public-primary" and [x["pack"] for x in r["courses"]] == ["chn-tongbian", "math-sujiao", "eng-yilin"]
+        assert r["preset"] == "js-public-primary" and [x["pack"] for x in r["courses"]] == ["chn-tongbian-63", "math-sujiao", "eng-yilin"]
         assert c.get("/parent/kids/defaults", params={"region": "江苏", "school_type": "private", "grade": "G3"}).json()["preset"] == "js-public-primary"
         assert c.get("/parent/kids/defaults", params={"region": "其它", "school_type": "international", "grade": "G8"}).json()["preset"] == "intl-cambridge"
         other = c.get("/parent/kids/defaults", params={"region": "其它", "school_type": "public", "grade": "G3"}).json()
