@@ -54,10 +54,13 @@ async def _login_required(request: Request, exc):
 @app.exception_handler(HTTPException)
 async def _http_error(request: Request, exc: HTTPException):
     p = request.url.path
-    if p.startswith("/api/") or p.startswith("/ext/") or request.method != "GET":
+    # 浏览器直接提交的表单（不是页面脚本发的请求）出错也给一个页面，不把 JSON 原样甩给家长（Safari 会显示成乱码）
+    form_post = request.method == "POST" and "text/html" in request.headers.get("accept", "")
+    if p.startswith("/api/") or p.startswith("/ext/") or (request.method != "GET" and not form_post):
         return JSONResponse({"error": exc.detail, "detail": exc.detail}, status_code=exc.status_code, headers=exc.headers)
+    back = request.headers.get("referer", "") if form_post else ""
     return render(request, "message.html", title="提示" if exc.status_code < 500 else "出错了",
-                  text=str(exc.detail), link="/", status_code=exc.status_code)
+                  text=str(exc.detail), link=back if back.startswith(str(request.base_url)) else "/", status_code=exc.status_code)
 
 
 @app.exception_handler(llm.LLMError)

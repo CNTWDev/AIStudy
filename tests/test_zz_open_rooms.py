@@ -186,7 +186,7 @@ def test_parent_sets_nickname_and_public_rooms():
         c.post("/login", data={"email": "or-pp@x.com", "password": "secret1"})
         assert "公开房间" in c.get(f"/parent/kids/{k}/edit").text and arena.public_rooms(dict(auth.get_user(k)))
         base = {"id": str(k), "name": "小可", "email": "or-pk@x.com", "grade": "G3", "daily_minutes": "60", "game_minutes": "20"}
-        assert c.post("/parent/kids/save", data={**base, "nickname": "小可爱"}).status_code == 400   # 带了真名
+        assert c.post("/parent/kids/save", data={**base, "nickname": "小可爱"}).text.count("昵称别用自己的名字") == 1   # 带了真名：回到表单提示
         c.post("/parent/kids/save", data={**base, "nickname": "星星", "private": "1"})
         u = auth.get_user(k)
         assert u["nickname"] == "星星" and not arena.public_rooms(dict(u))

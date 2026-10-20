@@ -74,21 +74,25 @@ async def kid_save(request: Request):
     grade = form.get("grade") or catalog.default_grade
     minutes = int(form.get("daily_minutes") or 60)
     pw = (form.get("password") or "").strip()
-    if not name:
-        raise HTTPException(400, "请填写孩子的名字")
-    _check_exam_dates(form)
     # 家里的成员都用登录名登录（孩子记得住的小名），邮箱选填；孩子的密码是 4 位数字，成人成员是普通密码
     draft = {"name": name, "login": form.get("login") or "", "email": form.get("email") or "", "grade": grade}
+    # 填错的地方都回到表单上提示（保留填过的内容），先全部检查完再建账号：不能账号建好了才报错
     try:
+        if not name:
+            raise ValueError("请填写孩子的名字")
+        _check_exam_dates(form)
+        if (form.get("nickname") or "").strip():
+            auth.check_nickname(name, form.get("nickname"))
         # 没填登录名（比如页面脚本没跑）：新加的就用名字起一个，编辑时保留原来的
         raw = (form.get("login") or "").strip() or ((auth.get_user(int(kid_id)) or {}).get("login") if kid_id else None) or auth.suggest_login(name)
         login = auth.validate_login(raw or "")
         email = auth.validate_email(form.get("email")) if (form.get("email") or "").strip() else None
         auth.check_free(email, login, int(kid_id) if kid_id else None)
-    except ValueError as e:
+    except (ValueError, HTTPException) as e:
+        msg = e.detail if isinstance(e, HTTPException) else str(e)
         if kid_id:
-            raise HTTPException(400, str(e))
-        return _kid_new(request, draft=draft, msg=str(e))
+            return _kid_form(request, auth.kid_of(p, int(kid_id), account_only=True), msg=msg)
+        return _kid_new(request, draft=draft, msg=msg)
     old_grade = None
     if kid_id:
         k = auth.kid_of(p, int(kid_id), account_only=True)
@@ -137,6 +141,9 @@ async def kid_tracks_save(request: Request, kid_id: int):
     kind = f.get("kind")
     if kind not in engine.TRACK_KINDS:
         raise HTTPException(400)
+
+    def back(msg):  # 填得不对：回到这一页，在上面提示
+        return RedirectResponse(f"/parent/kids/{kid_id}/plan?" + urlencode({"msg": msg}), 303)
     if f.get("action") == "stop":
         db.run("UPDATE tracks SET active=0 WHERE user_id=? AND kind=?", kid_id, kind)
         msg = f"已停止「{engine.TRACK_KINDS[kind]}」"
@@ -152,29 +159,29 @@ async def kid_tracks_save(request: Request, kid_id: int):
         if kind == "words":
             wl = content.word_lists.get(ref)
             if not wl:
-                raise HTTPException(400, "请选择词表")
+                return back("请选择词表")
             title, unit_name, units, total = wl["title"], "词", [], len(wl["words"])
         elif ref.startswith("lib:"):  # 书库：按页算，进度接着孩子已经在网站上读到的地方
             from ..library import library
             bid = ref[4:]
             lb, lt = library.books.get(bid), library.text(bid)
             if not lb or not lt:
-                raise HTTPException(400, "这本书的原文还没下载好")
+                return back("这本书的原文还没下载好，换一本或者过一会儿再试")
             title, unit_name, units, total = lb.get("title_zh") or lb["title"], "页", [], lt["n_pages"]
             if not position:
                 from ..library_web import progress
                 position = progress(kid_id, bid)["page"]
         elif kind == "listen":
-            raise HTTPException(400, "听书请从书库里选一本")
+            return back("听书请从书库里选一本")
         elif ref and ref != "custom":
             b = content.book(ref)
             if not b:
-                raise HTTPException(400, "没有这本书")
+                return back("没有这本书，请重新选一本")
             title, unit_name, units, total = b["title"], b.get("unit_name") or "章", b.get("units", []), b.get("total_units", 0)
         else:
             title = (f.get("title") or "").strip().strip("《》")[:60]
             if not title:
-                raise HTTPException(400, "请填写书名")
+                return back("请填写书名")
             unit_name = (f.get("unit_name") or "章").strip()[:4] or "章"
             units, total, ref = [], max(0, int(f.get("total_units") or 0)), ""
         with db.tx() as t:
@@ -229,8 +236,8 @@ async def progress_save(request: Request, pack_id: str):
     if pack_id not in {e["pack_id"] for e in enrollments(k["id"])}:
         raise HTTPException(404)
     f = await request.form()
-    if "exam_date" in f and not engine.set_exam_date(k["id"], pack_id, f.get("exam_date")):
-        raise HTTPException(400, "考试日期格式不对")
+    if "exam_date" in f and not engine.set_exam_date(k["id"], pack_id, f.get("exam_date")):  # 填错了回到这一门课提示
+        return RedirectResponse("/progress?" + urlencode({"pack": pack_id, "msg": "考试日期格式不对，请重新选一下"}) + f"#p-{pack_id}", 303)
     stage = f.get("stage") or None
     old = engine.enrollment_stage(k["id"], pack_id)
     adjust = f.get("adjust") or ""
