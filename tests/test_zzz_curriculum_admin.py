@@ -159,7 +159,7 @@ def test_partial_textbook_does_not_hide_remaining_kps(admin):
     pack = catalog.packs['math-sujiao']
     for stage in ('G2', 'G4'):
         chs = catalog.chapters('math-sujiao', stage)
-        assert {k for ch in chs for k in ch['kps']} == {k for k in pack.kp_ids if catalog.stage_in('math-sujiao', k) == stage}
+        assert {k for k in pack.kp_ids if catalog.stage_in('math-sujiao', k) == stage} <= {k for ch in chs for k in ch['kps']}   # 螺旋上升：前几年的点也可以再出现
         assert any(ch['status'] == 'pending' for ch in chs) and any(ch['status'] != 'pending' for ch in chs)
     manager.save(actor, version(), 'book', {'id': 'test-sz-book', 'name': '四上', 'edition_id': 'sz-math-primary', 'stage': 'G4',
                                             'status': 'partial', 'sources': 'https://example.org/book', 'order': '1'})

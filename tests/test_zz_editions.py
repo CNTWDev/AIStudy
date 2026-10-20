@@ -23,7 +23,7 @@ def test_same_point_different_textbooks():
         units = [u["name"] for b in catalog.packs["math-sujiao"].books for u in b["units"] if "MSH-NUM-01" in u["kps"]]
         assert len(units) == 3 and catalog.stage_in("math-sujiao", "MSH-NUM-01") == "G1"
         g4 = catalog.chapters("math-sujiao", "G4")
-        assert g4[0]["name"] == "周长与面积" and g4[0]["kps"] == ["MSH-GEO-09", "MSH-GEO-10"] and g4[0]["rank"] == 0
+        assert g4[1]["name"] == "二、周长与面积" and g4[1]["kps"] == ["MSH-GEO-09", "MSH-GEO-10"] and g4[1]["rank"] == 0
         # 主干不能直接选；家长选的是建在它上面的教材
         assert catalog.packs["math-cn"].standard and catalog.packs["math-cn"] not in catalog.courses()
         assert all(not p.standard for packs in catalog.by_subject().values() for p in packs)
@@ -53,12 +53,12 @@ def test_jiangsu_kid_follows_own_textbook(monkeypatch):
         e = dict(db.one("SELECT * FROM enrollments WHERE user_id=? AND pack_id='math-sujiao'", kid))
         assert e["stage"] == "G4"
         pv = engine.progress_view(kid, e)
-        # 四年级的苏教孩子：周长、年月日是今年的内容（上海三年级就教了）；十月中旬学校刚教完第一单元，下册的还没学
+        # 四年级的苏教孩子：周长、年月日是今年的内容（上海三年级就教了）；十月中旬学校教完了第一单元除法，下册的还没学
         assert {"MSH-GEO-09", "MSH-GEO-11"} <= {k["id"] for k in pv["stage_kps"]}
-        assert "MSH-GEO-09" in pv["learned"] and "MSH-GEO-11" not in pv["learned"]
-        assert pv["chapters"][0]["name"] == "周长与面积"
+        assert "MSH-NUM-25" in pv["learned"] and "MSH-GEO-11" not in pv["learned"]
+        assert pv["chapters"][0]["name"] == "一、两、三位数除以两位数"
         est = schoolyear.estimate({"grade": "G4"}, e, DAY)
-        assert est and est["chapters"][0]["key"] == "周长与面积"
+        assert est and est["chapters"][0]["key"] == "一、两、三位数除以两位数"
         # 学习页按孩子的教材显示：知识地图链到苏教数学，年级是四年级
         page = c.get("/learn/MSH-GEO-09").text
         assert "/map/math-sujiao" in page and "四年级" in page

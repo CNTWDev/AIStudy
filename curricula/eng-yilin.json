@@ -27,11 +27,11 @@
    "江苏 2025 秋新教材投入使用 https://www.yzwb.net/news/jiangsu/nanjing/202508/t20250822_253531.html",
    "译林教材培训 https://edu.yilin.com/index.php/NewsDetail/index?cat_id=2&id=81&nav_id=1"
   ],
-  "notes": "江苏公办英语（三年级起，有的区一年级起另有一二年级用书）。新版三上到四下、七上到八下的单元已对照目录；单元对应哪些知识点是按每单元的句型和 Grammar 课时判断的。五上、六上、九上（2026 秋新版）的单元名已查到，但单元里的句型和语法点网上还没有；五下、六下、九下新版 2027 春才出。这些册暂按课标主干的顺序排（「目录待核实」）。语音、阅读、写作、听说每个单元都在练，不归哪一个单元，记在每学年第一册的「贯穿各单元」里。",
+  "notes": "江苏公办英语（三年级起，有的区一年级起另有一二年级用书）。新版三上到四下、七上到八下的单元已对照目录；五上、六上、九上的单元名已对照，单元里的语法来自家长整理的清单（标「部分核实」）。单元对应哪些知识点是按每单元的句型和 Grammar 课时判断的。五下、六下、九下新版 2027 春才出，暂按课标主干的顺序排（「目录待核实」）。语音、阅读、写作、听说每个单元都在练，不归哪一个单元，记在每学年第一册的「贯穿各单元」里。",
   "selection": {
    "name": "译林版英语（江苏）",
    "hint": "课本封面印「译林出版社」，三年级起点。2024 年以后的新版。",
-   "warning": "五、六、九年级的新版目录还在核实，暂按课标顺序排。"
+   "warning": "五、六、九年级下册的新版还没出版，暂按课标顺序排。"
   }
  },
  "books": [
@@ -291,6 +291,137 @@
      "name": "Unit 8 In the kitchen",
      "kps": [
       "ESH-GRA-16"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G5",
+   "term": "上",
+   "name": "五年级上册",
+   "status": "partial",
+   "sources": [
+    "https://njzxxyy.com/forum.php?gid=688&showlist=1",
+    "https://www.sohu.com/a/1028247252_122831442",
+    "家长整理提供的新版单元与知识点清单（2026-10-20，项目讨论串）"
+   ],
+   "note": "单元名已对照网上目录；每单元的语法和句型来自家长整理的清单。",
+   "units": [
+    {
+     "name": "Unit 1 Good habits",
+     "kps": [
+      "ESH-GRA-15",
+      "ESH-GRA-25",
+      "ESH-GRA-10"
+     ]
+    },
+    {
+     "name": "Unit 2 I feel good",
+     "kps": [
+      "ESH-GRA-15",
+      "ESH-VOC-08",
+      "ESH-GRA-06"
+     ]
+    },
+    {
+     "name": "Unit 3 Hobbies",
+     "kps": [
+      "ESH-GRA-20",
+      "ESH-GRA-15"
+     ]
+    },
+    {
+     "name": "Unit 4 Safety first",
+     "kps": [
+      "ESH-GRA-25"
+     ]
+    },
+    {
+     "name": "Unit 5 At weekends",
+     "kps": [
+      "ESH-GRA-19"
+     ]
+    },
+    {
+     "name": "Unit 6 Getting along with others",
+     "kps": [
+      "ESH-GRA-13"
+     ]
+    },
+    {
+     "name": "Unit 7 Shopping smart",
+     "kps": [
+      "ESH-LIS-05"
+     ]
+    },
+    {
+     "name": "Unit 8 We love festivals!",
+     "kps": [
+      "ESH-GRA-30"
+     ]
+    }
+   ]
+  },
+  {
+   "stage": "G6",
+   "term": "上",
+   "name": "六年级上册",
+   "status": "partial",
+   "sources": [
+    "https://njzxxyy.com/forum.php?gid=688&showlist=1",
+    "https://www.bilibili.com/video/BV1gLTx6CEW8/",
+    "家长整理提供的新版单元与知识点清单（2026-10-20，项目讨论串）"
+   ],
+   "note": "单元名已对照网上目录；每单元的语法来自家长整理的清单（清单里 Unit 5 写作 Keeping it clean，两处网上目录都是 Keeping our city clean）。",
+   "units": [
+    {
+     "name": "Unit 1 Try your best",
+     "kps": [
+      "ESH-GRA-21"
+     ]
+    },
+    {
+     "name": "Unit 2 Honesty",
+     "kps": [
+      "ESH-GRA-22"
+     ]
+    },
+    {
+     "name": "Unit 3 Great people",
+     "kps": [
+      "ESH-GRA-22",
+      "ESH-GRA-21"
+     ]
+    },
+    {
+     "name": "Unit 4 Getting together",
+     "kps": [
+      "ESH-VOC-12"
+     ]
+    },
+    {
+     "name": "Unit 5 Keeping our city clean",
+     "kps": [
+      "ESH-GRA-13"
+     ]
+    },
+    {
+     "name": "Unit 6 Going green",
+     "kps": [
+      "ESH-GRA-25"
+     ]
+    },
+    {
+     "name": "Unit 7 Old things, new life",
+     "kps": [
+      "ESH-GRA-41"
+     ]
+    },
+    {
+     "name": "Unit 8 Then and now",
+     "kps": [
+      "ESH-GRA-31",
+      "ESH-GRA-21"
      ]
     }
    ]
@@ -557,6 +688,71 @@
     {
      "name": "Unit 8 A green world",
      "kps": []
+    }
+   ]
+  },
+  {
+   "stage": "G9",
+   "term": "上",
+   "name": "九年级上册",
+   "status": "partial",
+   "sources": [
+    "https://www.njzxxyy.com/forum.php?showlist=1&gid=689",
+    "https://mip.21cnjy.com/P/26007988.html",
+    "家长整理提供的新版单元与知识点清单（2026-10-20，项目讨论串）"
+   ],
+   "note": "单元名网上一处、家长清单一处，两者一致；每单元的语法来自家长整理的清单。",
+   "units": [
+    {
+     "name": "Unit 1 Know yourself",
+     "kps": [
+      "ESH-GRA-42",
+      "ESH-GRA-47"
+     ]
+    },
+    {
+     "name": "Unit 2 Teenage problems",
+     "kps": [
+      "ESH-GRA-42",
+      "ESH-GRA-46"
+     ]
+    },
+    {
+     "name": "Unit 3 Never give up",
+     "kps": [
+      "ESH-GRA-39",
+      "ESH-GRA-46"
+     ]
+    },
+    {
+     "name": "Unit 4 Life is beautiful",
+     "kps": [
+      "ESH-GRA-39"
+     ]
+    },
+    {
+     "name": "Unit 5 Music speaks",
+     "kps": [
+      "ESH-GRA-49"
+     ]
+    },
+    {
+     "name": "Unit 6 The art of the brush",
+     "kps": [
+      "ESH-GRA-49"
+     ]
+    },
+    {
+     "name": "Unit 7 The big screen",
+     "kps": [
+      "ESH-GRA-49"
+     ]
+    },
+    {
+     "name": "Unit 8 The world of literature",
+     "kps": [
+      "ESH-GRA-49"
+     ]
     }
    ]
   }
