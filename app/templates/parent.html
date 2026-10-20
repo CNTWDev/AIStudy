@@ -3,14 +3,14 @@
 {% block body %}
 <div class="row"><h1 class="grow">家长页</h1><a class="linkbtn" href="/invite">邀请亲友</a> <a class="btn ghost sm" href="/parent/kids/new">＋ 添加孩子或家人</a></div>
 {% if not llm_enabled() %}<div class="hint">提示：服务器还没有配置 AI 密钥。诊断、练习（现成题库）、复习、记录都能用；查词、讲解、AI 出题和 AI 短文需要配置后才能用（见 docs/DEPLOY.md）。</div>{% endif %}
-<p class="muted small">家长账号用来查看和安排：孩子用自己的邮箱和密码登录后才是学习状态（做题、阅读、复习、问{{ ASSISTANT }}）。</p>
-{% if not kids %}<div class="card"><p>还没有孩子账号。点「添加孩子或家人」，给每个孩子一个邮箱和密码，选好年级和教材。家里的大人也想学，年级选「成人」，课程由 TA 自己选。</p></div>{% endif %}
+<p class="muted small">家长账号用来查看和安排：孩子用自己的登录名和 4 位数字登录后才是学习状态（做题、阅读、复习、问{{ ASSISTANT }}）。</p>
+{% if not kids %}<div class="card"><p>还没有孩子账号。点「添加孩子或家人」，给每个孩子起一个登录名、设 4 位数字，选好年级和教材。家里的大人也想学，年级选「成人」，课程由 TA 自己选。</p></div>{% endif %}
 {% for k in kids %}
 {% if k.adult %}{# 家里的成人成员：学习由本人安排，家长这里只看坚持、只管账号 #}
 <div class="card pkid">
   <div class="row">
     <div class="grow grow-w"><h2 style="margin:0">{{ k.u.name }} <span class="pill">{{ stage_label(k.u.grade) }}</span>{% if k.u.status == 'disabled' %} <span class="pill st-weak">已暂停</span>{% endif %}</h2>
-      <div class="muted small">{{ k.u.email }} · 学习由 TA 自己安排，学习记录只有 TA 自己能看</div></div>
+      <div class="muted small">登录名 {{ account_name(k.u) }} · 学习由 TA 自己安排，学习记录只有 TA 自己能看</div></div>
   </div>
   <p class="small" style="margin:8px 0">🔥 连续 {{ k.streak }} 天 · 这一周学了 {{ k.week_days }} 天</p>
   <div class="pacts"><a href="/parent/kids/{{ k.u.id }}/edit">资料与密码</a></div>
@@ -21,7 +21,7 @@
   {% set done = k.today.plan|selectattr('done')|list|length %}{% set total = k.today.plan|length %}
   <div class="row">
     <div class="grow grow-w"><h2 style="margin:0">{{ k.u.name }} <span class="pill">{{ stage_label(k.u.grade) }}</span>{% if k.u.status == 'disabled' %} <span class="pill st-weak">已暂停</span>{% endif %}</h2>
-      <div class="muted small">{{ k.u.email }}{% if k.u.school %} · {{ k.u.school }}{% endif %} · 每天 {{ k.u.daily_minutes }} 分钟</div></div>
+      <div class="muted small">登录名 {{ account_name(k.u) }}{% if k.u.school %} · {{ k.u.school }}{% endif %} · 每天 {{ k.u.daily_minutes }} 分钟</div></div>
   </div>
   <a class="ptoday" href="/parent/as/{{ k.u.id }}" title="看今天的清单">
     <div class="pt-n"><b>{{ done }}<small>/{{ total }}</small></b><span>今天完成</span></div>

@@ -42,10 +42,10 @@ def test_full_flow(monkeypatch):
         r = c.post("/login", data={"email": "p@x.com", "password": "secret1"})
         assert "家长页" in r.text and 'href="/admin"' not in r.text
         # 姐姐：IGCSE 物理 + 剑桥英语 + 统编语文；弟弟：上海英语 + 统编语文 + 上海数学
-        c.post("/parent/kids/save", data={"name": "姐姐", "email": "a@x.com", "password": "secret1", "grade": "G8",
+        c.post("/parent/kids/save", data={"name": "姐姐", "email": "a@x.com", "password": "2580", "grade": "G8",
                                           "daily_minutes": "90", "subj_physics": "phy-cambridge",
                                           "subj_english": "eng-cambridge", "subj_chinese": "chn-tongbian"})
-        c.post("/parent/kids/save", data={"name": "弟弟", "email": "b@x.com", "password": "secret1", "grade": "G3",
+        c.post("/parent/kids/save", data={"name": "弟弟", "email": "b@x.com", "password": "2580", "grade": "G3",
                                           "daily_minutes": "60", "subj_english": "eng-shanghai",
                                           "subj_chinese": "chn-tongbian", "subj_math": "math-shanghai"})
         page = c.get("/parent").text
@@ -53,7 +53,7 @@ def test_full_flow(monkeypatch):
         c.get("/logout")
 
         # 姐姐登录
-        r = c.post("/login", data={"email": "a@x.com", "password": "secret1"})
+        r = c.post("/login", data={"email": "a@x.com", "password": "2580"})
         assert "今天的任务" in r.text
         assert "小测：看看你会哪些" in r.text
         for path in ["/subjects", "/map/phy-cambridge", "/learn/PHY-IG-1.1-05", "/review", "/words", "/reading", "/records",
@@ -197,7 +197,7 @@ def test_full_flow(monkeypatch):
         c.get("/logout")
 
         # 弟弟看不到姐姐的数据；家长可以看报告
-        c.post("/login", data={"email": "b@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "b@x.com", "password": "2580"})
         assert "学会了量筒读数" not in c.get("/records").text
         assert c.get("/parent").status_code == 403
         assert c.get("/map/math-shanghai").status_code == 200
@@ -241,7 +241,7 @@ def test_accounts():
 
         # 连续输错 5 次被锁定，正确密码也进不去；命令行可解锁
         for _ in range(5):
-            assert "邮箱或密码不对" in c.post("/login", data={"email": "q@x.com", "password": "wrong"}).text
+            assert "账号或密码不对" in c.post("/login", data={"email": "q@x.com", "password": "wrong"}).text
         assert "锁定" in c.post("/login", data={"email": "q@x.com", "password": "secret1"}).text
         from app import cli
         assert cli.main(["unlock", "q@x.com"]) == 0
@@ -342,7 +342,7 @@ def test_daily_tasks_progress_and_tools(monkeypatch):
         assert "已安排" in r.text
         c.get("/logout")
 
-        c.post("/login", data={"email": "b@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "b@x.com", "password": "2580"})
         plan = c.post("/api/plan/rebuild").json()["plan"]
         types = [t["type"] for t in plan]
         assert "progress" not in types  # 学校进度不再是每天的任务
@@ -452,7 +452,7 @@ def test_paper_import_and_diagnosis():
     from app import db, papers
     with TestClient(app) as c:
         kid_b = db.one("SELECT id FROM users WHERE email='b@x.com'")["id"]
-        c.post("/login", data={"email": "b@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "b@x.com", "password": "2580"})
         assert "导入一份试卷" in c.get("/papers").text
         # 没有照片也没有文字 → 提示
         assert c.post("/api/papers", data={"pack_id": "math-shanghai"}).status_code == 400
@@ -501,11 +501,11 @@ def test_paper_import_and_diagnosis():
 
         # 别人看不到；删除
         c.get("/logout")
-        c.post("/login", data={"email": "a@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "a@x.com", "password": "2580"})
         assert c.get(f"/papers/{pid}").status_code == 404
         assert c.get(f"/papers/{pid}/img/1.jpg").status_code == 404
         c.get("/logout")
-        c.post("/login", data={"email": "b@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "b@x.com", "password": "2580"})
         c.post(f"/papers/{pid}/delete")
         assert not db.one("SELECT id FROM papers WHERE id=?", pid)
         assert not (papers.PAPER_DIR / str(pid)).exists()
@@ -518,7 +518,7 @@ def test_ask_tutor():
     from app import db
     with TestClient(app) as c:
         kid_b = db.one("SELECT id FROM users WHERE email='b@x.com'")["id"]
-        c.post("/login", data={"email": "b@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "b@x.com", "password": "2580"})
         assert 'id="askbtn"' in c.get("/today").text
         assert 'id="askbtn"' not in c.get("/diagnose/math-shanghai").text  # 诊断时不能问
         item = c.get("/api/practice/MATH-PRE-UNIT?n=1").json()["items"][0]
@@ -535,7 +535,7 @@ def test_ask_tutor():
         assert "还是不懂" in c.get("/records").text  # 家长和孩子都能在记录里看到问过什么
         c.get("/logout")
         # 别的孩子看不到这段对话，也不能接着问
-        c.post("/login", data={"email": "a@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "a@x.com", "password": "2580"})
         assert c.get(f"/api/ask/{r['thread_id']}").status_code == 404
         r3 = c.post("/api/ask", json={"question": "hi", "thread_id": r["thread_id"]}).json()
         assert r3["thread_id"] != r["thread_id"]
@@ -563,7 +563,7 @@ def test_site_settings_and_insights():
                     and engine.get_mastery(kid_b).get(k, {}).get("status") != "mastered")
         for s2 in [s for s in catalog.successors(root) if s["pack"] == "math-shanghai"][:2]:
             engine.set_mastery(kid_b, s2["id"], 0.2, "weak", "test")
-        c.post("/login", data={"email": "b@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "b@x.com", "password": "2580"})
         assert "问小星" in c.get("/today").text and "我家学习本" in c.get("/today").text
         item = c.get("/api/practice/MATH-PRE-UNIT?n=1").json()["items"][0]
         for _ in range(2):
@@ -603,14 +603,15 @@ def test_account_management():
         st = {r["pack_id"]: r["stage"] for r in db.q("SELECT * FROM enrollments WHERE user_id=? AND active=1", kid_b)}
         assert st == {"eng-shanghai": "G4", "math-shanghai": "G4"}, st
         r = c.post(f"/parent/kids/{kid_b}/account", data={"action": "password", "password": ""})
-        temp = r.text.split("新密码：<b")[1].split(">")[1].split("<")[0]
-        assert len(temp) == 9 and "只显示这一次" in r.text
-        r = c.post(f"/parent/kids/{kid_b}/account", data={"action": "password", "password": "kidpass1"})
-        assert "新密码就是你刚才输入的" in r.text and "只显示这一次" not in r.text
+        temp = r.text.split("新 4 位数字：<b")[1].split(">")[1].split("<")[0]
+        assert len(temp) == 4 and temp.isdigit() and "只显示这一次" in r.text
+        assert "4 位数字" in c.post(f"/parent/kids/{kid_b}/account", data={"action": "password", "password": "7391"}).text
+        r = c.post(f"/parent/kids/{kid_b}/account", data={"action": "password", "password": "7391"})
+        assert "新的数字就是你刚才输入的" in r.text and "只显示这一次" not in r.text
         other = db.insert("INSERT INTO users(email,pw_hash,name,role,status,created_at) VALUES('z@x.com','x','z','kid','active',?)", db.now())
         assert c.post(f"/parent/kids/{other}/account", data={"action": "unlock"}).status_code == 404  # 不是自己的孩子
         c.get("/logout")
-        assert c.post("/login", data={"email": "b2@x.com", "password": "kidpass1"}).url.path == "/today"
+        assert c.post("/login", data={"email": "b2@x.com", "password": "7391"}).url.path == "/today"
         c.get("/logout")
         # 管理员：账号详情页，改家长邮箱、给临时密码（对方登录后必须先改密码）、解锁、退出所有设备
         c.post("/login", data={"email": "admin@x.com", "password": "secret1"})
@@ -644,7 +645,7 @@ def test_explore_warmup_and_selection(monkeypatch):
     from app import db, explore, webpage
     with TestClient(app) as c:
         kid = db.one("SELECT id FROM users WHERE email='a@x.com'")["id"]
-        c.post("/login", data={"email": "a@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "a@x.com", "password": "2580"})
         # 每天的清单最前面有「热身」：混着以前学过的知识点和旧单词
         plan = c.post("/api/plan/rebuild").json()["plan"]
         todo = [t for t in plan if not t["done"]]  # 今天已经做完的旧任务会留在清单最前面
@@ -724,7 +725,7 @@ def test_self_records():
     from app import db, records
     with TestClient(app) as c:
         kid = db.one("SELECT id FROM users WHERE email='b2@x.com'")["id"]
-        c.post("/login", data={"email": "b2@x.com", "password": "kidpass1"})
+        c.post("/login", data={"email": "b2@x.com", "password": "7391"})
         r = c.get("/api/records/words").json()
         assert r["pb"]["runs"] == 0 and r["ghost"] is None
         assert c.get("/api/records/nope").status_code == 404
@@ -804,7 +805,7 @@ def test_accuracy_trend():
     assert "高 👍" in records.trend_words(al)
     assert records.accuracy_trend(999999) is None
     with TestClient(app) as c:
-        c.post("/login", data={"email": "b2@x.com", "password": "kidpass1"})
+        c.post("/login", data={"email": "b2@x.com", "password": "7391"})
         page = c.get("/records").text
         assert "每天的正确率" in page and 'href="/day/' in page and "acc-subj" in page
         assert "data-trend" in page and '"avg":' in page and "data-tip=" in page   # 曲线和热力图都能悬停 / 点按看那一天
@@ -854,7 +855,7 @@ def test_curricula_layers_tracks_and_bridges():
         c.post("/parent/kids/save", data=form)
         c.get("/logout")
         # 同一概念互认：学会沪科版「密度」→ 剑桥物理的密度推断为「学习中」
-        c.post("/login", data={"email": "a@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "a@x.com", "password": "2580"})
         assert not db.one("SELECT 1 AS x FROM mastery WHERE user_id=? AND kp_id='PHY-IG-1.4-01' AND status!='unknown'", kid["id"])
         engine.record_attempt(kid["id"], None, "PSH-MECH-14", "probe", True)
         mrow = db.one("SELECT status, source FROM mastery WHERE user_id=? AND kp_id='PHY-IG-1.4-01'", kid["id"])
@@ -887,7 +888,7 @@ def test_content_bank():
     try:
         with TestClient(app) as c:
             kp = "PHY-IG-1.3-01"
-            c.post("/login", data={"email": "a@x.com", "password": "secret1"})
+            c.post("/login", data={"email": "a@x.com", "password": "2580"})
             items = c.get(f"/api/practice/{kp}?n=3").json()["items"]
             items = [i for i in items if not i.get("probe")]  # 去掉穿插的旧知识点题
             assert items and "items" in calls
@@ -913,10 +914,10 @@ def test_content_bank():
 
             # 另一个孩子（同年级）做同一知识点：直接用库里的题，不再出题
             c.post("/login", data={"email": "p2@x.com", "password": "secret1"})
-            c.post("/parent/kids/save", data={"name": "同学", "email": "c@x.com", "password": "secret1", "grade": "G8",
+            c.post("/parent/kids/save", data={"name": "同学", "email": "c@x.com", "password": "2580", "grade": "G8",
                                               "daily_minutes": "60", "subj_physics": "phy-cambridge", "subj_english": "eng-cambridge"})
             c.get("/logout")
-            c.post("/login", data={"email": "c@x.com", "password": "secret1"})
+            c.post("/login", data={"email": "c@x.com", "password": "2580"})
             n_items = calls.count("items")
             from app import engine
             again = engine.items_for(db.one("SELECT id FROM users WHERE email='c@x.com'")["id"], kp, n=3, grade="G8")
@@ -930,7 +931,7 @@ def test_content_bank():
             assert c.post("/api/flag", json={"id": bad, "reason": "nope"}).status_code == 400
             assert bad not in {i["id"] for i in c.get(f"/api/practice/{kp}?n=5").json()["items"]}
             c.get("/logout")
-            c.post("/login", data={"email": "a@x.com", "password": "secret1"})
+            c.post("/login", data={"email": "a@x.com", "password": "2580"})
             assert c.post("/api/flag", json={"id": bad, "reason": "unclear"}).json()["status"] == "review"
             c.get("/logout")
 

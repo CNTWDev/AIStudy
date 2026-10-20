@@ -22,7 +22,7 @@
 </div>
 <div class="card">
   <h3>通过我加入的家庭</h3>
-  {% for u in joined %}<p class="small">{{ u.name }} <span class="muted">{{ u.email }} · {{ u.created_at[:10] }}{% if u.status != 'active' %} · {{ {'pending':'待审批','disabled':'已停用','rejected':'未通过'}[u.status] }}{% endif %}</span></p>
+  {% for u in joined %}<p class="small">{{ u.name }} <span class="muted">{{ account_name(u) }} · {{ u.created_at[:10] }}{% if u.status != 'active' %} · {{ {'pending':'待审批','disabled':'已停用','rejected':'未通过'}[u.status] }}{% endif %}</span></p>
   {% else %}<p class="muted small">还没有</p>{% endfor %}
 </div>
 {% endblock %}

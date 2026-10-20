@@ -43,7 +43,7 @@ def test_read_listen_guide_and_plan():
         c.post("/admin/users/create", data={"email": "libp@x.com", "password": "secret1", "name": "书爸", "role": "parent"})
         c.get("/logout")
         c.post("/login", data={"email": "libp@x.com", "password": "secret1"})
-        c.post("/parent/kids/save", data={"name": "书娃", "email": "libk@x.com", "password": "secret1", "grade": "G5",
+        c.post("/parent/kids/save", data={"name": "书娃", "email": "libk@x.com", "password": "2580", "grade": "G5",
                                           "daily_minutes": "60", "subj_eng": "eng-shanghai"})
         kid = db.one("SELECT id FROM users WHERE email='libk@x.com'")
         page = c.get(f"/parent/kids/{kid['id']}/plan").text
@@ -54,7 +54,7 @@ def test_read_listen_guide_and_plan():
         assert tr["read_en"]["unit_name"] == "页" and tr["read_en"]["total_units"] == library.text("en-oz")["n_pages"]
         c.get("/logout")
 
-        c.post("/login", data={"email": "libk@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "libk@x.com", "password": "2580"})
         plan = c.post("/api/plan/rebuild").json()["plan"]
         read = next(t for t in plan if t["type"] == "read_en")
         listen = next(t for t in plan if t["type"] == "listen")
@@ -184,7 +184,7 @@ def test_bad_download_is_hidden_and_old_books_rebuilt():
         assert all(b["id"] != "en-alice" for b in library.shelf())
         assert "孩子看不到" in c.get("/admin/library").text
         c.get("/logout")
-        c.post("/login", data={"email": "libk@x.com", "password": "secret1"})   # 上一个测试建的孩子
+        c.post("/login", data={"email": "libk@x.com", "password": "2580"})   # 上一个测试建的孩子
         assert c.get("/books/en-alice").status_code == 404 and c.get("/books/en-alice/p/1").status_code == 404
         assert "/books/en-alice" not in c.get("/books").text
         c.get("/logout")

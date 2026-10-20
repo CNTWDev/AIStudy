@@ -21,10 +21,10 @@ def _setup(c, monkeypatch, email="mixk@x.com", grade="G8", subj=None):
     c.post("/admin/users/create", data={"email": "mixp@x.com", "password": "secret1", "name": "混爸", "role": "parent"})
     c.get("/logout")
     c.post("/login", data={"email": "mixp@x.com", "password": "secret1"})
-    c.post("/parent/kids/save", data={"name": "混娃", "email": email, "password": "secret1", "grade": grade,
+    c.post("/parent/kids/save", data={"name": "混娃", "email": email, "password": "2580", "grade": grade,
                                       "daily_minutes": "90", **(subj or {"subj_physics": "phy-cambridge"})})
     c.get("/logout")
-    c.post("/login", data={"email": email, "password": "secret1"})
+    c.post("/login", data={"email": email, "password": "2580"})
     return db.one("SELECT id FROM users WHERE email=?", email)["id"]
 
 

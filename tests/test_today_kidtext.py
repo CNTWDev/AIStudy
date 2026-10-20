@@ -63,10 +63,10 @@ def _kid(c, email):
     c.post("/admin/users/create", data={"email": f"p-{email}", "password": "secret1", "name": "家长", "role": "parent"})
     c.get("/logout")
     c.post("/login", data={"email": f"p-{email}", "password": "secret1"})
-    c.post("/parent/kids/save", data={"name": "小简", "email": email, "password": "secret1", "grade": "G3",
+    c.post("/parent/kids/save", data={"name": "小简", "email": email, "password": "2580", "grade": "G3",
                                       "daily_minutes": "60", "subj_math": "math-shanghai", "subj_english": "eng-shanghai"})
     c.get("/logout")
-    c.post("/login", data={"email": email, "password": "secret1"})
+    c.post("/login", data={"email": email, "password": "2580"})
     return dict(db.one("SELECT * FROM users WHERE email=?", email))
 
 

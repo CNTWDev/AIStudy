@@ -26,10 +26,12 @@
       </div>
       {% else %}<h2>登录</h2>{% endif %}
       <form method="post" action="/login" class="pane-login">
-        <label>邮箱</label><input type="email" name="email" required autocomplete="username" value="{{ email or '' }}">
-        <label>密码</label><input type="password" name="password" required autocomplete="current-password">
+        {# 大人填邮箱，孩子填登录名（家长添加时起的小名）+ 4 位数字；不带 @ 的就当登录名，密码框换成数字键盘 #}
+        <label>邮箱或登录名</label><input type="text" name="email" id="li-acct" required autocomplete="username" autocapitalize="off" spellcheck="false" value="{{ email or '' }}">
+        <label id="li-pwl">密码</label><input type="password" name="password" id="li-pw" required autocomplete="current-password">
         <div style="margin-top:16px"><button class="btn" style="width:100%">登录</button></div>
-        <p class="muted small">忘记密码：孩子的账号找家长重设，其他账号找管理员。</p>
+        {% if has_accts %}<p class="small" style="margin:10px 0 0"><a href="/login">← 这台设备上登录过的账号</a></p>{% endif %}
+        <p class="muted small">孩子：输入家长给你的登录名和 4 位数字。忘了找家长重设；大人的账号找管理员。</p>
       </form>
       {% endif %}
       {% if reg %}
@@ -97,4 +99,10 @@
   </section>
   {% endif %}
 </div>
+<script>
+(() => { const a = $('#li-acct'), pw = $('#li-pw'), l = $('#li-pwl'); if (!a) return;
+  const kid = () => { const k = a.value.trim() && !a.value.includes('@');
+    pw.inputMode = k ? 'numeric' : ''; l.textContent = k ? '密码（孩子输 4 位数字）' : '密码'; };
+  a.addEventListener('input', kid); kid(); })();
+</script>
 {% endblock %}

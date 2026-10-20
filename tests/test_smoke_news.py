@@ -56,7 +56,7 @@ def test_daily_news_flow(monkeypatch):
         c.get("/logout")
         c.post("/login", data={"email": "newsp@x.com", "password": "secret1"})
         for email, grade in (("newsk8@x.com", "G8"), ("newsk3@x.com", "G3"), ("newsk7@x.com", "G7")):
-            c.post("/parent/kids/save", data={"name": email[:6], "email": email, "password": "secret1", "grade": grade,
+            c.post("/parent/kids/save", data={"name": email[:6], "email": email, "password": "2580", "grade": grade,
                                               "daily_minutes": "60", "subj_english": "eng-shanghai"})
         c.get("/logout")
 
@@ -70,7 +70,7 @@ def test_daily_news_flow(monkeypatch):
         assert news.run_daily(force=False).get("skipped") or db.one("SELECT COUNT(*) AS n FROM contents WHERE kind='news'")["n"] == n_contents
 
         # 初二：中学那条，L3，有讨论题；打开两次是同一条阅读记录
-        c.post("/login", data={"email": "newsk8@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "newsk8@x.com", "password": "2580"})
         plan = c.post("/api/plan/rebuild").json()["plan"]
         t = next(t for t in plan if t["type"] == "read_en")
         assert t["url"] == "/news" and "Central bank holds rates" in t["title"]
@@ -95,14 +95,14 @@ def test_daily_news_flow(monkeypatch):
         c.get("/logout")
 
         # 初一和初二同级别：共用同一篇改写稿，不重新生成
-        c.post("/login", data={"email": "newsk7@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "newsk7@x.com", "password": "2580"})
         before = db.one("SELECT COUNT(*) AS n FROM contents WHERE kind='news'")["n"]
         c.get("/news")
         assert db.one("SELECT COUNT(*) AS n FROM contents WHERE kind='news'")["n"] == before
         c.get("/logout")
 
         # 三年级：小学那条，公有领域的源可以读原文
-        c.post("/login", data={"email": "newsk3@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "newsk3@x.com", "password": "2580"})
         page = c.get("/news").text
         assert "根据 NASA" in page and "挑战读原文" in page and "说一说" not in page
         c.get("/logout")
@@ -140,7 +140,7 @@ def test_news_failure_sends_kid_to_short_article(monkeypatch):
         raise llm.LLMError("AI 返回格式不对，请再试一次")
     monkeypatch.setattr(news, "open_for", broken)
     with TestClient(__import__("app.main", fromlist=["app"]).app) as c:
-        c.post("/login", data={"email": "newsk3@x.com", "password": "secret1"})
+        c.post("/login", data={"email": "newsk3@x.com", "password": "2580"})
         r = c.get("/news")
         assert r.status_code == 503 and "格式不对" not in r.text and "AI" not in r.text.split("<main")[1].split("</main>")[0]
         assert 'href="/reading/today?lang=en"' in r.text and "去读短文" in r.text

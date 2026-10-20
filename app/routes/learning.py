@@ -31,13 +31,13 @@ router = APIRouter()
 def change_password(request: Request, old: str = Form(...), new: str = Form(...)):
     u = auth.require_user(request)
     if not auth.check_pw(old, u["pw_hash"]):
-        return _back(err="旧密码不对")
+        return _back(err="原来的数字不对" if auth.uses_pin(u) else "旧密码不对")
     try:
         auth.set_password(u["id"], new, keep_session=request.session.get("sid"))
     except ValueError as e:
         return _back(err=str(e))
-    auth.log_event("password_change", user_id=u["id"], email=u["email"], request=request)
-    return _back(msg="密码已修改，其他设备上的登录已退出")
+    auth.log_event("password_change", user_id=u["id"], email=auth.account_name(u), request=request)
+    return _back(msg=("数字改好了" if auth.uses_pin(u) else "密码已修改") + "，其他设备上的登录已退出")
 
 
 @router.post("/api/flag")

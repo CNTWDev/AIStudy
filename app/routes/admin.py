@@ -69,12 +69,12 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
         ctx["recent_selfs"] = sorted([u for u in users if auth.is_self_learner(u)], key=lambda u: u["created_at"], reverse=True)[:5]
     elif tab == "families":
         ctx["families"] = [_family_row(p, users, active) for p in users if p["role"] == "parent"
-                           and (not q or q.lower() in (p["email"] + p["name"] + p["city"]).lower()
-                                or any(q.lower() in k["name"].lower() for k in users if k["parent_id"] == p["id"]))]
+                           and (not q or q.lower() in ((p["email"] or "") + p["name"] + p["city"]).lower()
+                                or any(q.lower() in (k["name"] + (k["login"] or "")).lower() for k in users if k["parent_id"] == p["id"]))]
     elif tab == "selfs":
         ctx["selfs"] = [{"u": u, "packs": [catalog.packs[e["pack_id"]].subject_name for e in enrollments(u["id"])],
                          "active": u["id"] in active} for u in users if auth.is_self_learner(u)
-                        and (not q or q.lower() in (u["email"] + u["name"]).lower())]
+                        and (not q or q.lower() in ((u["email"] or "") + (u["login"] or "") + u["name"]).lower())]
     elif tab == "invites":
         invites = db.q("SELECT v.*, u.name AS creator_name, u.email AS creator_email FROM invites v "
                        "LEFT JOIN users u ON u.id=v.created_by ORDER BY v.created_at DESC LIMIT 200")
@@ -168,9 +168,9 @@ def admin_user_status(request: Request, uid: int, status: str = Form(...), back:
         raise HTTPException(404)
     auth.set_status(uid, status, by=a["id"])
     event = {"active": "approve" if u["status"] == "pending" else "enable", "disabled": "disable", "rejected": "reject"}[status]
-    auth.log_event("admin_" + event, user_id=uid, email=u["email"], detail=f"by {a['email']}", request=request)
+    auth.log_event("admin_" + event, user_id=uid, email=auth.account_name(u), detail=f"by {a['email']}", request=request)
     word = {"approve": "已审批通过", "enable": "已启用", "disable": "已停用", "reject": "已拒绝"}[event]
-    return _admin_back(back, msg=f"{u['email']} {word}", uid=uid)
+    return _admin_back(back, msg=f"{auth.account_name(u)} {word}", uid=uid)
 
 
 @router.post("/admin/users/{uid}/admin")
@@ -180,7 +180,7 @@ def admin_toggle_admin(request: Request, uid: int, on: str = Form(""), back: str
     if not u or u["role"] != "parent" or uid == a["id"]:
         return _admin_back("families", msg="只能把其他家长账号设为管理员")
     db.run("UPDATE users SET is_admin=? WHERE id=?", 1 if on else 0, uid)
-    auth.log_event("admin_grant" if on else "admin_revoke", user_id=uid, email=u["email"], detail=f"by {a['email']}", request=request)
+    auth.log_event("admin_grant" if on else "admin_revoke", user_id=uid, email=auth.account_name(u), detail=f"by {a['email']}", request=request)
     if back == "family":
         return RedirectResponse(f"/admin/families/{uid}?" + urlencode({"msg": "已更新管理员权限"}), 303)
     return _admin_back("families", msg="已更新管理员权限")
@@ -194,8 +194,8 @@ def admin_reset_link(request: Request, uid: int, back: str = Form("families")):
         raise HTTPException(404)
     token = auth.create_reset(uid, a["id"])
     base = config.PUBLIC_URL or str(request.base_url).rstrip("/")
-    auth.log_event("admin_reset_link", user_id=uid, email=u["email"], detail=f"by {a['email']}", request=request)
-    return _admin_back(back, msg=f"已生成 {u['email']} 的重设密码链接（48 小时内有效，只能用一次），请发给对方：",
+    auth.log_event("admin_reset_link", user_id=uid, email=auth.account_name(u), detail=f"by {a['email']}", request=request)
+    return _admin_back(back, msg=f"已生成 {auth.account_name(u)} 的重设密码链接（48 小时内有效，只能用一次），请发给对方：",
                        link=f"{base}/reset/{token}", uid=uid)
 
 
@@ -211,20 +211,23 @@ def admin_user(request: Request, uid: int, msg: str = "", link: str = ""):
 
 
 @router.post("/admin/users/{uid}/profile")
-def admin_user_profile(request: Request, uid: int, name: str = Form(...), email: str = Form(...)):
+def admin_user_profile(request: Request, uid: int, name: str = Form(...), email: str = Form(""), login: str = Form("")):
     a = auth.require_admin(request)
     u = auth.get_user(uid)
     if not u or uid == a["id"]:
         raise HTTPException(404)
     try:
-        email = auth.validate_email(email)
+        # 学习账号可以只有登录名（家长添加的孩子），其他账号用邮箱登录
+        login = auth.validate_login(login) if (login.strip() and u["role"] == "kid") else (None if u["role"] == "kid" else u["login"])
+        email = auth.validate_email(email) if email.strip() else None
+        if not (email or login):
+            raise ValueError("邮箱和登录名至少填一个" if u["role"] == "kid" else "请填邮箱")
+        auth.check_free(email, login, uid)
     except ValueError as e:
         return _admin_back("user", msg=str(e), uid=uid)
-    other = auth.by_email(email)
-    if other and other["id"] != uid:
-        return _admin_back("user", msg="这个邮箱已被别的账号使用", uid=uid)
-    db.run("UPDATE users SET name=?, email=? WHERE id=?", (name or "").strip()[:40] or u["name"], email, uid)
-    auth.log_event("admin_edit_profile", user_id=uid, email=email, detail=f"from {u['email']} by {a['email']}", request=request)
+    db.run("UPDATE users SET name=?, email=?, login=? WHERE id=?", (name or "").strip()[:40] or u["name"], email, login, uid)
+    auth.log_event("admin_edit_profile", user_id=uid, email=auth.account_name({"email": email, "login": login}),
+                   detail=f"from {auth.account_name(u)} by {a['email']}", request=request)
     return _admin_back("user", msg="已保存", uid=uid)
 
 
@@ -422,9 +425,9 @@ def move_learner(kid, parent, actor, request=None) -> str:
     db.run("UPDATE users SET parent_id=? WHERE id=?", parent["id"] if parent else None, kid["id"])
     arena.leave_rooms(dict(kid))
     boards.refresh()
-    frm = f"{old['email']} 家" if old else "自学者"
-    to = f"{parent['email']} 家" if parent else "自学者"
-    auth.log_event("admin_move_learner", user_id=kid["id"], email=kid["email"], detail=f"{frm} → {to} by {actor['email']}", request=request)
+    frm = f"{auth.account_name(old)} 家" if old else "自学者"
+    to = f"{auth.account_name(parent)} 家" if parent else "自学者"
+    auth.log_event("admin_move_learner", user_id=kid["id"], email=auth.account_name(kid), detail=f"{frm} → {to} by {actor['email']}", request=request)
     return to
 
 

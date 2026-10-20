@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}选择账号 · {{ SITE }}{% endblock %}
+{% block body %}
+{# 这台设备上登录过的账号，像电脑的切换用户：点自己的头像，孩子输 4 位数字，大人输密码（docs/DESIGN.md §5.37）。
+   有孩子时用孩子的样式，小伙伴说话；页面上只有一件事要做（选人 / 输数字或密码）。 #}
+{% set cur = accts|selectattr('id', 'equalto', pick)|first if pick else none %}
+{% set hi = '是谁来了？点你的头像' if tone == 'kid' else '选择你的账号' %}
+<div class="kl" data-pick="{{ pick or '' }}" data-locked="{{ 1 if locked else '' }}">
+  <div class="kl-coach">
+    <span class="kl-cface">{{ mascot_svg('hive', 84 if tone == 'kid' else 56) }}</span>
+    <span class="say">{% if tone == 'kid' %}<b>{{ ASSISTANT }}</b>{% endif %}<span id="kl-say" data-hi="{{ hi }}">{{ error or hi }}</span></span>
+  </div>
+
+  <section class="kl-pick" {{ 'hidden' if cur }}>
+    <div class="kl-kids">
+      {% for u in accts %}
+      <button type="button" class="kl-kid" data-id="{{ u.id }}" data-name="{{ u.name }}" data-pin="{{ 1 if uses_pin(u) else '' }}">{{ mascot_svg(mascot_of(u), 72) }}<b>{{ u.name }}</b></button>
+      {% endfor %}
+    </div>
+  </section>
+
+  <form class="card kl-pin" method="post" action="/login/pick" autocomplete="off" {{ 'hidden' if not cur }} data-mode="{{ ('pin' if uses_pin(cur) else 'pw') if cur else '' }}">
+    <input type="hidden" name="uid" value="{{ pick or '' }}">
+    <div class="kl-me"><span class="kl-face">{% if cur %}{{ mascot_svg(mascot_of(cur), 56) }}{% endif %}</span><b class="kl-name">{{ cur.name if cur else '' }}</b></div>
+    {% if locked %}
+    <p class="kl-locked">先请爸爸妈妈打开家长页，在你的账号里点「解除锁定」，就能再登录了。</p>
+    {% else %}
+    <div class="kl-for-pin">
+      <input type="hidden" name="password" value="">
+      <div class="kl-dots {{ 'wrong' if error }}" aria-label="已经输入的数字"><i></i><i></i><i></i><i></i></div>
+      <div class="kl-pad" role="group" aria-label="数字键盘">
+        {% for n in '123456789' %}<button type="button" data-k="{{ n }}">{{ n }}</button>{% endfor %}
+        <button type="button" class="kl-alt" data-k="back-to-pick">换人</button><button type="button" data-k="0">0</button><button type="button" class="kl-alt" data-k="del" aria-label="删掉一个">⌫</button>
+      </div>
+    </div>
+    <div class="kl-for-pw">
+      <input type="password" name="password" placeholder="密码" autocomplete="current-password" aria-label="密码">
+      <button class="btn block">登录</button>
+    </div>
+    {% endif %}
+  </form>
+
+  <p class="kl-foot muted small">
+    <span class="kl-only-pin" {{ 'hidden' if not cur }}><a href="#" class="kl-back">换一个人</a> · </span>
+    <a href="/login?full=1">用别的账号登录</a>
+  </p>
+  <form method="post" action="/login/forget" class="kl-forget kl-only-pin" {{ 'hidden' if not cur }}
+        onsubmit="return confirm('这台设备上不再显示这个头像？以后要输账号登录。')">
+    <input type="hidden" name="uid" value="{{ pick or '' }}"><button class="linkbtn small muted">不在这台设备上显示</button>
+  </form>
+</div>
+<script>
+(() => {
+  const root = $('.kl'), pickBox = $('.kl-pick'), form = $('.kl-pin'), say = $('#kl-say');
+  const only = $$('.kl-only-pin'), dots = $$('.kl-dots i');
+  let pin = '';
+  const draw = () => dots.forEach((d, i) => d.classList.toggle('on', i < pin.length));
+  // 孩子：数字键盘；大人：密码框。另一套的输入框关掉，不提交
+  const mode = (m) => { form.dataset.mode = m;
+    $$('.kl-for-pin input').forEach(x => x.disabled = m !== 'pin'); $$('.kl-for-pw input').forEach(x => x.disabled = m !== 'pw'); };
+  const open = (b) => {
+    if (root.dataset.locked && b.dataset.id !== root.dataset.pick) { location.href = '/login'; return; }
+    form.uid.value = b.dataset.id; $('.kl-forget [name=uid]').value = b.dataset.id;
+    $('.kl-face').innerHTML = b.querySelector('svg').outerHTML; $('.kl-name').textContent = b.dataset.name;
+    mode(b.dataset.pin ? 'pin' : 'pw');
+    say.textContent = b.dataset.pin ? `嗨，${b.dataset.name}！输入你的 4 个数字` : `${b.dataset.name}，输入密码`;
+    pin = ''; draw(); $('.kl-dots')?.classList.remove('wrong');
+    pickBox.hidden = true; form.hidden = false; only.forEach(x => x.hidden = false);
+    if (!b.dataset.pin) $('.kl-for-pw input')?.focus();
+  };
+  const back = () => { form.hidden = true; pickBox.hidden = false; only.forEach(x => x.hidden = true);
+    say.textContent = say.dataset.hi; pin = ''; draw(); };
+  const key = (k) => {
+    if (form.hidden || root.dataset.locked || form.dataset.mode !== 'pin') return;
+    if (k === 'back-to-pick') return back();
+    if (k === 'del') { pin = pin.slice(0, -1); return draw(); }
+    if (!/^\d$/.test(k) || pin.length >= 4) return;
+    pin += k; draw(); $('.kl-dots').classList.remove('wrong');
+    if (pin.length === 4) { $('.kl-for-pin input').value = pin; setTimeout(() => form.submit(), 150); }
+  };
+  $$('.kl-kid').forEach(b => b.onclick = () => open(b));
+  $$('.kl-pad button').forEach(b => b.onclick = () => key(b.dataset.k));
+  $$('.kl-back').forEach(a => a.onclick = (e) => { e.preventDefault(); back(); });
+  document.addEventListener('keydown', (e) => {
+    if (form.dataset.mode !== 'pin') return;
+    if (e.key === 'Backspace') key('del'); else if (e.key === 'Escape') key('back-to-pick'); else key(e.key);
+  });
+  if (form.dataset.mode) mode(form.dataset.mode);
+  else if ($$('.kl-kid').length === 1) open($('.kl-kid'));
+  if (form.dataset.mode === 'pw') $('.kl-for-pw input')?.focus();
+})();
+</script>
+{% endblock %}
