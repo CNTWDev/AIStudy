@@ -86,3 +86,15 @@ def test_old_admin_override_of_split_pack_still_loads():
         assert result.kps[spine["kps"][0]["id"]]["name"] == "后台改过的名字" and result.kps["OLD-ADMIN-KP"]["pack"] == "math-shanghai"
         assert result.packs["math-shanghai"].base == "math-cn" and "OLD-ADMIN-KP" in result.packs["math-shanghai"].kp_ids
         assert result.selection_guide(result.packs["math-shanghai"])["name"] == "沪教数学（后台改过）"
+
+
+def test_skills_run_through_every_unit():
+    """语音、阅读、写作、听说每个单元都在练：算这一学年的内容，但不占一章，不影响按章推演学校进度。"""
+    with TestClient(app):
+        g7 = next(b for b in catalog.packs["eng-yilin"].books if b["stage"] == "G7" and b["term"] == "上")
+        assert "ESH-REA-06" in g7["throughout"] and catalog.stage_in("eng-yilin", "ESH-REA-06") == "G7"
+        chs = catalog.chapters("eng-yilin", "G7")
+        assert chs[0]["name"] == "Unit 1 This is me!" and not any("ESH-REA-06" in ch["kps"] for ch in chs)
+        # 苏科新版每学年重新从第 1 章编号；九年级上册有了四分位数和箱线图（2022 课标新增）
+        assert catalog.chapters("math-suke", "G8")[0]["name"] == "第1章 三角形"
+        assert catalog.stage_in("math-suke", "MCN-STA-03") == "G9"
