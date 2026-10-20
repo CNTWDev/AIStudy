@@ -70,6 +70,6 @@
 
 - 英语四上（2026 秋）：同步学习 App「四年级上」章节截图：Starter Our families and friends；Unit 1 My school … Unit 10 Weather，共 10 个单元，和家长此前整理的单元表一致。之前我们因为网上查不到而没有采用，现在有了截图，单元名写进该册 note。
 - 英语九上（2026 秋）：同一 App「初三上」截图：Unit 1 Teenage life / 2 People and their jobs / 3 Travellers' tales / 4 Folk customs / 5 Buildings / 6 Pollution，共 6 个单元。此前流传的 8 单元表（Great people … The power of love）确认不对。
-- 英语三上（2026 秋）：同一 App「三年级上」截图：Starter Our families and friends；Unit 1 A new start / 2 Proud of you, proud of…（标题没显示全）/ 3 Our garden / 4 Water / 5 I can help / 6 How do you feel? / 7 Jobs / 8 Finding places / 9 Special days in China / 10 Foods around the world，共 10 个单元。Starter 名称和四上一样，要课本再确认。
+- 英语三上（2026 秋）：同一 App「三年级上」截图：Starter Our families and friends；Unit 1 A new start / 2 Proud of you, proud of myself/ 3 Our garden / 4 Water / 5 I can help / 6 How do you feel? / 7 Jobs / 8 Finding places / 9 Special days in China / 10 Foods around the world，共 10 个单元。Starter 名称和四上一样，家长对照课本确认过；Unit 2 全称也是家长从课本补的。
 - 更正：上面「第三批核对」里我们因为网上查不到，判断三上「A new start」「How do you feel?」是外省的书，没有采用。截图说明家长当时给的三上单元是对的。
 - 三册都只有这一处来源，各单元语法点还没有，所以仍标「待核实」，不挂知识点。
