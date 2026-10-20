@@ -20,10 +20,12 @@
 ## 英语（`eng-shanghai`）
 
 - 3–9 年级各册的单元名还是旧牛津的 Module 标签，已全部改成「待核实」，并在每册 note 里写明。语法、词汇、语音这些知识点本身与课标一致，照常学；只是「第几单元」的进度推演不准。
-- 已查到的新版单元名（写在 note 里，单元对应的语法点未核实，所以没挂知识点）：
-  - 五上（2026 秋）：Starter、Clubs in our school、Traditional games、Amazing plants、Together with animals、Seeing a doctor、Rise to the challenge、Great scientists、Useful inventions、Using computers、A greener life。
-  - 六上（2024 秋起）：Starter、School life、Family ties（量词、一般过去时）、Food、Sports、Animals and us、Travelling around China。
-- 三上、四上新版目录没找到。
+- 已查到的新版单元名（写在各册 note 里；单元对应的语法点大多没查到，所以还没挂知识点）：
+  - 五上（2026 秋）：Starter、Clubs in our school、Traditional games、Amazing plants、Together with animals、Seeing a doctor、Rise to the challenge、Great scientists、Useful inventions、Using computers、A greener life。两个独立来源一致。
+  - 六上（2024 秋起）：Starter、School life（一般现在时）、Family ties（量词）、Food、Sports、Animals and us、Travelling around China。三个以上来源。
+  - 七上（2024 秋起）：Starter、Trying new things、Strong mind（need / had better）、Jobs、Smart home、Films、Mountains and rivers。三个以上来源。
+  - 八上（2025 秋起）：Water、Digital life、Curious minds、Then and now、Teamwork、Life in the future。两个来源。
+- 三上、四上、九上新版目录没找到。
 
 ## 语文（`chn-tongbian`）
 
@@ -45,7 +47,9 @@
 - 语文列的是六·三制的目录。五·四学制六上和它不一样，五上 2026 秋也有修订。
 - 剑桥代码：Further Mathematics 是 9231，不是「9709 Further」；A Level 中文是 9868，不是 9715；Business 0450 从 2027 年起改为 0264；漏了 0523（中文作为第一语言）。
 
+家长第二次给的上海英语 3–9 年级单元表（2026-10-20）：五上、六上、八上和我们查到的一致；七上（Friendship、School life、The seasons……）、三上（How do we feel? ……）是外省六·三制沪教版的书；四上、九上（九上 8 个单元，新版初中各册都是 6 个单元）查不到任何来源；时间线里「三年级 2024 秋启用」不对，官方目录是 2026 秋。
+
 ## 还要人找的
 
-- 新版英语三上、四上目录，以及各册单元对应的语法点。
+- 新版英语三上、四上、九上目录，以及各册单元对应的语法点。
 - 新版数学三下、四下、五下目录。
