@@ -4,7 +4,7 @@ import json
 from fastapi import APIRouter
 from fastapi import Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from .. import auth, brand, config, db, sitecfg
+from .. import auth, brand, config, db, mailer, sitecfg
 from ..catalog import SUBJECTS, SYSTEMS, catalog, is_adult, stage_label
 from ..library import CATALOG as BOOKS
 from ..web import (
@@ -152,7 +152,40 @@ def reset_submit(request: Request, token: str, password: str = Form(...), passwo
 def settings_page(request: Request, msg: str = "", err: str = "", force: str = ""):
     u = auth.require_user(request)
     return render(request, "settings.html", sessions=auth.sessions_of(u["id"]), this_sid=auth.current_session_hash(request),
-                  msg=msg, err=err)
+                  msg=msg, err=err, mail_kinds={k: (name, mailer.wants(u, k)) for k, name in mailer.KINDS.items()},
+                  mail_on=mailer.settings().enabled)
+
+
+@router.post("/settings/mail")
+async def settings_mail(request: Request):
+    u = auth.require_parent(request)
+    form = await request.form()
+    for kind in mailer.KINDS:
+        mailer.set_wants(u["id"], kind, bool(form.get(kind)))
+    return _back(msg="邮件通知已保存")
+
+
+@router.get("/mail/unsub", response_class=HTMLResponse)
+def mail_unsub_page(request: Request, t: str = ""):
+    """邮件里的「不想再收」：先确认一下（有的邮箱会自动打开信里的链接，不能一打开就退订）。"""
+    who = mailer.read_unsub_token(t)
+    if not who:
+        return render(request, "message.html", title="链接不对", text="这个退订链接不完整或已经失效。可以登录后在「我的账号」里关掉邮件通知。", link="/settings")
+    u = auth.get_user(who[0])
+    return render(request, "mail_unsub.html", token=t, kind_name=mailer.KINDS[who[1]], email=u["email"] if u else "",
+                  done=bool(u) and not mailer.wants(u, who[1]))
+
+
+@router.post("/mail/unsub", response_class=HTMLResponse)
+def mail_unsub(request: Request, t: str = ""):
+    """确认退订；邮箱客户端的「一键退订」（RFC 8058）也是 POST 到这里。"""
+    who = mailer.read_unsub_token(t)
+    if not who or not auth.get_user(who[0]):
+        raise HTTPException(404, "这个退订链接不完整或已经失效")
+    mailer.set_wants(who[0], who[1], False)
+    auth.log_event("mail_unsub", user_id=who[0], detail=who[1], request=request)
+    return render(request, "message.html", title="已退订", text=f"以后不再发「{mailer.KINDS[who[1]]}」。想再收，登录后在「我的账号」里打开。",
+                  link="/settings", link_label="去「我的账号」")
 
 
 @router.post("/settings/mascot")

@@ -35,6 +35,17 @@
   <div style="margin-top:12px"><button class="btn">保存</button></div>
   <p class="muted small for-grownups">改密码后，其他设备上的登录会自动退出。</p>
 </form>
+{% if user.role == 'parent' %}
+<form class="card" method="post" action="/settings/mail">
+  <h3>邮件通知</h3>
+  <p class="muted small">发到登录邮箱 {{ user.email }}。</p>
+  {% for kind, (name, on) in mail_kinds.items() %}
+  <label class="row" style="gap:8px;font-weight:400"><input type="checkbox" name="{{ kind }}" value="1" {{ 'checked' if on }} style="width:auto">{{ name }}<span class="muted small">{% if kind == 'weekly' %}每周一早上，讲每个孩子上周学了几天、进步在哪、系统发现的问题{% endif %}</span></label>
+  {% endfor %}
+  {% if not mail_on %}<p class="muted small">网站还没开通发信，开通后才会收到。</p>{% endif %}
+  <div style="margin-top:12px"><button class="btn">保存</button></div>
+</form>
+{% endif %}
 {% if simple %}<details class="quiet-box"><summary class="quiet-h">⚙️ 更多</summary>{% endif %}
 <div class="card">
   <h3>登录中的设备</h3>

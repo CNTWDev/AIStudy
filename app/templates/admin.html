@@ -379,6 +379,14 @@ $('#bpf').onsubmit = async e => {
     <tr><td>朗读</td><td>{% if tts_status[0] %}<b>可用</b> · {{ tts_status[1] }}{% else %}<b>未开启</b> · {{ tts_status[1] }}{% endif %}
       <div class="muted small">已缓存 {{ tts_stats.ready }} 段 · {{ tts_stats.chars }} 字 · {{ (tts_stats.bytes / 1048576)|round(1) }} MB · 共播放 {{ tts_stats.hits }} 次 · 今天新生成 {{ tts_stats.today_chars }} 字</div>
       <div class="muted small">在服务器 config/tts.toml 修改后重启</div></td></tr>
+    <tr><td>邮件</td><td>{% if mail_status[0] %}<b>可用</b> · {{ mail_status[1] }}{% else %}<b>未开启</b> · {{ mail_status[1] }}{% endif %}
+      <div class="muted small">在服务器 config/mail.toml 修改后重启（配置步骤见 docs/MAIL.md）</div>
+      {% if mail_status[0] %}<form method="post" action="/admin/mail/test" class="row" style="margin-top:6px"><input type="email" name="to" value="{{ me.email }}" required style="width:auto">
+        <button class="btn ghost sm">发一封测试邮件</button></form>{% endif %}
+      {% if mail_recent %}<details class="small" style="margin-top:6px"><summary>最近发的信</summary>
+        {% for m in mail_recent %}<div>{{ m.created_at[5:16]|replace('T',' ') }} · {{ m.to_addr }} · {{ m.subject }} ·
+          <b>{{ {'sent': '已发出', 'queued': '等着发', 'failed': '没发出去'}[m.status] or m.status }}</b>{% if m.error %} <span class="muted">（{{ m.error }}）</span>{% endif %}</div>{% endfor %}
+      </details>{% endif %}</td></tr>
     <tr><td>数据库迁移</td><td class="small">{% for m in migrations %}{{ m.name }}：{{ '已执行' if m.applied_at else '待执行' }}<br>{% endfor %}</td></tr>
   </table></div>
 </div>
