@@ -28,10 +28,13 @@
    "上海教育出版社 义务教育教科书（五·四学制）·数学 一至九年级（2024起）",
    "上海教育出版社 普通高中教科书·数学（2020）必修第一~四册、选择性必修第一~三册",
    "上海市教育考试院 2025/2026 中考、高考（春考、秋考）数学试卷专家点评",
-   "上海市教委《2025年上海市普通高中数学学业水平合格性考试命题要求》"
+   "上海市教委《2025年上海市普通高中数学学业水平合格性考试命题要求》",
+   "https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf",
+   "https://github.com/guchenlong/guchenlong.github.io（上海教师整理的「沪教版 · 2024」小学、初中数学目录）",
+   "https://github.com/wisalu1983-cell/math-quest/blob/main/reference-bank/curriculum/all-grades.md（转录自 51jiaoxi.com/books/3002730、3002897）"
   ],
-  "notes": "版本：沪教版（上海教育出版社）：义务教育教科书（五·四学制）·数学（2024年起按年级换用，主编李大潜；2026年秋季一至九年级均已使用）＋普通高中教科书·数学（2020，必修第一~四册、选择性必修第一~三册）\n上海仍为五四学制（2026年秋季上海编写教学用书目录中义务教育教材均标“五·四学制”）：小学G1-G5、初中G6-G9、高中G10-G12。义务教育数学已换用2024年起审定的新版沪教版（五·四学制）：2024秋 一、六、七年级起用，2025秋 二、八年级，2026秋 三、四、五、九年级——即2026-2027学年一至九年级全部为新教材。新版初中六年级上册为 第1章 有理数、第2章 简单的代数式、第3章 一元一次方程…；七年级上册为 第10章 整式的加减、第11章 整式的乘除、第12章 因式分解、第13章 分式…；原六年级上册“数的整除、分数、比和比例、圆和扇形”及初中“平面向量”在新版中已调出初中（待以课本核实具体去向）。本包G2-G5及G8-G9多数单元仍按旧版“试用本”编排，标注待核实。高中2020新教材：必修一（高一上）、必修二（高一下）、必修三（高二上）、选择性必修一（高二下）、选择性必修二（高三上）；必修四、选择性必修三为数学建模活动册。高考数学（春考/秋考）满分150分、21题（12填空+4选择+5解答）；中考数学2026年起卷面为24题。term 为大致学期，各校进度略有差异；prereqs 中 strength 取 必须/有帮助。",
-  "verified": "2026-10-06",
+  "notes": "版本：沪教版（上海教育出版社）：义务教育教科书（五·四学制）·数学（2024年起按年级换用，主编李大潜；2026年秋季一至九年级均已使用）＋普通高中教科书·数学（2020，必修第一~四册、选择性必修第一~三册）\n上海仍为五四学制（2026年秋季上海编写教学用书目录中义务教育教材均标“五·四学制”）：小学G1-G5、初中G6-G9、高中G10-G12。义务教育数学已换用2024年起审定的新版沪教版（五·四学制）：2024秋 一、六、七年级起用，2025秋 二、八年级，2026秋 三、四、五、九年级——即2026-2027学年一至九年级全部为新教材。2026-10-20 按新版核对：六上（第1–4章：有理数、简单的代数式、一元一次方程、线段与角）、六下（第5–9章：比和比例、圆和扇形、可能性与统计图表、圆柱与圆锥、二元一次方程组）已核对；三上、四上、五上和七上到九下的单元名各只有一处来源（部分核实）；新版三下、四下、五下 2027 春才用，目录待核实，五下暂放分数、长方体和正方体。一、二年级仍按旧版单元整理。新版删去了数的整除（改成五上因数与倍数）、长方体的再认识、代数方程和平面向量（向量到高中学）。高中2020新教材：必修一（高一上）、必修二（高一下）、必修三（高二上）、选择性必修一（高二下）、选择性必修二（高三上）；必修四、选择性必修三为数学建模活动册。高考数学（春考/秋考）满分150分、21题（12填空+4选择+5解答）；中考数学2026年起卷面为24题。term 为大致学期，各校进度略有差异。",
+  "verified": "2026-10-20",
   "system": "cn",
   "school_types": [
    "public",
@@ -228,93 +231,49 @@
    "stage": "G3",
    "term": "上",
    "name": "三年级上册",
-   "status": "legacy",
+   "status": "partial",
+   "sources": [
+    "https://github.com/guchenlong/guchenlong.github.io（上海教师整理的「沪教版 · 2024」小学、初中数学目录）",
+    "https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf"
+   ],
+   "note": "2026 秋新版；单元名只有一处来源。",
    "units": [
     {
-     "name": "口算与估算",
+     "name": "一、两步四则运算与应用题",
      "kps": [
-      "MSH-NUM-16"
+      "MSH-NUM-21",
+      "MSH-APP-04"
      ]
     },
     {
-     "name": "乘法",
+     "name": "二、用一位数乘",
      "kps": [
-      "MSH-NUM-17",
-      "MSH-NUM-20"
+      "MSH-NUM-16",
+      "MSH-NUM-17"
      ]
     },
     {
-     "name": "除法",
+     "name": "三、三角形与四边形",
+     "kps": [
+      "MSH-GEO-02"
+     ]
+    },
+    {
+     "name": "四、用一位数除",
      "kps": [
       "MSH-NUM-18"
      ]
     },
     {
-     "name": "分数的初步认识",
-     "kps": [
-      "MSH-NUM-19"
-     ]
-    },
-    {
-     "name": "长度",
-     "kps": [
-      "MSH-GEO-07"
-     ]
-    },
-    {
-     "name": "质量",
-     "kps": [
-      "MSH-GEO-08"
-     ]
-    },
-    {
-     "name": "周长",
-     "kps": [
-      "MSH-GEO-09"
-     ]
-    }
-   ]
-  },
-  {
-   "stage": "G3",
-   "term": "下",
-   "name": "三年级下册",
-   "status": "legacy",
-   "units": [
-    {
-     "name": "混合运算",
-     "kps": [
-      "MSH-NUM-21"
-     ]
-    },
-    {
-     "name": "小数的初步认识",
-     "kps": [
-      "MSH-NUM-22"
-     ]
-    },
-    {
-     "name": "面积",
-     "kps": [
-      "MSH-GEO-10"
-     ]
-    },
-    {
-     "name": "年月日",
+     "name": "五、年月日的秘密",
      "kps": [
       "MSH-GEO-11"
      ]
     },
     {
-     "name": "统计",
+     "name": "六、周长",
      "kps": [
-      "MSH-STA-01"
-     ]
-    },
-    {
-     "name": "应用题",
-     "kps": [
-      "MSH-APP-04"
+      "MSH-GEO-09"
      ]
     }
    ]
@@ -323,87 +282,50 @@
    "stage": "G4",
    "term": "上",
    "name": "四年级上册",
-   "status": "legacy",
+   "status": "partial",
+   "sources": [
+    "https://github.com/guchenlong/guchenlong.github.io（上海教师整理的「沪教版 · 2024」小学、初中数学目录）",
+    "https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf"
+   ],
+   "note": "2026 秋新版；单元名只有一处来源，「度量衡的故事」单元的内容还没核实。",
    "units": [
     {
-     "name": "大数的认识",
-     "kps": [
-      "MSH-NUM-23"
-     ]
-    },
-    {
-     "name": "乘法",
-     "kps": [
-      "MSH-NUM-24"
-     ]
-    },
-    {
-     "name": "除法",
-     "kps": [
-      "MSH-NUM-25"
-     ]
-    },
-    {
-     "name": "角",
-     "kps": [
-      "MSH-GEO-12"
-     ]
-    },
-    {
-     "name": "垂直与平行",
-     "kps": [
-      "MSH-GEO-13"
-     ]
-    },
-    {
-     "name": "面积",
-     "kps": [
-      "MSH-GEO-14"
-     ]
-    },
-    {
-     "name": "应用题",
-     "kps": [
-      "MSH-APP-05"
-     ]
-    }
-   ]
-  },
-  {
-   "stage": "G4",
-   "term": "下",
-   "name": "四年级下册",
-   "status": "legacy",
-   "units": [
-    {
-     "name": "运算律",
+     "name": "一、运算关系与运算律",
      "kps": [
       "MSH-NUM-26"
      ]
     },
     {
-     "name": "小数",
+     "name": "二、四面八方的学问",
      "kps": [
-      "MSH-NUM-27",
-      "MSH-NUM-28"
+      "MCN-GEO-07"
      ]
     },
     {
-     "name": "三角形",
+     "name": "三、整数的四则运算与应用题",
      "kps": [
-      "MSH-GEO-15"
+      "MSH-NUM-24",
+      "MSH-NUM-25",
+      "MSH-APP-05"
      ]
     },
     {
-     "name": "四边形",
+     "name": "四、大数的认识与改写",
      "kps": [
-      "MSH-GEO-16"
+      "MSH-NUM-23"
      ]
     },
     {
-     "name": "统计",
+     "name": "六、分数的初步认识",
      "kps": [
-      "MSH-STA-02"
+      "MSH-NUM-19"
+     ]
+    },
+    {
+     "name": "七、线与角",
+     "kps": [
+      "MSH-GEO-12",
+      "MSH-GEO-13"
      ]
     }
    ]
@@ -412,33 +334,38 @@
    "stage": "G5",
    "term": "上",
    "name": "五年级上册",
-   "status": "legacy",
+   "status": "partial",
+   "sources": [
+    "https://github.com/guchenlong/guchenlong.github.io（上海教师整理的「沪教版 · 2024」小学、初中数学目录）",
+    "https://edu.sh.gov.cn/cmsres/7a/7aed3909441a4c849d5d78b8d914f4fb/00e155989221056fb74efd6f967939f0.pdf"
+   ],
+   "note": "2026 秋新版；单元名只有一处来源。简易方程移到了六上。",
    "units": [
     {
-     "name": "小数乘除法",
+     "name": "一、小数的乘法与除法",
      "kps": [
       "MSH-NUM-29",
       "MSH-NUM-30"
      ]
     },
     {
-     "name": "简易方程",
-     "kps": [
-      "MSH-ALG-01",
-      "MSH-ALG-02"
-     ]
-    },
-    {
-     "name": "统计",
+     "name": "三、平均数",
      "kps": [
       "MSH-STA-03"
      ]
     },
     {
-     "name": "多边形面积",
+     "name": "五、面积的计算",
      "kps": [
       "MSH-GEO-17",
       "MSH-GEO-18"
+     ]
+    },
+    {
+     "name": "七、因数与倍数",
+     "kps": [
+      "MSH-NUM-32",
+      "MSH-NUM-33"
      ]
     }
    ]
@@ -446,57 +373,13 @@
   {
    "stage": "G5",
    "term": "下",
-   "name": "五年级下册",
-   "status": "legacy",
+   "name": "五年级下册（2027 春新版，目录待核实）",
+   "status": "pending",
+   "sources": [],
+   "note": "新版五下 2027 春才用；分数、长方体和正方体大概率在这一册，没核实。",
    "units": [
     {
-     "name": "列方程解应用题",
-     "kps": [
-      "MSH-APP-06"
-     ]
-    },
-    {
-     "name": "正数和负数",
-     "kps": [
-      "MSH-NUM-31"
-     ]
-    },
-    {
-     "name": "长方体和正方体",
-     "kps": [
-      "MSH-GEO-19",
-      "MSH-GEO-20"
-     ]
-    },
-    {
-     "name": "体积",
-     "kps": [
-      "MSH-GEO-21"
-     ]
-    },
-    {
-     "name": "可能性",
-     "kps": [
-      "MSH-STA-04"
-     ]
-    }
-   ]
-  },
-  {
-   "stage": "G6",
-   "term": "上",
-   "name": "六年级上册",
-   "status": "legacy",
-   "units": [
-    {
-     "name": "数的整除",
-     "kps": [
-      "MSH-NUM-32",
-      "MSH-NUM-33"
-     ]
-    },
-    {
-     "name": "分数",
+     "name": "分数（推测）",
      "kps": [
       "MSH-NUM-34",
       "MSH-NUM-35",
@@ -505,45 +388,53 @@
      ]
     },
     {
-     "name": "比和比例",
+     "name": "长方体和正方体（推测）",
      "kps": [
-      "MSH-NUM-37"
+      "MSH-GEO-19",
+      "MSH-GEO-20",
+      "MSH-GEO-21"
      ]
-    },
-    {
-     "name": "百分比",
-     "kps": [
-      "MSH-APP-08"
-     ]
-    },
-    {
-     "name": "圆和扇形",
-     "kps": [
-      "MSH-GEO-22"
-     ]
-    },
+    }
+   ]
+  },
+  {
+   "stage": "G6",
+   "term": "上",
+   "name": "六年级上册",
+   "status": "verified",
+   "sources": [
+    "https://max.book118.com/html/2025/0522/8111027131007067.shtm",
+    "https://max.book118.com/html/2025/0519/6221155213011130.shtm",
+    "https://github.com/wisalu1983-cell/math-quest/blob/main/reference-bank/curriculum/all-grades.md（转录自 51jiaoxi.com/books/3002730、3002897）"
+   ],
+   "units": [
     {
      "name": "第1章 有理数",
      "kps": [
-      "MSH-NUM-38"
-     ]
-    },
-    {
-     "name": "第1章 有理数（1.2-1.5 加减、乘除、乘方、混合运算）",
-     "kps": [
+      "MSH-NUM-31",
+      "MSH-NUM-38",
       "MSH-NUM-39"
-     ]
-    },
-    {
-     "name": "第3章 一元一次方程",
-     "kps": [
-      "MSH-ALG-03"
      ]
     },
     {
      "name": "第2章 简单的代数式",
      "kps": [
+      "MSH-ALG-01",
       "MSH-ALG-20"
+     ]
+    },
+    {
+     "name": "第3章 一元一次方程",
+     "kps": [
+      "MSH-ALG-02",
+      "MSH-ALG-03",
+      "MSH-APP-06"
+     ]
+    },
+    {
+     "name": "第4章 线段与角",
+     "kps": [
+      "MSH-GEO-23"
      ]
     }
    ]
@@ -552,36 +443,42 @@
    "stage": "G6",
    "term": "下",
    "name": "六年级下册",
-   "status": "legacy",
+   "status": "verified",
+   "sources": [
+    "https://github.com/wisalu1983-cell/math-quest/blob/main/reference-bank/curriculum/all-grades.md（转录自 51jiaoxi.com/books/3002730、3002897）",
+    "https://github.com/guchenlong/guchenlong.github.io（上海教师整理的「沪教版 · 2024」小学、初中数学目录）"
+   ],
    "units": [
     {
-     "name": "不等式",
+     "name": "第5章 比和比例",
      "kps": [
-      "MSH-ALG-04"
+      "MSH-NUM-37",
+      "MSH-APP-08"
      ]
     },
     {
-     "name": "方程组",
+     "name": "第6章 圆和扇形",
      "kps": [
-      "MSH-ALG-05"
+      "MSH-GEO-22"
      ]
     },
     {
-     "name": "线段与角",
+     "name": "第7章 可能性与统计图表",
      "kps": [
-      "MSH-GEO-23"
+      "MSH-STA-04",
+      "MCN-STA-02"
      ]
     },
     {
-     "name": "长方体的再认识",
-     "kps": [
-      "MSH-GEO-24"
-     ]
-    },
-    {
-     "name": "圆柱与圆锥（新版，待核实）",
+     "name": "第8章 圆柱与圆锥",
      "kps": [
       "MSH-GEO-54"
+     ]
+    },
+    {
+     "name": "第9章 二元一次方程组",
+     "kps": [
+      "MSH-ALG-05"
      ]
     }
    ]
@@ -589,8 +486,11 @@
   {
    "stage": "G7",
    "term": "上",
-   "name": "初一上册",
-   "status": "legacy",
+   "name": "七年级上册",
+   "status": "partial",
+   "sources": [
+    "https://github.com/guchenlong/guchenlong.github.io（上海教师整理的「沪教版 · 2024」小学、初中数学目录）"
+   ],
    "units": [
     {
      "name": "第10章 整式的加减",
@@ -618,7 +518,7 @@
      ]
     },
     {
-     "name": "图形的运动",
+     "name": "第14章 图形的运动",
      "kps": [
       "MSH-GEO-25"
      ]
@@ -628,43 +528,37 @@
   {
    "stage": "G7",
    "term": "下",
-   "name": "初一下册",
-   "status": "legacy",
+   "name": "七年级下册",
+   "status": "partial",
+   "sources": [
+    "https://github.com/guchenlong/guchenlong.github.io（上海教师整理的「沪教版 · 2024」小学、初中数学目录）",
+    "https://www.sohu.com/a/766290509_121124020"
+   ],
    "units": [
     {
-     "name": "实数",
+     "name": "第15章 一元一次不等式",
      "kps": [
-      "MSH-NUM-40"
+      "MSH-ALG-04"
      ]
     },
     {
-     "name": "相交线与平行线",
+     "name": "第16章 相交线与平行线",
      "kps": [
       "MSH-GEO-26"
      ]
     },
     {
-     "name": "三角形",
+     "name": "第17章 三角形",
      "kps": [
-      "MSH-GEO-27"
+      "MSH-GEO-27",
+      "MSH-GEO-28",
+      "MSH-GEO-30"
      ]
     },
     {
-     "name": "全等三角形",
-     "kps": [
-      "MSH-GEO-28"
-     ]
-    },
-    {
-     "name": "等腰三角形",
+     "name": "第18章 等腰三角形",
      "kps": [
       "MSH-GEO-29"
-     ]
-    },
-    {
-     "name": "平面直角坐标系",
-     "kps": [
-      "MSH-FUN-01"
      ]
     }
    ]
@@ -672,35 +566,34 @@
   {
    "stage": "G8",
    "term": "上",
-   "name": "初二上册",
-   "status": "legacy",
+   "name": "八年级上册",
+   "status": "partial",
+   "sources": [
+    "https://github.com/guchenlong/guchenlong.github.io（上海教师整理的「沪教版 · 2024」小学、初中数学目录）",
+    "https://www.sohu.com/a/766290509_121124020"
+   ],
    "units": [
     {
-     "name": "二次根式",
+     "name": "第19章 实数",
+     "kps": [
+      "MSH-NUM-40"
+     ]
+    },
+    {
+     "name": "第20章 二次根式",
      "kps": [
       "MSH-NUM-41"
      ]
     },
     {
-     "name": "一元二次方程",
+     "name": "第21章 一元二次方程",
      "kps": [
-      "MSH-ALG-11"
+      "MSH-ALG-11",
+      "MSH-APP-09"
      ]
     },
     {
-     "name": "正比例函数与反比例函数",
-     "kps": [
-      "MSH-FUN-02"
-     ]
-    },
-    {
-     "name": "几何证明",
-     "kps": [
-      "MSH-GEO-30"
-     ]
-    },
-    {
-     "name": "直角三角形",
+     "name": "第22章 直角三角形",
      "kps": [
       "MSH-GEO-31"
      ]
@@ -710,50 +603,40 @@
   {
    "stage": "G8",
    "term": "下",
-   "name": "初二下册",
-   "status": "legacy",
+   "name": "八年级下册",
+   "status": "partial",
+   "sources": [
+    "https://github.com/guchenlong/guchenlong.github.io（上海教师整理的「沪教版 · 2024」小学、初中数学目录）",
+    "https://www.sohu.com/a/766290509_121124020",
+    "https://www.sohu.com/a/916299644_121124319"
+   ],
+   "note": "反比例函数在八下还是九上，两处说法不一致，按目录列在八下。",
    "units": [
     {
-     "name": "一次函数",
-     "kps": [
-      "MSH-FUN-03"
-     ]
-    },
-    {
-     "name": "代数方程",
-     "kps": [
-      "MSH-ALG-12"
-     ]
-    },
-    {
-     "name": "方程应用",
-     "kps": [
-      "MSH-APP-09"
-     ]
-    },
-    {
-     "name": "四边形",
+     "name": "第23章 四边形",
      "kps": [
       "MSH-GEO-32",
-      "MSH-GEO-33"
-     ]
-    },
-    {
-     "name": "梯形",
-     "kps": [
+      "MSH-GEO-33",
       "MSH-GEO-34"
      ]
     },
     {
-     "name": "平面向量",
+     "name": "第24章 平面直角坐标系",
      "kps": [
-      "MSH-GEO-35"
+      "MSH-FUN-01"
      ]
     },
     {
-     "name": "概率初步",
+     "name": "第25章 一次函数",
      "kps": [
-      "MSH-STA-05"
+      "MSH-FUN-02",
+      "MSH-FUN-03"
+     ]
+    },
+    {
+     "name": "第26章 反比例函数",
+     "kps": [
+      "MSH-FUN-02"
      ]
     }
    ]
@@ -761,33 +644,37 @@
   {
    "stage": "G9",
    "term": "上",
-   "name": "初三上册",
-   "status": "legacy",
+   "name": "九年级上册",
+   "status": "partial",
+   "sources": [
+    "https://github.com/guchenlong/guchenlong.github.io（上海教师整理的「沪教版 · 2024」小学、初中数学目录）",
+    "https://www.sohu.com/a/916299644_121124319"
+   ],
    "units": [
     {
-     "name": "相似三角形",
+     "name": "第27章 二次函数",
+     "kps": [
+      "MSH-FUN-04"
+     ]
+    },
+    {
+     "name": "第28章 相似三角形",
      "kps": [
       "MSH-GEO-36",
       "MSH-GEO-37"
      ]
     },
     {
-     "name": "锐角三角比",
+     "name": "第29章 三角初步",
      "kps": [
       "MSH-GEO-38",
       "MSH-APP-10"
      ]
     },
     {
-     "name": "向量的线性运算",
+     "name": "第30章 投影与视图",
      "kps": [
-      "MSH-GEO-39"
-     ]
-    },
-    {
-     "name": "二次函数",
-     "kps": [
-      "MSH-FUN-04"
+      "MCN-GEO-03"
      ]
     }
    ]
@@ -795,27 +682,40 @@
   {
    "stage": "G9",
    "term": "下",
-   "name": "初三下册",
-   "status": "legacy",
+   "name": "九年级下册",
+   "status": "partial",
+   "sources": [
+    "https://github.com/guchenlong/guchenlong.github.io（上海教师整理的「沪教版 · 2024」小学、初中数学目录）",
+    "https://www.sohu.com/a/916299644_121124319"
+   ],
    "units": [
+    {
+     "name": "第31章 圆",
+     "kps": [
+      "MSH-GEO-40",
+      "MCN-GEO-04",
+      "MSH-GEO-41"
+     ]
+    },
+    {
+     "name": "第32章 抽样与数据分析",
+     "kps": [
+      "MSH-STA-06",
+      "MCN-STA-02",
+      "MCN-STA-03"
+     ]
+    },
+    {
+     "name": "第33章 概率初步",
+     "kps": [
+      "MSH-STA-05"
+     ]
+    },
     {
      "name": "中考复习",
      "kps": [
       "MSH-FUN-05",
       "MSH-GEO-42"
-     ]
-    },
-    {
-     "name": "圆",
-     "kps": [
-      "MSH-GEO-40",
-      "MSH-GEO-41"
-     ]
-    },
-    {
-     "name": "统计初步",
-     "kps": [
-      "MSH-STA-06"
      ]
     }
    ]

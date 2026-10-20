@@ -39,7 +39,8 @@
    "private"
   ],
   "base": "eng-cn",
-  "kind": "textbook"
+  "kind": "textbook",
+  "note": "3–9 年级的册目前按旧牛津上海版单元排，标「待核实」：知识点（语法、词汇、语音）与课标一致可以照常学，只是「第几单元」的进度推演不准。新版五上、六上单元名见各册 note。"
  },
  "books": [
   {
@@ -191,7 +192,7 @@
    "stage": "G3",
    "term": "上",
    "name": "三年级上册",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "3A Learn the sounds",
@@ -242,13 +243,14 @@
       "ESH-GRA-13"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G3",
    "term": "",
    "name": "三年级",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "3A–3B Read a story / Look and read",
@@ -256,13 +258,14 @@
       "ESH-REA-02"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G3",
    "term": "下",
    "name": "三年级下册",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "3B Learn the sounds",
@@ -295,13 +298,14 @@
       "ESH-WRI-02"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G4",
    "term": "上",
    "name": "四年级上册",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "4A Learn the sounds",
@@ -333,13 +337,14 @@
       "ESH-GRA-17"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G4",
    "term": "",
    "name": "四年级",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "4A–4B Read a story",
@@ -347,13 +352,14 @@
       "ESH-REA-03"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G4",
    "term": "下",
    "name": "四年级下册",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "4B Learn the sounds",
@@ -392,13 +398,14 @@
       "ESH-LIS-07"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G5",
    "term": "上",
    "name": "五年级上册",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "5A Learn the sounds",
@@ -430,13 +437,14 @@
       "ESH-GRA-26"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。新版五上（2026秋）单元：Starter; Unit 1 Clubs in our school; Unit 2 Traditional games; Unit 3 Amazing plants; Unit 4 Together with animals; Unit 5 Seeing a doctor; Unit 6 Rise to the challenge; Unit 7 Great scientists; Unit 8 Useful inventions; Unit 9 Using computers; Unit 10 A greener life（单一来源 dzkbw.com ws5s_2026，各单元语法点未核实）。"
   },
   {
    "stage": "G5",
    "term": "",
    "name": "五年级",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "5A–5B Read a story / Read and answer",
@@ -450,13 +458,14 @@
       "ESH-LIS-08"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G5",
    "term": "下",
    "name": "五年级下册",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "5B Module 1–2",
@@ -482,13 +491,14 @@
       "ESH-WRI-04"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G6",
    "term": "上",
    "name": "六年级上册",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "6A 语音（国际音标）",
@@ -520,13 +530,14 @@
       "ESH-GRA-31"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。新版六上（2024秋起）单元：Starter; Unit 1 School life; Unit 2 Family ties（量词、一般过去时）; Unit 3 Food; Unit 4 Sports; Unit 5 Animals and us; Unit 6 Travelling around China（renjiaoshe.com/jiaocai/3372、21cnjy 23407121；U3–U6 单一来源）。"
   },
   {
    "stage": "G6",
    "term": "",
    "name": "六年级",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "6A–6B Reading",
@@ -540,13 +551,14 @@
       "ESH-LIS-09"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G6",
    "term": "下",
    "name": "六年级下册",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "6A–6B",
@@ -573,13 +585,14 @@
       "ESH-WRI-05"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G7",
    "term": "上",
    "name": "初一上册",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "7A",
@@ -589,13 +602,14 @@
       "ESH-GRA-40"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G7",
    "term": "",
    "name": "初一",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "7A–7B",
@@ -622,13 +636,14 @@
       "ESH-LIS-10"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G7",
    "term": "下",
    "name": "初一下册",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "7B",
@@ -638,13 +653,14 @@
       "ESH-GRA-39"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G8",
    "term": "上",
    "name": "初二上册",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "8A",
@@ -653,13 +669,14 @@
       "ESH-GRA-43"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G8",
    "term": "",
    "name": "初二",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "8A–8B",
@@ -693,13 +710,14 @@
       "ESH-REA-14"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G8",
    "term": "下",
    "name": "初二下册",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "8B",
@@ -710,13 +728,14 @@
       "ESH-GRA-47"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G9",
    "term": "上",
    "name": "初三上册",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "9A",
@@ -725,13 +744,14 @@
       "ESH-PHO-10"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G9",
    "term": "",
    "name": "初三",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "9A–9B 中考复习",
@@ -749,13 +769,14 @@
       "ESH-WRI-14"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G9",
    "term": "下",
    "name": "初三下册",
-   "status": "legacy",
+   "status": "pending",
    "units": [
     {
      "name": "9B",
@@ -766,7 +787,8 @@
       "ESH-GRA-54"
      ]
     }
-   ]
+   ],
+   "note": "单元名沿用旧《英语（牛津上海版）》；2026-27 学年上海 3–9 年级已全部换成五·四学制新版（束定芳主编，上海教育出版社），新版各单元对应的语法/词汇点待核实。"
   },
   {
    "stage": "G10",
