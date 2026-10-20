@@ -347,6 +347,16 @@ class Catalog:
             if book["status"] in ("verified", "partial") and not book["sources"]:
                 self.errors.append(f"{pack.id}: {book['name']} 缺少目录来源")
             out.append(book)
+        # 语音、阅读这类板块不归哪一个单元、每个单元都在练（strand.throughout）：目录列了这个年级的册，就记在这一学年
+        # 第一册的 throughout 里，算这一年的内容，但不占章（不参与按章推演学校进度）
+        throughout = {s["id"] for s in base.strands if s.get("throughout")}
+        for k in base.kp_ids + own:
+            kp = self.kps[k]
+            book = next((b for b in sorted(out, key=lambda b: TERM_RANK.get(b["term"], 1)) if b["stage"] == kp["stage"]), None)
+            if k in view or kp["strand"] not in throughout or not book:
+                continue
+            book.setdefault("throughout", []).append(k)
+            view[k] = {**kp, "stage": book["stage"], "term": book["term"], "unit": ""}
         listed = {(b["stage"], t) for b in out for t in ((b["term"],) if b["term"] in TERM_RANK else TERM_RANK)}
         open_slots = [(s, t) for s in sorted(set(pack.stages) or {b["stage"] for b in out}, key=stage_rank)
                       for t in TERM_RANK if (s, t) not in listed]
@@ -368,7 +378,7 @@ class Catalog:
             unit["kps"].append(k)
             view[k] = {**self.kps[k], "stage": stage, "term": term, "unit": strand}
         out = sorted(out + list(auto.values()), key=lambda b: (stage_rank(b["stage"]), TERM_RANK.get(b["term"], 1)))
-        order = list(dict.fromkeys(k for b in out for u in b["units"] for k in u["kps"]))
+        order = list(dict.fromkeys(k for b in out for k in [x for u in b["units"] for x in u["kps"]] + b.get("throughout", [])))
         order += [k for k in own if k not in view]   # 本包自己的点没进目录：按它自己写的学段
         pack.kp_ids, pack.books, self.views[pack.id] = order, out, {**{k: self.kps[k] for k in own}, **view}
 

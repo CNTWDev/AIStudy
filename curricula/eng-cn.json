@@ -34,7 +34,8 @@
  "strands": [
   {
    "id": "PHO",
-   "name": "语音"
+   "name": "语音",
+   "throughout": true
   },
   {
    "id": "VOC",
@@ -46,16 +47,19 @@
   },
   {
    "id": "REA",
-   "name": "阅读"
+   "name": "阅读",
+   "throughout": true
   },
   {
    "id": "WRI",
-   "name": "写作"
+   "name": "写作",
+   "throughout": true
   },
   {
    "id": "LIS",
    "name": "听说",
-   "audio": true
+   "audio": true,
+   "throughout": true
   }
  ],
  "kps": [
