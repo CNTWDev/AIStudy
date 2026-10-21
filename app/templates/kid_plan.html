@@ -93,18 +93,23 @@
   {% else %}<p class="small">书库里的书还没下载好（管理员在「管理 → 书库」里下载）。</p>{% endif %}
 </div>
 
-<div class="card">
-  <div class="card-h"><span class="ico">🔤</span><h3>每天学新词</h3></div>
-  {{ current('words', '学') }}
-  <p class="muted small">每天自动从词表里取几个新词放进「单词复习」，之后按 1→2→4→7→15→30 天重复。孩子阅读时自己收藏的生词也会一起复习。</p>
-  <form method="post" action="/parent/kids/{{ k.id }}/tracks">
+<div class="card" id="words">
+  <div class="card-h"><span class="ico">🔤</span><h3>单词包</h3></div>
+  <p class="muted small">按年级和选的课自动挂好了，一般不用改。每天的新词从标着「每天新词」的包里来：已经会的跳过，同一组里隔着挑（意思挨着的词不在同一天学），先学一遍再进复习。要复习的词欠得多，新词会自动少加。{{ k.name }} 认识的词：<b>{{ wstats.known }}</b> 个。</p>
+  {% for a in wpacks %}{% set st = wstats.packs|selectattr('id', 'equalto', a.pack.id)|first %}
+  <form method="post" action="/parent/kids/{{ k.id }}/tracks" class="wp-row{{ ' off' if not a.on }}">
+    <input type="hidden" name="kind" value="words"><input type="hidden" name="ref" value="{{ a.pack.id }}">
+    <div class="grow"><b>{{ a.pack.title }}</b>
+      <div class="small muted">{% if not a.on %}已停用{% else %}{% if a.main %}每天新词 · {% endif %}{% if st %}抓牢 {{ st.caught }} / {{ st.total }} 个{% endif %}{% endif %}{% if a.auto %} · 自动挂的{% else %} · 家长加的{% endif %}</div></div>
+    {% if a.on %}{% if a.main %}<label class="small nw">每天 <input type="number" name="daily_amount" value="{{ a.per_day }}" min="0" max="30" style="width:64px"> 个</label><button class="btn sm soft">保存</button>{% endif %}
+    <button class="btn sm ghost" name="action" value="stop">停用</button>{% else %}<button class="btn sm soft" name="action" value="on">重新用</button>{% endif %}
+  </form>
+  {% else %}<p class="small">还没有单词包：选了英语课以后会按年级自动挂上，也可以在下面加一个。</p>{% endfor %}
+  <form method="post" action="/parent/kids/{{ k.id }}/tracks" class="row" style="margin-top:10px">
     <input type="hidden" name="kind" value="words">
-    <select name="ref">{% for id, wl in content.word_lists.items() %}<option value="{{ id }}">{{ wl.title }}（{{ wl.words|length }} 词）</option>{% endfor %}</select>
-    <div class="row">
-      <div><label>每天几个新词</label><input type="number" name="daily_amount" value="8" min="1" max="30"></div>
-      <div><label>从第几个开始（已会的可跳过）</label><input type="number" name="position" value="0" min="0"></div>
-    </div>
-    <div style="margin-top:10px"><button class="btn">{{ '换成这个词表' if active.words else '开始' }}</button></div>
+    <select name="ref" class="grow"><option value="">加一个单词包…</option>{% for id, wl in content.word_lists.items() if id not in wpacks|map(attribute='pack.id')|list %}<option value="{{ id }}">{{ wl.title }}（{{ wl.words|length }} 词）</option>{% endfor %}</select>
+    <label class="small nw">每天 <input type="number" name="daily_amount" value="5" min="0" max="30" style="width:64px"> 个</label>
+    <button class="btn sm">加上</button>
   </form>
 </div>
 

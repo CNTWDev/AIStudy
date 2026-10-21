@@ -847,6 +847,23 @@ math-cn（kind: standard，主干）     知识点、前置、题、讲解、掌
 - nginx：回包带 `X-Accel-Buffering: no`，宝塔 nginx 不会攒着一起给；等太久时每 10 秒发一个空行，不会被当成断了。
 - 快不快：真正的时间花在 AI 想（这几种用 effort=medium）。边写边看以后，从按下到看见第一句话就是 AI 开始写的时候，不用等整份写完。要再快，可以在 `config/llm.toml` 的 `[tasks.discuss]` / `[tasks.discuss_close]` / `[tasks.review]` 里单独把 effort 调成 low，不用改代码（想得会浅一点）。
 
+### 5.41 单词：单词包 → 每天新词 → 每个词的等级 → 用出来（`app/words.py`）
+
+单词是一个成体系的模块，不只是做题、查词时顺手攒下的卡片。四层，一条线：
+
+- **单词包**：现有词表（`content/words_en.json` 的年级核心词、学科术语）就是包。孩子按年级、教材自动挂（`word_packs.state='auto'`，用的时候才建行）：本年级的包是「主包」，每天加新词；低年级的包只在闪测和游戏里用。家长在「学习安排 → 单词包」里加、停、改每天几个；成人（含家里自管的成人）不自动加新词，在「🗺️ 我的词」页自己选。原来的「每天新词」（`tracks.kind='words'`）迁移进 `word_packs`（迁移 0045）。停掉的包：卡片暂停（`engine.Paused`），记录都在。
+- **每天新词**（`words.daily_new`，排今天计划时调用）：每个主包补到当天的量（小学 4、中学 5、成人 6，家长可改；当天调大了当场补齐）。一组 12 个词里隔 3 个挑（同一话题的词不在同一天），已经认得的跳过（热身、闪测里答对过），欠着要复习的太多先少加（40 个减半、80 个停）。新词卡带 `extra.new`。
+- **每个词的等级**（`words.ladder`，从 `events` 重放，不另存）：认得（看英文选中文）→ 听得出 → 想得起（看中文选英文）→ 拼得出 → 用得对（句子补洞）。某一级在两天以上答对才算到这一级；最近一次答错的词是「有点晃」。复习卡、闪测、乐园的每一次作答都经 `words.log_answer` 记一条 `target='word'` 的事件，带 `tier`。「我认识的词」只增不减（到过「认得」就算）。
+- **用出来**：例句库 `word_examples`，按学段（primary / secondary / adult）一个词两句，AI 写一次、所有人复用（`tasks.word_examples`，词用 `[[ ]]` 标出、句子里有线索）；后台按今天要用的词提前写（`words.prepare`，跟着 `prefetch.MODE`），没写好之前退回别的题型，不让孩子等。
+
+复习页（`/review?group=words`，标题「单词」）：新词第一次是**学习卡**——先猜意思（不算对错，记 `guess` 事件）→ 揭晓中文和例句 → 用一次（句子补洞）。复习过一轮放回句子里选词，等级到「拼得出」后隔一次出补洞拼写。答错的说「差一点，是 …」，这一轮最后再来一次。
+
+乐园「句子补洞」（`games/cloze.py`、`static/play/cloze.js`）：小路断成 6–10 截，补对一个洞落一块木板、小人往前走，走到旗子过关。题只出句子补洞（`Game.ask`），答错不扣命，这个词隔几道再来；不读整句（会把答案读出来）。用游戏时间；今天计划里的「单词」任务算学习。
+
+「🗺️ 我的词」（`/words/map`）：我认识的词有多少、有点晃的词、每个包按组的进度（抓住几个 / 见过几个）。孩子说法：没有「背、考、任务、错」，用「抓住、找回来、差一点」。
+
+还没做（内容和后续游戏）：课本单元词表（要先核对教材）、成人高频词表（NGSL）、听音抓泡泡、拼词搭桥、单词打怪（合作）、找错词侦探。讨论稿：`docs/英语单词游戏与单词系统-讨论稿.md`（项目文件夹）。
+
 ## 6. AI 抽象层与使用原则
 
 - **配置和代码分离**：提供方、模型、密钥、每日上限、按任务路由都在 `config/llm.toml`（模板 `config/llm.example.toml`），改完重启服务生效，不用改代码。值可以写成 `"${环境变量}"`。
@@ -865,7 +882,7 @@ math-cn（kind: standard，主干）     知识点、前置、题、讲解、掌
 
 ## 7. 数据表
 
-`users`（家长/孩子；`settings.method` 是学习方式）· `focus_blocks` / `focus_leaves`（一口气和每次离开，5.36）· `enrollments`（孩子选的教材包和当前学段）· `events`（学习事件：所有学习证据，掌握度按它重放）· `mastery`（掌握度，带模型指纹）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读/新词进度）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· 乐园：`arena_ability` / `arena_calib` / `arena_matches` / `arena_answers` / `arena_ledger` / `arena_awards`（贴纸）/ `game_rooms` / `room_members`（房间、成员、在用的设备）/ `game_sessions`（每一局，`state` 是玩的时候的存档）/ `game_runs`（每支队伍每关的最好成绩）· `traces`（追根：每次测了什么、根在哪）· `streak_freezes`（补签卡）· `sprint_runs`（冲刺）· `mix_sets`（每门课每天一组混合练习）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
+`users`（家长/孩子；`settings.method` 是学习方式）· `focus_blocks` / `focus_leaves`（一口气和每次离开，5.36）· `enrollments`（孩子选的教材包和当前学段）· `events`（学习事件：所有学习证据，掌握度按它重放）· `mastery`（掌握度，带模型指纹）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读进度）· `word_packs` / `word_examples`（单词包、例句，5.41）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· 乐园：`arena_ability` / `arena_calib` / `arena_matches` / `arena_answers` / `arena_ledger` / `arena_awards`（贴纸）/ `game_rooms` / `room_members`（房间、成员、在用的设备）/ `game_sessions`（每一局，`state` 是玩的时候的存档）/ `game_runs`（每支队伍每关的最好成绩）· `traces`（追根：每次测了什么、根在哪）· `streak_freezes`（补签卡）· `sprint_runs`（冲刺）· `mix_sets`（每门课每天一组混合练习）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
 
 ## 8. 后续路线
 

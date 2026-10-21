@@ -151,7 +151,7 @@ def _task_run(key, t):
 
 
 def prepare_task(user_id: int, t: dict) -> None:
-    """给一项任务备题：混合练习建好题单、备前 LOOKAHEAD 道；学知识点的备练习题（学新 / 预习连讲解）；热身备摸底题。"""
+    """给一项任务备题：混合练习建好题单、备前 LOOKAHEAD 道；学知识点的备练习题（学新 / 预习连讲解）；热身备摸底题；单词写例句。"""
     from . import explore, mix
     u = db.one("SELECT grade FROM users WHERE id=?", user_id)
     grade = (u and u["grade"]) or ""
@@ -160,6 +160,9 @@ def prepare_task(user_id: int, t: dict) -> None:
         ahead(user_id, db.jload(s["slots"], []), s["pos"], grade)
     elif t.get("type") in LEARN_TYPES and t.get("kp"):
         kick(user_id, t["kp"], 3, "preview" if t["type"] == "preview" else "practice", grade, teach=t["type"] in ("sync", "preview"))
+    elif t.get("type") == "words":   # 单词：今天的新词和要复习的词先把例句写好（新词学一遍时、复习补句子时用）
+        from . import words
+        words.prepare(user_id)
     elif t.get("type") == "warmup":
         for c in explore.candidates(user_id)[:WARMUP_PROBES]:
             kick(user_id, c["kp"], 1, "diagnose", grade)

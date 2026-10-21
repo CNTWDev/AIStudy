@@ -12,6 +12,7 @@
        end() {},                 // 这一关停下了（结束、换设备）：停掉循环
        onAnswer(res) {}, onXP(res) {}, onQuizOpen() {}, onQuizClose() {}, onRevive(info) {},
        revive: {need: 5, grow: false, verb: '接着打', done: '…'},   // 倒下答题的规矩（不写：答对 1 道复活、答错多欠 1 道）
+       quizOpts: {rightHtml, wrongHtml, nextDelay},   // 答题面板的额外选项（quiz.js：答对、答错时多显示什么，答对后隔多久出下一题）
        pause(on, ms) {},         // 暂停 / 继续了（游戏循环外壳会停，自己用墙上时钟算时间的游戏在这里把暂停的 ms 补上）
        verdict(res) {},          // 对战：这一局对我来说是赢还是输 → {result, title, why}（res 是房主报的结果）
        save() {},                // 我自己的状态，每 2 秒存到服务器（写了它，刷新、换设备才能接着玩）
@@ -398,10 +399,10 @@
       sh.match = match;
       if (net) net.send({t: 'here', playing: cur.session});
       if (quiz) quiz.destroy();
-      quiz = sh.quiz = new ArenaQuiz({matchId: match.match_id, dock: quizMode === 'dock' ? sh.dock : null,
+      quiz = sh.quiz = new ArenaQuiz(Object.assign({}, def.quizOpts || {}, {matchId: match.match_id, dock: quizMode === 'dock' ? sh.dock : null,
         sticky: quizMode === 'revive', autoNext: quizMode === 'revive', mount: quizMode === 'revive' ? stageEl : null,
         onAnswer: r => { onReviveAnswer(r); if (def.onAnswer) def.onAnswer(r, sh); }, onXP: r => def.onXP && def.onXP(r, sh),
-        onOpen: () => def.onQuizOpen && def.onQuizOpen(sh), onClose: () => def.onQuizClose && def.onQuizClose(sh)});
+        onOpen: () => def.onQuizOpen && def.onQuizOpen(sh), onClose: () => def.onQuizClose && def.onQuizClose(sh)}));
       if (quizMode === 'revive') quiz.el.querySelector('.aq-card').insertAdjacentHTML('afterbegin', '<div class="mp-debt"></div>');
       if (quizMode === 'dock') { sh.dock.hidden = false; quiz.el.classList.add('wait'); }
       myDeaths = resume ? resume.deaths || 0 : 0; peerDeaths = resume ? resume.peer_deaths || 0 : 0;

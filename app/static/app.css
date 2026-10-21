@@ -987,3 +987,23 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 @media print{header.top,.kc-actions,.kc-tip{display:none!important}.kcard{box-shadow:none;border:2px dashed #999}}
 .kl-pin[data-mode=pin] .kl-for-pw,.kl-pin[data-mode=pw] .kl-for-pin{display:none}
 .kl-for-pin{display:grid;justify-items:center;gap:14px}.kl-for-pw{display:grid;gap:12px;width:100%}
+/* 家长页：单词包一行一个（kid_plan.html） */
+.wp-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line)}
+.wp-row.off{opacity:.6}
+/* 单词：句子补洞的洞、新词学习卡（review.html） */
+.face.cloze .cz{font-size:1.15em;line-height:1.7;margin-bottom:6px}
+.gap{display:inline-block;min-width:4.2em;height:1.2em;vertical-align:-.15em;border-bottom:3px dashed var(--brand);margin:0 .2em}
+.gap.full{min-width:0;height:auto;border-bottom:3px solid var(--brand);padding:0 .2em;color:var(--ink);animation:gapin .35s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes gapin{0%{transform:translateY(-10px);opacity:0}100%{transform:none;opacity:1}}
+.lw{font-size:1.6em;font-weight:800;letter-spacing:.01em}
+.lx{line-height:1.6}.lx .hl,.lx b.hl{color:var(--brand)}
+@media (prefers-reduced-motion:reduce){.gap.full{animation:none}}
+/* 我的词（words_map.html）：认识的词数 + 每个包一组一根小柱子（实色 = 抓牢，浅色 = 见过） */
+.wm-n{display:flex;align-items:baseline;gap:8px}.wm-n b{font-size:2.6em;line-height:1;color:var(--brand)}.wm-n span{font-weight:700}
+.wm-units{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.wm-u{display:flex;flex-direction:column;align-items:center;gap:2px}
+.wm-bar{position:relative;width:18px;height:40px;border-radius:6px;background:var(--line-2);border:1px solid var(--line);overflow:hidden}
+.wm-bar i{position:absolute;left:0;right:0;bottom:0;background:var(--brand);z-index:2}
+.wm-bar i.met{background:var(--brand-2);opacity:.45;z-index:1}
+.wm-u.now .wm-bar{outline:2px solid var(--brand);outline-offset:1px}
+.wm-u small{font-size:11px;color:var(--faint)}

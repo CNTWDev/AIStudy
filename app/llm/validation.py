@@ -10,6 +10,7 @@ REQUIRED = {
     'book_guide': {'gist': str}, 'news_write': {'body': str, 'questions': list},
     'review': {'verdict': str, 'points': list},
     'discuss': {'steelman': str, 'challenge': str}, 'discuss_close': {'shift': str},
+    'word_examples': {'words': list},
 }
 
 

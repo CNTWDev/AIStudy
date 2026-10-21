@@ -307,3 +307,12 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 .bd-nick-row{display:flex;gap:8px}.bd-nick-row input{flex:1;min-width:0;font-size:16px;border:3px solid var(--pl-ink);border-radius:14px;padding:8px 12px}
 .bd-nick-err{color:#c2247a;min-height:1em}
 @media (prefers-color-scheme:dark){.bd-nick{background:linear-gradient(135deg,#4a3d12,#3a2540);color:#fff3c4}}
+/* 句子补洞的题（quiz.js：it.cloze）：句子靠左读，洞是一条虚线，答完把词填进去 */
+.aq-q.cloze{font-size:22px;text-align:left;line-height:1.55;font-weight:800}
+.aq-docked .aq-q.cloze{font-size:21px}
+.aq-gap{display:inline-block;min-width:3.6em;height:1.1em;vertical-align:-.12em;border-bottom:4px dashed #ff9f1c;margin:0 .15em}
+.aq-gap.ok,.aq-gap.no{min-width:0;height:auto;padding:0 .2em;border-bottom-style:solid;animation:aqgap .35s cubic-bezier(.2,.9,.3,1.4)}
+.aq-gap.ok{color:#1f8a4c;border-bottom-color:#2fbf71}.aq-gap.no{color:#c2410c;border-bottom-color:#ff9f1c}
+.aq-hint{font-size:14px;font-weight:700;color:var(--muted);margin:-6px 0 8px}
+@keyframes aqgap{0%{transform:translateY(-12px);opacity:0}100%{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.aq-gap.ok,.aq-gap.no{animation:none}}

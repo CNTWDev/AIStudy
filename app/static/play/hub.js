@@ -11,7 +11,7 @@
     const ctx = cv.getContext('2d'), H = 150, s = r.height / H, W = r.width / s;
     ctx.setTransform(s * dpr, 0, 0, s * dpr, 0, 0);
     const av = me.dataset.avatar, g = cv.dataset.preview, ground = 128;
-    const theme = {stickman: 'sunset', race: 'day', defense: 'candy'}[g] || 'day';
+    const theme = {stickman: 'sunset', race: 'day', defense: 'candy', cloze: 'day'}[g] || 'day';
     if (multi(ctx, g, W, H, t, av)) return;
     Play.scene.sky(ctx, W, H, theme);
     Play.scene.drawClouds(ctx, W, theme, t * (g === 'race' ? 4 : 1));
@@ -26,6 +26,14 @@
       Art.hero(ctx, W * 0.5 + Math.sin(t) * 20, ground, {avatar: av, pose: 'run', t: t * 1.6, scale: 0.72});
       ctx.fillStyle = '#2b2340'; for (let i = 0; i < 4; i++) for (let j = 0; j < 2; j++) if ((i + j) % 2) ctx.fillRect(W - 40 + j * 10, 40 + i * 10, 10, 10);
       ctx.strokeStyle = '#2b2340'; ctx.lineWidth = 3; ctx.strokeRect(W - 40, 40, 20, 40); ctx.beginPath(); ctx.moveTo(W - 40, 40); ctx.lineTo(W - 40, ground); ctx.stroke();
+    } else if (g === 'cloze') {   // 句子补洞：断开的路，一块木板搭上了，下一个缺口上一个问号
+      ctx.fillStyle = '#5db8f0'; ctx.fillRect(0, ground + 8, W, H - ground);
+      ctx.fillStyle = '#c99a6b';
+      for (const x of [10, W * 0.42, W * 0.78]) { Play.roundRect(ctx, x, ground - 4, W * 0.2, 40, 6); ctx.fill(); }
+      ctx.fillStyle = '#c98a4b'; Play.roundRect(ctx, 10 + W * 0.2 - 4, ground - 8 - Math.max(0, Math.sin(t * 1.5)) * 6, W * 0.22 - W * 0.0 + 8, 10, 4); ctx.fill();
+      ctx.font = '900 30px "Baloo 2", system-ui'; ctx.textAlign = 'center'; ctx.fillStyle = '#ff7a00';
+      ctx.fillText('?', W * 0.7, ground - 26 + Math.sin(t * 4) * 4);
+      Art.hero(ctx, W * 0.5, ground - 4, {avatar: av, pose: 'idle', t, scale: 0.6});
     } else if (g === 'defense') {
       Art.castle(ctx, 70, ground, 0.55, 1, t);
       Art.hero(ctx, 70, ground - 66, {avatar: av, pose: 'charge', t, scale: 0.5});

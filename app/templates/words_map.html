@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{# 我的词（app/words.py stats）：认识的词只增不减；每个单词包一组一组，抓牢了几个。说状态，不打分（DESIGN 5.22）。 #}
+{% block body %}
+<a href="/review?group=words" class="back">← 单词</a>
+<div class="card hero wm-hero">
+  <div class="wm-n"><b>{{ st.known }}</b><span>个我认识的词</span></div>
+  <p class="small">答对过一次就算认识，这个数只会越来越多。隔天还想得起来的词，算抓牢了。</p>
+  {% if st.wobbly %}<p class="small muted">还没抓牢、明天还会来找你的：{{ st.wobbly|join('、') }}</p>{% endif %}
+</div>
+{% if msg %}<div class="card flash-msg">{{ msg }}</div>{% endif %}
+{% for p in st.packs %}
+<div class="card wm-pack">
+  <div class="row"><h3 class="grow" style="margin:0">{{ p.title }}</h3><span class="pill">{% if p.main %}每天 {{ p.per_day }} 个新词{% else %}复习和游戏里用{% endif %}</span></div>
+  <p class="small muted">抓牢了 {{ p.caught }} 个，一共 {{ p.total }} 个</p>
+  <div class="wm-units">
+    {% for u in p.units %}
+    <div class="wm-u{{ ' now' if loop.index0 == p.current }}{{ ' done' if u.caught == u.total }}" title="{{ u.title }}：抓牢 {{ u.caught }}/{{ u.total }}">
+      <div class="wm-bar"><i style="height:{{ (100 * u.caught / u.total)|round|int if u.total else 0 }}%"></i><i class="met" style="height:{{ (100 * u.met / u.total)|round|int if u.total else 0 }}%"></i></div>
+      <small>{{ loop.index }}</small>
+    </div>
+    {% endfor %}
+  </div>
+  {% if p.main and p.current is not none %}<p class="small">正在学{{ p.units[p.current].title }}：见过 {{ p.units[p.current].met }} 个，抓牢 {{ p.units[p.current].caught }} 个。</p>{% endif %}
+  {% if can_edit %}
+  <form method="post" action="/words/packs" class="row" style="margin-top:6px">
+    <input type="hidden" name="ref" value="{{ p.id }}">
+    <label class="small nw">每天 <input type="number" name="daily_amount" value="{{ p.per_day }}" min="0" max="30" style="width:64px"> 个新词</label>
+    <button class="btn sm soft">保存</button><button class="btn sm ghost" name="action" value="stop">不学这个包</button>
+  </form>
+  {% endif %}
+</div>
+{% else %}
+<div class="empty card"><div class="e">🗺️</div><b>还没有单词包</b>{% if can_edit %}在下面挑一个开始。{% else %}选了英语课以后，会按年级自动挂上。{% endif %}</div>
+{% endfor %}
+{% if can_edit and others %}
+<div class="card">
+  <h3 style="margin-top:0">加一个单词包</h3>
+  <form method="post" action="/words/packs" class="row">
+    <select name="ref" class="grow"><option value="">选一个…</option>{% for wl in others %}<option value="{{ wl.id }}">{{ wl.title }}（{{ wl.words|length }} 词）</option>{% endfor %}</select>
+    <label class="small nw">每天 <input type="number" name="daily_amount" value="6" min="0" max="30" style="width:64px"> 个</label>
+    <button class="btn sm">加上</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

@@ -3,8 +3,9 @@
 - 错题（mistake）：原题原样重做，选项齐全。隔天连续做对 2 次 → 换一道同知识点的「变式题」，
   也做对了才算过关（防止只是背住了这道题的答案）。做错了明天再来。
   过关以后 RECHECK_DAYS 天再回头做一次原题：还会就真的掌握了（不再出现）；忘了就重新回到错题本里练。
-- 生词 / 短语 / 术语（word / phrase / term）：刚学的「看意思选单词」（四选一），熟一点的「看意思写单词」（拼写），
-  再熟一点和「听音写单词」（听写，不给意思）轮换着来。
+- 生词 / 短语 / 术语（word / phrase / term）：单词包里今天的新词第一次出现是一张学习卡（learn：先猜意思 → 揭晓、听读音、看例句 →
+  马上在句子里用一次），之后「看意思选单词」（四选一）→ 放回句子里（补洞，有例句才出）→「看意思写单词」（拼写）→
+  和「听音写单词」（听写，不给意思）、自己把词拼进句子里轮换着来（app/words.py）。
 - 知识点卡（kp）：从题库里取一道这个知识点的题来做。
 - 实在出不了题的（意思还没查到的词、老的错题找不到原题、题库里没题的知识点）才退回自评。
 """
@@ -14,7 +15,7 @@ import re
 import threading
 from datetime import timedelta
 
-from . import bank, db, engine, itemtypes, llm
+from . import bank, db, engine, evidence, itemtypes, llm, words
 from .catalog import catalog
 
 WORD_KINDS = ("word", "phrase", "term")
@@ -91,14 +92,61 @@ def _distractors(user_id: int, c, latin: bool, n=3) -> list[str]:
     return pool[:n]
 
 
-def _word_quiz(user_id: int, c) -> dict | None:
+CLOZE_BOX = 1          # 复习过一轮以后，有例句的词放回句子里选（补洞）
+CLOZE_SPELL_FROM = 4   # 再往后，拼写、听写之外也要自己把词拼进句子里
+
+
+def _grade(user_id: int) -> str:
+    u = db.one("SELECT grade FROM users WHERE id=?", user_id)
+    return (u and u["grade"]) or ""
+
+
+def _cloze(user_id: int, c, spell=False) -> dict | None:
+    front, ex = c["front"].strip(), _extra(c)
+    it = words.cloze_item({"w": front, "zh": _meaning(c), "pos": ex.get("pos", "")}, words.band(_grade(user_id)), random.Random(),
+                          words.pool_for(user_id, ex.get("list")), spell=spell)
+    if not it:
+        return None
+    if spell:
+        return {"mode": "cloze_spell", "q": it["q"], "hint": it["hint"], "shape": f"{len(front)} 个字母"}
+    return {"mode": "cloze", "q": it["q"], "options": it["options"]}
+
+
+def _learn(user_id: int, c) -> dict:
+    """新词第一次见：先猜意思（有例句就看着句子猜），再揭晓（意思、读音、例句），马上用一次（补洞；没有例句就看意思选单词）。
+    猜错不算：猜是为了让后面的揭晓记得更牢（Richland 等 2009），只有「用一次」算作答。"""
+    front, ex, meaning = c["front"].strip(), _extra(c), _meaning(c)
+    pool = words.pool_for(user_id, ex.get("list"))
+    others = list({w["zh"] for w in pool if w.get("zh") and w["zh"] != meaning and w["w"].lower() != front.lower()})
+    random.shuffle(others)
+    guess = others[:2] + [meaning]
+    random.shuffle(guess)
+    got = words.examples([front], words.band(_grade(user_id))).get(front.lower()) or []
+    sample = got[0] if got else None
+    use = _cloze(user_id, c) if got else None
+    if not use:
+        q = _word_quiz(user_id, c, plain=True)
+        use = q if q and q["mode"] == "choice" else None
+    return {"mode": "learn", "word": front, "meaning": meaning, "pos": ex.get("pos", ""), "guess": guess if len(guess) >= 3 else [],
+            "example": {"en": words._MARK.sub(lambda m: m.group(1), sample["en"]), "mark": front, "zh": sample.get("zh", "")} if sample else None,
+            "use": use}
+
+
+def _word_quiz(user_id: int, c, plain: bool = False) -> dict | None:
     meaning = _meaning(c)
     if not meaning:
         return None
     front, ex = c["front"].strip(), _extra(c)
     latin = bool(_LATIN.fullmatch(front)) and len(front) <= 40
+    if latin and not plain:
+        if ex.get("new") and not c["reviews"]:
+            return _learn(user_id, c)
+        q = (_cloze(user_id, c) if c["box"] == CLOZE_BOX else
+             _cloze(user_id, c, spell=True) if c["box"] >= CLOZE_SPELL_FROM and not c["box"] % 2 and front.isalpha() else None)
+        if q:
+            return q
     hint = " · ".join(x for x in (ex.get("pos", ""), ex.get("zh", "") if ex.get("zh") != meaning else "") if x)
-    if latin and c["box"] >= SPELL_FROM_BOX:
+    if latin and c["box"] >= SPELL_FROM_BOX and not plain:
         shape = f"{len(front)} 个字母" if " " not in front else f"{len(front.split())} 个词"
         if c["box"] >= DICTATE_FROM_BOX and c["box"] % 2:  # 听写：只听读音，不给意思和首字母
             return {"mode": "dictate", "say": front, "shape": shape}
@@ -284,13 +332,36 @@ def _variant(user_id: int, c, ex: dict) -> dict | None:
     return None
 
 
+# 复习页的题型 → 单词等级里的哪一级（app/words.py 的 TIERS）
+_TIER = {"choice": "reverse", "spell": "spell", "dictate": "dictate", "cloze": "cloze", "cloze_spell": "cloze"}
+
+
 def _answer_word(user_id: int, c, body: dict) -> dict:
     given = str(body.get("answer") or "").strip()
     norm = lambda s: " ".join(s.lower().replace("’", "'").split()).strip(".!?。")
     correct = bool(given) and not body.get("dont_know") and norm(given) == norm(c["front"])
-    fmt = "recall" if body.get("mode") in ("spell", "dictate") else "choice"
+    mode = body.get("mode") or "choice"
+    if mode == "learn":   # 学习卡：先猜的那一下只记下来（不算对错），算数的是「用一次」
+        use = body.get("use") if body.get("use") in _TIER else "choice"
+        if body.get("guess") is not None:
+            evidence.log(user_id, "word", f"{_extra(c).get('list') or ''}:{c['front']}", "guess",
+                         correct=str(body["guess"]).strip() == _meaning(c), mode="learn")
+        mode = use
+    fmt = "recall" if mode in ("spell", "dictate", "cloze_spell") else "choice"
     engine.schedule_card(user_id, c, "good" if correct else "again", fmt=fmt)
+    if c["kind"] in ("word", "term"):
+        words.log_answer(user_id, _extra(c).get("list") or "", c["front"], correct, _TIER.get(mode, "reverse"), mode="review",
+                         dont_know=bool(body.get("dont_know")))
     if c["kp_id"]:
         engine.update_mastery(user_id, c["kp_id"], correct, weight=0.6, source="review", fmt=fmt, kind="review")
     ex = _extra(c)
-    return {"correct": correct, "answer": c["front"], "meaning": c["back"], "example": ex.get("example", "")}
+    out = {"correct": correct, "answer": c["front"], "meaning": c["back"], "example": ex.get("example", "")}
+    if mode in ("cloze", "cloze_spell"):   # 补好的整句给孩子看、听（出题时没给，免得先听到答案）
+        got = words.examples([c["front"]], words.band(_grade(user_id))).get(c["front"].lower()) or []
+        q = str(body.get("q") or "")
+        for s in got:
+            full = words._MARK.sub(lambda m: m.group(1), s["en"])
+            if not q or words._MARK.sub("____", s["en"]) == q:
+                out.update(full=full, zh=s.get("zh", ""))
+                break
+    return out

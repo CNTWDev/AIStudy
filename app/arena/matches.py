@@ -85,7 +85,8 @@ def question(kid: dict, match_id, rng: random.Random | None = None) -> dict:
         raise ArenaError("冷冻中，等一下再答", 423, freeze_ms=int((st["freeze_until"] - now) * 1000))
     pend = st.get("pending")
     if not pend or now - pend["issued"] > rules.PENDING_KEEP_S:
-        it = sources.next_item(kid, st, get(m["game"]).target, rng or random.Random())
+        g = get(m["game"])
+        it = sources.next_item(kid, st, g.target, rng or random.Random(), ask=g.ask)
         pend = {"item": it, "issued": now}
         st["pending"] = pend
         _save_state(m["id"], st)
@@ -105,6 +106,8 @@ def answer(kid: dict, match_id, item_id: str, ans, dont_know=False, rng: random.
     correct = sources.settle(kid, st, it, ans, dont_know, ms)   # 学习记录（不计入当天打卡）、能力值
     dim, fam, lv = it["dim"], it["family"], it["level"]
     out = {"correct": correct, "answer": sources.itemtypes.display(it), "explain": it.get("explain", ""), "xp": 0}
+    if it.get("cloze"):   # 句子补洞：补好的整句和这个词（前端把它填进洞里、读出来）
+        out.update(full=it.get("full", ""), word=it.get("word", ""), zh=it.get("zh", ""))
     if correct:
         xp, crit = rules.roll_xp(rng, xp_today(kid["id"]))
         st["streak"] = st.get("streak", 0) + 1
