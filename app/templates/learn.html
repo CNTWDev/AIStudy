@@ -3,7 +3,7 @@
 {% set st = me.status if me else 'unknown' %}
 <a href="/map/{{ pack.id }}" class="small">← {{ pack.subject_name }}知识地图</a>
 <h1>{{ kp.name }}</h1>
-<p class="muted small"><span class="for-grownups">{% if kp.name_en %}{{ kp.name_en }} · {% endif %}</span>{{ stage_label(kp.stage) }}<span class="for-grownups"> · {{ strand }}</span> {% if kp.hot %}· <span style="color:var(--warn)">{{ '重点' if pack.kind == 'course' else '考试常考' }}</span>{% endif %}{% if kp.evidence %} · <span class="pill" title="这条规律的证据有多强：研究共识 / 经典案例 / 经验之谈">{{ kp.evidence }}</span>{% endif %}
+<p class="muted small"><span class="for-grownups">{% if kp.name_en %}{{ kp.name_en }} · {% endif %}</span>{{ stage_label(kp.stage) }}<span class="for-grownups"> · {{ strand }}</span> {% if kp.hot %}· <span style="color:var(--warn)">{{ '重点' if pack.kind == 'course' else '考试常考' }}</span>{% endif %}{% if kp.evidence %}{% set evb = EVIDENCE.get(kp.evidence, ('', '')) %} · <span class="pill evb" title="证据牌：{{ evb[1] }}">{{ evb[0] }} {{ kp.evidence }}</span>{% endif %}
  · <span class="pill st-{{ st }}">{{ STATUS_LABEL[st] }}</span></p>
 
 {% if ev %}<div class="evline small">
@@ -46,6 +46,7 @@
   {% if not think and not readonly %}<div id="guess" hidden></div>{% endif %}
   <div id="seebody">
     <div class="lcore">{{ kp.desc }}</div>
+    {% if kp.evidence %}{% set evb = EVIDENCE.get(kp.evidence, ('', '')) %}<div class="small evnote">{{ evb[0] }} <b>证据牌：{{ kp.evidence }}</b>（{{ evb[1] }}）{% if kp.evidence_note %}<br>{{ kp.evidence_note }}{% endif %}</div>{% endif %}
     {% if kp.sources %}<div class="small muted">出处：{{ kp.sources|join('；') }}</div>{% endif %}
     {% if kp.terms %}<div class="small" style="margin-top:6px">{{ '🔑 ' if simple else '关键词：' }}{% for t in kp.terms %}<span class="pill">{{ t }}</span> {% endfor %}</div>{% endif %}
     {% if think and not readonly %}<div class="think" style="margin-top:10px"><div class="small">✍️ {{ kp.think }}</div>
@@ -172,7 +173,7 @@ $('#teachbtn').onclick = async () => {
       (THINK && t.example ? `<p><b>再想一步：</b>${esc(t.example.q)}<br><span class="muted">→ ${esc(t.example.a)}</span></p>` : '') +
       (t.terms && t.terms.length ? '<p class="small">' + t.terms.map(x => `<span class="pill">${esc(x.en)} = ${esc(x.zh)}</span>`).join(' ') + '</p>' : '') +
       (THINK && t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '') +
-      (t.action ? `<p><b>本周试一试：</b>${esc(t.action)}</p>` : '') + '</div>';
+      (THINK && t.action ? `<p><b>本周试一试：</b>${esc(t.action)}</p>` : '') + '</div>';
   } catch (e) { look.stop(); $('#teach').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
   if (think) $('.lacts', Steps.sec('see')).hidden = false;
 };
@@ -182,7 +183,8 @@ function showWorked() {
   getTeach().then(t => {
     seekIn(w, look.stop());
     w.innerHTML = (t.example ? `<div class="lworked"><b>✍️ 看我做一遍</b><div>${esc(t.example.q)}</div>${qFig(t.example.fig)}<div class="lworked-a">${esc(t.example.a).replace(/\n/g, '<br>')}</div></div>` : '') +
-      (t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '');
+      (t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '') +
+      (t.action ? `<p class="laction"><b>🧪 本周试一试：</b>${esc(t.action)}</p>` : '');
   }).catch(() => { look.stop(); w.innerHTML = ''; });
 }
 // ---- 练题。题在打开页面时就去取（孩子的题后台已经备好），第一题先拿来「猜一猜」，学完做题时揭晓

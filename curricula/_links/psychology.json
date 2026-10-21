@@ -1,0 +1,59 @@
+{
+ "_doc": "心理学规律在几门成人课里的同一个概念（docs/成人心理学课-讨论稿.md §5）：心理学课讲是什么、证据多硬，CEO 课讲在公司里怎么用，散户美股实战课讲在交易里怎么表现。学会一个，其它推断为「学习中」。后合并的课把自己的知识点加进对应的概念里（一个知识点只能属于一个概念）。",
+ "concepts": [
+  {
+   "id": "psy.loss-aversion",
+   "name": "损失厌恶",
+   "kps": [
+    "PSY-D-04",
+    "CEO-M1-02",
+    "INV-P-01"
+   ]
+  },
+  {
+   "id": "psy.anchoring",
+   "name": "锚定",
+   "kps": [
+    "PSY-D-01",
+    "CEO-M6-09",
+    "INV-P-02"
+   ]
+  },
+  {
+   "id": "psy.confirmation-bias",
+   "name": "确认偏误",
+   "kps": [
+    "PSY-D-06",
+    "CEO-M6-06",
+    "INV-P-03"
+   ]
+  },
+  {
+   "id": "psy.overconfidence",
+   "name": "过度自信",
+   "kps": [
+    "PSY-D-05",
+    "CEO-M10-07",
+    "INV-P-04"
+   ]
+  },
+  {
+   "id": "psy.sunk-cost",
+   "name": "沉没成本",
+   "kps": [
+    "PSY-D-07",
+    "CEO-M6-05",
+    "INV-P-07"
+   ]
+  },
+  {
+   "id": "psy.reward-crowding-out",
+   "name": "外在奖励挤走内在动机",
+   "kps": [
+    "PSY-H-06",
+    "CEO-M1-12"
+   ]
+  }
+ ],
+ "links": []
+}

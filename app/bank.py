@@ -166,6 +166,10 @@ def find_content(kind: str, kp_id="", lang="", grade="", topic="", exclude=()) -
     return {**dict(r), "body": db.jload(r["body"], {})}
 
 
+def has_content(kind: str, kp_id: str) -> bool:
+    return bool(db.one("SELECT id FROM contents WHERE kind=? AND kp_id=? AND status='active' LIMIT 1", kind, kp_id))
+
+
 def save_content(kind: str, body: dict, kp_id="", lang="", grade="", topic="", title="", origin="ai", meta=None,
                  created_by=None) -> int:
     h = fingerprint(kind, kp_id, lang, body)

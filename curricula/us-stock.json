@@ -111,12 +111,13 @@
     "主动管理",
     "基准"
    ],
-   "evidence": "研究共识",
+   "evidence": "稳",
    "sources": [
     "标普道琼斯指数公司 SPIVA 美国主动基金表现报告（历年）",
     "Barber & Odean (2000) Trading Is Hazardous to Your Wealth"
    ],
-   "think": "先写下你的判断：你自己炒美股，有把握长期跑赢标普 500 吗？凭什么？"
+   "think": "先写下你的判断：你自己炒美股，有把握长期跑赢标普 500 吗？凭什么？",
+   "evidence_note": "标普的 SPIVA 报告历年显示，时间拉长到十年以上，大多数主动管理的美国股票基金跑输对应的指数；散户频繁交易跑输市场也有大样本研究。"
   },
   {
    "id": "INV-E-02",
@@ -186,11 +187,12 @@
     "认错条件",
     "事后偏差"
    ],
-   "evidence": "研究共识",
+   "evidence": "要小心",
    "sources": [
     "Fischhoff (1975) Hindsight ≠ foresight",
     "Annie Duke, Thinking in Bets (2018)"
-   ]
+   ],
+   "evidence_note": "后见之明偏差的证据很稳；「事先写下认错条件能改善投资结果」是由它推出的做法，还缺少直接的研究。"
   },
   {
    "id": "INV-B-01",
@@ -207,7 +209,7 @@
     "概率",
     "情景分析"
    ],
-   "evidence": "研究共识",
+   "evidence": "基本原理",
    "sources": [
     "John L. Kelly Jr. (1956) A New Interpretation of Information Rate"
    ]
@@ -232,7 +234,7 @@
     "赔率",
     "盈亏比"
    ],
-   "evidence": "研究共识"
+   "evidence": "基本原理"
   },
   {
    "id": "INV-B-03",
@@ -255,7 +257,7 @@
     "复利",
     "波动拖累"
    ],
-   "evidence": "研究共识"
+   "evidence": "基本原理"
   },
   {
    "id": "INV-B-04",
@@ -278,7 +280,7 @@
     "杠杆",
     "强制平仓"
    ],
-   "evidence": "研究共识"
+   "evidence": "基本原理"
   },
   {
    "id": "INV-B-05",
@@ -304,7 +306,7 @@
     "半凯利",
     "仓位"
    ],
-   "evidence": "研究共识",
+   "evidence": "基本原理",
    "sources": [
     "John L. Kelly Jr. (1956) A New Interpretation of Information Rate",
     "Edward O. Thorp, Beat the Dealer (1962)"
@@ -357,12 +359,13 @@
     "处置效应",
     "沉没成本"
    ],
-   "evidence": "研究共识",
+   "evidence": "稳",
    "sources": [
     "Kahneman & Tversky (1979) Prospect Theory",
     "Shefrin & Statman (1985) The Disposition to Sell Winners Too Early and Ride Losers Too Long",
     "Odean (1998) Are Investors Reluctant to Realize Their Losses?"
-   ]
+   ],
+   "evidence_note": "处置效应在美国、芬兰、中国等多个市场的交易数据里都出现过。"
   },
   {
    "id": "INV-P-02",
@@ -384,10 +387,11 @@
     "买入价",
     "历史高点"
    ],
-   "evidence": "研究共识",
+   "evidence": "稳",
    "sources": [
     "Tversky & Kahneman (1974) Judgment under Uncertainty: Heuristics and Biases"
-   ]
+   ],
+   "evidence_note": "「先给一个数、再估计」的锚定在多实验室重复里效应很大；市场里的锚（买入价、历史高点）主要来自交易数据的研究。"
   },
   {
    "id": "INV-P-03",
@@ -409,7 +413,7 @@
     "信息茧房",
     "反方观点"
    ],
-   "evidence": "研究共识",
+   "evidence": "稳",
    "sources": [
     "Nickerson (1998) Confirmation Bias: A Ubiquitous Phenomenon in Many Guises"
    ]
@@ -438,11 +442,12 @@
     "过度交易",
     "交易成本"
    ],
-   "evidence": "研究共识",
+   "evidence": "稳",
    "sources": [
     "Barber & Odean (2000) Trading Is Hazardous to Your Wealth",
     "Barber & Odean (2001) Boys Will Be Boys"
-   ]
+   ],
+   "evidence_note": "来自六万多个美国散户账户的交易数据：交易越频繁的人，扣掉成本后收益越差。"
   },
   {
    "id": "INV-P-05",
@@ -547,11 +552,12 @@
     "运气与能力",
     "复盘"
    ],
-   "evidence": "研究共识",
+   "evidence": "稳",
    "sources": [
     "Baron & Hershey (1988) Outcome Bias in Decision Evaluation",
     "Annie Duke, Thinking in Bets (2018)"
-   ]
+   ],
+   "evidence_note": "按结果好坏评价决策（结果偏差）在实验里反复出现。"
   },
   {
    "id": "INV-C-01",

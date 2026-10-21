@@ -356,10 +356,10 @@ def api_learn_done(request: Request, body: dict = Body(...)):
 
 @router.get("/api/context/{kp_id}")
 def api_context(request: Request, kp_id: str):
-    """知识背景和用处（AI 生成，按知识点缓存）。没配置 AI 就返回空。"""
+    """知识背景和用处（教材作者写的，或 AI 生成、按知识点缓存）。两样都没有就返回空。"""
     k = kid_or_redirect(request, manage=True)
     kp = learner_kp(k, kp_id)
-    if not llm.enabled():
+    if not llm.enabled() and not bank.has_content("context", kp_id):
         return {}
     prefetch.wait(k["id"], kp_id, "context")  # 打开学习页时后台已经在写：等它，不重复写
     try:

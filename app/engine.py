@@ -192,19 +192,23 @@ def retire_open_mistakes() -> int:
 
 def load_seed_lessons(seed_dir):
     """把 seed/teach_*.json 里人工写的讲义导入为作者版讲义（幂等）：同一个知识点只留这一篇，
-    AI 讲义和旧版作者讲义换下。管理员下架过的这一版不再自动上架。"""
+    AI 讲义和旧版作者讲义换下。管理员下架过的这一版不再自动上架。
+    讲义里可以带 context（「为什么学」的导入：story、question……），一样导入为作者版导入，不再请 AI 写。"""
     n = 0
     for path in sorted(seed_dir.glob("teach_*.json")):
         for lesson in json.loads(path.read_text(encoding="utf-8")).get("lessons", []):
             kp = catalog.kp(lesson.get("kp", ""))
             if not kp:
                 continue
-            body = {k: v for k, v in lesson.items() if k != "kp"}
-            old = db.one("SELECT id, status FROM contents WHERE qhash=?", bank.fingerprint("teach", kp["id"], bank.kp_lang(kp["id"]), body))
-            if old and old["status"] != "active":
-                continue
-            cid = old["id"] if old else bank.save_content("teach", body, kp["id"], bank.kp_lang(kp["id"]), title=kp["name"], origin="author")
-            db.run("UPDATE contents SET status='retired' WHERE kind='teach' AND kp_id=? AND status='active' AND id<>?", kp["id"], cid)
+            body = {k: v for k, v in lesson.items() if k not in ("kp", "context")}
+            for kind, b in (("teach", body), ("context", lesson.get("context"))):
+                if not b:
+                    continue
+                old = db.one("SELECT id, status FROM contents WHERE qhash=?", bank.fingerprint(kind, kp["id"], bank.kp_lang(kp["id"]), b))
+                if old and old["status"] != "active":
+                    continue
+                cid = old["id"] if old else bank.save_content(kind, b, kp["id"], bank.kp_lang(kp["id"]), title=kp["name"], origin="author")
+                db.run("UPDATE contents SET status='retired' WHERE kind=? AND kp_id=? AND status='active' AND id<>?", kind, kp["id"], cid)
             n += 1
     return n
 

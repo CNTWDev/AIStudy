@@ -5,7 +5,7 @@ import uuid
 from fastapi.testclient import TestClient
 
 from app import auth, bank, config, db, engine, itemtypes
-from app.catalog import catalog
+from app.catalog import EVIDENCE, catalog
 from app.main import app
 from app.web import course_choices
 
@@ -16,7 +16,7 @@ def test_ceo_pack_and_seed_files():
     assert pack.kind == "course" and pack.stages == ["CEO-1"] and "BeeJoy" in pack.copyright
     kps = [catalog.kps[k] for k in pack.kp_ids]
     assert kps[0]["id"] == "CEO-E-01"  # 先上开篇，原理库在后面
-    assert {k["evidence"] for k in kps} <= {"研究共识", "经典案例", "经验之谈"}
+    assert {k["evidence"] for k in kps} <= set(EVIDENCE)  # 和心理学课共用一套证据牌
     assert all(k.get("think") for k in kps if k["strand"] == "C")
     lessons = json.loads((config.SEED_DIR / "teach_ceo-core.json").read_text(encoding="utf-8"))["lessons"]
     assert {"CEO-E-01", "CEO-C-R-01", "CEO-C-Q-01"} <= {x["kp"] for x in lessons}
@@ -58,7 +58,8 @@ def test_ceo_learner_sees_case_lesson():
         assert "经验之谈" in page
         t = c.get("/api/teach/CEO-C-R-01").json()
         assert t["steps"][0]["title"].startswith("碰撞") and t["action"]
-        assert "研究共识" in c.get("/learn/CEO-M1-02").text
+        page = c.get("/learn/CEO-M1-02").text
+        assert "🟡 要小心" in page and "1.8–2.1" in page   # 证据牌和重复情况
 
 
 def _ceo_learner(c):
