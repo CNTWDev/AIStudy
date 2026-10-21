@@ -8,7 +8,7 @@
 <script>
 const IT = {{ item|tojson }};
 renderItem($('#ibox'), IT, {
-  submit: (answer, self, ms, extra) => api('/api/answer', Object.assign({item_id: IT.id, kp_id: IT.kp_id, answer, ms}, extra || {})),
+  submit: (answer, self, ms, extra, onPart) => api('/api/answer', Object.assign({item_id: IT.id, kp_id: IT.kp_id, answer, ms}, extra || {}), {onPart}),
   onDone: () => { $('#ibox').insertAdjacentHTML('beforeend', '<div class="row" style="margin-top:12px"><a class="btn" href="/thinking">回到值得再想的问题</a></div>'); }
 });
 </script>

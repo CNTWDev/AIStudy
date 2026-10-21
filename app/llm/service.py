@@ -7,7 +7,7 @@ import time
 from .validation import validate
 
 from .. import db
-from . import providers  # noqa: F401  注册内置提供方
+from . import providers, stream  # noqa: F401  注册内置提供方
 from .base import PROVIDER_TYPES, ChatRequest, LLMError, Provider
 from .settings import LLMSettings, load
 
@@ -107,15 +107,17 @@ def extract_json(text: str):
 MAX_RETRY_TOKENS = 16000
 
 
-def _complete_json(p, req: ChatRequest):
-    """调用一次并解析 JSON。回答写到一半被长度上限截断、或 JSON 坏了：放宽长度再试一次。"""
+def _complete_json(p, req: ChatRequest, on_text=None):
+    """调用一次并解析 JSON。回答写到一半被长度上限截断、或 JSON 坏了：放宽长度再试一次。
+    on_text：有人在等着看（llm/stream.py），边写边给。"""
+    call = (lambda: p.stream(req, on_text)) if on_text else (lambda: p.complete(req))
     try:
-        return extract_json(p.complete(req))
+        return extract_json(call())
     except LLMError:
         truncated = req.usage.get("truncated")
         req.max_tokens = min(max(req.max_tokens * 2, 4000), MAX_RETRY_TOKENS)
         try:
-            return extract_json(p.complete(req))
+            return extract_json(call())
         except LLMError:
             if truncated and req.usage.get("truncated"):
                 raise LLMError("AI 写得太长被截断了，请稍后再试") from None
@@ -160,7 +162,7 @@ def ask_json(task: str, system: str, user: str, *, user_id=None, effort="low", m
     _count_usage(user_id)
     started, status, error = time.monotonic(), "failed", ""
     try:
-        data = validate(task, _complete_json(p, req))
+        data = validate(task, _complete_json(p, req, stream.sink_for(task)))
         check_active()
         status = "ok"
     except Exception as exc:

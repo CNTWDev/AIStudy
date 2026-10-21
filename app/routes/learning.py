@@ -14,6 +14,7 @@ from ..web import (
     _public_item,
     _review_tasks_done,
     _save_learning,
+    streamed,
     _trace_or_404,
     catalog,
     enrollments,
@@ -306,7 +307,7 @@ def api_practice(request: Request, kp_id: str, n: int = 3, purpose: str = "pract
 def api_answer(request: Request, body: dict = Body(...)):
     k = kid_or_redirect(request)
     from .. import learning
-    return learning.submit(k["id"], body)
+    return streamed(request, lambda: learning.submit(k["id"], body))  # 思辨题、开放题点评：边写边看
 
 
 @router.post("/api/trace/start")
@@ -624,12 +625,15 @@ def api_filler(request: Request, kp: str = "", skip: str = ""):
 @router.post("/api/review/{card_id}/answer")
 def review_answer(request: Request, card_id: int, body: dict = Body(...)):
     k = kid_or_redirect(request)
-    r = recall.answer(k["id"], card_id, body)
-    if r.get("error"):
-        raise HTTPException(400, r["error"])
-    if not r.get("reveal") and not (r.get("discuss") and not r.get("done")):  # 思辨题想完才算这一张做完
-        _review_tasks_done(k["id"])
-    return r
+
+    def answer():
+        r = recall.answer(k["id"], card_id, body)
+        if r.get("error"):
+            raise HTTPException(400, r["error"])
+        if not r.get("reveal") and not (r.get("discuss") and not r.get("done")):  # 思辨题想完才算这一张做完
+            _review_tasks_done(k["id"])
+        return r
+    return streamed(request, answer)  # 错题本里的思辨题：边写边看
 
 
 @router.post("/api/cards")

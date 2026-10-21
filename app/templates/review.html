@@ -11,7 +11,7 @@ const KIND = {word: '生词', term: '术语', mistake: '错题', kp: '知识点'
 const GROUP = {{ group|tojson }}, TASK = {words: 'words', mistakes: 'mistakes', other: 'review'}[GROUP];
 const RUNKIND = {words: 'words', mistakes: 'mistakes'}[GROUP] || 'review';
 async function load() { cards = (await api('/api/review/due' + (GROUP ? '?group=' + GROUP : ''))).cards; i = 0; if (cards.length) Run.start(RUNKIND, {total: cards.length, mount: $('#flash')}); show(); }
-const post = (c, body) => api('/api/review/' + c.id + '/answer', body);
+const post = (c, body, onPart) => api('/api/review/' + c.id + '/answer', body, {onPart});
 function head(c, extra) {
   return `<div class="muted small">${KIND[c.kind] || c.kind}${c.kp_name ? ' · ' + esc(c.kp_name) : ''}${extra || ''} · 还剩 ${cards.length - i} 张</div>`;
 }
@@ -46,7 +46,7 @@ function showItem(box, c, q) {
   box.innerHTML = head(c, tag) + '<div class="qbox" style="text-align:left"></div>';
   const qb = $('.qbox', box), it = q.item;
   renderItem(qb, it, {
-    submit: (answer, self, ms, extra) => post(c, Object.assign({item_id: it.id, answer, self, ms}, extra || {})),
+    submit: (answer, self, ms, extra, onPart) => post(c, Object.assign({item_id: it.id, answer, self, ms}, extra || {}), onPart),
     dontKnow: () => post(c, {item_id: it.id, dont_know: true}),
     onDone: res => {
       if (res.reveal) return;

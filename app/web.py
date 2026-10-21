@@ -1,12 +1,19 @@
 """Shared presentation and account helpers; no router or application lifecycle."""
 
+import contextvars
+import json
+import logging
+import queue
 import re
+from concurrent.futures import ThreadPoolExecutor
 
 from datetime import date, timedelta
 
 from fastapi import HTTPException, Request
 
-from fastapi.responses import RedirectResponse
+from fastapi.encoders import jsonable_encoder
+
+from fastapi.responses import RedirectResponse, StreamingResponse
 
 from fastapi.templating import Jinja2Templates
 
@@ -536,3 +543,39 @@ def _bp_back(bp_id: int, msg="", anchor=""):
     from urllib.parse import urlencode
     return RedirectResponse(f"/admin/bank-papers/{bp_id}?" + urlencode({"msg": msg}) + (f"#{anchor}" if anchor else ""), 303)
 
+
+
+# 边写边看（docs/DESIGN.md 5.40）：页面带 Accept: application/x-ndjson 来要，就一行一个 JSON 地回：
+# {"part": {栏: 目前写到的字}} 若干行 → 最后 {"done": 正式结果}，出错是 {"error": "..", "status": 4xx}。
+# 业务照常在后台线程里跑完、提交（学员关了页面也不丢）；每 10 秒没东西就发一个空行，免得 nginx 以为断了。
+_stream_pool = ThreadPoolExecutor(8, thread_name_prefix="ai-stream")
+
+
+def streamed(request: Request, fn):
+    if "application/x-ndjson" not in request.headers.get("accept", ""):
+        return fn()
+    q: queue.Queue = queue.Queue()
+
+    def run():
+        with llm.stream.listen(lambda part: q.put({"part": part})):
+            try:
+                q.put({"done": jsonable_encoder(fn())})
+            except HTTPException as e:
+                q.put({"error": e.detail, "status": e.status_code})
+            except Exception:
+                logging.getLogger(__name__).exception("streamed request failed")
+                q.put({"error": "出错了，请再试一次", "status": 500})
+    _stream_pool.submit(contextvars.copy_context().run, run)
+
+    def lines():
+        while True:
+            try:
+                m = q.get(timeout=10)
+            except queue.Empty:
+                yield "\n"
+                continue
+            yield json.dumps(m, ensure_ascii=False) + "\n"
+            if "part" not in m:
+                return
+    return StreamingResponse(lines(), media_type="application/x-ndjson",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
