@@ -24,12 +24,12 @@
   {% if k %}<label style="display:flex;gap:8px;align-items:center;font-weight:normal"><input type="checkbox" name="disabled" value="1" style="width:auto" {{ 'checked' if k.status == 'disabled' }}> 暂停这个账号（孩子暂时不能登录，学习记录保留）</label>{% endif %}
   {% endif %}
   <div class="row">
-    <div class="grow"><label>年级</label><select name="grade" id="grade">{% for g in GRADES %}<option value="{{ g }}" data-rank="{{ stage_rank(g) }}" {{ 'selected' if (k.grade if k else catalog.default_grade) == g }}>{{ stage_label(g) }}</option>{% endfor %}</select></div>
+    <div class="grow"><label>年级</label><select name="grade" id="grade">{% for g in GRADES if not self_mode or is_adult(g) %}<option value="{{ g }}" data-rank="{{ stage_rank(g) }}" {{ 'selected' if (k.grade if k else catalog.default_grade) == g }}>{{ stage_label(g) }}</option>{% endfor %}</select></div>
     {% if not member_adult %}<div class="grow"><label>每天学习分钟</label><input type="number" name="daily_minutes" min="15" max="240" value="{{ k.daily_minutes if k else 60 }}"></div>{% endif %}
   </div>
   {% if member_adult %}<p class="hint small">{{ k.name }} 是家里的成人成员：课程、每天学多久由 TA 登录后在「我的课程」里自己安排，学习记录也只有 TA 自己能看。这里只管账号（名字、邮箱、密码、暂停）。年级改成大学以下，就改由家长安排学习。</p>
   {% else %}
-  <p class="muted small" style="margin:4px 0 0">{% if self_mode %}成年人选「成人」：AI 用成人的口吻讲解。{% else %}家里的大人（比如备考基金从业资格）年级选「成人」：AI 用成人的口吻讲解，课程由 TA 登录后自己选，学习记录只有 TA 自己能看。{% endif %}</p>
+  <p class="muted small" style="margin:4px 0 0">{% if self_mode %}在读大学选年级，其他选「成人」。下面列的是给成人的课。{% else %}家里的大人（比如备考基金从业资格）年级选「成人」：AI 用成人的口吻讲解，课程由 TA 登录后自己选，学习记录只有 TA 自己能看。{% endif %}</p>
   {% if not self_mode %}<p class="hint small" id="adult-note" hidden>成人成员登录后在「我的课程」里自己选课、定每天学多久；家长这里只管账号。</p>{% endif %}
   <div id="learning">
   <div id="games" {{ 'data-self=1' if self_mode }}>

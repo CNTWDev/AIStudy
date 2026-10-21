@@ -139,6 +139,7 @@ async def kid_save(request: Request):
         if status != k["status"]:
             auth.set_status(k["id"], status)
         kid_id = k["id"]
+        engine.fit_courses(kid_id)  # 年级跨过大学这条线：另一边的课暂停
     else:
         try:
             kid_id = auth.create_user(email, pw, name, "kid", parent_id=p["id"], grade=grade, login=login,

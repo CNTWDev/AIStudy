@@ -22,6 +22,7 @@ async def lifespan(app):
     engine.load_seed_lessons(config.SEED_DIR)
     bank.sync()
     methods.load()
+    engine.fit_courses()   # 在学的课都得是给这个人群的（课程按人群分开之前报的课）
     yield
     db.close()
 

@@ -24,6 +24,7 @@ def main(once=False):
     methods.load()
     engine.load_seed_items(config.SEED_DIR)
     engine.retire_open_mistakes()
+    engine.fit_courses()
     engine.load_seed_lessons(config.SEED_DIR)
     bank.sync()
     evidence.ensure_current()

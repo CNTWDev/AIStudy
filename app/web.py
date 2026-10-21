@@ -121,6 +121,18 @@ def kid_or_redirect(request: Request, manage: bool = False):
         raise HTTPException(403, PARENT_READONLY)
     return k
 
+def learner_pack(k, pack_id: str):
+    """学习者打开的课：不是给这群人的课当作没有（孩子打不开成人的课，自学的成人打不开中小学的课）。"""
+    if not catalog.visible(pack_id, k["grade"]):
+        raise HTTPException(404, "没有这门课")
+    return catalog.packs[pack_id]
+
+def learner_kp(k, kp_id: str) -> dict:
+    """学习者打开的知识点：同上，按它所在的课（成人课要用到的中小学基础，成人也能打开）。"""
+    if not catalog.kp_visible(kp_id or "", k["grade"]):
+        raise HTTPException(404, "没有这个知识点")
+    return catalog.kp(kp_id)
+
 def enrollments(kid_id: int):
     return [dict(r) for r in db.q("SELECT * FROM enrollments WHERE user_id=? AND active=1", kid_id)
             if r["pack_id"] in catalog.packs]
@@ -289,11 +301,12 @@ def _admin_user_page(request: Request, a, u, msg="", link="", **extra):
 
 def _kid_form_packs(form, grade: str, old: dict, grade_changed: bool) -> list[tuple[str, str, str]]:
     """每门课选一个教材版本（有方向的再选方向）；学段按年级自动对应。
-    年级没变、教材没换时保留原学段（「学校进度」里可能已经往后调过）。"""
+    年级没变、教材没换时保留原学段（「学校进度」里可能已经往后调过）。这个年级学不了的课不收（不信页面传来的）。"""
     out = []
     for subj in {p.subject for p in catalog.packs.values()}:
         pid = form.get(f"subj_{subj}") or ""
-        if pid in catalog.packs and catalog.packs[pid].subject == subj and not catalog.packs[pid].standard:
+        if pid in catalog.packs and catalog.packs[pid].subject == subj and not catalog.packs[pid].standard \
+                and catalog.visible(pid, grade):
             keep = pid in old and not grade_changed
             out.append((pid, old[pid] if keep else catalog.default_stage(pid, grade),
                         catalog.packs[pid].track(form.get(f"track_{pid}"))))
@@ -305,11 +318,10 @@ def default_minutes(grade: str) -> int:
     return 30 if r <= 2 else 40 if r <= 4 else 45 if r <= 6 else 60 if r <= 9 else 90
 
 
-def course_choices(school_type='', grade=None):
+def course_choices(school_type: str, grade: str):
+    """选课表单里列的课：只有这个学习者能学的（中小学生看中小学的课，成人看成人的课），按常见学科排。"""
     order = {subject: i for i, subject in enumerate(('chinese', 'math', 'english', 'science', 'physics', 'chemistry', 'biology', 'history', 'geography', 'economics'))}
-    return dict(sorted(catalog.by_subject(school_type).items(), key=lambda kv:
-                       (0 if is_adult(grade) and any(is_adult(p.stages[0]) for p in kv[1] if p.stages) else 1,
-                        order.get(kv[1][0].subject, 99))))
+    return dict(sorted(catalog.by_subject(school_type, grade).items(), key=lambda kv: order.get(kv[1][0].subject, 99)))
 
 
 def _kid_form(request: Request, k, self_mode=False, **extra):

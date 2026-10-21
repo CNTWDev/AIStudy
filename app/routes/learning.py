@@ -18,6 +18,8 @@ from ..web import (
     catalog,
     enrollments,
     is_adult,
+    learner_kp,
+    learner_pack,
     kid_or_redirect,
     render,
     require_self_managed,
@@ -68,8 +70,9 @@ async def my_courses_save(request: Request):
         _check_exam_dates(form)
         if grade not in GRADES:
             raise ValueError("年级不对")
-        if u["parent_id"] and not is_adult(grade):
-            raise ValueError("家里的成人成员年级选大学或「成人」；要改成孩子账号，请家长在家长页改年级。")
+        if not is_adult(grade):  # 自己安排学习的都是成人：看成人的课（docs/课程按人群分开-方案.md）
+            raise ValueError("家里的成人成员年级选大学或「成人」；要改成孩子账号，请家长在家长页改年级。" if u["parent_id"]
+                             else "自学账号是给成人的，年级选大学或「成人」。孩子请家长注册后在家长页添加。")
     except ValueError as e:
         return _kid_form(request, u, self_mode=True, msg=str(e))
     minutes = max(15, min(240, int(form.get("daily_minutes") or u["daily_minutes"] or 60)))
@@ -219,9 +222,7 @@ def subjects(request: Request):
 @router.get("/map/{pack_id}", response_class=HTMLResponse)
 def kmap(request: Request, pack_id: str):
     k = kid_or_redirect(request, manage=True)
-    if pack_id not in catalog.packs:
-        raise HTTPException(404)
-    pack = catalog.packs[pack_id]
+    pack = learner_pack(k, pack_id)
     m = engine.get_mastery(k["id"])
     stage = engine.enrollment_stage(k["id"], pack_id) or catalog.default_stage(pack_id, k["grade"])
     groups = []
@@ -246,9 +247,7 @@ def progress_snooze(request: Request):
 @router.get("/learn/{kp_id}", response_class=HTMLResponse)
 def learn(request: Request, kp_id: str, task: str = "practice"):
     k = kid_or_redirect(request, manage=True)
-    kp = catalog.kp(kp_id)
-    if not kp:
-        raise HTTPException(404, "没有这个知识点")
+    kp = learner_kp(k, kp_id)
     m = engine.get_mastery(k["id"])
     pre = [{**p, "m": m.get(p["id"])} for p in catalog.prereqs(kp_id)]
     post = [{**s, "m": m.get(s["id"])} for s in catalog.successors(kp_id)]
@@ -264,9 +263,7 @@ def learn(request: Request, kp_id: str, task: str = "practice"):
 @router.get("/api/teach/{kp_id}")
 def api_teach(request: Request, kp_id: str):
     k = kid_or_redirect(request)
-    kp = catalog.kp(kp_id)
-    if not kp:
-        raise HTTPException(404, "没有这个知识点")
+    kp = learner_kp(k, kp_id)
     # 讲解本身存在题库里大家共用；「你在别的学科学过……」是每个孩子自己的，现场拼上（来自人工写的关联说明）
     bridge = [{"subject": b["subject"], "name": b["kp"]["name"], "label": b["label"], "note": b["note"]}
               for b in engine.bridges(k["id"], kp_id) if b["status"] in ("mastered", "learning")][:3]
@@ -291,8 +288,7 @@ def _drawn(body: dict) -> dict:
 @router.get("/api/practice/{kp_id}")
 def api_practice(request: Request, kp_id: str, n: int = 3, purpose: str = "practice"):
     k = kid_or_redirect(request)
-    if not catalog.kp(kp_id):
-        raise HTTPException(404)
+    learner_kp(k, kp_id)
     purpose = purpose if purpose in ("practice", "preview") else "practice"
     prefetch.wait(k["id"], kp_id, purpose)  # 打开学习页时后台已经在出：等它，不重复出
     items = engine.items_for(k["id"], kp_id, n=min(n, 5), purpose=purpose, grade=k["grade"])
@@ -317,8 +313,7 @@ def api_answer(request: Request, body: dict = Body(...)):
 def api_trace_start(request: Request, body: dict = Body(...)):
     k = kid_or_redirect(request)
     kp_id = body.get("kp_id") or ""
-    if not catalog.kp(kp_id):
-        raise HTTPException(404)
+    learner_kp(k, kp_id)
     t = db.one("SELECT id FROM traces WHERE user_id=? AND kp_id=? AND day=?", k["id"], kp_id, db.today().isoformat())
     return {"id": t["id"] if t else trace.start(k["id"], kp_id, body.get("item_id") or "", body.get("answer"))}
 
@@ -352,8 +347,8 @@ def api_trace_answer(request: Request, tid: int, body: dict = Body(...)):
 def api_learn_done(request: Request, body: dict = Body(...)):
     k = kid_or_redirect(request)
     kp_id = body["kp_id"]
+    kp = learner_kp(k, kp_id)
     if body.get("summary"):
-        kp = catalog.kp(kp_id)
         engine.add_card(k["id"], "kp", kp["name"], body["summary"][:500], {"method": kp.get("method", "")}, kp_id)
     hit = engine.mark_task_by(k["id"], kp=kp_id)
     return {"ok": True, "flow": engine.flow_state(k["id"], (hit or [None])[0])}
@@ -363,9 +358,7 @@ def api_learn_done(request: Request, body: dict = Body(...)):
 def api_context(request: Request, kp_id: str):
     """知识背景和用处（AI 生成，按知识点缓存）。没配置 AI 就返回空。"""
     k = kid_or_redirect(request, manage=True)
-    kp = catalog.kp(kp_id)
-    if not kp:
-        raise HTTPException(404)
+    kp = learner_kp(k, kp_id)
     if not llm.enabled():
         return {}
     prefetch.wait(k["id"], kp_id, "context")  # 打开学习页时后台已经在写：等它，不重复写
@@ -512,7 +505,7 @@ def ask_history(request: Request, thread_id: int):
 @router.get("/diagnose/{pack_id}", response_class=HTMLResponse)
 def diagnose_page(request: Request, pack_id: str):
     k = kid_or_redirect(request)
-    pack = catalog.packs.get(pack_id) or (_ for _ in ()).throw(HTTPException(404))
+    pack = learner_pack(k, pack_id)
     stage = engine.enrollment_stage(k["id"], pack_id) or catalog.default_stage(pack_id, k["grade"])
     running = db.one("SELECT id FROM diag_sessions WHERE user_id=? AND pack_id=? AND status='running' ORDER BY id DESC",
                      k["id"], pack_id)
@@ -524,7 +517,7 @@ def diagnose_page(request: Request, pack_id: str):
 @router.post("/api/diag/start")
 def diag_start(request: Request, body: dict = Body(...)):
     k = kid_or_redirect(request)
-    pack_id = body["pack_id"]
+    pack_id = learner_pack(k, body.get("pack_id") or "").id
     stage = body.get("stage") or engine.enrollment_stage(k["id"], pack_id) or catalog.default_stage(pack_id, k["grade"])
     db.run("UPDATE diag_sessions SET status='abandoned' WHERE user_id=? AND pack_id=? AND status='running'", k["id"], pack_id)
     return {"sid": engine.start_diagnosis(k["id"], pack_id, stage)}
