@@ -401,6 +401,9 @@ def build_plan(user_id: int) -> list[dict]:
                 flex.append(t)
     # tail：每天都有、排在最后的任务（默认是阅读：学完新的，用大量输入放松收尾），和 fixed 一样不受时间预算限制
     tail = [t for kind in c.policy.get("tail", []) for t in _take(c, kind)]
+    # 最后一道关：任务指向的知识点学习者必须打得开（和学习页同一条规则 catalog.kp_visible），哪个来源漏了都排不进来
+    fixed, flex, tail = ([t for t in ts if not t.get("kp") or catalog.kp_visible(t["kp"], c.user["grade"])]
+                         for ts in (fixed, flex, tail))
     budget = c.user["daily_minutes"] or 60
     out, used, n_flex = [], sum(t["minutes"] for t in tail), 0
     for part, t in [("fixed", t) for t in fixed] + [("flex", t) for t in flex] + [("tail", t) for t in tail]:

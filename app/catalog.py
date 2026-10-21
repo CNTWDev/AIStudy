@@ -508,7 +508,7 @@ class Catalog:
         反过来不行：中小学的课用到成人课的点（前置、关联、同一概念），孩子追根、看关联就会走进成人课。"""
         def side(k):
             return self.packs[self.kp_pack[k]].audience
-        self.foundations = {}
+        self.foundations, self._closed = {}, {}
         for aud in ("school", "adult"):
             seen, stack = set(), [k for k in self.kps if side(k) in (aud, "all")]
             while stack:
@@ -544,6 +544,13 @@ class Catalog:
     def kp_visible(self, kp_id: str, grade: str | None) -> bool:
         """知识点能不能打开：它所在的课能看到，或者它是这群人的课要用到的基础。"""
         return self.visible(self.kp_pack.get(kp_id), grade) or kp_id in self.foundations.get(audience(grade), ())
+
+    def closed_to(self, grade: str | None) -> frozenset:
+        """这个学习者打不开的知识点（kp_visible 的反面，按人群算一次）：每天的学习（计划、自动发现、热身、复习）都不碰它们。"""
+        aud = audience(grade)
+        if aud not in self._closed:
+            self._closed[aud] = frozenset(k for k in self.kps if not self.kp_visible(k, grade))
+        return self._closed[aud]
 
     def courses(self) -> list[Pack]:
         """能选的课：主干不直接选，选建在它上面的教材。"""

@@ -67,4 +67,4 @@ def test_same_concept_in_another_textbook_stays():
                    catalog.default_stage(r["pack_id"], "G8"), r["active"])
         p = engine.Paused(uid)
         assert shared not in p.kps
-        assert p.kps and p.kps <= set(catalog.packs["phy-cambridge"].kp_ids)
+        assert p.kps and p.kps - catalog.closed_to("G8") <= set(catalog.packs["phy-cambridge"].kp_ids)   # 加上成人课的点（孩子打不开）
