@@ -635,27 +635,44 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .pquiet{color:var(--muted)}.pquiet b{color:var(--ink);font-weight:600}
 .quiet .wkcard:not([open]){display:flex;flex-direction:column;justify-content:center}
 
-/* Compact curriculum selection: expose only the chosen course and its matching guide. */
-.course-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:16px}
 /* 添加孩子：按学校模板默认排好的课，一行一门，后面「换」 */
 .course-sum{margin-top:12px}.course-sum-h{font-weight:600;margin-bottom:6px;line-height:1.5}
 .course-sum-list{display:grid;grid-template-columns:1fr auto;gap:6px 10px;font-size:15px;align-items:center}
 .course-sum-list .linkbtn,#login-edit{color:var(--brand-ink);font-weight:600}
 .kid-new{max-width:640px}
 .course-adjust{margin-top:10px}.course-adjust>summary{cursor:pointer;color:var(--brand-ink)}
-.course-choice{min-width:0;border:1px solid var(--line);border-radius:18px;padding:16px;background:var(--card)}
-.course-choice>label{font-size:18px;margin:0 0 8px}
-.course-info[hidden]{display:none}
 .picker-help{margin:12px 0;padding:12px 16px;border:1px solid var(--line);border-radius:12px}
-.picker-help>summary,.course-details>summary{cursor:pointer;color:var(--muted)}
+.picker-help>summary{cursor:pointer;color:var(--muted)}
 .picker-help ol{padding-left:22px}.picker-help p{margin-bottom:0}
-.picker-match{margin:12px 0 8px;line-height:1.6}.picker-status:empty{display:none}
-.picker-status,.picker-warning{padding:8px 10px;border-radius:10px;background:var(--brand-3);line-height:1.6}
-.course-details{margin-top:12px;overflow-wrap:anywhere}
-.course-details>summary{font-size:13px}.course-details dl{margin:12px 0}.course-details dt{font-weight:600}
-.course-details dd{margin:2px 0 10px}.course-details p{line-height:1.7}
-@media(min-width:900px){.course-grid{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}}
-.course-track{margin:10px 0}.course-track>summary{cursor:pointer;color:var(--muted);font-size:13px}
+/* 选课清单（_course_grid.html，DESIGN 5.39）：一门课一行，右边一个开关。行一样高、图标一列、开关一列，整张清单对齐；
+   关着的课图标变灰、字变浅，开着的课一眼看出来。要再选的（几套教材、考试方向、考试日期）只在开着时、在这一行下面多一小行。 */
+.cpick-list{margin-top:14px;border:1px solid var(--line);border-radius:18px;background:var(--card);overflow:hidden;max-width:720px}
+.cpick+.cpick{border-top:1px solid var(--line-2)}
+.cpick-list .cpick .cp-row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:14px;margin:0;padding:12px 16px;min-height:68px;cursor:pointer;font-weight:400}
+.cpick .cp-row:hover{background:var(--line-2)}
+.cpick .sico{transition:filter .15s,opacity .15s}
+.cpick:not([data-on]) .sico{filter:grayscale(1);opacity:.45}
+.cp-t{display:grid;gap:2px;min-width:0}.cp-t b{font-size:16px;font-weight:600;line-height:1.4}
+.cp-sub{color:var(--muted);font-size:13px;line-height:1.5;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.cpick[data-on] .cp-if-off,.cpick:not([data-on]) .cp-if-on{display:none}
+.cpick:not([data-on]) .cp-t b{color:var(--muted);font-weight:500}.cpick:not([data-on]) .cp-sub{color:var(--faint)}
+/* 开关：系统的勾选框藏起来（还在，能用键盘、读屏），画一个胶囊开关 */
+.cpick .cp-on{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.cp-sw{width:46px;height:28px;border-radius:99px;background:var(--line);position:relative;transition:background .15s;flex:none}
+.cp-sw::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
+.cp-on:checked+.cp-sw{background:var(--brand)}.cp-on:checked+.cp-sw::after{transform:translateX(18px)}
+.cp-on:focus-visible+.cp-sw{box-shadow:var(--ring)}
+/* 开着时多出的一小行：和标题文字左对齐 */
+.cp-opts{display:flex;flex-wrap:wrap;gap:8px 12px;padding:0 16px 14px 70px}
+.cp-opts[hidden],.cp-opts [hidden]{display:none}
+.cpick-list .cp-f{display:grid;gap:4px;margin:0;flex:1 1 220px;min-width:0;font-size:13px;font-weight:400;color:var(--muted)}
+.cp-f i{font-style:normal;color:var(--faint)}
+.cp-f :is(select,input){min-height:40px;padding-top:6px;padding-bottom:6px;font-size:14px}
+.cp-note{flex:1 1 100%;margin:0;padding:6px 10px;border-radius:10px;background:var(--brand-2);line-height:1.6}
+.cp-more{flex:1 1 100%;color:var(--muted)}.cp-more>summary{cursor:pointer;width:max-content;max-width:100%}
+.cp-more dl{margin:8px 0 0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;line-height:1.6;overflow-wrap:anywhere}.cp-more dt{color:var(--ink)}.cp-more dd{margin:0}
+@media (max-width:520px){.cp-opts{padding-left:16px}}
+@media (prefers-reduced-motion:reduce){.cp-sw,.cp-sw::after,.cpick .sico{transition:none}}
 /* 今天页「看看我的进步」：孩子端默认收起，页面只留今天要做的事 */
 .quiet-box>summary{cursor:pointer;list-style:none;user-select:none}
 .quiet-box>summary::-webkit-details-marker{display:none}
@@ -705,7 +722,8 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 [data-skin=kid] :is(h1,h2,h3,.btn,.num-big,.qc-key,.step .num,.flb-prog,.fb-v,.toast,.nx-t,.sec-card>b,.fs-h b){font-family:var(--f-round),-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
 [data-skin=kid] h1{font-size:28px;font-weight:800}[data-skin=kid] h2{font-weight:800}
 /* 卡片：浅色厚边（像一块厚纸板），可点的卡片按下会沉 */
-[data-skin=kid] :is(.card,.tile,.quick a,.goal-card,.flowbar,.course-choice){border:2px solid var(--k-card-edge);box-shadow:var(--k-card-drop)}
+[data-skin=kid] :is(.card,.tile,.quick a,.goal-card,.flowbar,.cpick-list){border:2px solid var(--k-card-edge);box-shadow:var(--k-card-drop)}
+[data-skin=kid] .cp-sw{box-shadow:inset 0 0 0 2px var(--k-ink)}[data-skin=kid] .cp-sw::after{box-shadow:0 0 0 2px var(--k-ink)}
 [data-skin=kid] :is(a.card,.card.link,.tile,.quick a,.subj):active{transform:translateY(3px);box-shadow:0 2px 0 var(--k-card-edge)}
 [data-skin=kid] :is(a.card,.card.link,.tile,.subj):hover{border-color:var(--brand-3);box-shadow:var(--k-card-drop)}
 [data-skin=kid] .quiet>.card,[data-skin=kid] .quiet-tiles .tile{box-shadow:none}

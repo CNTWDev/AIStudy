@@ -64,13 +64,13 @@
   <select name="method" id="method">{% for m in methods.choices() %}<option value="{{ m.id }}" data-desc="{{ m.desc }}" {{ 'selected' if m.id == cur_method }}>{{ m.name }}</option>{% endfor %}</select>
   <p class="muted small" id="method-desc" style="margin:4px 0 0"></p>
   <h2>学科与教材</h2>
-  {% if self_mode %}<p class="muted small">选你要学的课。考试日期选填：填了以后，每天学多少按离考试剩下的天数排，离考试两周时转为冲刺复习。以后也可以在「学习进度和考试日期」里改。</p>
-  {% else %}<p class="muted small">每门课选孩子学校用的教材版本就行，学段按上面的年级自动对应。之后在「学校进度」里点到学校正在教的那一课，系统据此往前补漏、往后预习。职业资格考试的课可以直接填考试日期。</p>{% endif %}
-  <details class="picker-help">
+  {% if self_mode %}<p class="muted small">打开你要学的课。有考试的课可以填考试日期：每天学多少按离考试剩下的天数排，离考试两周时转为冲刺复习。以后也可以在「学习进度和考试日期」里改。</p>
+  {% else %}<p class="muted small">打开孩子要学的课，有几套教材的挑学校用的那套，学段按上面的年级自动对应。之后在「学校进度」里点到学校正在教的那一课，系统据此往前补漏、往后预习。职业资格考试的课可以直接填考试日期。</p>{% endif %}
+  {% if not self_mode %}<details class="picker-help">
     <summary>不确定是哪一版？按课本这样核对</summary>
     <ol class="small"><li>看课本封面：学科、年级、上下册。</li><li>翻到版权页：核对出版社、教材版本，以及“六三学制 / 五四学制”。</li><li>国际课程向老师确认课程体系与考试代码。</li></ol>
-    <p class="small muted">名称相同不一定是同一套教材。找不到对应版本时，可先选“暂不安排，确认后再选”，以后再补，不必勉强选相近的版本。</p>
-  </details>
+    <p class="small muted">名称相同不一定是同一套教材。找不到对应版本时先关着，以后再补，不必勉强选相近的版本。</p>
+  </details>{% endif %}
   {% include "_course_grid.html" %}
   </div>{# #learning #}
   {% endif %}
@@ -84,6 +84,7 @@ $('#method').onchange = _md; _md();
 const _games = () => { const box = $('#learning'); if (!box || $('#games')?.dataset.self) return;
   const adult = +($('#grade').selectedOptions[0]?.dataset.rank || 0) >= 13;
   box.hidden = adult; $$('#learning select, #learning input').forEach(x => x.disabled = adult);
+  if (!adult) window.coursePicker?.update();  // 选课清单里关着的课不提交
   if ($('#adult-note')) $('#adult-note').hidden = !adult;
   // 新加的成员：孩子设 4 位数字，成人成员设普通密码
   if ($('#pin-box')) { $('#pin-box').hidden = adult; $('#pin-box input').disabled = adult;

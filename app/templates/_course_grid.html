@@ -1,26 +1,53 @@
-{# 每门课选教材（家长编辑孩子、添加孩子、自学者「我的课程」共用）#}
-  <div class="course-grid">
-  {% for subj, packs in packs_by_subject.items() %}
-  {% set cur = (packs|selectattr('id', 'in', enrolled)|first) %}
-  <section class="course-choice" data-subject="{{ packs[0].subject }}">
-    <label for="course-{{ packs[0].subject }}">{{ subj }}</label>
-    <select id="course-{{ packs[0].subject }}" name="subj_{{ packs[0].subject }}" class="course-select" aria-describedby="course-status-{{ packs[0].subject }}">
-      <option value="" {{ 'selected' if not cur }}>暂不安排，确认后再选</option>
-      {% for p in packs %}{% set guide = catalog.selection_guide(p) %}<option value="{{ p.id }}" data-start="{{ stage_rank(p.stages[0]) }}" data-end="{{ stage_rank(p.stages[-1]) }}" {{ 'selected' if cur and cur.id == p.id }}>{{ guide.name }}</option>{% endfor %}
-    </select>
-    <p class="small picker-status" id="course-status-{{ packs[0].subject }}" role="status" aria-live="polite"></p>
-    {% for p in packs %}{% set guide = catalog.selection_guide(p) %}
-    <div class="course-info" data-pack="{{ p.id }}" {{ 'hidden' if not cur or cur.id != p.id }}>
-      <p class="small picker-match"><b>核对课本：</b>{{ guide.hint }}</p>
-      {% if guide.warning %}<p class="small picker-warning">{{ guide.warning }}</p>{% endif %}
-      {% if p.tracks %}{% set early_exam = p.system == 'cambridge' and 'IGCSE' in p.stages and stage_rank(p.stages[0]) < 9 %}<details class="course-track" data-always-open="{{ '0' if early_exam else '1' }}" {{ 'open' if not early_exam or (k and stage_rank(k.grade) >= 9) }}><summary>{{ 'IGCSE 考试方向（备考时确认）' if p.system == 'cambridge' and 'IGCSE' in p.stages else '课程方向（按需要选择）' }}</summary><label class="small" for="track-{{ p.id }}">{{ '考试方向（请与老师确认）' if not self_mode else '课程 / 考试方向' }}</label><select id="track-{{ p.id }}" name="track_{{ p.id }}" class="trk">{% for t in p.tracks %}<option value="{{ t.id }}" {{ 'selected' if p.track(tracks.get(p.id)) == t.id }}>{{ t.name }}</option>{% endfor %}</select></details>{% endif %}
-      {% if self_mode or p.system == 'cert' %}<label class="small" for="exam-{{ p.id }}">考试日期（选填）</label><input id="exam-{{ p.id }}" type="date" name="exam_{{ p.id }}" value="{{ exams.get(p.id) or '' }}">{% endif %}
-      <details class="course-details"><summary>查看完整名称、适用范围与课程说明</summary>
-        <dl class="small"><dt>完整名称</dt><dd>{{ p.edition }}</dd><dt>适用地区 / 课程</dt><dd>{{ p.region or '请按学校课程核对' }}</dd><dt>已整理学段</dt><dd>{{ p.stages|map('stage_name')|join('、') }}</dd></dl>
-        {% if p.notes %}<p class="small muted">{{ p.notes }}</p>{% endif %}
-      </details>
-    </div>
+{# 选课（家长编辑孩子、添加孩子、自学者「我的课程」共用，docs/DESIGN.md §5.39）：
+   一门课一行，右边一个开关，开 = 学、关 = 不学。行高一样，整张清单一眼对齐。
+   只有真要再选的才在这一行下面多出一小行：几套教材选哪套、考试方向、考试日期。
+   表单字段不变：subj_<学科> = 教材 id（单一教材时就是开关本身，有几套时是下拉框）、track_<教材>、exam_<教材>。 #}
+{% import "_ui.html" as ui %}
+<div class="cpick-list">
+{% for subj, packs in packs_by_subject.items() %}
+{% set s = packs[0].subject %}
+{% set cur = (packs|selectattr('id', 'in', enrolled)|first) %}
+{% set one = packs|length == 1 %}
+{% set g0 = catalog.selection_guide(packs[0]) %}
+<div class="cpick" id="course-{{ s }}" data-subject="{{ s }}" data-name="{{ subj }}" {{ 'data-on' if cur }}>
+  <label class="cp-row">
+    {{ ui.subj_ico(s, 40) }}
+    <span class="cp-t"><b>{{ subj }}</b>
+      <small class="cp-sub">{% if one %}{{ g0.hint if packs[0].system == 'course' else g0.name }}{% else %}<span class="cp-if-off">{{ packs|length }} 套教材可选</span><span class="cp-if-on">挑学校用的那一套</span>{% endif %}</small></span>
+    <input type="checkbox" class="cp-on" role="switch" aria-label="学{{ subj }}" {{ 'checked' if cur }}
+      {% if one %}name="subj_{{ s }}" value="{{ packs[0].id }}" data-start="{{ stage_rank(packs[0].stages[0]) }}" data-end="{{ stage_rank(packs[0].stages[-1]) }}"{% endif %}>
+    <span class="cp-sw" aria-hidden="true"></span>
+  </label>
+  {% set has_opts = not one or packs|selectattr('tracks')|list or packs|selectattr('system', 'eq', 'cert')|list %}
+  <div class="cp-opts" {{ 'hidden' if not (cur and has_opts) }}>
+    {% if not one %}
+    <label class="cp-f"><span>教材</span>
+      <select name="subj_{{ s }}" class="cp-pack" {{ 'disabled' if not cur }}>
+        {% for p in packs %}<option value="{{ p.id }}" data-start="{{ stage_rank(p.stages[0]) }}" data-end="{{ stage_rank(p.stages[-1]) }}" {{ 'selected' if cur and cur.id == p.id }}>{{ catalog.selection_guide(p).name }}</option>{% endfor %}
+      </select></label>
+    {% endif %}
+    {% for p in packs %}
+    {% set on = cur and cur.id == p.id or (not cur and loop.first) %}
+    {% if p.tracks %}{% set early = p.system == 'cambridge' and 'IGCSE' in p.stages and stage_rank(p.stages[0]) < 9 %}
+    <label class="cp-f" data-pack="{{ p.id }}" data-from="{{ 9 if early else 0 }}" {{ 'hidden' if not on }}><span>考试方向</span>
+      <select id="track-{{ p.id }}" name="track_{{ p.id }}" {{ 'disabled' if not (cur and on) }}>{% for t in p.tracks %}<option value="{{ t.id }}" {{ 'selected' if p.track(tracks.get(p.id)) == t.id }}>{{ t.name }}</option>{% endfor %}</select></label>
+    {% endif %}
+    {% if p.system == 'cert' %}
+    <label class="cp-f" data-pack="{{ p.id }}" {{ 'hidden' if not on }}><span>考试日期 <i>选填</i></span>
+      <input type="date" name="exam_{{ p.id }}" value="{{ exams.get(p.id) or '' }}" {{ 'disabled' if not (cur and on) }}></label>
+    {% endif %}
     {% endfor %}
-  </section>
-  {% endfor %}
+    <p class="cp-note small" role="status" aria-live="polite"></p>
+    {% for p in packs %}{% set w = catalog.selection_guide(p).warning %}{% if w %}<p class="cp-note small" data-pack="{{ p.id }}" hidden>{{ w }}</p>{% endif %}{% endfor %}
+    {% if not one %}
+    <details class="cp-more small"><summary>怎么确认是这一套</summary>
+      {% for p in packs %}{% set guide = catalog.selection_guide(p) %}
+      <dl data-pack="{{ p.id }}" {{ 'hidden' if not (cur and cur.id == p.id or (not cur and loop.first)) }}><dt>核对课本</dt><dd>{{ guide.hint }}</dd>
+        <dt>完整名称</dt><dd>{{ p.edition }}</dd><dt>适用</dt><dd>{{ p.region or '请按学校课程核对' }} · {{ p.stages|map('stage_name')|join('、') }}</dd></dl>
+      {% endfor %}
+    </details>
+    {% endif %}
   </div>
+</div>
+{% endfor %}
+</div>

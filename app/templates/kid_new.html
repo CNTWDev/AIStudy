@@ -32,7 +32,7 @@
     </div>
     <details class="course-adjust" id="adjust">
       <summary class="small">逐科调整教材</summary>
-      <p class="muted small">学段按年级自动对应。找不到孩子课本那一版时，选「暂不安排」，以后再补。</p>
+      <p class="muted small">打开要学的课；有几套教材的再挑一套，学段按年级自动对应。找不到孩子课本那一版就先关着，以后再补。</p>
       {% include "_course_grid.html" %}
     </details>
   </div>
@@ -48,18 +48,17 @@
   <p style="margin:12px 0 0"><a class="btn ghost" href="/parent">取消</a></p>
 </form>
 <script>
-(() => {
-  const grade = $('#grade'), sum = $('#course-sum-list');
+addEventListener('DOMContentLoaded', () => {  // 等 course-picker.js（defer）准备好 coursePicker
+  const grade = $('#grade'), sum = $('#course-sum-list'), cp = window.coursePicker;
   const minutesFor = r => r <= 2 ? 30 : r <= 4 ? 40 : r <= 6 ? 45 : r <= 9 ? 60 : 90;  // 和 web.default_minutes 一致
   const rank = () => +(grade.selectedOptions[0]?.dataset.rank || 0);
-  // 已选的课列成一张小清单；每门后面「换」打开逐科调整
-  const short = t => t.split('（')[0];
+  // 打开的课列成一张小清单；每门后面「换」打开逐科调整，跳到那一行
   const renderSum = () => {
-    const rows = $$('.course-select').filter(s => s.value).map(s =>
-      `<span>${s.closest('.course-choice').querySelector('label').textContent} · ${short(s.selectedOptions[0].textContent)}</span>` +
-      `<button type="button" class="linkbtn small" data-subj="${s.id}">换</button>`);
-    sum.innerHTML = rows.join('') || '<span class="muted">还没有安排课，点下面「逐科调整教材」选。</span>';
-    $$('button[data-subj]', sum).forEach(b => b.onclick = () => { $('#adjust').open = true; const s = document.getElementById(b.dataset.subj); s.scrollIntoView({block: 'center'}); s.focus(); });
+    sum.innerHTML = cp.chosen().map(c => `<span>${c.name} · ${c.label}</span>` +
+      `<button type="button" class="linkbtn small" data-subj="${c.subject}">换</button>`).join('') ||
+      '<span class="muted">还没有安排课，点下面「逐科调整教材」选。</span>';
+    $$('button[data-subj]', sum).forEach(b => b.onclick = () => { $('#adjust').open = true;
+      const row = document.getElementById('course-' + b.dataset.subj); row.scrollIntoView({block: 'center'}); row.querySelector('.cp-pack, .cp-on').focus(); });
   };
   // 选了地区、学校类型、年级：服务器按学校模板给出默认的课，家长再按需要换
   const pick = name => $(`input[name=${name}]:checked`)?.value || '';
@@ -69,24 +68,22 @@
     let r; try { r = await (await fetch('/parent/kids/defaults?' + q)).json(); } catch (e) { return; }
     $('#preset-id').value = r.preset || '';
     $('#course-sum-h').textContent = r.title;
-    $$('.course-select').forEach(s => s.value = '');
-    r.courses.forEach(c => { const s = $(`.course-choice[data-subject="${c.subject}"] .course-select`); if (!s) return;
-      s.value = c.pack; s.dispatchEvent(new Event('change'));
-      const t = document.getElementById('track-' + c.pack); if (t && c.track) t.value = c.track; });
-    $$('.course-select').forEach(s => s.dispatchEvent(new Event('change')));
+    cp.clear();
+    r.courses.forEach(c => cp.set(c.subject, c.pack, c.track));
     renderSum();
   };
   $$('input[name=region], input[name=school_type]').forEach(x => x.addEventListener('change', fill));
-  $$('.course-select').forEach(s => s.addEventListener('change', renderSum));
+  document.addEventListener('course-change', renderSum);
   // 成人成员：不问学校，课程由本人安排；4 位数字换成普通密码
   const adultSwitch = () => { const adult = rank() >= 13;
     $('#learning').hidden = adult; $$('#learning select, #learning input').forEach(x => x.disabled = adult);
+    if (!adult) cp.update();  // 恢复时只让打开的课提交
     $('#adult-note').hidden = !adult; $('#defaults-note').hidden = adult;
     $('#pin-box').hidden = adult; $('#kpin').disabled = adult; $('#pw-box').hidden = !adult; $('#kpw').disabled = !adult;
     $('#dm').textContent = minutesFor(rank()); };
   grade.addEventListener('change', () => { adultSwitch(); if (rank() < 13) fill(); });
   adultSwitch(); renderSum();
-})();
+});
 </script>
 <script src="/static/course-picker.js?v={{ ASSET_V }}" defer></script>
 {% endblock %}
