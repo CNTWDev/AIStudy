@@ -49,7 +49,7 @@ PACK_KINDS = {"textbook": "审定教材", "syllabus": "考试大纲", "course": 
 TERM_RANK = {"上": 0, "下": 2}   # 章的先后：上册、不分册、下册
 # 目录包从主干继承的字段（目录包只管「哪一册、哪一单元、按什么顺序教哪些点」）
 EDITION_INHERITS = ("subject", "subject_name", "system", "teach_lang", "item_lang", "prompt_note", "progress",
-                    "tracks", "default_track")
+                    "tracks", "default_track", "audience")
 LINK_TYPES = {"uses": "要用到", "language": "另一种语言的说法", "context": "相关背景"}
 
 
@@ -66,6 +66,22 @@ ADULT_YEAR = 13  # 大学一年级及以上（含「成人」）算成人学习�
 
 def is_adult(grade: str | None) -> bool:
     return bool(grade) and stage_rank(grade) < 99 and stage_rank(grade) >= ADULT_YEAR
+
+
+# 课面向谁：中小学的课只给中小学生，成人的课只给成人（docs/课程按人群分开-方案.md）。
+# 分界线和 is_adult 是同一条：看学习者现在的年级，不看账号类型（家长、孩子、自学者只决定谁管谁）。
+AUDIENCES = {"school": "中小学", "adult": "成人", "all": "不分"}
+
+
+def audience(grade: str | None) -> str:
+    """学习者属于哪一群：年级是大学及以上、「成人」→ adult，其余 → school。"""
+    return "adult" if is_adult(grade) else "school"
+
+
+def _audience_of(years: list) -> str:
+    """课的学段都在大学及以上 → adult；都在高三及以下 → school；两边都有 → all。"""
+    sides = {y >= ADULT_YEAR for y in years if y < 99}
+    return "all" if len(sides) == 2 else "adult" if sides == {True} else "school"
 
 
 @dataclass
@@ -91,6 +107,7 @@ class Pack:
     chapters: bool = True                             # 能不能按章报进度；按能力分的（剑桥英语等）写 "progress": "none"
     selection: dict = field(default_factory=dict)    # 家长选课用的短名称、核对提示
     copyright: str = ""                               # 自编教材的版权声明，显示在知识点页底部
+    audience: str = "school"                          # 面向谁（AUDIENCES）：默认按学段推，包里写 "audience" 可覆盖
     open_review: str = ""                             # "ai"：简答题由 AI 点评和追问，不让学员自评（app/coach.py）
     thinking_moves: list = field(default_factory=list)  # 这门课看重的思考方式 [{id, name, desc}]；列了才出思辨题（app/discuss.py）
     base: str = ""                                    # 目录包：建在哪个主干上（知识点、题、讲解都是主干的）
@@ -157,6 +174,7 @@ class Catalog:
         self.concept_of: dict[str, str] = {}  # kp -> concept id
         self.links: list[dict] = []           # {from, to, type, note}
         self.link_index: dict[str, list] = {}  # kp -> [link]（两个方向都记）
+        self.foundations: dict[str, set] = {}  # 人群 -> 别的人群的课里、这群人的课要用到的基础知识点
         self.systems: list[dict] = []
         self.stages: list[dict] = []
         self.presets: list[dict] = []
@@ -227,6 +245,10 @@ class Catalog:
                 self._edition(pack, base, d.get("books") or [])
             if not pack.stages:
                 pack.stages = sorted({self.kp_in(pack.id, k)["stage"] for k in pack.kp_ids}, key=stage_rank)
+            years = {lv["id"]: float(lv.get("year", 99)) for lv in pack.levels}
+            pack.audience = meta.get("audience") or _audience_of([years.get(st, stage_rank(st)) for st in pack.stages])
+            if pack.audience not in AUDIENCES:
+                self.errors.append(f"{pack.id}: audience {pack.audience} 不认识（可选 {list(AUDIENCES)}）")
             self._meta[pack.id] = meta
             self.packs[pack.id] = pack
         self.kp_packs = {}   # 知识点 -> 用到它的教材（主干 + 各套目录）
@@ -242,6 +264,7 @@ class Catalog:
                     self.errors.append(f"{kp['pack']}: {kid} 的必须前置 {p['id']} 学段更晚（改成「有帮助」或调整学段）")
                 self.children.setdefault(p["id"], []).append(kid)
         self._load_links(directory / "_links")
+        self._audiences()
         for pr in self.presets:
             for subj, choice in pr.get("packs", {}).items():
                 pid = choice["pack"] if isinstance(choice, dict) else choice
@@ -444,6 +467,28 @@ class Catalog:
                 self.link_index.setdefault(ln["from"], []).append(ln)
                 self.link_index.setdefault(ln["to"], []).append(ln)
 
+    def _audiences(self):
+        """人群之间的知识点。成人的课可以把中小学的点当前置（补基础）：这些点成人也能打开（foundations）。
+        反过来不行：中小学的课用到成人课的点（前置、关联、同一概念），孩子追根、看关联就会走进成人课。"""
+        def side(k):
+            return self.packs[self.kp_pack[k]].audience
+        self.foundations = {}
+        for aud in ("school", "adult"):
+            seen, stack = set(), [k for k in self.kps if side(k) in (aud, "all")]
+            while stack:
+                for p in self.kps[stack.pop()]["prereqs"]:
+                    if p["id"] in self.kps and p["id"] not in seen:
+                        seen.add(p["id"])
+                        stack.append(p["id"])
+            self.foundations[aud] = {k for k in seen if side(k) not in (aud, "all")}
+        for k in sorted(self.foundations["school"]):
+            self.errors.append(f"{self.kp_pack[k]}: {k} 是成人课的知识点，中小学的课不能把它当前置")
+        pairs = [(f"关联 {ln['from']} → {ln['to']}", (ln["from"], ln["to"])) for ln in self.links]
+        pairs += [(f"概念 {c['id']}", c["kps"]) for c in self.concepts.values()]
+        for name, kps in pairs:
+            if {"school", "adult"} <= {side(k) for k in kps}:
+                self.errors.append(f"{name} 把中小学的课和成人的课连在一起了")
+
     # ---- 图谱查询 ----
     def kp(self, kp_id: str) -> dict | None:
         return self.kps.get(kp_id)
@@ -454,6 +499,15 @@ class Catalog:
 
     def stage_in(self, pack_id: str, kp_id: str) -> str:
         return self.kp_in(pack_id, kp_id)["stage"]
+
+    def visible(self, pack, grade: str | None) -> bool:
+        """这门课这个学习者能不能看到、选、学（按年级，见 AUDIENCES）。"""
+        p = pack if isinstance(pack, Pack) else self.packs.get(pack or "")
+        return bool(p) and p.audience in ("all", audience(grade))
+
+    def kp_visible(self, kp_id: str, grade: str | None) -> bool:
+        """知识点能不能打开：它所在的课能看到，或者它是这群人的课要用到的基础。"""
+        return self.visible(self.kp_pack.get(kp_id), grade) or kp_id in self.foundations.get(audience(grade), ())
 
     def courses(self) -> list[Pack]:
         """能选的课：主干不直接选，选建在它上面的教材。"""
@@ -591,10 +645,12 @@ class Catalog:
         below = [s for s in pack.stages if stage_rank(s) <= g]
         return below[-1] if below else pack.stages[0]
 
-    def by_subject(self, school_type: str = "") -> dict[str, list[Pack]]:
+    def by_subject(self, school_type: str = "", grade: str | None = None) -> dict[str, list[Pack]]:
+        """能选的课按学科分组；给了年级就只列这个学习者能学的课。"""
         out: dict[str, list[Pack]] = {}
         for p in self.courses():
-            out.setdefault(p.subject_name, []).append(p)
+            if grade is None or self.visible(p, grade):
+                out.setdefault(p.subject_name, []).append(p)
         if school_type:  # 适合这类学校的教材排前面（其它的仍可选：转学、提前学）
             for lst in out.values():
                 lst.sort(key=lambda p: bool(p.school_types) and school_type not in p.school_types)

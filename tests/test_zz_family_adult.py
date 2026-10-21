@@ -56,11 +56,11 @@ def test_family_adult_manages_own_learning():
         assert mom["name"] == "孩子妈妈" and mom["daily_minutes"] == 30
         assert db.q("SELECT 1 FROM enrollments WHERE user_id=? AND active=1", mom["id"])
 
-        # 孩子升到大学：自动改成自己安排，原来的课程留着
+        # 孩子升到大学：自动改成自己安排；中学的课暂停（记录留着），成人的课自己选
         db.run("INSERT INTO enrollments(user_id,pack_id,stage,active,track) VALUES(?,?,?,1,?)", kid, "math-shanghai", "G12", "")
         c.post("/parent/kids/save", data={"id": str(kid), "email": "fa-k@x.com", "name": "小宝", "grade": "U1"})
         assert auth.self_managed(auth.get_user(kid))
-        assert db.q("SELECT 1 FROM enrollments WHERE user_id=? AND pack_id='math-shanghai' AND active=1", kid)
+        assert db.q("SELECT active FROM enrollments WHERE user_id=? AND pack_id='math-shanghai'", kid)[0]["active"] == 0
 
         # 成人不上孩子的榜、不进公开房间；还没成年的孩子照常
         mom, child = dict(mom), dict(auth.get_user(auth.create_user("fa-c@x.com", "2580", "二宝", "kid", parent_id=pa, grade="G3")))

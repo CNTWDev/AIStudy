@@ -5,7 +5,7 @@ from fastapi import APIRouter
 from fastapi import Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from .. import auth, brand, config, db, mailer, sitecfg
-from ..catalog import SUBJECTS, SYSTEMS, catalog, is_adult, stage_label
+from ..catalog import SUBJECTS, SYSTEMS, catalog, stage_label
 from ..library import CATALOG as BOOKS
 from ..web import (
     _back,
@@ -32,12 +32,12 @@ SYSTEM_SHORT = {"cn": "上海教材", "cambridge": "剑桥国际", "cert": "职�
 
 def _showcase() -> dict:
     """登录页「这里能学什么」：从课程目录直接生成（加一个教材包，这里自动多一门），只展示、不能选课。
-    分中小学和成人两组；每门课能展开看板块（章）和知识点数。试点的零散包（知识点很少）不展示。"""
-    groups = {"school": {}, "adult": {}}
+    按课面向谁分中小学和成人两组（不分人群的课两组都有）；每门课能展开看板块（章）和知识点数。试点的零散包（知识点很少）不展示。"""
+    groups, total = {"school": {}, "adult": {}}, 0
     for p in catalog.courses():
         if len(p.kp_ids) < 20:
             continue
-        adult = all(is_adult(s) for s in p.stages)
+        total += len(p.kp_ids)
         n = {}
         for k in p.kp_ids:
             n[catalog.kps[k]["strand"]] = n.get(catalog.kps[k]["strand"], 0) + 1
@@ -47,10 +47,11 @@ def _showcase() -> dict:
                 "title": p.edition.split("（")[0], "edition": p.edition, "kps": len(p.kp_ids),
                 "stages": stages[0] if len(stages) == 1 else f"{stages[0]}–{stages[-1]}",
                 "strands": [{"name": s["name"], "n": n[s["id"]]} for s in p.strands if n.get(s["id"])]}
-        subj = groups["adult" if adult else "school"].setdefault(p.subject, {
-            "name": p.subject_name, "icon": SUBJECTS.get(p.subject, {}).get("icon", "📘"), "kps": 0, "packs": []})
-        subj["kps"] += item["kps"]
-        subj["packs"].append(item)
+        for g in (("school", "adult") if p.audience == "all" else (p.audience,)):
+            subj = groups[g].setdefault(p.subject, {
+                "name": p.subject_name, "icon": SUBJECTS.get(p.subject, {}).get("icon", "📘"), "kps": 0, "packs": []})
+            subj["kps"] += item["kps"]
+            subj["packs"].append(item)
     order = {s: i for i, s in enumerate(SUBJECTS)}
     out = {g: [s for _, s in sorted(v.items(), key=lambda kv: order.get(kv[0], 99))] for g, v in groups.items()}
     for subj in out["school"]:
@@ -59,7 +60,7 @@ def _showcase() -> dict:
         books = len(json.loads(BOOKS.read_text(encoding="utf-8")).get("books", []))
     except (OSError, ValueError):
         books = 0
-    return {**out, "books": books, "kps": sum(s["kps"] for g in out.values() for s in g)}
+    return {**out, "books": books, "kps": total}
 
 
 def _login_page(request: Request, **ctx):

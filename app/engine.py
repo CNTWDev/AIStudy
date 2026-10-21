@@ -151,6 +151,19 @@ def load_seed_items(seed_dir):
     return n
 
 
+def fit_courses(user_id: int | None = None) -> int:
+    """在学的课都得是给这个人群的（catalog.visible）：年级跨过大学这条线（孩子升大一、成人成员改回孩子年级），
+    另一边的课暂停，记录都留着（见 Paused），重新选回来接着学。改年级后和启动时做（幂等）；返回暂停了几门。"""
+    rows = db.q("SELECT e.user_id, e.pack_id, u.grade FROM enrollments e JOIN users u ON u.id=e.user_id "
+                "WHERE e.active=1" + (" AND e.user_id=?" if user_id else ""), *([user_id] if user_id else []))
+    off = [r for r in rows if r["pack_id"] in catalog.packs and not catalog.visible(r["pack_id"], r["grade"])]
+    for r in off:
+        db.run("UPDATE enrollments SET active=0 WHERE user_id=? AND pack_id=?", r["user_id"], r["pack_id"])
+    for uid in {r["user_id"] for r in off}:
+        today_plan(uid, rebuild=True)
+    return len(off)
+
+
 def retire_open_mistakes() -> int:
     """错题本里不该有思辨题：没有标准答案的题不判对错（app/discuss.py）。以前按简答题判过对错、
     后来改成思辨题的那些题：错题卡拿掉，当时的对错证据删掉、重算掌握状态（启动时做，幂等）。"""

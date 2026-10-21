@@ -193,6 +193,15 @@ math-cn（kind: standard，主干）     知识点、前置、题、讲解、掌
 - 选择记在 `users.preset` 和 `users.school_type` 里。
 - 新的学校类型加一条模板就行。模板引用的教材必须存在，由 `check-curricula` 校验。
 
+### 4.4.1 课程按人群分开：中小学的课给中小学生，成人的课给成人（`catalog.visible`）
+
+- 课有一个 `audience`：`school` / `adult` / `all`。默认从学段推：学段（或 levels 的 year）都在大学及以上 → adult，都在高三及以下 → school，两边都有 → all；包里写 `"audience"` 可覆盖。
+- 学习者属于哪一群看年级（`app/catalog.py` 的 `audience(grade)`，和 `is_adult` 同一条线），不看账号类型：家长、孩子、自学者只决定谁管谁。家长自己学成人课，就在家里加一个自己的成人成员。自学者都是成人，年级只能选大学或「成人」。
+- 一个函数管所有地方：选课表单只列能学的课（`course_choices`），保存时不收别的（`_kid_form_packs`），知识地图、学习页、讲解、练习、诊断打不开别的（`learner_pack` / `learner_kp`），登录页「这里能学什么」按它分组。
+- 年级跨线（孩子升大一、成人成员改回孩子年级）：另一边的课暂停、记录留着（`engine.fit_courses`，改年级后和启动时做，同 5.33）。
+- 知识点：成人的课可以把中小学的点当前置（补基础，`catalog.foundations`，成人也能打开）；中小学的课不能用到成人课的点，关联和概念也不能把两边连起来，`check-curricula` 校验。
+- 讨论稿：项目文件 `docs/课程按人群分开-方案.md`。
+
 ### 4.5 校对与来源
 
 2026-10 对照上海市教委教学用书目录、教育部目录、上海市教育考试院和剑桥官方大纲做过一次校对，报告和上海教材全景见 `docs/curricula-audit/`。
