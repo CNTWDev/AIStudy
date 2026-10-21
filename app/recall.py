@@ -119,6 +119,9 @@ def answer(user_id: int, card_id: int, body: dict) -> dict:
     # card is shown (prepare_variants); only fall back to preparing it here, outside the learner
     # transaction, when that did not happen. Network latency must not hold the learner lock.
     card = db.one("SELECT * FROM cards WHERE id=? AND user_id=?", card_id, user_id)
+    item = _item(body.get("item_id")) if card and card["kind"] == "mistake" else None
+    if item and itemtypes.of(item).judge == "open" and item["id"] in (_extra(card).get("item_id"), _extra(card).get("variant")):
+        return _discuss_card(user_id, card, item, body)
     if card and _wants_variant(card) and not body.get("dont_know"):
         item = _item(body.get("item_id"))
         if (item and item["id"] == _extra(card).get("item_id")
@@ -129,6 +132,18 @@ def answer(user_id: int, card_id: int, body: dict) -> dict:
             else:
                 _ensure_variant(user_id, card)
     return _answer_command(user_id, card_id, body)
+
+
+def _discuss_card(user_id: int, card, item: dict, body: dict) -> dict:
+    """错题卡上的题现在是思辨题（以前按简答题判错进了错题本）：没有对错，不该留在错题本。
+    这次照思辨题的方式想一遍（AI 陪着想，app/discuss.py），想完就把这张卡拿掉。"""
+    from . import discuss
+    kp_id = card["kp_id"] or item.get("kp_id")
+    u = db.one("SELECT grade FROM users WHERE id=?", user_id)
+    res = discuss.handle(user_id, item, kp_id, body, u["grade"] if u else "")
+    if res.get("done"):
+        db.run("DELETE FROM cards WHERE id=? AND user_id=?", card["id"], user_id)
+    return {**res, "redo": True}
 
 
 # ------------------------------------------------------------------ 变式题提前准备
