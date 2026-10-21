@@ -151,6 +151,32 @@ def load_seed_items(seed_dir):
     return n
 
 
+def retire_open_mistakes() -> int:
+    """错题本里不该有思辨题：没有标准答案的题不判对错（app/discuss.py）。以前按简答题判过对错、
+    后来改成思辨题的那些题：错题卡拿掉，当时的对错证据删掉、重算掌握状态（启动时做，幂等）。"""
+    open_ids = {r["id"] for r in db.q("SELECT id, type FROM items WHERE type IN (%s)" % ",".join(
+        "?" * len([t for t in itemtypes.TYPES.values() if t.judge == "open"])),
+        *[t.id for t in itemtypes.TYPES.values() if t.judge == "open"])}
+    if not open_ids:
+        return 0
+    gone = [c["id"] for c in db.q("SELECT id, extra FROM cards WHERE kind='mistake'")
+            if db.jload(c["extra"], {}).get("item_id") in open_ids]
+    for cid in gone:
+        db.run("DELETE FROM cards WHERE id=?", cid)
+    # 以前按标准答案判的对错也不算数：删掉这些作答证据，按剩下的证据重算掌握状态
+    marks = ",".join("?" * len(open_ids))
+    hit = db.q(f"SELECT DISTINCT user_id, target_id FROM events WHERE target='kp' AND item_id IN ({marks})", *open_ids)
+    if hit:
+        db.run(f"DELETE FROM events WHERE target='kp' AND item_id IN ({marks})", *open_ids)
+        db.run(f"DELETE FROM attempts WHERE item_id IN ({marks})", *open_ids)
+        for r in hit:
+            if not db.one("SELECT id FROM events WHERE user_id=? AND target='kp' AND target_id=? LIMIT 1", r["user_id"], r["target_id"]):
+                db.run("DELETE FROM mastery WHERE user_id=? AND kp_id=?", r["user_id"], r["target_id"])
+        for uid in {r["user_id"] for r in hit}:
+            evidence.replay(uid)
+    return len(gone)
+
+
 def load_seed_lessons(seed_dir):
     """把 seed/teach_*.json 里人工写的讲义导入为作者版讲义（幂等）：同一个知识点只留这一篇，
     AI 讲义和旧版作者讲义换下。管理员下架过的这一版不再自动上架。"""

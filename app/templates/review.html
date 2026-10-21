@@ -46,10 +46,11 @@ function showItem(box, c, q) {
   box.innerHTML = head(c, tag) + '<div class="qbox" style="text-align:left"></div>';
   const qb = $('.qbox', box), it = q.item;
   renderItem(qb, it, {
-    submit: (answer, self, ms) => post(c, {item_id: it.id, answer, self, ms}),
+    submit: (answer, self, ms, extra) => post(c, Object.assign({item_id: it.id, answer, self, ms}, extra || {})),
     dontKnow: () => post(c, {item_id: it.id, dont_know: true}),
     onDone: res => {
       if (res.reveal) return;
+      if (res.discuss) { $('.fbbox', qb).insertAdjacentHTML('beforeend', '<div class="small" style="margin-top:6px">这道题没有标准答案，想完就从错题本里拿掉了。</div>'); return nextBtn(box, res, c); }
       const opts = $$('.opt', qb);
       if (res.answer_index != null && opts[res.answer_index]) opts[res.answer_index].classList.add('right');
       // 上次做错时选的那个：标出来，看清自己当时错在哪

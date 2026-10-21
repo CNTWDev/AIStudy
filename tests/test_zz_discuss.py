@@ -108,3 +108,25 @@ def test_judged_places_skip_discuss_items():
         assert iid not in [i["id"] for i in engine.items_for(uid, KP, n=20, purpose="diagnose", ai=False)]
         from app import recall
         assert (recall._kp_item(uid, KP) or {}).get("type") != "discuss"
+
+
+def test_old_mistake_card_on_a_discuss_item():
+    """改成思辨题以前判错进了错题本的题：重做时照思辨题的方式想，想完卡就拿掉；启动时这类卡直接清掉。"""
+    with TestClient(app) as c:
+        uid = _login(c)
+        iid = _item_id()
+        cid = engine.add_card(uid, "mistake", ITEM["q"], "旧的参考答案", {"item_id": iid, "my_answer": "旧答案"}, KP)
+        r = c.post(f"/api/review/{cid}/answer", json={"item_id": iid, "answer": "不该停招，先建能力"}).json()
+        assert r["discuss"] and "correct" not in r and db.one("SELECT id FROM cards WHERE id=?", cid)
+        end = c.post(f"/api/review/{cid}/answer", json={"item_id": iid, "answer": "", "discussion_id": r["discussion_id"],
+                                                        "conclusion": "先拿两个岗位试点"}).json()
+        assert end["done"] and not db.one("SELECT id FROM cards WHERE id=?", cid)
+        assert not db.one("SELECT id FROM attempts WHERE user_id=? AND item_id=?", uid, iid)
+        cid2 = engine.add_card(uid, "mistake", ITEM["q"] + " ", "旧的参考答案", {"item_id": iid}, KP)
+        it = engine._item_row_to_dict(db.one("SELECT * FROM items WHERE id=?", iid))
+        engine.record_attempt(uid, {**it, "type": "short"}, KP, "practice", False, "旧答案")  # 改成思辨题以前判的错
+        assert db.one("SELECT status FROM mastery WHERE user_id=? AND kp_id=?", uid, KP)
+        assert engine.retire_open_mistakes() >= 1 and not db.one("SELECT id FROM cards WHERE id=?", cid2)
+        assert not db.one("SELECT id FROM events WHERE user_id=? AND item_id=?", uid, iid)
+        assert not db.one("SELECT id FROM attempts WHERE user_id=? AND item_id=?", uid, iid)
+        assert not db.one("SELECT status FROM mastery WHERE user_id=? AND kp_id=?", uid, KP)

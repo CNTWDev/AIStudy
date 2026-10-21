@@ -634,7 +634,7 @@ def review_answer(request: Request, card_id: int, body: dict = Body(...)):
     r = recall.answer(k["id"], card_id, body)
     if r.get("error"):
         raise HTTPException(400, r["error"])
-    if not r.get("reveal"):
+    if not r.get("reveal") and not (r.get("discuss") and not r.get("done")):  # 思辨题想完才算这一张做完
         _review_tasks_done(k["id"])
     return r
 
