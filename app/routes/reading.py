@@ -39,6 +39,37 @@ def words(request: Request, kind: str = "word"):
                   today_iso=db.today().isoformat())
 
 
+@router.get("/words/map", response_class=HTMLResponse)
+def words_map(request: Request, msg: str = ""):
+    """我的词：认识的词一共多少（只增不减），每个单词包一组一组抓牢了几个（app/words.py）。
+    孩子的包由家长在学习安排里管；自己安排学习的成人在这里加、停。"""
+    from .. import words
+    k = kid_or_redirect(request, manage=True)
+    me = auth.require_user(request)
+    mine = me["id"] == k["id"] and auth.self_managed(me)
+    st = words.stats(k["id"])
+    return render(request, "words_map.html", st=st, can_edit=mine, msg=msg, lad_names=words.LEVEL_NAME,
+                  others=[wl for i, wl in words.packs().items() if i not in {a["pack"]["id"] for a in words.attached(k["id"]) if a["on"]}] if mine else [])
+
+
+@router.post("/words/packs")
+async def words_packs(request: Request):
+    """自己安排学习的成人：加上 / 停掉一个单词包、改每天几个新词。"""
+    from urllib.parse import urlencode
+    from .. import words
+    me = auth.require_user(request)
+    if not auth.self_managed(me):
+        raise HTTPException(403, "孩子的单词包由家长在「学习安排」里管")
+    f = await request.form()
+    ref = f.get("ref") or ""
+    if ref not in words.packs():
+        return RedirectResponse("/words/map?" + urlencode({"msg": "请选一个单词包"}), 303)
+    amount = str(f.get("daily_amount") or "").strip()
+    words.set_pack(me["id"], ref, f.get("action") != "stop", int(amount) if amount.isdigit() else None)
+    engine.today_plan(me["id"], rebuild=True)
+    return RedirectResponse("/words/map?" + urlencode({"msg": "已保存"}), 303)
+
+
 @router.get("/reading/today")
 def reading_today(request: Request, lang: str = "en"):
     """每日阅读任务的入口：今天读过 / 生成过就直接打开那篇；还没有才进写文章的工具。"""

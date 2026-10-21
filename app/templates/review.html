@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block body %}
-<div class="row"><h1 class="grow">{{ {"words":"单词复习","mistakes":"错题重做","other":"复习卡片"}.get(group, "复习") }}</h1><a class="btn ghost sm" href="/words">生词本 / 错题本</a></div>
+<div class="row"><h1 class="grow">{{ {"words":"单词","mistakes":"错题重做","other":"复习卡片"}.get(group, "复习") }}</h1>{% if group == 'words' %}<a class="btn ghost sm" href="/words/map">🗺️ 我的词</a>{% endif %}<a class="btn ghost sm" href="/words">生词本 / 错题本</a></div>
 <p class="muted small for-grownups">{% if group == 'mistakes' %}错题原样再做一遍。隔天连续做对 2 次，会换一道同类的新题，也做对了就过关；过关 3 周后再回头看一眼。
+{% elif group == 'words' %}新词先猜意思、再看例句，马上在句子里用一次；学过的词换着方式考：选、补句子、拼、听写。答对了下次隔得更久，答错了这一轮最后再来一次。
 {% else %}每张都要作答。答对了下次隔得更久；答错了过一会儿再来一次。{% endif %}</p>
 <div class="card flash" id="flash"><span class="loading">加载中</span></div>
 <script>
@@ -36,7 +37,8 @@ function show() {
   const c = cards[i], q = c.quiz || {mode: 'self'};
   Run.total = cards.length;
   if (q.mode === 'item') return showItem(box, c, q);
-  if (q.mode === 'choice' || q.mode === 'spell' || q.mode === 'dictate') return showWord(box, c, q);
+  if (q.mode === 'learn') return showLearn(box, c, q);
+  if (q.mode === 'choice' || q.mode === 'spell' || q.mode === 'dictate' || q.mode === 'cloze' || q.mode === 'cloze_spell') return showWord(box, c, q);
   showSelf(box, c);
 }
 
@@ -72,18 +74,72 @@ function showItem(box, c, q) {
   });
 }
 
-/* 单词：看意思选单词（四选一），熟了以后看意思写单词，再熟一点和听音写单词轮换 */
-function showWord(box, c, q) {
+/* 句子补洞：____ 画成一个洞，补好以后把词填进去 */
+const gapHtml = (q, word) => esc(q).replace('____', word ? `<b class="gap full">${esc(word)}</b>` : '<span class="gap"></span>');
+/* 答完的反馈：对了说补上了 / 对了，错了说差一点、告诉他是哪个词，这一轮最后它还会再来 */
+function wordFb(box, res, q, answer, c) {
+  const cloze = q.mode === 'cloze' || q.mode === 'cloze_spell';
+  if (cloze && res.full) $('.face .cz', box).innerHTML = gapHtml(q.q, res.answer);
+  const sayIt = res.full || res.answer;
+  $('.fbbox', box).innerHTML = `<div class="fb ${res.correct ? 'ok' : 'no'} pop">${res.correct ? (cloze ? '✅ 补上了！' : '✅ 对了！') : '差一点，是 <b>' + esc(res.answer) + '</b>'}` +
+    (!res.correct && answer ? `<div class="small muted">${q.mode === 'spell' || q.mode === 'dictate' || q.mode === 'cloze_spell' ? '你写的' : '你选的'}：${esc(answer)}</div>` : '') +
+    (res.zh ? `<div class="small">${esc(res.zh)}</div>` : '') +
+    ((q.mode === 'dictate' || cloze) && res.meaning ? `<div class="small">${esc(res.answer)}：${esc(res.meaning.split('\n')[0])}</div>` : '') +
+    (res.example ? `<div class="small">例：${esc(res.example)}</div>` : '') +
+    (/^[A-Za-z]/.test(res.answer) ? ` <button class="btn ghost sm" onclick='say(${esc(JSON.stringify(sayIt))})'>🔊</button>` : '') +
+    (!res.correct && !again.has(c.id) && c.kind !== 'mistake' ? '<div class="small muted">这个词这一轮最后还会再来一次。</div>' : '') + `</div>`;
+  if (/^[A-Za-z]/.test(res.answer)) say(sayIt);
+}
+
+/* 新词第一次见：先猜（不算对错）→ 揭晓：意思、读音、例句 → 马上用一次（补洞，或者看意思选单词） */
+function showLearn(box, c, q) {
+  let guess = null;
+  const ex = q.example, hl = ex ? esc(ex.en).replace(new RegExp('\\b' + q.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i'), m => `<b class="hl">${m}</b>`) : '';
+  const say1 = `<button class="btn ghost sm" data-say="${esc(q.word)}">🔊</button>`;
+  const wire = () => $$('[data-say]', box).forEach(b => b.onclick = () => say(b.dataset.say, 'en', b.dataset.say.includes(' ') ? 'sentence' : 'word'));
+  function step1() {
+    if (!q.guess.length) return step2();
+    box.innerHTML = head(c, ' · 新词') + `<div class="face" style="min-height:120px"><div class="lw">${esc(q.word)} ${say1}</div>` +
+      (ex ? `<div class="small lx">${hl}</div>` : '') + `<div class="muted small" style="margin-top:6px">新词来了，先猜猜它是什么意思？猜错也没关系。</div></div>` +
+      `<div style="text-align:left">${q.guess.map(o => `<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
+    wire(); say(q.word, 'en', 'word');
+    $$('.opt', box).forEach(b => b.onclick = () => {
+      guess = b.dataset.v;
+      $$('.opt', box).forEach(x => { x.disabled = true; if (x.dataset.v === q.meaning) x.classList.add('right'); else if (x === b) x.classList.add('wrong'); });
+      setTimeout(step2, b.dataset.v === q.meaning ? 500 : 1100);
+    });
+  }
+  function step2() {
+    box.innerHTML = head(c, ' · 新词') + `<div class="face" style="min-height:120px"><div class="lw">${esc(q.word)} ${say1}</div>` +
+      `<div>${q.pos ? `<span class="muted small">${esc(q.pos)}</span> ` : ''}${esc(q.meaning)}</div>` +
+      (ex ? `<div class="small lx" style="margin-top:8px">${hl} <button class="btn ghost sm" data-say="${esc(ex.en)}">🔊</button></div><div class="small muted">${esc(ex.zh)}</div>` : '') +
+      `</div><button class="btn" id="use" style="margin-top:12px">记住了，用一次 →</button>`;
+    wire();
+    $('#use', box).onclick = step3;
+  }
+  async function step3() {
+    const u = q.use;
+    if (!u) {   // 出不了题（干扰项不够）：看过就算学了
+      await api('/api/review/' + c.id, {grade: 'good'}); Run.hit(true); known++; i++; return show();
+    }
+    showWord(box, c, u, {mode: 'learn', use: u.mode, guess});
+  }
+  step1();
+}
+
+/* 单词：看意思选单词（四选一）→ 放回句子里 → 看意思写单词 → 和听音写单词、自己拼进句子里轮换（app/recall.py） */
+function showWord(box, c, q, learn) {
   const speak = /^[A-Za-z]/.test(c.front) ? `<button class="btn ghost sm" id="say">🔊</button>` : '';
-  const dictate = q.mode === 'dictate';
-  let html = head(c, dictate ? ' · 听写' : '') + (dictate
+  const dictate = q.mode === 'dictate', cloze = q.mode === 'cloze' || q.mode === 'cloze_spell';
+  let html = head(c, learn ? ' · 新词：用一次' : dictate ? ' · 听写' : cloze ? ' · 补句子' : '') + (dictate
     ? `<div class="face" style="min-height:120px"><button class="btn lg" id="say">🔊 听一听</button><div class="muted small" style="margin-top:8px">听读音，写出这个${c.kind === 'term' ? '术语' : '单词'}（可以多听几遍）</div></div>`
+    : cloze ? `<div class="face cloze" style="min-height:120px"><div class="cz">${gapHtml(q.q)}</div><div class="muted small">${q.mode === 'cloze' ? '哪个词能补上这个洞？' : esc(q.hint) + ' · 把它拼进去'}</div></div>`
     : `<div class="face" style="min-height:120px">${esc(q.q)}${q.hint ? `<div class="muted small">${esc(q.hint)}</div>` : ''}</div>`);
-  if (q.mode === 'choice') {
+  if (q.mode === 'choice' || q.mode === 'cloze') {
     html += `<div style="text-align:left">${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
   } else {
     html += `<div class="muted small">${esc(q.shape)} · 写出这个${c.kind === 'term' ? '术语' : '单词'}</div>` +
-      `<div class="row" style="margin-top:8px"><input type="text" class="ans grow" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="写在这里">${dictate ? '' : speak}<button class="btn" id="go">提交</button></div>`;
+      `<div class="row" style="margin-top:8px"><input type="text" class="ans grow" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="写在这里">${dictate || cloze ? '' : speak}<button class="btn" id="go">提交</button></div>`;
   }
   html += `<div class="row" style="justify-content:center;margin-top:8px"><button class="linkbtn" id="dk">🤔 想不起来</button></div><div class="fbbox"></div>`;
   box.innerHTML = html;
@@ -91,14 +147,9 @@ function showWord(box, c, q) {
   if (dictate) say(q.say || c.front, 'en', 'word');
   const done = async (answer, el) => {
     $$('.opt,#go,#dk', box).forEach(b => b.disabled = true);
-    const res = await post(c, {answer, mode: q.mode, dont_know: answer === null});
-    if (q.mode === 'choice') $$('.opt', box).forEach(b => { if (b.dataset.v === res.answer) b.classList.add('right'); else if (b === el) b.classList.add('wrong'); });
-    $('.fbbox', box).innerHTML = `<div class="fb ${res.correct ? 'ok' : 'no'} pop">${res.correct ? '✅ 对了！' : '正确答案是 <b>' + esc(res.answer) + '</b>'}` +
-      (!res.correct && answer ? `<div class="small muted">${q.mode === 'choice' ? '你选的' : '你写的'}：${esc(answer)}</div>` : '') +
-      (dictate && res.meaning ? `<div class="small">${esc(res.meaning.split('\n')[0])}</div>` : '') +
-      (res.example ? `<div class="small">例：${esc(res.example)}</div>` : '') +
-      (/^[A-Za-z]/.test(res.answer) ? ` <button class="btn ghost sm" onclick="say(${esc(JSON.stringify(res.answer))})">🔊</button>` : '') + `</div>`;
-    if (/^[A-Za-z]/.test(res.answer)) say(res.answer);
+    const res = await post(c, Object.assign({answer, mode: q.mode, q: q.q, dont_know: answer === null}, learn || {}));
+    if (q.mode === 'choice' || q.mode === 'cloze') $$('.opt', box).forEach(b => { if (b.dataset.v === res.answer) b.classList.add('right'); else if (b === el) b.classList.add('wrong'); });
+    wordFb(box, res, q, answer, c);
     nextBtn(box, res, c);
   };
   $$('.opt', box).forEach(b => b.onclick = () => done(b.dataset.v, b));

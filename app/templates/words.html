@@ -20,7 +20,7 @@
 {% endmacro %}
 {% macro wcard(c, paused=False) %}
 <div class="card" style="padding:12px">
-  <div class="row"><b class="grow">{{ c.front }}</b>{% if paused %}<span class="pill">暂停</span>{% elif c.extra.passed %}<span class="pill">🏅 {{ c.extra.passed[5:] }} 过关</span>{% else %}<span class="pill">第 {{ c.box }} 轮 · {{ c.due[5:] }} 复习</span>{% endif %}
+  <div class="row"><b class="grow">{{ c.front }}</b>{% if paused %}<span class="pill">暂停</span>{% elif c.extra.passed %}<span class="pill">🏅 {{ c.extra.passed[5:] }} 过关</span>{% elif c.extra.new and not c.reviews %}<span class="pill">新词</span>{% else %}<span class="pill">第 {{ c.box }} 轮 · {{ c.due[5:] }} 复习</span>{% endif %}
     {% if not readonly %}<button class="linkbtn" title="从本子里删掉" onclick="if(confirm('删除？'))api('/api/cards/{{ c.id }}/delete',{}).then(()=>this.closest('.card').remove())">删除</button>{% endif %}</div>
   <div class="small" style="white-space:pre-wrap">{{ c.back }}</div>
   {% if c.extra.context %}<div class="small muted">原句：{{ c.extra.context }}</div>{% endif %}
@@ -34,7 +34,7 @@
 {% endmacro %}
 {% block body %}
 <a href="/review" class="back">← 复习</a>
-<h1>我的本子</h1>
+<div class="row"><h1 class="grow">我的本子</h1><a class="btn ghost sm" href="/words/map">🗺️ 我的词</a></div>
 <div class="subnav" style="margin:12px 0">
 {% for k, n in [('word','📒 生词本'),('mistake','❌ 错题本'),('kp','🧠 知识点总结'),('term','🔬 术语'),('sentence','✍️ 造句本')] %}
 <a class="{{ 'on' if kind == k }}" href="/words?kind={{ k }}">{{ n }} <b>{{ counts.get(k, 0) }}</b></a>

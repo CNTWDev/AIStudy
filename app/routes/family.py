@@ -164,10 +164,11 @@ async def kid_save(request: Request):
 def kid_plan_page(request: Request, kid_id: int, msg: str = ""):
     p = auth.require_parent(request)
     k = auth.kid_of(p, kid_id)
-    all_tracks = engine.tracks(kid_id, active_only=False)
+    from .. import words
+    all_tracks = [t for t in engine.tracks(kid_id, active_only=False) if t["kind"] != "words"]   # 单词改成单词包（word_packs）
     active = {t["kind"]: t for t in all_tracks if t["active"]}
     from ..library import library
-    return render(request, "kid_plan.html", k=k, active=active, history=[t for t in all_tracks if not t["active"]],
+    return render(request, "kid_plan.html", k=k, active=active, wpacks=words.attached(kid_id), wstats=words.stats(kid_id), history=[t for t in all_tracks if not t["active"]],
                   content=content, msg=msg, seg={kd: engine.track_today(t) for kd, t in active.items() if kd != "words"},
                   lib={l: sorted(library.shelf(l), key=lambda b: (k["grade"] not in b.get("grades", []), b.get("level", ""))) for l in ("en", "zh")})
 
@@ -184,7 +185,16 @@ async def kid_tracks_save(request: Request, kid_id: int):
 
     def back(msg):  # 填得不对：回到这一页，在上面提示
         return RedirectResponse(f"/parent/kids/{kid_id}/plan?" + urlencode({"msg": msg}), 303)
-    if f.get("action") == "stop":
+    if kind == "words":   # 单词包（app/words.py）：加上 / 停掉一个包、改每天几个新词
+        from .. import words
+        ref = f.get("ref") or ""
+        if ref not in words.packs():
+            return back("请选择词表")
+        on = f.get("action") != "stop"
+        amount = f.get("daily_amount")
+        words.set_pack(kid_id, ref, on, int(amount) if str(amount or "").strip().isdigit() else None)
+        msg = f"已安排「{engine.TRACK_KINDS[kind]}」：{words.packs()[ref]['title']}" if on else f"已停用单词包：{words.packs()[ref]['title']}"
+    elif f.get("action") == "stop":
         db.run("UPDATE tracks SET active=0 WHERE user_id=? AND kind=?", kid_id, kind)
         msg = f"已停止「{engine.TRACK_KINDS[kind]}」"
     elif f.get("action") == "move":
@@ -196,12 +206,7 @@ async def kid_tracks_save(request: Request, kid_id: int):
         minutes = max(5, min(90, int(f.get("daily_minutes") or 15)))
         amount = max(0, min(50, int(f.get("daily_amount") or 1)))
         position = max(0, int(f.get("position") or 0))
-        if kind == "words":
-            wl = content.word_lists.get(ref)
-            if not wl:
-                return back("请选择词表")
-            title, unit_name, units, total = wl["title"], "词", [], len(wl["words"])
-        elif ref.startswith("lib:"):  # 书库：按页算，进度接着孩子已经在网站上读到的地方
+        if ref.startswith("lib:"):  # 书库：按页算，进度接着孩子已经在网站上读到的地方
             from ..library import library
             bid = ref[4:]
             lb, lt = library.books.get(bid), library.text(bid)
@@ -228,7 +233,7 @@ async def kid_tracks_save(request: Request, kid_id: int):
             t.run("UPDATE tracks SET active=0 WHERE user_id=? AND kind=?", kid_id, kind)
             t.run("INSERT INTO tracks(user_id,kind,ref,title,unit_name,units,total_units,position,daily_amount,daily_minutes,"
                   "active,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,1,?)", kid_id, kind, ref, title, unit_name,
-                  db.jdump(units), total, position, amount if kind == "words" else max(1, amount), minutes, db.now())
+                  db.jdump(units), total, position, max(1, amount), minutes, db.now())
         msg = f"已安排「{engine.TRACK_KINDS[kind]}」：{title}"
     engine.today_plan(kid_id, rebuild=True)
     return RedirectResponse(f"/parent/kids/{kid_id}/plan?" + urlencode({"msg": msg}), 303)

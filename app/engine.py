@@ -97,7 +97,7 @@ class Paused:
     """退掉的课（或换掉的方向）留下的内容：记录都留着，只是不再出现在每天的学习里；重新选回这门课就接着来。
     kps：报过名的教材里、现在不在学的知识点（同一概念在在学的教材里有的、给在学的课打地基的，照常出），
     加上不是给这个人群的知识点（catalog.closed_to：学习页打不开的，每天的学习也不碰，比如成人以前在中小学的课里留下的记录）。
-    lists：还在给这个人用的词表（在学科目的、家长安排的单词任务）；别的词表来的单词卡暂停。"""
+    lists：还在给这个人用的单词包（app/words.py：自动挂的、家长加上的）；别的包来的单词卡暂停。"""
 
     def __init__(self, user_id: int):
         from . import explore, ladder
@@ -108,7 +108,7 @@ class Paused:
         keep = {k for f in ladder.foundations(dict(user or {}), active) for k in ladder.range_of(f, concepts)}
         self.kps = {k for e in rows for k in catalog.packs[e["pack_id"]].kp_ids
                     if catalog.concept_id(k) not in concepts and k not in keep} | catalog.closed_to((user or {}).get("grade"))
-        self.lists = {wl["id"] for wl in explore.word_lists(user_id)} | {t["ref"] for t in tracks(user_id) if t["kind"] == "words"}
+        self.lists = {wl["id"] for wl in explore.word_lists(user_id)}
 
     def card(self, c) -> bool:
         if c["kp_id"]:
@@ -855,27 +855,6 @@ def track_today(t) -> dict:
         return {"from": start, "to": start, "label": "已经读完啦，可以请家长换一本", "names": []}
     label = f"第 {start} {t['unit_name']}" if start == end else f"第 {start}–{end} {t['unit_name']}"
     return {"from": start, "to": end, "label": label, "names": [name(n) for n in range(start, end + 1)]}
-
-
-def add_daily_words(user_id: int) -> int:
-    """每天第一次排计划时，把词表里接下来的 N 个新词加进今天的复习。返回新加的个数。"""
-    from .content import content
-    today = db.today()
-    added = 0
-    for t in tracks(user_id):
-        if t["kind"] != "words" or t["last_day"] == today.isoformat():
-            continue
-        wl = content.word_lists.get(t["ref"])
-        words = wl["words"] if wl else []
-        chunk = words[t["position"]: t["position"] + max(0, t["daily_amount"])]
-        for w in chunk:
-            if add_card(user_id, "word", w["w"], w.get("zh", ""), {"pos": w.get("pos", ""), "list": t["ref"], "new": 1},
-                        due=today):
-                added += 1
-        pos = t["position"] + len(chunk)
-        db.run("UPDATE tracks SET position=?, last_day=?, finished_at=? WHERE id=?", pos, today.isoformat(),
-               db.now() if words and pos >= len(words) else None, t["id"])
-    return added
 
 
 def log_reading(user_id: int, track_id: int | None, *, to_pos=0, minutes=0, summary="", feeling="", pages="", title=""):

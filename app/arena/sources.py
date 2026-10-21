@@ -27,6 +27,7 @@ import re
 from datetime import timedelta
 
 from .. import ability, db, engine, evidence, explore, itemtypes, quickgen
+from .. import words as words_mod
 from ..catalog import catalog, stage_rank
 from ..content import content
 
@@ -189,6 +190,10 @@ class MathSource(Source):
 
 # ------------------------------------------------------------------ 英语单词 / 教材术语（四选一）
 
+def words_band(kid: dict) -> str:
+    return words_mod.band(kid.get("grade"))
+
+
 class WordSource(Source):
     """英语核心词表按年级分 5 级（同一个能力维度 vocab:en）；教材术语表（比如 IGCSE 物理术语）各自一个维度。
     今天该复习的生词卡、术语卡先出（四成左右，答了就算复习过，按记忆模型排下次），别的生词卡也常拿出来见见。"""
@@ -239,9 +244,11 @@ class WordSource(Source):
         return 1.2 if "english" in ctx.subjects else 0.6
 
     def _my_cards(self, ctx: Ctx) -> list:
+        """自己的生词卡、术语卡。单词包里今天的新词还没学过（复习页的学习卡）先不出：先学一遍，再拿来练。"""
         return ctx.get_or("word_cards", lambda: [c for c in db.q(
-            "SELECT id, front, back, kind, kp_id, due, extra FROM cards WHERE user_id=? AND kind IN ('word','term') AND LENGTH(back)<=24 "
-            "ORDER BY due", ctx.kid["id"]) if not ctx.paused.card(c)][:60])
+            "SELECT id, front, back, kind, kp_id, due, extra, reviews FROM cards WHERE user_id=? AND kind IN ('word','term') AND LENGTH(back)<=24 "
+            "ORDER BY due", ctx.kid["id"]) if not ctx.paused.card(c)
+            and not (not c["reviews"] and (db.jload(c["extra"], {}) or {}).get("new"))][:60])
 
     KNOWN_DAYS = 3
 
@@ -255,11 +262,14 @@ class WordSource(Source):
     # 同一个词换着方式考：认意思（看英文选中文）、反过来（看中文选英文）、听音选意思、拼写。
     # 认出来最容易，自己拼出来最难，也最能说明真记住了（填空蒙对的机会很小）。
     # 各方式难度不同，各自校准（题族 words / words:listen / words:spell……），能力值还是同一个。
-    FORMATS = {"core": {"read": 0.5, "reverse": 0.2, "listen": 0.12, "spell": 0.18},
-               "terms": {"read": 0.55, "reverse": 0.35, "spell": 0.1}}
-    FORMAT_SHIFT = {"listen": 0.5, "spell": 1.5}   # 比认意思难多少（难度 b 的起点）
+    # 句子补洞（cloze）：把词放回例句里（app/words.py），有例句的词才出，没有就换成看中文选英文、后台去写例句。
+    FORMATS = {"core": {"read": 0.42, "reverse": 0.18, "listen": 0.12, "spell": 0.16, "cloze": 0.12},
+               "terms": {"read": 0.5, "reverse": 0.3, "spell": 0.1, "cloze": 0.1}}
+    FORMAT_SHIFT = {"listen": 0.5, "spell": 1.5, "cloze": 0.6}   # 比认意思难多少（难度 b 的起点）
 
     def _format(self, ctx: Ctx, g: dict, rng: random.Random) -> str:
+        if ctx.get("ask_fmt"):   # 只出一种题的游戏（句子补洞）
+            return ctx["ask_fmt"]
         fm = dict(self.FORMATS["core" if g["family"] == "words" else "terms"])
         if ctx.get("mode") != "sprint":   # 听音只在快练和冲刺里出（有「不会」可点）；游戏里可能关着声音
             fm.pop("listen", None)
@@ -291,6 +301,12 @@ class WordSource(Source):
         else:   # 最近几天答对过的词先不出（换别的词，知识面更宽）；整张词表都答对过了才轮回来
             known = self._known(ctx)
             w = next((x for x in rng.sample(words, min(len(words), 12)) if x["w"].lower() not in known), None) or rng.choice(words)
+        cloze = None
+        if fmt == "cloze":
+            w, cloze = self._cloze(ctx, g, wl, words, w, rng)
+            if not cloze:
+                fmt, family = "reverse", g["family"]
+                levels = ability.calib(family, list(g["levels"]), self._prior)
         if fmt == "spell" and not self._spellable(w["w"]):
             w = next((x for x in rng.sample(words, len(words)) if self._spellable(x["w"]) and x["w"].lower() not in self._known(ctx)), None) \
                 or next((x for x in words if self._spellable(x["w"])), w)
@@ -301,7 +317,9 @@ class WordSource(Source):
         if len(others) < 3:
             others += [x["zh"] for x in rng.sample(content.word_lists[next(iter(content.word_lists))]["words"], 6)]
         rng.shuffle(others)
-        if fmt == "reverse":
+        if cloze:
+            it = cloze
+        elif fmt == "reverse":
             eng = list({x["w"] for x in words if x["w"] != w["w"]})
             rng.shuffle(eng)
             it = _mcq(f"「{w['zh']}」用英语怎么说？", w["w"], eng, rng)
@@ -319,14 +337,36 @@ class WordSource(Source):
             it = _mcq(f"{w['w']}", w["zh"], others, rng)
             it["say"] = w["w"]   # 前端可以读出来
         h = hashlib.sha1(f"{wl['id']}|{w['w']}|{fmt}".encode()).hexdigest()[:10]
-        it.update(id=f"word-{h}", family=family, level=lv, dim=g["dim"], word=w["w"], zh=w["zh"], list=wl["id"], fmt=fmt,
+        it.update(id=f"word-{h}", family=family, level=lv, dim=g["dim"], word=w["w"], zh=w["zh"], list=w.get("list") or wl["id"], fmt=fmt,
                   kp_id=w.get("kp") or "", card=w.get("card"), topic=g["title"], theta=theta, b=levels[lv][0], p=round(ability.sigmoid(theta - levels[lv][0]), 4),
-                  explain=f"{w['w']}：{w['zh']}")
+                  explain=f"{it['explain']}\n{w['w']}：{w['zh']}" if cloze else f"{w['w']}：{w['zh']}")
         return it
+
+    def _cloze(self, ctx: Ctx, g: dict, wl: dict, words: list, w: dict, rng: random.Random) -> tuple[dict, dict | None]:
+        """句子补洞：抽到的词有例句就用它，没有就在该复习的、自己的生词、这张表里找一个有例句的；都没有，后台去写。
+        已经拼得出的词（单词等级到 4）自己把它拼进句子里，其余从几个同词性的词里选。"""
+        b = ctx.get_or("band", lambda: words_band(ctx.kid))
+        cards = [{"w": c["front"], "zh": c["back"], "kp": c["kp_id"], "card": c["id"] if str(c["due"]) <= db.today().isoformat() else None,
+                  "list": (db.jload(c["extra"], {}) or {}).get("list")} for c in self._my_cards(ctx)
+                 if (c["kind"] == "word") == (g["family"] == "words")]
+        cand = [w] + [c for c in cards if c["card"]] + rng.sample(cards, min(len(cards), 8)) + rng.sample(words, min(len(words), 12))
+        have = words_mod.examples([c["w"] for c in cand], b)
+        served = ctx.get("served") or set()
+        lad = ctx.get_or("ladder", lambda: words_mod.ladder(ctx.kid["id"]))
+        for c in cand:
+            if c["w"].lower() not in have or f"w:{c['w'].lower()}" in served:
+                continue
+            spell = lad.get(c["w"].lower(), {}).get("level", 0) >= 4 and self._spellable(c["w"])
+            it = words_mod.cloze_item({**c, "pos": c.get("pos") or next((x.get("pos", "") for x in words if x["w"] == c["w"]), "")}, b, rng,
+                                      words_mod.pool_for(ctx.kid["id"], c.get("list") or wl["id"]), spell=spell)
+            if it:
+                return {**c, "list": c.get("list") or wl["id"]}, it
+        words_mod.prepare(ctx.kid["id"])
+        return w, None
 
     def record(self, kid, it, correct, ans, dont_know, ms, mode="game", weight=GAME_WEIGHT, calibrate=None):
         fmt = "recall" if it.get("type") == "fill" else "choice"
-        evidence.log(kid["id"], "word", f"{it['list']}:{it['word']}", "answer", correct=correct, mode=mode, fmt=fmt, weight=weight)
+        words_mod.log_answer(kid["id"], it["list"], it["word"], correct, it.get("fmt") or "read", mode=mode, weight=weight, dont_know=dont_know)
         if not it.get("retry"):
             ability.observe(kid["id"], it["dim"], it, correct)
             c = db.one("SELECT * FROM cards WHERE id=? AND user_id=? AND due<=?", it["card"], kid["id"], db.today().isoformat()) \
@@ -439,12 +479,15 @@ def weights(kid: dict, ctx: Ctx | None = None) -> dict[str, float]:
     return {k: w for k, s in SOURCES.items() if (w := s.weight(kid, ctx)) > 0}
 
 
-def pick(kid: dict, target: float, rng: random.Random, ctx: Ctx | None = None, mode: str = "game") -> dict:
+def pick(kid: dict, target: float, rng: random.Random, ctx: Ctx | None = None, mode: str = "game", ask: tuple | None = None) -> dict:
     """给这个孩子出一道题（游戏、冲刺都用它）：target 是目标答对率；mode = sprint 时也出听音题。
+    ask：只出一种题的游戏（句子补洞：("words", "cloze")），这个孩子用得上这个题源就只从它出。
     抽中的题源这次出不了题（比如题库里一时没有新题、后台还在出），换别的题源。"""
     ctx = ctx or Ctx(kid)
     ctx["mode"] = mode
     ws, it = weights(kid, ctx) or {"math": 1.0}, None
+    if ask and ask[0] in ws:
+        ws, ctx["ask_fmt"] = {ask[0]: 1.0}, ask[1] if len(ask) > 1 else None
     while ws and not it:
         sid = rng.choices(list(ws), weights=list(ws.values()))[0]
         ws.pop(sid)
@@ -468,7 +511,7 @@ def key(it: dict) -> str:
     return f"w:{it['word'].lower()}" if it.get("word") else it["id"]
 
 
-def next_item(kid: dict, st: dict, target: float, rng: random.Random, mode: str = "game") -> dict:
+def next_item(kid: dict, st: dict, target: float, rng: random.Random, mode: str = "game", ask: tuple | None = None) -> dict:
     """这一次（st 是这次快练 / 这一局的状态，调用方负责存）的下一题。"""
     n = st.get("n", 0)
     st["n"] = n + 1
@@ -481,7 +524,7 @@ def next_item(kid: dict, st: dict, target: float, rng: random.Random, mode: str 
     run = st.setdefault("run", {})
     ctx.update(served=set(seen), run=run)
     for _ in range(PICK_TRIES):
-        it = pick(kid, target, rng, ctx, mode)
+        it = pick(kid, target, rng, ctx, mode, ask)
         if key(it) not in seen:
             break
     seen.append(key(it))
@@ -512,4 +555,4 @@ def public(it: dict) -> dict:
     keypad = it.get("keypad") or ("dec" if t.id == "num" else "")
     return {"id": it["id"], "q": it["q"], "type": t.id, "widget": t.widget, "unit": it.get("unit", ""),
             "options": it.get("options"), "keypad": keypad, "topic": it.get("topic", ""), "src": it.get("src", ""),
-            "say": it.get("say", ""), "letters": it.get("letters")}
+            "say": it.get("say", ""), "letters": it.get("letters"), "cloze": bool(it.get("cloze")), "hint": it.get("hint", "")}

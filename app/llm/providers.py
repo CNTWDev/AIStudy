@@ -177,6 +177,12 @@ class MockProvider(Provider):
             for i, q in enumerate(data["questions"]):
                 q["kp_id"] = ids[i % len(ids)] if ids and i < 2 else "NOT-A-KP"
             return json.dumps(data, ensure_ascii=False)
+        if req.task == "word_examples":  # 照提示词里的词各写两句（app/words.py 只收把这个词原样标出来的句子）
+            import re
+            ws = re.findall(r"^- ([A-Za-z][A-Za-z '\-]*)（", req.user, re.M)
+            return json.dumps({"words": [{"w": w, "sentences": [{"en": f"Look, I can see the [[{w}]] today.", "zh": f"看，今天我看到了 {w}。"},
+                                                                  {"en": f"We talk about the [[{w}]] at school.", "zh": f"我们在学校说起 {w}。"}]}
+                                         for w in ws]}, ensure_ascii=False)
         return json.dumps(MOCK.get(req.task, {}), ensure_ascii=False)
 
 

@@ -61,7 +61,10 @@ class ArenaQuiz {
     const it = this.item;
     this.el.querySelector('.aq-topic').textContent = it.topic || '';
     const isWord = it.src === 'words' && it.say;
-    let h = `<div class="aq-q${it.q.length > 26 ? ' long' : ''}${isWord ? ' word' : ''}">${esc(it.q)}${isWord ? ' <button type="button" class="aq-say" aria-label="听发音">🔊</button>' : ''}</div>`;
+    // 句子补洞：____ 画成一个洞（答完把词填进去）；拼进句子的题下面一行写意思和首字母
+    const q = it.cloze ? esc(it.q).replace('____', '<span class="aq-gap"></span>') : esc(it.q);
+    let h = `<div class="aq-q${it.q.length > 26 ? ' long' : ''}${isWord ? ' word' : ''}${it.cloze ? ' cloze' : ''}">${q}${isWord ? ' <button type="button" class="aq-say" aria-label="听发音">🔊</button>' : ''}</div>`;
+    if (it.cloze && it.hint) h += `<div class="aq-hint">${esc(it.hint)}</div>`;
     if (it.widget === 'choice') {
       h += `<div class="aq-opts">${it.options.map((o, i) => `<button type="button" class="aq-opt c${i}" data-i="${i}"><b>${'ABCD'[i]}</b><span>${esc(o)}</span></button>`).join('')}</div>`;
     } else {
@@ -122,6 +125,8 @@ class ArenaQuiz {
         const right = it.options.findIndex(o => res.answer.endsWith(o));
         const rb = this.body.querySelector(`.aq-opt[data-i="${right}"]`); if (rb) rb.classList.add('right');
       }
+      if (it.cloze && res.word) { const g = this.body.querySelector('.aq-gap'); if (g) { g.textContent = res.word; g.classList.add(res.correct ? 'ok' : 'no'); } }
+      this.lastCloze = !!it.cloze;
       this.streak = res.correct ? (res.streak || this.streak + 1) : 0;
       this.o.onAnswer && this.o.onAnswer(res);
       if (res.correct) this.showRight(res); else { this.frozenUntil = Date.now() + (res.freeze_ms ?? 5000); this.showWrong(res); }
@@ -148,7 +153,7 @@ class ArenaQuiz {
     fb.innerHTML = this.o.rightHtml ? `<div class="aq-right pop">${this.o.rightHtml(res)}</div>` :
       `<div class="aq-right pop"><div class="aq-xp">+${res.xp} ⚡${res.crit ? ' <span class="aq-crit">暴击 ×2！</span>' : ''}</div>` +
       (res.special ? `<div class="aq-sp">💥 连对 ${res.streak} 题，攒到一次大招！</div>` : '') + '</div>';
-    if (this.docked || this.o.autoNext) setTimeout(() => { if (this.isOpen && !this.item && !this.frozen) this.load(); }, this.docked ? 650 : 750);
+    if (this.docked || this.o.autoNext) setTimeout(() => { if (this.isOpen && !this.item && !this.frozen) this.load(); }, this.o.nextDelay || (this.docked ? 650 : 750));
     else {
       fb.firstChild.insertAdjacentHTML('beforeend', '<button type="button" class="btn lg block aq-next">继续答题 →</button>');
       this.body.querySelector('.aq-next').onclick = () => this.load();
@@ -159,7 +164,7 @@ class ArenaQuiz {
     if (!this.frozen) {   // 不冷冻（冲刺）：看懂答案和思路，自己点下一题
       window.Play && Play.sfx.play(res.dont_know ? 'pop' : 'wrong');
       this.body.querySelector('.aq-fb').innerHTML =
-        `<div class="aq-wrong pop"><div>${res.dont_know ? '没关系，看看答案：' : '正确答案：'}<b>${esc(res.answer)}</b></div>` +
+        `<div class="aq-wrong pop"><div>${res.dont_know ? '没关系，看看答案：' : this.lastCloze ? '差一点，是 ' : '正确答案：'}<b>${esc(res.answer)}</b></div>` +
         (res.explain ? `<div class="small">${esc(res.explain)}</div>` : '') + (this.o.wrongHtml ? this.o.wrongHtml(res) : '') +
         `<button type="button" class="btn lg block aq-next">${res.dont_know ? '记住了' : '看懂了'}，下一题 →</button></div>`;
       const nx = this.body.querySelector('.aq-next'); nx.onclick = () => this.load(); setTimeout(() => nx.focus({preventScroll: true}), 30);

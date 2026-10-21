@@ -39,7 +39,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -534,3 +534,24 @@ def ask_tutor(grade: str, pack, context: str, history: list[tuple[str, str]], qu
                         user_id=user_id, effort="low", max_tokens=800, cache=False)
     reply = (data.get("reply") if isinstance(data, dict) else "") or "我们一步一步来：你先说说，这道题在问什么？"
     return {"reply": str(reply)[:1200]}
+
+
+WORD_BAND = {
+    "primary": "小学生（英语刚起步）：一句 5～9 个词，只用最常见的词和一般现在时；内容是学校、家、动物、食物、玩具、天气、运动",
+    "secondary": "初中生：一句 8～14 个词；内容是学校生活、朋友、运动、科学、新闻里的事，学科术语就放进那一科真实会说的话里",
+    "adult": "成年人：一句 8～18 个词；内容是工作、生活、新闻、理财里真实会说的话",
+}
+
+
+def word_examples(words: list[dict], band: str, user_id=None) -> dict:
+    """给一批单词写例句（app/words.py：按学段存一份，所有人复用；句子补洞就是把这个词挖掉）。"""
+    lines = "\n".join(f"- {w['w']}（{w.get('pos', '')} {w.get('zh', '')}）" for w in words)
+    user = (
+        f"给{WORD_BAND.get(band, WORD_BAND['secondary'])}写英文例句，用来练单词：每个词写 2 句。\n"
+        "要求：\n1. 这个词用给出的原样（不变形、不加 s/ed/ing），在句子里出现一次，用 [[ ]] 括起来，比如 I ate an [[apple]] after lunch.\n"
+        "2. 把这个词挖掉以后，要能从句子的其他部分猜出是它：上下文要有线索，同词性的别的常见词放进去说不通；意思用中文给出的那个。\n"
+        "3. 句子自然、积极，不写考试、成绩、受伤、吓人的事。\n4. 每句给通顺的中文翻译。\n"
+        f"词：\n{lines}\n"
+        '输出：{"words":[{"w":"apple","sentences":[{"en":"I ate an [[apple]] after lunch.","zh":"午饭后我吃了一个苹果。"}]}]}'
+    )
+    return ask_json("word_examples", "你是一位很会写例句的英语老师。", user, user_id=user_id, effort="low", max_tokens=4000)

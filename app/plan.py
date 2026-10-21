@@ -9,7 +9,7 @@
 """
 from datetime import timedelta
 
-from . import bankpapers, db, engine, evidence, explore, insights, mix, schoolyear, trace
+from . import bankpapers, db, engine, evidence, explore, insights, mix, schoolyear, trace, words
 from .catalog import catalog, stage_rank
 
 
@@ -139,12 +139,16 @@ def src_warmup(c: Ctx) -> list[dict]:
 
 
 def src_words(c: Ctx) -> list[dict]:
-    new_words = engine.add_daily_words(c.user_id)
-    n = len(engine.due_cards(c.user_id, 300, "words"))
-    if not n:
+    """单词：单词包里今天的新词（先学一遍）+ 到期要复习的词（app/words.py）。"""
+    words.daily_new(c.user_id)
+    due = engine.due_cards(c.user_id, 300, "words")
+    if not due:
         return []
-    return [{"type": "words", "title": f"单词：复习 {n} 个" + (f"（含新词 {new_words} 个）" if new_words else ""),
-             "why": "看意思选单词、拼单词；答错的等一会儿还会再来", "minutes": min(15, 3 + n // 4), "url": "/review?group=words"}]
+    new = sum(1 for d in due if not d["reviews"] and (db.jload(d["extra"], {}) or {}).get("new"))
+    old = len(due) - new
+    title = "单词：" + "，".join(x for x in (f"{new} 个新词" if new else "", f"复习 {old} 个" if old else "") if x)
+    return [{"type": "words", "title": title, "why": "新词先猜意思，再放进句子里用一次；答错的一会儿还会再来",
+             "minutes": min(15, 3 + new + len(due) // 4), "url": "/review?group=words"}]
 
 
 def src_mistakes(c: Ctx) -> list[dict]:

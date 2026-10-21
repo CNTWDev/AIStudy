@@ -252,7 +252,7 @@ def outcome_tasks(t, mastery: dict | None = None) -> list[dict]:
                  {"type": "weak", "kp": kp_id, "title": f"再战：{name}", "why": f"「{_name(root)}」补好了，回来再做几题",
                   "minutes": 8, "url": f"/learn/{kp_id}?task=weak", "id": f"{pid}-1"}]
     elif t["result"] == "lang":
-        tasks = [{"type": "words", "title": f"术语过关：{name}", "why": "中文会做、英文卡住了：先把这几个英文词弄熟",
+        tasks = [{"type": "words", "for": kp_id, "title": f"术语过关：{name}", "why": "中文会做、英文卡住了：先把这几个英文词弄熟",
                   "minutes": 5, "url": "/review?group=words", "id": f"{pid}-0"}]
     elif t["result"] == "self":
         tasks = [{"type": "weak", "kp": kp_id, "title": f"换个讲法再学：{name}", "why": "要用到的基础你都会，是这一个本身还没弄懂",
@@ -291,8 +291,9 @@ def _terms_due(user_id: int, kp_id: str):
 def add_tasks(user_id: int, tasks: list[dict]):
     """插进今天的清单：排在还没做的任务最前面（做完当前这项，下一项就是它）。同样的任务没做完就不重复加。"""
     plan = engine.today_plan(user_id)["plan"]
-    have = {(t["type"], t.get("kp")) for t in plan if not t.get("done")}
-    new = [{**t, "done": False} for t in tasks if (t["type"], t.get("kp")) not in have]
+    key = lambda t: (t["type"], t.get("kp") or t.get("for"))  # noqa: E731  术语过关和每天的单词任务都是 words，按为哪个知识点分开
+    have = {key(t) for t in plan if not t.get("done")}
+    new = [{**t, "done": False} for t in tasks if key(t) not in have]
     if not new:
         return
     at = next((i for i, t in enumerate(plan) if not t.get("done")), len(plan))
