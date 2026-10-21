@@ -107,6 +107,13 @@
    "icon": "🧭",
    "tone": "learn",
    "domain": "management"
+  },
+  {
+   "id": "invest",
+   "name": "散户美股实战课",
+   "icon": "📈",
+   "tone": "ok",
+   "domain": "finance"
   }
  ]
 }

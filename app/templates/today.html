@@ -50,6 +50,7 @@
   </div>
 </div>
 {% if rethink and not readonly %}<a class="bd-strip" href="/thinking"><span class="i">🧭</span><span>{{ rethink }} 道题到了换个条件再想的时候</span><span class="go">去想想 ›</span></a>{% endif %}
+{% if journal_due and not readonly %}<a class="bd-strip" href="/journal"><span class="i">📒</span><span>{{ journal_due }} 个决定到了回看的时候</span><span class="go">去复盘 ›</span></a>{% endif %}
 {% if board_tip and not readonly %}<a class="bd-strip" href="/boards"><span class="i">🏆</span><span>{{ board_tip }}</span><span class="go">学习榜 ›</span></a>{% endif %}
 
 {% if settled.used %}<div class="note-bar ice">🧊 {{ '昨天' if settled.used|length == 1 else '前几天' }}没做完第 1 节，自动用了 {{ settled.used|length }} 张补签卡，连续 {{ streak }} 天保住了！今天做完第 1 节就能接着往上涨。</div>{% endif %}

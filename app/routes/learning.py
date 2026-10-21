@@ -102,9 +102,9 @@ def today(request: Request):
     play = arena.status(k)
     exams = [x for x in (engine.exam_view(k["id"], e, m) for e in enrollments(k["id"])) if x and x["days_left"] >= 0]
     day = streak.today_state(k, t["plan"], t["minutes"], sprint.points_today(k["id"]))
-    from .. import discuss
+    from .. import discuss, journal
     return render(request, "today.html", t=t, play=play, day=day, settled=settled, exams=exams, board_tip=boards.nudge(dict(k)),
-                  rethink=len(discuss.due(k["id"])),
+                  rethink=len(discuss.due(k["id"])), journal_due=len(journal.due(k["id"])),
                   goals=streak.GOALS, sprint_best=sprint.best_day(k["id"]), play_locked=arena.locked_reason(play),
                   due=len(engine.due_cards(k["id"], 99)), progress_ask=engine.progress_prompt(k), streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
                   stars=engine.total_stars(k["id"]), rec=rec, auto=engine.day_summary(rec),
@@ -672,3 +672,45 @@ def thinking_again(request: Request, did: int):
     it = engine._item_row_to_dict(db.one("SELECT * FROM items WHERE id=?", d["item_id"]))
     item = {**_public_item({**it, "kp_id": d["kp_id"]}), "twist": d["twist"], "rethink": did}
     return render(request, "thinking.html", again=d, item=item, kp=catalog.kp(d["kp_id"]))
+
+
+# ------------------------------------------------------------------ 决策日志：做决定前写下理由和认错条件，到期复盘（app/journal.py）
+
+@router.get("/journal", response_class=HTMLResponse)
+def journal_page(request: Request, pack: str = ""):
+    from .. import journal
+    k = kid_or_redirect(request)   # 只有本人能看，家长也看不到
+    ps = journal.packs(k["id"])
+    if not ps:
+        return render(request, "message.html", title="决策日志", text="在学的课里还没有用到决策日志的。")
+    cur = next((p for p in ps if p.id == pack), ps[0])
+    return render(request, "journal.html", packs=ps, cur=cur, entries=journal.entries(k["id"]),
+                  patterns=journal.patterns(k["id"]), next_due=journal.due_soon(k["id"]),
+                  confidence=list(journal.CONFIDENCE), days_label=journal.days_label)
+
+
+@router.post("/journal")
+async def journal_add(request: Request):
+    from .. import journal
+    k = kid_or_redirect(request)
+    form = await request.form()
+    journal.add(k["id"], str(form.get("pack") or ""), dict(form))
+    return RedirectResponse("/journal?saved=1", 303)
+
+
+@router.get("/journal/{eid}", response_class=HTMLResponse)
+def journal_entry(request: Request, eid: int):
+    from .. import journal
+    k = kid_or_redirect(request)
+    e = journal.entry(k["id"], eid)
+    return render(request, "journal.html", entry=e, traps=journal.review_choices(e["pack"]),
+                  outcomes=journal.OUTCOMES, judgments=journal.JUDGMENTS)
+
+
+@router.post("/journal/{eid}/review")
+async def journal_review(request: Request, eid: int):
+    from .. import journal
+    k = kid_or_redirect(request)
+    form = await request.form()
+    journal.review(k["id"], eid, {**dict(form), "traps": form.getlist("traps")})
+    return RedirectResponse(f"/journal/{eid}", 303)

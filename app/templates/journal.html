@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block body %}
+{% if entry %}
+<a href="/journal" class="small">← 决策日志</a>
+<h1>{{ '📒 复盘' if not entry.reviewed else '📒 ' ~ entry.subject }}</h1>
+<div class="card">
+  {% if not entry.reviewed %}<p><b>{{ entry.subject }}</b></p>{% endif %}
+  <p class="muted small">{{ entry.created }} 写的 · 当时有 {{ entry.confidence // 10 }} 成把握 · 约定 {{ entry.review_on }} 回看</p>
+  {% for f in entry.fields %}<p><span class="muted small">{{ f.label }}</span><br>{{ f.text }}</p>{% endfor %}
+</div>
+{% if entry.reviewed %}
+<div class="card">
+  <h3>复盘</h3>
+  <p><span class="pill">{{ entry.judgment }}</span> <span class="pill">{{ entry.outcome }}</span></p>
+  {% if entry.quadrant == 'flawed-good' %}<div class="hint">⚠️ 判断有问题、结果却不错：这是最容易让人把错的做法重复下去的情况。</div>{% endif %}
+  {% if entry.review %}<p>{{ entry.review }}</p>{% endif %}
+  {% if entry.traps %}<p class="small">踩到的坑：{% for t in entry.traps %}<a href="/learn/{{ t.kp }}">{{ t.name }}</a>{{ '、' if not loop.last }}{% endfor %}</p>{% endif %}
+</div>
+{% else %}
+<form class="card" method="post" action="/journal/{{ entry.id }}/review">
+  <h3>先别看结果，回头看当时写的</h3>
+  <p class="muted small">理由清楚吗？仓位按规则吗？认错条件写了吗、到了有没有照做？这些决定「判断」站不站得住。再看结果。</p>
+  <label>当时的判断</label>
+  <div class="row">{% for k, v in judgments.items() %}<label class="pill"><input type="radio" name="judgment" value="{{ k }}" required> {{ v }}</label>{% endfor %}</div>
+  <label>结果</label>
+  <div class="row">{% for k, v in outcomes.items() %}<label class="pill"><input type="radio" name="outcome" value="{{ k }}" required> {{ v }}</label>{% endfor %}</div>
+  {% if traps %}<label>这次踩到了哪些坑？<span class="muted small">（可以不选）</span></label>
+  <div class="row" style="flex-wrap:wrap">{% for t in traps %}<label class="pill"><input type="checkbox" name="traps" value="{{ t.kp }}"> {{ t.name }}</label>{% endfor %}</div>{% endif %}
+  <label>想对自己说的话</label>
+  <textarea name="review" rows="3" placeholder="错在哪、下次怎么做；或者为什么这次只是运气"></textarea>
+  <div style="margin-top:12px"><button class="btn">写好了</button></div>
+</form>
+{% endif %}
+
+{% else %}
+<h1>📒 {{ cur.journal.name }}</h1>
+<p class="muted small">{{ cur.journal.intro or '做决定之前写下理由和认错条件，到期回来对照结果，分清是判断对了还是运气好。只有你自己看得到。' }}</p>
+{% if request.query_params.get('saved') %}<div class="note-bar">✅ 记下了。到了回看的日子，「今天」页会提醒你回来复盘。</div>{% endif %}
+
+{% set due = entries|selectattr('due')|list %}
+{% if due %}<h2>该回看了</h2>
+<div class="stack" style="display:grid;gap:10px">
+{% for e in due %}<a class="tile" href="/journal/{{ e.id }}" style="display:block"><div class="small muted">{{ e.created }} · {{ e.pack_name }}</div><div><b>{{ e.subject }}</b></div><div class="small">去复盘 ›</div></a>{% endfor %}
+</div>{% endif %}
+
+<details class="card" {{ 'open' if not entries }}>
+  <summary><b>✍️ 写一条</b></summary>
+  <form method="post" action="/journal">
+    {% if packs|length > 1 %}<label>哪门课</label><select name="pack">{% for p in packs %}<option value="{{ p.id }}" {{ 'selected' if p.id == cur.id }}>{{ p.subject_name }}</option>{% endfor %}</select>
+    {% else %}<input type="hidden" name="pack" value="{{ cur.id }}">{% endif %}
+    <label>{{ cur.journal.subject_label }}</label><input type="text" name="subject" required maxlength="200" placeholder="{{ cur.journal.subject_hint }}">
+    {% for f in cur.journal.fields %}<label>{{ f.label }}</label><textarea name="{{ f.id }}" rows="2" placeholder="{{ f.hint or '' }}"></textarea>{% endfor %}
+    <label>有几成把握？</label>
+    <select name="confidence">{% for c in confidence %}<option value="{{ c }}" {{ 'selected' if c == 50 }}>{{ c // 10 }} 成</option>{% endfor %}</select>
+    <label>什么时候回来看？</label>
+    <select name="days">{% for d in cur.journal.review_days %}<option value="{{ d }}">{{ days_label(d) }}</option>{% endfor %}</select>
+    <div style="margin-top:12px"><button class="btn">记下来</button></div>
+  </form>
+</details>
+
+{% if patterns.reviewed %}
+<h2>复盘过 {{ patterns.reviewed }} 个决定</h2>
+{% for f in patterns.found %}<div class="hint">🔎 {{ f }}</div>{% endfor %}
+<div class="tw"><table class="nums">
+  {% for q in patterns.quadrants %}<tr><td><b>{{ q.name }}</b><div class="muted small">{{ q.note }}</div></td><td>{{ q.n or '·' }}</td></tr>{% endfor %}
+</table></div>
+{% if patterns.traps %}<p class="small">踩过的坑：{% for t in patterns.traps %}<a href="/learn/{{ t.kp }}">{{ t.name }}</a> ×{{ t.n }}{{ '、' if not loop.last }}{% endfor %}</p>{% endif %}
+{% endif %}
+
+{% set waiting = entries|rejectattr('due')|list %}
+{% if waiting %}<h2>记过的</h2>
+<div class="stack" style="display:grid;gap:8px">
+{% for e in waiting %}<a class="tile" href="/journal/{{ e.id }}" style="display:block"><div class="small muted">{{ e.created }} · {{ e.confidence // 10 }} 成把握{% if e.reviewed %} · {{ e.judgment }} · {{ e.outcome }}{% else %} · {{ e.review_on }} 回看{% endif %}</div><div>{{ e.subject }}</div></a>{% endfor %}
+</div>
+{% elif not due and next_due %}<p class="muted small">下一条 {{ next_due }} 回看。</p>{% endif %}
+{% endif %}
+{% endblock %}
