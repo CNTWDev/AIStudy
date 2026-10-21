@@ -95,7 +95,8 @@ CARD_GROUPS = {"words": ("word", "phrase", "term"), "mistakes": ("mistake",), "o
 
 class Paused:
     """退掉的课（或换掉的方向）留下的内容：记录都留着，只是不再出现在每天的学习里；重新选回这门课就接着来。
-    kps：报过名的教材里、现在不在学的知识点（同一概念在在学的教材里有的、给在学的课打地基的，照常出）。
+    kps：报过名的教材里、现在不在学的知识点（同一概念在在学的教材里有的、给在学的课打地基的，照常出），
+    加上不是给这个人群的知识点（catalog.closed_to：学习页打不开的，每天的学习也不碰，比如成人以前在中小学的课里留下的记录）。
     lists：还在给这个人用的词表（在学科目的、家长安排的单词任务）；别的词表来的单词卡暂停。"""
 
     def __init__(self, user_id: int):
@@ -106,7 +107,7 @@ class Paused:
         concepts = ladder.enrolled_concepts(active)
         keep = {k for f in ladder.foundations(dict(user or {}), active) for k in ladder.range_of(f, concepts)}
         self.kps = {k for e in rows for k in catalog.packs[e["pack_id"]].kp_ids
-                    if catalog.concept_id(k) not in concepts and k not in keep}
+                    if catalog.concept_id(k) not in concepts and k not in keep} | catalog.closed_to((user or {}).get("grade"))
         self.lists = {wl["id"] for wl in explore.word_lists(user_id)} | {t["ref"] for t in tracks(user_id) if t["kind"] == "words"}
 
     def card(self, c) -> bool:
@@ -905,6 +906,9 @@ def today_plan(user_id: int, rebuild=False) -> dict:
     day = db.today().isoformat()
     row = db.one("SELECT * FROM days WHERE user_id=? AND day=?", user_id, day)
     plan = _upgrade_urls(db.jload(row["plan"], []) if row else [])
+    if plan and not rebuild:  # 排好以后课或年级变了：还没做的任务里有学习者打不开的知识点，就按现在的情况重排
+        grade = (db.one("SELECT grade FROM users WHERE id=?", user_id) or {}).get("grade")
+        rebuild = any(t.get("kp") and not t.get("done") and not catalog.kp_visible(t["kp"], grade) for t in plan)
     if rebuild or not plan:
         old_done = [t for t in plan if t.get("done")]
         plan = build_plan(user_id)
