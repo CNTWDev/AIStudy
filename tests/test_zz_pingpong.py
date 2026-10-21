@@ -1,4 +1,4 @@
-"""乒乓球对战（app/arena/games/pingpong.py）：登记、让球（按年级，再按最近谁赢得多自动调）、输一局要答对 5 道题的存档、一场的结果。"""
+"""乒乓球对战（app/arena/games/pingpong.py）：登记、让球（按年级，再按最近谁赢得多自动调）、输一局要答对 1 道题的存档、一场的结果。"""
 from fastapi.testclient import TestClient
 
 from app import arena, auth, db
@@ -46,9 +46,9 @@ def test_match_and_handicap():
         assert st["points"] == 7 and st["cap"] == 10 and st["to_win"] == 2
         assert st["assist"] == {str(big): 0.0, str(small): 0.8}   # 差 5 个年级：弟弟让球
 
-        # 输了一局：要答对 5 道题，存档记得住（刷新回来还是 5 道）
-        c2.post(f"/api/rooms/{rid}/save", json={**B, "session": play["session"], "el": 40, "need": 5, "me": {"y": 70}})
-        assert c2.get(f"/api/rooms/{rid}").json()["play"]["resume"]["need"] == 5
+        # 输了一局：要答对 1 道题（和所有游戏一样），存档记得住（刷新回来还在答题）
+        c2.post(f"/api/rooms/{rid}/save", json={**B, "session": play["session"], "el": 40, "need": 1, "me": {"y": 70}})
+        assert c2.get(f"/api/rooms/{rid}").json()["play"]["resume"]["need"] == 1
 
         # 弟弟赢了：记下赢的人和局分；下一场弟弟的让球少一点
         r = c.post(f"/api/rooms/{rid}/finish", json={**A, "session": play["session"], "result": "win",

@@ -3,7 +3,7 @@
    - 球打在球拍中间又快又直，打在边上斜着飞出去；挥拍的方向也会把球带偏一点。连续对打越久，球越快。
    - 球归接球的那台设备管：飞到我这边时，我的设备判断接没接到（没有网络延迟），接到了把球的位置和速度发给对方（'hit'），
      没接到就告诉对方得分（'pt'）。球飞到对方那边时，我这边把球停在对方球拍那里，等对方说接到还是没接到。
-   - 比分两台设备各算一份（得分消息按顺序编号，不会算两次）；一局打完，输的人倒下答题（外壳 ctx.die()，要答对 5 道），
+   - 比分两台设备各算一份（得分消息按顺序编号，不会算两次）；一局打完，输的人倒下答题（外壳 ctx.die()，和所有游戏一样答对 1 道），
      答完两边一起开始下一局。整场打完由开房间的人报结果（谁赢、局分）。
    - 刷新 / 换设备：比分在存档和对方那里（saveWorld），回来后这一分重新发球。 */
 (function () {
@@ -45,13 +45,12 @@
         return;
       }
       score.quiz = lose; setPhase('gameover', 1.8);
-      msg = mine ? `这一局你赢了！等 ${nameOf(lose)} 答 ${lvNeed()} 道题` : `这一局 ${nameOf(winner)} 赢了，答对 ${lvNeed()} 道题再接着打`;
-      if (mine) { Play.sfx.play('star'); mp.needs[lose] = lvNeed(); }
+      msg = mine ? `这一局你赢了！等 ${nameOf(lose)} 答对一道题` : `这一局 ${nameOf(winner)} 赢了，答对一道题再接着打`;
+      if (mine) { Play.sfx.play('star'); mp.needs[lose] = 1; }
       return;
     }
     setPhase('point', 1.1);
   }
-  const lvNeed = () => REVIVE.need;
   function nextGame() {   // 输的人答完题：下一局
     const loser = score.quiz;
     score.quiz = ''; score.g++; score.boost = loser;
@@ -314,19 +313,18 @@
     if (!ok) return;
     Object.assign(score, {games: {...w.games}, pts: {...w.pts}, g: w.g || 1, seq: w.seq || 0, boost: w.boost || '', quiz: w.quiz || '', over: w.over || ''});
     if (score.over) { setPhase('over', 0.5); msg = `${nameOf(score.over)} 赢了这一场！`; }
-    else if (score.quiz) { setPhase('quiz'); if (score.quiz === String(mp.me.id) && !mp.reviving) mp.die(); else if (score.quiz !== String(mp.me.id) && mp.needs[score.quiz] == null) mp.needs[score.quiz] = REVIVE.need; }
+    else if (score.quiz) { setPhase('quiz'); if (score.quiz === String(mp.me.id) && !mp.reviving) mp.die(); else if (score.quiz !== String(mp.me.id) && mp.needs[score.quiz] == null) mp.needs[score.quiz] = 1; }
     else serveReady();
   }
   const saveWorld = () => score && {games: score.games, pts: score.pts, g: score.g, seq: score.seq, boost: score.boost, quiz: score.quiz, over: score.over};
 
-  const REVIVE = {need: 5, grow: false, verb: '接着打', done: '🎉 答完了，接着打！'};
   PlayShell.init({
-    quiz: 'revive', tempo: 132, revive: REVIVE,
+    quiz: 'revive', tempo: 132, revive: {verb: '接着打', done: '🎉 答对了，接着打！'},
     noQuiz: '这一场我一局都没输，一道题都不用答！',
     rules: ['和家里人打乒乓球：<b>每局 7 分</b>（6 平以后要多赢 2 分，最多打到 10 分），<b>三局两胜</b>。',
             '上下拖手指（或移动鼠标、按 ↑ ↓）移动球拍；轮到你发球时点一下。',
             '球打在球拍中间又快又直，打在边上会斜着飞；挥拍的方向也会带偏球。对打越久球越快。',
-            '<b>输了一局要答对 5 道题</b>，才能接着打下一局（答错不加题，点「这题不会」换一道）。答完题，下一局你的球拍会变大。',
+            '<b>输了一局答对一道题</b>，就接着打下一局（答错了换一道接着答）。答对了，下一局你的球拍会变大。',
             '年纪小的球拍大一些、球飞过去慢一些；谁老赢，下次就难一点，老输就容易一点。'],
     keys: '电脑键盘：↑ ↓ 或 W S 移动球拍，空格 发球；也可以直接移动鼠标',
     input: {up: ['ArrowUp', 'w'], down: ['ArrowDown', 's'], serve: [' ', 'Enter']},
