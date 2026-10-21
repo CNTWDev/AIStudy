@@ -110,6 +110,7 @@ class Pack:
     audience: str = "school"                          # 面向谁（AUDIENCES）：默认按学段推，包里写 "audience" 可覆盖
     open_review: str = ""                             # "ai"：简答题由 AI 点评和追问，不让学员自评（app/coach.py）
     thinking_moves: list = field(default_factory=list)  # 这门课看重的思考方式 [{id, name, desc}]；列了才出思辨题（app/discuss.py）
+    journal: dict = field(default_factory=dict)       # 决策日志：写了才有（字段、回看天数、可标的陷阱），见 app/journal.py
     base: str = ""                                    # 目录包：建在哪个主干上（知识点、题、讲解都是主干的）
     books: list = field(default_factory=list)        # 目录包的册次 [{stage, term, name, status, sources, units: [{name, kps}]}]
 
@@ -331,7 +332,24 @@ class Catalog:
             prompt_note=meta.get("prompt_note", ""), levels=levels, chapters=meta.get("progress") != "none",
             selection=meta.get("selection") or {}, copyright=meta.get("copyright", ""),
             open_review=meta.get("open_review", ""), thinking_moves=self._moves(meta, d), base=meta.get("base", ""),
+            journal=self._journal(meta, d),
         )
+
+    def _journal(self, meta, d) -> dict:
+        """决策日志（app/journal.py）：{name, intro, subject_label, fields: [{id, label, hint}], review_days, traps: [本包知识点 id]}。"""
+        j = meta.get("journal") or {}
+        if not j:
+            return {}
+        kps = {k["id"] for k in d.get("kps", [])}
+        ids = [f.get("id") for f in j.get("fields") or []]
+        if not ids or not all(ids) or len(set(ids)) != len(ids) or not all(f.get("label") for f in j["fields"]):
+            self.errors.append(f"{meta['id']}: journal.fields 每项要有不重复的 id 和 label")
+        if not j.get("review_days") or not all(isinstance(n, int) and n > 0 for n in j["review_days"]):
+            self.errors.append(f"{meta['id']}: journal.review_days 要写正整数天数")
+        for t in j.get("traps") or []:
+            if t not in kps:
+                self.errors.append(f"{meta['id']}: journal.traps 里的 {t} 不是本包的知识点")
+        return {"name": "决策日志", "intro": "", "subject_label": "决定什么", "subject_hint": "", "traps": [], **j}
 
     def _moves(self, meta, d) -> list:
         """thinking_moves 可以直接写 {id, name, desc}，也可以写本包里知识点的 id（用它的名称和说明，学员能点开那一课）。"""

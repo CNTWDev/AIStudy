@@ -97,6 +97,7 @@
 </div>
 </details>
 {% if pack.thinking_moves and not readonly %}<p class="small"><a href="/thinking">🧭 值得再想的问题 · 我的思考方式</a></p>{% endif %}
+{% if pack.journal and not readonly %}<p class="small"><a href="/journal?pack={{ pack.id }}">📒 {{ pack.journal.name }}</a></p>{% endif %}
 {% if pack.copyright %}<p class="muted small">{{ pack.copyright }}</p>{% endif %}
 <script>
 const KP = {{ kp.id|tojson }}, TASK = {{ task|tojson }}, THINK = {{ (kp.think or '')|tojson }};
