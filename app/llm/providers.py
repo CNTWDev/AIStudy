@@ -23,6 +23,12 @@ class AnthropicProvider(Provider):
         return self._client
 
     def complete(self, req: ChatRequest) -> str:
+        return self._send(req)
+
+    def stream(self, req: ChatRequest, on_text) -> str:
+        return self._send(req, on_text)
+
+    def _send(self, req: ChatRequest, on_text=None) -> str:
         import anthropic
         kw = {
             "model": req.model or self.cfg.model,
@@ -36,12 +42,20 @@ class AnthropicProvider(Provider):
             ] + [{"type": "text", "text": req.user}]
         if self.cfg.extra.get("use_effort", True) and req.effort:
             kw["output_config"] = {"effort": req.effort}
+        if self.cfg.extra.get("server_fallback", True):
+            api, kw = self.client().beta.messages, {**kw, "betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"}
+        else:
+            api = self.client().messages
         try:
-            if self.cfg.extra.get("server_fallback", True):
-                resp = self.client().beta.messages.create(
-                    **kw, betas=["server-side-fallback-2026-07-01"], fallbacks="default")
+            if on_text is None:
+                resp = api.create(**kw)
             else:
-                resp = self.client().messages.create(**kw)
+                with api.stream(**kw) as s:
+                    text = ""
+                    for delta in s.text_stream:
+                        text += delta
+                        on_text(text)
+                    resp = s.get_final_message()
         except anthropic.AuthenticationError as e:
             raise LLMError("AI 密钥无效，请管理员检查 config/llm.toml 里的 api_key") from e
         except anthropic.RateLimitError as e:
@@ -68,6 +82,12 @@ class OpenAICompatProvider(Provider):
         return ok, why
 
     def complete(self, req: ChatRequest) -> str:
+        return self._send(req)
+
+    def stream(self, req: ChatRequest, on_text) -> str:
+        return self._send(req, on_text)
+
+    def _send(self, req: ChatRequest, on_text=None) -> str:
         url = self.cfg.base_url.rstrip("/") + "/chat/completions"
         body = {
             "model": req.model or self.cfg.model,
@@ -80,34 +100,57 @@ class OpenAICompatProvider(Provider):
             ] + [{"type": "text", "text": req.user}]
         if req.json_mode and self.cfg.extra.get("json_mode", True):
             body["response_format"] = {"type": "json_object"}
+        if on_text is not None:
+            body["stream"] = True
+        headers = {"Authorization": f"Bearer {self.cfg.api_key}"}
         last = None
         for _ in range(self.cfg.max_retries + 1):
             try:
-                r = httpx.post(url, json=body, timeout=self.cfg.timeout,
-                               headers={"Authorization": f"Bearer {self.cfg.api_key}"})
+                with httpx.stream("POST", url, json=body, timeout=self.cfg.timeout, headers=headers) as r:
+                    if r.status_code in (429, 500, 502, 503, 504):
+                        last = LLMError("AI 服务太忙，请稍后再试")
+                        continue
+                    if r.status_code in (401, 403):
+                        raise LLMError("AI 密钥无效，请管理员检查 config/llm.toml 里的 api_key")
+                    if r.status_code >= 400:
+                        if req.images:
+                            raise LLMError(f"AI 服务出错（{r.status_code}）：这个模型可能不支持看图片。请在 config/llm.toml 的 "
+                                           "[tasks.paper] 里换成支持图片的模型，或者改用「粘贴题目文字」")
+                        raise LLMError(f"AI 服务出错（{r.status_code}）")
+                    return self._read(r, req, on_text)
             except httpx.HTTPError as e:
                 last = LLMError("连不上 AI 服务，请检查服务器网络")
                 last.__cause__ = e
                 continue
-            if r.status_code in (429, 500, 502, 503, 504):
-                last = LLMError("AI 服务太忙，请稍后再试")
-                continue
-            if r.status_code in (401, 403):
-                raise LLMError("AI 密钥无效，请管理员检查 config/llm.toml 里的 api_key")
-            if r.status_code >= 400:
-                if req.images:
-                    raise LLMError(f"AI 服务出错（{r.status_code}）：这个模型可能不支持看图片。请在 config/llm.toml 的 "
-                                   "[tasks.paper] 里换成支持图片的模型，或者改用「粘贴题目文字」")
-                raise LLMError(f"AI 服务出错（{r.status_code}）")
-            try:
-                payload = r.json()
+        raise last
+
+    @staticmethod
+    def _read(r, req: ChatRequest, on_text) -> str:
+        """读回答：普通请求一整份 JSON；流式请求是一行行 data: {...}，最后 data: [DONE]。"""
+        try:
+            if on_text is None:
+                payload = json.loads(r.read())
                 usage = payload.get("usage") or {}
                 req.usage.update(input_tokens=usage.get("prompt_tokens"), output_tokens=usage.get("completion_tokens"))
                 req.usage["truncated"] = payload["choices"][0].get("finish_reason") == "length"
                 return payload["choices"][0]["message"]["content"]
-            except (KeyError, IndexError, ValueError) as e:
-                raise LLMError("AI 返回格式不对，请再试一次") from e
-        raise last
+            text = ""
+            for line in r.iter_lines():
+                if not line.startswith("data:") or line[5:].strip() == "[DONE]":
+                    continue
+                chunk = json.loads(line[5:])
+                if chunk.get("usage"):
+                    req.usage.update(input_tokens=chunk["usage"].get("prompt_tokens"), output_tokens=chunk["usage"].get("completion_tokens"))
+                for ch in chunk.get("choices") or []:
+                    if ch.get("finish_reason"):
+                        req.usage["truncated"] = ch["finish_reason"] == "length"
+                    delta = (ch.get("delta") or {}).get("content")
+                    if delta:
+                        text += delta
+                        on_text(text)
+            return text
+        except (KeyError, IndexError, ValueError) as e:
+            raise LLMError("AI 返回格式不对，请再试一次") from e
 
 
 @register("mock")
@@ -116,6 +159,15 @@ class MockProvider(Provider):
 
     def ready(self):
         return True, ""
+
+    def stream(self, req: ChatRequest, on_text) -> str:
+        """演示边写边看：一小段一小段地给（extra.stream_delay 秒一段，默认不等）。"""
+        import time
+        text = self.complete(req)
+        for i in range(8, len(text) + 8, 8):
+            time.sleep(float(self.cfg.extra.get("stream_delay", 0)))
+            on_text(text[:i])
+        return text
 
     def complete(self, req: ChatRequest) -> str:
         if req.task == "paper":  # 把示例题对应到提示词里给出的第一个候选知识点

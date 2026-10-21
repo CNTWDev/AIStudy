@@ -250,7 +250,7 @@ function show() {
     `<div class="muted small">第 ${idx + 1}/${items.length} 题<span class="for-grownups"> · 难度 ${'★'.repeat(it.difficulty || 1)}</span></div>`;
   $('#items').appendChild(box);
   renderItem(box, it, {
-    submit: (answer, self, ms, extra) => { lastAnswer = answer; return api('/api/answer', base(self ? {self, ms} : {answer, ms, ...extra})); },
+    submit: (answer, self, ms, extra, onPart) => { lastAnswer = answer; return api('/api/answer', base(self ? {self, ms} : {answer, ms, ...extra}), {onPart}); },
     dontKnow: () => api('/api/answer', base({dont_know: true})),
     onDone: res => {
       Run.hit(!!res.correct); Combo.hit(!!res.correct, box); celebrate(res, box);

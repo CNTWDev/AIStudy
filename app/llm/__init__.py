@@ -2,15 +2,16 @@
 
 - 配置：config/llm.toml（见 config/llm.example.toml）
 - 抽象：base.Provider / ChatRequest；新增厂商见 providers.py
-- 调用：service.ask_json（缓存、限额、JSON 解析）
+- 调用：service.ask_json（缓存、限额、JSON 解析）；stream：学员在等的回答边写边看
 - 任务：tasks.py（查词、讲解、出题、造句点评、开放题点评、思辨陪练、写短文、试卷解析、问一问小助手）
 """
+from . import stream
 from .base import ChatRequest, LLMError, Provider, register
 from .service import ask_json, check, enabled, model_of, ping, reload, settings
 from .tasks import PROMPT_VERSION, ask_tutor, book_guide, discuss_close, discuss_turn, explain_sentence, generate_items, kp_context, lookup, make_passage, make_variant, news_pick, news_write, parse_paper, review_open, sentence_feedback, solve_item, teach
 
 __all__ = [
-    "PROMPT_VERSION",
+    "PROMPT_VERSION", "stream",
     "ChatRequest", "LLMError", "Provider", "register", "ask_json", "check", "enabled", "model_of", "ping", "reload", "settings",
     "ask_tutor", "book_guide", "discuss_close", "discuss_turn", "explain_sentence", "generate_items", "kp_context", "lookup", "make_passage", "make_variant", "news_pick", "news_write", "parse_paper", "review_open", "sentence_feedback",
     "solve_item", "teach",

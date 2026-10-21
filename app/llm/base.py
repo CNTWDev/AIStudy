@@ -54,6 +54,12 @@ class Provider(ABC):
     def complete(self, req: ChatRequest) -> str:
         """发出请求，返回模型输出的文本。出错时抛 LLMError。"""
 
+    def stream(self, req: ChatRequest, on_text) -> str:
+        """同 complete，但边写边调用 on_text(目前写出的全部文字)（llm/stream.py）。不支持的提供方写完一次给。"""
+        text = self.complete(req)
+        on_text(text)
+        return text
+
 
 PROVIDER_TYPES: dict[str, type[Provider]] = {}
 

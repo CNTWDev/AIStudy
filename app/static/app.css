@@ -920,6 +920,19 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .seek-found{color:var(--brand-ink);font-weight:700;margin-bottom:4px}
 .seek-in{animation:seekin .45s ease-out}@keyframes seekin{from{opacity:0;transform:translateY(8px)}}
 [data-tone=adult] :is(.seek-lens,.seek-face .mascot){animation:none}
+/* 成人：没有小伙伴，一个转圈 + 几行字，当前那一步加粗，做完的打勾（DESIGN 5.40） */
+.seek.plain{background:var(--card);border:1px solid var(--line);border-radius:12px;gap:10px;padding:14px 16px}
+.seek.plain .seek-hd{gap:12px}.seek.plain .seek-t{font-size:15px;font-weight:700}
+.seek-spin{flex:none;width:20px;height:20px;border-radius:50%;border:2.5px solid var(--brand-3);border-top-color:var(--brand);animation:spin .9s linear infinite}
+.seek.plain .seek-trail{padding-left:32px;gap:5px}
+.seek.plain .seek-ico{width:8px;height:8px;border-radius:50%;background:var(--line);opacity:1}
+.seek.plain .seek-trail li.cur .seek-ico{background:var(--brand);box-shadow:none;animation:none}
+.seek.plain .seek-trail li.done .seek-ico{background:var(--ok)}
+.seek.compact.plain{padding:8px 2px;border:0;background:none}
+/* 等 AI 回话（aiWait）：等的时候按钮转圈写「正在想」，比普通的禁用清楚一点；AI 写出来的话先放在这里 */
+.btn[aria-busy=true]{opacity:.8}
+.aiwait{margin-top:10px}
+.aiwait-draft p{margin:6px 0 0}.aiwait-draft p:first-of-type{margin-top:4px}
 /* 一口气（app.js 的 Focus，DESIGN 5.36）：顶上一条细进度；结束卡复用「下一项」那张卡的样子 */
 .fzbar{display:flex;align-items:center;gap:8px;margin:6px 0 10px;padding:6px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-size:13px;color:var(--muted)}
 .fzbar .fz-t{white-space:nowrap}

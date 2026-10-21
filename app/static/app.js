@@ -1,11 +1,35 @@
-async function api(url, body, method) {
-  const opt = {method: method || (body ? 'POST' : 'GET'), headers: {}};
+/* o：请求方法（字符串），或 {method, onPart}。给了 onPart 就要「边写边看」（DESIGN 5.40）：
+   服务端一行一个 JSON，{"part": {栏: 目前写到的字}} 交给 onPart，最后 {"done": 结果} 作为返回值；不支持的接口照常整份返回 */
+async function api(url, body, o) {
+  if (typeof o === 'string') o = {method: o};
+  o = o || {};
+  const opt = {method: o.method || (body ? 'POST' : 'GET'), headers: {}};
   if (body !== undefined) { opt.headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
+  if (o.onPart) opt.headers.Accept = 'application/x-ndjson, application/json';
   const r = await fetch(url, opt);
+  if (o.onPart && r.ok && (r.headers.get('Content-Type') || '').includes('ndjson')) return apiLines(r, o.onPart);
   let data = {};
   try { data = await r.json(); } catch (e) {}
   if (!r.ok) throw new Error(data.error || data.detail || ('出错了 ' + r.status));
   return data;
+}
+async function apiLines(r, onPart) {
+  const rd = r.body.getReader(), dec = new TextDecoder();
+  let buf = '';
+  for (;;) {
+    const {value, done} = await rd.read();
+    buf += dec.decode(value, {stream: !done});
+    let i;
+    while ((i = buf.indexOf('\n')) >= 0) {
+      const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+      if (!line) continue;  // 等太久时服务端发的空行
+      const m = JSON.parse(line);
+      if (m.part) onPart(m.part);
+      else if ('done' in m) return m.done;
+      else throw new Error(m.error || '出错了，请再试一次');
+    }
+    if (done) throw new Error('连接断了，请再点一次');
+  }
 }
 function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function $(s, el) { return (el || document).querySelector(s); }
@@ -190,9 +214,12 @@ function renderItem(box, item, opts) {
     const btn = $('.submit', box);
     const answer = W === 'choice' ? chosen : (ans ? ans.value : '');
     if (W === 'choice' && chosen === null) { alert('先选一个答案'); return; }
-    btn.disabled = true;
+    // 思辨题、AI 点评的开放题要等 AI 想十几秒：按下就锁住、显示它在做什么，写出来一段就先看一段（aiWait）
+    const wait = W === 'discuss' || (W === 'self' && item.coach) ? aiWait(btn, $('.fbbox', box), W === 'discuss' ? 'discuss' : 'review', ans) : null;
+    if (!wait) btn.disabled = true;
     try {
-      const res = await opts.submit(answer, undefined, took(), W === 'discuss' && item.rethink ? {rethink: item.rethink} : undefined);
+      const res = await opts.submit(answer, undefined, took(), W === 'discuss' && item.rethink ? {rethink: item.rethink} : undefined, wait && wait.part);
+      if (wait) wait.end();
       if (res.discuss) { btn.remove(); ans.readOnly = true; discussRound(box, res, opts, took); return; }
       if (res.coach) { btn.remove(); if (dk) dk.remove(); ans.readOnly = true; coachRound(box, res, opts, took); return; }
       if (res.reveal) {
@@ -214,7 +241,7 @@ function renderItem(box, item, opts) {
       if (res.correct) cheer(box);
       Focus.rt(!!res.correct, took());
       opts.onDone && opts.onDone(res);
-    } catch (e) { btn.disabled = false; $('.fbbox', box).innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+    } catch (e) { if (wait) wait.fail(); else btn.disabled = false; $('.fbbox', box).innerHTML = `<div class="err">${esc(e.message)}</div>`; }
   };
   Focus.onRender(box, item);
 }
@@ -242,12 +269,12 @@ function coachRound(box, res, opts, took) {
   ta.focus();
   fu.onclick = async () => {
     if (ta.value.trim().length < 4) { alert('先写下你的想法'); return; }
-    fu.disabled = true;
+    const wait = aiWait(fu, fb, 'review', ta);
     try {
-      const r = await opts.submit(ta.value, undefined, took(), {review_id: res.review_id});
-      fu.closest('.qacts').remove(); ta.readOnly = true;
+      const r = await opts.submit(ta.value, undefined, took(), {review_id: res.review_id}, wait.part);
+      wait.end(); fu.closest('.qacts').remove();
       coachRound(box, r, opts, took);
-    } catch (e) { fu.disabled = false; fb.insertAdjacentHTML('beforeend', `<div class="err">${esc(e.message)}</div>`); }
+    } catch (e) { wait.fail(); fb.insertAdjacentHTML('beforeend', `<div class="err">${esc(e.message)}</div>`); }
   };
 }
 /* 思辨题的一轮（app/discuss.py）：AI 先把你的观点说得更有力、回答你的反问，再提一个挑战；
@@ -296,23 +323,24 @@ function discussRound(box, res, opts, took) {
   if (go) go.onclick = async () => {
     const ta = $('.dsc-more', ctl);
     if (ta.value.trim().length < 4) { alert('先写下你的想法'); return; }
-    go.disabled = true;
+    endb.disabled = true;
+    const wait = aiWait(go, ctl, 'discuss', ta);
     try {
-      const r = await opts.submit(ta.value, undefined, took(), {discussion_id: res.discussion_id});
-      ta.readOnly = true; go.closest('.qacts').remove(); close.remove();
+      const r = await opts.submit(ta.value, undefined, took(), {discussion_id: res.discussion_id}, wait.part);
+      wait.end(); go.closest('.qacts').remove(); close.remove();
       discussRound(box, r, opts, took);
-    } catch (e) { go.disabled = false; err(e); }
+    } catch (e) { wait.fail(); endb.disabled = false; err(e); }
   };
   if (endb) endb.onclick = () => { close.hidden = false; endb.closest('.qacts').remove(); const ta = $('.dsc-more', ctl); if (ta) ta.remove(); $('.dsc-c', ctl).focus(); };
   $('.dsc-done', ctl).onclick = async () => {
     const c = $('.dsc-c', ctl).value.trim();
     if (c.length < 4) { alert('写下你现在的结论'); return; }
-    const b = $('.dsc-done', ctl); b.disabled = true;
+    const wait = aiWait($('.dsc-done', ctl), ctl, 'discuss_close', $('.dsc-c', ctl), $('.dsc-a', ctl));
     try {
-      const r = await opts.submit('', undefined, took(), {discussion_id: res.discussion_id, conclusion: c, action: $('.dsc-a', ctl).value.trim()});
-      ctl.remove();
+      const r = await opts.submit('', undefined, took(), {discussion_id: res.discussion_id, conclusion: c, action: $('.dsc-a', ctl).value.trim()}, wait.part);
+      wait.end(); ctl.remove();
       discussRound(box, r, opts, took);
-    } catch (e) { b.disabled = false; err(e); }
+    } catch (e) { wait.fail(); err(e); }
   };
 }
 /* 做完一道题后可以标记「这道题有问题」：题库里的题会被很多孩子反复用，坏题要能被发现 */
@@ -1130,6 +1158,13 @@ const SEEK = {
   passage: o => ({t: '正在给你写一篇短文', sub: '写好了会自动打开，大约半分钟',
     steps: [['🧭', o.topic ? `围绕「${o.topic}」找素材` : '挑一个你会喜欢的话题'], ...(o.lang === 'en' ? [['🔤', '把你最近要复习的生词放进去']] : []),
       ['📏', '按你的年级调好长短和难度'], ['❓', '出几道读完做的小题']]}),
+  // 下面三种是等 AI 回话（aiWait）：步骤就是让 AI 做的那几件事，按这个顺序写回来
+  discuss: () => ({t: '正在读你的想法', sub: '先把你的观点说得更有力，再提一个值得想的问题', long: '这次想得久一点，再等几秒',
+    steps: [['🔍', '读懂你的判断和理由'], ['🧠', '分析：哪里最有力，哪里还没想到'], ['💬', '写回应，再提一个新挑战']]}),
+  discuss_close: () => ({t: '正在对照你这一路的想法', long: '这次想得久一点，再等几秒',
+    steps: [['🔁', '对照你开头和现在的想法'], ['🧭', '和几种成熟的看法比一比'], ['⚠️', '找出这个结论在什么情况下会出问题']]}),
+  review: () => ({t: '正在看你的回答', long: '这次想得久一点，再等几秒',
+    steps: [['🔍', '诊断：逐条对照要点'], ['🧠', '分析：找出最关键的缺口'], ['✍️', '给出建议：写点评和追问']]}),
 };
 const SEEK_AT = [0, 2600, 6000, 10500, 15500];  // 第几毫秒走到第几步；最后一步一直等到内容好了
 let seekN = 0;
@@ -1140,27 +1175,59 @@ function seekFace() {  // 同一页可能放几次小伙伴：SVG 里的 id 每�
 function seek(box, kind, o) {
   o = o || {};
   const spec = SEEK[kind](o), name = (window.AI && AI.name) || '';
-  const title = o.title || name + spec.t;
+  // 成人：不出小伙伴、不带名字，只有一个转圈和几行字（DESIGN 5.40）
+  const adult = document.body.dataset.tone === 'adult';
+  const title = o.title || (adult ? spec.t : name + spec.t);
+  const face = adult ? '<span class="seek-spin" aria-hidden="true"></span>' : `<span class="seek-face">${seekFace()}<i class="seek-lens" aria-hidden="true">🔍</i></span>`;
   let shown = false, stopped = false;
   const timers = [];
   const show = () => {
     if (stopped) return;
     shown = true;
     if (o.compact) {
-      box.innerHTML = `<div class="seek compact" role="status"><span class="seek-face">${seekFace()}<i class="seek-lens" aria-hidden="true">🔍</i></span><span class="loading">${esc(title)}</span></div>`;
+      box.innerHTML = `<div class="seek compact${adult ? ' plain' : ''}" role="status">${face}<span class="loading">${esc(title)}</span></div>`;
       return;
     }
-    box.innerHTML = `<div class="seek" role="status" aria-live="polite"><div class="seek-hd"><span class="seek-face">${seekFace()}<i class="seek-lens" aria-hidden="true">🔍</i></span>` +
+    box.innerHTML = `<div class="seek${adult ? ' plain' : ''}" role="status" aria-live="polite"><div class="seek-hd">${face}` +
       `<div><b class="seek-t">${esc(title)}</b>${spec.sub ? `<div class="seek-sub">${esc(spec.sub)}</div>` : ''}</div></div>` +
-      `<ol class="seek-trail">${spec.steps.map(([ico, txt]) => `<li><span class="seek-ico" aria-hidden="true">${ico}</span><span>${esc(txt)}</span></li>`).join('')}</ol>` +
-      `<div class="seek-long small muted" hidden>这次要翻的书有点多，再等一下下</div></div>`;
+      `<ol class="seek-trail">${spec.steps.map(([ico, txt]) => `<li><span class="seek-ico" aria-hidden="true">${adult ? '' : ico}</span><span>${esc(txt)}</span></li>`).join('')}</ol>` +
+      `<div class="seek-long small muted" hidden>${esc(spec.long || '这次要翻的书有点多，再等一下下')}</div></div>`;
     const lis = $$('.seek-trail li', box);
     const at = i => { if (stopped) return; lis.forEach((li, j) => { li.className = j < i ? 'done' : j === i ? 'cur' : ''; }); };
-    lis.forEach((_, i) => timers.push(setTimeout(() => at(i), SEEK_AT[i] || SEEK_AT[SEEK_AT.length - 1] + i * 4000)));
+    lis.forEach((_, i) => timers.push(setTimeout(() => at(i), SEEK_AT[i] ?? SEEK_AT[SEEK_AT.length - 1] + i * 4000)));
     timers.push(setTimeout(() => { const l = $('.seek-long', box); if (l && !stopped) l.hidden = false; }, 25000));
   };
   if (o.delay === 0) show(); else timers.push(setTimeout(show, o.delay ?? 350));
   return {stop() { stopped = true; timers.forEach(clearTimeout); return shown; }};
+}
+/* 等 AI 回话（思辨题、AI 点评这种要想十几秒的）：所有这样的按钮同一套（DESIGN 5.40）。
+   以前按下去只是按钮变浅，十几秒什么都没有，大家以为卡住了，一直点。现在：
+   1. 按下立刻锁住，按钮上转圈写「正在想」，写的字也锁住（不会提交第二次）；
+   2. box 里马上出现 AI 正在做的几步（seek：孩子是小伙伴，成人只有文字），一步步打勾；
+   3. AI 一开始写，就把写出来的话一段段放上来（边写边看），写完换成正式的卡片。
+   用法：const w = aiWait(btn, box, 'discuss', textarea…)；opts.submit(…, w.part)；好了 w.end()，出错 w.fail()（按钮和输入框放回去）。 */
+const AIDRAFT = {  // 边写边看时先放哪几栏，和正式卡片同样的开头
+  discuss: [['steelman', '💡 '], ['answer', '<b>你问的：</b>'], ['challenge', '🤔 ']],
+  discuss_close: [['shift', ''], ['own', '✨ 你自己的东西：'], ['watch', '⚠️ 值得留意：']],
+  review: [['feedback', ''], ['followup', '🤔 追问：']],
+};
+function aiWait(btn, box, kind, ...inputs) {
+  const label = btn.innerHTML;
+  btn.disabled = true; btn.setAttribute('aria-busy', 'true'); btn.textContent = '正在想';
+  inputs.forEach(i => { if (i) i.readOnly = true; });
+  const slot = document.createElement('div'); slot.className = 'aiwait'; box.appendChild(slot);
+  const look = seek(slot, kind, {delay: 0});
+  let draft = null;
+  const done = () => { look.stop(); slot.remove(); btn.removeAttribute('aria-busy'); };
+  return {
+    part(p) {
+      look.stop();
+      if (!draft) { slot.innerHTML = `<div class="fb dk aiwait-draft" aria-live="polite"><div class="loading small">正在写</div><div class="aiwait-body"></div></div>`; draft = $('.aiwait-body', slot); }
+      draft.innerHTML = AIDRAFT[kind].filter(([k]) => p[k]).map(([k, pre]) => `<p>${pre}${esc(p[k])}</p>`).join('');
+    },
+    end: done,
+    fail() { done(); btn.disabled = false; btn.innerHTML = label; inputs.forEach(i => { if (i) i.readOnly = false; }); },
+  };
 }
 /* 内容来了：等过的就轻轻淡入，接上刚才的等待 */
 function seekIn(el, waited) { if (waited && el) { el.classList.remove('seek-in'); void el.offsetWidth; el.classList.add('seek-in'); } }
