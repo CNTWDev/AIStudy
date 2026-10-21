@@ -11,7 +11,7 @@
        begin(ctx) {},            // 倒计时结束：开始玩
        end() {},                 // 这一关停下了（结束、换设备）：停掉循环
        onAnswer(res) {}, onXP(res) {}, onQuizOpen() {}, onQuizClose() {}, onRevive(info) {},
-       revive: {need: 5, grow: false, verb: '接着打', done: '…'},   // 倒下答题的规矩（不写：答对 1 道复活、答错多欠 1 道）
+       revive: {verb: '接着打', done: '…'},   // 倒下答题时怎么说（不写：「复活」）。规矩所有游戏一样，游戏改不了：见下面 REVIVE_NEED
        quizOpts: {rightHtml, wrongHtml, nextDelay},   // 答题面板的额外选项（quiz.js：答对、答错时多显示什么，答对后隔多久出下一题）
        pause(on, ms) {},         // 暂停 / 继续了（游戏循环外壳会停，自己用墙上时钟算时间的游戏在这里把暂停的 ms 补上）
        verdict(res) {},          // 对战：这一局对我来说是赢还是输 → {result, title, why}（res 是房主报的结果）
@@ -25,7 +25,7 @@
                                          联网时只有开房间的人报过关，谁都可以报没过（时间到了）。report.why 写在结算上
      ctx.toast(文字, 'good' | 'warn')；ctx.elapsed() 这一关玩了多少秒
    联网时还有：ctx.net 连接（net.js）；ctx.me / ctx.peer / ctx.peers {id, name, avatar, role}；ctx.host 我是不是开房间的（共享的东西由他算）；
-     ctx.die() 我倒下了：题目盖在游戏上，答对 1 道复活，答错多欠 1 道（最多 3 道），点「这题不会」不加；ctx.rescue() 队友救了我；
+     ctx.die() 我倒下了：题目盖在游戏上，答对 1 道就起来（答错、点「这题不会」都只是换一道，不加题）；ctx.rescue() 队友救了我；
      ctx.reviving 我在答题；ctx.deaths() 大家一共倒下几次；ctx.roleIndex(r) 角色是第几个；
      ctx.slot(id) 这个人是第几个（按角色排，0 起，对应关卡里的 1～4 号出生点，人少时也是连着的）
    设备：每个页面一个设备号（刷新不变）。服务器记着每个账号在哪台设备上玩（app/arena/rooms.py）：另一台设备上正在玩，
@@ -37,11 +37,15 @@
   const EMOTES = ['👍', '⏳', '🙌', '❤️', '❓'];
   const EMOTE_TEXT = {'👍': '好的', '⏳': '等等我', '🙌': '太棒了', '❤️': '加油', '❓': '怎么走？'};
 
+  // 倒下答题的规矩，所有游戏都一样：不管倒下几次、答错几次，永远是答对 1 道就起来。
+  // 答错不加题——一直答错的孩子最需要的是马上能回到游戏里，而不是越欠越多。
+  const REVIVE_NEED = 1;
+
   PlayShell.init = function (def) {
     const data = JSON.parse(root.dataset.info || '{}');
     const G = data.game, TOTAL = G.total || 0, multi = G.players[1] > 1, me0 = data.me;
     const quizMode = def.quiz || 'modal';
-    const RV = Object.assign({need: 1, grow: true, verb: '复活', done: '🎉 复活啦！'}, def.revive);
+    const RV = Object.assign({verb: '复活', done: '🎉 复活啦！'}, def.revive);
     const device = deviceId();
     const sh = {root, def, data, canvas: $('canvas'), hud: $('.pl-hud'), ctrl: $('.pl-ctrl'), dock: $('.pl-dock'),
                 match: null, quiz: null, over: true};
@@ -427,7 +431,7 @@
         if (def.save) { saveTimer = setInterval(save, 2000); save(); }
         if (resume) {
           if (net) net.send({t: 'need_world'});
-          if (resume.need > 0) { ctx.reviving = true; ctx.need = resume.need; send({t: 'rv', need: ctx.need}); Play.input.blocked = true; debtText(); hudDraw(); askNow(); }
+          if (resume.need > 0) { ctx.reviving = true; ctx.need = REVIVE_NEED; send({t: 'rv', need: ctx.need}); Play.input.blocked = true; debtText(); hudDraw(); askNow(); }
           sh.toast('接着玩！', 'good');
         }
       };
@@ -456,7 +460,7 @@
     // ---------------------------------------------------------------- 倒下答题复活（联网）
     function die() {
       if (!ctx || ctx.reviving) return;
-      ctx.reviving = true; ctx.need = RV.need; myDeaths++;
+      ctx.reviving = true; ctx.need = REVIVE_NEED; myDeaths++;
       send({t: 'rv', need: ctx.need, fresh: true});
       Play.input.clear(); Play.input.blocked = true;
       debtText(); hudDraw();
@@ -471,15 +475,15 @@
     setInterval(() => { if (cur && ctx && ctx.reviving && quiz && !quiz.isOpen) askNow(); }, 1000);   // 万一题目没弹出来
     function onReviveAnswer(res) {
       if (!ctx || !ctx.reviving) return;
-      if (res.correct) ctx.need--;
-      else if (!res.dont_know && RV.grow) ctx.need = Math.min(3, ctx.need + 1);
-      send({t: 'rv', need: ctx.need});
+      if (!res.correct) { debtText(res); return; }   // 答错不加题，题目自己换下一道
+      ctx.need = 0;
+      send({t: 'rv', need: 0});
       debtText(res); hudDraw();
-      if (ctx.need <= 0) setTimeout(() => revived(false), 650);
+      setTimeout(() => revived(false), 650);
     }
     function debtText(res) {
       const el = quiz && quiz.el.querySelector('.mp-debt'); if (!el) return;
-      el.innerHTML = ctx.need <= 0 ? RV.done : `${res && !res.correct && !res.dont_know && RV.grow ? '答错了，多欠 1 道。' : ''}再答对 <b>${ctx.need}</b> 道就${RV.verb}`;
+      el.innerHTML = ctx.need <= 0 ? RV.done : `${res && !res.correct ? '没关系，换一道。' : ''}答对 <b>1</b> 道就${RV.verb}`;
     }
     function revived(rescued) {
       if (!ctx || !ctx.reviving) return;
@@ -501,7 +505,7 @@
       const chip = m => {
         const mine = m.id === me0.id, need = mine ? ctx.need : ctx.needs[m.id], off = !mine && !online.has(m.id);
         return `<div class="mp-chip${mine ? ' me' : ''}${need ? ' dead' : ''}${off ? ' off' : ''}" data-id="${m.id}"><span>${roleOf(m.role).icon}</span><b>${esc(m.name)}</b>
-          <small>${off ? '掉线了' : need ? `答题中 · 还要对 ${need} 道` : '在玩'}</small><i class="mp-emote"></i></div>`;
+          <small>${off ? '掉线了' : need ? '答题中 · 答对就回来' : '在玩'}</small><i class="mp-emote"></i></div>`;
       };
       const clock = sh.hud.querySelector('.mp-clock');
       sh.hud.innerHTML = `<div class="mp-chips">${room.members.map(chip).join('')}</div><div class="grow"></div><div class="mp-clock">${clock ? esc(clock.textContent) : ''}</div>`;

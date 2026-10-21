@@ -33,3 +33,15 @@ def test_review_wrong_card_comes_back_only_once():
     html = (ROOT / "templates" / "review.html").read_text(encoding="utf-8")
     assert "cards.push(c)" in html and html.count("cards.push(") == 1
     assert "again.has(c.id)" in html
+
+
+def test_revive_rule_is_one_correct_answer_for_every_game():
+    """倒下答题的规矩只在外壳里写一次：不管倒下几次、答错几次，永远答对 1 道就起来。
+    以前答错一道多欠一道（最多 3 道），乒乓球输一局要答对 5 道；一直答错的孩子越欠越多，越玩越挫败。"""
+    shell = (ROOT / "static" / "play" / "shell.js").read_text(encoding="utf-8")
+    assert "const REVIVE_NEED = 1;" in shell
+    assert "RV.need" not in shell and "RV.grow" not in shell and "ctx.need + 1" not in shell
+    for f in (ROOT / "static" / "play").glob("*.js"):
+        js = f.read_text(encoding="utf-8")
+        assert not re.search(r"revive\s*:\s*\{[^}]*\b(need|grow)\s*:", js), f"{f.name} 自己改了复活要答几道题"
+        assert "多欠" not in js, f"{f.name} 还在说答错多欠一道"
