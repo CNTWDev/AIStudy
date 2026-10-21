@@ -336,6 +336,9 @@ def _talk(turns: list[dict]) -> str:
 
 
 _NO_VERDICT = "不判对错，不打分，不说「正确」「错误」「差一点」「标准答案」。像一位有经验、尊重对方的同行在讨论，不像阅卷老师。\n"
+# 学员写的话里像是本人有危险：不讨论题目，交给 app/safety.py 给出求助渠道（不做诊断、不做辅导）
+_CARE = ('如果学员写的话显示他本人可能有自伤、轻生的危险，或者正处在很严重的痛苦里（不是在讨论题目本身），'
+         '不要回应题目，只输出 {"care": true}。\n')
 
 
 def discuss_turn(item: dict, kp: dict, pack, grade: str, twist: str, turns: list[dict], user_id=None) -> dict:
@@ -347,7 +350,7 @@ def discuss_turn(item: dict, kp: dict, pack, grade: str, twist: str, turns: list
             "- challenge：一个最值得想的挑战，以问题结尾：一个反例，一个换了条件的情况，或者学员还没站过的位置"
             "（几种看法里学员还没碰到的那一种）。挑战是为了让学员想得更深，不是暗示有一个标准答案。\n"
             "- moves：学员最新这段话里真正用到的思考方式 [{\"id\":\"..\",\"note\":\"一句话依据，引用学员的话\"}]，没有就给空列表，不要凑。\n"
-            + _NO_VERDICT +
+            + _NO_VERDICT + _CARE +
             '输出：{"steelman":"..","answer":"..","challenge":"..","moves":[{"id":"..","note":".."}]}')
     return ask_json("discuss", _tutor(grade), user, user_id=user_id, effort="medium", max_tokens=1500, cache=False)
 
@@ -356,14 +359,14 @@ def discuss_close(item: dict, kp: dict, pack, grade: str, twist: str, turns: lis
                   user_id=None) -> dict:
     """思辨题收尾：学员写了自己的结论和动作以后，帮他看清想法的变化和这个结论的边界。"""
     user = (_discuss_context(item, kp, pack, grade, twist) + "对话：\n" + _talk(turns) + "\n\n"
-            f"学员最后写的结论：{conclusion}\n学员打算在公司里做的一件事：{action or '（没写）'}\n\n"
+            f"学员最后写的结论：{conclusion}\n学员写的「{pack.discuss_action}」：{action or '（没写）'}\n\n"
             "请：\n"
             "- shift：两三句，对照学员的第一段话和最后的结论，说他的想法变了什么、守住了什么（没变也可以是好事）。\n"
             "- near：学员的结论和上面哪几种看法接近（编号列表，从 1 开始；都不接近就给空列表）。\n"
             "- own：学员的结论里有没有几种看法都没覆盖、但站得住的东西，有就一句话说出来，没有留空。\n"
             "- watch：一句话，在什么情况下学员的这个结论会出问题，值得留意。\n"
             "- moves：整段对话里学员真正用到的思考方式，格式同上。\n"
-            + _NO_VERDICT +
+            + _NO_VERDICT + _CARE +
             '输出：{"shift":"..","near":[1],"own":"..","watch":"..","moves":[{"id":"..","note":".."}]}')
     return ask_json("discuss_close", _tutor(grade), user, user_id=user_id, effort="medium", max_tokens=1500, cache=False)
 

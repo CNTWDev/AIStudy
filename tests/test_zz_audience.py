@@ -28,7 +28,7 @@ def _audience_checks():
     kids = {p.id for ps in catalog.by_subject("public", "G3").values() for p in ps}
     adults = {p.id for ps in catalog.by_subject("", "ADULT").values() for p in ps}
     assert "math-shanghai" in kids and "ceo-core" not in kids and "fund-law" not in kids
-    assert {"ceo-core", "fund-law"} <= adults and not adults & kids and all(catalog.packs[p].audience == "adult" for p in adults)
+    assert {"ceo-core", "fund-law", "psy-core"} <= adults and not adults & kids and all(catalog.packs[p].audience == "adult" for p in adults)
 
 
 def test_school_course_cannot_depend_on_adult_course(tmp_path):

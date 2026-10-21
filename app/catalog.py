@@ -51,6 +51,17 @@ TERM_RANK = {"上": 0, "下": 2}   # 章的先后：上册、不分册、下册
 EDITION_INHERITS = ("subject", "subject_name", "system", "teach_lang", "item_lang", "prompt_note", "progress",
                     "tracks", "default_track", "audience")
 LINK_TYPES = {"uses": "要用到", "language": "另一种语言的说法", "context": "相关背景"}
+# 证据牌：成人课里一条规律的证据有多硬（知识点的 evidence 字段，可选；evidence_note 一句话说重复情况和边界）。
+# 前三档说的是研究结论，必须写出处（sources）；后三档不是研究结论，各自说明来路。所有课共用这一套。
+EVIDENCE = {
+    "稳": ("🟢", "多次独立重复、有元分析或大样本支持"),
+    "要小心": ("🟡", "方向基本成立，但效应不大、条件多，或学界有争论"),
+    "站不住": ("🔴", "大规模重复没有成功，或原研究有严重问题；讲它是为了知道它为什么会火、为什么会倒"),
+    "基本原理": ("📐", "定义或推理得出的道理（会计、概率、研究方法），不需要实验来证明"),
+    "经典案例": ("📖", "来自有名的真实案例，不是对照研究"),
+    "经验之谈": ("💬", "有经验的人总结的做法，还没有系统研究"),
+}
+RESEARCH_EVIDENCE = ("稳", "要小心", "站不住")
 
 
 def stage_rank(stage: str) -> float:
@@ -111,6 +122,7 @@ class Pack:
     open_review: str = ""                             # "ai"：简答题由 AI 点评和追问，不让学员自评（app/coach.py）
     thinking_moves: list = field(default_factory=list)  # 这门课看重的思考方式 [{id, name, desc}]；列了才出思辨题（app/discuss.py）
     journal: dict = field(default_factory=dict)       # 决策日志：写了才有（字段、回看天数、可标的陷阱），见 app/journal.py
+    discuss_action: str = "接下来我会做的一件事"        # 思辨题收尾时，「落到自己身上」那一栏问什么（CEO 课：回到公司做的事）
     base: str = ""                                    # 目录包：建在哪个主干上（知识点、题、讲解都是主干的）
     books: list = field(default_factory=list)        # 目录包的册次 [{stage, term, name, status, sources, units: [{name, kps}]}]
 
@@ -236,6 +248,11 @@ class Catalog:
                     continue
                 if kp["stage"] not in STAGE_RANK:
                     self.errors.append(f"{pack.id}: {kp['id']} 的学段 {kp['stage']} 没有在 _meta/stages.json 里定义")
+                ev = kp.get("evidence")
+                if ev and ev not in EVIDENCE:
+                    self.errors.append(f"{pack.id}: {kp['id']} 的证据牌 {ev} 不认识（可选 {list(EVIDENCE)}）")
+                elif ev in RESEARCH_EVIDENCE and not kp.get("sources"):
+                    self.errors.append(f"{pack.id}: {kp['id']} 标了「{ev}」，要写出处（sources）")
                 bad = set(kp.get("tracks") or []) - track_ids
                 if bad:
                     self.errors.append(f"{pack.id}: {kp['id']} 引用了不存在的方向 {sorted(bad)}")
@@ -333,6 +350,7 @@ class Catalog:
             selection=meta.get("selection") or {}, copyright=meta.get("copyright", ""),
             open_review=meta.get("open_review", ""), thinking_moves=self._moves(meta, d), base=meta.get("base", ""),
             journal=self._journal(meta, d),
+            **({"discuss_action": meta["discuss_action"]} if meta.get("discuss_action") else {}),
         )
 
     def _journal(self, meta, d) -> dict:

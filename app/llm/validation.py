@@ -16,6 +16,8 @@ REQUIRED = {
 def validate(task, data):
     if not isinstance(data, dict):
         raise LLMError('AI 返回结构不正确，请重试')
+    if task in ('discuss', 'discuss_close') and data.get('care') is True:
+        return data   # 学员像是有危险：不回应题目（app/safety.py）
     for key, kind in REQUIRED.get(task, {}).items():
         if not isinstance(data.get(key), kind):
             raise LLMError('AI 返回内容不完整，请重试')

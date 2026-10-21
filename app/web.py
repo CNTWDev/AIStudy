@@ -28,7 +28,7 @@ from . import news, tts_web
 
 templates = Jinja2Templates(directory=config.BASE_DIR / "app" / "templates")
 
-templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, methods=methods,
+templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LABEL=engine.STATUS_LABEL, EVIDENCE=catalog_mod.EVIDENCE, methods=methods,
                              llm_enabled=llm.enabled, GRADES=GRADES, answer_display=engine.answer_display,
                              stage_rank=stage_rank, is_adult=is_adult, is_self_learner=auth.is_self_learner, self_managed=auth.self_managed, uses_pin=auth.uses_pin, account_name=auth.account_name, game_minutes=arena.game_minutes, game_unlock=arena.game_unlock, is_private=auth.is_private, PROVINCES=boards.PROVINCES, city_label=boards.city_label,
                              GAME_MINUTE_CHOICES=arena.GAME_MINUTE_CHOICES, UNLOCK_CHOICES=arena.UNLOCK_CHOICES,

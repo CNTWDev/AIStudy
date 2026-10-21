@@ -114,6 +114,13 @@
    "icon": "📈",
    "tone": "ok",
    "domain": "finance"
+  },
+  {
+   "id": "psy",
+   "name": "心理学",
+   "icon": "🧠",
+   "tone": "learn",
+   "domain": "psychology"
   }
  ]
 }

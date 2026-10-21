@@ -254,13 +254,19 @@ function coachRound(box, res, opts, took) {
    你可以接着说，也可以随时写下结论。收尾时对照几种看法和各自成立的条件，记下这次用到的思考方式。不判对错 */
 function discussRound(box, res, opts, took) {
   const fb = $('.fbbox', box);
+  if (res.care) {  // 学员写的话里有危险信号：先关心人，这道题停下（app/safety.py）
+    fb.insertAdjacentHTML('beforeend', `<div class="fb dk pop dsc-care"><div class="fb-v">💛 ${esc(res.care.title)}</div><div>${esc(res.care.text)}</div>` +
+      `<ul>${(res.care.lines || []).map(l => `<li><b>${esc(l)}</b></li>`).join('')}</ul></div>`);
+    return;
+  }
+  const actLabel = res.action_label || '接下来我会做的一件事';
   const moveChip = m => `<span class="chip dsc-move" title="${esc(m.note || '')}">${esc(m.name)}${m.how ? (m.how === 'self' ? ' · 自己想到' : ' · 追问后想到') : ''}</span>`;
   if (res.done) {
     const views = (res.perspectives || []).map(p => `<li class="${p.near ? 'near' : ''}">${p.near ? '<span class="dsc-near">你的结论接近这一种</span>' : ''}` +
       `<div><b>${esc(p.view)}</b></div><div class="small">成立的条件：${esc(p.holds_when || '')}</div>` +
       (p.risk ? `<div class="small muted">用错了会怎样：${esc(p.risk)}</div>` : '') + '</li>').join('');
     fb.insertAdjacentHTML('beforeend', `<div class="fb dk pop dsc-end"><div class="fb-v">🧭 你的结论</div>` +
-      `<div class="dsc-mine">${esc(res.conclusion)}${res.action ? `<div class="small">回到公司要做的事：${esc(res.action)}</div>` : ''}</div>` +
+      `<div class="dsc-mine">${esc(res.conclusion)}${res.action ? `<div class="small">${esc(actLabel)}：${esc(res.action)}</div>` : ''}</div>` +
       (res.shift ? `<div style="margin-top:10px">${esc(res.shift)}</div>` : '') +
       (res.own ? `<div style="margin-top:8px">✨ 你自己的东西：${esc(res.own)}</div>` : '') +
       (res.watch ? `<div style="margin-top:8px">⚠️ 值得留意：${esc(res.watch)}</div>` : '') +
@@ -282,7 +288,7 @@ function discussRound(box, res, opts, took) {
   h += `<div class="dsc-ctl">` + (res.can_continue ? `<textarea class="ans dsc-more" placeholder="接着说：同意、反驳、补充，或者反问"></textarea>` +
     `<div class="qacts"><button class="btn sm dsc-go">接着说</button><button class="btn ghost sm dsc-end-btn">我想好了，写结论</button></div>` : '') +
     `<div class="dsc-close" ${res.can_continue ? 'hidden' : ''}><textarea class="ans dsc-c" placeholder="我现在的结论是……"></textarea>` +
-    `<input type="text" class="ans dsc-a" placeholder="回到公司，我会做的一件事（可以不写）"><div class="qacts"><button class="btn sm dsc-done">写好了</button></div></div></div>`;
+    `<input type="text" class="ans dsc-a" placeholder="${esc(actLabel)}（可以不写）"><div class="qacts"><button class="btn sm dsc-done">写好了</button></div></div></div>`;
   fb.insertAdjacentHTML('beforeend', h);
   const ctl = fb.lastElementChild;
   const err = e => ctl.insertAdjacentHTML('beforeend', `<div class="err">${esc(e.message)}</div>`);

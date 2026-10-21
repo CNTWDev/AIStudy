@@ -7,12 +7,13 @@
 不判对错、不进错题本、不算掌握度的对错证据。记下的是这次用到了哪些思考方式（课程包的 thinking_moves）：
 第一段话里就用到的算「自己想到」，被挑战以后才用到的算「追问后想到」，攒起来就是学员的思考画像（profile）。
 想完以后，题里的 twists 按 3 / 7 / 14 天排期：到时换一个条件再问一次（due）。没配置 AI 时跳过对话，直接写结论、看几种看法。
+学员写的话里有自伤、轻生的信号（app/safety.py，或 AI 判断），这道题停下、给出求助渠道，这段话不存。
 """
 from datetime import timedelta
 
 from fastapi import HTTPException
 
-from . import db, engine, llm
+from . import db, engine, llm, safety
 from .catalog import catalog
 
 MAX_TURNS = 4            # 学员最多说几轮，之后只能写结论
@@ -53,15 +54,22 @@ def _twist(user_id: int, item: dict, rethink) -> tuple[str, int | None]:
 
 
 def handle(user_id: int, item: dict, kp_id: str, body: dict, grade: str) -> dict:
-    if body.get("conclusion") is not None:
-        return _close(user_id, item, kp_id, body, grade)
-    return _turn(user_id, item, kp_id, body, grade)
+    out = _close(user_id, item, kp_id, body, grade) if body.get("conclusion") is not None else _turn(user_id, item, kp_id, body, grade)
+    return {**out, "action_label": _pack(kp_id).discuss_action}
+
+
+def _care(body: dict) -> dict:
+    """先关心人：这一轮不回应题目、不存学员这段话，给出求助渠道。"""
+    return {"discuss": True, "care": safety.CARE, "discussion_id": body.get("discussion_id"), "done": False,
+            "can_continue": False, "ai": False}
 
 
 def _turn(user_id, item, kp_id, body, grade) -> dict:
     text = str(body.get("answer") or "").strip()[:3000]
     if len(text) < 4:
         raise HTTPException(400, "先写下你的想法")
+    if safety.crisis(text):
+        return _care(body)
     if body.get("discussion_id"):
         row = db.one("SELECT * FROM discussions WHERE id=? AND user_id=? AND item_id=? AND done=0",
                      body["discussion_id"], user_id, item["id"])
@@ -83,6 +91,8 @@ def _turn(user_id, item, kp_id, body, grade) -> dict:
             reply = llm.discuss_turn(item, catalog.kp(kp_id), _pack(kp_id), grade, twist, turns, user_id=user_id)
         except llm.LLMError:
             ai = False
+    if reply.get("care") is True:
+        return _care(body)
     seen = _seen(reply.get("moves"), known)
     for m in seen:
         moves.setdefault(m["id"], "self" if mine == 1 else "prompted")
@@ -107,6 +117,8 @@ def _close(user_id, item, kp_id, body, grade) -> dict:
     action = str(body.get("action") or "").strip()[:1000]
     if len(conclusion) < 4:
         raise HTTPException(400, "写下你现在的结论")
+    if safety.crisis(conclusion + "\n" + action):
+        return _care(body)
     row = db.one("SELECT * FROM discussions WHERE id=? AND user_id=? AND item_id=? AND done=0",
                  body.get("discussion_id"), user_id, item["id"])
     if not row:
@@ -120,6 +132,8 @@ def _close(user_id, item, kp_id, body, grade) -> dict:
                                   user_id=user_id)
         except llm.LLMError:
             r = {}
+    if r.get("care") is True:
+        return _care(body)
     for m in _seen(r.get("moves"), known):
         moves.setdefault(m["id"], "prompted")
     near = {int(i) for i in r.get("near") or [] if str(i).isdigit()}

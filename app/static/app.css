@@ -836,6 +836,9 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .dsc-moves{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
 .dsc-move{font-size:12px;padding:2px 10px;cursor:default}.dsc-move:hover{border-color:var(--line);background:var(--card)}.dsc-move:active{transform:none}
 .dsc-ctl{margin-top:10px}
+.dsc-care{border-left:4px solid var(--warn)}.dsc-care ul{margin:8px 0 0;padding-left:20px}
+.evnote{margin:8px 0 4px;color:var(--muted)}.evnote b{color:var(--ink)}
+.laction{margin-top:10px}
 .dsc-ctl .ans{margin-top:8px}
 .dsc-mine{margin-top:6px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--card) 70%,transparent)}
 .dsc-views{list-style:none;padding:0;margin:8px 0 0}
