@@ -8,6 +8,7 @@
   隔开了还认得出才是真的从记忆里取出来了（docs/DESIGN.md 5.44）。前几次复习按 1/2/4/7 天（YOUNG_STEPS），
   一次比一次难：「看意思选单词」（四选一）/ 放回句子里（补洞，有例句才出）→「看意思写单词」（拼写）→
   和「听音写单词」（听写，不给意思）、自己把词拼进句子里轮换着来（app/words.py）；之后交给记忆模型排期。
+  要拼的题前几轮用字母块（这个词的字母 + 几个容易混的），再往后自己打，打不出来也能要字母块（_pad）。
   同一个词一次只考一个方向，两个方向分在不同的日子。
 - 知识点卡（kp）：从题库里取一道这个知识点的题来做。
 - 实在出不了题的（意思还没查到的词、老的错题找不到原题、题库里没题的知识点）才退回自评。
@@ -25,6 +26,7 @@ WORD_KINDS = ("word", "phrase", "term")
 PASS_STREAK = 2        # 隔天连续做对几次，换变式题
 PASS_NO_VARIANT = 3    # 找不到变式题时，隔天连续做对几次算过关
 SPELL_FROM_BOX = 2     # 复习过几轮（box）之后，从四选一升级为拼写
+TYPE_FROM_BOX = 5      # 拼写、听写、拼进句子：这之前用字母块拼（词的字母 + 几个容易混的），之后自己打；打的时候也能要字母块
 DICTATE_FROM_BOX = 3   # 再往后，拼写和听写轮换（box 为奇数时听写）
 PASSED_DUE = "9999-12-31"
 RECHECK_DAYS = 21      # 过关后隔多久回头看一眼
@@ -112,7 +114,7 @@ def _cloze(user_id: int, c, spell=False) -> dict | None:
     if not it:
         return None
     if spell:
-        return {"mode": "cloze_spell", "q": it["q"], "hint": it["hint"], "shape": f"{len(front)} 个字母"}
+        return _pad(c, {"mode": "cloze_spell", "q": it["q"], "hint": it["hint"], "shape": f"{len(front)} 个字母"})
     return {"mode": "cloze", "q": it["q"], "options": it["options"]}
 
 
@@ -143,6 +145,15 @@ def _learn(user_id: int, c) -> dict:
             "check": check}
 
 
+def _pad(c, q: dict) -> dict:
+    """要自己拼的题（拼写、听写、拼进句子）带一盘字母块（letters）：tiles 为真时直接用字母块拼（前几轮），
+    否则自己打，想不起来可以要字母块。用了字母块拼对记成 tiles（「想得起」），自己打对才算「拼得出」。"""
+    front = c["front"].strip()
+    if front.isalpha() and len(front) <= 14:
+        q.update(letters=words.letter_pad(front, random.Random(), tiles=True), tiles=c["box"] < TYPE_FROM_BOX)
+    return q
+
+
 def _word_quiz(user_id: int, c, plain: bool = False) -> dict | None:
     meaning = _meaning(c)
     if not meaning:
@@ -160,12 +171,12 @@ def _word_quiz(user_id: int, c, plain: bool = False) -> dict | None:
     if latin and c["box"] >= SPELL_FROM_BOX and not plain:
         shape = f"{len(front)} 个字母" if " " not in front else f"{len(front.split())} 个词"
         if c["box"] >= DICTATE_FROM_BOX and c["box"] % 2:  # 听写：只听读音，不给意思和首字母
-            return {"mode": "dictate", "say": front, "shape": shape}
-        return {"mode": "spell", "q": meaning, "hint": hint, "say": front, "shape": f"{shape} · 首字母 {front[0]}"}
+            return _pad(c, {"mode": "dictate", "say": front, "shape": shape})
+        return _pad(c, {"mode": "spell", "q": meaning, "hint": hint, "say": front, "shape": f"{shape} · 首字母 {front[0]}"})
     others = _distractors(user_id, c, latin)
     if len(others) < 3:
-        return {"mode": "spell", "q": meaning, "hint": hint, "say": front,
-                "shape": f"{len(front)} 个字母 · 首字母 {front[0]}"} if latin else None
+        return _pad(c, {"mode": "spell", "q": meaning, "hint": hint, "say": front,
+                        "shape": f"{len(front)} 个字母 · 首字母 {front[0]}"}) if latin else None
     opts = others + [front]
     random.shuffle(opts)
     return {"mode": "choice", "q": meaning, "hint": hint, "options": opts}
@@ -368,8 +379,9 @@ def _answer_word(user_id: int, c, body: dict) -> dict:
     correct = bool(given) and not body.get("dont_know") and norm(given) == norm(want)
     fmt = "recall" if mode in ("spell", "dictate", "cloze_spell") else "choice"
     engine.schedule_card(user_id, c, "good" if correct else "again", due=_due(c, correct), fmt=fmt)
+    tier = "tiles" if body.get("tiles") and fmt == "recall" else _TIER.get(mode, "reverse")   # 用字母块拼的：还不算自己拼得出
     if c["kind"] in ("word", "term"):
-        words.log_answer(user_id, _extra(c).get("list") or "", c["front"], correct, _TIER.get(mode, "reverse"), mode="review",
+        words.log_answer(user_id, _extra(c).get("list") or "", c["front"], correct, tier, mode="review",
                          dont_know=bool(body.get("dont_know")))
     if c["kp_id"]:
         engine.update_mastery(user_id, c["kp_id"], correct, weight=0.6, source="review", fmt=fmt, kind="review")

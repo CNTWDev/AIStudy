@@ -29,7 +29,7 @@ log = logging.getLogger("aistudy.words")
 
 UNIT = 12                 # 词表没分组时，每组几个词
 STRIDE = 3                # 一组里隔几个挑一个（同一天的新词不挨着）
-TIERS = {"copy": 1, "read": 1, "listen": 2, "reverse": 3, "choice": 3, "spell": 4, "dictate": 4, "cloze": 5}
+TIERS = {"copy": 1, "read": 1, "listen": 2, "reverse": 3, "choice": 3, "tiles": 3, "spell": 4, "dictate": 4, "cloze": 5}   # tiles：用字母块拼对（还不算自己拼得出）
 LEVEL_NAME = {0: "还没学", 1: "认得", 2: "听得出", 3: "想得起", 4: "拼得出", 5: "用得对"}
 CAUGHT = 3                # 到「想得起」（隔天也想得起来）算抓牢了
 BACKLOG_HALF, BACKLOG_STOP = 40, 80   # 欠着要复习的词这么多：新词减半 / 先不加新词
@@ -512,6 +512,25 @@ def _options(word: dict, pool: list[dict], n: int, rng: random.Random) -> list[s
     return out
 
 
+_LOOKALIKE = dict(zip("bdpqmnilaeuvckszorgjtfhwyx", "dbqpnmlieavukczsalvgftnvjz"))   # 长得像、读得像、容易拼混的字母
+
+
+def letter_pad(w: str, rng: random.Random, tiles: bool = False) -> list[str]:
+    """拼词用的一盘字母：这个词用到的字母，再混几个容易拼混的（b/d、m/n、e/a……），打乱。
+    tiles：复习页的字母块，每块用一次，重复的字母各给一块（降难度的一档：想不起来全部字母时从里面挑）；
+    否则是游戏里的字母键盘，每个字母一个键、可以反复按，一盘不超过 11 个键。"""
+    word = [ch for ch in w.lower() if ch.isalpha()]
+    have = set(word)
+    base = word if tiles else sorted(have)
+    near = list(dict.fromkeys(_LOOKALIKE[ch] for ch in word if ch in _LOOKALIKE and _LOOKALIKE[ch] not in have))
+    rng.shuffle(near)
+    rest = [ch for ch in "abcdefghijklmnopqrstuvwxyz" if ch not in have and ch not in near]
+    n = max(1, min(3, 14 - len(base))) if tiles else max(0, min(3, 11 - len(base)))
+    pad = base + (near + rng.sample(rest, len(rest)))[:n]
+    rng.shuffle(pad)
+    return pad
+
+
 def cloze_item(word: dict, b: str, rng: random.Random, pool: list[dict], spell: bool = False) -> dict | None:
     """把这个词（{w, zh, pos}）挖掉的一句话：选词补洞（mcq，选项是英文词），spell 时自己拼进去（fill）。还没有例句返回 None。
     不带读音（say）：先读出整句就把答案说出来了；full 是补好的整句，答完再看、再听。"""
@@ -523,10 +542,7 @@ def cloze_item(word: dict, b: str, rng: random.Random, pool: list[dict], spell: 
     gap = _MARK.sub("____", s["en"])
     explain = f"{full}\n{s['zh']}" if s.get("zh") else full
     if spell:
-        letters = sorted(set(word["w"].lower()))
-        rest = [ch for ch in "abcdefghijklmnopqrstuvwxyz" if ch not in letters]
-        letters += rng.sample(rest, max(0, min(3, 11 - len(letters))))
-        rng.shuffle(letters)
+        letters = letter_pad(word["w"], rng)
         return {"type": "fill", "q": gap, "answer": [word["w"]], "keypad": "letters", "letters": letters, "full": full,
                 "cloze": True, "zh": s.get("zh", ""), "hint": f"{word.get('zh', '')} · 首字母 {word['w'][0]}", "explain": explain}
     others = _options(word, pool, 3 if b == "primary" else 4, rng)
