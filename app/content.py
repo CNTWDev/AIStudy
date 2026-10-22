@@ -64,9 +64,12 @@ class Content:
             lv["books"] = books
             self.en_levels.append(lv)
         self.for_kids = en.get("for_kids", {})
-        for wl in _load("words_en.json").get("lists", []):
-            if wl.get("id") and wl.get("words"):
-                self.word_lists[wl["id"]] = wl
+        # 单词包：words_en.json（核心词、术语、场景词）+ words/*.json（课本、高中、考试、成人通用，app/words.py）
+        files = ["words_en.json"] + [f"words/{p.name}" for p in sorted((CONTENT_DIR / "words").glob("*.json"))]
+        for name in files:
+            for wl in _load(name).get("lists", []):
+                if wl.get("id") and wl.get("words"):
+                    self.word_lists[wl["id"]] = wl
         self.plans = _load("plans.json").get("templates", [])
         return self
 

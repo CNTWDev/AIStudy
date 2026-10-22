@@ -168,7 +168,7 @@ def kid_plan_page(request: Request, kid_id: int, msg: str = ""):
     all_tracks = [t for t in engine.tracks(kid_id, active_only=False) if t["kind"] != "words"]   # 单词改成单词包（word_packs）
     active = {t["kind"]: t for t in all_tracks if t["active"]}
     from ..library import library
-    return render(request, "kid_plan.html", k=k, active=active, wpacks=words.attached(kid_id), wstats=words.stats(kid_id), history=[t for t in all_tracks if not t["active"]],
+    return render(request, "kid_plan.html", k=k, active=active, wpacks=words.attached(kid_id), wstats=words.stats(kid_id), wgroups=words.grouped(), history=[t for t in all_tracks if not t["active"]],
                   content=content, msg=msg, seg={kd: engine.track_today(t) for kd, t in active.items() if kd != "words"},
                   lib={l: sorted(library.shelf(l), key=lambda b: (k["grade"] not in b.get("grades", []), b.get("level", ""))) for l in ("en", "zh")})
 

@@ -1,19 +1,21 @@
 {% extends "base.html" %}
-{# 我的词（app/words.py stats）：认识的词只增不减；每个单词包一组一组，抓牢了几个。说状态，不打分（DESIGN 5.22）。 #}
+{# 单词（app/words.py，DESIGN 5.41/5.42）：认识的词只增不减；今天的新词；我的单词包一组一组抓牢了几个；单词包书架。说状态，不打分（DESIGN 5.22）。 #}
 {% block body %}
-<a href="/review?group=words" class="back">← 单词</a>
 <div class="card hero wm-hero">
   <div class="wm-n"><b>{{ st.known }}</b><span>个我认识的词</span></div>
-  <p class="small">答对过一次就算认识，这个数只会越来越多。隔天还想得起来的词，算抓牢了。</p>
+  <p class="small for-grownups">答对过一次就算认识，这个数只会越来越多。隔天还想得起来的词，算抓牢了。</p>
   {% if st.wobbly %}<p class="small muted">还没抓牢、明天还会来找你的：{{ st.wobbly|join('、') }}</p>{% endif %}
+  {% if due %}<a href="/review?group=words" class="btn nw">今天的单词 {{ due }} 个</a>{% endif %}
 </div>
 {% if can_play %}{# 单词跑酷（app/arena/games/runner.py）：词按我会到哪一级来出；成人不占游戏时间，从这里进 #}
-<a href="/arena/runner" class="card wm-play row"><span class="wm-play-i">🏃</span><span class="grow"><b>单词跑酷</b><br><span class="small muted">换道、跳过栏杆，撞上对的字母把词拼出来。词按你会到哪一级来出，越熟提示越少。</span></span><span class="btn">去跑</span></a>
+<a href="/arena/runner" class="card wm-play row"><span class="wm-play-i">🏃</span><span class="grow"><b>单词跑酷</b><br><span class="small muted for-grownups">换道、跳过栏杆，撞上对的字母把词拼出来。词按你会到哪一级来出，越熟提示越少。</span></span><span class="btn">去跑</span></a>
 {% endif %}
 {% if msg %}<div class="card flash-msg">{{ msg }}</div>{% endif %}
-{% for p in st.packs %}
+<h2 class="wm-h">我的单词包</h2>
+{% set side = st.packs|rejectattr('main')|list %}
+{% for p in st.packs if p.main %}
 <div class="card wm-pack">
-  <div class="row"><h3 class="grow" style="margin:0">{{ p.title }}</h3><span class="pill">{% if p.main %}每天 {{ p.per_day }} 个新词{% else %}复习和游戏里用{% endif %}</span></div>
+  <div class="row"><h3 class="grow" style="margin:0"><a href="/words/pack/{{ p.id }}">{{ p.title }}</a></h3><span class="pill">{% if p.main %}每天 {{ p.per_day }} 个新词{% else %}复习和游戏里用{% endif %}</span></div>
   <p class="small muted">抓牢了 {{ p.caught }} 个，一共 {{ p.total }} 个</p>
   <div class="wm-units">
     {% for u in p.units %}
@@ -23,7 +25,7 @@
     </div>
     {% endfor %}
   </div>
-  {% if p.main and p.current is not none %}<p class="small">正在学{{ p.units[p.current].title }}：见过 {{ p.units[p.current].met }} 个，抓牢 {{ p.units[p.current].caught }} 个。</p>{% endif %}
+  {% if p.main and p.current is not none %}<p class="small">{% if p.school %}学校正在上{% else %}正在学{% endif %}「{{ p.units[p.current].title }}」：见过 {{ p.units[p.current].met }} 个，抓牢 {{ p.units[p.current].caught }} 个。</p>{% endif %}
   {% if can_edit %}
   <form method="post" action="/words/packs" class="row" style="margin-top:6px">
     <input type="hidden" name="ref" value="{{ p.id }}">
@@ -32,17 +34,31 @@
   </form>
   {% endif %}
 </div>
-{% else %}
-<div class="empty card"><div class="e">🗺️</div><b>还没有单词包</b>{% if can_edit %}在下面挑一个开始。{% else %}选了英语课以后，会按年级自动挂上。{% endif %}</div>
-{% endfor %}
-{% if can_edit and others %}
-<div class="card">
-  <h3 style="margin-top:0">加一个单词包</h3>
-  <form method="post" action="/words/packs" class="row">
-    <select name="ref" class="grow"><option value="">选一个…</option>{% for wl in others %}<option value="{{ wl.id }}">{{ wl.title }}（{{ wl.words|length }} 词）</option>{% endfor %}</select>
-    <label class="small nw">每天 <input type="number" name="daily_amount" value="6" min="0" max="30" style="width:64px"> 个</label>
-    <button class="btn sm">加上</button>
-  </form>
-</div>
+{% else %}{% if not side %}
+<div class="empty card"><div class="e">🗺️</div><b>还没有单词包</b>{% if can_edit %}在下面的书架上挑一个开始。{% else %}选了英语课以后，会按年级和课本自动挂上。{% endif %}</div>
+{% endif %}{% endfor %}
+{% if side %}
+<details class="card wm-shelf"{% if can_edit %} open{% endif %}>
+  <summary><b>复习和游戏里也用这些包</b></summary>
+  <p class="small muted for-grownups">{% if can_edit and not st.packs|selectattr('main')|list %}还没挑自己的包：先用这些词玩游戏。在下面的书架上挑一个包，每天就会学几个新词。{% else %}以前学过的词从这里来，不每天加新词。{% endif %}</p>
+  {% for p in side %}<div class="wm-row"><a class="grow" href="/words/pack/{{ p.id }}"><b>{{ p.title }}</b></a><span class="small muted nw">抓牢 {{ p.caught }} / {{ p.total }}</span></div>{% endfor %}
+</details>
 {% endif %}
+{% if shelves %}
+<h2 class="wm-h">单词包书架</h2>
+{% if not can_edit %}<p class="small muted for-grownups">一个年级一个包，按课本的册和单元分好了。家长可以在「学习安排」里加别的包。</p>{% endif %}
+{% for sh in shelves %}
+<details class="card wm-shelf"{% if can_edit %} open{% endif %}>
+  <summary><b>{{ sh.name }}</b> <span class="small muted">{{ sh.packs|length }} 个包</span></summary>
+  {% for it in sh.packs %}{% set wl = it.pack %}
+  <div class="wm-row">
+    <a class="grow" href="/words/pack/{{ wl.id }}"><b>{{ wl.title }}</b><span class="small muted"> · {{ wl.words|length }} 词</span></a>
+    {% if it.on %}<span class="pill">在学</span>
+    {% elif can_edit %}<form method="post" action="/words/packs"><input type="hidden" name="ref" value="{{ wl.id }}"><input type="hidden" name="daily_amount" value="6"><button class="btn sm soft">加上</button></form>{% endif %}
+  </div>
+  {% endfor %}
+</details>
+{% endfor %}
+{% endif %}
+<p class="small muted" style="text-align:center"><a href="/words">单词本：查过的、学过的词都在这 ›</a></p>
 {% endblock %}

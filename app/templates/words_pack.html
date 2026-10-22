@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{# 一个单词包（app/words.py pack_view）：按册、按单元列出全部词，每个词我会到哪一级；课本包标出学校正在上的单元。 #}
+{% block body %}
+<a href="/words/map" class="back">← 单词</a>
+<div class="card wp-hero">
+  <div class="small muted">{{ v.shelf }}</div>
+  <h2 style="margin:4px 0">{{ v.pack.title }}</h2>
+  <p class="small">一共 {{ v.total }} 个词，抓牢了 {{ v.caught }} 个。</p>
+  {% if v.pack.source_note %}<p class="small muted for-grownups">来源：{{ v.pack.source_note }}</p>{% endif %}
+  {% if can_edit %}
+  <form method="post" action="/words/packs" class="row"><input type="hidden" name="ref" value="{{ v.pack.id }}"><input type="hidden" name="back" value="pack">
+    {% if v.on %}<button class="btn sm ghost" name="action" value="stop">不学这个包</button>{% else %}<input type="hidden" name="daily_amount" value="6"><button class="btn sm">加上，每天 6 个新词</button>{% endif %}
+  </form>
+  {% endif %}
+</div>
+{% if msg %}<div class="card flash-msg">{{ msg }}</div>{% endif %}
+<p class="small muted wp-legend">{% for n in range(1, 6) %}<span class="wp-lv lv{{ n }}"></span>{{ lad_names[n] }} {% endfor %}</p>
+{% for u in v.units %}
+<details class="card wp-unit"{% if u.school or (loop.first and not v.units|selectattr('school')|list) %} open{% endif %}>
+  <summary><b>{{ u.title }}</b> <span class="small muted">{{ u.words|length }} 词</span>{% if u.school %} <span class="pill">学校正在上</span>{% endif %}</summary>
+  <div class="wp-words">
+    {% for w in u.words %}<span class="wp-w{{ ' met' if w.met }}" title="{{ lad_names[w.level] }}"><span class="wp-lv lv{{ w.level }}"></span><b>{{ w.w }}</b> <span class="small muted">{{ w.zh }}</span></span>{% endfor %}
+  </div>
+</details>
+{% endfor %}
+{% endblock %}

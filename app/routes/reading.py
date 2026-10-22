@@ -48,8 +48,21 @@ def words_map(request: Request, msg: str = ""):
     me = auth.require_user(request)
     mine = me["id"] == k["id"] and auth.self_managed(me)
     st = words.stats(k["id"])
+    due = (db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind IN ('word','term') AND due<=?", k["id"], db.today().isoformat()) or {}).get("n") or 0
     return render(request, "words_map.html", st=st, can_edit=mine, can_play=me["id"] == k["id"], msg=msg, lad_names=words.LEVEL_NAME,
-                  others=[wl for i, wl in words.packs().items() if i not in {a["pack"]["id"] for a in words.attached(k["id"]) if a["on"]}] if mine else [])
+                  shelves=words.shelves(k["id"]), due=due)
+
+
+@router.get("/words/pack/{pack_id}", response_class=HTMLResponse)
+def words_pack(request: Request, pack_id: str, msg: str = ""):
+    """一个单词包：按册、按单元列出全部词，每个词我会到哪一级；课本包标出学校正在上的那一单元。"""
+    from .. import words
+    k = kid_or_redirect(request, manage=True)
+    me = auth.require_user(request)
+    v = words.pack_view(k["id"], pack_id)
+    if not v:
+        raise HTTPException(404, "没有这个单词包")
+    return render(request, "words_pack.html", v=v, msg=msg, can_edit=me["id"] == k["id"] and auth.self_managed(me), lad_names=words.LEVEL_NAME)
 
 
 @router.post("/words/packs")
@@ -67,7 +80,8 @@ async def words_packs(request: Request):
     amount = str(f.get("daily_amount") or "").strip()
     words.set_pack(me["id"], ref, f.get("action") != "stop", int(amount) if amount.isdigit() else None)
     engine.today_plan(me["id"], rebuild=True)
-    return RedirectResponse("/words/map?" + urlencode({"msg": "已保存"}), 303)
+    back = f"/words/pack/{ref}" if f.get("back") == "pack" else "/words/map"
+    return RedirectResponse(back + "?" + urlencode({"msg": "已保存"}), 303)
 
 
 @router.get("/reading/today")

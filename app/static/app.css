@@ -1008,3 +1008,15 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .wm-bar i.met{background:var(--brand-2);opacity:.45;z-index:1}
 .wm-u.now .wm-bar{outline:2px solid var(--brand);outline-offset:1px}
 .wm-u small{font-size:11px;color:var(--faint)}
+/* 单词：书架、单词包详情（DESIGN 5.42） */
+.wm-h{font-size:1.05em;margin:18px 4px 8px}
+.wm-pack h3 a,.wm-row a{color:inherit;text-decoration:none}
+.wm-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--line-2)}.wm-row:first-of-type{border-top:0}
+.wm-row form{margin:0}
+.wp-unit summary{cursor:pointer;list-style:none}.wp-unit summary::-webkit-details-marker{display:none}
+.wp-words{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.wp-w{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.wp-lv{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--line);flex:none}
+.wp-lv.lv1{background:#cfe3ff}.wp-lv.lv2{background:#9cc6ff}.wp-lv.lv3{background:#5aa0f5}.wp-lv.lv4{background:#2f7be0}.wp-lv.lv5{background:#1b55b0}
+.wp-legend{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:4px 4px 10px}.wp-legend .wp-lv{margin-right:2px}
+.wm-shelf summary{cursor:pointer;padding:2px 0}.wm-shelf[open] summary{margin-bottom:6px}
