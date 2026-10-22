@@ -2,7 +2,7 @@
 {% block body %}
 <div class="row"><h1 class="grow">{{ {"words":"单词","mistakes":"错题重做","other":"复习卡片"}.get(group, "复习") }}</h1>{% if group == 'words' %}<a class="btn ghost sm" href="/words/map">🔤 单词包</a>{% endif %}<a class="btn ghost sm" href="/words">生词本 / 错题本</a></div>
 <p class="muted small for-grownups">{% if group == 'mistakes' %}错题原样再做一遍。隔天连续做对 2 次，会换一道同类的新题，也做对了就过关；过关 3 周后再回头看一眼。
-{% elif group == 'words' %}新词先猜意思、再看例句，隔开几个别的词再回来认一次（马上考只是在考刚才的印象）。同一个词一次只考一个方向；学过的词隔 1、2、4、7 天回来，一次比一次难：选、补句子、拼、听写。答错了隔几张再来一次。
+{% elif group == 'words' %}新词先猜意思、再看例句，隔开几个别的词再回来认一次（马上考只是在考刚才的印象）。同一个词一次只考一个方向；学过的词隔 1、2、4、7 天回来，一次比一次难：选、补句子、拼、听写（前几轮用字母块拼，后面自己打，打不出来可以要字母块）。答错了隔几张再来一次。
 {% else %}每张都要作答。答对了下次隔得更久；答错了隔几张再来一次。{% endif %}</p>
 <div class="card flash" id="flash"><span class="loading">加载中</span></div>
 <script>
@@ -166,21 +166,45 @@ function showWord(box, c, q, learn) {
   if (pick) {
     html += `<div style="text-align:left">${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
   } else {
-    html += `<div class="muted small">${esc(q.shape)} · 写出这个${c.kind === 'term' ? '术语' : '单词'}</div>` +
-      `<div class="row" style="margin-top:8px"><input type="text" class="ans grow" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="写在这里">${dictate || cloze ? '' : speak}<button class="btn" id="go">提交</button></div>`;
+    html += `<div class="muted small">${esc(q.shape)} · ${q.tiles && q.letters ? '用下面的字母拼出来' : '写出这个' + (c.kind === 'term' ? '术语' : '单词')}</div>` +
+      `<div class="spell-in">${q.tiles && q.letters ? '' : `<div class="row" style="margin-top:8px"><input type="text" class="ans grow" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="写在这里">${dictate || cloze ? '' : speak}<button class="btn" id="go">提交</button></div>`}</div>`;
   }
-  html += `<div class="row" style="justify-content:center;margin-top:8px"><button class="linkbtn" id="dk">🤔 想不起来</button></div><div class="fbbox"></div>`;
+  html += `<div class="row" style="justify-content:center;margin-top:8px">${q.letters && !q.tiles ? '<button class="linkbtn" id="abc">🔤 给我字母</button>' : ''}<button class="linkbtn" id="dk">🤔 想不起来</button></div><div class="fbbox"></div>`;
   box.innerHTML = html;
+  let usedTiles = false;
+  /* 字母块：这个词的字母 + 几个容易混的，每块用一次；点错了退一格（电脑上直接按键盘也行） */
+  const tiles = () => {
+    usedTiles = true;
+    const built = [];
+    $('.spell-in', box).innerHTML = `<div class="spell-built"></div><div class="ltiles">${q.letters.map((l, k) => `<button class="ltile" data-k="${k}">${esc(l)}</button>`).join('')}</div>` +
+      `<div class="row" style="justify-content:center;margin-top:8px"><button class="btn ghost" id="back">⌫ 退一格</button><button class="btn" id="go">好了</button></div>`;
+    const draw = () => { $('.spell-built', box).innerHTML = built.map(k => `<b>${esc(q.letters[k])}</b>`).join('') + '<i></i>'; };
+    const put = b => { if (b && !b.disabled) { built.push(+b.dataset.k); b.disabled = true; draw(); } };
+    const undo = () => { const k = built.pop(); if (k != null) { $(`.ltile[data-k="${k}"]`, box).disabled = false; draw(); } };
+    $$('.ltile', box).forEach(b => b.onclick = () => put(b));
+    $('#back', box).onclick = undo;
+    $('#go', box).onclick = () => built.length && done(built.map(k => q.letters[k]).join(''));
+    box.onkeydown = e => {
+      if (!$('.ltile', box) || $('#go', box).disabled) return;
+      if (e.key === 'Backspace') { e.preventDefault(); undo(); }
+      else if (e.key === 'Enter') $('#go', box).click();
+      else if (/^[a-z]$/i.test(e.key)) put($$('.ltile', box).find(b => !b.disabled && b.textContent === e.key.toLowerCase()));
+    };
+    if ($('#abc', box)) $('#abc', box).remove();
+    draw(); box.tabIndex = -1; box.focus({preventScroll: true});
+  };
   if ($('#say', box)) $('#say', box).onclick = () => say(q.say || c.front, 'en', 'word');
   if (dictate || meaning) say(q.say || c.front, 'en', 'word');
   const done = async (answer, el) => {
-    $$('.opt,#go,#dk', box).forEach(b => b.disabled = true);
-    const res = await post(c, Object.assign({answer, mode: q.mode, q: q.q, dont_know: answer === null}, learn || {}));
+    $$('.opt,.ltile,#go,#back,#abc,#dk', box).forEach(b => b.disabled = true);
+    const res = await post(c, Object.assign({answer, mode: q.mode, q: q.q, dont_know: answer === null, tiles: usedTiles}, learn || {}));
     if (pick) $$('.opt', box).forEach(b => { if (b.dataset.v === (res.pick || res.answer)) b.classList.add('right'); else if (b === el) b.classList.add('wrong'); });
     wordFb(box, res, q, answer, c);
     nextBtn(box, res, c, q);
   };
   $$('.opt', box).forEach(b => b.onclick = () => done(b.dataset.v, b));
+  if (q.tiles && q.letters) tiles();
+  if ($('#abc', box)) $('#abc', box).onclick = tiles;
   const inp = $('.ans', box);
   if (inp) {
     inp.focus();

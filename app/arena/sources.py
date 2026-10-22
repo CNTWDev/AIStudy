@@ -329,12 +329,8 @@ class WordSource(Source):
             rng.shuffle(eng)
             it = _mcq(f"「{w['zh']}」用英语怎么说？", w["w"], eng, rng)
         elif fmt == "spell":
-            letters = sorted(set(w["w"].lower()))
-            rest = [ch for ch in "abcdefghijklmnopqrstuvwxyz" if ch not in letters]
-            letters += rng.sample(rest, max(0, min(3, 11 - len(letters))))   # 再混几个不用的字母
-            rng.shuffle(letters)
             it = {"type": "fill", "q": f"「{w['zh']}」怎么拼？", "answer": [w["w"]], "keypad": "letters",
-                  "letters": letters, "say": w["w"]}
+                  "letters": words_mod.letter_pad(w["w"], rng), "say": w["w"]}
         elif fmt == "listen":
             it = _mcq("听一听，是什么意思？", w["zh"], others, rng)
             it["say"] = w["w"]
@@ -354,9 +350,7 @@ class WordSource(Source):
         h = words_mod.run_hint(lad.get(w["w"].lower()), ability.sigmoid(theta - levels[lv][0]))
         family = f"{g['family']}:run{h}"
         levels = ability.calib(family, list(g["levels"]), lambda x: self._prior(x) + self.RUN_SHIFT[h])
-        letters = sorted(set(w["w"].lower()))
-        letters += rng.sample([ch for ch in "abcdefghijklmnopqrstuvwxyz" if ch not in letters], max(0, min(3, 11 - len(letters))))
-        rng.shuffle(letters)
+        letters = words_mod.letter_pad(w["w"], rng)
         q = f"照着拼：{w['w']}（{w['zh']}）" if h == 0 else f"「{w['zh']}」怎么拼？" + (f"首字母 {w['w'][0]}" if h == 1 else "")
         it = {"type": "fill", "q": q, "answer": [w["w"]], "keypad": "letters", "letters": letters, "say": w["w"],
               "run": {"w": w["w"], "zh": w["zh"], "hint": h}}

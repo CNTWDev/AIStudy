@@ -271,3 +271,25 @@ def test_adult_shelves_and_parent_groups(monkeypatch):
         assert "商务英语核心词（上）" in c.get("/words/map").text
         groups = dict(words.grouped())
         assert words.SHELVES["exam"] in groups and words.SHELVES["grade"] in groups
+
+
+def test_spell_with_letter_tiles_first(monkeypatch):
+    """要自己拼的题，前几轮用字母块拼（这个词的每个字母 + 几个容易混的），之后自己打；用字母块拼对还不算「拼得出」。"""
+    rng = random.Random(1)
+    pad = words.letter_pad("apple", rng, tiles=True)
+    assert sorted(ch for ch in pad if ch in "aple") == sorted("apple") and len(pad) == 8   # 两个 p 各一块，再混 3 个
+    keys = words.letter_pad("apple", rng)
+    assert len(keys) == len(set(keys)) and set("aple") <= set(keys) and len(keys) <= 11   # 游戏键盘：每个字母一个键
+    with TestClient(app) as c:
+        k = _kid(c, monkeypatch, "wd-tiles@x.com")
+        cid = engine.add_card(k["id"], "word", "apple", "苹果", {"list": "en-core-g3"}, due=db.today())
+        db.run("UPDATE cards SET box=2, reviews=2 WHERE id=?", cid)
+        q = recall.quiz(k["id"], db.one("SELECT * FROM cards WHERE id=?", cid))
+        assert q["mode"] == "spell" and q["tiles"] and sorted(ch for ch in q["letters"] if ch in "aple") == sorted("apple")
+        r = c.post(f"/api/review/{cid}/answer", json={"mode": "spell", "answer": "apple", "tiles": True}).json()
+        assert r["correct"]
+        ev = db.one("SELECT data FROM events WHERE user_id=? AND target='word' AND target_id LIKE '%:apple' ORDER BY id DESC", k["id"])
+        assert (db.jload(ev["data"], {}) or {}).get("tier") == "tiles"
+        db.run("UPDATE cards SET box=6, due=? WHERE id=?", db.today().isoformat(), cid)
+        q = recall.quiz(k["id"], db.one("SELECT * FROM cards WHERE id=?", cid))
+        assert q["mode"] in ("spell", "dictate", "cloze_spell") and not q["tiles"] and q["letters"]   # 自己打，打不出来可以要字母块

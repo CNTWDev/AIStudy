@@ -992,6 +992,14 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .wp-row.off{opacity:.6}
 /* 单词：句子补洞的洞、新词学习卡（review.html） */
 .face.cloze .cz{font-size:1.15em;line-height:1.7;margin-bottom:6px}
+/* 字母块拼词（复习页）：拼好的字母一行，下面一盘字母，每块用一次 */
+.spell-built{min-height:48px;display:flex;justify-content:center;align-items:flex-end;gap:4px;font-weight:800;font-size:28px;line-height:1.2;letter-spacing:.04em;margin:8px 0 4px}
+.spell-built b{border-bottom:3px solid var(--brand);padding:0 2px}.spell-built i{width:16px;border-bottom:3px dashed var(--line);height:1.1em}
+.ltiles{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:6px 0}
+.ltile{width:48px;height:52px;font-weight:700;font-size:22px;line-height:1;font-family:inherit;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);cursor:pointer;transition:transform .06s,opacity .15s}
+.ltile:disabled{opacity:.25;cursor:default}
+[data-skin=kid] .ltile{border:var(--k-edge) solid var(--k-ink);box-shadow:var(--k-drop)}
+[data-skin=kid] .ltile:active:not(:disabled){transform:translateY(3px);box-shadow:var(--k-press)}
 .gap{display:inline-block;min-width:4.2em;height:1.2em;vertical-align:-.15em;border-bottom:3px dashed var(--brand);margin:0 .2em}
 .gap.full{min-width:0;height:auto;border-bottom:3px solid var(--brand);padding:0 .2em;color:var(--ink);animation:gapin .35s cubic-bezier(.2,.9,.3,1.4)}
 @keyframes gapin{0%{transform:translateY(-10px);opacity:0}100%{transform:none;opacity:1}}
