@@ -1008,6 +1008,7 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 @media (prefers-reduced-motion:reduce){.gap.full{animation:none}}
 /* 我的词（words_map.html）：认识的词数 + 每个包一组一根小柱子（实色 = 抓牢，浅色 = 见过） */
 .wm-n{display:flex;align-items:baseline;gap:8px}.wm-n b{font-size:2.6em;line-height:1;color:var(--brand)}.wm-n span{font-weight:700}
+.hero.wm-hero{display:block}.wm-hero p{margin:8px 0 0;max-width:62ch}.wm-hero .btn.nw{margin-top:14px}
 .wm-play{text-decoration:none;color:inherit;gap:12px;align-items:center}.wm-play-i{font-size:2.2em;line-height:1}
 .wm-units{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .wm-u{display:flex;flex-direction:column;align-items:center;gap:2px}
