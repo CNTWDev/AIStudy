@@ -85,6 +85,8 @@ def test_ladder_levels_from_answers(monkeypatch):
         st = words.stats(k["id"])
         assert st["known"] >= 1 and "cat" in st["wobbly"]
         assert c.get("/words/map").status_code == 200 and "我认识的词" in c.get("/words/map").text
+        today = c.get("/today").text   # 入口在「今天」的快捷格子里，不占底栏（底栏五格，乐园居中）
+        assert '<a href="/words/map"><span class="qi">' in today and '<span class="i">🔤</span>' not in today
 
 
 def test_examples_and_cloze_in_review(monkeypatch):
