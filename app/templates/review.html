@@ -2,45 +2,73 @@
 {% block body %}
 <div class="row"><h1 class="grow">{{ {"words":"单词","mistakes":"错题重做","other":"复习卡片"}.get(group, "复习") }}</h1>{% if group == 'words' %}<a class="btn ghost sm" href="/words/map">🔤 单词包</a>{% endif %}<a class="btn ghost sm" href="/words">生词本 / 错题本</a></div>
 <p class="muted small for-grownups">{% if group == 'mistakes' %}错题原样再做一遍。隔天连续做对 2 次，会换一道同类的新题，也做对了就过关；过关 3 周后再回头看一眼。
-{% elif group == 'words' %}新词先猜意思、再看例句，马上在句子里用一次；学过的词换着方式考：选、补句子、拼、听写。答对了下次隔得更久，答错了这一轮最后再来一次。
-{% else %}每张都要作答。答对了下次隔得更久；答错了过一会儿再来一次。{% endif %}</p>
+{% elif group == 'words' %}新词先猜意思、再看例句，隔开几个别的词再回来认一次（马上考只是在考刚才的印象）。同一个词一次只考一个方向；学过的词隔 1、2、4、7 天回来，一次比一次难：选、补句子、拼、听写。答错了隔几张再来一次。
+{% else %}每张都要作答。答对了下次隔得更久；答错了隔几张再来一次。{% endif %}</p>
 <div class="card flash" id="flash"><span class="loading">加载中</span></div>
 <script>
-let cards = [], i = 0, known = 0;
-const again = new Set();  // 这一轮已经排到最后再来一次的卡：每张只再来一次，不然一直答不出就绕不出去
+/* 一轮里的顺序（docs/DESIGN.md 5.44）：同一个词不连着出。新词学完不当场考，隔开 LAG 个别的再回来认一次；
+   答错的也一样，隔开几个再来（每张只再来一次）。queue 是今天到期的卡（新词和旧词穿插着排），back 是要「隔一会儿再回来」的。 */
+const LAG = 3, SLACK = 4;   // 至少隔开 3 个；到期以后最多再拖 4 个就先出它
+let queue = [], back = [], n = 0, known = 0, total = 0, cur = null;
+const again = new Set();
 const KIND = {word: '生词', term: '术语', mistake: '错题', kp: '知识点', phrase: '短语'};
 const GROUP = {{ group|tojson }}, TASK = {words: 'words', mistakes: 'mistakes', other: 'review'}[GROUP];
 const RUNKIND = {words: 'words', mistakes: 'mistakes'}[GROUP] || 'review';
-async function load() { cards = (await api('/api/review/due' + (GROUP ? '?group=' + GROUP : ''))).cards; i = 0; if (cards.length) Run.start(RUNKIND, {total: cards.length, mount: $('#flash')}); show(); }
+async function load() {
+  const cards = (await api('/api/review/due' + (GROUP ? '?group=' + GROUP : ''))).cards;
+  const isNew = c => (c.quiz || {}).mode === 'learn', fresh = cards.filter(isNew), old = cards.filter(c => !isNew(c));
+  while (fresh.length || old.length) { if (fresh.length) queue.push({c: fresh.shift()}); if (old.length) queue.push({c: old.shift()}); }
+  total = queue.length;
+  if (total) Run.start(RUNKIND, {total, mount: $('#flash')});
+  show();
+}
+const left = () => queue.length + back.length + 1;
+/* 隔一会儿再回来：至少隔开 LAG 个别的 */
+function later(c, q, extra) { back.push(Object.assign({c, q, at: n, ready: n + LAG, due: n + LAG + SLACK}, extra)); total++; }
+function retry(c, q) { if (!again.has(c.id)) { again.add(c.id); later(c, q); } }
+/* 下一个：拖到期的回头题 → 今天的卡 → 还没到点的回头题（只剩它们了） */
+function pick() {
+  back.sort((a, b) => a.due - b.due);
+  if (back.length && back[0].due <= n) return back.shift();
+  return queue.shift() || back.shift() || null;
+}
+/* 回头题前面一个别的都没隔开（这一轮只剩它了）：马上再考只是在考刚才的印象，不出了，留到下次 */
+function nextStep() {
+  let s = pick();
+  while (s && s.at === n) { if (s.learn) post(s.c, {mode: 'seen'}); total--; s = pick(); }
+  if (s) n++;
+  return s;
+}
 const post = (c, body, onPart) => api('/api/review/' + c.id + '/answer', body, {onPart});
 function head(c, extra) {
-  return `<div class="muted small">${KIND[c.kind] || c.kind}${c.kp_name ? ' · ' + esc(c.kp_name) : ''}${extra || ''} · 还剩 ${cards.length - i} 张</div>`;
+  return `<div class="muted small">${KIND[c.kind] || c.kind}${c.kp_name ? ' · ' + esc(c.kp_name) : ''}${extra || ''} · 还剩 ${left()} 张</div>`;
 }
-function retry(c) { if (!again.has(c.id)) { again.add(c.id); cards.push(c); } }
-function nextBtn(box, res, c) {
+function nextBtn(box, res, c, q) {
   Run.hit(!!res.correct);
   if (res.correct) { known++; cheer(box); }
-  else if (c.kind !== 'mistake' && c.kind !== 'kp') retry(c);  // 生词答错：这一轮最后再来一次
+  else if (c.kind !== 'mistake' && c.kind !== 'kp') retry(c, q);  // 生词答错：隔几个再来一次
   const b = document.createElement('button'); b.className = 'btn'; b.style.marginTop = '12px'; b.textContent = '下一张 →';
-  b.onclick = () => { i++; show(); };
+  b.onclick = show;
   box.appendChild(b); b.focus();
 }
 function show() {
   const box = $('#flash');
-  if (i >= cards.length) {
-    box.innerHTML = `<div class="face pop">🎉 ${cards.length ? '完成了！答对 ' + known + ' 张' : '现在没有要复习的'}</div>` +
+  cur = nextStep();
+  if (!cur) {
+    box.innerHTML = `<div class="face pop">🎉 ${total ? '完成了！答对 ' + known + ' 张' : '现在没有要复习的'}</div>` +
       (TASK ? '' : '<a class="btn" href="/go">接着做今天的任务 →</a>');
-    if (cards.length) Run.finish();
+    if (total) Run.finish();
     if (TASK) finishTask(TASK);  // 这一项做完了：底部弹出下一项，不用回首页
     return;
   }
-  const c = cards[i], q = c.quiz || {mode: 'self'};
-  Run.total = cards.length;
+  Run.total = total;
+  const c = cur.c, q = cur.q || c.quiz || {mode: 'self'};
   if (q.mode === 'item') return showItem(box, c, q);
   if (q.mode === 'learn') return showLearn(box, c, q);
-  if (q.mode === 'choice' || q.mode === 'spell' || q.mode === 'dictate' || q.mode === 'cloze' || q.mode === 'cloze_spell') return showWord(box, c, q);
+  if (WORD_MODES.includes(q.mode)) return showWord(box, c, q, cur.learn);
   showSelf(box, c);
 }
+const WORD_MODES = ['meaning', 'choice', 'spell', 'dictate', 'cloze', 'cloze_spell'];
 
 /* 错题重做 / 知识点题：原题原样（选项齐全），系统判对错 */
 function showItem(box, c, q) {
@@ -76,22 +104,22 @@ function showItem(box, c, q) {
 
 /* 句子补洞：____ 画成一个洞，补好以后把词填进去 */
 const gapHtml = (q, word) => esc(q).replace('____', word ? `<b class="gap full">${esc(word)}</b>` : '<span class="gap"></span>');
-/* 答完的反馈：对了说补上了 / 对了，错了说差一点、告诉他是哪个词，这一轮最后它还会再来 */
+/* 答完的反馈：对了说补上了 / 对了，错了说差一点、告诉他是哪个词（认意思：是哪个意思），隔几张它还会再来 */
 function wordFb(box, res, q, answer, c) {
   const cloze = q.mode === 'cloze' || q.mode === 'cloze_spell';
   if (cloze && res.full) $('.face .cz', box).innerHTML = gapHtml(q.q, res.answer);
   const sayIt = res.full || res.answer;
-  $('.fbbox', box).innerHTML = `<div class="fb ${res.correct ? 'ok' : 'no'} pop">${res.correct ? (cloze ? '✅ 补上了！' : '✅ 对了！') : '差一点，是 <b>' + esc(res.answer) + '</b>'}` +
+  $('.fbbox', box).innerHTML = `<div class="fb ${res.correct ? 'ok' : 'no'} pop">${res.correct ? (cloze ? '✅ 补上了！' : '✅ 对了！') : '差一点，是 <b>' + esc(res.pick || res.answer) + '</b>'}` +
     (!res.correct && answer ? `<div class="small muted">${q.mode === 'spell' || q.mode === 'dictate' || q.mode === 'cloze_spell' ? '你写的' : '你选的'}：${esc(answer)}</div>` : '') +
     (res.zh ? `<div class="small">${esc(res.zh)}</div>` : '') +
     ((q.mode === 'dictate' || cloze) && res.meaning ? `<div class="small">${esc(res.answer)}：${esc(res.meaning.split('\n')[0])}</div>` : '') +
     (res.example ? `<div class="small">例：${esc(res.example)}</div>` : '') +
     (/^[A-Za-z]/.test(res.answer) ? ` <button class="btn ghost sm" onclick='say(${esc(JSON.stringify(sayIt))})'>🔊</button>` : '') +
-    (!res.correct && !again.has(c.id) && c.kind !== 'mistake' ? '<div class="small muted">这个词这一轮最后还会再来一次。</div>' : '') + `</div>`;
+    (!res.correct && !again.has(c.id) && c.kind !== 'mistake' ? '<div class="small muted">隔几张，这个词还会再来一次。</div>' : '') + `</div>`;
   if (/^[A-Za-z]/.test(res.answer)) say(sayIt);
 }
 
-/* 新词第一次见：先猜（不算对错）→ 揭晓：意思、读音、例句 → 马上用一次（补洞，或者看意思选单词） */
+/* 新词第一次见：先猜（不算对错）→ 揭晓：意思、读音、例句。不当场考：隔开几个别的词，再回来认一次（q.check） */
 function showLearn(box, c, q) {
   let guess = null;
   const ex = q.example, hl = ex ? esc(ex.en).replace(new RegExp('\\b' + q.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i'), m => `<b class="hl">${m}</b>`) : '';
@@ -113,29 +141,29 @@ function showLearn(box, c, q) {
     box.innerHTML = head(c, ' · 新词') + `<div class="face" style="min-height:120px"><div class="lw">${esc(q.word)} ${say1}</div>` +
       `<div>${q.pos ? `<span class="muted small">${esc(q.pos)}</span> ` : ''}${esc(q.meaning)}</div>` +
       (ex ? `<div class="small lx" style="margin-top:8px">${hl} <button class="btn ghost sm" data-say="${esc(ex.en)}">🔊</button></div><div class="small muted">${esc(ex.zh)}</div>` : '') +
-      `</div><button class="btn" id="use" style="margin-top:12px">记住了，用一次 →</button>`;
+      `<div class="muted small" style="margin-top:8px">读一读，记一记。过一会儿它会回来找你。</div>` +
+      `</div><button class="btn" id="use" style="margin-top:12px">记下了 →</button>`;
     wire();
     $('#use', box).onclick = step3;
   }
-  async function step3() {
-    const u = q.use;
-    if (!u) {   // 出不了题（干扰项不够）：看过就算学了
-      await api('/api/review/' + c.id, {grade: 'good'}); Run.hit(true); known++; i++; return show();
-    }
-    showWord(box, c, u, {mode: 'learn', use: u.mode, guess});
+  function step3() {
+    if (q.check) later(c, q.check, {learn: {mode: 'learn', check: q.check.mode, guess}});
+    else post(c, {mode: 'seen'});   // 出不了题（干扰项不够）：看过就算学了，明天第一次考
+    show();
   }
   step1();
 }
 
-/* 单词：看意思选单词（四选一）→ 放回句子里 → 看意思写单词 → 和听音写单词、自己拼进句子里轮换（app/recall.py） */
+/* 单词：新词回来认意思 → 看意思选单词（四选一）/ 放回句子里 → 看意思写单词 → 和听音写单词、自己拼进句子里轮换（app/recall.py） */
 function showWord(box, c, q, learn) {
   const speak = /^[A-Za-z]/.test(c.front) ? `<button class="btn ghost sm" id="say">🔊</button>` : '';
-  const dictate = q.mode === 'dictate', cloze = q.mode === 'cloze' || q.mode === 'cloze_spell';
-  let html = head(c, learn ? ' · 新词：用一次' : dictate ? ' · 听写' : cloze ? ' · 补句子' : '') + (dictate
+  const dictate = q.mode === 'dictate', cloze = q.mode === 'cloze' || q.mode === 'cloze_spell', meaning = q.mode === 'meaning', pick = meaning || q.mode === 'choice' || q.mode === 'cloze';
+  let html = head(c, learn ? ' · 刚才的新词，还认得吗' : dictate ? ' · 听写' : cloze ? ' · 补句子' : '') + (dictate
     ? `<div class="face" style="min-height:120px"><button class="btn lg" id="say">🔊 听一听</button><div class="muted small" style="margin-top:8px">听读音，写出这个${c.kind === 'term' ? '术语' : '单词'}（可以多听几遍）</div></div>`
     : cloze ? `<div class="face cloze" style="min-height:120px"><div class="cz">${gapHtml(q.q)}</div><div class="muted small">${q.mode === 'cloze' ? '哪个词能补上这个洞？' : esc(q.hint) + ' · 把它拼进去'}</div></div>`
+    : meaning ? `<div class="face" style="min-height:120px"><div class="lw">${esc(q.q)} ${speak}</div><div class="muted small">它是什么意思？</div></div>`
     : `<div class="face" style="min-height:120px">${esc(q.q)}${q.hint ? `<div class="muted small">${esc(q.hint)}</div>` : ''}</div>`);
-  if (q.mode === 'choice' || q.mode === 'cloze') {
+  if (pick) {
     html += `<div style="text-align:left">${q.options.map(o => `<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
   } else {
     html += `<div class="muted small">${esc(q.shape)} · 写出这个${c.kind === 'term' ? '术语' : '单词'}</div>` +
@@ -144,13 +172,13 @@ function showWord(box, c, q, learn) {
   html += `<div class="row" style="justify-content:center;margin-top:8px"><button class="linkbtn" id="dk">🤔 想不起来</button></div><div class="fbbox"></div>`;
   box.innerHTML = html;
   if ($('#say', box)) $('#say', box).onclick = () => say(q.say || c.front, 'en', 'word');
-  if (dictate) say(q.say || c.front, 'en', 'word');
+  if (dictate || meaning) say(q.say || c.front, 'en', 'word');
   const done = async (answer, el) => {
     $$('.opt,#go,#dk', box).forEach(b => b.disabled = true);
     const res = await post(c, Object.assign({answer, mode: q.mode, q: q.q, dont_know: answer === null}, learn || {}));
-    if (q.mode === 'choice' || q.mode === 'cloze') $$('.opt', box).forEach(b => { if (b.dataset.v === res.answer) b.classList.add('right'); else if (b === el) b.classList.add('wrong'); });
+    if (pick) $$('.opt', box).forEach(b => { if (b.dataset.v === (res.pick || res.answer)) b.classList.add('right'); else if (b === el) b.classList.add('wrong'); });
     wordFb(box, res, q, answer, c);
-    nextBtn(box, res, c);
+    nextBtn(box, res, c, q);
   };
   $$('.opt', box).forEach(b => b.onclick = () => done(b.dataset.v, b));
   const inp = $('.ans', box);
@@ -175,7 +203,7 @@ function showSelf(box, c) {
     await api('/api/review/' + c.id, {grade: b.dataset.g});
     Run.hit(b.dataset.g === 'good');
     if (b.dataset.g === 'again') retry(c); else if (b.dataset.g === 'good') { known++; cheer($('#flash')); }
-    i++; show();
+    show();
   });
 }
 load();

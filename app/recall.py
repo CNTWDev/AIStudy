@@ -3,9 +3,12 @@
 - 错题（mistake）：原题原样重做，选项齐全。隔天连续做对 2 次 → 换一道同知识点的「变式题」，
   也做对了才算过关（防止只是背住了这道题的答案）。做错了明天再来。
   过关以后 RECHECK_DAYS 天再回头做一次原题：还会就真的掌握了（不再出现）；忘了就重新回到错题本里练。
-- 生词 / 短语 / 术语（word / phrase / term）：单词包里今天的新词第一次出现是一张学习卡（learn：先猜意思 → 揭晓、听读音、看例句 →
-  马上在句子里用一次），之后「看意思选单词」（四选一）→ 放回句子里（补洞，有例句才出）→「看意思写单词」（拼写）→
-  和「听音写单词」（听写，不给意思）、自己把词拼进句子里轮换着来（app/words.py）。
+- 生词 / 短语 / 术语（word / phrase / term）：单词包里今天的新词第一次出现是一张学习卡（learn：先猜意思 → 揭晓、听读音、看例句），
+  不当场考：隔开几个别的词以后再回来认一次（check：听读音、看英文选意思）。马上考只是在考刚才那几秒的印象；
+  隔开了还认得出才是真的从记忆里取出来了（docs/DESIGN.md 5.44）。前几次复习按 1/2/4/7 天（YOUNG_STEPS），
+  一次比一次难：「看意思选单词」（四选一）/ 放回句子里（补洞，有例句才出）→「看意思写单词」（拼写）→
+  和「听音写单词」（听写，不给意思）、自己把词拼进句子里轮换着来（app/words.py）；之后交给记忆模型排期。
+  同一个词一次只考一个方向，两个方向分在不同的日子。
 - 知识点卡（kp）：从题库里取一道这个知识点的题来做。
 - 实在出不了题的（意思还没查到的词、老的错题找不到原题、题库里没题的知识点）才退回自评。
 """
@@ -25,6 +28,7 @@ SPELL_FROM_BOX = 2     # 复习过几轮（box）之后，从四选一升级为�
 DICTATE_FROM_BOX = 3   # 再往后，拼写和听写轮换（box 为奇数时听写）
 PASSED_DUE = "9999-12-31"
 RECHECK_DAYS = 21      # 过关后隔多久回头看一眼
+YOUNG_STEPS = (1, 2, 4, 7)   # 单词前几次答对后隔几天再来（box 0→1 隔 1 天，1→2 隔 2 天……）；之后按记忆模型
 _LATIN = re.compile(r"[A-Za-z][A-Za-z '\-.]*")
 _NO_MEANING = "（意思还没查到"
 log = logging.getLogger(__name__)
@@ -112,24 +116,31 @@ def _cloze(user_id: int, c, spell=False) -> dict | None:
     return {"mode": "cloze", "q": it["q"], "options": it["options"]}
 
 
-def _learn(user_id: int, c) -> dict:
-    """新词第一次见：先猜意思（有例句就看着句子猜），再揭晓（意思、读音、例句），马上用一次（补洞；没有例句就看意思选单词）。
-    猜错不算：猜是为了让后面的揭晓记得更牢（Richland 等 2009），只有「用一次」算作答。"""
-    front, ex, meaning = c["front"].strip(), _extra(c), _meaning(c)
-    pool = words.pool_for(user_id, ex.get("list"))
-    others = list({w["zh"] for w in pool if w.get("zh") and w["zh"] != meaning and w["w"].lower() != front.lower()})
+def _meanings(user_id: int, c, meaning: str, n: int = 3) -> list[str]:
+    """几个意思（含正确的），打乱：从同一个包里别的词的中文里挑干扰项。"""
+    front, ex = c["front"].strip().lower(), _extra(c)
+    others = list({w["zh"] for w in words.pool_for(user_id, ex.get("list")) if w.get("zh") and w["zh"] != meaning and w["w"].lower() != front})
     random.shuffle(others)
-    guess = others[:2] + [meaning]
-    random.shuffle(guess)
+    opts = others[:n - 1] + [meaning]
+    random.shuffle(opts)
+    return opts if len(opts) >= n else []
+
+
+def _learn(user_id: int, c) -> dict:
+    """新词第一次见：先猜意思（有例句就看着句子猜），再揭晓（意思、读音、例句）。猜错不算：猜是为了让后面的揭晓记得更牢
+    （Richland 等 2009）。揭晓完不当场考：check 是隔开几个别的词以后回来认的那一下（听读音、看英文选意思，换一组干扰项），
+    算数的是它。认意思出不了（同包的词太少）退回看意思选单词；都出不了，看过就算学了，明天再考。"""
+    front, ex, meaning = c["front"].strip(), _extra(c), _meaning(c)
     got = words.examples([front], words.band(_grade(user_id))).get(front.lower()) or []
     sample = got[0] if got else None
-    use = _cloze(user_id, c) if got else None
-    if not use:
+    opts = _meanings(user_id, c, meaning, 4)
+    check = {"mode": "meaning", "q": front, "say": front, "options": opts} if opts else None
+    if not check:
         q = _word_quiz(user_id, c, plain=True)
-        use = q if q and q["mode"] == "choice" else None
-    return {"mode": "learn", "word": front, "meaning": meaning, "pos": ex.get("pos", ""), "guess": guess if len(guess) >= 3 else [],
+        check = q if q and q["mode"] == "choice" else None
+    return {"mode": "learn", "word": front, "meaning": meaning, "pos": ex.get("pos", ""), "guess": _meanings(user_id, c, meaning),
             "example": {"en": words._MARK.sub(lambda m: m.group(1), sample["en"]), "mark": front, "zh": sample.get("zh", "")} if sample else None,
-            "use": use}
+            "check": check}
 
 
 def _word_quiz(user_id: int, c, plain: bool = False) -> dict | None:
@@ -333,22 +344,30 @@ def _variant(user_id: int, c, ex: dict) -> dict | None:
 
 
 # 复习页的题型 → 单词等级里的哪一级（app/words.py 的 TIERS）
-_TIER = {"choice": "reverse", "spell": "spell", "dictate": "dictate", "cloze": "cloze", "cloze_spell": "cloze"}
+_TIER = {"meaning": "read", "choice": "reverse", "spell": "spell", "dictate": "dictate", "cloze": "cloze", "cloze_spell": "cloze"}
+
+
+def _due(c, correct: bool):
+    """答对后下次哪天：前几次按 YOUNG_STEPS（1/2/4/7 天），之后（或答错）交给记忆模型（答错默认今天再来）。"""
+    return db.today() + timedelta(days=YOUNG_STEPS[c["box"]]) if correct and c["box"] < len(YOUNG_STEPS) else None
 
 
 def _answer_word(user_id: int, c, body: dict) -> dict:
     given = str(body.get("answer") or "").strip()
     norm = lambda s: " ".join(s.lower().replace("’", "'").split()).strip(".!?。")
-    correct = bool(given) and not body.get("dont_know") and norm(given) == norm(c["front"])
     mode = body.get("mode") or "choice"
-    if mode == "learn":   # 学习卡：先猜的那一下只记下来（不算对错），算数的是「用一次」
-        use = body.get("use") if body.get("use") in _TIER else "choice"
+    if mode == "seen":    # 学习卡看过了，但这一轮没有别的词能隔开它、或者出不了题：今天不考，明天第一次考
+        engine.schedule_card(user_id, c, "hard", due=db.today() + timedelta(days=YOUNG_STEPS[0]), fmt="choice")
+        return {"seen": True}
+    if mode == "learn":   # 学习卡隔开以后回来的那一下：先猜的那一下只记下来（不算对错），算数的是 check
         if body.get("guess") is not None:
             evidence.log(user_id, "word", f"{_extra(c).get('list') or ''}:{c['front']}", "guess",
                          correct=str(body["guess"]).strip() == _meaning(c), mode="learn")
-        mode = use
+        mode = body.get("check") if body.get("check") in _TIER else "choice"
+    want = _meaning(c) if mode == "meaning" else c["front"]
+    correct = bool(given) and not body.get("dont_know") and norm(given) == norm(want)
     fmt = "recall" if mode in ("spell", "dictate", "cloze_spell") else "choice"
-    engine.schedule_card(user_id, c, "good" if correct else "again", fmt=fmt)
+    engine.schedule_card(user_id, c, "good" if correct else "again", due=_due(c, correct), fmt=fmt)
     if c["kind"] in ("word", "term"):
         words.log_answer(user_id, _extra(c).get("list") or "", c["front"], correct, _TIER.get(mode, "reverse"), mode="review",
                          dont_know=bool(body.get("dont_know")))
@@ -356,6 +375,8 @@ def _answer_word(user_id: int, c, body: dict) -> dict:
         engine.update_mastery(user_id, c["kp_id"], correct, weight=0.6, source="review", fmt=fmt, kind="review")
     ex = _extra(c)
     out = {"correct": correct, "answer": c["front"], "meaning": c["back"], "example": ex.get("example", "")}
+    if mode == "meaning":
+        out["pick"] = want   # 认意思：选项里该亮的是这个意思
     if mode in ("cloze", "cloze_spell"):   # 补好的整句给孩子看、听（出题时没给，免得先听到答案）
         got = words.examples([c["front"]], words.band(_grade(user_id))).get(c["front"].lower()) or []
         q = str(body.get("q") or "")
