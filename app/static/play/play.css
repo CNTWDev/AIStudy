@@ -97,6 +97,7 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 .aq-ok{border:3px solid var(--pl-ink);box-shadow:0 4px 0 var(--pl-ink);background:var(--pl-mint);color:#fff;border-radius:16px;font:inherit;font-size:18px;font-weight:900;min-height:56px;padding:0 18px;cursor:pointer}
 .aq-ok:active{transform:translateY(3px);box-shadow:0 1px 0 var(--pl-ink)}
 .aq-pad{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.aq-pad.num{grid-template-columns:repeat(7,1fr)}.aq-pad.num .del{grid-column:span 2}  /* 1–7 / 8 9 0 . − ⌫⌫ */
 .aq-pad button{border:2.5px solid var(--pl-ink);box-shadow:0 3px 0 var(--pl-ink);background:var(--card);color:var(--ink);border-radius:14px;font:inherit;font-size:22px;font-weight:900;min-height:50px;cursor:pointer;transition:transform .05s}
 .aq-pad button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--pl-ink)}.aq-pad button.del{background:var(--pl-soft)}
 .aq-fb:empty{display:none}.aq-fb{margin-top:10px}

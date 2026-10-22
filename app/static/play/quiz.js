@@ -71,9 +71,9 @@ class ArenaQuiz {
       const coarse = matchMedia('(pointer:coarse)').matches, abc = it.keypad === 'letters';   // abc：拼单词，给一盘字母
       h += `<div class="aq-ans"><input class="aq-in" autocomplete="off" autocapitalize="off" spellcheck="false" ${coarse ? 'inputmode="none" readonly' : `inputmode="${abc ? 'text' : 'decimal'}"`} placeholder="?">` +
         (it.unit ? `<span class="aq-unit">${esc(it.unit)}</span>` : '') + `<button type="button" class="aq-ok">确定</button></div>`;
-      const extra = it.keypad === 'frac' ? '/' : it.keypad === 'neg' ? '−' : '.';
-      const keys = abc ? [...(it.letters || []), '⌫'] : ['1', '2', '3', '4', '5', '6', '7', '8', '9', extra, '0', '⌫'];
-      h += `<div class="aq-pad">${keys.map(k => `<button type="button" data-k="${k}"${k === '⌫' ? ' class="del"' : ''}>${k}</button>`).join('')}</div>`;
+      // 数字盘一律带负号（答案可能是负数，不靠出题时标）；分数题把小数点换成 /
+      const keys = abc ? [...(it.letters || []), '⌫'] : ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', it.keypad === 'frac' ? '/' : '.', '−', '⌫'];
+      h += `<div class="aq-pad${abc ? '' : ' num'}">${keys.map(k => `<button type="button" data-k="${k}"${k === '⌫' ? ' class="del"' : ''}>${k}</button>`).join('')}</div>`;
     }
     if (this.o.dontKnow) h += `<button type="button" class="aq-dk">🤔 这题不会</button>`;
     h += `<div class="aq-fb"></div>`;
@@ -85,7 +85,8 @@ class ArenaQuiz {
       if (!inp.readOnly) setTimeout(() => inp.focus({preventScroll: true}), 30);
       this.body.querySelectorAll('.aq-pad button').forEach(b => b.onclick = () => {
         const k = b.dataset.k; window.Play && Play.sfx.play('click');
-        inp.value = k === '⌫' ? inp.value.slice(0, -1) : (inp.value + (k === '−' ? '-' : k)).slice(0, 12);
+        // 负号随时按都行：没有就加在最前面，再按一次去掉
+        inp.value = k === '⌫' ? inp.value.slice(0, -1) : k === '−' ? (inp.value.startsWith('-') ? inp.value.slice(1) : '-' + inp.value) : (inp.value + k).slice(0, 12);
       });
       this.body.querySelector('.aq-ok').onclick = () => this.submit(inp.value);
     }
