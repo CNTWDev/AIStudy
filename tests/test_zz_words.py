@@ -100,19 +100,32 @@ def test_examples_and_cloze_in_review(monkeypatch):
         assert set(got) == {x["front"].lower() for x in new}
         assert words._clean("cat", [{"en": "I like cats.", "zh": ""}, {"en": "A [[dog]] and a [[cat]].", "zh": ""}]) == []
 
-        # 新词第一次是学习卡：先猜（不算对错）→ 揭晓 → 补洞用一次
+        # 新词第一次是学习卡：先猜（不算对错）→ 揭晓；不当场考，隔开几个词以后回来认意思（check）
         card = db.one("SELECT * FROM cards WHERE id=?", new[0]["id"])
         q = recall.quiz(k["id"], card)
-        assert q["mode"] == "learn" and q["example"] and q["use"]["mode"] == "cloze" and "____" in q["use"]["q"]
-        assert card["front"] in q["use"]["options"] and q["meaning"] in q["guess"]
-        r = c.post(f"/api/review/{card['id']}/answer", json={"mode": "learn", "use": "cloze", "guess": "不对的意思",
-                                                             "answer": card["front"], "q": q["use"]["q"]}).json()
-        assert r["correct"] and r["full"] and "[[" not in r["full"]
+        assert q["mode"] == "learn" and q["example"] and "use" not in q and q["meaning"] in q["guess"]
+        chk = q["check"]
+        assert chk["mode"] == "meaning" and chk["q"] == card["front"] and q["meaning"] in chk["options"] and len(chk["options"]) == 4
+        r = c.post(f"/api/review/{card['id']}/answer", json={"mode": "learn", "check": "meaning", "guess": "不对的意思",
+                                                             "answer": q["meaning"]}).json()
+        assert r["correct"] and r["pick"] == q["meaning"]
         ev = db.q("SELECT kind, data FROM events WHERE user_id=? AND target='word' AND target_id LIKE ?", k["id"], f"%:{card['front']}")
         assert {e["kind"] for e in ev} == {"guess", "answer"}
-        assert any((db.jload(e["data"], {}) or {}).get("tier") == "cloze" for e in ev if e["kind"] == "answer")
+        assert any((db.jload(e["data"], {}) or {}).get("tier") == "read" for e in ev if e["kind"] == "answer")
         card = db.one("SELECT * FROM cards WHERE id=?", card["id"])
-        assert card["reviews"] == 1 and recall.quiz(k["id"], card)["mode"] == "cloze"   # 复习过一轮：放回句子里选
+        assert card["reviews"] == 1 and card["due"] == (db.today() + timedelta(days=1)).isoformat()   # 第二天第一次复习
+        q2 = recall.quiz(k["id"], card)
+        assert q2["mode"] == "cloze" and "____" in q2["q"]          # 第二天换方向：放回句子里选英文
+        r = c.post(f"/api/review/{card['id']}/answer", json={"mode": "cloze", "answer": card["front"], "q": q2["q"]}).json()
+        assert r["correct"] and r["full"] and "[[" not in r["full"]
+        assert db.one("SELECT due FROM cards WHERE id=?", card["id"])["due"] == (db.today() + timedelta(days=2)).isoformat()  # 1/2/4/7
+
+        # 看过、这一轮没隔开（或出不了题）：今天不考，明天第一次考
+        other = new[1]
+        assert c.post(f"/api/review/{other['id']}/answer", json={"mode": "seen"}).json()["seen"]
+        row = db.one("SELECT * FROM cards WHERE id=?", other["id"])
+        assert row["due"] == (db.today() + timedelta(days=1)).isoformat() and recall.quiz(k["id"], row)["mode"] != "learn"
+        assert not db.q("SELECT 1 FROM events WHERE user_id=? AND target='word' AND target_id LIKE ?", k["id"], f"%:{other['front']}")
 
         # 页面：单词任务是「几个新词」
         plan = c.post("/api/plan/rebuild").json()["plan"]
