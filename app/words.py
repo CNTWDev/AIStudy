@@ -1,8 +1,10 @@
 """单词模块（docs/DESIGN.md 5.41，讨论稿 docs/英语单词游戏与单词系统-讨论稿.md）：学什么、每天学几个新词、每个词会到哪一级。
 
 四层，复习卡只是其中一层：
-1. 单词包（学什么）：content/words_en.json 的每张词表就是一个包，一包分几组（词表写了 units 就按它，没写每 UNIT 个词一组）。
-   按年级、教材自动挂（_auto：英语核心词给学英语的孩子、IGCSE 物理术语给选了剑桥物理的孩子，学到当前年级为止）；
+1. 单词包（学什么）：content/words_en.json 和 content/words/*.json 的每张词表就是一个包，一包分几组（词表写了 units 就按它，
+   没写每 UNIT 个词一组）。包放在书架上（shelf）：课本包（一个年级一包，按册、按单元）、核心词、考试和课标、成人常用、成人场景、学科术语。
+   按年级、教材自动挂（_auto：课本包给选了这套教材的孩子、英语核心词给学英语的孩子、IGCSE 物理术语给选了剑桥物理的孩子，
+   学到当前年级为止；考试包、成人包不自动挂）；课本包的组对上课程目录的册和单元，新词先出学校正在上的那一单元（school_unit）；
    家长可以加一个包、停一个包、改每天几个新词（word_packs）。成人不自动加新词，自己挑包；还没挑的先挂上成人的高频词、场景词（只在游戏、闪测里用）。
 2. 每天的新词（daily_new）：只从「主包」里来（覆盖孩子现在年级的包、术语包、家长加上的包），已经会的跳过；
    一组里隔着挑（第 1、4、7、10 个……），意思挨着的词（同一个话题）不在同一天学，免得互相串（Tinkham 1993）。
@@ -48,9 +50,17 @@ def packs() -> dict[str, dict]:
     return _content().word_lists
 
 
+SHELVES = {   # 单词包书架（包的 shelf）：孩子的课本包按年级自动挂；考试包家长加；成人的包成人自己挑
+    "grade": "课本单词包", "core": "核心词", "exam": "考试和课标词汇", "adult": "成人常用词", "scene": "成人场景词", "terms": "学科术语"}
+
+
+def shelf(wl: dict) -> str:
+    return wl.get("shelf") or ("terms" if is_terms(wl) else "core")
+
+
 def is_terms(wl: dict) -> bool:
     """教材术语包（IGCSE 物理术语等）：给选了这套教材的孩子，卡片是 term。"""
-    return bool(wl.get("packs")) and not wl.get("subject")
+    return wl.get("shelf") == "terms" or (bool(wl.get("packs")) and not wl.get("subject") and not wl.get("shelf"))
 
 
 def units(wl: dict) -> list[dict]:
@@ -89,8 +99,11 @@ def _auto(user_id: int) -> list[dict]:
     enrolled = {e["pack_id"] for e in explore._enrolls(user_id)}
     subjects = {catalog.packs[p].subject for p in enrolled}
     g = stage_rank(user["grade"] or catalog.default_grade)
-    return [wl for wl in packs().values()
-            if (wl.get("subject") in subjects or enrolled & set(wl.get("packs") or [])) and _span(wl)[0] <= g]
+    def fits(wl):   # 写了教材的包只给选了这套教材的人（课本包、术语包）；只写了学科的给学这门课的人；考试包、成人包不自动挂
+        if shelf(wl) in ("exam",) + ADULT_SHELVES:
+            return False
+        return bool(enrolled & set(wl["packs"])) if wl.get("packs") else wl.get("subject") in subjects
+    return [wl for wl in packs().values() if fits(wl) and _span(wl)[0] <= g]
 
 
 def _rows(user_id: int) -> dict[str, dict]:
@@ -103,11 +116,12 @@ def attached(user_id: int) -> list[dict]:
     user = _user(user_id)
     rows, auto = _rows(user_id), _auto(user_id)
     adult = is_adult(user["grade"])
-    if adult and not any(r["state"] == "on" for r in rows.values()):   # 成人还没挑包：先挂上成人的高频词、场景词（游戏、闪测有词可用，不每天加新词）
-        auto = auto + [wl for wl in packs().values() if wl.get("shelf") in ADULT_SHELVES and wl not in auto]
+    if adult and not any(r["state"] == "on" for r in rows.values()):   # 成人还没挑包：先挂上场景词和最常用的高频词（游戏、闪测有词可用，不每天加新词）
+        auto = auto + [wl for wl in packs().values() if (wl.get("shelf") == "scene" or wl.get("starter")) and wl not in auto]
     g = stage_rank(user["grade"] or "G3")
     core = [wl for wl in auto if not is_terms(wl)]
-    now = [wl for wl in core if _span(wl)[0] <= g <= _span(wl)[1]] or core[-1:]   # 比所有词表都高的年级：最高那张
+    books = [wl for wl in core if shelf(wl) == "grade"] or core   # 有课本单词包就用课本包当主包，核心词留着闪测、游戏用
+    now = [wl for wl in books if _span(wl)[0] <= g <= _span(wl)[1]] or books[-1:]   # 比所有词表都高的年级：最高那张
     out, seen = [], set()
     for wl in auto + [packs()[p] for p, r in rows.items() if r["state"] == "on" and p in packs()]:
         if wl["id"] in seen:
@@ -131,7 +145,8 @@ def set_pack(user_id: int, pack_id: str, on: bool, per_day: int | None = None) -
     """家长（成人自己）加上 / 停掉一个包、改每天几个新词。"""
     if pack_id not in packs():
         return False
-    auto = {wl["id"] for wl in _auto(user_id)}
+    # 本来就自动当主包的（本年级的课本包等）记 auto，升年级跟着换；自动挂着却不是主包的（低年级包、核心词），家长加上就当主包
+    auto = {a["pack"]["id"] for a in attached(user_id) if a["auto"] and a["main"]}
     state = ("auto" if pack_id in auto else "on") if on else "off"
     per = None if per_day is None else max(0, min(30, int(per_day)))
     if db.one("SELECT 1 FROM word_packs WHERE user_id=? AND pack_id=?", user_id, pack_id):
@@ -155,10 +170,34 @@ def _known(user_id: int) -> set[str]:
         "SELECT DISTINCT target_id FROM events WHERE user_id=? AND target='word' AND kind='answer' AND correct=1", user_id)}
 
 
-def _pick(wl: dict, skip: set[str], n: int) -> list[tuple[int, dict]]:
-    """从还有没学的词的那一组起，隔着挑 n 个：[(第几组, 词)]。"""
+def school_unit(user_id: int, wl: dict) -> int | None:
+    """课本单词包跟着学校进度走：学校大概正在上哪一册哪一单元（app/schoolyear.py 按校历推演、家长可纠正），
+    就是包里的第几组。单元名对得上（新版词表）按名字对；对不上（旧版词表）按「这一册第几单元」对。放假、没选这套教材时 None。"""
+    if not wl.get("units") or not wl.get("packs"):
+        return None
+    from . import explore, schoolyear
+    user = db.one("SELECT * FROM users WHERE id=?", user_id)
+    e = next((e for e in explore._enrolls(user_id) if e["pack_id"] in wl["packs"]), None)
+    est = schoolyear.estimate(dict(user), e, manual=schoolyear._manual(user_id)) if user and e else None
+    ch = est and est["current"]
+    if not ch:
+        return None
+    pos = [c["name"] for c in est["chapters"] if c.get("book") == ch.get("book")].index(ch["name"])
+    for exact in (True, False):
+        for i, u in enumerate(wl["units"]):
+            if u.get("book") == ch.get("book") and (u.get("unit") == ch["name"] if exact else u.get("pos") == pos):
+                return i
+    return None
+
+
+def _pick(wl: dict, skip: set[str], n: int, start: int | None = None) -> list[tuple[int, dict]]:
+    """从还有没学的词的那一组起，隔着挑 n 个：[(第几组, 词)]。
+    start：学校正在上的那一组——先学它，再补前面落下的，最后才往后学。"""
     out = []
-    for ui, u in enumerate(units(wl)):
+    us = list(enumerate(units(wl)))
+    if start is not None and 0 <= start < len(us):
+        us = [us[start]] + us[:start] + us[start + 1:]
+    for ui, u in us:
         left = [(i, w) for i, w in enumerate(u["words"]) if w.get("zh") and w["w"].lower() not in skip]
         left.sort(key=lambda x: (x[0] % STRIDE, x[0]))
         for _, w in left[:n - len(out)]:
@@ -201,7 +240,7 @@ def daily_new(user_id: int) -> int:
         n = max(0, int(a["per_day"] * scale + 0.5) - done.get(wl["id"], 0))
         if not n:
             continue
-        for ui, w in _pick(wl, skip, n):
+        for ui, w in _pick(wl, skip, n, school_unit(user_id, wl)):
             skip.add(w["w"].lower())
             if engine.add_card(user_id, "term" if is_terms(wl) else "word", w["w"], w["zh"],
                                {"pos": w.get("pos", ""), "list": wl["id"], "unit": ui, "new": 1}, w.get("kp") or None, due=db.today()):
@@ -287,12 +326,56 @@ def stats(user_id: int) -> dict:
             caught = sum(1 for w in ws if lad.get(w, {}).get("level", 0) >= CAUGHT)
             met = sum(1 for w in ws if w in have or lad.get(w, {}).get("ok"))
             us.append({"title": u["title"], "total": len(ws), "caught": caught, "met": met})
-        cur = next((i for i, u in enumerate(us) if u["met"] < u["total"]), None)
+        sch = school_unit(user_id, a["pack"]) if a["main"] else None
+        cur = sch if sch is not None and us[sch]["met"] < us[sch]["total"] else next((i for i, u in enumerate(us) if u["met"] < u["total"]), None)
         out.append({"id": a["pack"]["id"], "title": a["pack"]["title"], "main": a["main"], "per_day": a["per_day"],
-                    "units": us, "current": cur, "total": sum(u["total"] for u in us), "caught": sum(u["caught"] for u in us)})
+                    "units": us, "current": cur, "school": sch is not None and cur == sch,
+                    "total": sum(u["total"] for u in us), "caught": sum(u["caught"] for u in us)})
     out.sort(key=lambda p: (not p["main"], -_span(packs()[p["id"]])[0]))
     wobbly = [w for w, v in lad.items() if v["wobbly"]]
     return {"known": known, "packs": out, "wobbly": wobbly[-12:]}
+
+
+def shelves(user_id: int) -> list[dict]:
+    """单词包书架：[{id, name, packs: [{pack, on}]}]。孩子看自己这套教材的课本包；成人看成人、场景、考试和全部课本包。"""
+    user = _user(user_id)
+    adult = is_adult(user["grade"])
+    on = {a["pack"]["id"] for a in attached(user_id) if a["on"]}
+    mine = {wl["id"] for wl in _auto(user_id)}
+    series = {wl.get("series") for wl in packs().values() if wl["id"] in mine and wl.get("series")}
+    order = ("adult", "scene", "exam", "grade") if adult else ("grade",)   # 孩子只看自己这套课本的包（孩子不挑包，家长在学习安排里加）
+    out = []
+    for sid in order:
+        ps = [wl for wl in packs().values() if shelf(wl) == sid and (adult or sid != "grade" or wl.get("series") in series)]
+        if ps:
+            ps.sort(key=lambda wl: (wl.get("series") or "", _span(wl)[0]))
+            out.append({"id": sid, "name": SHELVES[sid], "packs": [{"pack": wl, "on": wl["id"] in on} for wl in ps]})
+    return out
+
+
+def grouped() -> list[tuple[str, list[dict]]]:
+    """全部单词包按书架分组（家长「加一个单词包」的下拉框用）。"""
+    out = []
+    for sid, name in SHELVES.items():
+        ps = sorted((wl for wl in packs().values() if shelf(wl) == sid), key=lambda wl: (wl.get("series") or "", _span(wl)[0]))
+        if ps:
+            out.append((name, ps))
+    return out
+
+
+def pack_view(user_id: int, pack_id: str) -> dict | None:
+    """一个单词包的全部词，按组排，每个词带上我会到哪一级（0 = 还没学）。"""
+    wl = packs().get(pack_id)
+    if not wl:
+        return None
+    lad = ladder(user_id)
+    sch = school_unit(user_id, wl)
+    us = [{"title": u["title"], "school": i == sch,
+           "words": [{**w, "level": lad.get(w["w"].lower(), {}).get("level", 0), "met": w["w"].lower() in lad} for w in u["words"]]}
+          for i, u in enumerate(units(wl))]
+    return {"pack": wl, "shelf": SHELVES[shelf(wl)], "units": us, "total": sum(len(u["words"]) for u in us),
+            "caught": sum(1 for u in us for w in u["words"] if w["level"] >= CAUGHT),
+            "on": any(a["on"] and a["pack"]["id"] == pack_id for a in attached(user_id))}
 
 
 # ------------------------------------------------------------------ 例句（AI 写一次，按学段存，所有人复用）

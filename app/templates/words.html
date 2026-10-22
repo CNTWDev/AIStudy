@@ -34,7 +34,7 @@
 {% endmacro %}
 {% block body %}
 <a href="/review" class="back">← 复习</a>
-<div class="row"><h1 class="grow">我的本子</h1><a class="btn ghost sm" href="/words/map">🗺️ 我的词</a></div>
+<div class="row"><h1 class="grow">我的本子</h1><a class="btn ghost sm" href="/words/map">🔤 单词包</a></div>
 <div class="subnav" style="margin:12px 0">
 {% for k, n in [('word','📒 生词本'),('mistake','❌ 错题本'),('kp','🧠 知识点总结'),('term','🔬 术语'),('sentence','✍️ 造句本')] %}
 <a class="{{ 'on' if kind == k }}" href="/words?kind={{ k }}">{{ n }} <b>{{ counts.get(k, 0) }}</b></a>

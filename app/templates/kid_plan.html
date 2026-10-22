@@ -107,7 +107,7 @@
   {% else %}<p class="small">还没有单词包：选了英语课以后会按年级自动挂上，也可以在下面加一个。</p>{% endfor %}
   <form method="post" action="/parent/kids/{{ k.id }}/tracks" class="row" style="margin-top:10px">
     <input type="hidden" name="kind" value="words">
-    <select name="ref" class="grow"><option value="">加一个单词包…</option>{% for id, wl in content.word_lists.items() if id not in wpacks|map(attribute='pack.id')|list %}<option value="{{ id }}">{{ wl.title }}（{{ wl.words|length }} 词）</option>{% endfor %}</select>
+    <select name="ref" class="grow"><option value="">加一个单词包…</option>{% set have = wpacks|map(attribute='pack.id')|list %}{% for name, ps in wgroups %}<optgroup label="{{ name }}">{% for wl in ps if wl.id not in have %}<option value="{{ wl.id }}">{{ wl.title }}（{{ wl.words|length }} 词）</option>{% endfor %}</optgroup>{% endfor %}</select>
     <label class="small nw">每天 <input type="number" name="daily_amount" value="5" min="0" max="30" style="width:64px"> 个</label>
     <button class="btn sm">加上</button>
   </form>
