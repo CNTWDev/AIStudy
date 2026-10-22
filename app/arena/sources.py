@@ -30,6 +30,7 @@ from .. import ability, db, engine, evidence, explore, itemtypes, quickgen
 from .. import words as words_mod
 from ..catalog import catalog, stage_rank
 from ..content import content
+from .errors import ArenaError
 
 GAME_WEIGHT = 0.5   # 游戏里限时作答，作为掌握度证据打对折（不会因为手快手慢误判）
 
@@ -265,10 +266,12 @@ class WordSource(Source):
     # 句子补洞（cloze）：把词放回例句里（app/words.py），有例句的词才出，没有就换成看中文选英文、后台去写例句。
     FORMATS = {"core": {"read": 0.42, "reverse": 0.18, "listen": 0.12, "spell": 0.16, "cloze": 0.12},
                "terms": {"read": 0.5, "reverse": 0.3, "spell": 0.1, "cloze": 0.1}}
-    FORMAT_SHIFT = {"listen": 0.5, "spell": 1.5, "cloze": 0.6}   # 比认意思难多少（难度 b 的起点）
+    FORMAT_SHIFT = {"listen": 0.5, "spell": 1.5, "cloze": 0.6, "run": 1.2}   # 比认意思难多少（难度 b 的起点）
+    # 单词跑酷（run）：撞字母把词拼出来，按这个词的等级给提示（words.run_hint），三档各自校准
+    RUN_SHIFT = (-1.0, 1.2, 1.8)
 
     def _format(self, ctx: Ctx, g: dict, rng: random.Random) -> str:
-        if ctx.get("ask_fmt"):   # 只出一种题的游戏（句子补洞）
+        if ctx.get("ask_fmt"):   # 只出一种题的游戏（单词跑酷）
             return ctx["ask_fmt"]
         fm = dict(self.FORMATS["core" if g["family"] == "words" else "terms"])
         if ctx.get("mode") != "sprint":   # 听音只在快练和冲刺里出（有「不会」可点）；游戏里可能关着声音
@@ -307,7 +310,7 @@ class WordSource(Source):
             if not cloze:
                 fmt, family = "reverse", g["family"]
                 levels = ability.calib(family, list(g["levels"]), self._prior)
-        if fmt == "spell" and not self._spellable(w["w"]):
+        if fmt in ("spell", "run") and not self._spellable(w["w"]):
             w = next((x for x in rng.sample(words, len(words)) if self._spellable(x["w"]) and x["w"].lower() not in self._known(ctx)), None) \
                 or next((x for x in words if self._spellable(x["w"])), w)
             if not self._spellable(w["w"]):
@@ -319,6 +322,8 @@ class WordSource(Source):
         rng.shuffle(others)
         if cloze:
             it = cloze
+        elif fmt == "run":
+            it, fmt, family, levels = self._run(ctx, g, w, theta, lv, levels, rng)
         elif fmt == "reverse":
             eng = list({x["w"] for x in words if x["w"] != w["w"]})
             rng.shuffle(eng)
@@ -341,6 +346,21 @@ class WordSource(Source):
                   kp_id=w.get("kp") or "", card=w.get("card"), topic=g["title"], theta=theta, b=levels[lv][0], p=round(ability.sigmoid(theta - levels[lv][0]), 4),
                   explain=f"{it['explain']}\n{w['w']}：{w['zh']}" if cloze else f"{w['w']}：{w['zh']}")
         return it
+
+    def _run(self, ctx: Ctx, g: dict, w: dict, theta: float, lv: int, levels: dict, rng: random.Random) -> tuple:
+        """单词跑酷的一个词：前端按 run（词、中文、提示几档）在跑道上摆字母；摔倒了答题起来时，这一题就是「把它拼出来」。
+        返回 (题, 题型, 题族, 这个题族各级的难度)：题型是哪一档提示（copy / spell / dictate），学习记录按它算单词等级。"""
+        lad = ctx.get_or("ladder", lambda: words_mod.ladder(ctx.kid["id"]))
+        h = words_mod.run_hint(lad.get(w["w"].lower()), ability.sigmoid(theta - levels[lv][0]))
+        family = f"{g['family']}:run{h}"
+        levels = ability.calib(family, list(g["levels"]), lambda x: self._prior(x) + self.RUN_SHIFT[h])
+        letters = sorted(set(w["w"].lower()))
+        letters += rng.sample([ch for ch in "abcdefghijklmnopqrstuvwxyz" if ch not in letters], max(0, min(3, 11 - len(letters))))
+        rng.shuffle(letters)
+        q = f"照着拼：{w['w']}（{w['zh']}）" if h == 0 else f"「{w['zh']}」怎么拼？" + (f"首字母 {w['w'][0]}" if h == 1 else "")
+        it = {"type": "fill", "q": q, "answer": [w["w"]], "keypad": "letters", "letters": letters, "say": w["w"],
+              "run": {"w": w["w"], "zh": w["zh"], "hint": h}}
+        return it, words_mod.RUN_HINTS[h], family, levels
 
     def _cloze(self, ctx: Ctx, g: dict, wl: dict, words: list, w: dict, rng: random.Random) -> tuple[dict, dict | None]:
         """句子补洞：抽到的词有例句就用它，没有就在该复习的、自己的生词、这张表里找一个有例句的；都没有，后台去写。
@@ -479,14 +499,19 @@ def weights(kid: dict, ctx: Ctx | None = None) -> dict[str, float]:
     return {k: w for k, s in SOURCES.items() if (w := s.weight(kid, ctx)) > 0}
 
 
+NO_SOURCE = {"words": "还没有单词包：孩子请家长在「学习安排 → 单词包」里加一个，自己学的在「我的词」里挑一个。"}
+
+
 def pick(kid: dict, target: float, rng: random.Random, ctx: Ctx | None = None, mode: str = "game", ask: tuple | None = None) -> dict:
     """给这个孩子出一道题（游戏、冲刺都用它）：target 是目标答对率；mode = sprint 时也出听音题。
-    ask：只出一种题的游戏（句子补洞：("words", "cloze")），这个孩子用得上这个题源就只从它出。
+    ask：只出一种题的游戏（单词跑酷：("words", "run")），只从这个题源出；这个人用不上它（没有单词包）就出不了，告诉他为什么。
     抽中的题源这次出不了题（比如题库里一时没有新题、后台还在出），换别的题源。"""
     ctx = ctx or Ctx(kid)
     ctx["mode"] = mode
     ws, it = weights(kid, ctx) or {"math": 1.0}, None
-    if ask and ask[0] in ws:
+    if ask:
+        if ask[0] not in ws:
+            raise ArenaError(NO_SOURCE.get(ask[0], "这款游戏现在没有题可以出"), 409)
         ws, ctx["ask_fmt"] = {ask[0]: 1.0}, ask[1] if len(ask) > 1 else None
     while ws and not it:
         sid = rng.choices(list(ws), weights=list(ws.values()))[0]
@@ -555,4 +580,5 @@ def public(it: dict) -> dict:
     keypad = it.get("keypad") or ("dec" if t.id == "num" else "")
     return {"id": it["id"], "q": it["q"], "type": t.id, "widget": t.widget, "unit": it.get("unit", ""),
             "options": it.get("options"), "keypad": keypad, "topic": it.get("topic", ""), "src": it.get("src", ""),
-            "say": it.get("say", ""), "letters": it.get("letters"), "cloze": bool(it.get("cloze")), "hint": it.get("hint", "")}
+            "say": it.get("say", ""), "letters": it.get("letters"), "cloze": bool(it.get("cloze")), "hint": it.get("hint", ""),
+            "run": it.get("run"), "retry": bool(it.get("retry"))}

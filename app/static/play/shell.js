@@ -45,6 +45,7 @@
     const data = JSON.parse(root.dataset.info || '{}');
     const G = data.game, TOTAL = G.total || 0, multi = G.players[1] > 1, me0 = data.me;
     const quizMode = def.quiz || 'modal';
+    const BACK = data.back || '/arena', BACK_TEXT = BACK === '/arena' ? '回乐园' : '回我的词';   // 成人从「我的词」进学单词的游戏
     const RV = Object.assign({verb: '复活', done: '🎉 复活啦！'}, def.revive);
     const device = deviceId();
     const sh = {root, def, data, canvas: $('canvas'), hud: $('.pl-hud'), ctrl: $('.pl-ctrl'), dock: $('.pl-dock'),
@@ -185,7 +186,7 @@
         if (e.data && e.data.need_nick) { if (needNick) needNick(); else askNick(); return; }
         sh.toast(e.message, 'warn');
         if (multi && !room) showLobby();
-        else if (!room) panel.innerHTML += `<p class="pl-locked">${esc(e.message || '没打开，过一会儿再试试。')}</p><a class="btn block" href="/arena">回乐园</a>`;
+        else if (!room) panel.innerHTML += `<p class="pl-locked">${esc(e.message || '没打开，过一会儿再试试。')}</p><a class="btn block" href="${BACK}">${BACK_TEXT}</a>`;
         return;
       }
       clearInterval(poll);
@@ -300,7 +301,7 @@
       if (room) { try { await roomApi('leave'); } catch (e) { /* 房间已经关了 */ } }
       if (net) { net.send({t: 'room'}); net.close(); net = null; }
       online.clear();
-      if (!multi) { location.href = '/arena'; return; }
+      if (!multi) { location.href = BACK; return; }
       try { lobby = await api(`/api/games/${G.id}/lobby`); } catch (e) { /* 用旧的 */ }
       showLobby();
     }
@@ -650,7 +651,7 @@
         row.innerHTML = `${next ? `<button type="button" class="btn lg pl-next" data-n="${next}">下一关 →</button>` : ''}
           <button type="button" class="btn lg pl-again" data-n="${n}">${again}</button>
           ${multi || TOTAL ? `<button type="button" class="btn ghost lg mp-back">${multi ? '回房间' : '选关'}</button>` : ''}
-          ${multi ? '' : '<a class="btn ghost lg" href="/arena">回乐园</a>'}`;
+          ${multi ? '' : `<a class="btn ghost lg" href="${BACK}">${BACK_TEXT}</a>`}`;
         row.querySelectorAll('[data-n]').forEach(b => b.onclick = async () => {
           if (TOTAL) { try { room = await roomApi('level', {n: +b.dataset.n}); } catch (e) { sh.toast(e.message, 'warn'); return; } }
           startNew(+b.dataset.n);

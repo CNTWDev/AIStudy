@@ -54,8 +54,8 @@ def _ago(seconds: int) -> str:
     return (datetime.fromisoformat(db.now()) - timedelta(seconds=seconds)).isoformat(timespec="seconds")
 
 
-def _locked(u: dict) -> str:
-    return rules.locked_reason(rules.status(u, {g: v.max_seconds for g, v in GAMES.items()}))
+def _locked(u: dict, g) -> str:
+    return "" if rules.free_for(u, g) else rules.locked_reason(rules.status(u, {k: v.max_seconds for k, v in GAMES.items()}))
 
 
 # ------------------------------------------------------------------ 房间和成员
@@ -289,7 +289,7 @@ def room_info(kid: dict, room_id, world=None) -> dict:
     public = bool(r["multi"]) and r["kind"] in ("public", "code")
     users = {u["id"]: dict(u) for u in db.q("SELECT * FROM users WHERE id IN (SELECT user_id FROM room_members WHERE room_id=?)", r["id"])}
     members = [{**member(users[m["user_id"]], public), "role": m["role"], "host": m["user_id"] == r["host_id"],
-                "locked": _locked(users[m["user_id"]])} for m in _members(r["id"]) if m["user_id"] in users]
+                "locked": _locked(users[m["user_id"]], g)} for m in _members(r["id"]) if m["user_id"] in users]
     team = progress.team_key(m["id"] for m in members)
     full = len(members) >= g.players[0]
     lv = g.level(max(1, min(g.total, r["level"] or 1))) if g.total else None
@@ -361,7 +361,7 @@ def lobby(kid: dict, game: str) -> dict:
                           "name": room_name(dict(hu), r["kind"] != "family") if hu else "",
                           "host": member(dict(hu), r["kind"] != "family") if hu and r["host_id"] != kid["id"] else None})
     teams = {str(s["id"]): progress.progress(g, progress.team_key((kid["id"], s["id"]))) for s in sibs} if g.total and g.multi else {}
-    return {"siblings": sibs, "rooms": rooms, "locked": _locked(kid), "teams": teams, "public_ok": public_ok,
+    return {"siblings": sibs, "rooms": rooms, "locked": _locked(kid, g), "teams": teams, "public_ok": public_ok,
             "adult": is_adult(kid.get("grade")),
             "nickname": (kid.get("nickname") or "").strip()}
 

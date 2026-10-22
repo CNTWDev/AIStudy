@@ -28,9 +28,12 @@ def arena_game(request: Request, game: str):
     if game not in arena.GAMES:
         raise HTTPException(404)
     g, a, room = arena.GAMES[game], arena.hub(k), rooms.my_room(k, game)
+    free = arena.free_for(k, g)   # 成人玩学单词的游戏：不受乐园时长限制，从「我的词」进来，返回也回那里
+    if free:
+        a = {**a, "locked": "", "status": {**a["status"], "unlimited": True}}
     if a["locked"] and not rooms.playing(room):   # 还不能玩：回乐园首页，那里写着为什么、去做任务
         return RedirectResponse("/arena?locked=1", 303)
-    return render(request, "arena_game.html", g=g, game=game, a=a, me=rooms.member(k), room=room,
+    return render(request, "arena_game.html", g=g, game=game, a=a, me=rooms.member(k), room=room, back="/words/map" if free else "/arena",
                   lobby=rooms.lobby(k, game) if g.multi else None, gb=boards.board(dict(k), "game", "all", game), gba=boards.board(dict(k), "game_all", "all", game))
 
 

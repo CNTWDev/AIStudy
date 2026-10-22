@@ -8,10 +8,10 @@
 <link rel="stylesheet" href="/static/play/mp.css?v={{ ASSET_V }}">
 {% if g.css %}<link rel="stylesheet" href="/static/play/{{ game }}.css?v={{ ASSET_V }}">{% endif %}
 {% set info = {'game': g.describe(), 'me': me, 'room': room, 'lobby': lobby, 'avatar': a.avatar, 'left': a.status.left, 'unlimited': a.status.unlimited,
-               'locked': a.locked, 'need': a.status.need, 'ghost': a.ghost, 'level': a.level.level} %}
+               'locked': a.locked, 'need': a.status.need, 'back': back, 'ghost': a.ghost, 'level': a.level.level} %}
 <div id="pl" class="pl pl-{{ game }}{{ ' pl-mp' if g.multi }}" data-info='{{ info|tojson }}'>
   <div class="pl-top">
-    <a href="/arena" class="pl-back" aria-label="回乐园">‹</a>
+    <a href="{{ back }}" class="pl-back" aria-label="{{ '回我的词' if back != '/arena' else '回乐园' }}">‹</a>
     <b class="pl-name">{{ g.icon }} {{ g.name }}</b>
     <span class="pl-chip">{% if g.multi %}{{ g.players[1] }} 人联网{% else %}Lv.{{ a.level.level }}{% endif %}</span>
     <button type="button" class="pl-icon" data-pause aria-label="暂停" title="暂停" hidden>⏸</button><button type="button" class="pl-icon" data-music aria-label="背景音乐">🎵</button><button type="button" class="pl-icon" data-sfx aria-label="音效">🔊</button>

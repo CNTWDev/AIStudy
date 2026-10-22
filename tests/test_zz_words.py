@@ -118,32 +118,69 @@ def test_examples_and_cloze_in_review(monkeypatch):
         assert "新词" in t["title"]
 
 
-def test_cloze_game(monkeypatch):
+def test_run_hint_follows_word_level():
+    assert words.run_hint(None, 0.5) == 0                          # 新词：整个词写出来照着拼
+    assert words.run_hint(None, 0.9) == 1                          # 水平高的，没见过的词也不用照着拼
+    assert words.run_hint({"level": 0, "ok": True}, 0.5) == 1      # 答对过：中文 + 首字母
+    assert words.run_hint({"level": 4}, 0.5) == 2                  # 拼得出：只给中文和读音
+    assert words.run_hint({"level": 4, "wobbly": True}, 0.5) == 1  # 最近一次错了：退一档
+
+
+def test_runner_game(monkeypatch):
     with TestClient(app) as c:
         k = _kid(c, monkeypatch, "wd6@x.com")
-        g = arena.GAMES["cloze"]
-        assert g.ask == ("words", "cloze") and not g.freeze and g.total == 1000
-        assert g.level(1)["holes"] == 6 and g.level(1000)["holes"] == 10
-        assert g.checks(g.level(1), {"score": 5}, 95) == {"clear": True, "focus": True, "streak": True}
-        assert c.get("/arena/cloze").status_code == 200
-
-        # 还没有例句：先出看中文选英文（不让孩子等），后台去写；写好了就出句子补洞
+        g = arena.GAMES["runner"]
+        assert "cloze" not in arena.GAMES                          # 句子补洞不在乐园里了（补句子还是复习里的一种题）
+        assert list(arena.GAMES)[0] == "runner" and g.ask == ("words", "run") and g.study and not g.freeze and g.total == 1000
+        assert g.level(1)["words"] == 4 and g.level(1)["bars"] == 0 and g.level(1000)["words"] == 10
+        assert g.level(1000)["speed"] > g.level(1)["speed"]
+        assert g.checks(g.level(1), {"deaths": 0, "score": 3}, None) == {"clear": True, "safe": True, "clean": True}
+        assert g.checks(g.level(1), {"deaths": 1, "score": 2}, None) == {"clear": True, "safe": False, "clean": False}
         arena.set_game_unlock(k["id"], "free")
         k = dict(db.one("SELECT * FROM users WHERE id=?", k["id"]))
-        m = matches.start(k, "cloze")
-        it = sources.next_item(k, {}, 0.8, random.Random(1), ask=g.ask)
-        assert it["src"] == "words"
-        monkeypatch.setattr(prefetch, "MODE", "inline")
-        for lid in ("en-core-g1-2", "en-core-g3"):
-            ws = [{"w": w["w"], "zh": w["zh"], "pos": w.get("pos", "")} for w in words.packs()[lid]["words"]]
-            for i in range(0, len(ws), 50):
-                words.write_examples(ws[i:i + 50], words.band("G3"))
-        q = matches.question(k, m["match_id"], random.Random(2))["item"]
-        assert q["cloze"] and "____" in q["q"] and q["say"] == ""     # 先读出整句就把答案说出来了
-        pend = db.jload(db.one("SELECT data FROM arena_matches WHERE id=?", m["match_id"])["data"])["pending"]["item"]
-        res = matches.answer(k, m["match_id"], q["id"], pend["answer"] if pend["type"] == "mcq" else pend["answer"][0])
-        assert res["correct"] and res["word"] == pend["word"] and res["full"]
-        assert db.one("SELECT 1 FROM events WHERE user_id=? AND target='word' AND data LIKE '%cloze%'", k["id"])
+        assert c.get("/arena/runner").status_code == 200
+
+        # 出的是一个要拼的词：前端按 run 摆字母；摔倒答题时同一道题就是「把它拼出来」
+        m = matches.start(k, "runner")
+        q = matches.question(k, m["match_id"], random.Random(3))["item"]
+        assert q["type"] == "fill" and q["keypad"] == "letters" and q["run"]["w"] and q["run"]["hint"] in (0, 1, 2)
+        assert q["say"] == q["run"]["w"]
+        res = matches.answer(k, m["match_id"], q["id"], q["run"]["w"])
+        assert res["correct"] and res["word"] == q["run"]["w"]
+        ev = db.one("SELECT data FROM events WHERE user_id=? AND target='word' ORDER BY id DESC LIMIT 1", k["id"])
+        assert (db.jload(ev["data"], {}) or {}).get("tier") in words.RUN_HINTS
+
+        # 撞错过字母：报撞到的那串，算没拼对，词进复习
+        q = matches.question(k, m["match_id"], random.Random(4))["item"]
+        res = matches.answer(k, m["match_id"], q["id"], q["run"]["w"] + "x")
+        assert not res["correct"] and res["word"] == q["run"]["w"]
+        assert db.one("SELECT 1 FROM cards WHERE user_id=? AND LOWER(front)=?", k["id"], q["run"]["w"].lower())
+
+
+def test_adult_runner_has_words_and_no_game_clock(monkeypatch):
+    with TestClient(app) as c:
+        if not auth.by_email("admin@x.com"):
+            c.post("/register", data={"email": "admin@x.com", "password": "secret1", "name": "站长"})
+        uid = auth.create_user("wd-run@x.com", "secret1", "自学", "kid", grade="ADULT")
+        c.get("/logout")
+        c.post("/login", data={"email": "wd-run@x.com", "password": "secret1"})
+        att = {a["pack"]["id"]: a for a in words.attached(uid)}
+        assert "en-scene-restaurant" in att and not att["en-scene-restaurant"]["main"]   # 还没挑包：先挂上场景词，不每天加新词
+        u = dict(db.one("SELECT * FROM users WHERE id=?", uid))
+        assert arena.game_minutes(u) == 0 and arena.free_for(u, arena.GAMES["runner"])   # 自学的成人不玩乐园，跑酷照样能跑
+        assert not arena.free_for(u, arena.GAMES["race"])
+        page = c.get("/arena/runner")
+        assert page.status_code == 200 and "/words/map" in page.text
+        assert "单词跑酷" in c.get("/words/map").text
+        m = matches.start(u, "runner")
+        assert m["unlimited"]
+        q = matches.question(u, m["match_id"], random.Random(5))["item"]
+        scene = {w["w"] for wl in words.packs().values() if wl.get("shelf") == "scene" for w in wl["words"]}
+        assert q["run"]["w"] in scene
+
+        # 自己挑了包：只用挑的
+        c.post("/words/packs", data={"ref": "en-core-g8-igcse", "daily_amount": "5"})
+        assert "en-scene-restaurant" not in {a["pack"]["id"] for a in words.attached(uid)}
 
 
 def test_adult_picks_own_packs(monkeypatch):

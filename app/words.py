@@ -3,14 +3,14 @@
 四层，复习卡只是其中一层：
 1. 单词包（学什么）：content/words_en.json 的每张词表就是一个包，一包分几组（词表写了 units 就按它，没写每 UNIT 个词一组）。
    按年级、教材自动挂（_auto：英语核心词给学英语的孩子、IGCSE 物理术语给选了剑桥物理的孩子，学到当前年级为止）；
-   家长可以加一个包、停一个包、改每天几个新词（word_packs）。成人不自动加新词，自己挑包。
+   家长可以加一个包、停一个包、改每天几个新词（word_packs）。成人不自动加新词，自己挑包；还没挑的先挂上成人的高频词、场景词（只在游戏、闪测里用）。
 2. 每天的新词（daily_new）：只从「主包」里来（覆盖孩子现在年级的包、术语包、家长加上的包），已经会的跳过；
    一组里隔着挑（第 1、4、7、10 个……），意思挨着的词（同一个话题）不在同一天学，免得互相串（Tinkham 1993）。
    要复习的词欠得多就少加新词，先把旧的找回来。高频词的缺口不在这里补：热身里的旧词闪测在找，没认出来的直接进复习。
    新词先「学」再进复习：复习页第一次见到它是学习卡（先猜、揭晓、马上在句子里用一次，app/recall.py 的 learn）。
 3. 每个词会到哪一级（ladder）：认得 → 听得出 → 想得起 → 拼得出 → 用得对，从学习记录（events 里 target='word' 的作答）推出来，
    在两个不同的日子答对过这一级（或更难的一级）才算到了。不另存一份，和掌握状态一样可以重放。
-4. 用出来：例句（examples，AI 写一次、所有人复用）让单词能放进句子里考（句子补洞：复习、快练、乐园都用 cloze_item）。
+4. 用出来：例句（examples，AI 写一次、所有人复用）让单词能放进句子里考（句子补洞：复习、快练都用 cloze_item）。
 
 在哪儿答的单词题都记成 target='word' 的事件（data.tier 是哪一级的题），所以游戏里错的词，第二天复习和别的游戏里会先出。
 """
@@ -27,13 +27,14 @@ log = logging.getLogger("aistudy.words")
 
 UNIT = 12                 # 词表没分组时，每组几个词
 STRIDE = 3                # 一组里隔几个挑一个（同一天的新词不挨着）
-TIERS = {"read": 1, "listen": 2, "reverse": 3, "choice": 3, "spell": 4, "dictate": 4, "cloze": 5}
+TIERS = {"copy": 1, "read": 1, "listen": 2, "reverse": 3, "choice": 3, "spell": 4, "dictate": 4, "cloze": 5}
 LEVEL_NAME = {0: "还没学", 1: "认得", 2: "听得出", 3: "想得起", 4: "拼得出", 5: "用得对"}
 CAUGHT = 3                # 到「想得起」（隔天也想得起来）算抓牢了
 BACKLOG_HALF, BACKLOG_STOP = 40, 80   # 欠着要复习的词这么多：新词减半 / 先不加新词
 PER_DAY = {"primary": 4, "secondary": 5, "adult": 6}
 TERMS_PER_DAY = 2
 WORD_KINDS = ("word", "term")
+ADULT_SHELVES = ("adult", "scene")   # 成人的包：日常高频、场景词（content/words_en.json 的 shelf）
 
 
 def _content():
@@ -102,6 +103,8 @@ def attached(user_id: int) -> list[dict]:
     user = _user(user_id)
     rows, auto = _rows(user_id), _auto(user_id)
     adult = is_adult(user["grade"])
+    if adult and not any(r["state"] == "on" for r in rows.values()):   # 成人还没挑包：先挂上成人的高频词、场景词（游戏、闪测有词可用，不每天加新词）
+        auto = auto + [wl for wl in packs().values() if wl.get("shelf") in ADULT_SHELVES and wl not in auto]
     g = stage_rank(user["grade"] or "G3")
     core = [wl for wl in auto if not is_terms(wl)]
     now = [wl for wl in core if _span(wl)[0] <= g <= _span(wl)[1]] or core[-1:]   # 比所有词表都高的年级：最高那张
@@ -218,6 +221,19 @@ def log_answer(user_id: int, list_id: str, word: str, correct: bool, tier: str, 
     from . import evidence
     evidence.log(user_id, "word", f"{list_id or ''}:{word}", "answer", correct=correct, mode=mode, weight=weight,
                  fmt="recall" if TIERS.get(tier, 1) >= 4 and tier != "cloze" else "choice", dont_know=dont_know, data={"tier": tier})
+
+
+# 单词跑酷（app/arena/games/runner.py）里一个词给多少提示，跟着这个词的等级走：新词整个词淡淡地写在上面照着拼（copy），
+# 认得了只给中文和首字母（spell），拼得出了只给中文和读音（dictate）；最近一次答错了退一档。
+RUN_HINTS = ("copy", "spell", "dictate")
+
+
+def run_hint(v: dict | None, p: float) -> int:
+    """v：这个词在 ladder 里的那一条（没答过是 None）；p：按水平预计这一级的词答对的概率（没见过的词，水平高的也不用照着拼）。"""
+    v = v or {}
+    lv = v.get("level", 0)
+    h = 2 if lv >= 4 else 1 if lv >= 1 or v.get("ok") or p >= 0.85 else 0
+    return max(0, h - 1) if v.get("wobbly") else h
 
 
 def _tier(r) -> int:
