@@ -1,8 +1,0 @@
-/* 句子补洞：上面是小路，下面常驻答题面板（句子里的洞、几个词牌） */
-.pl-cloze.has-dock .pl-stage{height:clamp(220px,40vh,440px)}
-@media (max-width:640px) and (orientation:portrait){.pl-cloze.has-dock .pl-stage{height:clamp(190px,32vh,360px)}}
-@media (orientation:landscape) and (max-height:540px){.pl-cloze.has-dock .pl-stage{height:calc(100vh - 64px)}}
-.cz-hud{display:flex;gap:8px;justify-content:flex-end;width:100%}
-.cz-chip{background:#fff;border:3px solid var(--pl-ink);box-shadow:0 3px 0 var(--pl-ink);border-radius:14px;padding:2px 10px;font-size:18px;font-weight:900;color:var(--pl-ink);min-width:72px;text-align:center;line-height:1.35}
-.cz-combo{color:#b9a9cc}.cz-combo.hot{background:#fff1c9;color:#ff6a00}
-.cz-sub{display:block;font-size:14px;font-weight:700;color:var(--muted);margin-top:2px}

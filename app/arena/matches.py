@@ -56,7 +56,9 @@ def start(kid: dict, game: str, session=None, resume=None) -> dict:
     resume：刷新、换设备回到这一局时，接着用原来的对局（还开着的话）。"""
     g = get(game)
     st = status(kid)
-    why = rules.locked_reason(st)
+    if rules.free_for(kid, g):   # 成人玩学单词的游戏：自己安排时间，不受乐园的时长和解锁限制
+        st = {**st, "left": rules.UNLIMITED_SECONDS, "unlimited": True}
+    why = "" if rules.free_for(kid, g) else rules.locked_reason(st)
     if why:
         raise ArenaError(why, 403)
     sid = None
@@ -106,7 +108,7 @@ def answer(kid: dict, match_id, item_id: str, ans, dont_know=False, rng: random.
     correct = sources.settle(kid, st, it, ans, dont_know, ms)   # 学习记录（不计入当天打卡）、能力值
     dim, fam, lv = it["dim"], it["family"], it["level"]
     out = {"correct": correct, "answer": sources.itemtypes.display(it), "explain": it.get("explain", ""), "xp": 0}
-    if it.get("cloze"):   # 句子补洞：补好的整句和这个词（前端把它填进洞里、读出来）
+    if it.get("cloze") or it.get("run"):   # 句子补洞、单词跑酷：这个词（前端读出来、写在画面上），补洞还有补好的整句
         out.update(full=it.get("full", ""), word=it.get("word", ""), zh=it.get("zh", ""))
     if correct:
         xp, crit = rules.roll_xp(rng, xp_today(kid["id"]))

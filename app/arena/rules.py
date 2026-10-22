@@ -157,6 +157,12 @@ def status(kid: dict, max_seconds: dict | None = None) -> dict:
             "unlimited": unlimited, "can_bonus_all": bool(timed and total and done < total)}
 
 
+def free_for(kid: dict, game) -> bool:
+    """学单词的游戏（Game.study）对成人不设时长和解锁：成人自己安排学习，没有家长定的游戏时间（自学的成人连乐园都不显示）。
+    孩子玩它和别的游戏一样，算今天玩游戏的时间。"""
+    return bool(getattr(game, "study", False)) and is_adult(kid.get("grade"))
+
+
 def locked_reason(st: dict) -> str:
     if not st["base"]:
         return "家长设置了暂时不玩游戏。"

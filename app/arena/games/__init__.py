@@ -36,7 +36,8 @@ class Game:
     color = "#2f6f5e"
     players = (1, 1)              # 房间里最少、最多几个人：单机 (1, 1)，两人联网 (2, 2)，全家一起 (2, 6)
     target = 0.75                 # 题目的目标答对率（按每个孩子自己的水平出题）
-    ask: tuple | None = None      # 只出一种题：(题源, 题型)，比如句子补洞 ("words", "cloze")；不写就按孩子的科目混着出
+    ask: tuple | None = None      # 只出一种题：(题源, 题型)，比如单词跑酷 ("words", "run")；不写就按孩子的科目混着出
+    study = False                 # 学单词这类学习游戏：成人玩不受乐园时长限制（rules.free_for），孩子照常算游戏时间
     freeze = True                 # 答错冷冻几秒；联网游戏不冷冻，答对一道就起来
     max_seconds = 600             # 一局最多算多少秒的游戏时间
     roles: dict = {}              # 角色 id → (名字, 图标)；第一个是开房间的人默认的角色
@@ -163,9 +164,9 @@ class Game:
                 "stars": [{"key": k, "label": t} for k, t in self.stars], "total": self.total}
 
 
-from . import bubble, cloze, defense, duo, pingpong, race, snake, stickman  # noqa: E402,F401  （登记游戏；首页按这个顺序）
+from . import bubble, defense, duo, pingpong, race, runner, snake, stickman  # noqa: E402,F401  （登记游戏；首页按这个顺序）
 
-ORDER = ("stickman", "cloze", "race", "defense", "duo", "bubble", "snake", "pingpong")
+ORDER = ("runner", "stickman", "race", "defense", "duo", "bubble", "snake", "pingpong")
 GAMES = {k: REGISTRY[k] for k in ORDER} | REGISTRY
 
 __all__ = ["REGISTRY", "GAMES", "Game", "get", "register"]

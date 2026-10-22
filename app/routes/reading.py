@@ -48,7 +48,7 @@ def words_map(request: Request, msg: str = ""):
     me = auth.require_user(request)
     mine = me["id"] == k["id"] and auth.self_managed(me)
     st = words.stats(k["id"])
-    return render(request, "words_map.html", st=st, can_edit=mine, msg=msg, lad_names=words.LEVEL_NAME,
+    return render(request, "words_map.html", st=st, can_edit=mine, can_play=me["id"] == k["id"], msg=msg, lad_names=words.LEVEL_NAME,
                   others=[wl for i, wl in words.packs().items() if i not in {a["pack"]["id"] for a in words.attached(k["id"]) if a["on"]}] if mine else [])
 
 

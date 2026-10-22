@@ -5,7 +5,8 @@
   "pos_note": "n. 名词 v. 动词 adj. 形容词 adv. 副词 prep. 介词 conj. 连词 pron. 代词 det. 限定词 num. 数词 interj. 感叹词 phr. 短语",
   "notes": [
    "每个词表用 subject（选了这个学科的孩子都用）或 packs（只给选了这些教材的孩子）说明给谁用；stage 是适用学段。",
-   "不同列表之间允许少量重复（同一个词在高年级以新的意思/用法再出现，如 compare、describe）。"
+   "不同列表之间允许少量重复（同一个词在高年级以新的意思/用法再出现，如 compare、describe）。",
+   "shelf 是包放在哪一排（成人的场景词 scene、成人高频 adult 等）；shelf 是 adult / scene 的包，成人还没自己挑包时先挂上（只在游戏、闪测里用）。"
   ]
  },
  "lists": [
@@ -7391,6 +7392,1258 @@
      "w": "Big Bang theory",
      "zh": "大爆炸理论",
      "pos": "n."
+    }
+   ]
+  },
+  {
+   "id": "en-scene-restaurant",
+   "subject": "english",
+   "shelf": "scene",
+   "title": "场景：餐厅点餐",
+   "stage": "U1-ADULT",
+   "source_note": "成人场景高频词：日常交流里这个场景最常用的单词（单个词，不含短语），中文取这个场景里的意思",
+   "count": 38,
+   "words": [
+    {
+     "w": "menu",
+     "zh": "菜单",
+     "pos": "n."
+    },
+    {
+     "w": "order",
+     "zh": "点（菜）",
+     "pos": "v."
+    },
+    {
+     "w": "waiter",
+     "zh": "服务员",
+     "pos": "n."
+    },
+    {
+     "w": "table",
+     "zh": "桌子",
+     "pos": "n."
+    },
+    {
+     "w": "bill",
+     "zh": "账单",
+     "pos": "n."
+    },
+    {
+     "w": "tip",
+     "zh": "小费",
+     "pos": "n."
+    },
+    {
+     "w": "water",
+     "zh": "水",
+     "pos": "n."
+    },
+    {
+     "w": "coffee",
+     "zh": "咖啡",
+     "pos": "n."
+    },
+    {
+     "w": "tea",
+     "zh": "茶",
+     "pos": "n."
+    },
+    {
+     "w": "juice",
+     "zh": "果汁",
+     "pos": "n."
+    },
+    {
+     "w": "beef",
+     "zh": "牛肉",
+     "pos": "n."
+    },
+    {
+     "w": "chicken",
+     "zh": "鸡肉",
+     "pos": "n."
+    },
+    {
+     "w": "pork",
+     "zh": "猪肉",
+     "pos": "n."
+    },
+    {
+     "w": "fish",
+     "zh": "鱼",
+     "pos": "n."
+    },
+    {
+     "w": "salad",
+     "zh": "沙拉",
+     "pos": "n."
+    },
+    {
+     "w": "soup",
+     "zh": "汤",
+     "pos": "n."
+    },
+    {
+     "w": "bread",
+     "zh": "面包",
+     "pos": "n."
+    },
+    {
+     "w": "rice",
+     "zh": "米饭",
+     "pos": "n."
+    },
+    {
+     "w": "noodles",
+     "zh": "面条",
+     "pos": "n."
+    },
+    {
+     "w": "dessert",
+     "zh": "甜点",
+     "pos": "n."
+    },
+    {
+     "w": "spicy",
+     "zh": "辣的",
+     "pos": "adj."
+    },
+    {
+     "w": "sweet",
+     "zh": "甜的",
+     "pos": "adj."
+    },
+    {
+     "w": "salty",
+     "zh": "咸的",
+     "pos": "adj."
+    },
+    {
+     "w": "fork",
+     "zh": "叉子",
+     "pos": "n."
+    },
+    {
+     "w": "knife",
+     "zh": "刀",
+     "pos": "n."
+    },
+    {
+     "w": "spoon",
+     "zh": "勺子",
+     "pos": "n."
+    },
+    {
+     "w": "napkin",
+     "zh": "餐巾",
+     "pos": "n."
+    },
+    {
+     "w": "plate",
+     "zh": "盘子",
+     "pos": "n."
+    },
+    {
+     "w": "glass",
+     "zh": "玻璃杯",
+     "pos": "n."
+    },
+    {
+     "w": "takeaway",
+     "zh": "外卖；打包带走",
+     "pos": "n."
+    },
+    {
+     "w": "delicious",
+     "zh": "好吃的",
+     "pos": "adj."
+    },
+    {
+     "w": "vegetarian",
+     "zh": "素食的",
+     "pos": "adj."
+    },
+    {
+     "w": "allergic",
+     "zh": "过敏的",
+     "pos": "adj."
+    },
+    {
+     "w": "receipt",
+     "zh": "收据",
+     "pos": "n."
+    },
+    {
+     "w": "reserve",
+     "zh": "预订",
+     "pos": "v."
+    },
+    {
+     "w": "breakfast",
+     "zh": "早餐",
+     "pos": "n."
+    },
+    {
+     "w": "lunch",
+     "zh": "午餐",
+     "pos": "n."
+    },
+    {
+     "w": "dinner",
+     "zh": "晚餐",
+     "pos": "n."
+    }
+   ]
+  },
+  {
+   "id": "en-scene-travel",
+   "subject": "english",
+   "shelf": "scene",
+   "title": "场景：出行交通",
+   "stage": "U1-ADULT",
+   "source_note": "成人场景高频词：日常交流里这个场景最常用的单词（单个词，不含短语），中文取这个场景里的意思",
+   "count": 32,
+   "words": [
+    {
+     "w": "airport",
+     "zh": "机场",
+     "pos": "n."
+    },
+    {
+     "w": "flight",
+     "zh": "航班",
+     "pos": "n."
+    },
+    {
+     "w": "ticket",
+     "zh": "票",
+     "pos": "n."
+    },
+    {
+     "w": "passport",
+     "zh": "护照",
+     "pos": "n."
+    },
+    {
+     "w": "visa",
+     "zh": "签证",
+     "pos": "n."
+    },
+    {
+     "w": "luggage",
+     "zh": "行李",
+     "pos": "n."
+    },
+    {
+     "w": "gate",
+     "zh": "登机口",
+     "pos": "n."
+    },
+    {
+     "w": "boarding",
+     "zh": "登机",
+     "pos": "n."
+    },
+    {
+     "w": "delay",
+     "zh": "延误",
+     "pos": "n."
+    },
+    {
+     "w": "taxi",
+     "zh": "出租车",
+     "pos": "n."
+    },
+    {
+     "w": "subway",
+     "zh": "地铁",
+     "pos": "n."
+    },
+    {
+     "w": "station",
+     "zh": "车站",
+     "pos": "n."
+    },
+    {
+     "w": "platform",
+     "zh": "站台",
+     "pos": "n."
+    },
+    {
+     "w": "train",
+     "zh": "火车",
+     "pos": "n."
+    },
+    {
+     "w": "bus",
+     "zh": "公交车",
+     "pos": "n."
+    },
+    {
+     "w": "map",
+     "zh": "地图",
+     "pos": "n."
+    },
+    {
+     "w": "left",
+     "zh": "向左",
+     "pos": "adv."
+    },
+    {
+     "w": "right",
+     "zh": "向右",
+     "pos": "adv."
+    },
+    {
+     "w": "straight",
+     "zh": "直着（走）",
+     "pos": "adv."
+    },
+    {
+     "w": "corner",
+     "zh": "拐角",
+     "pos": "n."
+    },
+    {
+     "w": "street",
+     "zh": "街道",
+     "pos": "n."
+    },
+    {
+     "w": "bridge",
+     "zh": "桥",
+     "pos": "n."
+    },
+    {
+     "w": "traffic",
+     "zh": "交通",
+     "pos": "n."
+    },
+    {
+     "w": "arrive",
+     "zh": "到达",
+     "pos": "v."
+    },
+    {
+     "w": "depart",
+     "zh": "出发",
+     "pos": "v."
+    },
+    {
+     "w": "schedule",
+     "zh": "时刻表",
+     "pos": "n."
+    },
+    {
+     "w": "transfer",
+     "zh": "换乘",
+     "pos": "v."
+    },
+    {
+     "w": "seat",
+     "zh": "座位",
+     "pos": "n."
+    },
+    {
+     "w": "window",
+     "zh": "窗户",
+     "pos": "n."
+    },
+    {
+     "w": "aisle",
+     "zh": "过道",
+     "pos": "n."
+    },
+    {
+     "w": "customs",
+     "zh": "海关",
+     "pos": "n."
+    },
+    {
+     "w": "address",
+     "zh": "地址",
+     "pos": "n."
+    }
+   ]
+  },
+  {
+   "id": "en-scene-hotel",
+   "subject": "english",
+   "shelf": "scene",
+   "title": "场景：住酒店",
+   "stage": "U1-ADULT",
+   "source_note": "成人场景高频词：日常交流里这个场景最常用的单词（单个词，不含短语），中文取这个场景里的意思",
+   "count": 32,
+   "words": [
+    {
+     "w": "hotel",
+     "zh": "酒店",
+     "pos": "n."
+    },
+    {
+     "w": "room",
+     "zh": "房间",
+     "pos": "n."
+    },
+    {
+     "w": "reception",
+     "zh": "前台",
+     "pos": "n."
+    },
+    {
+     "w": "key",
+     "zh": "钥匙",
+     "pos": "n."
+    },
+    {
+     "w": "floor",
+     "zh": "楼层",
+     "pos": "n."
+    },
+    {
+     "w": "elevator",
+     "zh": "电梯",
+     "pos": "n."
+    },
+    {
+     "w": "towel",
+     "zh": "毛巾",
+     "pos": "n."
+    },
+    {
+     "w": "shower",
+     "zh": "淋浴",
+     "pos": "n."
+    },
+    {
+     "w": "pillow",
+     "zh": "枕头",
+     "pos": "n."
+    },
+    {
+     "w": "blanket",
+     "zh": "毯子",
+     "pos": "n."
+    },
+    {
+     "w": "wifi",
+     "zh": "无线网",
+     "pos": "n."
+    },
+    {
+     "w": "password",
+     "zh": "密码",
+     "pos": "n."
+    },
+    {
+     "w": "deposit",
+     "zh": "押金",
+     "pos": "n."
+    },
+    {
+     "w": "single",
+     "zh": "单人的",
+     "pos": "adj."
+    },
+    {
+     "w": "double",
+     "zh": "双人的",
+     "pos": "adj."
+    },
+    {
+     "w": "suite",
+     "zh": "套房",
+     "pos": "n."
+    },
+    {
+     "w": "guest",
+     "zh": "客人",
+     "pos": "n."
+    },
+    {
+     "w": "stay",
+     "zh": "住",
+     "pos": "v."
+    },
+    {
+     "w": "night",
+     "zh": "晚（住一晚）",
+     "pos": "n."
+    },
+    {
+     "w": "laundry",
+     "zh": "洗衣服务",
+     "pos": "n."
+    },
+    {
+     "w": "quiet",
+     "zh": "安静的",
+     "pos": "adj."
+    },
+    {
+     "w": "noisy",
+     "zh": "吵的",
+     "pos": "adj."
+    },
+    {
+     "w": "clean",
+     "zh": "干净的",
+     "pos": "adj."
+    },
+    {
+     "w": "dirty",
+     "zh": "脏的",
+     "pos": "adj."
+    },
+    {
+     "w": "broken",
+     "zh": "坏了的",
+     "pos": "adj."
+    },
+    {
+     "w": "repair",
+     "zh": "修理",
+     "pos": "v."
+    },
+    {
+     "w": "extra",
+     "zh": "额外的",
+     "pos": "adj."
+    },
+    {
+     "w": "available",
+     "zh": "有空房的；可用的",
+     "pos": "adj."
+    },
+    {
+     "w": "cancel",
+     "zh": "取消",
+     "pos": "v."
+    },
+    {
+     "w": "invoice",
+     "zh": "发票",
+     "pos": "n."
+    },
+    {
+     "w": "view",
+     "zh": "景色",
+     "pos": "n."
+    },
+    {
+     "w": "balcony",
+     "zh": "阳台",
+     "pos": "n."
+    }
+   ]
+  },
+  {
+   "id": "en-scene-doctor",
+   "subject": "english",
+   "shelf": "scene",
+   "title": "场景：看病买药",
+   "stage": "U1-ADULT",
+   "source_note": "成人场景高频词：日常交流里这个场景最常用的单词（单个词，不含短语），中文取这个场景里的意思",
+   "count": 31,
+   "words": [
+    {
+     "w": "doctor",
+     "zh": "医生",
+     "pos": "n."
+    },
+    {
+     "w": "nurse",
+     "zh": "护士",
+     "pos": "n."
+    },
+    {
+     "w": "hospital",
+     "zh": "医院",
+     "pos": "n."
+    },
+    {
+     "w": "clinic",
+     "zh": "诊所",
+     "pos": "n."
+    },
+    {
+     "w": "pharmacy",
+     "zh": "药店",
+     "pos": "n."
+    },
+    {
+     "w": "medicine",
+     "zh": "药",
+     "pos": "n."
+    },
+    {
+     "w": "pill",
+     "zh": "药片",
+     "pos": "n."
+    },
+    {
+     "w": "fever",
+     "zh": "发烧",
+     "pos": "n."
+    },
+    {
+     "w": "cough",
+     "zh": "咳嗽",
+     "pos": "n."
+    },
+    {
+     "w": "cold",
+     "zh": "感冒",
+     "pos": "n."
+    },
+    {
+     "w": "headache",
+     "zh": "头痛",
+     "pos": "n."
+    },
+    {
+     "w": "pain",
+     "zh": "疼痛",
+     "pos": "n."
+    },
+    {
+     "w": "hurt",
+     "zh": "疼",
+     "pos": "v."
+    },
+    {
+     "w": "stomach",
+     "zh": "胃；肚子",
+     "pos": "n."
+    },
+    {
+     "w": "throat",
+     "zh": "喉咙",
+     "pos": "n."
+    },
+    {
+     "w": "tooth",
+     "zh": "牙齿",
+     "pos": "n."
+    },
+    {
+     "w": "dizzy",
+     "zh": "头晕的",
+     "pos": "adj."
+    },
+    {
+     "w": "tired",
+     "zh": "累的",
+     "pos": "adj."
+    },
+    {
+     "w": "sick",
+     "zh": "生病的",
+     "pos": "adj."
+    },
+    {
+     "w": "rest",
+     "zh": "休息",
+     "pos": "v."
+    },
+    {
+     "w": "appointment",
+     "zh": "预约",
+     "pos": "n."
+    },
+    {
+     "w": "allergy",
+     "zh": "过敏",
+     "pos": "n."
+    },
+    {
+     "w": "injury",
+     "zh": "受伤",
+     "pos": "n."
+    },
+    {
+     "w": "bandage",
+     "zh": "绷带",
+     "pos": "n."
+    },
+    {
+     "w": "blood",
+     "zh": "血",
+     "pos": "n."
+    },
+    {
+     "w": "symptom",
+     "zh": "症状",
+     "pos": "n."
+    },
+    {
+     "w": "insurance",
+     "zh": "保险",
+     "pos": "n."
+    },
+    {
+     "w": "emergency",
+     "zh": "急诊；紧急情况",
+     "pos": "n."
+    },
+    {
+     "w": "heart",
+     "zh": "心脏",
+     "pos": "n."
+    },
+    {
+     "w": "breathe",
+     "zh": "呼吸",
+     "pos": "v."
+    },
+    {
+     "w": "dose",
+     "zh": "（药的）剂量",
+     "pos": "n."
+    }
+   ]
+  },
+  {
+   "id": "en-scene-shopping",
+   "subject": "english",
+   "shelf": "scene",
+   "title": "场景：购物",
+   "stage": "U1-ADULT",
+   "source_note": "成人场景高频词：日常交流里这个场景最常用的单词（单个词，不含短语），中文取这个场景里的意思",
+   "count": 35,
+   "words": [
+    {
+     "w": "shop",
+     "zh": "商店",
+     "pos": "n."
+    },
+    {
+     "w": "price",
+     "zh": "价格",
+     "pos": "n."
+    },
+    {
+     "w": "cheap",
+     "zh": "便宜的",
+     "pos": "adj."
+    },
+    {
+     "w": "expensive",
+     "zh": "贵的",
+     "pos": "adj."
+    },
+    {
+     "w": "discount",
+     "zh": "折扣",
+     "pos": "n."
+    },
+    {
+     "w": "sale",
+     "zh": "打折",
+     "pos": "n."
+    },
+    {
+     "w": "size",
+     "zh": "尺码",
+     "pos": "n."
+    },
+    {
+     "w": "medium",
+     "zh": "中号的",
+     "pos": "adj."
+    },
+    {
+     "w": "large",
+     "zh": "大号的",
+     "pos": "adj."
+    },
+    {
+     "w": "color",
+     "zh": "颜色",
+     "pos": "n."
+    },
+    {
+     "w": "try",
+     "zh": "试（穿）",
+     "pos": "v."
+    },
+    {
+     "w": "fit",
+     "zh": "合身",
+     "pos": "v."
+    },
+    {
+     "w": "cash",
+     "zh": "现金",
+     "pos": "n."
+    },
+    {
+     "w": "card",
+     "zh": "银行卡",
+     "pos": "n."
+    },
+    {
+     "w": "pay",
+     "zh": "付钱",
+     "pos": "v."
+    },
+    {
+     "w": "change",
+     "zh": "零钱",
+     "pos": "n."
+    },
+    {
+     "w": "refund",
+     "zh": "退款",
+     "pos": "n."
+    },
+    {
+     "w": "exchange",
+     "zh": "换货",
+     "pos": "v."
+    },
+    {
+     "w": "bag",
+     "zh": "袋子",
+     "pos": "n."
+    },
+    {
+     "w": "cashier",
+     "zh": "收银员",
+     "pos": "n."
+    },
+    {
+     "w": "counter",
+     "zh": "柜台",
+     "pos": "n."
+    },
+    {
+     "w": "brand",
+     "zh": "品牌",
+     "pos": "n."
+    },
+    {
+     "w": "quality",
+     "zh": "质量",
+     "pos": "n."
+    },
+    {
+     "w": "gift",
+     "zh": "礼物",
+     "pos": "n."
+    },
+    {
+     "w": "wrap",
+     "zh": "包装",
+     "pos": "v."
+    },
+    {
+     "w": "buy",
+     "zh": "买",
+     "pos": "v."
+    },
+    {
+     "w": "sell",
+     "zh": "卖",
+     "pos": "v."
+    },
+    {
+     "w": "cost",
+     "zh": "花费",
+     "pos": "v."
+    },
+    {
+     "w": "total",
+     "zh": "总共",
+     "pos": "n."
+    },
+    {
+     "w": "coupon",
+     "zh": "优惠券",
+     "pos": "n."
+    },
+    {
+     "w": "online",
+     "zh": "在网上",
+     "pos": "adv."
+    },
+    {
+     "w": "delivery",
+     "zh": "送货",
+     "pos": "n."
+    },
+    {
+     "w": "shoes",
+     "zh": "鞋",
+     "pos": "n."
+    },
+    {
+     "w": "shirt",
+     "zh": "衬衫",
+     "pos": "n."
+    },
+    {
+     "w": "jacket",
+     "zh": "夹克",
+     "pos": "n."
+    }
+   ]
+  },
+  {
+   "id": "en-scene-email",
+   "subject": "english",
+   "shelf": "scene",
+   "title": "场景：工作邮件",
+   "stage": "U1-ADULT",
+   "source_note": "成人场景高频词：日常交流里这个场景最常用的单词（单个词，不含短语），中文取这个场景里的意思",
+   "count": 33,
+   "words": [
+    {
+     "w": "email",
+     "zh": "邮件",
+     "pos": "n."
+    },
+    {
+     "w": "dear",
+     "zh": "亲爱的（称呼）",
+     "pos": "adj."
+    },
+    {
+     "w": "regards",
+     "zh": "问候（落款）",
+     "pos": "n."
+    },
+    {
+     "w": "attach",
+     "zh": "附上",
+     "pos": "v."
+    },
+    {
+     "w": "attachment",
+     "zh": "附件",
+     "pos": "n."
+    },
+    {
+     "w": "reply",
+     "zh": "回复",
+     "pos": "v."
+    },
+    {
+     "w": "forward",
+     "zh": "转发",
+     "pos": "v."
+    },
+    {
+     "w": "subject",
+     "zh": "主题",
+     "pos": "n."
+    },
+    {
+     "w": "request",
+     "zh": "请求",
+     "pos": "n."
+    },
+    {
+     "w": "confirm",
+     "zh": "确认",
+     "pos": "v."
+    },
+    {
+     "w": "deadline",
+     "zh": "截止日期",
+     "pos": "n."
+    },
+    {
+     "w": "update",
+     "zh": "最新情况",
+     "pos": "n."
+    },
+    {
+     "w": "report",
+     "zh": "报告",
+     "pos": "n."
+    },
+    {
+     "w": "draft",
+     "zh": "草稿",
+     "pos": "n."
+    },
+    {
+     "w": "review",
+     "zh": "审阅",
+     "pos": "v."
+    },
+    {
+     "w": "feedback",
+     "zh": "反馈",
+     "pos": "n."
+    },
+    {
+     "w": "urgent",
+     "zh": "紧急的",
+     "pos": "adj."
+    },
+    {
+     "w": "inform",
+     "zh": "通知",
+     "pos": "v."
+    },
+    {
+     "w": "provide",
+     "zh": "提供",
+     "pos": "v."
+    },
+    {
+     "w": "require",
+     "zh": "需要",
+     "pos": "v."
+    },
+    {
+     "w": "regarding",
+     "zh": "关于",
+     "pos": "prep."
+    },
+    {
+     "w": "contract",
+     "zh": "合同",
+     "pos": "n."
+    },
+    {
+     "w": "proposal",
+     "zh": "提案",
+     "pos": "n."
+    },
+    {
+     "w": "budget",
+     "zh": "预算",
+     "pos": "n."
+    },
+    {
+     "w": "client",
+     "zh": "客户",
+     "pos": "n."
+    },
+    {
+     "w": "colleague",
+     "zh": "同事",
+     "pos": "n."
+    },
+    {
+     "w": "manager",
+     "zh": "经理",
+     "pos": "n."
+    },
+    {
+     "w": "team",
+     "zh": "团队",
+     "pos": "n."
+    },
+    {
+     "w": "project",
+     "zh": "项目",
+     "pos": "n."
+    },
+    {
+     "w": "issue",
+     "zh": "问题",
+     "pos": "n."
+    },
+    {
+     "w": "solution",
+     "zh": "解决办法",
+     "pos": "n."
+    },
+    {
+     "w": "sincerely",
+     "zh": "谨上（落款）",
+     "pos": "adv."
+    },
+    {
+     "w": "apologize",
+     "zh": "道歉",
+     "pos": "v."
+    }
+   ]
+  },
+  {
+   "id": "en-scene-meeting",
+   "subject": "english",
+   "shelf": "scene",
+   "title": "场景：开会",
+   "stage": "U1-ADULT",
+   "source_note": "成人场景高频词：日常交流里这个场景最常用的单词（单个词，不含短语），中文取这个场景里的意思",
+   "count": 34,
+   "words": [
+    {
+     "w": "meeting",
+     "zh": "会议",
+     "pos": "n."
+    },
+    {
+     "w": "agenda",
+     "zh": "议程",
+     "pos": "n."
+    },
+    {
+     "w": "minutes",
+     "zh": "会议纪要",
+     "pos": "n."
+    },
+    {
+     "w": "present",
+     "zh": "汇报；展示",
+     "pos": "v."
+    },
+    {
+     "w": "slide",
+     "zh": "幻灯片",
+     "pos": "n."
+    },
+    {
+     "w": "discuss",
+     "zh": "讨论",
+     "pos": "v."
+    },
+    {
+     "w": "decide",
+     "zh": "决定",
+     "pos": "v."
+    },
+    {
+     "w": "decision",
+     "zh": "决定",
+     "pos": "n."
+    },
+    {
+     "w": "agree",
+     "zh": "同意",
+     "pos": "v."
+    },
+    {
+     "w": "disagree",
+     "zh": "不同意",
+     "pos": "v."
+    },
+    {
+     "w": "opinion",
+     "zh": "看法",
+     "pos": "n."
+    },
+    {
+     "w": "point",
+     "zh": "观点",
+     "pos": "n."
+    },
+    {
+     "w": "suggest",
+     "zh": "建议",
+     "pos": "v."
+    },
+    {
+     "w": "question",
+     "zh": "问题",
+     "pos": "n."
+    },
+    {
+     "w": "answer",
+     "zh": "回答",
+     "pos": "n."
+    },
+    {
+     "w": "goal",
+     "zh": "目标",
+     "pos": "n."
+    },
+    {
+     "w": "plan",
+     "zh": "计划",
+     "pos": "n."
+    },
+    {
+     "w": "task",
+     "zh": "任务",
+     "pos": "n."
+    },
+    {
+     "w": "action",
+     "zh": "行动",
+     "pos": "n."
+    },
+    {
+     "w": "progress",
+     "zh": "进展",
+     "pos": "n."
+    },
+    {
+     "w": "result",
+     "zh": "结果",
+     "pos": "n."
+    },
+    {
+     "w": "data",
+     "zh": "数据",
+     "pos": "n."
+    },
+    {
+     "w": "chart",
+     "zh": "图表",
+     "pos": "n."
+    },
+    {
+     "w": "summary",
+     "zh": "总结",
+     "pos": "n."
+    },
+    {
+     "w": "conclude",
+     "zh": "得出结论",
+     "pos": "v."
+    },
+    {
+     "w": "follow",
+     "zh": "跟进",
+     "pos": "v."
+    },
+    {
+     "w": "postpone",
+     "zh": "推迟",
+     "pos": "v."
+    },
+    {
+     "w": "invite",
+     "zh": "邀请",
+     "pos": "v."
+    },
+    {
+     "w": "attend",
+     "zh": "参加",
+     "pos": "v."
+    },
+    {
+     "w": "host",
+     "zh": "主持",
+     "pos": "v."
+    },
+    {
+     "w": "call",
+     "zh": "电话会议；通话",
+     "pos": "n."
+    },
+    {
+     "w": "share",
+     "zh": "分享",
+     "pos": "v."
+    },
+    {
+     "w": "screen",
+     "zh": "屏幕",
+     "pos": "n."
+    },
+    {
+     "w": "mute",
+     "zh": "静音",
+     "pos": "v."
     }
    ]
   }

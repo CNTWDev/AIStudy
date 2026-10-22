@@ -11,7 +11,7 @@
     const ctx = cv.getContext('2d'), H = 150, s = r.height / H, W = r.width / s;
     ctx.setTransform(s * dpr, 0, 0, s * dpr, 0, 0);
     const av = me.dataset.avatar, g = cv.dataset.preview, ground = 128;
-    const theme = {stickman: 'sunset', race: 'day', defense: 'candy', cloze: 'day'}[g] || 'day';
+    const theme = {stickman: 'sunset', race: 'day', defense: 'candy', runner: 'day'}[g] || 'day';
     if (multi(ctx, g, W, H, t, av)) return;
     Play.scene.sky(ctx, W, H, theme);
     Play.scene.drawClouds(ctx, W, theme, t * (g === 'race' ? 4 : 1));
@@ -26,14 +26,20 @@
       Art.hero(ctx, W * 0.5 + Math.sin(t) * 20, ground, {avatar: av, pose: 'run', t: t * 1.6, scale: 0.72});
       ctx.fillStyle = '#2b2340'; for (let i = 0; i < 4; i++) for (let j = 0; j < 2; j++) if ((i + j) % 2) ctx.fillRect(W - 40 + j * 10, 40 + i * 10, 10, 10);
       ctx.strokeStyle = '#2b2340'; ctx.lineWidth = 3; ctx.strokeRect(W - 40, 40, 20, 40); ctx.beginPath(); ctx.moveTo(W - 40, 40); ctx.lineTo(W - 40, ground); ctx.stroke();
-    } else if (g === 'cloze') {   // 句子补洞：断开的路，一块木板搭上了，下一个缺口上一个问号
-      ctx.fillStyle = '#5db8f0'; ctx.fillRect(0, ground + 8, W, H - ground);
-      ctx.fillStyle = '#c99a6b';
-      for (const x of [10, W * 0.42, W * 0.78]) { Play.roundRect(ctx, x, ground - 4, W * 0.2, 40, 6); ctx.fill(); }
-      ctx.fillStyle = '#c98a4b'; Play.roundRect(ctx, 10 + W * 0.2 - 4, ground - 8 - Math.max(0, Math.sin(t * 1.5)) * 6, W * 0.22 - W * 0.0 + 8, 10, 4); ctx.fill();
-      ctx.font = '900 30px "Baloo 2", system-ui'; ctx.textAlign = 'center'; ctx.fillStyle = '#ff7a00';
-      ctx.fillText('?', W * 0.7, ground - 26 + Math.sin(t * 4) * 4);
-      Art.hero(ctx, W * 0.5, ground - 4, {avatar: av, pose: 'idle', t, scale: 0.6});
+    } else if (g === 'runner') {   // 单词跑酷：往远处收的跑道，字母牌迎面过来
+      const hz = 46, cx = W / 2;
+      ctx.fillStyle = '#7b7f92'; ctx.beginPath(); ctx.moveTo(cx - 14, hz); ctx.lineTo(cx + 14, hz); ctx.lineTo(cx + W * 0.42, H); ctx.lineTo(cx - W * 0.42, H); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.8)'; ctx.lineWidth = 2;
+      for (const k of [-1, 1]) { ctx.beginPath(); ctx.moveTo(cx + k * 5, hz); ctx.lineTo(cx + k * W * 0.14, H); ctx.stroke(); }
+      const k = (t * 0.6) % 1, y = hz + (H - 40 - hz) * k, sz = 10 + 26 * k;
+      ['C', 'A', 'T'].forEach((ch, i) => {
+        const x = cx + (i - 1) * W * 0.09 * (0.3 + k);
+        ctx.fillStyle = '#fff'; Play.roundRect(ctx, x - sz / 2, y - sz, sz, sz, sz * 0.2); ctx.fill();
+        ctx.strokeStyle = '#2b2340'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = '#2b2340'; ctx.font = `900 ${Math.round(sz * 0.7)}px "Baloo 2", system-ui`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(ch, x, y - sz / 2);
+      });
+      Art.hero(ctx, cx, H - 6, {avatar: av, pose: 'run', t: t * 1.5, scale: 0.55});
     } else if (g === 'defense') {
       Art.castle(ctx, 70, ground, 0.55, 1, t);
       Art.hero(ctx, 70, ground - 66, {avatar: av, pose: 'charge', t, scale: 0.5});

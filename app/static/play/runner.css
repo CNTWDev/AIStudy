@@ -1,0 +1,18 @@
+/* 单词跑酷：上面一条是要拼的词（中文 + 字母格子），两边是金币、第几个词、连击 */
+.pl-runner .pl-stage{height:clamp(320px,62vh,600px)}
+@media (orientation:landscape) and (max-height:540px){.pl-runner .pl-stage{height:calc(100vh - 120px)}}
+.rn-hud{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:start;width:100%}
+.rn-side{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.rn-chip{background:#fff;border:3px solid var(--pl-ink);box-shadow:0 3px 0 var(--pl-ink);border-radius:14px;padding:2px 10px;font-size:17px;font-weight:900;color:var(--pl-ink);text-align:center;line-height:1.35;white-space:nowrap}
+.rn-combo{color:#b9a9cc}.rn-combo.hot{background:#fff1c9;color:#ff6a00}
+.rn-word{justify-self:center;background:#fff;border:3px solid var(--pl-ink);box-shadow:0 4px 0 var(--pl-ink);border-radius:18px;padding:6px 12px 8px;text-align:center;opacity:0;transform:translateY(-6px);transition:opacity .2s,transform .2s;max-width:100%}
+.rn-word.on{opacity:1;transform:none}
+.rn-zh{display:flex;gap:6px;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--pl-ink)}
+.rn-say{border:0;background:#ffe9a8;border-radius:10px;font-size:16px;padding:0 6px;cursor:pointer}
+.rn-slots{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-top:4px}
+.rn-slot{width:28px;height:34px;border-radius:8px;border:2.5px solid #cfc6e0;background:#f6f3fb;font:900 22px/30px "Baloo 2",system-ui,sans-serif;color:var(--pl-ink)}
+.rn-slot.got{background:#c9f2d3;border-color:#2fa84f;color:#1f7a39}
+.rn-slot.next{border-color:#ff7a00;box-shadow:0 0 0 3px #ffe0bf}
+.rn-slot.ghost{color:rgba(43,35,64,.32)}
+.rn-sub{display:block;font-size:14px;font-weight:700;color:var(--muted);margin-top:2px}
+@media (max-width:480px){.rn-slot{width:22px;height:28px;font-size:18px;line-height:24px}.rn-chip{font-size:14px;padding:1px 7px}.rn-zh{font-size:16px}}
