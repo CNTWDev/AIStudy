@@ -13,10 +13,10 @@
 {% set all_done = total and done == total %}
 {# 小伙伴（问{{ ASSISTANT }} 的那个形象，和 base.html 的 window.AI 同一个）：孩子的今天页上它站在主卡旁边说一句话；成人、家长查看不出现 #}
 {% set kidface = tone == 'kid' %}
-{% macro face(size) %}{% if ASSISTANT_ICON == '🙋' %}{{ mascot_svg(mascot_of(user), size) }}{% else %}<span class="face-emo" style="font-size:{{ (size * 0.8)|int }}px">{{ ASSISTANT_ICON }}</span>{% endif %}{% endmacro %}
+{% macro face(size) %}{% if ASSISTANT_ICON == '🙋' %}{{ mascot_svg(mascot_of(user), size, 'mascot', 'cheer' if all_done else '') }}{% else %}<span class="face-emo" style="font-size:{{ (size * 0.8)|int }}px">{{ ASSISTANT_ICON }}</span>{% endif %}{% endmacro %}
 <div class="card hero focus {{ 'alldone' if all_done }} {{ 'has-coach' if kidface and not readonly }}">
   {% if kidface and not readonly %}<a class="coach {{ 'yay' if all_done }}" href="/settings#mascot" title="换一个小伙伴">
-    <span class="say"><b>{{ ASSISTANT }}</b>{% if nx and done == 0 %}准备好了吗？我陪你一起开始！{% elif nx and not day.base %}已经做完 {{ done }} 项，接着来！{% elif nx %}真稳！后面每项都多一颗 ⭐{% elif all_done and not t.checked_in %}我就知道你行 💪{% elif all_done %}今天辛苦啦，明天见！{% else %}我在这儿，有不懂的随时问我{% endif %}</span>
+    <span class="say"><b>{{ ASSISTANT }}</b>{% if nx and done == 0 %}{{ look.greet if look and look.greet else '准备好了吗？我陪你一起开始！' }}{% elif nx and not day.base %}已经做完 {{ done }} 项，接着来！{% elif nx %}真稳！后面每项都多一颗 ⭐{% elif all_done and not t.checked_in %}我就知道你行 💪{% elif all_done %}今天辛苦啦，明天见！{% else %}我在这儿，有不懂的随时问我{% endif %}</span>
     <span class="cface">{{ face(92) }}</span></a>{% endif %}
   <div class="hero-main">
   <div class="hi">{{ t.day[5:7]|int }} 月 {{ t.day[8:]|int }} 日 · 星期{{ td.wd if td else '' }}

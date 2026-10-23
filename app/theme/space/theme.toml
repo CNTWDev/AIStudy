@@ -1,0 +1,80 @@
+name = "太空站"
+desc = "深蓝和星光，跟值班机器人一起出任务"
+order = 2
+greet = "太空站准备就绪，我们出发！"
+
+[mascot]
+name = "小宇"
+desc = "太空站的值班机器人，天线上顶着一颗星"
+
+# 底栏五个图标
+[nav]
+today = "🚀"
+subjects = "🪐"
+arena = "👾"
+reading = "📡"
+records = "🌟"
+
+[light]
+bg = "#eef2fb"
+card = "#ffffff"
+ink = "#1d2340"
+muted = "#58607f"
+faint = "#878ea9"
+line = "#dde3f2"
+line-2 = "#eef1f9"
+brand = "#38bdf8"
+brand-d = "#0ea5e9"
+brand-2 = "#e1f4ff"
+brand-3 = "#a8e2ff"
+brand-ink = "#075985"
+brand-ink-d = "#0c4a6e"
+on-brand = "#0b1530"
+sun-2 = "#e6efff"
+k-ink = "#1d2340"
+k-card-edge = "#d2dbf0"
+heat-0 = "#e3e8f4"
+heat-1 = "#c4e9ff"
+heat-2 = "#7fd2fb"
+heat-3 = "#38bdf8"
+heat-4 = "#0284c7"
+
+[dark]
+bg = "#0b1020"
+card = "#151b30"
+ink = "#e8ecff"
+muted = "#a6aecb"
+faint = "#7d85a4"
+line = "#273052"
+line-2 = "#1b2240"
+brand = "#38bdf8"
+brand-d = "#0ea5e9"
+brand-2 = "#10294a"
+brand-3 = "#1d4673"
+brand-ink = "#7dd3fc"
+brand-ink-d = "#bae6fd"
+on-brand = "#0b1530"
+sun-2 = "#1a2444"
+k-ink = "#4d62a3"
+k-card-edge = "#263056"
+k-card-shadow = "#05070f"
+heat-0 = "#1b2240"
+heat-1 = "#12405e"
+heat-2 = "#0e6a98"
+heat-3 = "#38bdf8"
+heat-4 = "#7dd3fc"
+
+# 乐园：深蓝描边，音效换成方波「哔哔」声（像老游戏机）
+[play]
+ink = "#1d2340"
+wave = "square"
+pitch = 1.0
+
+# 乐园「白天」场景换成星球表面
+[play.day]
+sky = ["#1d2a5c", "#4a5aa8"]
+hill = ["#5b6bb5", "#46559c"]
+ground = "#9aa7d8"
+soil = "#6b76a8"
+cloud = "#7f8fd0"
+stars = true

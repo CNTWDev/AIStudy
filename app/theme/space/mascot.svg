@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><style>@media (prefers-color-scheme:dark){svg{filter:drop-shadow(0 0 1px #f3ecdd) drop-shadow(0 0 1px #f3ecdd)}}</style><path d="M32 13 V6.5" stroke="#2B2118" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M32 1.2 l1.9 3.6 4 .6 -2.9 2.8 .7 4 -3.7-1.9 -3.7 1.9 .7-4 -2.9-2.8 4-.6z" fill="#FFD23F" stroke="#2B2118" stroke-width="1.8" stroke-linejoin="round"/>
+<rect x="6.5" y="27" width="7" height="15" rx="3.5" fill="#38BDF8" stroke="#2B2118" stroke-width="2.5"/>
+<rect x="50.5" y="27" width="7" height="15" rx="3.5" fill="#38BDF8" stroke="#2B2118" stroke-width="2.5"/>
+<rect x="11" y="13" width="42" height="42" rx="15" fill="#DCE6F6" stroke="#2B2118" stroke-width="2.5"/>
+<rect x="17" y="21" width="30" height="21" rx="9.5" fill="#1D2340" stroke="#2B2118" stroke-width="2"/>
+<ellipse cx="25.5" cy="30" rx="3.2" ry="3.8" fill="#5EF2FF"/><ellipse cx="38.5" cy="30" rx="3.2" ry="3.8" fill="#5EF2FF"/>
+<path d="M27.5 36 Q32 39.5 36.5 36" fill="none" stroke="#5EF2FF" stroke-width="2.4" stroke-linecap="round"/>
+<circle cx="19" cy="47.5" r="2.8" fill="#FF9BAE" opacity=".85"/><circle cx="45" cy="47.5" r="2.8" fill="#FF9BAE" opacity=".85"/>
+<rect x="27" y="46" width="10" height="4.5" rx="2.25" fill="#38BDF8" stroke="#2B2118" stroke-width="1.8"/></svg>

@@ -1,0 +1,78 @@
+name = "舞台练习生"
+desc = "粉紫应援色，每天练一点，总有一天站上舞台"
+order = 3
+greet = "今天的练习开始啦，我陪你一起！"
+
+[mascot]
+name = "星星"
+desc = "和你一起练习的练习生，头上别着一颗星"
+
+[nav]
+today = "🎤"
+subjects = "🎼"
+arena = "🕺"
+reading = "💌"
+records = "🌟"
+
+[light]
+bg = "#fbf2f9"
+card = "#ffffff"
+ink = "#2a1838"
+muted = "#6c587a"
+faint = "#998aa5"
+line = "#f0deee"
+line-2 = "#f8eef7"
+brand = "#ff7eb6"
+brand-d = "#f55fa2"
+brand-2 = "#ffe7f2"
+brand-3 = "#ffc4df"
+brand-ink = "#a0216a"
+brand-ink-d = "#7c1952"
+on-brand = "#2a1838"
+sun-2 = "#fdecf6"
+k-ink = "#3a2050"
+k-card-edge = "#efd2e8"
+heat-0 = "#f3e6f1"
+heat-1 = "#ffd3e7"
+heat-2 = "#ffa8d0"
+heat-3 = "#ff7eb6"
+heat-4 = "#c2408a"
+
+[dark]
+bg = "#170f1e"
+card = "#22172c"
+ink = "#f6eafa"
+muted = "#c4afd1"
+faint = "#96829f"
+line = "#3a2a48"
+line-2 = "#2a1e35"
+brand = "#ff8ec0"
+brand-d = "#ff6fae"
+brand-2 = "#3a1a33"
+brand-3 = "#5c2652"
+brand-ink = "#ffb3d6"
+brand-ink-d = "#ffd3e7"
+on-brand = "#2a1030"
+sun-2 = "#2e1d36"
+k-ink = "#7a5a8e"
+k-card-edge = "#3a2948"
+k-card-shadow = "#0b060f"
+heat-0 = "#2a1e35"
+heat-1 = "#4a1f40"
+heat-2 = "#7a2c63"
+heat-3 = "#c2408a"
+heat-4 = "#ff8ec0"
+
+# 乐园：深紫描边，音效换成清亮的正弦音、整体高一点（像闪光的应援棒）
+[play]
+ink = "#3a2050"
+wave = "sine"
+pitch = 1.12
+
+# 乐园「白天」场景换成舞台灯光下的粉紫色
+[play.day]
+sky = ["#ffc4e1", "#fde9ff"]
+hill = ["#d9b8f0", "#c39be6"]
+ground = "#f6c7de"
+soil = "#d99cc0"
+cloud = "#fff5fb"

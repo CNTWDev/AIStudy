@@ -415,7 +415,7 @@ const Flow = {
     const sub = st.all_done ? (isSimple() ? '' : '坚持比做对更重要，今天你做到了。') : sec ? (sec.base ? (isSimple() ? '🛡️ 连续天数保住啦' : '第 1 节做完了，今天的连续天数保住啦。') : `又亮了一格，还剩 ${sec.left} 节。`) : '';
     const m = document.createElement('div'); m.className = 'flow-sheet'; m.setAttribute('role', 'dialog');
     m.innerHTML = `<div class="fs-card"><button type="button" class="fs-x" aria-label="先看看这页" title="先看看这页">✕</button>
-      <div class="fs-h"><b>${head}</b>${sub ? `<span>${sub}</span>` : ''}</div>
+      <div class="fs-h">${(st.all_done || sec) && window.AI && AI.cheer ? `<span class="fs-face" aria-hidden="true">${AI.cheer}</span>` : ''}<b>${head}</b>${sub ? `<span>${sub}</span>` : ''}</div>
       <div class="fs-prog"><span>今天 ${st.done}/${st.total}</span><i><b style="width:${Math.round(100 * st.done / st.total)}%"></b></i></div>
       ${nx ? `<a class="fs-next" href="${esc(nx.url)}"><span class="fs-k">下一项 · 第 ${nx.n} 项${nx.minutes ? ' · 约 ' + nx.minutes + ' 分钟' : ''}</span><b>${esc(nx.title)}</b>${nx.why && !isSimple() ? `<span class="fs-why">${esc(nx.why)}</span>` : ''}<span class="btn lg block fs-go">继续 →</span></a>`
         : `<div class="fs-end"><a class="btn lg" href="/sprint">⚡ 还想做？来冲刺</a><a class="btn soft lg" href="/arena">🎮 去乐园</a></div>`}

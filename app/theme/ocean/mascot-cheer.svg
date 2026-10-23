@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><style>@media (prefers-color-scheme:dark){svg{filter:drop-shadow(0 0 1px #f3ecdd) drop-shadow(0 0 1px #f3ecdd)}}</style><circle cx="54" cy="10" r="3.5" fill="#D6F5FF" stroke="#2B2118" stroke-width="1.8"/><circle cx="48.5" cy="4.5" r="2" fill="#D6F5FF" stroke="#2B2118" stroke-width="1.5"/>
+<path d="M11 35 Q11 10 32 10 Q53 10 53 35 V46 Q53 53 47.5 51.5 Q44.5 50.5 44 47 Q42.5 54.5 38 52.5 Q35.5 51.5 35 48 Q32 56 29 48 Q28.5 51.5 26 52.5 Q21.5 54.5 20 47 Q19.5 50.5 16.5 51.5 Q11 53 11 46 Z" fill="#FF8A65" stroke="#2B2118" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M20.5 32 Q24.5 26.5 28.5 32" fill="none" stroke="#2B2118" stroke-width="2.8" stroke-linecap="round"/><path d="M35.5 32 Q39.5 26.5 43.5 32" fill="none" stroke="#2B2118" stroke-width="2.8" stroke-linecap="round"/>
+<circle cx="18.5" cy="38" r="3" fill="#FF5C8A" opacity=".6"/><circle cx="45.5" cy="38" r="3" fill="#FF5C8A" opacity=".6"/>
+<path d="M26.5 36.5 Q32 44 37.5 36.5 Z" fill="#E8546F" stroke="#2B2118" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="22" cy="19" r="2.2" fill="#FFB199"/><circle cx="41" cy="17" r="1.8" fill="#FFB199"/></svg>
