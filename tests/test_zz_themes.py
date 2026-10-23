@@ -81,6 +81,13 @@ def test_kid_switches_theme(monkeypatch):
         today = c.get("/today").text
         assert 'data-look="space"' in today and "太空站准备就绪" in today and 'href="/brand/space.svg"' in today
         assert '"wave": "square"' in today  # 乐园的音色
+        assert '<span class="i">🚀</span>' in today and ', cheer: "' in today  # 底栏图标、小伙伴开心的样子
+        assert '"day": {' in today                                          # 乐园白天场景
+        for f in ("pattern", "horizon"):
+            r = c.get(f"/theme/space/{f}.svg")
+            assert r.status_code == 200 and r.text.startswith("<svg")
+        assert c.get("/theme/space/mascot.svg").status_code == 404 and c.get("/theme/nope/pattern.svg").status_code == 404
+        assert "body[data-look=\"space\"]::before{background:url(/theme/space/horizon.svg" in c.get("/theme.css").text
         icon = c.get("/brand/space.svg")
         assert icon.status_code == 200 and icon.headers["content-type"].startswith("image/svg")
         assert c.get("/brand/nope.svg").status_code == 404
