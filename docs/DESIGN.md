@@ -902,7 +902,7 @@ math-cn（kind: standard，主干）     知识点、前置、题、讲解、掌
 
 ## 7. 数据表
 
-`users`（家长/孩子；`settings.method` 是学习方式）· `focus_blocks` / `focus_leaves`（一口气和每次离开，5.36）· `enrollments`（孩子选的教材包和当前学段）· `events`（学习事件：所有学习证据，掌握度按它重放）· `mastery`（掌握度，带模型指纹）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读进度）· `word_packs` / `word_examples`（单词包、例句，5.41）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· 乐园：`arena_ability` / `arena_calib` / `arena_matches` / `arena_answers` / `arena_ledger` / `arena_awards`（贴纸）/ `game_rooms` / `room_members`（房间、成员、在用的设备）/ `game_sessions`（每一局，`state` 是玩的时候的存档）/ `game_runs`（每支队伍每关的最好成绩）· `traces`（追根：每次测了什么、根在哪）· `streak_freezes`（补签卡）· `sprint_runs`（冲刺）· `mix_sets`（每门课每天一组混合练习）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
+`users`（家长/孩子；`settings.method` 是学习方式）· `focus_blocks` / `focus_leaves`（一口气和每次离开，5.36）· `enrollments`（孩子选的教材包和当前学段）· `events`（学习事件：所有学习证据，掌握度按它重放）· `mastery`（掌握度，带模型指纹）· `items` / `item_kps`（题库和题目考的知识点）· `contents`（讲解、背景、短文）· `flags`（标记有问题）· `attempts`（每次作答）· `cards`（复习卡片：生词/错题/术语/总结）· `diag_sessions`（诊断过程和结果）· `days`（每日计划、分钟数、打卡、反思）· `readings` · `lookups`（查词记录）· `tracks`（阅读进度）· `word_packs` / `word_examples`（单词包、例句，5.41）· `reading_logs` · `kp_taught`（学校学过的知识点）· `papers` / `paper_items`（试卷）· `api_tokens`（插件连接码）· `diary`（迭代日记，5.50）· 乐园：`arena_ability` / `arena_calib` / `arena_matches` / `arena_answers` / `arena_ledger` / `arena_awards`（贴纸）/ `game_rooms` / `room_members`（房间、成员、在用的设备）/ `game_sessions`（每一局，`state` 是玩的时候的存档）/ `game_runs`（每支队伍每关的最好成绩）· `traces`（追根：每次测了什么、根在哪）· `streak_freezes`（补签卡）· `sprint_runs`（冲刺）· `mix_sets`（每门课每天一组混合练习）· `ask_threads` / `ask_messages`（问小艾）· `sentences`（造句与点评）· `llm_cache` · `llm_usage` · 账号：`sessions` · `invites` · `password_resets` · `auth_events` · 迁移记录：`schema_migrations`。完整定义见 `migrations/`。
 
 ## 8. 后续路线
 
@@ -982,3 +982,12 @@ math-cn（kind: standard，主干）     知识点、前置、题、讲解、掌
 - 不算作答的：原卷上老师批的对错（`exam`）、诊断里的自评、复习卡片的「记得 / 不记得」（`kind='review'`）。术语卡挂了知识点、在游戏里答的，知识点那条证据也记成 `kind='review'`（和单词复习一样），一题只数一次。
 - 五个来源：📚 学习和练习、🔤 单词、📖 阅读理解、🎮 乐园游戏、⚡ 冲刺。曲线的「全部」什么都算，另外能按学科、按来源切换着看；下面一行列出最近 7 天每个来源多少题、正确率多少。乐园和冲刺的题跟着水平自动调难度，正确率本来就在七成左右，所以每周进步卡「正确率提高」只比不算乐园和冲刺的正确率，写明「不算乐园和冲刺」；答题总数按来源分开写。
 
+
+### 5.50 迭代日记：每一次调整背后的那个父亲（`app/diary.py`、管理后台 `/admin/diary`）
+
+- 系统的每一次重要调整，背后是对孩子的一次观察、对学习的一次理解。代码和 PR 只记下改了什么；日记记下为什么，和那天心里在想什么。
+- **谁写**：不是管理员填。有「为什么」的改动合并以后，由 Claude 用父亲的口吻写一篇草稿；同一天的几件事合成一篇；只修 bug、调排版的不写。管理员读，然后收下、改一改，或者不要（不要了的还能找回来）。
+- **口吻**：第一人称，大白话，短句，留白；事后回头看；在一个小细节上停住；写父亲自己的着急、忍住、后悔、再试一次。只写真的事：没发生过的场景不编。
+- **谁能看**：现在只有管理员（`diary.audience` 默认 `admin`，以后可以开放给家里人或所有人）。
+- **隐私**：仓库是公开的，这里只有模块，没有日记。一篇日记是一个 Markdown 文件（开头 `day / title / quote / changes / prs / tags / status`，正文空行分段），放在服务器的 `DATA_DIR/diary/`，或在后台上传（也存进这个目录）。打开日记页时读一遍目录：新的进表；后台没改过的跟着文件变；后台改过的（`edited`）和不要了的，文件不再覆盖。
+- 页面：时间线按月份一行一篇（日期、标题、最上面那一句、标签），草稿单独排在最上面；读一篇时宽度收窄、行距放大，末尾一行「那天改了什么」链到 PR，上一篇 / 下一篇翻着读。

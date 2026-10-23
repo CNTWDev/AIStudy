@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_admin.html" import admin_nav %}
+{% block body %}
+<h1>管理后台</h1>
+{{ admin_nav('diary') }}
+<h2>📔 迭代日记</h2>
+{% if msg %}<div class="hint">{{ msg }}</div>{% endif %}
+{% for name, why in sync.errors %}<div class="err">{{ name }}：{{ why }}</div>{% endfor %}
+<p class="muted small">系统每一次重要的调整，背后是对孩子的一次观察、对学习的一次理解。日记由 Claude 写，你来读：收下、改一改，或者不要。
+只有管理员看得到。日记不进公开仓库，文件放在服务器的 <code>DATA_DIR/diary/</code>，也可以在下面上传。</p>
+
+{% if drafts %}
+<h2>等你看的草稿（{{ drafts|length }}）</h2>
+<div class="diary-list">{% for e in drafts %}{% include "_diary_item.html" %}{% endfor %}</div>
+{% endif %}
+
+<h2>日记{% if n %} · 共 {{ n }} 篇{% endif %}</h2>
+{% for month, rows in months %}
+<div class="diary-month">{{ month }}</div>
+<div class="diary-list">{% for e in rows %}{% include "_diary_item.html" %}{% endfor %}</div>
+{% else %}<p class="muted">还没有日记。</p>{% endfor %}
+
+<details class="card"><summary><b>上传日记文件</b></summary>
+  <p class="muted small">一篇一个 <code>.md</code> 文件，文件名就是这篇的名字（比如 <code>2026-10-07-win.md</code>）。同名的再传一次就是更新；在后台改过的不会被覆盖。</p>
+  <form method="post" action="/admin/diary/upload" enctype="multipart/form-data" class="row">
+    <input type="file" name="files" accept=".md,text/markdown" multiple required>
+    <button class="btn" data-busy="上传中…">上传</button></form>
+</details>
+<p class="muted small">{% if dropped is none %}<a href="/admin/diary?show=dropped">看看不要了的</a>{% else %}<a href="/admin/diary">收起</a>{% endif %}</p>
+{% if dropped %}<div class="diary-list">{% for e in dropped %}{% include "_diary_item.html" %}{% endfor %}</div>
+{% elif dropped is not none %}<p class="muted small">没有不要了的。</p>{% endif %}
+{% endblock %}
