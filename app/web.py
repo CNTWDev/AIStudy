@@ -27,7 +27,7 @@ from .catalog import GRADES, catalog, is_adult, stage_label, stage_rank
 
 from .methods import methods
 
-from . import brand
+from . import brand, theme
 
 from . import catalog as catalog_mod
 
@@ -42,7 +42,8 @@ templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LA
                              trend_words=records.trend_words, tts_info=tts_web.client_info, qview=itemtypes.view,
                              qfig=figures.present)
 
-templates.env.globals.update(MASCOTS=brand.MASCOTS, mascot_of=brand.mascot_of, mascot_chosen=brand.has_chosen, mascot_svg=brand.mascot_svg,
+templates.env.globals.update(MASCOTS=brand.MASCOTS, mascot_of=brand.mascot_of, mascot_chosen=brand.has_chosen, mascot_svg=brand.mascot_svg, mascot_icon=brand.icon_url,
+                             look_client=theme.client, LOOK_CSS_V=theme.CSS_V,
                              wordmark_svg=brand.wordmark_svg)
 
 templates.env.globals["news_today_title"] = news.today_title
@@ -85,7 +86,7 @@ def render(request: Request, name: str, status_code: int = 200, **ctx):
         ctx["dayflow"] = _flow_here(request, user)
     base = {"user": user, "kid": kid, "readonly": bool(user and user["role"] != "kid"),
             "SITE": sitecfg.get("site_name"), "ASSISTANT": sitecfg.get("assistant_name"),
-            "ASSISTANT_ICON": sitecfg.get("assistant_icon"), "tone": ui_tone(kid or user)}
+            "ASSISTANT_ICON": sitecfg.get("assistant_icon"), "tone": ui_tone(kid or user), "look": theme.look_of(kid or user)}
     # simple：孩子自己在看（不是家长、不是成人学习者）——少字多图，说明文字只给家长看（docs/KID_UX.md）
     base["simple"] = bool(user and user["role"] == "kid" and base["tone"] == "kid")
     return templates.TemplateResponse(request, name, {**base, **ctx}, status_code=status_code)

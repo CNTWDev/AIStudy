@@ -3,8 +3,8 @@ import json
 
 from fastapi import APIRouter
 from fastapi import Form, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
-from .. import auth, brand, config, db, mailer, sitecfg
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
+from .. import auth, brand, config, db, mailer, sitecfg, theme
 from ..catalog import SUBJECTS, SYSTEMS, catalog, stage_label
 from ..library import CATALOG as BOOKS
 from ..web import (
@@ -188,7 +188,8 @@ def reset_submit(request: Request, token: str, password: str = Form(...), passwo
 @router.get("/settings", response_class=HTMLResponse)
 def settings_page(request: Request, msg: str = "", err: str = "", force: str = ""):
     u = auth.require_user(request)
-    return render(request, "settings.html", sessions=auth.sessions_of(u["id"]), this_sid=auth.current_session_hash(request),
+    return render(request, "settings.html", looks=theme.choices(u) if theme.applies(u) else [], mascots=theme.mascots_for(u),
+                  sessions=auth.sessions_of(u["id"]), this_sid=auth.current_session_hash(request),
                   msg=msg, err=err, mail_kinds={k: (name, mailer.wants(u, k)) for k, name in mailer.KINDS.items()},
                   mail_on=mailer.settings().enabled)
 
@@ -228,9 +229,31 @@ def mail_unsub(request: Request, t: str = ""):
 @router.post("/settings/mascot")
 def settings_mascot(request: Request, mascot: str = Form(...)):
     u = auth.require_user(request)
-    if not brand.set_mascot(u["id"], mascot):
+    if mascot not in theme.mascots_for(u) or not brand.set_mascot(u["id"], mascot):
         return _back(err="没有这个形象")
-    return _back(msg=f"换好了，以后陪你学习的是「{brand.MASCOTS[mascot][0]}」")
+    return _back(msg=f"换好了，以后陪你学习的是「{brand.ALL[mascot][0]}」")
+
+
+@router.post("/settings/look")
+def settings_look(request: Request, look: str = Form(...)):
+    u = auth.require_user(request)
+    if (err := theme.set_look(u, look)):
+        return _back(err=err)
+    return _back(msg=f"换好了，现在是「{theme.LOOKS[look]['name']}」主题")
+
+
+@router.get("/theme.css")
+def theme_css():
+    return Response(theme.CSS, media_type="text/css", headers={"Cache-Control": "public, max-age=86400"})
+
+
+@router.get("/brand/{m}.svg")
+def mascot_icon(m: str):
+    """主题带来的小伙伴当浏览器标签图标（beejoy 自己的五个在 /static/brand）。"""
+    svg = brand.raw_svg(m)
+    if not svg:
+        raise HTTPException(404)
+    return Response(svg, media_type="image/svg+xml", headers={"Cache-Control": "public, max-age=86400"})
 
 
 @router.post("/settings/profile")

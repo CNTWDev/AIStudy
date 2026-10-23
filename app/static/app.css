@@ -401,6 +401,21 @@ transition:border-color .15s,background .15s,transform .12s;height:100%}
 .mascots input:checked+.m::after{content:"✓";position:absolute;top:8px;right:10px;width:22px;height:22px;border-radius:50%;background:var(--brand);color:var(--on-brand);font-size:13px;font-weight:800;display:grid;place-items:center}
 .mascots input:focus-visible+.m{box-shadow:var(--ring)}
 .mascots .m .mascot{transition:transform .2s}.mascots input:checked+.m .mascot{transform:scale(1.08) rotate(-4deg)}
+/* 换主题（DESIGN 5.45）：每张卡挂着自己的 data-look，里面的颜色就是那个主题的 */
+.looks{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:10px}
+.looks label{display:block;margin:0;position:relative;cursor:pointer}.looks label.lock{cursor:default}
+.looks input{position:absolute;opacity:0;pointer-events:none}
+.lk{box-sizing:border-box;width:100%;display:flex;flex-direction:column;gap:10px;padding:14px;border:2px solid var(--k-card-edge,var(--line));border-radius:18px;background:var(--bg);color:var(--ink);box-shadow:var(--k-card-drop,none);transition:transform .15s}
+.lk-top{display:flex;align-items:center;gap:10px}.lk-top b{display:block;font-size:16px}.lk-top small{display:block;font-size:12px;color:var(--muted);line-height:1.45}
+.lk-demo{display:flex;gap:8px;align-items:center}
+.lk-demo i{font-style:normal;font-weight:800;font-size:14px;border-radius:12px;border:2px solid var(--k-ink,var(--ink));padding:5px 12px;background:var(--card);box-shadow:0 3px 0 var(--k-ink,var(--ink))}
+.lk-demo .lk-opt.on{background:var(--brand-3)}.lk-demo .lk-go{margin-left:auto;background:var(--brand);color:var(--on-brand)}
+.lk-lock{font-size:12px;color:var(--muted)}
+.looks label:not(.lock):hover .lk{transform:translateY(-2px)}
+.looks label.lock .lk{opacity:.6;filter:saturate(.5)}
+.looks input:checked+.lk{border-color:var(--k-ink,var(--brand));outline:3px solid var(--brand);outline-offset:2px}
+.looks input:checked+.lk::after{content:"✓";position:absolute;top:10px;right:12px;width:22px;height:22px;border-radius:50%;background:var(--brand);color:var(--on-brand);font-size:13px;font-weight:800;display:grid;place-items:center}
+.looks input:focus-visible+.lk{box-shadow:var(--ring)}
 /* 登录页 */
 .brandhero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;margin:12px 0 4px}
 .brandhero .wordmark{color:var(--ink)}.brandhero p{margin:0;color:var(--muted)}

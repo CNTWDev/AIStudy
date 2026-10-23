@@ -7,7 +7,7 @@
    角色列表和解锁条件在服务器 app/arena/awards.py（AVATARS），这里只管样子。 */
 (function () {
   const Art = window.Art = {};
-  const INK = '#2b2340';
+  const INK = (window.LOOK && window.LOOK.ink) || '#2b2340';  // 描边颜色跟孩子选的主题走（DESIGN 5.45）
 
   Art.AVATARS = {
     mint: {main: '#3fbf8f', head: '#fff4e3', acc: 'sprout'},

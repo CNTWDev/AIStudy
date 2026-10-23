@@ -2,6 +2,7 @@
 
 图形放在 app/static/brand/*.svg（网页图标、手机图标也用它们）；页面里用 `mascot_svg()` 内联，好跟着深色模式和尺寸走。
 每个学习者可以在「我的账号」里选一个自己喜欢的形象（存在 users.settings.mascot），顶栏标志和浏览器标签图标都换成它；没选的用 DEFAULT。
+主题（app/theme）可以自带小伙伴，加载时用 add_mascot 登记进 ALL；MASCOTS 只是 beejoy 自己的五个。
 """
 import itertools
 import re
@@ -25,21 +26,40 @@ DEFAULT = "hive"
 
 # 文件里的 <style> 只给单独打开时（浏览器标签图标）用；内联到页面会变成全局样式，去掉，深色模式由 app.css 处理
 _SVG = {k: re.sub(r"<style>.*?</style>", "", (BRAND_DIR / f"{k}.svg").read_text().strip()) for k in MASCOTS}
+ALL = dict(MASCOTS)  # 加上主题带来的小伙伴
+_RAW: dict[str, str] = {}  # 主题小伙伴的原文件（浏览器标签图标用）
+
+
+def add_mascot(m: str, name: str, desc: str, svg: str) -> None:
+    ALL[m] = (name, desc)
+    _SVG[m] = re.sub(r"<style>.*?</style>", "", svg.strip())
+    _RAW[m] = svg.strip()
+
+
 _WORDMARK = re.search(r'd="([^"]+)"', (BRAND_DIR / "wordmark.svg").read_text()).group(1)
 _uid = itertools.count(1)
 
 
 def mascot_of(user: dict | None) -> str:
     m = (db.jload(user.get("settings"), {}) or {}).get("mascot") if user else None
-    return m if m in MASCOTS else DEFAULT
+    return m if m in ALL else DEFAULT
 
 
 def has_chosen(user: dict | None) -> bool:
-    return bool(user) and (db.jload(user.get("settings"), {}) or {}).get("mascot") in MASCOTS
+    return bool(user) and (db.jload(user.get("settings"), {}) or {}).get("mascot") in ALL
+
+
+def icon_url(m: str) -> str:
+    """浏览器标签图标：beejoy 的在 /static/brand，主题带来的由 /brand/<id>.svg 给（可能在不进仓库的私有主题里）。"""
+    return f"/static/brand/{m}.svg" if m in MASCOTS else f"/brand/{m}.svg"
+
+
+def raw_svg(m: str) -> str | None:
+    return _RAW.get(m)
 
 
 def set_mascot(user_id: int, m: str) -> bool:
-    if m not in MASCOTS:
+    if m not in ALL:
         return False
     u = db.one("SELECT settings FROM users WHERE id=?", user_id)
     st = db.jload(u["settings"], {}) if u else {}

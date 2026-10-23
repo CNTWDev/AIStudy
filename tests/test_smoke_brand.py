@@ -36,7 +36,7 @@ def test_kid_picks_mascot():
         game = c.get("/arena/stickman").text
         assert 'id="pl"' in game and "data-skin" not in game
         page = c.get("/settings").text
-        assert "选一个陪你学习的小伙伴" in page and page.count('name="mascot"') == 5
+        assert "选一个陪你学习的小伙伴" in page and page.count('name="mascot"') == 7  # 五个 + 两个直接能选的主题带来的
 
         r = c.post("/settings/mascot", data={"mascot": "drop"})
         assert "蜜糖滴" in r.text

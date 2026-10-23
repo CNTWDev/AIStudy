@@ -164,9 +164,13 @@
     if (AC.state === 'suspended') AC.resume();
     return AC;
   }
+  // 主题的音色（DESIGN 5.45）：旋律类的音（三角波）换成主题的波形，整体按主题升降；噪声类（打击、爆炸）不变
+  const LOOK = window.LOOK || {}, PITCH = LOOK.pitch || 1;
   function tone(f, t0, dur, o) {
     const a = ac(); if (!a) return;
     o = Object.assign({type: 'sine', vol: 0.25, slide: 0, attack: 0.005}, o || {});
+    if (LOOK.wave && o.type === 'triangle') { o.type = LOOK.wave; if (LOOK.wave === 'square') o.vol *= 0.6; }  // 方波听着更响，压一点
+    f *= PITCH;
     const osc = a.createOscillator(), g = a.createGain();
     osc.type = o.type; osc.frequency.setValueAtTime(f, t0);
     if (o.slide) osc.frequency.exponentialRampToValueAtTime(Math.max(30, f + o.slide), t0 + dur);

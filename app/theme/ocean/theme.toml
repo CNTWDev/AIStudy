@@ -1,0 +1,64 @@
+name = "深海探险"
+desc = "蓝绿色的海底，安安静静往下潜"
+order = 4
+unlock = 7
+greet = "潜水装备好了，我们一起下潜！"
+
+[mascot]
+name = "墨墨"
+desc = "住在珊瑚旁边的小章鱼，最会吐泡泡"
+
+[light]
+bg = "#edf8f6"
+card = "#ffffff"
+ink = "#10302f"
+muted = "#4c6b69"
+faint = "#7c9795"
+line = "#d4ebe8"
+line-2 = "#e8f5f3"
+brand = "#2dd4bf"
+brand-d = "#14b8a6"
+brand-2 = "#d8f6f1"
+brand-3 = "#a5ebdf"
+brand-ink = "#0b6158"
+brand-ink-d = "#084d46"
+on-brand = "#062b28"
+sun-2 = "#e1f5f2"
+k-ink = "#12403c"
+k-card-edge = "#cae5e1"
+heat-0 = "#e0efed"
+heat-1 = "#b5ece2"
+heat-2 = "#6fdcca"
+heat-3 = "#2dd4bf"
+heat-4 = "#0f9488"
+
+[dark]
+bg = "#08171a"
+card = "#102428"
+ink = "#e2f6f3"
+muted = "#a0c2bd"
+faint = "#769592"
+line = "#1f3c3f"
+line-2 = "#15302f"
+brand = "#2dd4bf"
+brand-d = "#14b8a6"
+brand-2 = "#0d3532"
+brand-3 = "#135049"
+brand-ink = "#5eead4"
+brand-ink-d = "#99f6e4"
+on-brand = "#062b28"
+sun-2 = "#12302f"
+k-ink = "#3d6b66"
+k-card-edge = "#1d3a3c"
+k-card-shadow = "#03090a"
+heat-0 = "#15302f"
+heat-1 = "#11463f"
+heat-2 = "#127066"
+heat-3 = "#2dd4bf"
+heat-4 = "#99f6e4"
+
+# 乐园：深青描边，音效换成柔和的正弦音、整体低一点（像水里的回声）
+[play]
+ink = "#12403c"
+wave = "sine"
+pitch = 0.89
