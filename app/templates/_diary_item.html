@@ -1,0 +1,5 @@
+<a class="diary-item{{ ' draft' if e.status == 'draft' }}" href="/admin/diary/{{ e.id }}">
+  <span class="d">{{ e.day[5:7]|int }} 月 {{ e.day[8:]|int }} 日</span>
+  <span class="t"><b>{{ e.title }}{% if e.status == 'draft' %} <span class="pill">草稿</span>{% endif %}</b>{% if e.quote %}<span class="q">{{ e.quote }}</span>{% endif %}</span>
+  {% if e.tags %}<span class="tags">{% for t in e.tags %}<span class="pill">{{ t }}</span>{% endfor %}</span>{% endif %}
+</a>
