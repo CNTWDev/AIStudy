@@ -3,7 +3,7 @@ from ..content import content
 from fastapi import APIRouter
 from fastapi import Body, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from .. import arena, auth, bank, boards, db, engine, evidence, explore, insights, itemtypes, lessons, llm, mix, prefetch, recall, records, sitecfg, sprint, streak, trace
+from .. import arena, auth, bank, boards, db, engine, evidence, explore, insights, itemtypes, lessons, llm, mix, prefetch, recall, records, sitecfg, sprint, streak, testout, trace
 from datetime import date
 from ..web import (
     GRADES,
@@ -260,8 +260,9 @@ def learn(request: Request, kp_id: str, task: str = "practice", full: int = 0):
     # 成人课学过的课再打开：回访（先回想 → 新案例 → 用到自己身上），不再把讲解看一遍；?full=1 照常从头看
     revisit = is_adult(k["grade"]) and not full and lessons.revisit(k["id"], kp_id)
     mine = db.one("SELECT back FROM cards WHERE user_id=? AND kind='kp' AND kp_id=? ORDER BY id DESC LIMIT 1", k["id"], kp_id) if revisit else None
+    offer = testout.N if auth.current_user(request)["role"] == "kid" and testout.offered(k["id"], kp_id) else 0
     return render(request, "learn.html", kp=kp, pack=pack, pre=pre, post=post, me=m.get(kp_id), task=task, ev=evidence.explain(k['id'], m.get(kp_id)),
-                  revisit=revisit, mine=(mine or {}).get("back", ""),
+                  revisit=revisit, mine=(mine or {}).get("back", ""), testout=offer,
                   strand=catalog.strand_name(pack.id, kp["strand"]), vocab=vocab, bridges=engine.bridges(k["id"], kp_id, m))
 
 
@@ -371,6 +372,29 @@ def api_twin(request: Request, item_id: str, kp_id: str):
         raise HTTPException(404)
     it = engine.twin_for(k["id"], bank.row_to_item(row), kp_id, k["grade"])
     return {"item": {**itemtypes.public(it), "id": it["id"], "kp_id": kp_id} if it else None}
+
+
+@router.get("/api/testout/{kp_id}")
+def api_testout(request: Request, kp_id: str):
+    """「这课我熟，考我一下」的题（app/testout.py）。"""
+    k = kid_or_redirect(request)
+    learner_kp(k, kp_id)
+    if not testout.offered(k["id"], kp_id):
+        raise HTTPException(409, "这一课不用考")
+    import uuid
+    return {"items": [{**_public_item(i), "request_id": uuid.uuid4().hex} for i in testout.items(k["id"], kp_id, k["grade"])]}
+
+
+@router.post("/api/testout/done")
+def api_testout_done(request: Request, body: dict = Body(...)):
+    """考我一下的题都答对了：算上过这一课，今天这一项打勾。"""
+    k = kid_or_redirect(request)
+    kp_id = str(body.get("kp_id") or "")
+    learner_kp(k, kp_id)
+    if not testout.offered(k["id"], kp_id) or not testout.passed(k["id"], kp_id, body.get("item_ids") or []):
+        return {"ok": False}
+    hit = engine.mark_task_by(k["id"], kp=kp_id)
+    return {"ok": True, "flow": engine.flow_state(k["id"], (hit or [None])[0])}
 
 
 @router.post("/api/learn/done")

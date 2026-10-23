@@ -22,7 +22,7 @@ from .catalog import catalog
 
 log = logging.getLogger("aistudy.prefetch")
 
-LEARN_TYPES = ("sync", "preview", "weak", "backfill", "check", "exam")  # 带 kp、会去 /learn 做题的任务
+LEARN_TYPES = engine.LESSON_TASKS  # 带 kp、会去 /learn 做题的任务
 WARMUP_PROBES = 4
 LOOKAHEAD = 3          # 混合练习往前备几道
 MAX_THREADS = 3        # 同时在后台出题的最多几个（别一下子打满 AI 的并发）
@@ -159,7 +159,7 @@ def prepare_task(user_id: int, t: dict) -> None:
         s = mix.get_or_create(user_id, t["pack"], t.get("n") or mix.size_for(15, grade))
         ahead(user_id, db.jload(s["slots"], []), s["pos"], grade)
     elif t.get("type") in LEARN_TYPES and t.get("kp"):
-        kick(user_id, t["kp"], 3, "preview" if t["type"] == "preview" else "practice", grade, teach=t["type"] in ("sync", "preview"))
+        kick(user_id, t["kp"], 3, "preview" if t["type"] == "preview" else "practice", grade, teach=t["type"] in ("sync", "preview", "lesson"))
     elif t.get("type") == "words":   # 单词：今天的新词和要复习的词先把例句写好（新词学一遍时、复习补句子时用）
         from . import words
         words.prepare(user_id)

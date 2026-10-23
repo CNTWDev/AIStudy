@@ -12,6 +12,8 @@
 - cross   交叉校验：答对过但只用一种问法的、从别的教材推断来的，换一种题型 / 情境再问；
 - preview 预习：学校下一步要学的，两道入门题。
 
+只能在这里学的课（自编课、考证，engine.SELF_TAUGHT）：没上过的课一道都不出（先上课），「新学的」是最近几天上过的课，没有预习。
+
 一组里做错的题（摸底题除外）过几题换一道同类题再来，最多两次（连续重学）。
 融合题：新知识点的最后一次是一道同时用到它和一两个旧知识点的题（AI 出、存进题库复用）。
 """
@@ -66,10 +68,14 @@ class _Ctx:
         own = set(catalog.ids_for(pack_id, self.e["track"])) if self.e else set()
         past = set(explore.past_range(user_id, self.e, self.taught)) if self.e else set()
         self.found = ladder.scope_for(pack_id, self.user, self.enrolls) if self.e else set()
+        # 只能在这里学的课（自编课、考证）：还没上过的课不出题，先去上课（engine.unlearned）
+        self.self_taught = bool(self.e) and engine.self_taught(pack_id)
+        self.hold = engine.unlearned(user_id, self.enrolls)
+        own -= self.hold
         self.own = own
         self.calendar = bool(self.e and schoolyear.estimate(self.user, self.e))
-        self.back = past | self.found      # 能往回练的
-        self.scope = own | self.found      # 这一组能出的知识点
+        self.back = (past | self.found) - self.hold      # 能往回练的
+        self.scope = (own | self.found) - self.hold      # 这一组能出的知识点
 
     def st(self, k):
         return self.mastery.get(k, {})
@@ -89,9 +95,24 @@ def _new_kps(c: _Ctx) -> list[str]:
         if ch:
             i = ch["kps"].index(cur)
             out += [k for k in ch["kps"][:i] if k in c.taught and c.st(k).get("status") in ("weak", "learning")][-1:]
+    if c.self_taught:   # 只能在这里学的课：「新学的」是最近上过的课（上课是今天的另一项任务，见 plan 的「新的一课」）
+        out = [k for k in out if k not in c.hold]
+        out += [k for k in _just_learned(c) if k not in out]
+        return out[:2]
     if len(out) < 2 and not cur and not c.calendar:   # 没有学校进度的课（按能力分的）：前置都会了、还没学的；按校历走的课放假不学新的
         out += [k["id"] for k in engine.frontier(c.user_id, e["pack_id"], e["stage"], c.mastery)[:2 - len(out)]]
     return list(dict.fromkeys(out))[:2]
+
+
+JUST_LEARNED_DAYS = 3
+
+
+def _just_learned(c: _Ctx) -> list[str]:
+    """最近几天上过、还没掌握的课，最近上的在前。"""
+    from . import lessons
+    rows = [r for k, r in lessons.learned(c.user_id).items() if k in c.own and c.st(k).get("status") != "mastered"
+            and evidence.days_since(r["last_done"]) <= JUST_LEARNED_DAYS]
+    return [r["kp_id"] for r in sorted(rows, key=lambda r: r["last_done"], reverse=True)]
 
 
 def _recent(c: _Ctx, used: set) -> list[str]:
@@ -161,6 +182,8 @@ def _past(c: _Ctx, used: set, near: list[str]) -> list[dict]:
 def _preview(c: _Ctx, used: set, new: list[str]) -> list[str]:
     e = c.e
     out = []
+    if c.self_taught:   # 没上过的课不出题：先上课（plan 里「新的一课」）
+        return out
     base = e["progress_kp"] or (new[0] if new else None)
     if base:
         nxt = engine.next_after(e["pack_id"], base, c.mastery, c.taught, e["track"])
