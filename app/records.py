@@ -78,10 +78,11 @@ def _week(user_id: int, start, end) -> dict:
     rows = db.q("SELECT * FROM runs WHERE user_id=? AND day>=? AND day<?", user_id, start.isoformat(), end.isoformat())
     att = db.q("SELECT correct, ms FROM attempts WHERE user_id=? AND created_at>=? AND created_at<?",
                user_id, start.isoformat(), end.isoformat())
-    timed = [a["ms"] for a in att if a["correct"] and a["ms"]]
+    timed = [a["ms"] for a in att if a["correct"] and a["ms"]]   # 用时只有知识点的题记着
+    t = tally(answers(user_id, start.isoformat(), end.isoformat()))
     return {"runs": len(rows), "pbs": sum(len(db.jload(r["pbs"], [])) for r in rows),
             "focus": sum(r["ms_active"] for r in rows) // 60000,
-            "attempts": len(att), "acc": round(100 * sum(1 for a in att if a["correct"]) / len(att)) if att else None,
+            "attempts": t["n"], "acc": t["steady_acc"], "by": t["by"], "split": tally_words(t),
             "sec": round(sum(timed) / len(timed) / 1000, 1) if len(timed) >= 3 else None,
             "lit": db.one("SELECT COUNT(*) AS n FROM lights WHERE user_id=? AND day>=? AND day<?", user_id,
                           start.isoformat(), end.isoformat())["n"],
@@ -102,7 +103,7 @@ def weekly(user_id: int, last_mon=None) -> dict | None:
     if w1["sec"] and w0["sec"] and w1["sec"] < w0["sec"]:
         lines.append(f"答对一题平均快了 {w0['sec'] - w1['sec']:.1f} 秒（{w0['sec']} → {w1['sec']} 秒）")
     if w1["acc"] is not None and w0["acc"] is not None and w1["acc"] > w0["acc"]:
-        lines.append(f"正确率从 {w0['acc']}% 提高到 {w1['acc']}%")
+        lines.append(f"正确率从 {w0['acc']}% 提高到 {w1['acc']}%（不算乐园和冲刺）")
     if w1["lit"]:
         lines.append(f"新点亮 {w1['lit']} 个知识点")
     if w1["pbs"]:
@@ -111,7 +112,7 @@ def weekly(user_id: int, last_mon=None) -> dict | None:
         lines.append(f"专注学习 {w1['focus']} 分钟" + (f"（比再上周多 {w1['focus'] - w0['focus']} 分钟）" if w1["focus"] > w0["focus"] else ""))
     if w1["sprint"]:
         lines.append(f"冲刺了 {w1['sprint']} 分" + (f"（比再上周多 {w1['sprint'] - w0['sprint']} 分）" if w1["sprint"] > w0["sprint"] else ""))
-    lines.append(f"学习了 {w1['days']} 天，做题 {w1['attempts']} 道")
+    lines.append(f"学习了 {w1['days']} 天，答题 {w1['attempts']} 道" + (f"：{w1['split']}" if w1["split"] else ""))
     return {"from": last_mon.isoformat(), "to": (this_mon - timedelta(days=1)).isoformat(), "lines": lines,
             "this": w1, "prev": w0, "monday": today.weekday() == 0}
 
@@ -140,10 +141,86 @@ def summary(user_id: int) -> dict:
     return {"rows": rows, "focus": _mmss(int(focus)) if focus >= 60_000 else ""}
 
 
+# ------------------------------------------------------------------ 所有作答：在哪儿答的都算，按来源分开看
+
+# 每一次作答都记在事件表里（kind='answer'）：知识点的题（target='kp'，每日任务、练习、热身、复习、试卷重做、游戏、冲刺）、
+# 单词（target='word'，热身、单词复习、游戏里的单词题）、阅读理解（target='reading'）。报告都从这里数，不再只数 attempts 表
+# （单词和阅读理解从来不进 attempts）。不算作答的：原卷上老师批的对错（exam，不是那天做的）、诊断里的自评。
+ANSWER_TARGETS = ("kp", "word", "reading")
+NOT_ANSWERS = ("exam", "diagnose-self")
+# 来源：乐园和冲刺的题跟着水平自动调难度，正确率本来就稳在七成多，和学习、复习的正确率分开看才有意义
+SOURCES = {"study": ("📚", "学习和练习"), "words": ("🔤", "单词"), "reading": ("📖", "阅读理解"),
+           "game": ("🎮", "乐园游戏"), "sprint": ("⚡", "冲刺")}
+ADAPTIVE = ("game", "sprint")
+ANSWER_SQL = ("kind='answer' AND target IN (%s) AND mode NOT IN (%s) AND correct IS NOT NULL"
+              % (",".join(f"'{t}'" for t in ANSWER_TARGETS), ",".join(f"'{m}'" for m in NOT_ANSWERS)))
+
+
+def source_of(target: str, mode: str) -> str:
+    if mode in ADAPTIVE:
+        return mode
+    return {"word": "words", "reading": "reading"}.get(target, "study")
+
+
+def answers(user_id: int, start: str, end: str | None = None, limit: int | None = None) -> list:
+    """这段时间的每一次作答（start / end 是日期或时间字符串；limit：只要最近的几条，新的在前）。"""
+    sql = f"SELECT target, target_id, mode, correct, dont_know, created_at FROM events WHERE user_id=? AND {ANSWER_SQL} AND created_at>=?"
+    args = [user_id, start]
+    if end:
+        sql += " AND created_at<?"
+        args.append(end)
+    sql += " ORDER BY id DESC" + (f" LIMIT {int(limit)}" if limit else "")
+    return db.q(sql, *args)
+
+
+def tally(rows) -> dict:
+    """一组作答的总数、答对、正确率，和每个来源各多少（只列有的来源，顺序固定）。"""
+    by = {}
+    for r in rows:
+        c = by.setdefault(source_of(r["target"], r["mode"]), [0, 0, 0])
+        c[0] += 1
+        c[1] += 1 if r["correct"] else 0
+        c[2] += 1 if r["dont_know"] else 0
+    n, ok = sum(c[0] for c in by.values()), sum(c[1] for c in by.values())
+    steady = [by[k] for k in by if k not in ADAPTIVE]
+    sn, sok = sum(c[0] for c in steady), sum(c[1] for c in steady)
+    return {"n": n, "ok": ok, "acc": _acc(n, ok), "dk": sum(c[2] for c in by.values()),
+            "steady_acc": _acc(sn, sok) if sn >= TREND_MIN else None,   # 不算乐园和冲刺的正确率：比进步用
+            "by": [{"key": k, "icon": SOURCES[k][0], "name": SOURCES[k][1], "n": by[k][0], "ok": by[k][1],
+                    "acc": _acc(by[k][0], by[k][1])} for k in SOURCES if k in by]}
+
+
+def tally_words(t: dict) -> str:
+    """「学习和练习 120 道（对 85%）、乐园游戏 260 道（对 72%）」——只有一个来源时不用分。"""
+    if len(t["by"]) < 2:
+        return ""
+    return "、".join(f"{s['name']} {s['n']} 道（对 {s['acc']}%）" for s in t["by"])
+
+
+def recent(user_id: int, limit: int = 60) -> list[dict]:
+    """「最近做题」：最近的作答，知识点的题写知识点名，单词写词，阅读理解写第几题。"""
+    from .catalog import catalog
+    out = []
+    for r in answers(user_id, "", limit=limit):
+        src = source_of(r["target"], r["mode"])
+        if r["target"] == "kp":
+            kp = catalog.kp(r["target_id"])
+            what = kp["name"] if kp else r["target_id"]
+        elif r["target"] == "word":
+            what = r["target_id"].split(":", 1)[-1]
+        else:
+            what = "阅读理解"
+        out.append({"at": r["created_at"], "what": what, "src": src, "icon": SOURCES[src][0],
+                    "kind": RECENT_KIND.get(r["mode"]) or SOURCES[src][1], "correct": r["correct"], "dont_know": r["dont_know"]})
+    return out
+
+
+RECENT_KIND = {"practice": "练习", "preview": "预习", "helped": "跟着做", "diagnose": "小测", "probe": "热身",
+               "review": "复习", "redo": "错题重做", "paper": "试卷重做", "game": "乐园", "sprint": "冲刺"}
+
+
 # ------------------------------------------------------------------ 每天的正确率：画成曲线，看自己是在变好还是变差
 
-# 不算进正确率的作答：原卷上老师批的对错（不是那天做的）、诊断里的自评、乐园和冲刺里的限时题（难度跟着孩子自动调，正确率本来就稳在七成多）
-TREND_SKIP = ("exam", "diagnose-self", "game", "sprint")
 TREND_MIN = 5          # 一天少于 5 题：点画成空心，提醒「题少，参考价值小」
 
 
@@ -188,25 +265,30 @@ def _series(days: list[str], by_day: dict[str, list[int]]) -> dict:
 
 
 def accuracy_trend(user_id: int, days: int = 30) -> dict | None:
-    """最近 days 天每天的做题正确率（全部 + 分学科），和「最近 7 天 vs 再前 7 天」的对比。一题都没做过返回 None。"""
+    """最近 days 天每天的正确率（全部、分学科、分来源），和「最近 7 天 vs 再前 7 天」的对比。一题都没答过返回 None。
+    全部 = 在哪儿答的都算（每日任务、单词、阅读理解、乐园、冲刺）；来源分开的曲线另外能切换着看。"""
     from .catalog import catalog
     today = db.today()
     span = [(today - timedelta(days=days - 1 - i)).isoformat() for i in range(days)]
     start = (today - timedelta(days=max(days, 14) - 1)).isoformat()
-    marks = ",".join("?" * len(TREND_SKIP))
-    rows = db.q(f"SELECT kp_id, correct, created_at FROM attempts WHERE user_id=? AND created_at>=? AND mode NOT IN ({marks})",
-                user_id, start, *TREND_SKIP)
+    rows = answers(user_id, start)
     if not rows:
         return None
     by: dict[str, dict[str, list[int]]] = {"all": {}}
     names = {}
     for r in rows:
         d = r["created_at"][:10]
-        kp = catalog.kp(r["kp_id"])
-        pack = catalog.packs.get(kp["pack"]) if kp else None
-        keys = ["all"] + ([pack.subject] if pack else [])
-        if pack:
-            names[pack.subject] = pack.subject_name
+        if r["target"] == "kp":
+            kp = catalog.kp(r["target_id"])
+            pack = catalog.packs.get(kp["pack"]) if kp else None
+            subj = (pack.subject, pack.subject_name) if pack else None
+        elif r["target"] == "word":
+            subj = ("english", "英语")
+        else:   # 阅读理解：target_id 是「语言:第几篇:第几题」
+            subj = ("english", "英语") if r["target_id"].startswith("en:") else ("chinese", "语文")
+        keys = ["all", "src:" + source_of(r["target"], r["mode"])] + ([subj[0]] if subj else [])
+        if subj:
+            names[subj[0]] = subj[1]
         for key in keys:
             c = by.setdefault(key, {}).setdefault(d, [0, 0])
             c[0] += 1
@@ -217,18 +299,22 @@ def accuracy_trend(user_id: int, days: int = 30) -> dict | None:
         n = sum(a for a, _ in cells)
         return {"n": n, "acc": _acc(n, sum(b for _, b in cells))}
 
-    series = []
-    for key in ["all"] + sorted(names, key=lambda s: names[s]):
+    def make(key, name, group):
         s = _series(span, by[key])
-        if key != "all" and s["n"] < 10:   # 题太少的学科不单独画
-            continue
-        series.append({"key": key, "name": "全部" if key == "all" else names[key], **s,
-                       "now": week(key, 0), "prev": week(key, 7)})
-    if len(series) == 2:   # 只有一门课：「全部」就是它，不用切换
-        series = series[:1]
+        return {"key": key, "name": name, "group": group, **s, "now": week(key, 0), "prev": week(key, 7)}
+
+    subjects = [make(k, names[k], "subject") for k in sorted(names, key=lambda s: names[s]) if _series(span, by[k])["n"] >= 10]
+    sources = [make("src:" + k, SOURCES[k][0] + " " + SOURCES[k][1], "source") for k in SOURCES
+               if "src:" + k in by and _series(span, by["src:" + k])["n"] >= 10]   # 题太少的学科、来源不单独画
+    series = [make("all", "全部", "all")]
+    if len(subjects) >= 2:   # 只有一门课：「全部」就是它，不用切换
+        series += subjects
+    if len(sources) >= 2:
+        series += sources
     labels = [{"x": round(100 * i / max(1, days - 1), 2), "text": d[5:].replace("-", "/")}
               for i, d in enumerate(span) if (days - 1 - i) % 7 == 0]
-    return {"days": days, "series": series, "labels": labels, "min": TREND_MIN}
+    week_rows = [r for r in rows if r["created_at"][:10] > (today - timedelta(days=7)).isoformat()]
+    return {"days": days, "series": series, "labels": labels, "min": TREND_MIN, "week": tally(week_rows)}
 
 
 def trend_words(s: dict) -> str:

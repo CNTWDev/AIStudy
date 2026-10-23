@@ -2,7 +2,7 @@
 from fastapi import APIRouter
 from fastapi import Body, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from .. import auth, bank, config, db, engine, itemtypes, llm, news, recall, webpage
+from .. import auth, bank, config, db, engine, evidence, itemtypes, llm, news, recall, webpage
 import re
 from datetime import timedelta
 from ..web import (
@@ -261,6 +261,8 @@ def reading_finish(request: Request, rid: int, body: dict = Body(...)):
         mode = "listen" if body.get("mode") == "listen" and r["lang"] == "en" and qs else "read"
         db.run("UPDATE readings SET finished_at=?, minutes=minutes+?, answers=?, mode=? WHERE id=?", db.now(), minutes,
                db.jdump({str(k2): v for k2, v in answers.items()}), mode, rid)
+        for i, res in enumerate(results):   # 阅读理解的每道题也是一次作答：进学习报告（app/records.py），不进掌握度
+            evidence.log(k["id"], "reading", f"{r['lang']}:{rid}:{i}", "answer", correct=res["ok"], mode=mode, fmt="choice")
     engine._touch_day(k["id"])  # 在线阅读的时间由页面自动计时
     hit = engine.mark_task_by(k["id"], type="read_" + r["lang"], lang=r["lang"])
     return {"results": results, "flow": engine.flow_state(k["id"], hit[0]) if hit else None}

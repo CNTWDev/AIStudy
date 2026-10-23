@@ -73,6 +73,10 @@ def test_go_and_flow():
         res = c.post(f"/api/reading/{rid}/finish", json={"minutes": 3, "answers": {"0": "0"}}).json()
         assert len(res["results"]) == len(qs) and (not qs or res["results"][0]["view"]["options"])
         assert res["flow"] and res["flow"]["just"] and res["flow"]["next"]["id"] == "t1"
+        # 阅读理解的每道题也进学习报告（app/records.py）；再交一次不重复记
+        c.post(f"/api/reading/{rid}/finish", json={"minutes": 3, "answers": {"0": "0"}})
+        n_read = db.one("SELECT COUNT(*) AS n FROM events WHERE user_id=? AND target='reading'", kid["id"])["n"]
+        assert n_read == len(qs)
         # 再进来：直接看到上次的答案和解析
         page = c.get("/reading/today?lang=en").text
         assert "这篇读完了" in page and ("qc-ans" in page or not qs)

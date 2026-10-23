@@ -242,7 +242,7 @@ async def kid_tracks_save(request: Request, kid_id: int):
 @router.get("/parent/kids/{kid_id}", response_class=HTMLResponse)
 def kid_report(request: Request, kid_id: int):
     p = auth.require_parent(request)
-    k = auth.kid_of(p, kid_id)
+    k = auth.kid_of(p, kid_id, report=True)   # 家里的成人成员的学习记录家长也能看
     return render(request, "records.html", **_records_ctx(k), report_for=k)
 
 

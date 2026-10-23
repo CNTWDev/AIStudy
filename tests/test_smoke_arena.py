@@ -134,6 +134,10 @@ def test_match_flow():
         r = c.post(f"/api/arena/{mid}/a", json={"item_id": q["id"], "answer": str(_right_answer(it))}).json()
         assert r["correct"] and r["xp"] >= 70
         assert db.one("SELECT COUNT(*) AS n FROM attempts WHERE user_id=? AND mode='game'", kid["id"])["n"] == 2
+        # 学习报告也数游戏里的题，单独列一个来源（以前正确率曲线专门不算）
+        from app import records
+        game = next(b for b in records.tally(records.answers(kid["id"], db.today().isoformat()))["by"] if b["key"] == "game")
+        assert game["n"] == 2 and game["ok"] == 1
         assert db.one("SELECT COUNT(*) AS n FROM arena_ability WHERE user_id=?", kid["id"])["n"] >= 1
         # 旧题不能再交
         assert c.post(f"/api/arena/{mid}/a", json={"item_id": q["id"], "answer": "1"}).status_code == 409

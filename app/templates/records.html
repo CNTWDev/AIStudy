@@ -7,7 +7,7 @@
 <div class="statline st4" style="margin-top:14px">
   <div><b>🔥 {{ streak }}</b><span>连续打卡（天）</span></div>
   <div><b>{{ cal|selectattr('level')|list|length }}</b><span>近 12 周学习的天数</span></div>
-  <div><b>{{ tot.n or 0 }}</b><span>做题 · 正确率 {{ ((tot.ok or 0) * 100 / tot.n)|int if tot.n else 0 }}%</span></div>
+  <div><b>{{ tot.n }}</b><span>答题 · 正确率 {{ tot.acc or 0 }}%</span></div>
   <div><b>{{ words }} / {{ mistakes }}</b><span>生词 / 错题</span></div>
 </div>
 {% if not report_for %}<a class="bd-strip" href="/boards"><span class="i">🏆</span><span>学习榜：连续打卡、本周进步，看看你排第几</span><span class="go">去看 ›</span></a>{% endif %}
@@ -53,8 +53,8 @@
 <div class="tw"><table><tr><th>日期</th><th>书</th><th>读到</th><th>分钟</th><th>一句话</th></tr>
 {% for r in reads %}<tr class="small"><td class="nw">{{ r.day[5:] }}</td><td class="tx">{{ r.title }}</td><td>{{ r.to_pos or r.pages or '' }}</td><td class="nw">{{ r.minutes }}</td><td class="tx">{{ r.feeling }} {{ r.summary }}</td></tr>{% endfor %}</table></div>{% endif %}
 <h2>最近做题</h2>
-<div class="tw"><table><tr><th>时间</th><th>知识点</th><th>类型</th><th>结果</th></tr>
-{% for a in attempts %}<tr><td class="small nw">{{ a.created_at[5:16].replace('T',' ') }}</td><td class="tx">{{ a.kp.name if a.kp else a.kp_id }}</td><td class="small nw">{{ {'practice':'练习','diagnose':'小测','diagnose-self':'小测自评','review':'复习','paper':'试卷重做','exam':'原卷'}.get(a.mode, a.mode) }}</td><td class="nw">{{ '✅' if a.correct else ('🤔 还不会' if a.dont_know else '❌') }}</td></tr>
+<div class="tw"><table><tr><th>时间</th><th>题目</th><th>在哪儿</th><th>结果</th></tr>
+{% for a in recent %}<tr><td class="small nw">{{ a.at[5:16].replace('T',' ') }}</td><td class="tx">{{ a.what }}</td><td class="small nw">{{ a.icon }} {{ a.kind }}</td><td class="nw">{{ '✅' if a.correct else ('🤔 还不会' if a.dont_know else '❌') }}</td></tr>
 {% else %}<tr><td colspan="4" class="muted">还没有记录</td></tr>{% endfor %}</table></div>
 {% if asks %}<h2>最近问{{ ASSISTANT }}的问题</h2>
 <div class="tw"><table>{% for a in asks %}<tr class="small"><td class="nw">{{ a.created_at[5:16].replace('T', ' ') }}</td><td class="tx">{{ a.text }}</td><td class="muted">{{ a.page }}</td></tr>{% endfor %}</table></div>{% endif %}

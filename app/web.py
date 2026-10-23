@@ -124,7 +124,7 @@ def kid_or_redirect(request: Request, manage: bool = False):
     if not k:
         raise HTTPException(400, "请先在家长页选择一个孩子")
     if auth.self_managed(k):  # 家里的成人成员：学习记录只有本人能看
-        raise HTTPException(403, f"{k['name']} 是家里的成人成员，学习由 TA 自己安排，学习记录也只有 TA 自己能看。")
+        raise HTTPException(403, f"{k['name']} 是家里的成人成员，学习由 TA 自己安排；TA 的学习报告在家长页点「学习报告」看。")
     if not manage:
         raise HTTPException(403, PARENT_READONLY)
     return k
@@ -202,10 +202,12 @@ def kid_brief(k) -> dict:
 
 
 def adult_brief(k) -> dict:
-    """家里的成人成员在家长页上：只有坚持（连续天数、这一周学了几天），学了什么、错在哪只有本人能看。"""
+    """家里的成人成员在家长页上：坚持（连续天数、这一周学了几天）、正确率小曲线、上周进步，点进去看完整的学习记录（只看不改）。
+    学习由 TA 自己安排，所以没有今天的清单和安排学习的入口。"""
     cal = engine.calendar(k["id"], weeks=1)
     return {"u": k, "adult": True, "streak": engine.streak(k["id"]),
-            "week_days": sum(1 for d in cal if d["minutes"] or d["checked"])}
+            "week_days": sum(1 for d in cal if d["minutes"] or d["checked"]),
+            "trend": records.accuracy_trend(k["id"], 14), "weekly": records.weekly(k["id"])}
 
 
 def _school_progress(k) -> list[dict]:
@@ -244,7 +246,8 @@ def _site_stats(users):
                   "WHERE day>=? AND (minutes>0 OR checked_in=1) GROUP BY day", since):
         if r["day"] in per_day:
             per_day[r["day"]].update(kids=r["kids"], minutes=r["minutes"] or 0)
-    for r in db.q("SELECT SUBSTR(created_at,1,10) AS day, COUNT(*) AS n FROM attempts WHERE created_at>=? GROUP BY SUBSTR(created_at,1,10)", since):
+    for r in db.q(f"SELECT SUBSTR(created_at,1,10) AS day, COUNT(*) AS n FROM events WHERE {records.ANSWER_SQL} AND created_at>=? "
+                  "GROUP BY SUBSTR(created_at,1,10)", since):
         if r["day"] in per_day:
             per_day[r["day"]]["attempts"] = r["n"]
     for r in db.q("SELECT day, SUM(calls) AS n FROM llm_usage WHERE day>=? GROUP BY day", since):
@@ -255,8 +258,8 @@ def _site_stats(users):
         if r["day"] in per_day:
             per_day[r["day"]]["asks"] = r["n"]
     one = lambda sql, *a: db.one(sql, *a)["n"] or 0  # noqa: E731
-    totals = {"attempts": one("SELECT COUNT(*) AS n FROM attempts"),
-              "accuracy": one("SELECT CAST(100*AVG(correct) AS INTEGER) AS n FROM attempts WHERE mode<>'exam'"),
+    totals = {"attempts": one(f"SELECT COUNT(*) AS n FROM events WHERE {records.ANSWER_SQL}"),   # 在哪儿答的题都算（app/records.py）
+              "accuracy": one(f"SELECT CAST(100*AVG(correct) AS INTEGER) AS n FROM events WHERE {records.ANSWER_SQL}"),
               "cards": one("SELECT COUNT(*) AS n FROM cards"), "papers": one("SELECT COUNT(*) AS n FROM papers"),
               "asks": one("SELECT COUNT(*) AS n FROM ask_messages WHERE role='user'"),
               "reads": one("SELECT COUNT(*) AS n FROM reading_logs"),
@@ -268,12 +271,11 @@ def _site_stats(users):
     for k in users:
         if k["role"] != "kid":
             continue
-        r = db.one("SELECT COUNT(*) AS n, SUM(correct) AS ok, SUM(dont_know) AS dk FROM attempts WHERE user_id=? AND created_at>=?",
-                   k["id"], week)
+        r = records.tally(records.answers(k["id"], week))
         d = db.one("SELECT COUNT(*) AS n, SUM(minutes) AS m FROM days WHERE user_id=? AND day>=? AND (minutes>0 OR checked_in=1)",
                    k["id"], week)
         rows.append({"u": k, "parent": by_id.get(k["parent_id"]), "days": d["n"], "minutes": d["m"] or 0,
-                     "attempts": r["n"], "acc": int(100 * (r["ok"] or 0) / r["n"]) if r["n"] else None, "dk": r["dk"] or 0,
+                     "attempts": r["n"], "acc": r["acc"], "dk": r["dk"], "split": records.tally_words(r),
                      "asks": one("SELECT COUNT(*) AS n FROM ask_threads WHERE user_id=? AND created_at>=?", k["id"], week),
                      "insights": one("SELECT COUNT(*) AS n FROM insights WHERE user_id=? AND resolved_at IS NULL", k["id"]),
                      "streak": engine.streak(k["id"])})
@@ -502,13 +504,10 @@ def _records_ctx(k):
     m = engine.get_mastery(k["id"])
     packs = [{"pack": catalog.packs[e["pack_id"]], "stage": e["stage"], "sum": engine.pack_summary(k["id"], e["pack_id"], m)}
              for e in enrollments(k["id"])]
-    attempts = db.q("SELECT * FROM attempts WHERE user_id=? ORDER BY id DESC LIMIT 60", k["id"])
-    att = [{**dict(a), "kp": catalog.kp(a["kp_id"])} for a in attempts]
     weak = sorted([v for v in m.values() if v["status"] == "weak" and catalog.kp(v["kp_id"])], key=lambda v: v["score"])
     days = db.q("SELECT * FROM days WHERE user_id=? AND (reflection<>'' OR checked_in=1) ORDER BY day DESC LIMIT 14", k["id"])
     lookups = db.q("SELECT query, created_at FROM lookups WHERE user_id=? ORDER BY id DESC LIMIT 30", k["id"])
-    tot = db.one("SELECT COUNT(*) AS n, SUM(correct) AS ok FROM attempts WHERE user_id=?", k["id"])
-    return {"k": k, "packs": packs, "attempts": att, "weak": [(catalog.kp(w["kp_id"]), w) for w in weak[:12]],
+    return {"k": k, "packs": packs, "recent": records.recent(k["id"]), "weak": [(catalog.kp(w["kp_id"]), w) for w in weak[:12]],
             "cal": engine.calendar(k["id"], 12, full_weeks=True), "streak": engine.streak(k["id"]), "days": days, "lookups": lookups,
             "reads": db.q("SELECT * FROM reading_logs WHERE user_id=? ORDER BY id DESC LIMIT 30", k["id"]),
             "found": insights.open_insights(k["id"]), "solved": insights.resolved_recent(k["id"]),
@@ -516,7 +515,7 @@ def _records_ctx(k):
                          "AND m.role='user' WHERE t.user_id=? ORDER BY m.id DESC LIMIT 20", k["id"]),
             "papers": [{**dict(p), "rep": db.jload(p["report"], {})} for p in
                        db.q("SELECT * FROM papers WHERE user_id=? ORDER BY id DESC LIMIT 20", k["id"])],
-            "tot": tot, "trend": records.accuracy_trend(k["id"]), "mistakes": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='mistake'", k["id"])["n"],
+            "tot": records.tally(records.answers(k["id"], "")), "trend": records.accuracy_trend(k["id"]), "mistakes": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='mistake'", k["id"])["n"],
             "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='word'", k["id"])["n"]}
 
 def _lang_of(text: str) -> str:

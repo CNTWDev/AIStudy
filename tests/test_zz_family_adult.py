@@ -1,4 +1,4 @@
-"""家里的成人成员：挂在家庭里，但学习自己安排（自己选课，记录只有本人能看）；家长只管账号；不上孩子的榜、不进公开房间。"""
+"""家里的成人成员：挂在家庭里，但学习自己安排（自己选课）；家长管账号、能看学习报告（只看不改）；不上孩子的榜、不进公开房间。"""
 from fastapi.testclient import TestClient
 
 from app import auth, boards, db
@@ -27,11 +27,12 @@ def test_family_adult_manages_own_learning():
         assert mom["parent_id"] == pa and auth.self_managed(mom) and not auth.is_self_learner(mom)
         assert not db.q("SELECT 1 FROM enrollments WHERE user_id=?", mom["id"])
 
-        # 家长页：只看坚持，学习记录、今天清单都进不去；资料与密码能改
+        # 家长页：能看学习报告（只看）；今天清单、安排学习都进不去；资料与密码能改
         page = c.get("/parent").text
         assert "妈妈" in page and "学习由 TA 自己安排" in page and f"/parent/as/{mom['id']}" not in page
+        assert f'href="/parent/kids/{mom["id"]}"' in page
         assert c.get(f"/parent/as/{mom['id']}").status_code == 403
-        assert c.get(f"/parent/kids/{mom['id']}").status_code == 403
+        assert "妈妈 的学习记录" in c.get(f"/parent/kids/{mom['id']}").text
         assert c.get(f"/parent/kids/{mom['id']}/plan").status_code == 403
         edit = c.get(f"/parent/kids/{mom['id']}/edit").text
         assert "家里的成人成员" in edit and 'name="subj_' not in edit and 'name="daily_minutes"' not in edit

@@ -5,7 +5,7 @@
 <div class="stats">
   <div class="stat"><b>{{ r.done }}/{{ r.plan|length }}</b><span>完成任务 ⭐</span></div>
   <div class="stat"><b>{{ r.minutes }}</b><span>学习分钟{% if r.offline_minutes %}（线下 {{ r.offline_minutes }}）{% endif %}</span></div>
-  <div class="stat"><b>{{ r.attempts|length }}</b><span>做题（对 {{ r.right }}）</span></div>
+  <div class="stat"><b>{{ r.answers.n }}</b><span>答题（对 {{ r.answers.ok }}）</span></div>
   <div class="stat"><b>{{ r.reviews }}</b><span>复习卡片</span></div>
   <div class="stat"><b>{{ r.new_cards|length }}</b><span>新收藏</span></div>
 </div>
@@ -21,10 +21,11 @@
   {% for x in r.reads %}<p class="small">📖 《{{ x.title }}》{% if x.to_pos %} 读到第 {{ x.to_pos }}{% endif %}{% if x.pages %} {{ x.pages }}{% endif %} · {{ x.minutes }} 分钟 {{ x.feeling }}{% if x.summary %}<br><span class="muted">「{{ x.summary }}」</span>{% endif %}</p>{% endfor %}
   {% for x in r.readings %}<p class="small">{{ '🎧' if x.mode == 'listen' else '📄' }} {{ x.title }}（{{ '英文' if x.lang == 'en' else '中文' }}短文{{ '，先听后读' if x.mode == 'listen' }}）</p>{% endfor %}
 </div>{% endif %}
-{% if r.attempts %}<div class="card">
+{% if r.answers.n %}<div class="card">
   <h3 style="margin-top:0">做题</h3>
-  <p class="small muted">对 {{ r.right }} · 错 {{ r.wrong }} · 还不会 {{ r.dont_know }}（做了就有收获）</p>
-  {% for a in r.attempts %}<p class="small">{{ '✅' if a.correct else ('🤔' if a.dont_know else '❌') }} {{ a.kp.name if a.kp else a.kp_id }}</p>{% endfor %}
+  {% if r.answers.by|length > 1 %}<p class="small">{% for b in r.answers.by %}<span class="pill">{{ b.icon }} {{ b.name }} {{ b.n }} 题 · 对 {{ b.ok }}</span> {% endfor %}</p>{% endif %}
+  {% if r.attempts %}<p class="small muted">知识点的题：对 {{ r.right }} · 错 {{ r.wrong }} · 还不会 {{ r.dont_know }}（做了就有收获）</p>{% endif %}
+  {% for a in r.attempts %}<p class="small">{{ '✅' if a.correct else ('🤔' if a.dont_know else '❌') }} {{ a.kp.name if a.kp else a.kp_id }}{% if a.mode in ('game', 'sprint') %} <span class="faint">{{ '🎮 乐园' if a.mode == 'game' else '⚡ 冲刺' }}</span>{% endif %}</p>{% endfor %}
 </div>{% endif %}
 {% if r.new_cards or r.lookups %}<div class="card">
   <h3 style="margin-top:0">新收藏 / 查过的词</h3>
