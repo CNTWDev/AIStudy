@@ -1,4 +1,4 @@
-"""积少成多：一共攒了多少、学会过只增不减、做完一项的「这一项 → 今天 → 一共」、里程碑、每天第一次打开的那句话（docs/DESIGN.md 5.50）。"""
+"""积少成多：一共攒了多少、学会过只增不减、做完一项的「这一项 → 今天 → 一共」、里程碑、每天第一次打开的那句话（docs/DESIGN.md 5.51）。"""
 import uuid
 from datetime import datetime, timedelta
 

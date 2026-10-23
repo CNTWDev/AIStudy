@@ -224,14 +224,14 @@ def _school_progress(k) -> list[dict]:
                         "check": not e["progress_at"] or e["progress_at"] < confirm_before})
     return out
 
-# 管理后台导航：按「管谁、管什么内容、看运行、改设置」分四组，每个后台页面顶部都用这一份（_admin.html）。
+# 管理后台导航：按「管谁、管什么内容、看运行、改设置」分四组（迭代日记记的是系统为什么这样长，放在「运行」），每个后台页面顶部都用这一份（_admin.html）。
 ADMIN_NAV = [
     ("用户", [("overview", "概览", "/admin"), ("families", "家庭", "/admin?tab=families"), ("selfs", "自学者", "/admin?tab=selfs"),
              ("invites", "邀请码", "/admin?tab=invites"), ("log", "安全日志", "/admin?tab=log")]),
     ("内容", [("curricula", "教材与知识点", "/admin/curricula"), ("bank", "题库", "/admin?tab=bank"), ("papers", "卷库", "/admin?tab=papers"),
              ("library", "书库", "/admin/library"), ("news", "每日新闻", "/admin/news")]),
     ("运行", [("stats", "数据统计", "/admin?tab=stats"), ("arena", "游戏公平", "/admin?tab=arena"),
-             ("operations", "后台任务与 AI", "/admin/operations")]),
+             ("operations", "后台任务与 AI", "/admin/operations"), ("diary", "迭代日记", "/admin/diary")]),
     ("设置", [("system", "站点设置", "/admin?tab=system")]),
 ]
 ADMIN_TABS = {key for _, items in ADMIN_NAV for key, _, url in items if url.startswith("/admin?") or url == "/admin"}

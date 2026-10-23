@@ -1067,3 +1067,21 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .wp-lv.lv1{background:#cfe3ff}.wp-lv.lv2{background:#9cc6ff}.wp-lv.lv3{background:#5aa0f5}.wp-lv.lv4{background:#2f7be0}.wp-lv.lv5{background:#1b55b0}
 .wp-legend{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:4px 4px 10px}.wp-legend .wp-lv{margin-right:2px}
 .wm-shelf summary{cursor:pointer;padding:2px 0}.wm-shelf[open] summary{margin-bottom:6px}
+/* 迭代日记（管理后台 /admin/diary，app/diary.py）：像翻一本本子——时间线一行一篇，读的时候宽度收窄、行距放大、段间留白 */
+.diary-month{margin:18px 0 6px;font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.05em}
+.diary-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);overflow:hidden}
+.diary-item{display:grid;grid-template-columns:5.5em 1fr auto;gap:4px 12px;align-items:baseline;padding:12px 14px;color:var(--ink);text-decoration:none;border-top:1px solid var(--line-2)}
+.diary-item:first-child{border-top:0}.diary-item:hover{background:var(--bg)}
+.diary-item .d{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.diary-item .t{display:flex;flex-direction:column;gap:2px;min-width:0}.diary-item .q{font-size:13px;color:var(--muted)}
+.diary-item .tags,.diary .tags{display:flex;flex-wrap:wrap;gap:4px}
+@media (max-width:560px){.diary-item{grid-template-columns:1fr}.diary-item .tags{display:none}}
+.diary{max-width:36em;margin:8px auto 24px;font-size:17px;line-height:2}
+.diary-day{font-size:13px;color:var(--muted);letter-spacing:.05em}
+.diary h2{margin:4px 0 18px;font-size:24px;line-height:1.4}
+.diary blockquote{margin:0 0 22px;padding:2px 0 2px 14px;border-left:3px solid var(--brand);color:var(--muted)}
+.diary p{margin:0 0 1.1em}
+.diary footer{margin-top:26px;padding-top:12px;border-top:1px solid var(--line);font-size:14px;line-height:1.7;color:var(--muted)}
+.diary .tags{margin-top:10px}
+.diary-acts,.diary-nav{max-width:36em;margin:0 auto 14px}.diary-nav{display:flex;justify-content:space-between;gap:12px}
+.diary-edit label{display:block;margin:0 0 12px;font-size:14px;color:var(--muted)}.diary-edit input,.diary-edit textarea{display:block;width:100%;margin-top:4px;font-size:16px;line-height:1.8}
