@@ -195,15 +195,25 @@ function renderItem(box, item, opts) {
   const took = () => Date.now() - t0 - (Away.now() - a0);
   $$('.opt', box).forEach(b => b.onclick = () => { $$('.opt', box).forEach(x => x.classList.remove('sel')); b.classList.add('sel'); chosen = b.dataset.i; });
   const hb = $('.hintbtn', box);
-  if (hb) hb.onclick = () => { $('.hintbox', box).innerHTML = `<div class="hint" style="margin-top:8px">💡 ${esc(item.hint)}</div>`; hb.remove(); };
+  let hinted = false;
+  if (hb) hb.onclick = () => { hinted = true; $('.hintbox', box).innerHTML = `<div class="hint" style="margin-top:8px">💡 ${esc(item.hint)}</div>`; hb.remove(); };
   const dk = $('.dkbtn', box);
   if (dk) dk.onclick = async () => {
+    // 「还不会」分三级（opts.ladder，docs/DESIGN.md 5.46）：先点一下路子 → 还不会就一步一步一起做这道 → 趁热试一道一样的
+    const nudge = opts.ladder && !hinted && (item.hint || item.nudge);
+    if (nudge) {
+      hinted = true; if (hb) hb.remove();
+      $('.hintbox', box).innerHTML = `<div class="hint help1" style="margin-top:8px">💡 ${isSimple() ? '先给你一点提示' : '先给你一点提示，再想一想'}：${esc(nudge)}</div>`;
+      dk.textContent = '🤔 还是不会';
+      return;
+    }
     dk.disabled = true;
     try {
       const res = await opts.dontKnow();
       if (!res) return;  // 返回空：页面自己接着走（小测直接下一题），这里不再显示讲解
       $$('.opt', box).forEach(b => b.disabled = true);
       $$('.submit,.hintbtn,.dkbtn', box).forEach(b => b.remove());
+      if (opts.ladder) return walkThrough(box, item, res, opts);
       $('.fbbox', box).innerHTML = feedback(res, {choice: W === 'choice'});
       opts.onDone && opts.onDone(res);
     } catch (e) { dk.disabled = false; $('.fbbox', box).innerHTML = `<div class="err">${esc(e.message)}</div>`; }
@@ -244,6 +254,47 @@ function renderItem(box, item, opts) {
     } catch (e) { if (wait) wait.fail(); else btn.disabled = false; $('.fbbox', box).innerHTML = `<div class="err">${esc(e.message)}</div>`; }
   };
   Focus.onRender(box, item);
+}
+/* 「还不会」的第二、三级：解析拆成几小步，看懂一步点下一步，最后是答案；再趁热试一道一样的（/api/twin，
+   同一个骨架换了数字和情境）。一道「一样的」在看讲解的工夫就去取了，点按钮时多半已经备好 */
+function walkThrough(box, item, res, opts) {
+  const kp = item.kp_id || '', steps = res.steps || [];
+  const twinP = kp ? api(`/api/twin?item_id=${encodeURIComponent(item.item_id || item.id)}&kp_id=${encodeURIComponent(kp)}`).catch(() => ({})) : null;
+  const fb = $('.fbbox', box);
+  fb.innerHTML = `<div class="fb dk pop help2"><div class="fb-v">${isSimple() ? '📌 没关系，我们一起做一遍：' : '📌 没关系，我们一步一步把这道做出来：'}</div>` +
+    `<ol class="help-steps"></ol><div class="help-ctl"></div></div>`;
+  const ol = $('.help-steps', fb), ctl = $('.help-ctl', fb);
+  let i = 0;
+  const end = () => {
+    ctl.innerHTML = qAns({answer: res.answer, points: res.points, transcript: res.transcript}) +
+      `<div class="fb-note">${isSimple() ? '📒 记下了，明天换一道新题再来' : '已放进错题本：明天换一道新题来考你，不再做这道原题。'}</div>`;
+    if (twinP) {
+      const tb = document.createElement('div'); tb.className = 'help3';
+      tb.innerHTML = `<button type="button" class="btn soft">🔁 ${isSimple() ? '试一道一样的' : '趁热试一道一样的'}</button>`;
+      ctl.appendChild(tb);
+      $('button', tb).onclick = async () => {
+        $('button', tb).disabled = true;
+        const r = await twinP;
+        if (!r || !r.item) { tb.innerHTML = `<div class="small muted">这会儿没找到一样的题，明天会换一道新题来考你。</div>`; return; }
+        tb.innerHTML = `<div class="small help3-h">🔁 一样的路子，换一道：</div><div class="help3-q"></div>`;
+        renderItem($('.help3-q', tb), r.item, {
+          submit: (answer, self, ms) => api('/api/answer', {item_id: r.item.id, kp_id: r.item.kp_id || kp, mode: 'helped', answer, self, ms}),
+          onDone: r2 => {
+            if (r2.reveal) return;
+            $('.help3-q', tb).insertAdjacentHTML('beforeend', `<div class="small" style="margin-top:6px">${r2.correct ? '👍 这下有路了！明天换一道新题，看看还记不记得。' : '没关系，今天先到这儿，明天换一道题再来。'}</div>`);
+          }
+        });
+      };
+    }
+    opts.onDone && opts.onDone(res);
+  };
+  const next = () => {
+    ol.insertAdjacentHTML('beforeend', `<li>${esc(steps[i]).replace(/\n/g, '<br>')}</li>`); i++;
+    if (i >= steps.length) return end();
+    ctl.innerHTML = `<button type="button" class="btn sm">看懂了，下一步 →</button>`;
+    $('.btn', ctl).onclick = next;
+  };
+  if (steps.length) next(); else end();
 }
 /* 开放题的一轮 AI 点评（app/coach.py）。追问没结束时只说想到了哪些、还差几点，不给答案；
    学员回答追问，再点评一轮；结束时逐条对照要点，再给参考思路 */

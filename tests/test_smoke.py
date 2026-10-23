@@ -97,7 +97,8 @@ def test_full_flow(monkeypatch):
         assert due
         assert "box" in c.post(f"/api/review/{due[0]['id']}", json={"grade": "good"}).json()
 
-        # 错题重做：原题原样（带选项），系统判对错；隔天连续做对 2 次 → 换变式题，做对才过关
+        # 错题重做：原题只再做一次（带选项、标出上次选的），之后换变式题；不同的日子做对 2 道变式题过关，
+        # 过关 3 周后用一道新的变式题回头看（docs/DESIGN.md 5.46）
         from app import bank, recall
         kid_a = db.one("SELECT id FROM users WHERE email='a@x.com'")["id"]
         it = next(i for i in engine.items_for(kid_a, "MATH-PRE-UNIT", n=5) if i["type"] in ("mcq", "fill", "num"))
@@ -108,37 +109,52 @@ def test_full_flow(monkeypatch):
                               due=db.today())
         card = next(x for x in c.get("/api/review/due?group=mistakes").json()["cards"] if x["id"] == cid)
         assert card["quiz"]["mode"] == "item" and "answer" not in card["quiz"]["item"] and card["quiz"]["last"] == "1"
+        assert not card["quiz"]["variant"] and card["quiz"]["item"]["id"] == it["id"]  # 第一次：原题改一改
         if it["type"] == "mcq":
             assert card["quiz"]["item"]["options"]
         res = c.post(f"/api/review/{cid}/answer", json={"item_id": it["id"], "answer": "zzz-wrong"}).json()
         assert res["correct"] is False and res["next"] == "tomorrow"
         assert db.one("SELECT due FROM cards WHERE id=?", cid)["due"] > db.today().isoformat()  # 错了明天再做
         assert c.post(f"/api/review/{cid}/answer", json={"item_id": "nope", "answer": "1"}).status_code == 400
-        db.run("UPDATE cards SET due=? WHERE id=?", db.today().isoformat(), cid)
-        res = c.post(f"/api/review/{cid}/answer", json={"item_id": it["id"], "answer": right(it)}).json()
-        assert res["correct"] and res["streak"] == 1
-        res = c.post(f"/api/review/{cid}/answer", json={"item_id": it["id"], "answer": right(it)}).json()
+        group = recall._group_ids(it["id"])
+
+        def variant():
+            db.run("UPDATE cards SET due=? WHERE id=?", db.today().isoformat(), cid)
+            q = recall.quiz(kid_a, db.one("SELECT * FROM cards WHERE id=?", cid))
+            if q["mode"] == "later":   # 变式题还没备好：后台备（测试里直接备）
+                recall._ensure_variant(kid_a, db.one("SELECT * FROM cards WHERE id=?", cid))
+                q = recall.quiz(kid_a, db.one("SELECT * FROM cards WHERE id=?", cid))
+            assert q["mode"] == "item" and q["variant"] and q["item"]["id"] not in group, q  # 原题改过了：以后都是新题
+            v = bank.row_to_item(db.one("SELECT * FROM items WHERE id=?", q["item"]["id"]))
+            return v, ({"item_id": v["id"], "self": "ok"} if v["type"] == "short" else {"item_id": v["id"], "answer": right(v)})
+        v, body = variant()
+        res = c.post(f"/api/review/{cid}/answer", json=body).json()
+        assert res["correct"] and res["streak"] == 1 and res["need"] == 1, res
+        assert db.one("SELECT due FROM cards WHERE id=?", cid)["due"] == (db.today() + timedelta(days=recall.VARIANT_GAPS[1])).isoformat()
+        v2, body = variant()
+        assert v2["id"] != v["id"]  # 做对过的变式题也不再出
+        res = c.post(f"/api/review/{cid}/answer", json=body).json()
         assert res["streak"] == 1  # 同一天做对两次只算一次
         ex = db.jload(db.one("SELECT extra FROM cards WHERE id=?", cid)["extra"])
         db.run("UPDATE cards SET extra=? WHERE id=?", db.jdump({**ex, "streak_day": "2000-01-01"}), cid)
-        res = c.post(f"/api/review/{cid}/answer", json={"item_id": it["id"], "answer": right(it)}).json()
-        assert res.get("variant_next") or res.get("passed"), res
-        if res.get("variant_next"):
-            db.run("UPDATE cards SET due=? WHERE id=?", db.today().isoformat(), cid)
-            q = recall.quiz(kid_a, db.one("SELECT * FROM cards WHERE id=?", cid))
-            assert q["variant"] and q["item"]["id"] != it["id"]
-            v = bank.row_to_item(db.one("SELECT * FROM items WHERE id=?", q["item"]["id"]))
-            body = {"item_id": v["id"], "self": "ok"} if v["type"] == "short" else {"item_id": v["id"], "answer": right(v)}
-            res = c.post(f"/api/review/{cid}/answer", json=body).json()
-            assert res["passed"], res
-        # 过关：先不移出，3 周后回头做一次原题；还会才真正掌握，不再出现
+        _, body = variant()
+        res = c.post(f"/api/review/{cid}/answer", json=body).json()
+        assert res["passed"], res
+        # 过关：先不移出，3 周后换一道新题回头看；还会才真正掌握，不再出现
         assert db.one("SELECT due FROM cards WHERE id=?", cid)["due"] == (db.today() + timedelta(days=recall.RECHECK_DAYS)).isoformat()
-        db.run("UPDATE cards SET due=? WHERE id=?", db.today().isoformat(), cid)
+        v4, body = variant()
         q = recall.quiz(kid_a, db.one("SELECT * FROM cards WHERE id=?", cid))
-        assert q["recheck"] and q["item"]["id"] == it["id"]  # 回头看做的是原题
-        res = c.post(f"/api/review/{cid}/answer", json={"item_id": it["id"], "answer": right(it)}).json()
+        assert q["recheck"]
+        res = c.post(f"/api/review/{cid}/answer", json=body).json()
         assert res["kept"], res
         assert db.one("SELECT due FROM cards WHERE id=?", cid)["due"] == recall.PASSED_DUE
+
+        # 原题第一次就改对了：隔两天换一道新题来考
+        db.run("DELETE FROM cards WHERE kind='mistake'")
+        cid = engine.add_card(kid_a, "mistake", it["q"], "答案", {"item_id": it["id"], "my_answer": "1"}, "MATH-PRE-UNIT", due=db.today())
+        res = c.post(f"/api/review/{cid}/answer", json={"item_id": it["id"], "answer": right(it)}).json()
+        assert res["variant_next"], res
+        assert db.one("SELECT due FROM cards WHERE id=?", cid)["due"] == (db.today() + timedelta(days=recall.VARIANT_GAPS[0])).isoformat()
 
         # 单词复习：看意思选单词（四选一），系统判对错
         db.run("DELETE FROM cards WHERE user_id=? AND kind='word'", kid_a)

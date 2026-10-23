@@ -1,8 +1,11 @@
 """复习要作答：卡片不再只让孩子自己点「记得 / 模糊」（全靠自觉），而是出成题、由系统判对错。
 
-- 错题（mistake）：原题原样重做，选项齐全。隔天连续做对 2 次 → 换一道同知识点的「变式题」，
-  也做对了才算过关（防止只是背住了这道题的答案）。做错了明天再来。
-  过关以后 RECHECK_DAYS 天再回头做一次原题：还会就真的掌握了（不再出现）；忘了就重新回到错题本里练。
+- 错题（mistake）：做错的原题只再做一次（第二天，选项齐全、标出上次选的），为的是改掉这一个错；
+  之后都换「变式题」——同一个知识点、孩子没做过的题（换情境、换问法，不是换了数字的同一道）：
+  隔 2 天、再隔 4 天各一道，在不同的日子做对 2 道就过关。点了「还不会」的不做原题（答案当时已经看过了），直接从变式题开始。
+  做错了明天再来（换一道新的变式题）。过关以后 RECHECK_DAYS 天再用一道新的变式题回头看：还会就真的掌握了（不再出现）；
+  忘了就重新回到错题本里练。同一道题做对一次证据就拿到了，再做练的是记住答案（docs/DESIGN.md 5.46）。
+  变式题打开错题本时在后台备好（prepare_variants）；还没备好的卡今天先不出（mode=later），下次打开再做。
 - 生词 / 短语 / 术语（word / phrase / term）：单词包里今天的新词第一次出现是一张学习卡（learn：先猜意思 → 揭晓、听读音、看例句），
   不当场考：隔开几个别的词以后再回来认一次（check：听读音、看英文选意思）。马上考只是在考刚才那几秒的印象；
   隔开了还认得出才是真的从记忆里取出来了（docs/DESIGN.md 5.44）。前几次复习按 1/2/4/7 天（YOUNG_STEPS），
@@ -10,7 +13,7 @@
   和「听音写单词」（听写，不给意思）、自己把词拼进句子里轮换着来（app/words.py）；之后交给记忆模型排期。
   要拼的题前几轮用字母块（这个词的字母 + 几个容易混的），再往后自己打，打不出来也能要字母块（_pad）。
   同一个词一次只考一个方向，两个方向分在不同的日子。
-- 知识点卡（kp）：从题库里取一道这个知识点的题来做。
+- 知识点卡（kp）：从题库里取一道这个知识点、孩子没做过的题来做（做对过的题不再出）。
 - 实在出不了题的（意思还没查到的词、老的错题找不到原题、题库里没题的知识点）才退回自评。
 """
 import logging
@@ -23,8 +26,10 @@ from . import bank, db, engine, evidence, itemtypes, llm, words
 from .catalog import catalog
 
 WORD_KINDS = ("word", "phrase", "term")
-PASS_STREAK = 2        # 隔天连续做对几次，换变式题
-PASS_NO_VARIANT = 3    # 找不到变式题时，隔天连续做对几次算过关
+PASS_STREAK = 2        # 变式题在不同的日子做对几道算过关
+PASS_NO_VARIANT = 3    # 出不了变式题时（没有知识点的老错题、没配置 AI）：原题隔天做对几次算过关
+VARIANT_GAPS = (2, 4)  # 原题改对以后隔几天出第一道变式题；变式题做对第 1 道以后隔几天出第 2 道
+LATER_MAX_DAYS = 3     # 变式题一直备不出来（AI 出错）：卡片过期这么多天以后，退回做原题 / 自评，不让它一直挂着
 SPELL_FROM_BOX = 2     # 复习过几轮（box）之后，从四选一升级为拼写
 TYPE_FROM_BOX = 5      # 拼写、听写、拼进句子：这之前用字母块拼（词的字母 + 几个容易混的），之后自己打；打的时候也能要字母块
 DICTATE_FROM_BOX = 3   # 再往后，拼写和听写轮换（box 为奇数时听写）
@@ -56,8 +61,13 @@ def quiz(user_id: int, c) -> dict:
     """一张到期的卡 → 怎么考。返回 {mode: item / choice / spell / dictate / self, ...}，不含答案。"""
     kind, ex = c["kind"], _extra(c)
     if kind == "mistake":
-        variant = bool(ex.get("variant")) and not ex.get("passed")  # 过关后的回头看：做原题
-        it = _item(ex.get("variant") if variant else ex.get("item_id")) or _item(ex.get("item_id"))
+        it, variant = _item(ex.get("item_id")), False
+        if _on_variants(c, ex):
+            v = _variant(user_id, c, ex)
+            if v:
+                it, variant = v, True
+            elif llm.enabled() and not _overdue(c):
+                return {"mode": "later"}   # 变式题后台还在出：今天先做别的，不拿原题凑
         if it:
             return {"mode": "item", "item": {**itemtypes.public(it), "id": it["id"]}, "variant": variant,
                     "recheck": bool(ex.get("passed")), "last": None if variant else ex.get("my_answer"), "streak": ex.get("streak", 0)}
@@ -69,15 +79,28 @@ def quiz(user_id: int, c) -> dict:
         it = _kp_item(user_id, c["kp_id"])
         if it:
             return {"mode": "item", "item": {**itemtypes.public(it), "id": it["id"]}}
+        if llm.enabled() and not _overdue(c) and catalog.kp(c["kp_id"]):
+            return {"mode": "later"}   # 这个点的题都做对过了：后台出新题，下次再考
     return {"mode": "self"}
 
 
+def _overdue(c) -> bool:
+    return (c["due"] or "") < (db.today() - timedelta(days=LATER_MAX_DAYS)).isoformat()
+
+
+def _judged(r) -> bool:
+    return r["type"] in itemtypes.TYPES and itemtypes.of(r["type"]).judge != "open"
+
+
 def _kp_item(user_id: int, kp_id: str) -> dict | None:
-    """知识点卡：题库里这个知识点的题，没做过的优先，做错过的其次（不现场让 AI 出题，复习要快）。"""
-    rows = [r for r in bank.candidates(user_id, kp_id) if r["type"] in itemtypes.TYPES and itemtypes.of(r["type"]).judge != "open"]
+    """知识点卡：题库里这个知识点孩子没做过的题，其次是做错过、还没做对的（不现场让 AI 出题，复习要快；
+    缺题由 prepare_variants 在后台出）。做对过的题不再出；没配置 AI 的部署出不了新题，才拿它们来用。"""
+    rows = [r for r in bank.candidates(user_id, kp_id) if _judged(r)]
+    if llm.enabled():
+        rows = [r for r in rows if not bank.retired(r)]
     if not rows:
         return None
-    rows.sort(key=lambda r: (r["done"] > 0 and r["ok"] > 0, r["done"] > 0, random.random()))
+    rows.sort(key=lambda r: (bank.retired(r), r["done"] > 0 or bool(r["gdone"]), random.random()))
     return bank.row_to_item(rows[0])
 
 
@@ -185,22 +208,10 @@ def _word_quiz(user_id: int, c, plain: bool = False) -> dict | None:
 # ------------------------------------------------------------------ 判对错、排期
 
 def answer(user_id: int, card_id: int, body: dict) -> dict:
-    # A variant may be needed after this answer. It is normally prepared in the background when the
-    # card is shown (prepare_variants); only fall back to preparing it here, outside the learner
-    # transaction, when that did not happen. Network latency must not hold the learner lock.
     card = db.one("SELECT * FROM cards WHERE id=? AND user_id=?", card_id, user_id)
     item = _item(body.get("item_id")) if card and card["kind"] == "mistake" else None
-    if item and itemtypes.of(item).judge == "open" and item["id"] in (_extra(card).get("item_id"), _extra(card).get("variant")):
+    if item and itemtypes.of(item).judge == "open" and item["id"] == _extra(card).get("item_id"):
         return _discuss_card(user_id, card, item, body)
-    if card and _wants_variant(card) and not body.get("dont_know"):
-        item = _item(body.get("item_id"))
-        if (item and item["id"] == _extra(card).get("item_id")
-                and (body.get("self") == "ok" if itemtypes.of(item).self_rated else itemtypes.check(item, body.get("answer")))):
-            t = _prep.get(card_id)
-            if t:
-                t.join(timeout=90)  # 后台还在出题：等它，不重复出
-            else:
-                _ensure_variant(user_id, card)
     return _answer_command(user_id, card_id, body)
 
 
@@ -222,24 +233,38 @@ _prep: dict[int, threading.Thread] = {}
 _prep_lock = threading.Lock()
 
 
-def _wants_variant(c) -> bool:
-    """这张错题卡再做对一次就要换变式题了。"""
-    if c["kind"] != "mistake" or not c["kp_id"]:
+def _on_variants(c, ex: dict) -> bool:
+    """这张错题卡现在该做变式题了：原题已经改过一次，或者当时点的是「还不会」，或者是过关后的回头看。
+    没挂知识点的老错题出不了变式题，一直做原题。"""
+    if not c["kp_id"] or not catalog.kp(c["kp_id"]):
         return False
-    ex = _extra(c)
-    return not ex.get("passed") and not ex.get("variant") and ex.get("streak", 0) >= PASS_STREAK - 1
+    return bool(ex.get("fixed") or ex.get("dont_know") or ex.get("my_answer") == DONT_KNOW or ex.get("passed"))
+
+
+DONT_KNOW = "（还不会）"   # engine.record_attempt 记在错题卡上的「上次的答案」
+
+
+def _needs_item(user_id: int, c) -> bool:
+    """这张卡（这次或下次）要出的题，题库里还没有：错题卡缺变式题（还在改原题的也先备上，下次就要用），
+    知识点卡缺没做过的题。"""
+    if c["kind"] == "mistake":
+        return bool(c["kp_id"]) and bool(catalog.kp(c["kp_id"])) and _variant(user_id, c, _extra(c)) is None
+    return c["kind"] == "kp" and bool(c["kp_id"]) and bool(catalog.kp(c["kp_id"])) and _kp_item(user_id, c["kp_id"]) is None
 
 
 def _ensure_variant(user_id: int, c) -> None:
-    """题库里还没有能当变式题的，才请 AI 出题（存进题库，以后复用）。已经有了就什么都不做。"""
-    if _variant(user_id, c, _extra(c)) is None and llm.enabled():
-        engine.items_for(user_id, c["kp_id"], n=3)
+    """题库里还没有能出的题，才请 AI 出题（存进题库，以后别的孩子也能用）。已经有了就什么都不做。
+    原题那一组（换了数字的同一道）不算，出的题要换个样子。"""
+    if not llm.enabled() or not _needs_item(user_id, c):
+        return
+    group = _group_ids(_extra(c).get("item_id")) if c["kind"] == "mistake" else set()
+    engine.items_for(user_id, c["kp_id"], n=1, purpose="diagnose", exclude=group)
 
 
 def prepare_variants(user_id: int, cards) -> None:
-    """打开错题重做时，后台为快要换变式题的卡把题准备好：孩子提交答案时不用再等 AI 现场出题。"""
+    """打开错题重做、复习时，后台为要换新题的卡把题准备好：孩子做到这张卡时不用等 AI 现场出题。"""
     for c in cards:
-        if not _wants_variant(c) or _variant(user_id, c, _extra(c)) is not None or not llm.enabled():
+        if not llm.enabled() or not _needs_item(user_id, c):
             continue
         with _prep_lock:
             if c["id"] in _prep:
@@ -272,12 +297,14 @@ def _answer_command(user_id: int, card_id: int, body: dict) -> dict:
     if not item:
         return {"error": "没有这道题"}
     ex = _extra(c)
-    if c["kind"] == "mistake":
-        if item["id"] not in (ex.get("item_id"), ex.get("variant")):
-            return {"error": "这道题不是这张卡的"}
-    elif c["kind"] != "kp" or item["id"] not in {r["id"] for r in bank.candidates(user_id, c["kp_id"])}:
+    # 错题卡：原题，或者这个知识点的任何一道题（变式题是出卡时现挑的）；知识点卡：这个知识点的题
+    if c["kind"] == "mistake" and item["id"] == ex.get("item_id"):
+        pass
+    elif not c["kp_id"] or c["kind"] not in ("mistake", "kp") or item["id"] not in {r["id"] for r in bank.candidates(user_id, c["kp_id"])}:
         return {"error": "这道题不是这张卡的"}
     reveal = {**itemtypes.reveal(item), "redo": True}  # 前端：不再显示「已放进错题本」
+    if body.get("dont_know"):
+        reveal["steps"] = itemtypes.walk(item)   # 「还不会」：一步一步一起做这道（app.js walkThrough）
     dk = bool(body.get("dont_know"))
     if dk:
         correct = False
@@ -300,6 +327,7 @@ def _answer_command(user_id: int, card_id: int, body: dict) -> dict:
 
 def _after_mistake(user_id: int, c, ex: dict, item: dict, correct: bool, fmt: str) -> dict:
     today = db.today().isoformat()
+    original = item["id"] == ex.get("item_id")
     if ex.get("passed"):  # 过关后的回头看
         if correct:
             ex["kept"] = today
@@ -307,27 +335,26 @@ def _after_mistake(user_id: int, c, ex: dict, item: dict, correct: bool, fmt: st
             return {"passed": True, "kept": True}
         ex.pop("passed", None)
         ex.pop("kept", None)
-    on_variant = item["id"] == ex.get("variant")
+    variants = _on_variants(c, ex)
+    if original and not variants and c["kp_id"] and catalog.kp(c["kp_id"]):
+        ex["fixed"] = today   # 原题改过一次了：以后都换变式题
+    ex.pop("variant", None)   # 以前的版本记过「定好的那道变式题」，现在每次现挑
     if not correct:
         ex.update(streak=0, streak_day="")
-        ex.pop("variant", None)  # 变式题做错了：说明还没真懂，回到原题重新来
         engine.schedule_card(user_id, c, "again", due=db.today() + timedelta(days=1), extra=ex, fmt=fmt)
         return {"next": "tomorrow"}
+    if not variants and ex.get("fixed") == today:   # 原题改对了：隔两天换一道新题来考
+        engine.schedule_card(user_id, c, "good", due=db.today() + timedelta(days=VARIANT_GAPS[0]), extra=ex, fmt=fmt)
+        return {"variant_next": True, "streak": 0}
     if ex.get("streak_day") != today:  # 同一天做对两次只算一次
         ex["streak"] = ex.get("streak", 0) + 1
         ex["streak_day"] = today
-    if on_variant:
+    need = (PASS_STREAK if variants else PASS_NO_VARIANT) - ex["streak"]
+    if need <= 0:
         return _pass(user_id, c, ex, today, fmt)
-    if ex["streak"] >= PASS_STREAK:
-        v = _variant(user_id, c, ex)
-        if v:
-            ex["variant"] = v["id"]
-            engine.schedule_card(user_id, c, "good", extra=ex, fmt=fmt)
-            return {"variant_next": True, "streak": ex["streak"]}
-        if ex["streak"] >= PASS_NO_VARIANT:
-            return _pass(user_id, c, ex, today, fmt)
-    engine.schedule_card(user_id, c, "good", extra=ex, fmt=fmt)
-    return {"streak": ex["streak"], "need": (PASS_STREAK if c["kp_id"] else PASS_NO_VARIANT) - ex["streak"]}
+    engine.schedule_card(user_id, c, "good", due=db.today() + timedelta(days=VARIANT_GAPS[min(ex["streak"], len(VARIANT_GAPS) - 1)]),
+                         extra=ex, fmt=fmt)
+    return {"streak": ex["streak"], "need": need}
 
 
 def _pass(user_id: int, c, ex: dict, today: str, fmt: str) -> dict:
@@ -338,20 +365,28 @@ def _pass(user_id: int, c, ex: dict, today: str, fmt: str) -> dict:
     return {"passed": True, "recheck_on": due.isoformat()}
 
 
+def _group_ids(item_id) -> set:
+    """一道题和它同一组（换了数字的同一道题）的所有题。"""
+    r = db.one("SELECT near_key FROM items WHERE id=?", item_id) if item_id else None
+    if not r:
+        return {item_id} if item_id else set()
+    return {item_id} | ({x["id"] for x in db.q("SELECT id FROM items WHERE near_key=?", r["near_key"])} if r["near_key"] else set())
+
+
 def _variant(user_id: int, c, ex: dict) -> dict | None:
-    """同一知识点的另一道题（不是原题、不是同一组换数字的题）：仅从已准备好的题库选择，AI 准备在事务外完成。"""
+    """同一知识点的另一道题，换个样子考：不是原题、不是同一组换数字的题、这个孩子没做对过的；没做过的优先，
+    和原题题型不一样的优先。仅从已准备好的题库选择，AI 准备在事务外完成（prepare_variants）。"""
     if not c["kp_id"] or not catalog.kp(c["kp_id"]):
         return None
     orig = _item(ex.get("item_id")) or {}
-    near = db.one("SELECT near_key FROM items WHERE id=?", orig.get("id")) if orig else None
-    for candidate in bank.candidates(user_id, c["kp_id"]):
-        if itemtypes.of(candidate["type"]).judge == "open":  # 复习要判对错，思辨题另有「换条件再想」（app/discuss.py）
-            continue
-        it = bank.row_to_item(candidate)
-        r = db.one("SELECT near_key FROM items WHERE id=?", it["id"])
-        if it["id"] != orig.get("id") and not (near and near["near_key"] and r and r["near_key"] == near["near_key"]):
-            return it
-    return None
+    group = _group_ids(orig.get("id"))
+    fmt0 = itemtypes.fmt(orig["type"]) if orig.get("type") in itemtypes.TYPES else ""
+    rows = [r for r in bank.candidates(user_id, c["kp_id"]) if r["id"] not in group and _judged(r) and not bank.retired(r)]
+    if not rows:
+        return None
+    # 复习要判对错：思辨题另有「换条件再想」（app/discuss.py）
+    rows.sort(key=lambda r: (r["done"] > 0 or bool(r["gdone"]), itemtypes.fmt(r["type"]) == fmt0, r["other"] or 0, r["id"]))
+    return bank.row_to_item(rows[0])
 
 
 # 复习页的题型 → 单词等级里的哪一级（app/words.py 的 TIERS）

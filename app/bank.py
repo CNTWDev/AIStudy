@@ -11,7 +11,7 @@ import json
 import re
 import uuid
 
-from . import db, llm
+from . import db, itemtypes, llm
 from .catalog import catalog
 
 FLAG_REASONS = {"wrong": "答案好像不对", "unclear": "题目有错或看不懂", "offtopic": "和这个知识点没关系"}
@@ -125,13 +125,24 @@ def candidates(user_id: int, kp_id: str) -> list:
         "(SELECT COUNT(*) FROM attempts a WHERE a.item_id=i.id AND a.user_id=? AND a.correct=1) AS ok, "
         # 同型组里做过几次（换了数字的同一道题算做过）
         "(SELECT COUNT(*) FROM attempts a JOIN items j ON j.id=a.item_id WHERE a.user_id=? AND j.near_key=i.near_key) AS gdone, "
+        # 同型组里做对过几次：做对过的组对这个孩子退役（engine.items_for）
+        "(SELECT COUNT(*) FROM attempts a JOIN items j ON j.id=a.item_id WHERE a.user_id=? AND j.near_key=i.near_key AND a.correct=1) AS gok, "
         "(SELECT MIN(CASE WHEN x.kp_id=? THEN 0 ELSE 1 END) FROM item_kps x WHERE x.item_id=i.id AND x.kp_id IN (" + marks + ")) AS other "
         "FROM items i WHERE i.status='active' "
         "AND i.id IN (SELECT item_id FROM item_kps WHERE kp_id IN (" + marks + ")) "
         "AND i.id NOT IN (SELECT target_id FROM flags WHERE user_id=? AND target='item') "
         # 试卷原题来自某个孩子的卷子，只给这个孩子自己用
         "AND (i.source<>'paper' OR i.id IN (SELECT pi.item_id FROM paper_items pi JOIN papers p ON p.id=pi.paper_id WHERE p.user_id=?))",
-        user_id, user_id, user_id, user_id, kp_id, *kps, *kps, user_id, user_id)
+        user_id, user_id, user_id, user_id, user_id, kp_id, *kps, *kps, user_id, user_id)
+
+
+def retired(r) -> bool:
+    """这道题对这个孩子用完了（candidates 的一行）：做对过，或者同型组（换了数字的同一道题）里做对过，
+    或者是想完了的思辨题（之后换条件再想由 app/discuss.py 排期）。用完的题哪里都不再出：
+    做对一次证据就拿到了，再做同一道题练的是记住答案，不是方法（docs/DESIGN.md 5.46）。"""
+    if r["ok"] or r["gok"]:
+        return True
+    return bool(r["done"]) and itemtypes.of(r["type"]).judge == "open"
 
 
 def flagged_by(user_id: int) -> set:

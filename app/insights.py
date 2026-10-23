@@ -14,6 +14,7 @@ from . import db, engine, evidence
 from .catalog import catalog
 
 WINDOW_DAYS = 14
+DONT_KNOW_DAYS = 7   # 这么多天里同一个点点了两次「还不会」，就改排学这一课
 
 
 def _since(days: int) -> str:
@@ -62,12 +63,15 @@ def _detect(user_id: int, paused: engine.Paused) -> list[dict]:
         if sum(1 for x in out if x["kind"] == "root") >= 3:
             break
 
-    # 2. 反复点「这道题还不会」
-    dk = Counter(a["kp_id"] for a in att if a["dont_know"])
+    # 2. 一周里同一个点点了两次「这道题还不会」：不是题的问题，是这一课没学过或没学懂。
+    #    再出题没用，先把这一课从头学一遍（为什么学 → 看懂 → 方法和例题 → 练题），再做新题
+    week = _since(DONT_KNOW_DAYS)
+    dk = Counter(a["kp_id"] for a in att if a["dont_know"] and a["created_at"] >= week)
     for k, n in dk.most_common(3):
         if n >= 2 and catalog.kp(k):
-            out.append({"kind": "dont_know", "key": k, "kp_id": k, "severity": 2, "action": "weak", "for_kid": 1,
-                        "title": f"「{_name(k)}」还没想通", "detail": f"最近点了 {n} 次「还不会」，换个讲法再学一遍"})
+            out.append({"kind": "dont_know", "key": k, "kp_id": k, "severity": 3, "action": "weak", "for_kid": 1,
+                        "task_title": f"从头学一遍：{_name(k)}",
+                        "title": f"「{_name(k)}」还没想通", "detail": f"这周点了 {n} 次「还不会」，先把这一课从头学一遍，再做新题"})
 
     # 3. 同一个知识点问了好几次
     for r in db.q("SELECT kp_id, COUNT(*) AS n FROM ask_threads WHERE user_id=? AND created_at>=? AND kp_id IS NOT NULL "
@@ -212,7 +216,7 @@ def plan_tasks(found: list[dict]) -> dict[str, list[dict]]:
         if not kp or f["action"] not in out or kp["id"] in seen:
             continue
         seen.add(kp["id"])
-        title = {"backfill": "先打基础：", "weak": "再练练：", "check": "还记得吗："}[f["action"]] + kp["name"]
+        title = f.get("task_title") or {"backfill": "先打基础：", "weak": "再练练：", "check": "还记得吗："}[f["action"]] + kp["name"]
         out[f["action"]].append({"type": f["action"], "kp": kp["id"], "title": title, "why": "🔍 " + f["title"],
                                  "minutes": {"backfill": 10, "weak": 12, "check": 6}[f["action"]], "pack": kp["pack"],
                                  "auto": True})

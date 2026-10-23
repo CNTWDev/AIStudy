@@ -9,8 +9,8 @@
 """
 from datetime import timedelta
 
-from . import bankpapers, db, engine, evidence, explore, insights, mix, schoolyear, trace, words
-from .catalog import catalog, stage_rank
+from . import bankpapers, db, engine, evidence, explore, insights, lessons, mix, schoolyear, trace, words
+from .catalog import catalog, is_adult, stage_rank
 
 
 class Ctx:
@@ -347,7 +347,6 @@ def src_mix(c: Ctx) -> list[dict]:
 def src_drill(c: Ctx) -> list[dict]:
     """快练 5 分钟：口算、单词、术语、公式和单位这类短题，限时、连对加倍（冲刺的玩法，见 app/sprint.py）。
     求又快又准：基本功练到不用想。成人学习者不排。"""
-    from .catalog import is_adult
     if is_adult(c.user["grade"]) or not c.enrolls:
         return []
     return [{"type": "drill", "title": "⚡ 快练 5 分钟", "why": "口算、单词、术语这类短题，越快越准越好；连对倍数会越来越高",
@@ -408,6 +407,10 @@ def build_plan(user_id: int) -> list[dict]:
     # 最后一道关：任务指向的知识点学习者必须打得开（和学习页同一条规则 catalog.kp_visible），哪个来源漏了都排不进来
     fixed, flex, tail = ([t for t in ts if not t.get("kp") or catalog.kp_visible(t["kp"], c.user["grade"])]
                          for ts in (fixed, flex, tail))
+    # 成人课：刚学完（或刚回访完）的课隔几天才再排（3 / 7 / 14…天，app/lessons.py），不连着几天同一课
+    if is_adult(c.user["grade"]):
+        rest = lessons.resting(user_id)
+        fixed, flex, tail = ([t for t in ts if t.get("kp") not in rest] for ts in (fixed, flex, tail))
     budget = c.user["daily_minutes"] or 60
     out, used, n_flex = [], sum(t["minutes"] for t in tail), 0
     for part, t in [("fixed", t) for t in fixed] + [("flex", t) for t in flex] + [("tail", t) for t in tail]:
