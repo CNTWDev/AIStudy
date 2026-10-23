@@ -1,11 +1,13 @@
 /* 向下跳：一根柱子上一层层圆盘，← → 转柱子（鼠标、手指左右拖也行），让一直在弹的球从洞里一层层掉下去，躲开红色的刺，最快掉到底。
    关卡（app/arena/games/helix.py）：rows 一层一串 12 个字母，n 普通、g 洞、s 刺、q 题门；spin / blink 是会自己转的层、一闪一闪的刺占多少。
-   题门：球落到这一层上才开门（之前掉不下去），门上按选项个数开 2～4 个洞，洞口立着答案牌；题写在上面。
-     球一直原地弹，不催；第一次掉进哪个洞就是答案（记一次作答）：对了变火球；错了洞口有盖子把球弹回来，那块牌子变灰，再选；
+   题门：球落到这一层上就停住、开门（之前掉不下去），门上按选项个数开 2～4 个洞，洞口立着答案牌；题写在上面。
+     停下来慢慢选，不催：← → 一下换一个答案（转到它的洞上），↓ / 空格 / 回车掉下去；鼠标、手指直接点答案牌也行（转过去就掉）。
+     第一次掉进哪个洞就是答案（记一次作答）：对了变火球；错了洞口有盖子把球弹回来，那块牌子变灰，再选；
      连错两次，对的那个洞亮起来、题上写出答案，照样掉下去过关（不变火球）。想题的前 GATE_FREE 秒不算进用时。
    连穿 3 层不落地也变火球：火球砸得碎下一层（普通格、刺都行，题门砸不碎）。
    掉到刺上倒下：外壳盖上题目，和所有游戏一样答对 1 道就起来（REVIVE_NEED），起来以后刺软一会儿。
-   画面：2.5D 斜着往下看，圆盘是椭圆，球一直在正前方；镜头只往下走。
+   画面：2.5D 斜着往下看，圆盘是椭圆，球一直在正前方；镜头只往下走，球在上面三分之一，下面两层整层看得见；
+     球正下方有个落点影子（跳过对着洞的层，画在真正会落到的那一层上），落到刺上就变红，来得及转开。
    几个人一起（最多 4 个）：同一座塔各跳各的（转动、题都是自己的），每隔一会儿告诉大家我掉到第几层（hx），
    右边的深度条上画出每个人；到底了告诉大家我的用时（hx done），谁先到底谁第一，在终点看着大家、发表情加油；
    大家都到底了由开房间的人报过关（用时取最后一个人的，题门一次答对的加起来）。 */
@@ -17,11 +19,12 @@
   const BR = 0.13;                                             // 球的半径（层间距的几分之一）
   const FIRE_AT = 3, GATE_FREE = 8, SAFE_S = 1.5;
   const ROLE_COLOR = {sun: '#ffc93c', berry: '#ff5d7a', mint: '#3fbf8f', sky: '#4d96ff'};   // 球的颜色跟角色走（helix.py roles），几个人一起分得清
-  const SPIN = 4.2, SPIN_ACC = 22;                             // 按住键转多快（弧度 / 秒）、多快转到最快
+  const SPIN = 4.2, SPIN_MAX = 7.5, SPIN_ACC = 40;             // 按住键转多快（弧度 / 秒）：点一下转得准，按住半秒越转越快
 
   let sh = null, stage = null, ctx = null, c = null, hud = null;
   const fx = new Play.FX();
   let S = null, clock = 0, drag = null, shift = false, hudEl = null;
+  const touchy = matchMedia('(pointer: coarse)').matches;
   let mates = {}, sendT = 0;   // 一起玩的人：id → {name, role, next, done: {secs, ok}}
 
   // ------------------------------------------------------------ 关卡 → 一层层圆盘（自己转的层、闪的刺、蜂蜜按种子摆，每次一样）
@@ -42,7 +45,7 @@
 
   function fresh(lv, avatar) {
     lv = lv || DEMO;
-    return {mode: 'preview', lv, rows: build(lv), avatar: avatar || 'mint', rot: 0, w: 0, snap: null,
+    return {mode: 'preview', lv, rows: build(lv), avatar: avatar || 'mint', rot: 0, w: 0, hold: 0, snap: null, dropAfter: false,
             y: 0.45, vy: 0, next: 0, cam: -0.2, streak: 0, fire: false, safe: 0, squash: 0,
             honey: 0, gatesOk: 0, gatesDone: 0, free: 0, falls: 0, limit: 600, winT: 0, sent: false, flags: 0, ghostTold: false};
   }
@@ -52,6 +55,7 @@
   const cellAt = (row, a) => Math.floor(mod(a - S.rot - row.ang, Math.PI * 2) / SEC) % N;   // 角度 a 上是第几格
   const ballCell = row => cellAt(row, BALL_A);
   const spikeOut = row => !row.blink || mod(clock + row.phase, 2.8) < 1.6;
+  const openOpt = (q, o) => q.armed && o >= 0 && !q.tried.has(o) && (!q.done || o === q.right);   // 这个答案的洞还能掉进去
 
   // ------------------------------------------------------------ 题门：落到这一层上才开门；门上开几个洞看选项有几个
   async function loadGate(row) {
@@ -91,7 +95,7 @@
       pass(row);
     } else {
       g.tried.add(j); Play.sfx.play('wrong'); fx.shake(4, 0.2);
-      sh.toast('不是它，再转一转找找', 'warn');
+      sh.toast('不是它，再选一个', 'warn');
       bounce(row);
     }
     buildQ();
@@ -99,16 +103,51 @@
   function wrongAgain(row, j) {   // 已经知道对的是哪个了（第一次答错时服务器告诉的）：再错一次就亮出来
     const g = row.q;
     g.tried.add(j); Play.sfx.play('pop');
-    if (g.tried.size >= 2) { g.done = true; sh.toast('对的洞亮起来了，看看答案再掉下去', 'warn'); }
-    else sh.toast('还不是它，再找找', 'warn');
+    if (g.tried.size >= 2) { g.done = true; sh.toast('对的答案亮起来了，看看再掉下去', 'warn'); }
+    else sh.toast('还不是它，再选一个', 'warn');
     bounce(row); buildQ();
+  }
+  function rest(row) {   // 落到题门上：球停住不弹了，开门，慢慢选
+    if (!row.q) loadGate(row);
+    S.mode = 'gate'; S.y = row.i + 1 - BR; S.vy = 0; S.squash = 1; S.streak = 0; S.w = 0;
+    if (!row.q.armed) { row.q.armed = true; if (row.q.item && row.q.item.say && typeof Speak !== 'undefined') Speak.play(row.q.item.say, 'en', 'word'); buildQ(); }
+    Play.sfx.play('click');
+  }
+  function aimAt(row, o) {   // 把第 o 个答案的洞（两格宽）转到球下面，就近转
+    const j0 = [...Array(N).keys()].find(j => row.q.holeOf[j] === o && row.q.holeOf[mod(j - 1, N)] !== o);
+    if (j0 == null) return;
+    const base = S.snap ?? S.rot, want = BALL_A - row.ang - (j0 + 1) * SEC;
+    S.snap = base + mod(want - base + Math.PI, Math.PI * 2) - Math.PI; S.w = 0;
+    Play.sfx.play('swing');
+  }
+  function aimNearest(row) {   // 拖完松手：转到最近的那个答案
+    const q = row.q; if (!q || !q.item && !q.done) return;
+    let best = -1, d = 9;
+    for (let j = 0; j < N; j++) {
+      const o = q.holeOf[j];
+      if (!openOpt(q, o) || q.holeOf[mod(j - 1, N)] === o) continue;
+      const e = Math.abs(mod(BALL_A - row.ang - (j + 1) * SEC - S.rot + Math.PI, Math.PI * 2) - Math.PI);
+      if (e < d) { d = e; best = o; }
+    }
+    if (best >= 0) aimAt(row, best);
+  }
+  function dropGate() {   // 题门上按 ↓ / 点了答案牌：球下面是哪个答案，就掉进哪个洞
+    const s = S, row = s.rows[s.next], g = row && row.q;
+    s.dropAfter = false;
+    if (!g || !g.item && !g.done) return;   // 题还没来
+    if (s.snap != null) { s.rot = s.snap; s.snap = null; }
+    const opt = g.holeOf[ballCell(row)];
+    if (!openOpt(g, opt)) { Play.sfx.play('pop'); sh.toast(touchy ? '先点一个答案牌' : '先用 ← → 选一个答案', 'warn'); return; }
+    s.mode = 'play'; s.vy = 1.5;
+    if (g.done) return pass(row);
+    if (g.right >= 0) return opt === g.right ? (g.done = true, Play.sfx.play('star'), buildQ(), pass(row)) : wrongAgain(row, opt);
+    choose(row, opt);
   }
 
   // ------------------------------------------------------------ 球
   function bounce(row) {
     S.y = row.i + 1 - BR; S.vy = -BOUNCE; S.squash = 1;
     S.streak = 0;
-    if (row.gate && row.q && !row.q.armed) { row.q.armed = true; if (row.q.item && row.q.item.say && typeof Speak !== 'undefined') Speak.play(row.q.item.say, 'en', 'word'); buildQ(); }
     Play.sfx.play('click');
   }
   function pass(row) {
@@ -129,14 +168,11 @@
   function hit(row) {   // 球的底碰到这一层：看下面是什么
     const j = ballCell(row), ch = row.cells[j];
     if (row.broken) return pass(row);
-    if (row.gate) {
-      const g = row.q, opt = g ? g.holeOf[j] : -1;
+    if (row.gate) {   // 题门：停在门上（选错弹回来也是落回这里），选好了 dropGate 掉下去；看过答案以后正对着对的洞就直接过
+      const g = row.q;
       if (S.fire) { S.fire = false; sh.toast('题门砸不碎，看题吧', 'warn'); }
-      if (!g || !g.armed || !g.item && !g.done || opt < 0) return bounce(row);
-      if (g.done) return opt === g.right ? pass(row) : bounce(row);
-      if (g.tried.has(opt)) return bounce(row);
-      if (g.right >= 0) return opt === g.right ? (g.done = true, Play.sfx.play('star'), buildQ(), pass(row)) : wrongAgain(row, opt);
-      return choose(row, opt);
+      if (g && g.armed && g.done && g.holeOf[j] === g.right) return pass(row);
+      return rest(row);
     }
     if (ch === 'g') return pass(row);
     if (S.fire) return smash(row);
@@ -186,9 +222,8 @@
         s.y = s.rows.length + 1 - BR; s.mode = 'win'; s.vy = 0; buildQ();
         Play.sfx.play('win'); sh.toast('🏁 到底啦！', 'good');
       }
-      const gt = gateHere();
-      if (gt && gt.armed && !gt.done && gt.right < 0 && gt.free < GATE_FREE) { const d = Math.min(dt, GATE_FREE - gt.free); gt.free += d; s.free += d; }
-      if (c && c.elapsed() >= s.limit) { s.mode = 'done'; sh.toast('⏰ 时间到！', 'warn'); setTimeout(() => report('lose'), 900); }
+    } else if (s.mode === 'gate') {
+      s.y = s.next + 1 - BR;
     } else if (s.mode === 'wait') {
       s.y = s.next + 1 - BR + Math.sin(clock * 30) * 0.01;   // 在洞口的盖子上晃，等判分
     } else if (s.mode === 'win') {
@@ -196,7 +231,12 @@
       if (Math.random() < 0.3) fx.burst(Math.random() * stage.W, stage.H * 0.3, {n: 4, shape: 'confetti', speed: 240});
       if (!s.sent && s.winT > 1.4) { s.sent = true; arrived(); }
     }
-    s.cam = Math.max(s.cam, s.cam + (s.y - 0.7 - s.cam) * Math.min(1, dt * 6));   // 镜头只往下走
+    if (s.mode === 'play' || s.mode === 'gate') {
+      const gt = gateHere();
+      if (gt && gt.armed && !gt.done && gt.right < 0 && gt.free < GATE_FREE) { const d = Math.min(dt, GATE_FREE - gt.free); gt.free += d; s.free += d; }
+      if (c && c.elapsed() >= s.limit) { s.mode = 'done'; sh.toast('⏰ 时间到！', 'warn'); setTimeout(() => report('lose'), 900); }
+    }
+    s.cam = Math.max(s.cam, s.cam + (s.y - 0.6 - s.cam) * Math.min(1, dt * 6));   // 镜头只往下走，球在上面三分之一
     if (c && c.net && (sendT -= dt) <= 0 && s.mode !== 'win') { sendT = 0.25; c.net.send({t: 'hx', n: s.next, f: s.fire ? 1 : 0}); }
     hudTick();
   }
@@ -208,23 +248,28 @@
   const gateHere = () => { const r = S.rows[S.next]; return r && r.gate ? r.q : null; };
 
   function turn(dt) {   // 转柱子：按住键越转越快；Shift + 方向 / 滚轮：转到下一个洞（动画）；拖：跟着手指
-    const s = S, inp = Play.input, live = s.mode === 'play' || s.mode === 'wait';
-    if (!live || inp.blocked) { s.w = 0; return; }
-    const l = inp.take('left'), r = inp.take('right');
-    if (shift && (l || r)) snapNext(l ? -1 : 1);
-    const want = shift ? 0 : (inp.keys.left ? 1 : 0) - (inp.keys.right ? 1 : 0);
-    if (want) { s.snap = null; s.w += Math.sign(want - s.w / SPIN) * SPIN_ACC * dt; s.w = Play.clamp(s.w, -SPIN, SPIN); }
-    else s.w *= Math.max(0, 1 - dt * 14);
+    // 题门上（gate）：← → 一下换一个答案，↓ / 空格 / 回车掉下去；点了答案牌就等转到了再掉（dropAfter）
+    const s = S, inp = Play.input, gate = s.mode === 'gate', live = s.mode === 'play' || s.mode === 'wait' || gate;
+    if (!live || inp.blocked) { s.w = 0; s.hold = 0; inp.take('drop'); return; }
+    const l = inp.take('left'), r = inp.take('right'), down = inp.take('drop');
+    if ((shift || gate) && (l || r)) { s.dropAfter = false; snapNext(l ? -1 : 1); }
+    const want = shift || gate ? 0 : (inp.keys.left ? 1 : 0) - (inp.keys.right ? 1 : 0);
+    if (want) {
+      s.snap = null; s.hold += dt;
+      const top = SPIN + (SPIN_MAX - SPIN) * Math.min(1, s.hold / 0.5);
+      s.w = Play.clamp(s.w + Math.sign(want * top - s.w) * SPIN_ACC * dt, -top, top);
+    } else { s.hold = 0; s.w *= Math.max(0, 1 - dt * 14); }
     s.rot += s.w * dt;
     if (s.snap != null) {
       const d = s.snap - s.rot;
-      if (Math.abs(d) < 0.004) { s.rot = s.snap; s.snap = null; } else s.rot += d * Math.min(1, dt * 14);
+      if (Math.abs(d) < 0.004) { s.rot = s.snap; s.snap = null; } else s.rot += d * Math.min(1, dt * 16);
     }
+    if (gate && (down || s.dropAfter && s.snap == null)) dropGate();
   }
   function snapNext(dir) {   // 下面那一层，往 dir 那边第一个能掉下去的洞，转到它正中间
     const s = S, row = s.rows[s.next];
     if (!row) return;
-    const open = j => row.broken || (row.gate ? row.q && row.q.armed && row.q.holeOf[j] >= 0 && !row.q.tried.has(row.q.holeOf[j]) && (!row.q.done || row.q.holeOf[j] === row.q.right) : row.cells[j] === 'g');
+    const open = j => row.broken || (row.gate ? row.q && openOpt(row.q, row.q.holeOf[j]) : row.cells[j] === 'g');
     const base = s.snap ?? s.rot, a = mod(BALL_A - base - row.ang, Math.PI * 2), cur = Math.floor(a / SEC) % N;
     let j = cur;
     while (open(j) && j !== mod(cur - dir * N, N)) { j = mod(j + dir, N); if (j === cur) break; }   // 先离开现在这个洞
@@ -239,10 +284,10 @@
   }
 
   // ------------------------------------------------------------ 画面
-  function geo() {
+  function geo() {   // 层距 PX 小、塔窄一点：球在上面三分之一（镜头 y - 0.6），下面两层整层都在画面里，看得见刺和洞
     const W = stage.W, H = stage.H, side = W >= 640;
-    const R = Math.min(side ? 200 : W * 0.4, H * 0.42), CX = side ? W / 2 - 10 : W / 2 - 6;
-    return {W, H, R, RP: R * 0.2, K: 0.3, CX, PX: H * 0.4, TOP: H * 0.24, TH: Math.max(8, R * 0.08)};
+    const R = Math.min(side ? 170 : W * 0.36, H * 0.28), CX = side ? W / 2 - 10 : W / 2 - 6;
+    return {W, H, R, RP: R * 0.2, K: 0.34, CX, PX: H * 0.24, TOP: H * 0.22, TH: Math.max(7, R * 0.08)};
   }
   const sy = (g, y) => g.TOP + (y - S.cam) * g.PX;
   const P = (g, a, y, r) => [g.CX + r * Math.cos(a), y + r * g.K * Math.sin(a)];
@@ -265,12 +310,13 @@
       ctx.font = `900 ${Math.round(g.R * 0.2)}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = INK; ctx.fillText('🏁 终点', g.CX, fy + 2);
     }
     let ballDrawn = false;
+    const land = s.mode === 'play' ? landRow() : null;
     for (let i = last - 1; i >= first; i--) {
       const row = s.rows[i], y = sy(g, i + 1), above = i > 0 ? sy(g, i) : -40;
       if (!ballDrawn && i < s.next) { ball(g); ballDrawn = true; }   // 球在这一层下面
       if (!row.broken) { half(g, row, y, th, false); }
       pillar(g, Math.min(above, y), y);
-      if (!row.broken) { half(g, row, y, th, true); if (row.gate) labels(g, row, y); }
+      if (!row.broken) { half(g, row, y, th, true); if (row === land) shadow(g, row, y); if (row.gate) labels(g, row, y); }
       if (i === first && first > 0) pillar(g, -40, sy(g, i));
     }
     if (first === 0 && s.rows.length) pillar(g, -40, sy(g, 1));
@@ -282,6 +328,24 @@
     }
     ctx.restore();
     fx.draw(ctx); fx.drawFlash(ctx, g.W, g.H);
+  }
+  function landRow() {   // 球直直往下会落在哪一层：对着洞（或砸碎了）的层跳过去，最多看三层
+    for (let i = S.next; i < Math.min(S.rows.length, S.next + 3); i++) {
+      const row = S.rows[i];
+      if (!row.broken && (row.gate || row.cells[ballCell(row)] !== 'g')) return row;
+    }
+    return null;
+  }
+  function shadow(g, row, y) {   // 落点影子：落到刺上就变成警告（黄圈 + !，一跳一跳）
+    const bad = !row.gate && row.cells[ballCell(row)] === 's' && spikeOut(row) && S.safe <= 0 && !S.fire;
+    const [x, py] = P(g, BALL_A, y, g.R * 0.62), r = ballR(g) * (bad ? 1.25 + Math.sin(clock * 14) * 0.12 : 1.05);
+    ctx.fillStyle = bad ? 'rgba(43,35,64,.55)' : 'rgba(43,35,64,.25)';
+    ctx.beginPath(); ctx.ellipse(x, py, r, r * 0.45, 0, 0, Math.PI * 2); ctx.fill();
+    if (bad) {   // 刺本来就是红的：影子加一圈亮黄、上面一个 !，一眼看得出「要落到刺上了」
+      ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 3.5; ctx.stroke();
+      ctx.font = `900 ${Math.round(r * 1.1)}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.lineWidth = 4; ctx.strokeStyle = INK; ctx.strokeText('!', x, py - r * 0.4); ctx.fillStyle = '#ffd23f'; ctx.fillText('!', x, py - r * 0.4);
+    }
   }
   function pillar(g, y0, y1) {
     if (y1 <= y0) return;
@@ -348,8 +412,9 @@
       if (q) { ctx.font = `900 ${Math.round(g.R * 0.13)}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = INK; ctx.fillText('…', g.CX, y + g.R * g.K * 0.6); }
       return;
     }
-    const a0 = S.rot + row.ang, seen = new Set();
+    const a0 = S.rot + row.ang, seen = new Set(), sel = S.mode === 'gate' && S.rows[S.next] === row ? q.holeOf[ballCell(row)] : -1;
     const items = [];
+    q.rects = [];   // 点答案牌用（画面坐标，后面的先放，点的时候从前面的找起）
     for (let j = 0; j < N; j++) {
       const o = q.holeOf[j]; if (o < 0 || seen.has(o)) continue;
       seen.add(o);
@@ -357,25 +422,28 @@
       items.push({o, a, depth: Math.sin(a)});
     }
     items.sort((p, r) => p.depth - r.depth);
-    for (const {o, a, depth} of items) {
-      const [x, ly] = P(g, a, y, g.R * 0.62), k = (0.78 + 0.22 * (depth + 1) / 2) * g.R / 190;
-      const text = q.item.options[o], tried = q.tried.has(o), right = q.done && o === q.right;
-      ctx.globalAlpha = depth < 0 ? 0.75 : 1;
+    for (const {o, a, depth} of items) {   // 牌子立在洞口外沿：前面的挂在圆盘边下面（球挡不住），后面的立在边上
+      const [x, ry] = P(g, a, y, g.R * 1.08), k = (0.78 + 0.22 * (depth + 1) / 2) * Math.max(0.8, g.R / 150);
+      const text = q.item.options[o], tried = q.tried.has(o), right = q.done && o === q.right, on = o === sel && !tried;
+      ctx.globalAlpha = depth < -0.3 ? 0.8 : 1;
       ctx.font = `900 ${Math.round(24 * k)}px ${FONT}`;
-      const w = Math.max(54 * k, ctx.measureText(text).width + 22 * k), h = 38 * k;
-      ctx.fillStyle = tried ? '#ddd6e8' : right ? '#c9f2d3' : '#fff';
-      Play.roundRect(ctx, x - w / 2, ly - h - 8 * k, w, h, 11 * k); ctx.fill();
-      ctx.strokeStyle = right ? '#2fa84f' : INK; ctx.lineWidth = right ? 4 : 2.5; ctx.stroke();
+      const w = Math.max(54 * k, ctx.measureText(text).width + 22 * k), h = 38 * k, cy = ry + (depth > 0 ? depth * (g.TH + h * 0.6) : depth * h * 0.25);   // 后面的贴着边，不钻到题牌底下
+      const x0 = x - w / 2, y0 = cy - h / 2;
+      ctx.fillStyle = tried ? '#ddd6e8' : right ? '#c9f2d3' : on ? '#fff1b8' : '#fff';
+      Play.roundRect(ctx, x0, y0, w, h, 11 * k); ctx.fill();
+      ctx.strokeStyle = right ? '#2fa84f' : on ? '#ff9f1a' : INK; ctx.lineWidth = right || on ? 4 : 2.5; ctx.stroke();
+      q.rects.push({o, x0, y0, x1: x0 + w, y1: y0 + h});
       ctx.fillStyle = tried ? '#9a90ad' : INK; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(text, x, ly - h / 2 - 7 * k);
-      if (tried) { ctx.strokeStyle = '#e0475b'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x - w / 2 + 6, ly - h - 2 * k); ctx.lineTo(x + w / 2 - 6, ly - 14 * k); ctx.stroke(); }
+      ctx.fillText(text, x, cy + 1);
+      if (tried) { ctx.strokeStyle = '#e0475b'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x0 + 6, y0 + 6); ctx.lineTo(x0 + w - 6, y0 + h - 6); ctx.stroke(); }
       ctx.globalAlpha = 1;
     }
   }
+  const ballR = g => Math.max(BR * g.PX, g.R * 0.1);
   function ball(g) {
-    const s = S, r = BR * g.PX, x = g.CX, y = sy(g, s.y) + g.R * 0.62 * g.K, main = myColor();
+    const s = S, r = ballR(g), x = g.CX, y = sy(g, s.y) + g.R * 0.62 * g.K, main = myColor();
     s.cx = x; s.by = y;
-    const sq = s.squash * 0.28, rx = r * (1 + sq), ry = r * (1 - sq);
+    const sq = s.mode === 'gate' ? 0.05 * Math.sin(clock * 5) : s.squash * 0.28, rx = r * (1 + sq), ry = r * (1 - sq);   // 停在题门上：轻轻喘气
     if (s.vy > 2 || s.fire) {   // 拖尾
       for (let k = 1; k <= 5; k++) { ctx.globalAlpha = 0.12 * (6 - k); ctx.fillStyle = s.fire ? '#ff7a00' : main; ctx.beginPath(); ctx.arc(x, y - k * r * 0.7, r * (1 - k * 0.1), 0, Math.PI * 2); ctx.fill(); }
       ctx.globalAlpha = 1;
@@ -447,7 +515,8 @@
     hud.topic.textContent = it.topic || '题门';
     hud.text.textContent = g.done && g.right >= 0 && g.tried.size ? `${it.q}  →  ${it.options[g.right]}` : it.q;
     hud.say.hidden = !it.say;
-    hud.tip.textContent = !g.armed ? '落到门上，转一转找答案' : g.done ? '对的洞亮了，掉下去吧' : g.tried.size ? '选错的洞盖上了，再找找' : '把对的洞转到球下面，掉进去！';
+    const how = touchy ? '点一下答案牌就掉进去' : '← → 选答案，↓ 或空格掉下去（也能点答案牌）';
+    hud.tip.textContent = !g.armed ? '落到门上就停下来，慢慢想' : g.done ? (touchy ? '对的答案亮了，点它掉下去' : '对的答案亮了，选它掉下去') : g.tried.size ? '选错的盖上了，再选一个' : how;
     hud.q.classList.toggle('long', it.q.length > 24);
   }
   function hudTick() {
@@ -503,17 +572,28 @@
   // ------------------------------------------------------------ 鼠标、手指：左右拖着转（拖多少转多少）；滚轮一格一格转；Shift 键
   function pointerSetup(cv) {
     cv.style.touchAction = 'none';
-    cv.addEventListener('pointerdown', e => { drag = {x: e.clientX}; cv.setPointerCapture && cv.setPointerCapture(e.pointerId); Play.sfx.unlock(); });
+    const live = () => S && !Play.input.blocked && (S.mode === 'play' || S.mode === 'wait' || S.mode === 'gate');
+    cv.addEventListener('pointerdown', e => { drag = {x: e.clientX, x0: e.clientX, y0: e.clientY, moved: false}; cv.setPointerCapture && cv.setPointerCapture(e.pointerId); Play.sfx.unlock(); });
     cv.addEventListener('pointermove', e => {
-      if (!drag || !S || Play.input.blocked || !(S.mode === 'play' || S.mode === 'wait')) { if (drag) drag.x = e.clientX; return; }
+      if (!drag) return;
+      if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > 8) drag.moved = true;
+      if (!live()) { drag.x = e.clientX; return; }
       const r = cv.getBoundingClientRect(), dx = (e.clientX - drag.x) * stage.W / Math.max(1, r.width);
-      drag.x = e.clientX; S.snap = null;
+      drag.x = e.clientX; S.snap = null; S.dropAfter = false;
       S.rot -= dx / (geo().R * 0.62);
     });
-    const up = () => { drag = null; };
-    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    cv.addEventListener('pointerup', e => {   // 题门上：点答案牌 = 转过去掉下去；拖完松手 = 停到最近的答案上
+      const d = drag; drag = null;
+      if (!d || !live() || S.mode !== 'gate') return;
+      const row = S.rows[S.next];
+      if (d.moved) return aimNearest(row);
+      const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) * stage.W / Math.max(1, r.width), y = (e.clientY - r.top) * stage.H / Math.max(1, r.height);
+      const hit = (row.q.rects || []).slice().reverse().find(b => x >= b.x0 - 6 && x <= b.x1 + 6 && y >= b.y0 - 6 && y <= b.y1 + 6);
+      if (hit && openOpt(row.q, hit.o)) { aimAt(row, hit.o); S.dropAfter = true; }
+    });
+    cv.addEventListener('pointercancel', () => { drag = null; });
     cv.addEventListener('wheel', e => {
-      if (!S || !(S.mode === 'play' || S.mode === 'wait') || Play.input.blocked) return;
+      if (!live()) return;
       e.preventDefault();
       S.snap = (S.snap ?? S.rot) + Math.sign(e.deltaY || e.deltaX) * SEC * 0.5;
     }, {passive: false});
@@ -548,9 +628,10 @@
   }
 
   const rules = [
-    '球一直在弹；<b>← →</b> 按住转柱子，<b>鼠标 / 手指左右拖</b>也能转，让洞转到球下面，球就掉下去',
+    '球一直在弹；<b>← →</b> 按住转柱子（按久了越转越快），<b>鼠标 / 手指左右拖</b>也能转，让洞转到球下面，球就掉下去',
+    '球下面的<b>小影子</b>是它要落的地方，影子<b>变红</b>就是要落到刺上了，快转开',
     '<b>红色的刺</b>别碰，碰到就倒下，答对 1 道就起来',
-    '<b>题门</b>：上面写着题，门上每个洞立着一个答案，转到对的洞掉进去就<b>变火球</b>；选错了会弹回来，再找找',
+    '<b>题门</b>：球落到门上就停住，上面写着题，每个洞立着一个答案。<b>← →</b> 一下换一个，<b>↓ / 空格</b>掉下去；也可以直接<b>点答案牌</b>。答对<b>变火球</b>，选错了会弹回来，再选',
     '连穿 3 层不落地也会变<b>火球</b>，火球能砸碎下一层（连刺一起）',
     '最快掉到 <b>🏁 底</b>就赢；想题的前 8 秒不算时间，右边的 👻 是上次的自己',
     '几个人一起：同一座塔各跳各的，右边看得到大家掉到哪了，<b>谁先到底谁第一</b>，大家都到底才过关',
@@ -558,8 +639,8 @@
 
   PlayShell.init({
     quiz: 'revive', tempo: 132, rules, moreHint: '一起比谁先到底',
-    keys: '电脑：← → 或 A D 按住转，Shift + ← → 一下转到下一个洞；鼠标左右拖、滚轮也能转',
-    input: {left: ['ArrowLeft', 'a'], right: ['ArrowRight', 'd']},
+    keys: '电脑：← → 或 A D 按住转（越按越快），Shift + ← → 一下转到下一个洞；题门上 ← → 选答案，↓ / 空格 / 回车掉下去；鼠标拖、滚轮也能转',
+    input: {left: ['ArrowLeft', 'a'], right: ['ArrowRight', 'd'], drop: ['ArrowDown', 's', ' ', 'Enter']},
     revive: {verb: '接着跳', done: '🎉 接着跳！'},
     setup: boot, ready, begin,
     end() { if (S) S.mode = S.mode === 'win' ? 'win' : 'done'; if (hudEl) hudEl.innerHTML = ''; },
