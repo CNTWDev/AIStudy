@@ -72,12 +72,12 @@ const WORD_MODES = ['meaning', 'choice', 'spell', 'dictate', 'cloze', 'cloze_spe
 
 /* 错题重做 / 知识点题：原题原样（选项齐全），系统判对错 */
 function showItem(box, c, q) {
-  const tag = c.kind === 'mistake' ? (q.recheck ? ' · 过关后回头看一眼' : q.variant ? ' · 换一道同类题，做对就过关' : (q.streak ? ` · 已隔天做对 ${q.streak} 次` : '')) : '';
+  const tag = c.kind === 'mistake' ? (q.recheck ? ' · 过关后回头看一眼' : q.variant ? ' · 换一道同类的新题' : ' · 上次做错的原题，改一改') : '';
   box.innerHTML = head(c, tag) + '<div class="qbox" style="text-align:left"></div>';
   const qb = $('.qbox', box), it = q.item;
   renderItem(qb, it, {
     submit: (answer, self, ms, extra, onPart) => post(c, Object.assign({item_id: it.id, answer, self, ms}, extra || {}), onPart),
-    dontKnow: () => post(c, {item_id: it.id, dont_know: true}),
+    dontKnow: () => post(c, {item_id: it.id, dont_know: true}), ladder: true,
     onDone: res => {
       if (res.reveal) return;
       if (res.discuss) { $('.fbbox', qb).insertAdjacentHTML('beforeend', '<div class="small" style="margin-top:6px">这道题没有标准答案，想完就从错题本里拿掉了。</div>'); return nextBtn(box, res, c); }
@@ -92,9 +92,9 @@ function showItem(box, c, q) {
       let note = '';
       if (res.kept) note = '🏅 隔了几周还会，这道题真的掌握了！';
       else if (res.passed) note = '🏅 过关！3 周后再回头看一眼，还会就彻底掌握了。';
-      else if (res.variant_next) note = '👍 隔天连续做对了！下次换一道同类的新题，做对就过关。';
-      else if (res.correct && res.need > 0) note = `再隔天做对 ${res.need} 次就能过关。`;
-      else if (c.kind === 'mistake' && !res.correct) note = '没关系，看懂上面的讲解，明天再做一次。';
+      else if (res.variant_next) note = '👍 改对了！过两天换一道同类的新题来考你。';
+      else if (res.correct && res.need > 0) note = `过几天再换一道新题，做对 ${res.need} 道就能过关。`;
+      else if (c.kind === 'mistake' && !res.correct) note = '没关系，看懂上面的讲解，明天换一道题再试。';
       if (note) $('.fbbox', qb).insertAdjacentHTML('beforeend', `<div class="small" style="margin-top:6px">${note}</div>`);
       if (res.passed) confetti();
       nextBtn(box, res, c);

@@ -47,7 +47,7 @@
 {% if s.fb.better %}<div class="small muted">示范：{{ s.fb.better }}</div>{% endif %}</div>
 {% else %}<div class="empty card"><div class="e">✍️</div><b>还没有造句</b>在生词本里给单词造个句子，{{ ASSISTANT }}会帮你看看。</div>{% endfor %}
 {% elif kind == 'mistake' %}
-<p class="muted small for-grownups">做错的题、点了「这道题还不会」的题都在这里，到时间会叫你回来重做：隔天做对 2 次，换一道同类的新题，也做对就过关；过关 3 周后再回头看一眼，还会就真的掌握了。</p>
+<p class="muted small for-grownups">做错的题、点了「这道题还不会」的题都在这里，到时间会叫你回来：做错的原题第二天改一次，之后都换同类的新题（点了「还不会」的直接做新题），在不同的日子做对 2 道就过关；过关 3 周后再用一道新题回头看一眼，还会就真的掌握了。</p>
 {% for c in cards %}
 {{ mcard(c) }}
 {% else %}{% if not paused %}<div class="empty card"><div class="e">🎯</div><b>错题本是空的</b>做错的题、点了「这道题还不会」的题，都会自动放进来。</div>{% endif %}{% endfor %}

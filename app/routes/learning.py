@@ -3,7 +3,7 @@ from ..content import content
 from fastapi import APIRouter
 from fastapi import Body, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from .. import arena, auth, bank, boards, db, engine, evidence, explore, insights, itemtypes, llm, mix, prefetch, recall, records, sitecfg, sprint, streak, trace
+from .. import arena, auth, bank, boards, db, engine, evidence, explore, insights, itemtypes, lessons, llm, mix, prefetch, recall, records, sitecfg, sprint, streak, trace
 from datetime import date
 from ..web import (
     GRADES,
@@ -246,7 +246,7 @@ def progress_snooze(request: Request):
 
 
 @router.get("/learn/{kp_id}", response_class=HTMLResponse)
-def learn(request: Request, kp_id: str, task: str = "practice"):
+def learn(request: Request, kp_id: str, task: str = "practice", full: int = 0):
     k = kid_or_redirect(request, manage=True)
     kp = learner_kp(k, kp_id)
     m = engine.get_mastery(k["id"])
@@ -257,7 +257,11 @@ def learn(request: Request, kp_id: str, task: str = "practice"):
     vocab = db.q("SELECT front, back FROM cards WHERE user_id=? AND kp_id=? AND kind='term'", k["id"], kp_id)
     if auth.current_user(request)["role"] == "kid":  # 孩子看讲解的工夫，后台把练习题和讲解备好，点「开始练习」不用等
         prefetch.kick(k["id"], kp_id, n=3, purpose="preview" if task == "preview" else "practice", grade=k["grade"], teach=True)
+    # 成人课学过的课再打开：回访（先回想 → 新案例 → 用到自己身上），不再把讲解看一遍；?full=1 照常从头看
+    revisit = is_adult(k["grade"]) and not full and lessons.revisit(k["id"], kp_id)
+    mine = db.one("SELECT back FROM cards WHERE user_id=? AND kind='kp' AND kp_id=? ORDER BY id DESC LIMIT 1", k["id"], kp_id) if revisit else None
     return render(request, "learn.html", kp=kp, pack=pack, pre=pre, post=post, me=m.get(kp_id), task=task, ev=evidence.explain(k['id'], m.get(kp_id)),
+                  revisit=revisit, mine=(mine or {}).get("back", ""),
                   strand=catalog.strand_name(pack.id, kp["strand"]), vocab=vocab, bridges=engine.bridges(k["id"], kp_id, m))
 
 
@@ -344,6 +348,31 @@ def api_trace_answer(request: Request, tid: int, body: dict = Body(...)):
     return res
 
 
+@router.post("/api/learn/recall")
+def api_learn_recall(request: Request, body: dict = Body(...)):
+    """成人课回访的第一步：不看讲解，先用一两句话回想这一课，再对照，自己说想起来了没有（提取练习，记一小份证据）。"""
+    k = kid_or_redirect(request)
+    kp_id = body.get("kp_id") or ""
+    learner_kp(k, kp_id)
+    engine.update_mastery(k["id"], kp_id, bool(body.get("ok")), weight=RECALL_WEIGHT, source="review-self", fmt="recall", kind="review")
+    return {"ok": True}
+
+
+RECALL_WEIGHT = 0.3   # 自己对照、自己说想起来了：和复习卡的自评一样只算一小份
+
+
+@router.get("/api/twin")
+def api_twin(request: Request, item_id: str, kp_id: str):
+    """点了「还不会」、一步步看完以后，趁热试一道一样的（engine.twin_for）。"""
+    k = kid_or_redirect(request)
+    learner_kp(k, kp_id)
+    row = db.one("SELECT * FROM items WHERE id=?", item_id)
+    if not row:
+        raise HTTPException(404)
+    it = engine.twin_for(k["id"], bank.row_to_item(row), kp_id, k["grade"])
+    return {"item": {**itemtypes.public(it), "id": it["id"], "kp_id": kp_id} if it else None}
+
+
 @router.post("/api/learn/done")
 def api_learn_done(request: Request, body: dict = Body(...)):
     k = kid_or_redirect(request)
@@ -351,6 +380,7 @@ def api_learn_done(request: Request, body: dict = Body(...)):
     kp = learner_kp(k, kp_id)
     if body.get("summary"):
         engine.add_card(k["id"], "kp", kp["name"], body["summary"][:500], {"method": kp.get("method", "")}, kp_id)
+    lessons.done(k["id"], kp_id)   # 学过这一课（成人课回来时换成回访，见 app/lessons.py）
     hit = engine.mark_task_by(k["id"], kp=kp_id)
     return {"ok": True, "flow": engine.flow_state(k["id"], (hit or [None])[0])}
 
@@ -589,6 +619,8 @@ def review_due(request: Request, group: str = ""):
         d["extra"] = db.jload(c["extra"], {})
         d["kp_name"] = (catalog.kp(c["kp_id"]) or {}).get("name", "") if c["kp_id"] else ""
         d["quiz"] = recall.quiz(k["id"], c)  # 复习要作答，系统判对错（见 app/recall.py）
+        if d["quiz"].get("mode") == "later":  # 要出的新题后台还在备：今天先不出这张，下次打开再做
+            continue
         cards.append(d)
     return {"cards": cards}
 

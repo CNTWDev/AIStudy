@@ -1,4 +1,4 @@
-"""错题重做提交要快：变式题在打开错题时就在后台备好；题库里已有能当变式题的，提交时不再请 AI 现场出题。"""
+"""错题重做要快：变式题在打开错题时就在后台备好（还在改原题的卡也先备上）；题库里已有能当变式题的，不请 AI。"""
 from fastapi.testclient import TestClient
 
 from app import bank, db, engine, llm, recall

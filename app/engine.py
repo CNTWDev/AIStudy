@@ -1,5 +1,6 @@
 """学习引擎：掌握度、间隔复习、诊断（向后回溯）、每日计划（补弱/回溯/复习/预习/阅读）。"""
 import json
+import re
 from datetime import date, timedelta
 
 from . import ability, bank, bankflow, db, evidence, itemtypes, llm
@@ -220,38 +221,45 @@ save_items = bank.save_items
 
 def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="", exclude=None, uses=None, ai=True,
               near_level: int | None = None, fallback: bool | None = None) -> list[dict]:
-    """取题（全站出题都走这里：练习、热身、学新、游戏、快练、冲刺）：先用题库里这个孩子没做过的题
+    """取题（全站出题都走这里：练习、热身、学新、游戏、快练、冲刺、复习卡、错题的变式题）：先用题库里这个孩子没做过的题
     （这个知识点的，加上别的教材里同一概念的），卷库真题优先；没做过的不够，配置了 AI 就现场出新题、存进题库，
-    以后别的孩子也能用。做过的题（换了数字的同一道、做错过的）只在出不了新题时才拿来凑数——
-    同一个孩子尽量不见重复的题，知识点用新题反复考，才知道是真会了还是记住了这道题。
+    以后别的孩子也能用。同一个知识点用新题反复考，才知道是真会了还是记住了这道题。
+    做对过的题（连同换了数字的同一组）对这个孩子退役，哪里都不再出（bank.retired）：没有新题，这个点今天就少出，
+    交给后台去出（app/prefetch.py），不拿做对过的题凑数。只有没配置 AI 的部署才拿做对过的题凑（没有别的题可出）。
+    做错过、还没做对的题可以凑数：先出同组没做过的（换了数字的同一道），再出原题。
     exclude：这次已经出过的题。near_level：想要的难度级别（1-5，按孩子的水平定，见 app/ability.py），新题里离它近的先出。
     purpose="quick"：只要 20 秒内答得完的短题（bank.is_quick），游戏和快练用；不够时请 AI 出的也是快答题。
     purpose="combine"：融合题——一道题同时要用到这个知识点和 uses 里的旧知识（见 app/mix.py），题挂在几个知识点上。
     ai=False：不请 AI——只给没做过的现成题，不够就少给，由调用的地方交给后台去出（app/prefetch.py），孩子先做别的。
-    fallback：新题出不来时拿做过的老题凑数（默认：请了 AI 或没配置 AI 时凑；ai=False 且有 AI 时不凑，等后台出新题）。"""
+    fallback：新题出不来时拿做错过的老题凑数（默认：请了 AI 或没配置 AI 时凑；ai=False 且有 AI 时不凑，等后台出新题）。"""
     exclude = set(exclude or ())
     if purpose == "combine":
         return _combine_items(user_id, kp_id, n, grade, exclude, uses or [], ai)
-    rows = [r for r in bank.candidates(user_id, kp_id) if r["id"] not in exclude]
+    every = bank.candidates(user_id, kp_id)
+    seen = {r["id"] for r in every if r["done"] or bank.retired(r)}  # 这个孩子见过的题：AI 出重了也不算新题
+    rows = [r for r in every if r["id"] not in exclude]
     if purpose == "quick":
         rows = [r for r in rows if bank.is_quick(r["type"], db.jload(r["data"], {}))]
     if purpose == "diagnose":  # 摸底、找根源、热身要的是对错：没有标准答案的思辨题不拿来判
         rows = [r for r in rows if itemtypes.of(r["type"]).judge != "open"]
-    fresh = [r for r in rows if r["done"] == 0 and not r["gdone"]]
-    # 同型组里做过别的题（换了数字的同一道题）：排在新题后面；做错过的那组，先出同组没做过的，再出原题
-    twins = [r for r in rows if r["done"] == 0 and r["gdone"]]
-    redo = [r for r in rows if r["done"] > 0 and r["ok"] == 0]  # 做错过的题，换个时间再做
-    done_ok = [r for r in rows if r["done"] > 0 and r["ok"] > 0]
+    spent = [r for r in rows if bank.retired(r)]
+    live = [r for r in rows if not bank.retired(r)]
+    fresh = [r for r in live if r["done"] == 0 and not r["gdone"]]
+    # 同型组里做过别的题、还没做对（换了数字的同一道题）：排在新题后面；再后面是做错过的原题
+    twins = [r for r in live if r["done"] == 0 and r["gdone"]]
+    redo = [r for r in live if r["done"] > 0]
     # 交叉验证：优先没用过的题型（已经用选择题答对过，就先给填空 / 计算）
     m = db.one("SELECT evidence FROM mastery WHERE user_id=? AND kp_id=?", user_id, kp_id)
     seen_fmts = set(db.jload(m["evidence"], {}).get("fmts", [])) if m and m["evidence"] else set()
     near = (lambda r: abs(bankflow.level(r) - near_level)) if near_level else (lambda r: 0)
-    # 卷库里管理员核对过的真题 / 名校卷 / 名师卷，比 AI 出的题优先
-    fresh = sorted(fresh, key=lambda r: (near(r), r["other"] or 0, r["source"] != "bank", itemtypes.fmt(r["type"]) in seen_fmts,
-                                         bankflow.level(r)))
-    old = sorted(twins, key=lambda r: (near(r), bankflow.level(r))) + redo + done_ok
-    if purpose == "diagnose":
-        fresh, old = sorted(rows, key=lambda r: (r["done"] > 0, r["other"] or 0, abs(r["difficulty"] - 2))), []
+    if purpose == "diagnose":  # 摸底题：只考核心，难度 2 附近的先出
+        fresh = sorted(fresh, key=lambda r: (r["other"] or 0, abs(r["difficulty"] - 2)))
+    else:  # 卷库里管理员核对过的真题 / 名校卷 / 名师卷，比 AI 出的题优先
+        fresh = sorted(fresh, key=lambda r: (near(r), r["other"] or 0, r["source"] != "bank", itemtypes.fmt(r["type"]) in seen_fmts,
+                                             bankflow.level(r)))
+    old = sorted(twins, key=lambda r: (near(r), bankflow.level(r))) + redo
+    if not llm.enabled():  # 没配置 AI：出不了新题，做对过的也只好再用（隔得最久的先出）
+        old += sorted(spent, key=lambda r: r["updated_at"] or "")
     picked, spare = _one_per_group(fresh, n, kp_id), _one_per_group(old, n, kp_id)
     lack_figs = purpose in ("practice", "preview") and _lacks_figs(kp_id, rows)
     if lack_figs:  # 要看图的知识点题库里还一道带图的都没有（多是有配图以前出的老题）：带图的新题排在前面
@@ -264,8 +272,8 @@ def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="", exclu
         pack = catalog.packs[catalog.kp_pack[kp_id]]
         try:
             new = llm.generate_items(kp, pack, grade, n=max(QUICK_BATCH if purpose == "quick" else 3, n - len(picked)),
-                                     purpose=purpose, user_id=user_id)
-            have = {p["id"] for p in picked} | bank.flagged_by(user_id) | exclude
+                                     purpose=purpose, user_id=user_id, avoid=_avoid(every))
+            have = {p["id"] for p in picked} | bank.flagged_by(user_id) | exclude | seen
             saved = [it for it in save_items(kp_id, new, purpose=purpose, grade=grade, meta=bank.gen_meta("items", purpose=purpose))
                      if it["id"] not in have and (purpose != "quick" or bank.is_quick(it["type"], it))
                      and (purpose != "diagnose" or itemtypes.of(it).judge != "open")]
@@ -275,10 +283,46 @@ def items_for(user_id: int, kp_id: str, n=3, purpose="practice", grade="", exclu
             picked += [{**it, "kp_id": kp_id} for it in saved[: n - len(picked)]]
         except llm.LLMError:
             pass
-    if len(picked) < n and fallback:  # 新题出不来：做过的题照用（先换了数字的同型题，再做错过的，最后做对过的）
+    if len(picked) < n and fallback:  # 新题出不来：做错过的题照用（先换了数字的同型题，再原题）
         have = {p["id"] for p in picked}
         picked += [it for it in spare if it["id"] not in have][: n - len(picked)]
     return picked[:n]
+
+
+def twin_for(user_id: int, item: dict, kp_id: str, grade="") -> dict | None:
+    """点了「还不会」、跟着一步步做完这道以后，趁热试的那一道「一样的」：同一个骨架、换了数字和情境。
+    先用题库里同一组（换了数字的同一道）这个孩子没做过的；没有就请 AI 照着这道改编一道（存进题库，
+    同一组以后别的孩子直接用）；还不行就出这个知识点的一道新题。看完例题马上做一道同构的题，比只看讲解学得会
+    （Trafton & Reiser 1993；docs/DESIGN.md 5.46）。"""
+    rows = [r for r in bank.candidates(user_id, kp_id) if r["id"] != item["id"] and not bank.retired(r) and not r["done"]
+            and itemtypes.of(r["type"]).judge != "open"]
+    near = db.one("SELECT near_key FROM items WHERE id=?", item["id"])
+    same = [r for r in rows if near and near["near_key"] and r["near_key"] == near["near_key"]]
+    if same:
+        return {**bank.row_to_item(same[0]), "kp_id": kp_id}
+    kp = catalog.kp(kp_id)
+    if llm.enabled() and kp and item.get("source") != "paper":  # 孩子自己卷子上的原题不拿去改编给别人用
+        try:
+            v = llm.make_variant(item, kp, catalog.packs[catalog.kp_pack[kp_id]], grade or catalog.default_grade)
+        except llm.LLMError:
+            v = None
+        if v:
+            seen = {r["id"] for r in bank.candidates(user_id, kp_id) if r["done"] or bank.retired(r)} | {item["id"]}
+            saved = [x for x in save_items(kp_id, [v], purpose="practice", grade=grade, meta=bank.gen_meta("variant", twin_of=item["id"]))
+                     if x["id"] not in seen]
+            if saved:
+                return {**saved[0], "kp_id": kp_id}
+    got = items_for(user_id, kp_id, n=1, grade=grade, exclude={item["id"]}, fallback=False)
+    return got[0] if got else None
+
+
+AVOID_N = 8   # 请 AI 出新题时，附上这个知识点已有的几道题的开头：新题换情境、换问法，别和它们撞
+
+
+def _avoid(rows) -> list[str]:
+    """已有的题（先列这个孩子做过的）：题干开头几十个字，给 AI 当「别出成这样」的参照。"""
+    rows = sorted(rows, key=lambda r: (not r["done"], r["other"] or 0))
+    return [re.sub(r"\s+", " ", db.jload(r["data"], {}).get("q", ""))[:50] for r in rows[:AVOID_N] if db.jload(r["data"], {}).get("q")]
 
 
 QUICK_BATCH = 5   # 快答题一次请 AI 出几道（一次调用，存下来以后都能用）
@@ -368,7 +412,7 @@ def record_attempt(user_id: int, item: dict | None, kp_id: str, mode: str, corre
         # 错题自动进错题本（以卡片形式参与间隔复习）
         back = f"{itemtypes.display(item)}\n{item.get('explain', '')}"
         add_card(user_id, "mistake", item["q"], back.strip(), {"item_id": item["id"], "zh": item.get("zh", ""),
-                 "my_answer": "（还不会）" if dont_know else str(answer)}, kp_id)
+                 "my_answer": "（还不会）" if dont_know else str(answer), "dont_know": dont_know}, kp_id)
     if touch:
         _touch_day(user_id)
     return status

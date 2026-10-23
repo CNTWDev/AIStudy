@@ -67,7 +67,7 @@ async function show() {
   let lastAnswer = null;
   renderItem(box, it, {
     submit: (answer, self, ms, extra, onPart) => { lastAnswer = answer; return api('/api/answer', base(self ? {self, ms} : {answer, ms, ...extra}), {onPart}); },
-    dontKnow: () => api('/api/answer', base({dont_know: true})),
+    dontKnow: () => api('/api/answer', base({dont_know: true})), ladder: true,
     onDone: async res => {
       answered++; if (res.correct) right++;
       Run.hit(!!res.correct); Combo.hit(!!res.correct, box); celebrate(res, box);

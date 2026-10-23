@@ -48,7 +48,7 @@ def _answer(user_id, body):
             user_id, row["id"]):
         raise HTTPException(403, "不能访问这道题")
     mode = body.get("mode") or "practice"
-    if mode not in ("practice", "preview", "probe"):
+    if mode not in ("practice", "preview", "probe", "helped"):
         raise HTTPException(400, "作答模式不正确")
     if itemtypes.of(it).judge == "open":  # 思辨题：不判对错，AI 陪着想（app/discuss.py）
         u = db.one("SELECT grade FROM users WHERE id=?", user_id)
@@ -58,9 +58,10 @@ def _answer(user_id, body):
         if mode == "probe":
             pr = body.get("probe") or {}
             explore.after_probe(user_id, kp_id, False, int(pr.get("depth") or 0), pr.get("from") or "")
-        return {"correct": False, "dont_know": True, **itemtypes.reveal(it), "hint": it.get("hint", ""),
+        return {"correct": False, "dont_know": True, **itemtypes.reveal(it), "hint": it.get("hint", ""), "steps": itemtypes.walk(it),
                 "trace": trace.offer(user_id, kp_id, True) if mode in trace.COUNT_MODES else None}
-    review, weight, answer = None, 1.0, body.get("answer", body.get("self", ""))
+    review, answer = None, body.get("answer", body.get("self", ""))
+    weight = HELPED_WEIGHT if mode == "helped" else 1.0
     if itemtypes.of(it).self_rated:
         if "self" not in body and coach.on(it, kp_id):  # AI 点评和追问；追问没结束就先返回这一轮的点评
             u = db.one("SELECT grade FROM users WHERE id=?", user_id)
@@ -94,6 +95,10 @@ def _answer(user_id, body):
 
 
 COMBINE_WEIGHT = 0.5
+# 点了「还不会」、跟着一步步做完以后马上试的那道（mode=helped）：刚看完讲解答对多半是短时记忆，只算一小份证据；
+# 做错了也不进错题本（原题已经在里面了），明天换新题再考
+HELPED_WEIGHT = 0.3
+
 
 
 def _combine_evidence(user_id: int, it: dict, kp_id: str, correct: bool) -> None:
