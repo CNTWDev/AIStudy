@@ -11,6 +11,8 @@
 题目也都可以带 fig 字段（一张图：程序按「画图说明」画的图，或原卷上裁下来的图），见 app/figures/；
 带 audio 字段（一段录音稿，听力题），见 app/audio/。
 """
+import re
+
 from . import audio, figures
 
 
@@ -221,7 +223,30 @@ def public(item: dict) -> dict:
         out["fig"] = figures.present(item)  # 画好的图（画图说明里可能有答案，比如 checks，不给前端）
     if item.get("audio"):
         out["audio"] = audio.present(item)
+    if not out.get("hint") and t.judge != "open":  # 点了「还不会」先给的那一句：这类题的路子（知识点的方法），不是答案
+        from .catalog import catalog
+        kp = catalog.kp(item.get("kp_id") or "")
+        if kp and kp.get("method"):
+            out["nudge"] = kp["method"]
     return {**out, "widget": t.widget, "self_rated": t.self_rated, "judge": t.judge}
+
+
+WALK_MAX = 4   # 「一起做这道」最多分几步
+
+
+def walk(item: dict) -> list[str]:
+    """点了「还不会」以后，把这道题的解析拆成几小步，一步一步看（先看懂这一步，再点下一步）。
+    解析本来分了行就按行；是一整段就按句子分，再并成不超过 WALK_MAX 步。没有解析就是空的（只看答案）。"""
+    text = str(item.get("explain") or "").strip()
+    if not text:
+        return []
+    parts = [x.strip() for x in text.split("\n") if x.strip()]
+    if len(parts) == 1:
+        parts = [x.strip() for x in re.split(r"(?<=[。！？；])|(?<=[.!?;])\s+", text) if x and x.strip()]
+    if len(parts) <= WALK_MAX:
+        return parts
+    size, sep = -(-len(parts) // WALK_MAX), " " if text.isascii() else ""
+    return [sep.join(parts[i:i + size]) for i in range(0, len(parts), size)]
 
 
 def reveal(item: dict) -> dict:

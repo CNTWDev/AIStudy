@@ -529,6 +529,9 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .fb .qc-ans dt{background:color-mix(in srgb,var(--card) 70%,transparent)}
 .fb-v{font-weight:700;font-size:16px}
 .fb-note{font-size:13px;color:var(--muted);margin-top:10px}
+/* 「还不会」：一步一步一起做这道，再趁热试一道一样的（app.js walkThrough） */
+.help-steps{margin:8px 0 0;padding-left:1.4em}.help-steps li{margin:6px 0;line-height:1.6}.help-ctl{margin-top:8px}
+.help3{margin-top:12px}.help3-h{margin-bottom:6px;font-weight:600}.help3-q{background:var(--card);border-radius:12px;padding:10px}
 .rq{margin-bottom:18px}.rq:last-of-type{margin-bottom:6px}
 .mcard{padding:14px 16px}.mc-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
 
@@ -907,6 +910,7 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .lteach{margin-top:4px;padding-top:10px;border-top:1px dashed var(--line)}
 .lbridges{margin-top:12px}
 .lacts{margin-top:18px}
+.ltestout{margin:0 0 10px}.ltestout>summary{cursor:pointer;color:var(--brand-ink)}.ltestout>div{margin-top:8px}
 .lpeek{margin-top:10px}.lpeek>summary{cursor:pointer;color:var(--brand-ink)}.lpeek>div{margin-top:6px;padding:10px 12px;background:var(--bg);border-radius:12px}
 .lguess{margin-top:0}.lguess-r{margin-top:8px;font-weight:600}
 .lstarts{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:8px}.lstarts .chip{cursor:pointer}

@@ -136,7 +136,7 @@ def test_same_item_not_again_anywhere(monkeypatch):
         engine.record_attempt(k["id"], b, kp, "game", False, "1")
         assert engine.items_for(k["id"], kp, n=5, purpose="quick", ai=False) == []      # 都做过了：等后台出新题
         old = engine.items_for(k["id"], kp, n=5, purpose="quick", ai=False, fallback=True)
-        assert [x["id"] for x in old] == [b["id"], a["id"]]                              # 实在出不了新题：先做错过的
+        assert [x["id"] for x in old] == [b["id"]]       # 实在出不了新题：只拿做错过的凑，做对过的不再出（DESIGN 5.46）
         long = bank.save_items(kp, [{"type": "mcq", "q": "x" * 120, "options": ["a", "b", "c", "d"], "answer": 0}])[0]
         assert long["id"] not in {x["id"] for x in engine.items_for(k["id"], kp, n=5, purpose="quick", ai=False)}   # 快答只要短题
 

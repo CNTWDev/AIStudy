@@ -131,7 +131,9 @@ def _mix_note(pack, purpose: str) -> str:
     return "优先用 mcq/num/fill（能自动判分），short 最多 1 道。"
 
 
-def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=None, uses=None) -> list[dict]:
+def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=None, uses=None, avoid=None) -> list[dict]:
+    """avoid：这个知识点已有的几道题的开头（engine._avoid）。新题要换情境、换问法，别和它们撞：
+    同一个知识点用不一样的题反复考，才练得到方法、不只是记住一道题。"""
     uses = uses or []
     purpose_txt = {
         "practice": f"生成 {n} 道练习题，难度从易到难（1,2,3）。",
@@ -150,11 +152,18 @@ def generate_items(kp: dict, pack, grade: str, n=3, purpose="practice", user_id=
     user = (
         f"{_audience(grade, pack)}\n知识点：{kp['name']}（{kp.get('name_en','')}）\n说明：{kp.get('desc','')}\n"
         f"诊断思路参考：{kp.get('probe','')}\n关键词：{', '.join(kp.get('terms', []))}\n\n"
-        f"{purpose_txt}\n{_mix_note(pack, purpose)}不要照搬教材原文。"
+        f"{purpose_txt}\n{_mix_note(pack, purpose)}不要照搬教材原文。{_avoid_note(avoid)}"
         f"有答案的题，答案必须正确且唯一，请自己检查一遍。\n输出格式：{_item_schema(pack, kp)}{_traps_note(kp)}{_figs_note(kp, pack)}"
     )
     data = ask_json("items", _tutor(grade) + "你也是严谨的出题人。", user, user_id=user_id, effort="medium", cache=False)
     return _normalized(data.get("items", []) if isinstance(data, dict) else data)
+
+
+def _avoid_note(avoid) -> str:
+    if not avoid:
+        return ""
+    return ("\n题库里这个知识点已经有下面这些题（只列了开头）。新题要换一个情境、换一种问法或题型，"
+            "不要只改几个数字、也不要和它们撞题：\n" + "\n".join(f"- {a}" for a in avoid) + "\n")
 
 
 def solve_item(item: dict, pack, grade: str) -> dict:

@@ -417,6 +417,7 @@ class BankSource(Source):
             mastery, taught, due = ctx.mastery, ctx.taught, ctx.due
             needs = evidence.needs_work(ctx.kid["id"], mastery)
             out: dict[str, list[str]] = {c: [] for c in SHARES}
+            hold = ctx.paused.unlearned
             for e in ctx.packs:
                 pack = catalog.packs[e["pack_id"]]
                 skip = {x["id"] for x in pack.strands if x.get("audio") or QUICK_SKIP.search(x.get("name", ""))}
@@ -424,7 +425,7 @@ class BankSource(Source):
                 top = top if top < 99 else ctx.rank
                 for k in catalog.ids_for(pack.id, e.get("track")):
                     kp = catalog.kp_in(pack.id, k)
-                    if kp.get("strand") in skip:
+                    if kp.get("strand") in skip or k in hold:   # 只能在这里学的课还没上过：先上课
                         continue
                     r = stage_rank(kp["stage"])
                     if k in needs:

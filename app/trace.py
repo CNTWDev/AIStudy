@@ -129,7 +129,7 @@ def _lang_item(user_id: int, t) -> dict | None:
     orig = db.one("SELECT data FROM items WHERE id=?", t["item_id"])
     if not orig or db.jload(orig["data"], {}).get("zh"):
         return None  # 原题本来就有中文翻译，那就不是读不懂题干的问题
-    rows = sorted(bank.candidates(user_id, t["kp_id"]), key=lambda r: r["done"])
+    rows = sorted(bank.candidates(user_id, t["kp_id"]), key=lambda r: (bank.retired(r), r["done"]))  # 做对过的题放最后
     for r in rows:
         it = bank.row_to_item(r)
         if r["id"] != t["item_id"] and it.get("zh") and not itemtypes.of(it).self_rated:
