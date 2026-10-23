@@ -31,6 +31,9 @@
 
 <ol class="lbar" id="lbar">{% for id, label in steps %}<li data-step="{{ id }}"{% if loop.first %} class="cur"{% endif %}><button type="button">{{ label }}</button></li>{% endfor %}</ol>
 
+{# 只能在这里学的课、还没上过（app/testout.py）：已经懂的，考两道能自动判的题，都对就算上过这一课 #}
+{% if testout and not readonly %}<details class="ltestout small" id="testout"><summary>这一课你已经熟了？考我一下：{{ testout }} 道题都对就跳过这一课</summary><div id="tobox"></div></details>{% endif %}
+
 <div class="lflow">
 {% if revisit %}
 {# 成人课回访（app/lessons.py）：这一课以前学过，不再看一遍讲解。先回想（提取练习）→ 对照 → 新案例 → 用到自己身上 #}
@@ -323,4 +326,48 @@ Steps.onEnter = id => { if (id === 'method' && $('#worked')) getTeach().then(t =
 {% endif %}
 Steps.init();
 </script>
+{% if testout and not readonly %}<script>
+(() => {
+  const box = $('#tobox'), ok = [];
+  let items = [], idx = 0;
+  const end = async () => {
+    if (ok.length < items.length) {
+      box.innerHTML = '<div class="hint">有一道没对上，说明这一课值得学一遍。从上面第一步开始吧，学完再练。</div>';
+      return;
+    }
+    try {
+      const r = await api('/api/testout/done', {kp_id: KP, item_ids: ok});
+      if (!r.ok) throw new Error('');
+      try { localStorage.removeItem(Steps.key); } catch (e) {}
+      box.innerHTML = '<div class="hint">都对了 👍 这一课算上过了，后面的练习和复习会带上它。</div>';
+      if (r.flow && r.flow.total) Flow.done(r.flow);
+    } catch (e) { box.innerHTML = '<div class="hint">这次没能算过，照常学一遍吧。</div>'; }
+  };
+  const show = () => {
+    if (idx >= items.length) return end();
+    const it = items[idx], q = document.createElement('div');
+    box.innerHTML = `<div class="muted small">考我一下 第 ${idx + 1}/${items.length} 题</div>`;
+    box.appendChild(q);
+    renderItem(q, it, {
+      submit: (answer, self, ms, extra, onPart) => api('/api/answer', {item_id: it.id, kp_id: KP, request_id: it.request_id, answer, ms, ...extra}, {onPart}),
+      onDone: res => {
+        if (res.correct) ok.push(it.id);
+        const nx = document.createElement('div'); nx.className = 'row'; nx.style.marginTop = '10px';
+        nx.innerHTML = `<button class="btn">${idx + 1 < items.length ? '下一题 →' : '看看结果 →'}</button>`;
+        nx.querySelector('.btn').onclick = () => { idx++; show(); };
+        q.appendChild(nx);
+      }
+    });
+  };
+  $('#testout').addEventListener('toggle', async () => {
+    if (!$('#testout').open || items.length) return;
+    seek(box, 'items', {compact: true, delay: 0});
+    try {
+      items = (await api('/api/testout/' + encodeURIComponent(KP))).items || [];
+      if (!items.length) { box.innerHTML = '<div class="hint">这一课还没有能直接判对错的题，先学一遍吧。</div>'; return; }
+      show();
+    } catch (e) { box.innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+  });
+})();
+</script>{% endif %}
 {% endblock %}

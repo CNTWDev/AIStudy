@@ -910,6 +910,7 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .lteach{margin-top:4px;padding-top:10px;border-top:1px dashed var(--line)}
 .lbridges{margin-top:12px}
 .lacts{margin-top:18px}
+.ltestout{margin:0 0 10px}.ltestout>summary{cursor:pointer;color:var(--brand-ink)}.ltestout>div{margin-top:8px}
 .lpeek{margin-top:10px}.lpeek>summary{cursor:pointer;color:var(--brand-ink)}.lpeek>div{margin-top:6px;padding:10px 12px;background:var(--bg);border-radius:12px}
 .lguess{margin-top:0}.lguess-r{margin-top:8px;font-weight:600}
 .lstarts{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:8px}.lstarts .chip{cursor:pointer}

@@ -94,10 +94,71 @@ def schedule_card(user_id: int, c, grade: str, due=None, extra=None, fmt="recall
 CARD_GROUPS = {"words": ("word", "phrase", "term"), "mistakes": ("mistake",), "other": ("kp",)}
 
 
+SELF_TAUGHT = ("course", "cert")   # 只能在这里学的课：自编课（CEO、心理学……）、考证。学校不教，学员没在别处学过
+
+
+def self_taught(pack_id: str) -> bool:
+    return catalog.packs[pack_id].system in SELF_TAUGHT
+
+
+def unlearned(user_id: int, enrolls: list | None = None) -> set[str]:
+    """只能在这里学的课里，这个人还没上过的课（docs/没学就先考-讨论稿.md v2）。
+
+    学校的课按校历推演教到了哪（孩子不用自己标）；这类课没有别的地方会教，所以先上课再做题：
+    学习页走完一课（或者「这课我熟，考我一下」通过）才算上过（app/lessons.py），同一概念在别的课里上过的也算。
+    没上过的课只以「新的一课」的任务出现，练习、换个问法、快练、游戏、热身、复习都不出它的题。"""
+    from . import lessons
+    rows = enrolls if enrolls is not None else [dict(e) for e in db.q(
+        "SELECT * FROM enrollments WHERE user_id=? AND active=1", user_id) if e["pack_id"] in catalog.packs]
+    packs = [e for e in rows if self_taught(e["pack_id"])]
+    if not packs:
+        return set()
+    done = set(lessons.learned(user_id))
+    concepts = {catalog.concept_id(k) for k in done}
+    return {k for e in packs for k in catalog.ids_for(e["pack_id"], e.get("track"))
+            if k not in done and catalog.concept_id(k) not in concepts}
+
+
+def next_lessons(user_id: int, pack_id: str, hold: set[str]) -> list[dict]:
+    """只能在这里学的课：下一课是哪几课。按课本的顺序，必须先学的课都上过了、自己还没上过的。"""
+    return [k for k in catalog.pack_kps(pack_id, track=enroll_track(user_id, pack_id))
+            if k["id"] in hold and not any(p["id"] in hold for p in catalog.prereqs(k["id"], required_only=True))]
+
+
+LESSON_TASKS = ("sync", "preview", "lesson", "weak", "backfill", "check", "exam")   # 去学习页、学完打勾的任务
+
+
+def backfill_lessons() -> int:
+    """有「学过的课」记录（app/lessons.py）以前，学员在只能在这里学的课里已经上过的课：补记下来，
+    免得这些课又从第一课排起、做过的练习都停下（启动时做，幂等：一门课里已经有记录就不再补）。
+    凭据：学习页写过的总结卡，和每天清单里学完打了勾的学习任务。"""
+    n = 0
+    for e in db.q("SELECT user_id, pack_id, track FROM enrollments WHERE active=1"):
+        if e["pack_id"] not in catalog.packs or not self_taught(e["pack_id"]):
+            continue
+        uid, kps = e["user_id"], set(catalog.ids_for(e["pack_id"], e["track"]))
+        if any(r["kp_id"] in kps for r in db.q("SELECT kp_id FROM lessons WHERE user_id=?", uid)):
+            continue
+        days: dict[str, set] = {}
+        for c in db.q("SELECT kp_id, created_at FROM cards WHERE user_id=? AND kind='kp'", uid):
+            if c["kp_id"] in kps:
+                days.setdefault(c["kp_id"], set()).add(c["created_at"][:10])
+        for d in db.q("SELECT day, plan FROM days WHERE user_id=?", uid):
+            for t in db.jload(d["plan"], []) or []:
+                if t.get("done") and t.get("type") in LESSON_TASKS and t.get("kp") in kps:
+                    days.setdefault(t["kp"], set()).add(d["day"])
+        for k, ds in days.items():
+            db.run("INSERT INTO lessons(user_id,kp_id,first_done,last_done,n) VALUES(?,?,?,?,?) ON CONFLICT(user_id,kp_id) DO NOTHING",
+                   uid, k, min(ds), max(ds), len(ds))
+            n += 1
+    return n
+
+
 class Paused:
     """退掉的课（或换掉的方向）留下的内容：记录都留着，只是不再出现在每天的学习里；重新选回这门课就接着来。
     kps：报过名的教材里、现在不在学的知识点（同一概念在在学的教材里有的、给在学的课打地基的，照常出），
     加上不是给这个人群的知识点（catalog.closed_to：学习页打不开的，每天的学习也不碰，比如成人以前在中小学的课里留下的记录）。
+    unlearned：只能在这里学的课里、还没上过的课（见 unlearned）：先上课，题才出现，所以也不进每天的练习。
     lists：还在给这个人用的单词包（app/words.py：自动挂的、家长加上的）；别的包来的单词卡暂停。"""
 
     def __init__(self, user_id: int):
@@ -107,8 +168,10 @@ class Paused:
         user = db.one("SELECT grade FROM users WHERE id=?", user_id)
         concepts = ladder.enrolled_concepts(active)
         keep = {k for f in ladder.foundations(dict(user or {}), active) for k in ladder.range_of(f, concepts)}
+        self.unlearned = unlearned(user_id, active)
         self.kps = {k for e in rows for k in catalog.packs[e["pack_id"]].kp_ids
-                    if catalog.concept_id(k) not in concepts and k not in keep} | catalog.closed_to((user or {}).get("grade"))
+                    if catalog.concept_id(k) not in concepts and k not in keep} | catalog.closed_to((user or {}).get("grade")) \
+            | self.unlearned
         self.lists = {wl["id"] for wl in explore.word_lists(user_id)}
 
     def card(self, c) -> bool:

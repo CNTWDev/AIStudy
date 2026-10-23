@@ -19,6 +19,7 @@ async def lifespan(app):
     content.load()
     engine.load_seed_items(config.SEED_DIR)
     engine.retire_open_mistakes()
+    engine.backfill_lessons()
     engine.load_seed_lessons(config.SEED_DIR)
     bank.sync()
     methods.load()

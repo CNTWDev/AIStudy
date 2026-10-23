@@ -30,7 +30,7 @@ mastery = { model = "bkt" }
 memory = { model = "fsrs", target_r = 0.85 }
 [profiles.balanced.plan]
 fixed = ["exam_date", "warmup", "mistakes", "words", "drill"]
-flex = ["top", "paper", "diagnose", "exam", "mix", "weak+backfill", "review"]
+flex = ["top", "paper", "diagnose", "exam", "lesson", "mix", "weak+backfill", "review"]
 tail = ["reading"]
 limits = { top = 1, paper = 1, diagnose = 1, weak = 1, preview = 1 }
 mix = { new = 0.3, recent = 0.2, past = 0.3, cross = 0.1, preview = 0.1 }
@@ -43,7 +43,7 @@ mastery = { model = "bkt", master_p = 0.9, min_days = 3 }
 memory = { model = "fsrs", target_r = 0.9 }
 [profiles.mastery.plan]
 fixed = ["exam_date", "warmup", "mistakes", "words", "drill"]
-flex = ["top", "paper", "diagnose", "exam", "backfill", "mix", "weak", "review"]
+flex = ["top", "paper", "diagnose", "exam", "lesson", "backfill", "mix", "weak", "review"]
 tail = ["reading"]
 limits = { top = 1, paper = 1, diagnose = 1, weak = 1, preview = 0 }
 mix = { new = 0.25, recent = 0.25, past = 0.4, cross = 0.1, preview = 0 }
@@ -56,7 +56,7 @@ mastery = { model = "bkt" }
 memory = { model = "fsrs", target_r = 0.9 }
 [profiles.exam.plan]
 fixed = ["exam_date", "mistakes", "words", "drill"]
-flex = ["top", "exam", "paper", "mix", "weak+backfill", "review"]
+flex = ["top", "exam", "paper", "lesson", "mix", "weak+backfill", "review"]
 tail = ["reading"]
 limits = { top = 1, paper = 1, weak = 2, preview = 0 }
 mix = { new = 0.2, recent = 0.4, past = 0.3, cross = 0.1, preview = 0 }

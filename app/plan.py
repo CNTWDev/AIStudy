@@ -27,6 +27,7 @@ class Ctx:
         self.enrolls = [e for e in db.q("SELECT * FROM enrollments WHERE user_id=? AND active=1", user_id)
                         if e["pack_id"] in catalog.packs]
         self.taught = engine.taught_set(user_id)
+        self.hold = engine.unlearned(user_id, [dict(e) for e in self.enrolls])   # 只能在这里学的课里没上过的：先上课
         self.day_seed = db.today().toordinal()
         self._auto = None
         self._per_pack = None
@@ -54,12 +55,13 @@ def _hot_first(kps: list, key=lambda k: k):
 
 
 def _scan_packs(c: Ctx) -> dict:
-    out = {"sync": [], "weak": [], "backfill": [], "check": [], "preview": [], "diagnose": [], "stale": []}
+    out = {"sync": [], "weak": [], "backfill": [], "check": [], "preview": [], "lesson": [], "diagnose": [], "stale": []}
     model = c.profile.mastery
     for e in c.enrolls:
         pack_id, stage = e["pack_id"], e["stage"]
         pv = engine.progress_view(c.user_id, e)
         cert = catalog.packs[pack_id].system == "cert"  # 职业资格考试：按考试日期走，不跟学校进度
+        own = engine.self_taught(pack_id)   # 只能在这里学的课：先上课再做题，不摸底（docs/没学就先考-讨论稿.md）
         if pv["stale"] and not cert:
             out["stale"].append(catalog.packs[pack_id].subject_name)
         # 跟上学校：正在学的知识点没掌握，就练它；进度之后的下一个可以预习。掌握了就自动换下一个（见 advance_progress）
@@ -74,7 +76,7 @@ def _scan_packs(c: Ctx) -> dict:
                 out["preview"].append({"type": "preview", "kp": nxt["id"], "title": f"预习：{nxt['name']}",
                                        "why": "学校马上要学，先看一眼", "minutes": 8, "pack": pack_id})
         # 往回巩固：学校学过、但系统里还没检测过的知识点，每天轮一个做个小检查
-        unchecked = [k for k in pv["learned"] if c.mastery.get(k, {}).get("status") in (None, "unknown")
+        unchecked = [k for k in pv["learned"] if k not in c.hold and c.mastery.get(k, {}).get("status") in (None, "unknown")
                      and stage_rank(catalog.stage_in(pack_id, k)) >= stage_rank(stage) - 2]
         if c.prefer_hot:
             unchecked = [k for k in unchecked if catalog.kps[k].get("hot")] or unchecked
@@ -84,9 +86,9 @@ def _scan_packs(c: Ctx) -> dict:
                                  "why": f"{'学校学过' if k['id'] in c.taught else '以前学过'}，做道小题看看（会的话很快就过）",
                                  "minutes": 6, "pack": pack_id})
         diag = db.one("SELECT id FROM diag_sessions WHERE user_id=? AND pack_id=? AND status='done'", c.user_id, pack_id)
-        if not diag and not cert:  # 考证一般从零学起，不先摸底（想测可以在「学科」里自己点诊断）
+        if not diag and not own:  # 考证、自编课从零学起，不先摸底（想测可以在「学科」里自己点诊断；每课也能「考我一下」跳过）
             out["diagnose"].append(pack_id)
-        kp_ids = set(catalog.ids_for(pack_id, e["track"]))
+        kp_ids = set(catalog.ids_for(pack_id, e["track"])) - c.hold
         weak = sorted([c.mastery[k] for k in kp_ids if k in c.mastery and model.needs_work(c.mastery[k])],
                       key=lambda m: m["score"])
         if c.prefer_hot:
@@ -103,7 +105,11 @@ def _scan_packs(c: Ctx) -> dict:
                 out["weak"].append({"type": "weak", "kp": w["kp_id"], "title": f"攻克：{kp['name']}",
                                     "why": "刚学不久，多练几次就熟了" if w["status"] == "learning" else "上次有点卡，再练一次会更稳",
                                     "minutes": 12, "pack": pack_id})
-        if diag and not progress_kp and not e["exam_date"]:  # 诊断前不安排预习；有考试日期的由 src_exam 安排新内容
+        if own and not e["exam_date"]:   # 自编课：按课本顺序上下一课；有考试日期的由 src_exam 安排新内容
+            for k in engine.next_lessons(c.user_id, pack_id, c.hold)[:1]:
+                out["lesson"].append({"type": "lesson", "kp": k["id"], "title": f"新的一课：{k['name']}", "pack": pack_id,
+                                      "why": "先看这一课讲什么、为什么学，学完再做题", "minutes": 10})
+        elif diag and not progress_kp and not e["exam_date"]:  # 诊断前不安排预习；有考试日期的由 src_exam 安排新内容
             for k in engine.frontier(c.user_id, pack_id, stage, c.mastery)[:2]:
                 out["preview"].append({"type": "preview", "kp": k["id"], "title": f"预习：{k['name']}",
                                        "why": "要先会的你都会了，可以先看一眼" + ("，考试常考" if k.get("hot") else ""), "minutes": 8, "pack": pack_id})
@@ -291,7 +297,7 @@ def src_backfill(c: Ctx) -> list[dict]:
 
 def src_check(c: Ctx) -> list[dict]:
     """交叉验证：昨天以前答对过、还差「隔天再对 / 换一种题型」的，今天换一道题确认（排在最前），然后是回顾小检查。"""
-    mine = {k for e in c.enrolls for k in catalog.ids_for(e["pack_id"], e["track"])}
+    mine = {k for e in c.enrolls for k in catalog.ids_for(e["pack_id"], e["track"])} - c.hold
     confirm = [m for k, m in c.mastery.items() if k in mine and m["status"] == "learning" and (m["score"] or 0) >= 0.6
                and m.get("last_ev") and evidence.days_since(m["last_ev"]) >= 0.5 and m["attempts"] and catalog.kp(k)]
     confirm.sort(key=lambda m: -(m["score"] or 0))
@@ -317,6 +323,12 @@ def src_preview(c: Ctx) -> list[dict]:
     return c.per_pack["preview"]
 
 
+def src_lesson(c: Ctx) -> list[dict]:
+    """只能在这里学的课（自编课、考证）：每门课按课本顺序上下一课。学完了，这一课的题才进练习（engine.unlearned）。
+    第一门课的那一课不因为时间不够被截掉：不上课，后面就没有能练的。"""
+    return [{**t, "keep": i == 0} for i, t in enumerate(c.per_pack["lesson"])]
+
+
 MIX_MIN_MINUTES = 10
 
 
@@ -333,6 +345,8 @@ def src_mix(c: Ctx) -> list[dict]:
         pack = catalog.packs[e["pack_id"]]
         if pack.system == "cert" and not e["exam_date"]:   # 考证的课先设考试日期（src_exam_date）
             continue
+        if engine.self_taught(pack.id) and not set(catalog.ids_for(pack.id, e["track"])) - c.hold:
+            continue   # 只能在这里学的课，一课都还没上过：今天先上课（「新的一课」），没有能练的
         n = mix.size_for(MIX_MIN_MINUTES, c.user["grade"])
         made = done_today.get(pack.id)
         if made:   # 今天已经开始做了：题数以那一组为准
@@ -361,7 +375,7 @@ def src_review(c: Ctx) -> list[dict]:
 
 SOURCES = {"progress": src_progress, "exam_date": src_exam_date, "warmup": src_warmup, "words": src_words, "mistakes": src_mistakes,
            "reading": src_reading, "exam": src_exam, "sync": src_sync, "top": src_top, "paper": src_paper, "diagnose": src_diagnose,
-           "weak": src_weak, "backfill": src_backfill, "check": src_check, "preview": src_preview, "review": src_review,
+           "weak": src_weak, "backfill": src_backfill, "check": src_check, "preview": src_preview, "lesson": src_lesson, "review": src_review,
            "mix": src_mix, "drill": src_drill}
 DEFAULT_LIMITS = {"sync": 2, "top": 1, "paper": 1, "diagnose": 1, "check": 2, "preview": 1}
 
