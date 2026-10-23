@@ -1115,7 +1115,9 @@ def day_record(user_id: int, day: str) -> dict:
     row = db.one("SELECT * FROM days WHERE user_id=? AND day=?", user_id, day)
     plan = db.jload(row["plan"], []) if row else []
     att = db.q("SELECT * FROM attempts WHERE user_id=? AND created_at>=? AND created_at<? ORDER BY id", user_id, day, nxt)
+    from . import records
     return {
+        "answers": records.tally(records.answers(user_id, day, nxt)),   # 在哪儿答的都算（单词、阅读理解、乐园、冲刺），按来源分
         "day": day, "plan": plan, "done": sum(1 for t in plan if t.get("done")),
         "minutes": row["minutes"] if row else 0, "checked_in": bool(row and row["checked_in"]),
         "reflection": row["reflection"] if row else "", "mood": (row["mood"] if row else "") or "",

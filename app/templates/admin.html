@@ -87,7 +87,7 @@
   <h3 style="margin-top:0">每个孩子（近 7 天）</h3>
   <div class="tw"><table class="small nums"><tr><th>孩子</th><th>家长</th><th>学习天数</th><th>分钟</th><th>做题 / 正确率</th><th>还不会</th><th>提问</th><th>连续</th><th>系统发现</th><th></th></tr>
   {% for r in kid_rows %}<tr><td class="nw"><b>{{ r.u.name }}</b> <span class="muted">{{ stage_label(r.u.grade) }}</span></td><td class="nw">{{ r.parent.name if r.parent }}</td><td>{{ r.days }}</td><td>{{ r.minutes }}</td>
-    <td>{{ r.attempts }}{% if r.acc is not none %} / {{ r.acc }}%{% endif %}</td><td>{{ r.dk }}</td><td>{{ r.asks }}</td><td class="nw">{{ r.streak }} 天</td><td>{{ r.insights }}</td>
+    <td{% if r.split %} title="{{ r.split }}"{% endif %}>{{ r.attempts }}{% if r.acc is not none %} / {{ r.acc }}%{% endif %}</td><td>{{ r.dk }}</td><td>{{ r.asks }}</td><td class="nw">{{ r.streak }} 天</td><td>{{ r.insights }}</td>
     <td class="nw"><a href="/admin/kids/{{ r.u.id }}">报告</a></td></tr>
   {% else %}<tr><td colspan="10" class="muted">还没有孩子账号</td></tr>{% endfor %}</table></div>
 </div>

@@ -472,7 +472,7 @@ def is_self_learner(u) -> bool:
 
 def self_managed(u) -> bool:
     """学习自己安排：自学者，或家庭里的成人成员（年级在大学及以上）。家庭只是把一家人放在一起（家里的房间、一起打卡），
-    家长管的只是未成年的孩子。成人成员自己在「我的课程」里选课，学习记录只有本人能看；家长只能管账号（改密码、暂停）。"""
+    家长管的只是未成年的孩子。成人成员自己在「我的课程」里选课、自己学；家长能管账号（改密码、暂停），也能看 TA 的学习记录（只看不改）。"""
     return bool(u) and u["role"] == "kid" and (not u["parent_id"] or is_adult(u["grade"]))
 
 
@@ -481,13 +481,14 @@ def with_other_kids(u) -> bool:
     return not is_private(u) and not is_adult(u.get("grade"))
 
 
-def kid_of(parent, kid_id: int, account_only: bool = False):
-    """家长名下的一个成员。默认是要看或安排学习：成人成员（self_managed）不行；account_only：只管账号（资料、密码、暂停）。"""
+def kid_of(parent, kid_id: int, account_only: bool = False, report: bool = False):
+    """家长名下的一个成员。默认是要安排学习：成人成员（self_managed）不行；
+    account_only：只管账号（资料、密码、暂停）；report：只看学习记录——家里的成人成员也能看。"""
     k = db.one("SELECT * FROM users WHERE id=? AND parent_id=?", kid_id, parent["id"])
     if not k:
         raise HTTPException(404, "没有这个孩子账号")
-    if not account_only and self_managed(k):
-        raise HTTPException(403, f"{k['name']} 是家里的成人成员，学习由 TA 自己安排，学习记录也只有 TA 自己能看。")
+    if not (account_only or report) and self_managed(k):
+        raise HTTPException(403, f"{k['name']} 是家里的成人成员，学习由 TA 自己安排；在家长页能看 TA 的学习报告。")
     return k
 
 

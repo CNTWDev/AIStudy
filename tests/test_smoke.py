@@ -789,47 +789,55 @@ def test_self_records():
 
 
 def test_accuracy_trend():
-    """每天的正确率曲线：按天算、分学科、近 7 天和再前 7 天比；限时题和原卷不算；孩子和家长都看得到。"""
+    """每天的正确率曲线：按天算、分学科、分来源，近 7 天和再前 7 天比；在哪儿答的都算（单词、乐园），原卷不算；孩子和家长都看得到。"""
     from datetime import datetime, timedelta
 
     from app import db, records
     from app.catalog import catalog
+    from app import evidence
     kid = db.one("SELECT id FROM users WHERE email='b2@x.com'")["id"]
-    db.run("DELETE FROM attempts WHERE user_id=?", kid)
+    db.run("DELETE FROM events WHERE user_id=?", kid)
     kp_eng = next(k for k in catalog.packs["eng-shanghai"].kp_ids)
     kp_math = next(k for k in catalog.packs["math-shanghai"].kp_ids)
     today = db.today()
 
-    def add(back, kp, n, ok, mode="practice"):
+    def add(back, kp, n, ok, mode="practice", target="kp"):
         at = datetime.combine(today - timedelta(days=back), datetime.min.time()).replace(hour=19).isoformat()
         for i in range(n):
-            db.run("INSERT INTO attempts(user_id,item_id,kp_id,mode,correct,answer,created_at) VALUES(?,?,?,?,?,?,?)",
-                   kid, None, kp, mode, 1 if i < ok else 0, "", at)
+            evidence.log(kid, target, kp if target == "kp" else f"{kp}:w{i}", "answer", correct=i < ok, mode=mode, at=at)
     add(10, kp_eng, 10, 6)       # 再前 7 天：60%
     add(2, kp_eng, 10, 9)        # 最近 7 天：英语 9/10
     add(1, kp_math, 10, 7)       # 数学 7/10
-    add(0, kp_eng, 3, 3)         # 今天只做了 3 题：空心点
-    add(0, kp_eng, 20, 0, "game")    # 乐园里的限时题不算
-    add(0, kp_eng, 20, 0, "exam")    # 原卷上的对错不算
+    add(1, "g3", 10, 10, "review", "word")   # 单词复习也算（算英语）
+    add(0, kp_eng, 3, 3)         # 今天学习只做了 3 题
+    add(0, kp_eng, 20, 0, "game")    # 乐园里的题也算，另外能单独看
+    add(0, kp_eng, 20, 0, "exam")    # 原卷上老师批的对错不算
+    evidence.log(kid, "kp", kp_eng, "review", correct=True, mode="review-self")   # 复习卡片自评不是作答
     tr = records.accuracy_trend(kid)
     al = tr["series"][0]
-    assert al["key"] == "all" and al["n"] == 33 and [p["acc"] for p in al["pts"]] == [60, 90, 70, 100]
-    assert al["pts"][-1]["few"] and not al["pts"][0]["few"]
+    assert al["key"] == "all" and al["n"] == 63 and [p["acc"] for p in al["pts"]] == [60, 90, 85, 13]
+    assert not al["pts"][-1]["few"]
     # 每一天都有数（没做题的日子 n=0），给悬停 / 点按显示
-    assert len(al["days"]) == 30 and al["days"][-1]["n"] == 3 and al["days"][-1]["acc"] == 100
-    assert al["days"][-4]["n"] == 0 and al["days"][-4]["acc"] is None and al["days"][-1]["avg"] == 83
-    assert al["now"] == {"n": 23, "acc": 83} and al["prev"] == {"n": 10, "acc": 60}
-    assert {s["name"] for s in tr["series"]} >= {"全部"} and len(tr["series"]) == 3   # 英语、数学各一条
-    assert "高 👍" in records.trend_words(al)
+    assert len(al["days"]) == 30 and al["days"][-1]["n"] == 23 and al["days"][-1]["acc"] == 13
+    assert al["days"][-4]["n"] == 0 and al["days"][-4]["acc"] is None and al["days"][-1]["avg"] == 55
+    assert al["now"] == {"n": 53, "acc": 55} and al["prev"] == {"n": 10, "acc": 60}
+    keys = [s["key"] for s in tr["series"]]
+    assert keys[0] == "all" and sorted(keys[1:3]) == ["english", "math"] and keys[3:] == ["src:study", "src:words", "src:game"]
+    study = next(s for s in tr["series"] if s["key"] == "src:study")
+    assert study["now"] == {"n": 23, "acc": 83} and "高 👍" in records.trend_words(study)
+    assert [(b["key"], b["n"], b["acc"]) for b in tr["week"]["by"]] == [("study", 23, 83), ("words", 10, 100), ("game", 20, 0)]
+    wk = records.tally(records.answers(kid, (today - timedelta(days=6)).isoformat()))
+    assert wk["n"] == 53 and wk["steady_acc"] == 88 and "乐园游戏 20 道（对 0%）" in records.tally_words(wk)
     assert records.accuracy_trend(999999) is None
     with TestClient(app) as c:
         c.post("/login", data={"email": "b2@x.com", "password": "7391"})
         page = c.get("/records").text
         assert "每天的正确率" in page and 'href="/day/' in page and "acc-subj" in page
+        assert 'value="src:game"' in page and "🎮 乐园游戏 20 题 · 0%" in page and "g3" not in page.split("最近做题")[0]
         assert "data-trend" in page and '"avg":' in page and "data-tip=" in page   # 曲线和热力图都能悬停 / 点按看那一天
         c.get("/logout")
         c.post("/login", data={"email": "p2@x.com", "password": "secret1"})
-        assert "最近 7 天正确率 83%" in c.get("/parent").text
+        assert "最近 7 天正确率 55%" in c.get("/parent").text
         page = c.get(f"/parent/kids/{kid}").text
         assert "每天的正确率" in page and 'href="/day/' not in page.split("acc-trend")[1].split("</svg>")[0]
         c.get("/logout")

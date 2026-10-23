@@ -1,6 +1,6 @@
 """每周学习报告邮件：每周一早上（时间在 config/mail.toml 的 [weekly] 里改）给每个家长发一封，讲每个孩子上周的情况。
 
-一封信里一家所有还没成年的孩子（家里的成人成员学习自己安排，记录只有本人能看，不进报告）。
+一封信里一家所有的学习成员：孩子，和家里的成人成员（学习由 TA 自己安排，家长也能看 TA 的记录）。
 内容只放家长用得上的：上周学了几天、多少分钟、现在连续几天；比再上一周进步在哪（和孩子看到的每周进步卡同一份，
 app/records.py 的 weekly）；系统发现的问题（insights）。看细节点链接回网站。
 上周之后才加进来的孩子不算；一个孩子都没有就不发。
@@ -9,7 +9,7 @@ from datetime import date, datetime, timedelta
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from . import auth, config, db, engine, insights, mailer, records, sitecfg
+from . import config, db, engine, insights, mailer, records, sitecfg
 
 _env = Environment(loader=FileSystemLoader(config.BASE_DIR / "app" / "templates" / "mail"),
                    autoescape=select_autoescape(["html"]), trim_blocks=True, lstrip_blocks=True)
@@ -32,7 +32,7 @@ def kid_week(k: dict, mon: date) -> dict:
     card = records.weekly(k["id"], mon)
     return {"name": k["name"], "id": k["id"], "days": row["days"], "minutes": int(row["minutes"]),
             "streak": engine.streak(k["id"]), "lines": card["lines"][:-1] if card else [],
-            "attempts": card["this"]["attempts"] if card else 0,
+            "attempts": card["this"]["attempts"] if card else 0, "split": card["this"]["split"] if card else "",
             "found": [{"title": f["title"], "detail": f["detail"]} for f in insights.open_insights(k["id"], limit=3)]}
 
 
@@ -41,7 +41,7 @@ def build_weekly(parent: dict, mon: date) -> dict | None:
     end = mon + timedelta(days=7)
     kids = [dict(k) for k in db.q("SELECT * FROM users WHERE parent_id=? AND status='active' AND created_at<? ORDER BY id",
                                   parent["id"], end.isoformat())]
-    kids = [kid_week(k, mon) for k in kids if not auth.self_managed(k)]
+    kids = [kid_week(k, mon) for k in kids]
     if not kids:
         return None
     site = sitecfg.get("site_name")

@@ -389,8 +389,10 @@ class WordSource(Source):
                 if it.get("card") else None
             if c:   # 今天该复习的生词卡：在这里答了就算复习过了，按记忆模型排下次
                 engine.schedule_card(kid["id"], c, "good" if correct else "again", fmt=fmt)
-        if it.get("kp_id"):   # 术语卡挂了知识点：也算这个知识点的一条证据（θ 上面已经记在词汇维度上）
-            super().record(kid, it, correct, ans, dont_know, ms, mode, weight, calibrate=False)
+        if it.get("kp_id"):   # 术语卡挂了知识点：也算这个知识点的一条证据（θ 上面已经记在词汇维度上）；
+            # 和单词复习一样记成 kind=review：这一题的作答已经在上面记过一次，学习报告不重复数（app/records.py）
+            engine.update_mastery(kid["id"], it["kp_id"], correct, weight=weight, source=mode, fmt=fmt,
+                                  dont_know=dont_know, kind="review")
         if not correct:       # 不认识的词放进复习
             engine.add_card(kid["id"], "word" if it["family"].startswith("words") else "term", it["word"], it["zh"],
                             {"list": it["list"], "from": mode}, it.get("kp_id") or None)

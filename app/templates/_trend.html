@@ -17,9 +17,11 @@
 {% set multi = tr.series|length > 1 %}
 <div class="card trend" id="acc-trend">
   <div class="card-h"><span class="ico">📈</span><h3>每天的正确率 <span class="muted small" style="font-weight:400">近 {{ tr.days }} 天 · 只跟自己比</span></h3></div>
-  {% if multi %}<div class="seg" role="radiogroup" aria-label="选学科" style="margin-bottom:8px">
-    {% for s in tr.series %}<label><input type="radio" name="acc-subj" value="{{ s.key }}" {{ 'checked' if loop.first }} onchange="accTrend(this.value)"><span>{{ s.name }}</span></label>{% endfor %}
-  </div>{% endif %}
+  {% if multi %}{% set subj = tr.series|selectattr('group', 'equalto', 'subject')|list %}{% set src = tr.series|selectattr('group', 'equalto', 'source')|list %}
+  {% for opts in ([tr.series[:1] + subj] if subj else []) + ([(tr.series[:1] if not subj else []) + src] if src else []) %}
+  <div class="seg" role="radiogroup" aria-label="{{ '按在哪儿答的看' if opts[-1].group == 'source' else '选学科' }}" style="margin-bottom:8px">
+    {% for s in opts %}<label><input type="radio" name="acc-subj" value="{{ s.key }}" {{ 'checked' if s.key == 'all' }} onchange="accTrend(this.value)"><span>{{ s.name }}</span></label>{% endfor %}
+  </div>{% endfor %}{% endif %}
   {% for s in tr.series %}
   <div class="trend-pane" data-key="{{ s.key }}" {{ 'hidden' if not loop.first }}>
     <p class="small" style="margin:2px 0 10px">{{ trend_words(s) }}</p>
@@ -27,7 +29,8 @@
   </div>
   {% endfor %}
   <div class="legend trend-leg"><span><i class="pt-i"></i>每天</span><span><i class="pt-i few"></i>那天不到 {{ tr.min }} 题</span><span><i class="avg-i"></i>近 7 天平均</span><span><i class="g80-i"></i>80%</span></div>
-  <p class="tiny faint" style="margin:6px 0 0">学新内容的日子正确率低一点很正常；看粗线的走向比看某一天更有用。乐园和冲刺里的限时题不算在内。</p>
+  {% if tr.week.by|length > 1 %}<div class="src-split small" style="margin:8px 0 0">最近 7 天：{% for b in tr.week.by %}<span class="pill">{{ b.icon }} {{ b.name }} {{ b.n }} 题 · {{ b.acc }}%</span> {% endfor %}</div>{% endif %}
+  <p class="tiny faint" style="margin:6px 0 0">在哪儿答的题都算：每日任务、单词、阅读理解、乐园和冲刺。学新内容的日子正确率低一点很正常，看粗线的走向比看某一天更有用；乐园和冲刺的题跟着水平自动调难度，正确率本来就在七成左右。</p>
 </div>
 {% if multi %}<script>function accTrend(k){document.querySelectorAll('#acc-trend .trend-pane').forEach(function(p){p.hidden=p.dataset.key!==k})}</script>{% endif %}
 {% endmacro %}

@@ -10,10 +10,12 @@
 <div class="card pkid">
   <div class="row">
     <div class="grow grow-w"><h2 style="margin:0">{{ k.u.name }} <span class="pill">{{ stage_label(k.u.grade) }}</span>{% if k.u.status == 'disabled' %} <span class="pill st-weak">已暂停</span>{% endif %}</h2>
-      <div class="muted small">登录名 {{ account_name(k.u) }} · 学习由 TA 自己安排，学习记录只有 TA 自己能看</div></div>
+      <div class="muted small">登录名 {{ account_name(k.u) }} · 学习由 TA 自己安排</div></div>
   </div>
   <p class="small" style="margin:8px 0">🔥 连续 {{ k.streak }} 天 · 这一周学了 {{ k.week_days }} 天</p>
-  <div class="pacts"><a href="/parent/kids/{{ k.u.id }}/edit">资料与密码</a></div>
+  {% if k.trend %}<div class="trend-mini"><p class="small" style="margin:6px 0 4px">📊 {{ trend_words(k.trend.series[0]) }}</p>{{ trend_ui.spark(k.trend) }}</div>{% endif %}
+  {% if k.weekly %}<p class="small" style="margin:6px 0">📈 上周进步（{{ k.weekly.from[5:] }}~{{ k.weekly.to[5:] }}）：{{ k.weekly.lines|join('；') }}</p>{% endif %}
+  <div class="pacts"><a class="btn sm" href="/parent/kids/{{ k.u.id }}">学习报告</a> <a href="/parent/kids/{{ k.u.id }}/edit">资料与密码</a></div>
 </div>
 {% else %}
 {# 视觉重心：每个孩子先看「今天怎么样」+ 需要留意的发现；操作按钮只有一个实心的，其余是一排小入口 #}

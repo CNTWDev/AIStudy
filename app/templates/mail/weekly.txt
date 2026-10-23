@@ -4,7 +4,7 @@
 {% for k in kids %}
 
 【{{ k.name }}】
-上周学了 {{ k.days }} 天（共 7 天），一共 {{ k.minutes }} 分钟，做题 {{ k.attempts }} 道。{% if k.streak %}现在连续学习 {{ k.streak }} 天。{% endif %}
+上周学了 {{ k.days }} 天（共 7 天），一共 {{ k.minutes }} 分钟，答题 {{ k.attempts }} 道{% if k.split %}（{{ k.split }}）{% endif %}。{% if k.streak %}现在连续学习 {{ k.streak }} 天。{% endif %}
 {% if k.lines %}
 比再上一周进步的地方：
 {% for l in k.lines %}

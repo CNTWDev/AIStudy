@@ -52,7 +52,8 @@ def test_weekly_report_queue_send_retry_unsub(monkeypatch):
     rows = _ours(pa)
     assert len(rows) == 1 and rows[0]["ref"] == last_mon.isoformat() and rows[0]["to_addr"] == "mail-p@x.com"
     r = rows[0]
-    assert "小明学了 2 天" in r["subject"] and "妈妈" not in r["body_text"] and "新来的" not in r["body_text"]
+    assert "小明学了 2 天" in r["subject"] and "新来的" not in r["body_text"]
+    assert "【妈妈】" in r["body_text"] and f"/parent/kids/{adult}" in r["body_html"]   # 家里的成人成员也进报告，家长能点进去看
     assert "一共 55 分钟" in r["body_text"] and f"/parent/kids/{kid}" in r["body_html"] and "/mail/unsub?t=" in r["body_html"]
 
     # 发出去：带一键退订头；发过的不再发
