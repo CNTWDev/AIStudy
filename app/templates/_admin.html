@@ -1,7 +1,7 @@
-{# 管理后台共用：导航（app/web.py ADMIN_NAV，四组，每个后台页面顶部用 {{ admin_nav('当前页的 key') }}）、账号状态标签。 #}
+{# 管理后台共用：导航（app/web.py ADMIN_NAV，四组，每个后台页面顶部用 {{ admin_nav('当前页的 key') }}；每组一行，菜单项放进等宽格子，上下对齐）、账号状态标签。 #}
 {% macro admin_nav(on, pending=0) -%}
 <nav class="adminnav" aria-label="管理后台">
-  {% for group, items in ADMIN_NAV %}<div class="grp"><span class="gl">{{ group }}</span>{% for key, label, url in items %}<a href="{{ url }}" class="{{ 'on' if key == on }}">{{ label }}{% if key == 'overview' and pending %} <span class="badge">{{ pending }}</span>{% endif %}</a>{% endfor %}</div>{% endfor %}
+  {% for group, items in ADMIN_NAV %}<div class="grp"><span class="gl">{{ group }}</span><div class="its">{% for key, label, url in items %}<a href="{{ url }}" class="{{ 'on' if key == on }}">{{ label }}{% if key == 'overview' and pending %} <span class="badge">{{ pending }}</span>{% endif %}</a>{% endfor %}</div></div>{% endfor %}
 </nav>
 {%- endmacro %}
 
