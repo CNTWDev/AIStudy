@@ -7,6 +7,14 @@ greet = "太空站准备就绪，我们出发！"
 name = "小宇"
 desc = "太空站的值班机器人，天线上顶着一颗星"
 
+# 底栏五个图标
+[nav]
+today = "🚀"
+subjects = "🪐"
+arena = "👾"
+reading = "📡"
+records = "🌟"
+
 [light]
 bg = "#eef2fb"
 card = "#ffffff"
@@ -61,3 +69,12 @@ heat-4 = "#7dd3fc"
 ink = "#1d2340"
 wave = "square"
 pitch = 1.0
+
+# 乐园「白天」场景换成星球表面
+[play.day]
+sky = ["#1d2a5c", "#4a5aa8"]
+hill = ["#5b6bb5", "#46559c"]
+ground = "#9aa7d8"
+soil = "#6b76a8"
+cloud = "#7f8fd0"
+stars = true

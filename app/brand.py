@@ -30,10 +30,15 @@ ALL = dict(MASCOTS)  # 加上主题带来的小伙伴
 _RAW: dict[str, str] = {}  # 主题小伙伴的原文件（浏览器标签图标用）
 
 
-def add_mascot(m: str, name: str, desc: str, svg: str) -> None:
+_CHEER: dict[str, str] = {}  # 开心的样子（答对、做完）；没有就用平常的
+
+
+def add_mascot(m: str, name: str, desc: str, svg: str, cheer: str | None = None) -> None:
     ALL[m] = (name, desc)
     _SVG[m] = re.sub(r"<style>.*?</style>", "", svg.strip())
     _RAW[m] = svg.strip()
+    if cheer:
+        _CHEER[m] = re.sub(r"<style>.*?</style>", "", cheer.strip())
 
 
 _WORDMARK = re.search(r'd="([^"]+)"', (BRAND_DIR / "wordmark.svg").read_text()).group(1)
@@ -68,9 +73,9 @@ def set_mascot(user_id: int, m: str) -> bool:
     return True
 
 
-def mascot_svg(m: str, size: int = 28, cls: str = "mascot") -> Markup:
-    """内联 SVG。同一页可能放好几个，clipPath 的 id 每次加个后缀免得互相串。"""
-    svg = _SVG.get(m) or _SVG[DEFAULT]
+def mascot_svg(m: str, size: int = 28, cls: str = "mascot", mood: str = "") -> Markup:
+    """内联 SVG。同一页可能放好几个，clipPath 的 id 每次加个后缀免得互相串。mood="cheer"：开心的样子（有的话）。"""
+    svg = (mood == "cheer" and _CHEER.get(m)) or _SVG.get(m) or _SVG[DEFAULT]
     n = next(_uid)
     svg = re.sub(r'id="(\w+)"', rf'id="\1-{n}"', svg)
     svg = re.sub(r'url\(#(\w+)\)', rf'url(#\1-{n})', svg)

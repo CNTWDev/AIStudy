@@ -8,6 +8,13 @@ greet = "潜水装备好了，我们一起下潜！"
 name = "墨墨"
 desc = "住在珊瑚旁边的小章鱼，最会吐泡泡"
 
+[nav]
+today = "🐚"
+subjects = "🧭"
+arena = "🐠"
+reading = "📜"
+records = "⭐"
+
 [light]
 bg = "#edf8f6"
 card = "#ffffff"
@@ -62,3 +69,11 @@ heat-4 = "#99f6e4"
 ink = "#12403c"
 wave = "sine"
 pitch = 0.89
+
+# 乐园「白天」场景换成海底
+[play.day]
+sky = ["#3fb8c7", "#bff0ea"]
+hill = ["#5fcfa8", "#3fae8c"]
+ground = "#f0dfb6"
+soil = "#d8bf8c"
+cloud = "#e6fbff"

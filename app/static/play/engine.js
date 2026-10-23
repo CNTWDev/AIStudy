@@ -308,6 +308,8 @@
       for (let x = -s; x < W; x += 24) { ctx.beginPath(); ctx.moveTo(x, y - 2); ctx.lineTo(x + 5, y - 12); ctx.lineTo(x + 10, y - 2); ctx.fill(); }
     },
   };
+  // 主题（DESIGN 5.45）可以换「白天」场景的颜色（乐园首页、跑酷、闪电赛跑、各游戏的第一个世界）；别的世界保持原样，认得出是哪一关
+  if (LOOK.day) Object.assign(Play.scene.themes.day, LOOK.day);
 
   // ---------------------------------------------------------------- 输入
   Play.input = {

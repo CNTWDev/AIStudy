@@ -43,7 +43,7 @@ templates.env.globals.update(stage_label=stage_label, catalog=catalog, STATUS_LA
                              qfig=figures.present)
 
 templates.env.globals.update(MASCOTS=brand.MASCOTS, mascot_of=brand.mascot_of, mascot_chosen=brand.has_chosen, mascot_svg=brand.mascot_svg, mascot_icon=brand.icon_url,
-                             look_client=theme.client, LOOK_CSS_V=theme.CSS_V,
+                             look_client=theme.client, LOOK_CSS_V=theme.CSS_V, nav_icon=theme.nav_icon,
                              wordmark_svg=brand.wordmark_svg)
 
 templates.env.globals["news_today_title"] = news.today_title

@@ -247,6 +247,15 @@ def theme_css():
     return Response(theme.CSS, media_type="text/css", headers={"Cache-Control": "public, max-age=86400"})
 
 
+@router.get("/theme/{tid}/{name}.svg")
+def theme_art(tid: str, name: str):
+    """主题的整页插画（底纹、底部场景）。"""
+    svg = theme.art(tid, name)
+    if not svg:
+        raise HTTPException(404)
+    return Response(svg, media_type="image/svg+xml", headers={"Cache-Control": "public, max-age=604800"})
+
+
 @router.get("/brand/{m}.svg")
 def mascot_icon(m: str):
     """主题带来的小伙伴当浏览器标签图标（beejoy 自己的五个在 /static/brand）。"""

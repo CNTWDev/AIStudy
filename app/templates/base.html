@@ -20,7 +20,7 @@
 {% if user and user.role == 'kid' %}<script>window.ME = {call: {{ ((user.nickname or '').strip() or user.name)|tojson }}};</script>{% endif %}
 {# 主题（DESIGN 5.45）：乐园的描边颜色和音色跟着孩子选的主题走（art.js、engine.js 读它） #}
 {% if look %}<script>window.LOOK = {{ look_client(look)|tojson }};</script>{% endif %}
-<script>window.AI = {name: {{ ASSISTANT|tojson }}, face: {{ (mascot_svg(mascot, 56) if ASSISTANT_ICON == '🙋' else ASSISTANT_ICON)|string|tojson }}};</script>
+<script>window.AI = {name: {{ ASSISTANT|tojson }}, face: {{ (mascot_svg(mascot, 56) if ASSISTANT_ICON == '🙋' else ASSISTANT_ICON)|string|tojson }}{% if look and ASSISTANT_ICON == '🙋' %}, cheer: {{ mascot_svg(mascot, 64, 'mascot', 'cheer')|string|tojson }}{% endif %}};</script>
 {% if user and user.role == 'parent' and kid %}
 <div class="banner">正在查看 <b>{{ kid.name }}</b> 的学习（家长只查看和管理，做题请用孩子的账号）· <a href="/parent">回到家长页</a></div>
 {% endif %}
@@ -52,11 +52,11 @@
 {% if kid %}
 {% set p = request.url.path %}
 <nav class="tabs">
-  <a href="/today" class="{{ 'on' if p.startswith('/today') or p.startswith('/sprint') or p.startswith('/review') or p.startswith('/words') or p.startswith('/warmup') }}"><span class="i">☀️</span>今天</a>
-  <a href="/subjects" class="{{ 'on' if p.startswith('/subjects') or p.startswith('/papers') or p.startswith('/progress') or p.startswith('/map') or p.startswith('/learn') or p.startswith('/diagnose') }}"><span class="i">🗺️</span>学科</a>
-  {% if not readonly %}{% if not is_adult(kid.grade) or game_minutes(kid) %}<a href="/arena" class="play {{ 'on' if p.startswith('/arena') }}"><span class="i">🎮</span>乐园</a>{% endif %}
-  <a href="/reading" class="{{ 'on' if p.startswith('/reading') }}"><span class="i">📖</span>阅读</a>{% endif %}
-  <a href="/records" class="{{ 'on' if p.startswith('/records') or p.startswith('/day/') }}"><span class="i">📅</span>记录</a>
+  <a href="/today" class="{{ 'on' if p.startswith('/today') or p.startswith('/sprint') or p.startswith('/review') or p.startswith('/words') or p.startswith('/warmup') }}"><span class="i">{{ nav_icon(look, 'today', '☀️') }}</span>今天</a>
+  <a href="/subjects" class="{{ 'on' if p.startswith('/subjects') or p.startswith('/papers') or p.startswith('/progress') or p.startswith('/map') or p.startswith('/learn') or p.startswith('/diagnose') }}"><span class="i">{{ nav_icon(look, 'subjects', '🗺️') }}</span>学科</a>
+  {% if not readonly %}{% if not is_adult(kid.grade) or game_minutes(kid) %}<a href="/arena" class="play {{ 'on' if p.startswith('/arena') }}"><span class="i">{{ nav_icon(look, 'arena', '🎮') }}</span>乐园</a>{% endif %}
+  <a href="/reading" class="{{ 'on' if p.startswith('/reading') }}"><span class="i">{{ nav_icon(look, 'reading', '📖') }}</span>阅读</a>{% endif %}
+  <a href="/records" class="{{ 'on' if p.startswith('/records') or p.startswith('/day/') }}"><span class="i">{{ nav_icon(look, 'records', '📅') }}</span>记录</a>
 </nav>
 {% endif %}
 </body>

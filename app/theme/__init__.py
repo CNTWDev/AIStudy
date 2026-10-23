@@ -3,7 +3,9 @@
 主题只换样子，不换怎么学：一页一个主按钮、能按的东西有描边有厚度、读题时页面不动、对错的颜色、题目和讲解的说法，
 都不跟主题走。只有孩子（ui_tone 是 kid）用主题；成人、家长、管理员和登录页保持原样。
 
-一个主题是一个文件夹：theme.toml（名字、颜色、乐园、开场白）+ 可选的 mascot.svg（这个主题的小伙伴）。
+一个主题是一个文件夹：theme.toml（名字、颜色、底栏图标、乐园、开场白）+ 可选的插画：
+mascot.svg（这个主题的小伙伴）、mascot-cheer.svg（它开心的样子）、pattern.svg（整页淡淡的底纹，240 一块）、
+horizon.svg（页面底部的场景画）。插画由 tools/gen_theme_art.py 生成，也可以换成画师画的。
 内置的在 app/theme/<id>/，不进公开仓库的（比如授权来的 IP 主题）放在 DATA_DIR/themes/<id>/，部署时装进去，格式一样。
 颜色只能改 TOKENS 里这些；没写的都用 app.css 的默认值。每个主题浅色、深色两套都要写全，测试会检查文字对比度。
 """
@@ -24,6 +26,9 @@ TOKENS = ("bg", "card", "ink", "muted", "faint", "line", "line-2",
           "k-ink", "k-card-edge", "k-card-shadow", "heat-0", "heat-1", "heat-2", "heat-3", "heat-4")
 # 乐园（play.css、art.js、engine.js）：描边颜色；音色——旋律类音效换成哪种波形、整体升降多少
 PLAY_WAVES = ("sine", "triangle", "square")
+NAV = ("today", "subjects", "arena", "reading", "records")   # 底栏五个图标
+ART = ("pattern", "horizon")                                  # 整页的插画（/theme/<id>/<name>.svg）
+SCENE = ("sky", "hill", "ground", "soil", "cloud", "stars")   # 乐园「白天」场景能换的颜色（engine.js 的 Play.scene.themes.day）
 
 
 def _load(d: Path) -> dict | None:
@@ -35,10 +40,13 @@ def _load(d: Path) -> dict | None:
             "unlock": int(t.get("unlock", 0)), "greet": t.get("greet", ""),
             "light": {k: v for k, v in t.get("light", {}).items() if k in TOKENS},
             "dark": {k: v for k, v in t.get("dark", {}).items() if k in TOKENS},
-            "play": t.get("play", {})}
+            "play": t.get("play", {}), "nav": {k: v for k, v in t.get("nav", {}).items() if k in NAV},
+            "art": {k: (d / f"{k}.svg").read_text(encoding="utf-8") for k in ART if (d / f"{k}.svg").is_file()}}
     m = t.get("mascot", {})
     if (d / "mascot.svg").is_file():  # 主题自带的小伙伴，id 和主题一样
-        brand.add_mascot(d.name, m.get("name", t["name"]), m.get("desc", ""), (d / "mascot.svg").read_text(encoding="utf-8"))
+        cheer = d / "mascot-cheer.svg"
+        brand.add_mascot(d.name, m.get("name", t["name"]), m.get("desc", ""), (d / "mascot.svg").read_text(encoding="utf-8"),
+                         cheer.read_text(encoding="utf-8") if cheer.is_file() else None)
         look["mascot"] = d.name
     else:
         look["mascot"] = m.get("id", brand.DEFAULT)
@@ -148,20 +156,41 @@ def css() -> str:
         if not t["light"]:
             continue
         sel = f'[data-look="{t["id"]}"]'
+        if t["art"]:  # 整页插画画在 body::before 上（app.css 管位置、深色压暗），底部场景 + 底纹
+            layers = []
+            if "horizon" in t["art"]:
+                layers.append(f'url(/theme/{t["id"]}/horizon.svg?v={_v(t["art"]["horizon"])}) center bottom/max(100%,900px) auto no-repeat')
+            if "pattern" in t["art"]:
+                layers.append(f'url(/theme/{t["id"]}/pattern.svg?v={_v(t["art"]["pattern"])}) 0 0/240px repeat')
+            out.append(f'body{sel}::before{{background:{",".join(layers)}}}')
         out.append(f"{sel}{{{_block(t['light'], t['play'])}}}")
-        dark = _block(t["dark"], {**t["play"], "ink": t["play"].get("ink-dark") or t["play"].get("ink")})
+        dark = _block(t["dark"], t["play"])
         out.append(f"@media (prefers-color-scheme:dark){{:root:not([data-theme=light]) {sel}{{{dark}}}}}")
         out.append(f":root[data-theme=dark] {sel}{{{dark}}}")
     return "\n".join(out) + "\n"
 
 
 def client(look: dict | None) -> dict:
-    """给页面脚本（乐园的描边和音色）：window.LOOK。"""
+    """给页面脚本（乐园的描边、音色、白天场景的颜色）：window.LOOK。"""
     p = (look or {}).get("play", {})
     wave = p.get("wave") if p.get("wave") in PLAY_WAVES else None
-    return {"id": look["id"] if look else None, "ink": p.get("ink"), "inkDark": p.get("ink-dark"),
-            "wave": wave, "pitch": float(p.get("pitch", 1) or 1)}
+    day = {k: v for k, v in p.get("day", {}).items() if k in SCENE}
+    return {"id": look["id"] if look else None, "ink": p.get("ink"), "wave": wave, "pitch": float(p.get("pitch", 1) or 1),
+            "day": day or None}
+
+
+def nav_icon(look: dict | None, key: str, default: str) -> str:
+    return ((look or {}).get("nav") or {}).get(key) or default
+
+
+def art(tid: str, name: str) -> str | None:
+    t = LOOKS.get(tid)
+    return t["art"].get(name) if t else None
+
+
+def _v(text: str) -> str:
+    return hashlib.sha1(text.encode()).hexdigest()[:8]
 
 
 CSS = css()
-CSS_V = hashlib.sha1(CSS.encode()).hexdigest()[:8]
+CSS_V = _v(CSS)
