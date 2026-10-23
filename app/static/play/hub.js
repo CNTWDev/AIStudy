@@ -11,7 +11,7 @@
     const ctx = cv.getContext('2d'), H = 150, s = r.height / H, W = r.width / s;
     ctx.setTransform(s * dpr, 0, 0, s * dpr, 0, 0);
     const av = me.dataset.avatar, g = cv.dataset.preview, ground = 128;
-    const theme = {stickman: 'sunset', race: 'day', defense: 'candy', runner: 'day'}[g] || 'day';
+    const theme = {stickman: 'sunset', race: 'day', defense: 'candy', runner: 'day', helix: 'day'}[g] || 'day';
     if (multi(ctx, g, W, H, t, av)) return;
     Play.scene.sky(ctx, W, H, theme);
     Play.scene.drawClouds(ctx, W, theme, t * (g === 'race' ? 4 : 1));
@@ -40,6 +40,21 @@
         ctx.fillText(ch, x, y - sz / 2);
       });
       Art.hero(ctx, cx, H - 6, {avatar: av, pose: 'run', t: t * 1.5, scale: 0.55});
+    } else if (g === 'helix') {   // 向下跳：柱子上的圆盘转着，球在上面弹
+      const cx = W / 2, R = Math.min(70, W * 0.3), rot = t * 0.8;
+      ctx.fillStyle = '#fff6e0'; ctx.fillRect(cx - 12, 0, 24, H);
+      for (const [y, gap] of [[60, 0], [112, 2.2]]) {
+        for (let j = 0; j < 12; j++) {
+          const a0 = rot + gap + j * Math.PI / 6;
+          if (j < 2) continue;
+          ctx.beginPath();
+          for (let k = 0; k <= 4; k++) { const a = a0 + Math.PI / 6 * k / 4; ctx.lineTo(cx + R * Math.cos(a), y + R * 0.3 * Math.sin(a)); }
+          for (let k = 4; k >= 0; k--) { const a = a0 + Math.PI / 6 * k / 4; ctx.lineTo(cx + 12 * Math.cos(a), y + 3.6 * Math.sin(a)); }
+          ctx.fillStyle = j === 7 ? '#ff4d5a' : j % 2 ? '#ffc93c' : '#ffd45e'; ctx.fill(); ctx.strokeStyle = '#2b2340'; ctx.lineWidth = 1.5; ctx.stroke();
+        }
+      }
+      const by = 52 - Math.abs(Math.sin(t * 5)) * 26;
+      ctx.fillStyle = Art.avatar(av).main; ctx.beginPath(); ctx.arc(cx, by, 9, 0, 7); ctx.fill(); ctx.strokeStyle = '#2b2340'; ctx.lineWidth = 2; ctx.stroke();
     } else if (g === 'defense') {
       Art.castle(ctx, 70, ground, 0.55, 1, t);
       Art.hero(ctx, 70, ground - 66, {avatar: av, pose: 'charge', t, scale: 0.5});

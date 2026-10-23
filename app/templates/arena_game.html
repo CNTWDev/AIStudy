@@ -13,7 +13,7 @@
   <div class="pl-top">
     <a href="{{ back }}" class="pl-back" aria-label="{{ '回单词' if back != '/arena' else '回乐园' }}">‹</a>
     <b class="pl-name">{{ g.icon }} {{ g.name }}</b>
-    <span class="pl-chip">{% if g.multi %}{{ g.players[1] }} 人联网{% else %}Lv.{{ a.level.level }}{% endif %}</span>
+    <span class="pl-chip">{% if g.multi %}{{ '%d～%d 人' % (g.players[0], g.players[1]) if g.players[0] == 1 else '%d 人联网' % g.players[1] }}{% else %}Lv.{{ a.level.level }}{% endif %}</span>
     <button type="button" class="pl-icon" data-pause aria-label="暂停" title="暂停" hidden>⏸</button><button type="button" class="pl-icon" data-music aria-label="背景音乐">🎵</button><button type="button" class="pl-icon" data-sfx aria-label="音效">🔊</button>
   </div>
   <div class="pl-stage">

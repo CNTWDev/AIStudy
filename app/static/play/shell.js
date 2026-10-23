@@ -12,6 +12,7 @@
        end() {},                 // 这一关停下了（结束、换设备）：停掉循环
        onAnswer(res) {}, onXP(res) {}, onQuizOpen() {}, onQuizClose() {}, onRevive(info) {},
        revive: {verb: '接着打', done: '…'},   // 倒下答题时怎么说（不写：「复活」）。规矩所有游戏一样，游戏改不了：见下面 REVIVE_NEED
+       moreHint: '人多怪兽也多',   // 房间里还能进人时，后面接的一句（不写就不说）
        quizOpts: {rightHtml, wrongHtml, nextDelay},   // 答题面板的额外选项（quiz.js：答对、答错时多显示什么，答对后隔多久出下一题）
        pause(on, ms) {},         // 暂停 / 继续了（游戏循环外壳会停，自己用墙上时钟算时间的游戏在这里把暂停的 ms 补上）
        verdict(res) {},          // 对战：这一局对我来说是赢还是输 → {result, title, why}（res 是房主报的结果）
@@ -334,7 +335,7 @@
         if (room.kind === 'code') h += `<div class="mp-pin">🔒 密码 <b>${esc(room.pin)}</b><small>告诉想一起玩的小伙伴：在大厅里点「${esc(room.name)}」，输这个密码就进来了</small></div>`;
         else if (room.kind === 'public') h += `<p class="mp-hint">🌏 公开房间：全站的小伙伴都能进来，大家只看到昵称。</p>`;
         const more = G.players[1] - room.members.length;
-        if (room.full && more > 0) h += `<p class="mp-hint">还能再进 ${more} 个人，人多怪兽也多。开始以后就不能进人了。</p>`;
+        if (room.full && more > 0) h += `<p class="mp-hint">还能再进 ${more} 个人${def.moreHint ? `，${def.moreHint}` : ''}。开始以后就不能进人了。</p>`;
         if (room.host && G.roles.length > 1 && room.members.length > 1) h += `<button type="button" class="btn sm ghost mp-swap">🔁 换角色</button>`;
       } else {
         h = `<canvas class="pl-me" data-av="${esc(data.avatar)}"></canvas>` + h;

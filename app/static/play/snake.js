@@ -352,6 +352,7 @@
   }
   let pointerReady = false;
   PlayShell.init({
+    moreHint: '人多怪兽也多',
     quiz: 'revive', tempo: 126,
     rules: ['2～4 条小蛇是一队，一起<b>吃豆子长大</b>，大家加起来够长就过关（人多目标也长）。',
             '← → 转弯，按住空格冲刺（会变短一点）；手机、平板：手指按住往哪拖就往哪游。',

@@ -142,8 +142,9 @@ def after_match(kid_id: int, game_keys: list[str], st: dict, status: dict, focus
 
 def after_run(game, team: str, session_id: int, rep: dict, before: dict, after: dict) -> list[str]:
     """一起过了一关（联网游戏）：给全队的贴纸。一路上都有：第一次过关、打通一个世界（10 个世界）、连着几关没人倒下、
-    倒下答的题全答对、星星攒够、一共闯过 50 / 200 / 500 关、全部打通。比的是「我们」和上次的「我们」。"""
-    if not game.multi:
+    倒下答的题全答对、星星攒够、一共闯过 50 / 200 / 500 关、全部打通。比的是「我们」和上次的「我们」。
+    一个人也能玩的联网游戏（向下跳）自己玩时不发：这些贴纸说的是「一起」。"""
+    if not game.multi or "," not in team:
         return []
     keys = ["mp1"]
     if rep["deaths"] == 0:

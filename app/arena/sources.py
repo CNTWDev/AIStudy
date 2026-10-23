@@ -274,6 +274,8 @@ class WordSource(Source):
         if ctx.get("ask_fmt"):   # 只出一种题的游戏（单词跑酷）
             return ctx["ask_fmt"]
         fm = dict(self.FORMATS["core" if g["family"] == "words" else "terms"])
+        if ctx.get("shape") == "choices":   # 题要写成几个短选项的游戏（向下跳）：只出认意思、看中文选英文
+            fm = {k: v for k, v in fm.items() if k in ("read", "reverse")}
         if ctx.get("mode") != "sprint":   # 听音只在快练和冲刺里出（有「不会」可点）；游戏里可能关着声音
             fm.pop("listen", None)
         return rng.choices(list(fm), weights=list(fm.values()))[0]
@@ -475,6 +477,82 @@ class BankSource(Source):
         return None
 
 
+# ------------------------------------------------------------------ 写成几个短选项（向下跳：选项写在洞口的小牌子上）
+
+OPT_WIDTH = 12     # 一个选项最宽多少（汉字算 2）：洞口的牌子只放得下这么多
+Q_WIDTH = 64       # 题目最长多少：挂在柱子上的题牌
+
+
+def _width(s: str) -> int:
+    return sum(2 if ord(ch) > 0x2E80 else 1 for ch in str(s))
+
+
+def _fmt_num(x) -> str:
+    x = round(float(x), 4)
+    return str(int(x)) if x == int(x) else f"{x:.4f}".rstrip("0").rstrip(".")
+
+
+def _near_numbers(ans: float, rng: random.Random) -> list[str]:
+    """数字答案旁边、容易算错成的数：差 1、差 2、差 10（大数差 100）、小数点挪一位。"""
+    step = 100 if abs(ans) >= 1000 else 10 if abs(ans) >= 20 else 3   # 10 以内的题，错的选项也在 10 左右，不一眼排除
+    cands = [ans + 1, ans - 1, ans + 2, ans - 2, ans + step, ans - step]
+    if ans != int(ans):
+        cands += [ans * 10, ans / 10]
+    right = _fmt_num(ans)
+    out = list(dict.fromkeys(_fmt_num(c) for c in cands if (c >= 0 or ans < 0) and _fmt_num(c) != right))
+    rng.shuffle(out)
+    return out
+
+
+def _near_fractions(right: str, rng: random.Random) -> list[str]:
+    from fractions import Fraction
+    try:
+        f = Fraction(right)
+    except (ValueError, ZeroDivisionError):
+        return []
+    d = f.denominator
+    cands = [f + Fraction(1, d), f - Fraction(1, d), Fraction(f.numerator + 1, d + 1) if d > 1 else f + 1, 1 / f if f else f + 2]
+    out = list(dict.fromkeys(quickgen._frac_str(c) for c in cands if c > 0 and c != f))
+    rng.shuffle(out)
+    return out
+
+
+def as_choices(it: dict, rng: random.Random) -> dict | None:
+    """把一道题写成 2～4 个短选项（选择题；答案是数、分数的计算题按容易算错的数配错误选项）。写不成的返回 None。
+    计算题改成选一个以后容易了（能排除、能蒙），所以换个题族单独校准（<题族>:pick），能力值还是同一个。"""
+    if _width(it.get("q", "")) > Q_WIDTH:
+        return None
+    t = it.get("type")
+    if t == "mcq":
+        opts = list(it.get("options") or [])
+        try:
+            right = opts[int(it["answer"])]
+        except (TypeError, ValueError, IndexError, KeyError):
+            return None
+        if _width(right) > OPT_WIDTH:
+            return None
+        wrongs = [o for o in opts if o != right and _width(o) <= OPT_WIDTH][:3]
+        if not wrongs:
+            return None
+        return {**_mcq(it["q"], right, wrongs, rng), **{k: v for k, v in it.items() if k not in ("type", "q", "options", "answer")}}
+    if t == "num" and _width(_fmt_num(it["answer"])) <= OPT_WIDTH:
+        right, wrongs = _fmt_num(it["answer"]), _near_numbers(float(it["answer"]), rng)[:2]
+    elif t == "fill" and it.get("keypad") == "frac":
+        it = {**it, "q": re.sub(r"（写成[^）]*）", "", it["q"]).strip()}   # 选一个，不用自己写
+        right = it["answer"][0]
+        wrongs = [w for w in _near_fractions(right, rng) if w not in it["answer"]][:2]
+    else:
+        return None
+    if not wrongs:
+        return None
+    family = f"{it['family']}:pick" if it.get("family") else ""
+    out = {**{k: v for k, v in it.items() if k not in ("tol", "keypad")}, **_mcq(it["q"], right, wrongs, rng)}
+    if family and it.get("level"):
+        b = ability.calib(family, [it["level"]])[it["level"]][0]
+        out.update(family=family, b=b, p=round(ability.sigmoid(it.get("theta", 0) - b), 4))
+    return out
+
+
 def _reshuffle(it: dict, rng: random.Random) -> dict:
     """选项打乱，答案跟着换（再考一次时也换个位置，不让孩子记位置）。"""
     if it.get("type") != "mcq":
@@ -497,12 +575,15 @@ def weights(kid: dict, ctx: Ctx | None = None) -> dict[str, float]:
 NO_SOURCE = {"words": "还没有单词包：孩子请家长在「学习安排 → 单词包」里加一个，自己学的在「我的词」里挑一个。"}
 
 
-def pick(kid: dict, target: float, rng: random.Random, ctx: Ctx | None = None, mode: str = "game", ask: tuple | None = None) -> dict:
+def pick(kid: dict, target: float, rng: random.Random, ctx: Ctx | None = None, mode: str = "game", ask: tuple | None = None,
+         shape: str = "") -> dict:
     """给这个孩子出一道题（游戏、冲刺都用它）：target 是目标答对率；mode = sprint 时也出听音题。
     ask：只出一种题的游戏（单词跑酷：("words", "run")），只从这个题源出；这个人用不上它（没有单词包）就出不了，告诉他为什么。
+    shape = "choices"：题都写成 2～4 个短选项（as_choices），写不成的换别的题源。
     抽中的题源这次出不了题（比如题库里一时没有新题、后台还在出），换别的题源。"""
     ctx = ctx or Ctx(kid)
-    ctx["mode"] = mode
+    ctx["mode"], ctx["shape"] = mode, shape
+    shaped = (lambda x: x and as_choices(x, rng)) if shape == "choices" else (lambda x: x)
     ws, it = weights(kid, ctx) or {"math": 1.0}, None
     if ask:
         if ask[0] not in ws:
@@ -512,9 +593,11 @@ def pick(kid: dict, target: float, rng: random.Random, ctx: Ctx | None = None, m
         sid = rng.choices(list(ws), weights=list(ws.values()))[0]
         ws.pop(sid)
         s = SOURCES[sid]
-        it = s.pick(kid, ctx, min(0.92, target + s.target_shift), rng)
-    if not it:
-        sid, it = "math", SOURCES["math"].pick(kid, ctx, target, rng)
+        it = shaped(s.pick(kid, ctx, min(0.92, target + s.target_shift), rng))
+    for _ in range(PICK_TRIES):   # 口算总出得了（写成选项也总写得成：答案是程序算的数）
+        if it:
+            break
+        sid, it = "math", shaped(SOURCES["math"].pick(kid, ctx, target, rng))
     it["src"] = sid
     return it
 
@@ -531,7 +614,8 @@ def key(it: dict) -> str:
     return f"w:{it['word'].lower()}" if it.get("word") else it["id"]
 
 
-def next_item(kid: dict, st: dict, target: float, rng: random.Random, mode: str = "game", ask: tuple | None = None) -> dict:
+def next_item(kid: dict, st: dict, target: float, rng: random.Random, mode: str = "game", ask: tuple | None = None,
+              shape: str = "") -> dict:
     """这一次（st 是这次快练 / 这一局的状态，调用方负责存）的下一题。"""
     n = st.get("n", 0)
     st["n"] = n + 1
@@ -544,7 +628,7 @@ def next_item(kid: dict, st: dict, target: float, rng: random.Random, mode: str 
     run = st.setdefault("run", {})
     ctx.update(served=set(seen), run=run)
     for _ in range(PICK_TRIES):
-        it = pick(kid, target, rng, ctx, mode, ask)
+        it = pick(kid, target, rng, ctx, mode, ask, shape)
         if key(it) not in seen:
             break
     seen.append(key(it))
