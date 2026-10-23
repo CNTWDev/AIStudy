@@ -551,6 +551,18 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 @keyframes fsin{from{transform:translateY(110%)}to{transform:none}}
 .fs-x{position:absolute;right:10px;top:10px;border:0;background:var(--line-2);color:var(--muted);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px}
 .fs-h b{display:block;font-size:19px;padding-right:34px}.fs-face{float:right;margin:-6px 30px 0 8px}.fs-face .mascot{display:block}.fs-h span{display:block;color:var(--muted);font-size:14px;margin-top:2px}
+.grow-card .grow-nums{margin:4px 0 12px}.grow-card .bar span{background:var(--brand);border-radius:99px}
+.jars{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.jar{position:relative;width:22px;height:28px;border-radius:5px 5px 8px 8px;border:2px solid var(--brand-d);background:var(--card);overflow:hidden}
+.jar::before{content:"";position:absolute;left:3px;right:3px;top:-2px;height:4px;border-radius:2px;background:var(--brand-d)}
+.jar b{position:absolute;left:0;right:0;bottom:0;background:var(--brand)}.jar.full{background:var(--brand)}
+.grow-weeks{display:flex;align-items:flex-end;gap:4px;height:120px;margin-top:14px}
+.gw{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.gw i{display:flex;flex-direction:column;justify-content:flex-start;width:100%;max-width:28px;border-radius:5px 5px 2px 2px;background:var(--brand-3);overflow:hidden;min-height:2px}
+.gw i em{display:block;background:var(--brand)}.gw span{font-size:10px;color:var(--faint);margin-top:3px;white-space:nowrap}.gw.now span{color:var(--ink);font-weight:600}
+.fs-grow{margin:10px 0 0;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}.fs-grow b{color:var(--ink);font-size:17px}
+.fs-learned{display:block;margin:8px 0 0;padding:8px 12px;border-radius:12px;background:var(--learn-2);color:var(--ink);font-size:14px;text-decoration:none}
+.fs-mile{margin:8px 0 0;padding:10px 12px;border-radius:12px;background:var(--brand-2);color:var(--ink);font-weight:600;font-size:15px}
 .fs-prog{display:flex;align-items:center;gap:10px;margin:10px 0 12px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
 .fs-prog i{flex:1;height:8px;border-radius:99px;background:var(--line-2);overflow:hidden}.fs-prog i b{display:block;height:100%;background:var(--ok);border-radius:99px;transition:width .6s}
 .fs-next{display:block;padding:14px;border-radius:18px;background:var(--brand-2);border:1.5px solid var(--brand-3);color:var(--ink)}

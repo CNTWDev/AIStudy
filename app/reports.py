@@ -9,7 +9,7 @@ from datetime import date, datetime, timedelta
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from . import config, db, engine, insights, mailer, records, sitecfg
+from . import config, db, engine, growth, insights, mailer, records, sitecfg
 
 _env = Environment(loader=FileSystemLoader(config.BASE_DIR / "app" / "templates" / "mail"),
                    autoescape=select_autoescape(["html"]), trim_blocks=True, lstrip_blocks=True)
@@ -31,7 +31,7 @@ def kid_week(k: dict, mon: date) -> dict:
                  "WHERE user_id=? AND day>=? AND day<? AND (minutes>0 OR checked_in=1)", k["id"], mon.isoformat(), end.isoformat())
     card = records.weekly(k["id"], mon)
     return {"name": k["name"], "id": k["id"], "days": row["days"], "minutes": int(row["minutes"]),
-            "streak": engine.streak(k["id"]), "lines": card["lines"][:-1] if card else [],
+            "streak": engine.streak(k["id"]), "total": growth.line(k["id"]), "lines": card["lines"][:-1] if card else [],
             "attempts": card["this"]["attempts"] if card else 0, "split": card["this"]["split"] if card else "",
             "found": [{"title": f["title"], "detail": f["detail"]} for f in insights.open_insights(k["id"], limit=3)]}
 

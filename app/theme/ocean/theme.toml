@@ -77,3 +77,8 @@ hill = ["#5fcfa8", "#3fae8c"]
 ground = "#f0dfb6"
 soil = "#d8bf8c"
 cloud = "#e6fbff"
+
+# 记录页「我的积累」里装满的那个东西（app/growth.py 的 board）：一个装 100 道题
+[grow]
+icon = "🐚"
+name = "个贝壳"

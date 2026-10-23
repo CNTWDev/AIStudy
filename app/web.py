@@ -17,7 +17,7 @@ from fastapi.responses import RedirectResponse, StreamingResponse
 
 from fastapi.templating import Jinja2Templates
 
-from . import arena, auth, bankpapers, boards, coach, config, db, engine, evidence, explore, focus, insights, itemtypes, llm, papers, records, sitecfg, sprint, streak, trace
+from . import arena, auth, bankpapers, boards, coach, config, db, engine, evidence, explore, focus, growth, insights, itemtypes, llm, papers, records, sitecfg, sprint, streak, trace
 
 from . import figures
 
@@ -507,7 +507,7 @@ def _records_ctx(k):
     weak = sorted([v for v in m.values() if v["status"] == "weak" and catalog.kp(v["kp_id"])], key=lambda v: v["score"])
     days = db.q("SELECT * FROM days WHERE user_id=? AND (reflection<>'' OR checked_in=1) ORDER BY day DESC LIMIT 14", k["id"])
     lookups = db.q("SELECT query, created_at FROM lookups WHERE user_id=? ORDER BY id DESC LIMIT 30", k["id"])
-    return {"k": k, "packs": packs, "recent": records.recent(k["id"]), "weak": [(catalog.kp(w["kp_id"]), w) for w in weak[:12]],
+    return {"k": k, "packs": packs, "recent": records.recent(k["id"]), "grow": growth.board(k["id"], theme.look_of(k)), "weak": [(catalog.kp(w["kp_id"]), w) for w in weak[:12]],
             "cal": engine.calendar(k["id"], 12, full_weeks=True), "streak": engine.streak(k["id"]), "days": days, "lookups": lookups,
             "reads": db.q("SELECT * FROM reading_logs WHERE user_id=? ORDER BY id DESC LIMIT 30", k["id"]),
             "found": insights.open_insights(k["id"]), "solved": insights.resolved_recent(k["id"]),

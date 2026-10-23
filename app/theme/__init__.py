@@ -38,6 +38,7 @@ def _load(d: Path) -> dict | None:
     t = tomllib.loads(f.read_text(encoding="utf-8"))
     look = {"id": d.name, "name": t["name"], "desc": t.get("desc", ""), "order": t.get("order", 99),
             "unlock": int(t.get("unlock", 0)), "greet": t.get("greet", ""),
+            "grow": {k: str(v) for k, v in t.get("grow", {}).items() if k in ("icon", "name")},
             "light": {k: v for k, v in t.get("light", {}).items() if k in TOKENS},
             "dark": {k: v for k, v in t.get("dark", {}).items() if k in TOKENS},
             "play": t.get("play", {}), "nav": {k: v for k, v in t.get("nav", {}).items() if k in NAV},
