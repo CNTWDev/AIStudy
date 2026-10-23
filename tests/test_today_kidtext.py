@@ -11,7 +11,7 @@ from app.main import app
 BUDGET = {
     "/today": 450, "/subjects": 200, "/map/math-shanghai": 400, "/learn/MSH-NUM-12": 260,
     "/diagnose/math-shanghai": 80, "/warmup": 100, "/review": 40, "/words": 120, "/words/map": 260, "/reading": 200,
-    "/books": 150, "/records": 250, "/arena": 320, "/sprint": 80, "/progress": 450, "/settings": 180,  # /arena：每多一个游戏多一张卡（标签 + 名字）
+    "/books": 150, "/records": 250, "/arena": 335, "/sprint": 80, "/progress": 450, "/settings": 180,  # /arena：每多一个游戏多一张卡（标签 + 名字）
     "/tools": 80, "/papers": 260, "/mocks": 100,
 }
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}

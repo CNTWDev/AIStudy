@@ -88,7 +88,7 @@ def question(kid: dict, match_id, rng: random.Random | None = None) -> dict:
     pend = st.get("pending")
     if not pend or now - pend["issued"] > rules.PENDING_KEEP_S:
         g = get(m["game"])
-        it = sources.next_item(kid, st, g.target, rng or random.Random(), ask=g.ask)
+        it = sources.next_item(kid, st, g.target, rng or random.Random(), ask=g.ask, shape=g.shape)
         pend = {"item": it, "issued": now}
         st["pending"] = pend
         _save_state(m["id"], st)

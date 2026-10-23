@@ -1,0 +1,23 @@
+/* 向下跳：上面一条是题门的题（中间），两边是用时、蜂蜜、连穿 / 火球；联网时外壳的状态条在最上面，这一层往下让一点 */
+.pl-helix .pl-stage{height:clamp(360px,70vh,640px)}
+@media (orientation:landscape) and (max-height:540px){.pl-helix .pl-stage{height:calc(100vh - 120px)}}
+.hx-layer{position:absolute;left:0;right:0;top:0;padding:10px 12px;pointer-events:none;z-index:2}
+.hx-layer.mp{top:46px}
+.hx-hud{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:start;width:100%}
+.hx-side{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.hx-side.r{align-items:flex-end;margin-right:52px}
+.hx-chip{background:#fff;border:3px solid var(--pl-ink);box-shadow:0 3px 0 var(--pl-ink);border-radius:14px;padding:2px 10px;font-size:17px;font-weight:900;color:var(--pl-ink);white-space:nowrap;line-height:1.35}
+.hx-fire{color:#b9a9cc}.hx-fire.hot{background:#fff1c9;color:#ff6a00}
+.hx-q{justify-self:center;max-width:min(520px,100%);background:#fff;border:3px solid var(--pl-ink);box-shadow:0 4px 0 var(--pl-ink);border-radius:18px;padding:6px 14px 8px;text-align:center;opacity:0;transform:translateY(-6px);transition:opacity .2s,transform .2s}
+.hx-q.on{opacity:1;transform:none}
+.hx-topic{font-size:12px;font-weight:700;color:var(--muted)}
+.hx-text{display:flex;gap:6px;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:var(--pl-ink);line-height:1.25}
+.hx-q.long .hx-text{font-size:17px}
+.hx-say{border:0;background:#ffe9a8;border-radius:10px;font-size:16px;padding:0 6px;cursor:pointer}
+.hx-tip{font-size:13px;font-weight:700;color:#8a6d1f;margin-top:2px}
+.hx-sub{display:block;font-size:14px;font-weight:700;color:var(--muted);margin-top:2px}
+@media (max-width:560px){
+  .hx-hud{grid-template-columns:1fr auto}.hx-q{grid-column:1/-1;grid-row:2}.hx-side{flex-direction:row}.hx-side.r{margin-right:24px}
+  .hx-chip{font-size:14px;padding:1px 7px}.hx-text{font-size:19px}.hx-q.long .hx-text{font-size:15px}
+}
+.pl-helix .pl-toast{top:auto;bottom:18px}   /* 上面是题门的题，提示放到下面，不挡题 */
