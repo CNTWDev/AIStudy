@@ -78,3 +78,8 @@ ground = "#9aa7d8"
 soil = "#6b76a8"
 cloud = "#7f8fd0"
 stars = true
+
+# 记录页「我的积累」里装满的那个东西（app/growth.py 的 board）：一个装 100 道题
+[grow]
+icon = "🪐"
+name = "颗星球"

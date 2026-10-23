@@ -3,7 +3,7 @@ from ..content import content
 from fastapi import APIRouter
 from fastapi import Body, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from .. import arena, auth, bank, boards, db, engine, evidence, explore, insights, itemtypes, lessons, llm, mix, prefetch, recall, records, sitecfg, sprint, streak, testout, trace
+from .. import arena, auth, bank, boards, db, engine, evidence, explore, growth, insights, itemtypes, lessons, llm, mix, prefetch, recall, records, sitecfg, sprint, streak, testout, trace
 from datetime import date
 from ..web import (
     GRADES,
@@ -103,6 +103,10 @@ def today(request: Request):
     play = arena.status(k)
     exams = [x for x in (engine.exam_view(k["id"], e, m) for e in enrollments(k["id"])) if x and x["days_left"] >= 0]
     day = streak.today_state(k, t["plan"], t["minutes"], sprint.points_today(k["id"]))
+    weekly = records.weekly(k["id"])
+    tot, teen = growth.totals(k["id"]), growth.teen_of(k)
+    hello = growth.hello(k["id"], tot, teen, settled, weekly) if me["role"] == "kid" else ""
+    pop = growth.milestones(k["id"], tot, teen) if me["role"] == "kid" else []   # 在冲刺、乐园里跨过的：回到今天页庆祝
     from .. import discuss, journal
     return render(request, "today.html", t=t, play=play, day=day, settled=settled, exams=exams, board_tip=boards.nudge(dict(k)),
                   rethink=len(discuss.due(k["id"])), journal_due=len(journal.due(k["id"])),
@@ -110,7 +114,7 @@ def today(request: Request):
                   due=len(engine.due_cards(k["id"], 99)), progress_ask=engine.progress_prompt(k), streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
                   stars=engine.total_stars(k["id"]), rec=rec, auto=engine.day_summary(rec),
                   cov=explore.coverage(k["id"], m), lit=explore.lit_today(k["id"]), ahead=explore.ahead(k["id"], m),
-                  vocab=explore.word_stats(k["id"]), weekly=records.weekly(k["id"]), mine=records.summary(k["id"]),
+                  vocab=explore.word_stats(k["id"]), weekly=weekly, tot=tot, hello=hello, pop=pop, mine=records.summary(k["id"]),
                   found=insights.open_insights(k["id"], for_kid=me["role"] == "kid", limit=4 if me["role"] == "kid" else 10))
 
 

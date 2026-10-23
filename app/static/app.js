@@ -442,6 +442,14 @@ function cheer(el) {
     document.body.appendChild(p); setTimeout(() => p.remove(), 1000);
   }
 }
+/* 数字从旧的跳到新的（只在孩子做完事以后用；系统设置了减少动画就直接显示新数） */
+function countUp(el, from, to, ms) {
+  const fmt = x => Math.round(x).toLocaleString('en-US');
+  if (from >= to || matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = fmt(to); return; }
+  const t0 = performance.now(), d = ms || 900;
+  const step = t => { const k = Math.min(1, (t - t0) / d); el.textContent = fmt(from + (to - from) * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); };
+  setTimeout(() => requestAnimationFrame(step), 350);
+}
 function confetti() {
   const colors = ['#f6b400', '#ffd25c', '#ff9bae', '#7aa7ff', '#a893ff', '#d6eeff'];
   for (let i = 0; i < 80; i++) {
@@ -467,16 +475,30 @@ const Flow = {
     const m = document.createElement('div'); m.className = 'flow-sheet'; m.setAttribute('role', 'dialog');
     m.innerHTML = `<div class="fs-card"><button type="button" class="fs-x" aria-label="先看看这页" title="先看看这页">✕</button>
       <div class="fs-h">${(st.all_done || sec) && window.AI && AI.cheer ? `<span class="fs-face" aria-hidden="true">${AI.cheer}</span>` : ''}<b>${head}</b>${sub ? `<span>${sub}</span>` : ''}</div>
+      ${Flow.grow(st.grow)}
       <div class="fs-prog"><span>今天 ${st.done}/${st.total}</span><i><b style="width:${Math.round(100 * st.done / st.total)}%"></b></i></div>
       ${nx ? `<a class="fs-next" href="${esc(nx.url)}"><span class="fs-k">下一项 · 第 ${nx.n} 项${nx.minutes ? ' · 约 ' + nx.minutes + ' 分钟' : ''}</span><b>${esc(nx.title)}</b>${nx.why && !isSimple() ? `<span class="fs-why">${esc(nx.why)}</span>` : ''}<span class="btn lg block fs-go">继续 →</span></a>`
         : `<div class="fs-end"><a class="btn lg" href="/sprint">⚡ 还想做？来冲刺</a><a class="btn soft lg" href="/arena">🎮 去乐园</a></div>`}
       <div class="fs-alt">${sec && nx ? '<button type="button" class="linkbtn fs-rest">☕ 休息 3 分钟</button>' : ''}<a class="linkbtn" href="/today${st.all_done ? '#daylog' : ''}">${st.all_done ? '📝 写一句一日记录' : '回到今天'}</a></div></div>`;
     document.body.appendChild(m);
     const go = $('.fs-next', m); if (go) setTimeout(() => go.focus(), 50);
-    if (st.all_done || sec) confetti(); else if (st.just) cheer($('.fs-card', m));
+    const mile = st.grow && st.grow.milestones.length;
+    if (st.all_done || sec || mile) confetti(); else if (st.just) cheer($('.fs-card', m));
+    const tn = $('.fs-total', m); if (tn) countUp(tn, +tn.dataset.from, +tn.dataset.to);
     $('.fs-x', m).onclick = () => { m.remove(); if (nx) Flow.pill(nx); };
     const rb = $('.fs-rest', m); if (rb) rb.onclick = () => restTimer($('.fs-card', m), () => { m.remove(); Flow.done({...st, section: null}); });
     if (st.just) Flow.strip(st);
+  },
+  /* 积少成多（app/growth.py）：这一项答了几道 → 今天 → 一共；第一次学会的知识点带名字和「第几个」；刚跨过的里程碑 */
+  grow(g) {
+    if (!g || !g.total) return '';
+    const n = x => x.toLocaleString('en-US');
+    const bits = (g.item ? [`这一项 ${g.item} 道`] : []).concat(g.today ? [`今天 ${n(g.today)} 道`] : [], [
+      `一共 <b class="fs-total" data-from="${g.total - g.item}" data-to="${g.total}">${n(g.total - g.item)}</b> 道`]);
+    return `<div class="fs-grow">${bits.join(' · ')}</div>` +
+      (g.learned.length === 1 ? `<a class="fs-learned" href="/learn/${esc(g.learned[0].id)}">🌟 学会了：<b>${esc(g.learned[0].name)}</b>（第 ${g.learned[0].n} 个）</a>`
+        : g.learned.length ? `<div class="fs-learned">🌟 学会了 ${g.learned.length} 个：<b>${g.learned.map(k => esc(k.name)).join('、')}</b>（第 ${g.learned[0].n}～${g.learned[g.learned.length - 1].n} 个）</div>` : '') +
+      g.milestones.map(x => `<div class="fs-mile">🏅 ${esc(x.text)}</div>`).join('');
   },
   /* 收起来以后：右下角留一个「下一项 →」 */
   pill(nx) {

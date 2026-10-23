@@ -4,12 +4,44 @@
 {% block body %}
 {% if report_for %}<a href="/parent" class="back">← 家长页</a>{% endif %}
 <div class="ph"><h1>{{ k.name }} 的学习记录</h1></div>
+{% set g = grow %}
+{% if not report_for and tone == 'kid' %}
+{# 孩子看的这一版：只有「一共」，只增不减（app/growth.py，DESIGN 5.51）。正确率、掌握度给家长看 #}
+<div class="card grow-card">
+  <div class="card-h"><h3>🌱 我的积累 <span class="muted small">从第一天到今天，一点一点攒起来的</span></h3></div>
+  <div class="statline st4 grow-nums">
+    <div><b>{{ g.tot.kps }}</b><span>学会的知识点</span></div>
+    <div><b>{{ '{:,}'.format(g.tot.answers) }}</b><span>答过的题</span></div>
+    <div><b>{{ '{:,}'.format(g.tot.words) }}</b><span>认识的单词</span></div>
+    <div><b>{{ g.tot.days }}</b><span>学习的天数</span></div>
+  </div>
+  {% if g.tot.answers %}{% set j = g.jars %}
+  <div class="jars" aria-label="一共 {{ j.full }} {{ j.name }}，每一{{ j.name[0] }} {{ j.unit }} 道题">
+    {% for _ in range(j.full) %}<i class="jar full"></i>{% endfor %}<i class="jar"><b style="height:{{ j.part }}%"></b></i>
+  </div>
+  <p class="small muted" style="margin:6px 0 0">{{ j.icon }} 装满了 <b>{{ j.full + j.more }}</b> {{ j.name }}{% if j.more %}（这里放不下，只画了 {{ j.full }}）{% endif %}，每一{{ j.name[0] }}是 {{ j.unit }} 道题 · 下一{{ j.name[0] }}已经装了 {{ j.part_n }} 道</p>
+  {% endif %}
+  {% if g.weeks|length > 1 %}{% set top = g.weeks[-1].n or 1 %}
+  <div class="grow-weeks" aria-label="每周结束时一共答了多少">
+    {% for w in g.weeks %}<div class="gw {{ 'now' if w.now }}" title="{{ w.mon[5:] }} 这一周 +{{ w.add }} 道，一共 {{ w.n }} 道"><i style="height:{{ (100 * w.n / top)|round(1) }}%"><em style="height:{{ (100 * w.add / (w.n or 1))|round(1) }}%"></em></i><span>{{ w.mon[5:7]|int }}/{{ w.mon[8:]|int }}</span></div>{% endfor %}
+  </div>
+  <p class="tiny faint" style="margin:4px 0 0">每一周叠在前面的上面，顶上那一截是那一周新加的。</p>
+  {% endif %}
+  {% if g.recent %}<div class="as-g" style="margin-top:10px"><span class="as-l">🌟 最近两周学会的</span><div class="chips">{% for k2 in g.recent[:6] %}<a class="chip" href="/learn/{{ k2.id }}">{{ k2.name }}</a>{% endfor %}{% if g.recent|length > 6 %}<span class="chip">还有 {{ g.recent|length - 6 }} 个</span>{% endif %}</div></div>{% endif %}
+  {% for x in g.next %}
+  <div class="row small" style="margin-top:8px"><span class="grow">再{{ x.verb }} <b>{{ x.mark - x.n }}</b> {{ x.unit }}，就到 {{ '{:,}'.format(x.mark) }} {{ x.unit }}{{ '题' if x.kind == 'answers' else ('知识点' if x.kind == 'kps' else '单词') }}</span></div>
+  <div class="bar"><span style="width:{{ x.pct }}%"></span></div>
+  {% endfor %}
+</div>
+{% else %}
 <div class="statline st4" style="margin-top:14px">
   <div><b>🔥 {{ streak }}</b><span>连续打卡（天）</span></div>
   <div><b>{{ cal|selectattr('level')|list|length }}</b><span>近 12 周学习的天数</span></div>
   <div><b>{{ tot.n }}</b><span>答题 · 正确率 {{ tot.acc or 0 }}%</span></div>
   <div><b>{{ words }} / {{ mistakes }}</b><span>生词 / 错题</span></div>
 </div>
+{% if report_for %}{% set gl = g.tot %}<p class="small muted" style="margin:8px 0 0">📚 从第一天到现在：学会 {{ gl.kps }} 个知识点、答过 {{ '{:,}'.format(gl.answers) }} 道题、认识 {{ '{:,}'.format(gl.words) }} 个单词、学了 {{ gl.days }} 天。孩子在今天页和记录页看到的是同一组数，可以照着夸具体的事（「你都学会 {{ gl.kps }} 个知识点了」）。</p>{% endif %}
+{% endif %}
 {% if not report_for %}<a class="bd-strip" href="/boards"><span class="i">🏆</span><span>学习榜：连续打卡、本周进步，看看你排第几</span><span class="go">去看 ›</span></a>{% endif %}
 {% if trend %}{{ trend_ui.accuracy(trend, link=not report_for) }}{% endif %}
 <div class="card">

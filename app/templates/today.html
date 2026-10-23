@@ -16,13 +16,14 @@
 {% macro face(size) %}{% if ASSISTANT_ICON == '🙋' %}{{ mascot_svg(mascot_of(user), size, 'mascot', 'cheer' if all_done else '') }}{% else %}<span class="face-emo" style="font-size:{{ (size * 0.8)|int }}px">{{ ASSISTANT_ICON }}</span>{% endif %}{% endmacro %}
 <div class="card hero focus {{ 'alldone' if all_done }} {{ 'has-coach' if kidface and not readonly }}">
   {% if kidface and not readonly %}<a class="coach {{ 'yay' if all_done }}" href="/settings#mascot" title="换一个小伙伴">
-    <span class="say"><b>{{ ASSISTANT }}</b>{% if nx and done == 0 %}{{ look.greet if look and look.greet else '准备好了吗？我陪你一起开始！' }}{% elif nx and not day.base %}已经做完 {{ done }} 项，接着来！{% elif nx %}真稳！后面每项都多一颗 ⭐{% elif all_done and not t.checked_in %}我就知道你行 💪{% elif all_done %}今天辛苦啦，明天见！{% else %}我在这儿，有不懂的随时问我{% endif %}</span>
+    <span class="say"><b>{{ ASSISTANT }}</b>{% if nx and done == 0 %}{{ hello or (look.greet if look and look.greet else '准备好了吗？我陪你一起开始！') }}{% elif nx and not day.base %}已经做完 {{ done }} 项，接着来！{% elif nx %}真稳！后面每项都多一颗 ⭐{% elif all_done and not t.checked_in %}我就知道你行 💪{% elif all_done %}今天辛苦啦，明天见！{% else %}我在这儿，有不懂的随时问我{% endif %}</span>
     <span class="cface">{{ face(92) }}</span></a>{% endif %}
   <div class="hero-main">
   <div class="hi">{{ t.day[5:7]|int }} 月 {{ t.day[8:]|int }} 日 · 星期{{ td.wd if td else '' }}
     <span class="hstat" title="连续学习天数"><span class="flame">🔥</span> 连续 <b>{{ streak }}</b> 天</span>
     <a class="hstat hlink" href="/boards" title="学习榜：比每天坚持">🏆 学习榜</a>
     <span class="hstat" title="累计得到的星星">⭐ <b>{{ stars }}</b></span>
+    {% if tot.answers %}<a class="hstat hlink" href="/records" title="从第一天到现在一共答了多少道题（在哪儿答的都算）">📚 一共 <b>{{ '{:,}'.format(tot.answers) }}</b> 道</a>{% endif %}
     {% if day.cards %}<span class="hstat" title="哪天没来得及做完第 1 节，会自动用一张补上，连续天数不断">🧊 <b>{{ day.cards }}</b></span>{% endif %}</div>
   {% if nx %}
   <div class="nx-l">{{ '今天从这里开始' if done == 0 else '下一项' }} · 第 {{ t.plan.index(nx) + 1 }} 项</div>
@@ -205,6 +206,9 @@ function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); l
   const key = 'secs:' + DAY.day, seen = +(ls(key) || 0);
   ls(key, DAY.secs);
   if (DAY.secs > seen && DAY.secs < DAY.n && seen >= 0 && DAY.n > 1) setTimeout(() => sectionDone(DAY.secs), 700);
+  // 在冲刺、乐园里跨过的里程碑：回到今天页庆祝一次（服务器记着，换设备不再放）
+  const pop = {{ pop|map(attribute='text')|list|tojson }};
+  if (pop.length) setTimeout(() => { confetti(); toast('🏅 ' + pop.join(' '), 4500); }, 900);
   if (DAY.goal && ls('goal:' + DAY.day) !== '1') { ls('goal:' + DAY.day, '1'); setTimeout(() => { confetti(); toast('🎯 今天的目标达成了！'); }, 1200); }
 })();
 function sectionDone(n) {

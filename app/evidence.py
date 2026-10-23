@@ -81,6 +81,9 @@ def _save(user_id, kp_id, st, *, attempts, correct, source, key):
            "last_ev=excluded.last_ev, evidence=excluded.evidence, model=excluded.model",
            user_id, kp_id, st["p"], attempts, correct, st["status"], source, st["last"] or db.now(),
            st["s"], st["d"], st["last"], json.dumps(st["ev"], ensure_ascii=False), key)
+    if st["status"] == "mastered":   # 第一次学会记下来，以后又不稳了也不删（app/growth.py：「学会过」只增不减）
+        from . import growth
+        growth.learned(user_id, kp_id, st["last"])
 
 
 def _apply(user_id: int, kp_id: str, e: dict, item: dict | None) -> str:

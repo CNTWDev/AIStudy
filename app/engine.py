@@ -1035,6 +1035,8 @@ def mark_task_by(user_id: int, **match):
     hit = []
     for t in plan:
         if all(t.get(k) == v for k, v in match.items()):
+            if not t.get("done"):
+                t["done_at"] = db.now()   # 「这一项答了几道」从上一项做完数到这一项做完（app/growth.py）
             t["done"] = True
             hit.append(t["id"])
     db.run("UPDATE days SET plan=? WHERE user_id=? AND day=?", db.jdump(plan), user_id, day)
@@ -1086,6 +1088,10 @@ def flow_state(user_id: int, current: str | None = None) -> dict:
     # 刚好学完一节（而且前面几节也都完成了）：停一下、亮一格。先跳着做了后面的，不算「学完一节」
     if sc and sc["complete"] and len(secs) > 1 and not out["all_done"] and all(x["complete"] for x in secs[:sc["n"]]):
         out["section"] = {"n": sc["n"], "of": len(secs), "left": sum(1 for x in secs if not x["complete"]), "base": sc["n"] == 1}
+    if out["just"]:   # 这一项 → 今天 → 一共（app/growth.py）
+        from . import growth
+        u = db.one("SELECT grade FROM users WHERE id=?", user_id)
+        out["grow"] = growth.after_task(user_id, current, growth.teen_of(u) if u else False)
     return out
 
 

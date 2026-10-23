@@ -58,3 +58,8 @@ heat-4 = "#ffc21a"
 
 [play]
 ink = "#2b2340"
+
+# 记录页「我的积累」里装满的那个东西（app/growth.py 的 board）：一个装 100 道题
+[grow]
+icon = "🍯"
+name = "罐蜜"
