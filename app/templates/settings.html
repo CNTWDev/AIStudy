@@ -7,15 +7,15 @@
 {% if looks %}{# 主题（DESIGN 5.45）：每张卡是这个主题自己的颜色和小伙伴，点一下全站就换 #}
 <form class="card" method="post" action="/settings/look" id="look">
   <h3>换个主题</h3>
-  <p class="muted small" style="margin:-4px 0 0">颜色、小伙伴、乐园里的声音都会一起换。随时可以换回来。</p>
+  <p class="muted small for-grownups" style="margin:-4px 0 0">颜色、小伙伴、乐园里的声音都会一起换。随时可以换回来。</p>
   {% set cur = look.id if look else '' %}
   <div class="looks">
   {% for t in looks %}
-    <label class="{{ 'lock' if not t.open }}"><input type="radio" name="look" value="{{ t.id }}" {{ 'checked' if t.id == cur }} {{ 'disabled' if not t.open }} onchange="this.form.submit()">
+    <label class="{{ 'lock' if not t.open }}" title="{{ t.desc }}{{ '（连续学习 ' ~ t.unlock ~ ' 天解锁）' if not t.open }}"><input type="radio" name="look" value="{{ t.id }}" {{ 'checked' if t.id == cur }} {{ 'disabled' if not t.open }} onchange="this.form.submit()">
       <span class="lk" data-look="{{ t.id }}">
-        <span class="lk-top">{{ mascot_svg(t.mascot, 52) }}<span><b>{{ t.name }}</b><small>{{ t.desc }}</small></span></span>
-        <span class="lk-demo" aria-hidden="true"><i class="lk-opt">A</i><i class="lk-opt on">B</i><i class="lk-go">开始</i></span>
-        {% if not t.open %}<span class="lk-lock">🔒 连续学习 {{ t.unlock }} 天解锁 · 还差 {{ t.left }} 天</span>{% endif %}
+        <span class="lk-top">{{ mascot_svg(t.mascot, 52) }}<span><b>{{ t.name }}</b><small class="for-grownups">{{ t.desc }}</small></span></span>
+        <span class="lk-demo" aria-hidden="true"><i class="lk-opt">A</i><i class="lk-opt on">B</i><i class="lk-go">▶</i></span>
+        {% if not t.open %}<span class="lk-lock">🔒 还差 {{ t.left }} 天</span>{% endif %}
       </span></label>
   {% endfor %}
   </div>
@@ -29,8 +29,8 @@
   {% set cur = mascot_of(user) %}
   <div class="mascots">
   {% for id, (name, desc) in mascots.items() %}
-    <label><input type="radio" name="mascot" value="{{ id }}" {{ 'checked' if id == cur }} onchange="this.form.submit()">
-      <span class="m">{{ mascot_svg(id, 64) }}<b>{{ name }}</b><small>{{ desc }}</small></span></label>
+    <label title="{{ desc }}"><input type="radio" name="mascot" value="{{ id }}" {{ 'checked' if id == cur }} onchange="this.form.submit()">
+      <span class="m">{{ mascot_svg(id, 64) }}<b>{{ name }}</b><small class="{{ 'for-grownups' if looks }}">{{ desc }}</small></span></label>
   {% endfor %}
   </div>
   <noscript><div style="margin-top:12px"><button class="btn">保存</button></div></noscript>

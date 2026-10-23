@@ -71,7 +71,7 @@ def test_kid_switches_theme(monkeypatch):
         today = c.get("/today").text
         assert 'data-look="honey"' in today and 'href="/theme.css?v=' in today and "准备好了吗？我陪你一起开始！" in today
         page = c.get("/settings").text
-        assert page.count('name="look"') == 4 and "还差 7 天" in page
+        assert page.count('name="look"') == 4 and "还差 7 天" in page and "连续学习 7 天解锁" in page
         assert 'value="space"' in page and page.count('name="mascot"') == 7  # 五个 beejoy 的 + 太空站、练习生的小伙伴
         assert c.get("/theme.css").headers["content-type"].startswith("text/css")
 
