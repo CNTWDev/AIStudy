@@ -3,11 +3,9 @@
 <a href="/today" class="small">← 今天</a>
 <h1>热身 🧠</h1>
 <p class="muted small">{% if simple %}凭第一感觉答，不会就点「不会」 👍{% else %}几道小题，有新有旧，凭第一感觉答就好。不会就点「不会」，记下来以后慢慢补上，答错也没关系。{% endif %}</p>
-<div class="daybar"><span id="wbar" style="width:0%"></span></div>
 <div id="wbox" class="card"><span class="loading">{{ ASSISTANT }}正在按你的水平挑题</span></div>
 <script>
 let items = [], idx = 0, right = 0, lit = 0, found = 0;
-function bar() { $('#wbar').style.width = (items.length ? 100 * idx / items.length : 0) + '%'; }
 async function load() {
   try {
     items = (await waitWith($('#wbox'), api('/api/warmup'))).items;
@@ -20,7 +18,6 @@ function next(box, res) {
   nextUp(box, idx + 1 >= items.length ? '完成热身' : '下一题 →', () => { idx++; show(); }, res, {wait: res && res.lit ? 1800 : 0});
 }
 function show() {
-  bar();
   if (idx >= items.length) {
     $('#wbox').innerHTML = `<p class="pop" style="font-size:20px"><b>热身完成：${right}/${items.length}</b> ${right === items.length ? '全对 🎉' : '👍'}</p>` +
       `<p class="small muted">${lit ? `🌟 点亮 ${lit} 个` : ''}${isSimple() ? '' : (lit ? ' · ' : '') + (found ? `找到 ${found} 个要补的地方，已经排进以后的练习` : '你的学习地图又清楚了一些')}</p>`;

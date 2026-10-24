@@ -1,11 +1,11 @@
-/* 手感：答对一题的即时反馈（声音 + 震动 + 一下打击感 + 飞进计数的 +1），学习页和乐园游戏共用这一份
+/* 手感：答对一题的即时反馈（声音 + 震动 + 按下去的打击感），学习页和乐园游戏共用这一份
    （docs/DESIGN.md 5.52，讨论稿 docs/答对即时激励-讨论稿.md）。
    Juice.sfx      音效：用 Web Audio 现场合成，不用下载素材；全站一个开关（记在本机），游戏里的 🔊 也是它
    Juice.buzz     震动：只有安卓的浏览器能震（iPhone / iPad 的网页不支持，电脑没有），震不了就什么都不做
    Juice.answer   答完一题：对了「叮咚」，连对一题升一个音（五声音阶，升到第 8 个封顶），3/5/10 连对一个小和弦，
                   难题答对一个更亮的音；答错一个低而柔的「嗒」，不震
    Juice.done     一项做完：过关的和弦 + 长一点的震动
-   Juice.thunk / Juice.plus   按下去沉一下；「+1」从题目飞到「这一项 N 道」上
+   Juice.thunk    按下去沉一下（学习页上题目是主角，不飞 +1、不弹胶囊：DESIGN 5.21）
    三种人：kid 小学（音色可爱）、teen 初中以上（干净、短）、adult 成人（声音默认关）。晚上 9 点到早上 7 点音量减半。 */
 (function () {
   const J = window.Juice = {};
@@ -113,25 +113,11 @@
   const BUZZ = {tap: 8, right: 15, combo: [20, 40, 20], hard: [25, 30, 40], done: [30, 50, 30, 50, 80]};
   J.buzz = kind => { try { if (soundOn() && navigator.vibrate) navigator.vibrate(BUZZ[kind] || 0); } catch (e) { /* 不支持 */ } };
 
-  // ---------------------------------------------------------------- 画面：打击感、+1
+  // ---------------------------------------------------------------- 画面：按下去的打击感
   J.thunk = el => {
     if (!el || J.still()) return;
     el.classList.remove('j-thunk'); void el.offsetWidth; el.classList.add('j-thunk');
     setTimeout(() => el.classList.remove('j-thunk'), 450);
-  };
-  J.bump = el => { if (!el) return; el.classList.remove('j-bump'); void el.offsetWidth; el.classList.add('j-bump'); };
-  // 「+1」从题目飞到计数上（没有计数就往上飘一下）；落下时计数跳一下
-  J.plus = (from, to) => {
-    if (!from) return;
-    if (J.still()) return J.bump(to);
-    const a = from.getBoundingClientRect(), p = document.createElement('span');
-    p.className = 'j-plus'; p.textContent = '+1';
-    p.style.left = (a.left + a.width / 2) + 'px'; p.style.top = (a.top + Math.min(a.height, 80) / 2) + 'px';
-    document.body.appendChild(p);
-    const b = to && to.getBoundingClientRect(), seen = b && b.bottom > 0 && b.top < innerHeight;
-    const dx = seen ? b.left + b.width / 2 - (a.left + a.width / 2) : 0, dy = seen ? b.top + b.height / 2 - (a.top + Math.min(a.height, 80) / 2) : -60;
-    requestAnimationFrame(() => { p.style.transform = `translate(${dx}px, ${dy}px) scale(${seen ? 0.7 : 1})`; p.style.opacity = seen ? '0.9' : '0'; });
-    setTimeout(() => { p.remove(); if (seen) J.bump(to); }, 480);
   };
 
   // ---------------------------------------------------------------- 答完一题、一项做完

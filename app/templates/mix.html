@@ -4,12 +4,10 @@
 <h1>{{ pack.subject_name }}练习</h1>
 <p class="muted small">{% if simple %}新的旧的混着练，错了的过一会儿还会再来 👍{% else %}今天学的、最近学的、以前学的混在一起练，有的还会换个问法再问一次。做错的题过几题会换一道同类的再来，这次做对就好。{% endif %}</p>
 <p class="small for-grownups mixparts">这一组 {{ total }} 题：{% for r, n in parts.items() if n %}<span class="pill mixrole-{{ r }}">{{ {'new':'新学的','recent':'最近学的','past':'以前学过的','cross':'换个问法','preview':'预习'}[r] }} {{ n }}</span> {% endfor %}</p>
-<div class="daybar"><span id="mbar" style="width:0%"></span></div>
 <div id="mbox" class="card"><span class="loading">{{ ASSISTANT }}正在按你的水平挑题</span></div>
 <script>
 const SET = {{ set_id }}, KIDS_DONE = {{ 'true' if done else 'false' }};
 let queue = [], total = {{ total }}, answered = {{ answered }}, right = {{ right }}, ended = false, loading = null, serverDone = false, seenNew = new Set(), lastKp = "";
-function bar() { $('#mbar').style.width = (total ? Math.min(100, 100 * answered / total) : 0) + '%'; }
 async function fetchMore() {
   if (serverDone || loading) return loading;
   loading = api(`/api/mix/${SET}/next?k_=4`).then(r => { queue.push(...r.items); total = Math.max(total, r.total); serverDone = r.done; loading = null; })
@@ -46,7 +44,6 @@ function teachBtn(box, kp) {
   box.appendChild(d);
 }
 async function show() {
-  bar();
   if (!queue.length) {
     if (!serverDone) {
       seek($('#mbox'), 'items', {compact: true, delay: 0});
@@ -72,8 +69,7 @@ async function show() {
       answered++; if (res.correct) right++;
       Run.hit(!!res.correct); celebrate(res, box);
       let again = false;
-      try { const r = await api(`/api/mix/${SET}/tick`, {kp: t.kp, role: t.role, correct: !!res.correct}); again = r.again; if (r.total) total = Math.max(total, r.total); if (again) serverDone = false; } catch (e) {}
-      bar();
+      try { const r = await api(`/api/mix/${SET}/tick`, {kp: t.kp, role: t.role, correct: !!res.correct}); again = r.again; if (r.total) Run.total = total = Math.max(total, r.total); if (again) serverDone = false; } catch (e) {}
       if (again) box.insertAdjacentHTML('beforeend', '<div class="small muted" style="margin-top:6px">🔁 过几题会换一道同类的再来，到时候再试一次。</div>');
       nextUp(box, !queue.length && serverDone ? '完成练习' : '下一题 →', () => show(), res, {wait: res.lit ? 1800 : 0});
       if (res.trace) {
@@ -90,7 +86,6 @@ async function show() {
 }
 async function finish(already) {
   if (ended) return; ended = true;
-  bar();
   $('#mbox').innerHTML = `<p class="pop" style="font-size:20px"><b>练完了：${right}/${answered}</b> ${answered && right === answered ? '全对 🎉' : '👍'}</p>` +
     `<p class="small muted">${isSimple() ? '' : '做错的已经记下来，明天的练习和错题重做里还会再见到。'}</p>`;
   if (!already) Run.finish();

@@ -739,27 +739,21 @@ document.addEventListener('DOMContentLoaded', () => {
   $$('#askchips button').forEach(b => b.onclick = () => Ask.send(b.textContent));
 });
 
-/* ---------- 激励：每答一题的即时反馈、连对、点亮知识点（少而有效：只奖励真实的进步） ----------
-   答题卡（renderItem）答完一题就调 Combo.hit，页面不用管：声音和震动在 Juice（juice.js），这里管连对和画面。
-   每道自动判分的题都飞一个「+1」进「这一项 N 道」（答错也算，积少成多数的是答了几道）；答对「叮咚」，连对一题升一个音；
-   连对 3/5/10 一个小和弦，小学的孩子再冒几颗星星；难题答对（res.hard）说一句。答错一个柔的「嗒」，连对悄悄归零。
-   成人不显示连对，声音默认关。 */
+/* ---------- 激励：每答一题的即时反馈，留给做完一项（DESIGN 5.21、5.52） ----------
+   答题卡（renderItem）答完一题就调 Combo.hit，页面不用管：声音和震动在 Juice（juice.js），这里只记连对。
+   题目是这一页的主角：答对「叮咚」，连对一题升一个音，选项自己变色，就这么多；不飞 +1、不弹连对胶囊、不冒星星，
+   「这一项 N 道」的数悄悄加一。难题答对在题下面说一句。真正的庆祝留给一项做完（Flow 的下一项卡）。
+   答错一个柔的「嗒」，连对悄悄归零。成人声音默认关。 */
 const Combo = {
   n: 0,
   hit(ok, el, res) {
     res = res || {};
     Combo.n = ok ? Combo.n + 1 : 0;
-    const who = Juice.who();
-    if (!res.dont_know) { Juice.answer(ok, {el, streak: Combo.n, hard: res.hard}); Juice.plus(el, $('#runbar .rn')); }
-    if (ok && res.hard && who !== 'adult') toast(who === 'teen' ? '💪 这道题不简单，做对了' : '💪 这题很多人会错，你做对了！', 1800);
-    let b = $('#combo');
-    if (who === 'adult') return;
-    if (!b) { b = document.createElement('div'); b.id = 'combo'; ($('#runbar .rn') || document.body).insertAdjacentElement('afterend', b); }
-    if (Combo.n >= 2) {
-      b.textContent = `🔥 ×${Combo.n}`;
-      b.classList.add('on'); Juice.bump(b);
-      if (who === 'kid' && (Combo.n === 3 || Combo.n === 5 || Combo.n % 10 === 0)) cheer(el || b);
-    } else b.classList.remove('on');
+    if (res.dont_know) return;
+    Juice.answer(ok, {el, streak: Combo.n, hard: res.hard});
+    const who = Juice.who(), fb = el && el.closest && $('.fbbox', el.closest('.q') || document);
+    if (ok && res.hard && who !== 'adult' && fb)
+      fb.insertAdjacentHTML('afterbegin', `<div class="small hardnote">${who === 'teen' ? '💪 这道题不简单，做对了' : '💪 这题很多人会错，你做对了'}</div>`);
   },
 };
 /* 「下一题」：自动判分的题答对了，0.8 秒后自己翻过去（按钮上走一道进度条）；答错停下来看讲解。回车 = 点它。
@@ -819,8 +813,9 @@ const Run = {
     let el = $('#runbar');
     if (!el) {
       el = document.createElement('div'); el.id = 'runbar'; el.className = 'runbar';
-      // 📚 这一项答了几道（每答一题飞一个 +1 进来，Combo.hit）；🔊 全站一个声音开关（游戏里的也是它）
-      el.innerHTML = `<div class="row small"><span>⏱ 专注 <b class="rt">0:00</b></span><span class="rn" hidden>📚 这一项 <b>0</b> 道</span><span class="muted rpb"></span><span class="grow"></span><span class="rg muted"></span>` +
+      // 题目才是主角（DESIGN 5.21）：这里只是一条细线 + 一行灰字，不跟着滚，也不一秒一秒地跳
+      // 📚 这一项答了几道（积少成多，悄悄加一）；🔊 全站一个声音开关（游戏里的也是它）
+      el.innerHTML = `<div class="row small"><span class="rn" hidden>📚 这一项 <b>0</b> 道</span><span class="muted rpb"></span><span class="grow"></span><span class="rg muted"></span>` +
         `<button type="button" class="linkbtn rsnd" title="答题的声音和震动"></button></div>` +
         (opts.race === false ? '' : `<div class="race"><i class="ghost" title="上周的我"></i><i class="me" title="我"></i></div>`);
       if (opts.mount) opts.mount.insertAdjacentElement('beforebegin', el);
@@ -855,7 +850,6 @@ const Run = {
   },
   draw() {
     const el = Run.el; if (!el) return;
-    $('.rt', el).textContent = Run.mmss(Run.active);
     const rn = $('.rn', el); rn.hidden = !Run.n; $('b', rn).textContent = Run.n;
     if (Run.pb && Run.pb.focus >= 60000) $('.rpb', el).textContent = `· 最长 ${Run.mmss(Run.pb.focus)}` + (Run.active > Run.pb.focus ? ' 🔥 正在破纪录' : '');
     const race = $('.race', el);
@@ -1217,7 +1211,10 @@ const Focus = {
   /* 只按整分钟跳一格，不一秒一秒地走：读题、想题的时候页面不动（DESIGN 5.30） */
   draw() {
     const el = Focus.el; if (!el || !Focus.b) return;
-    const m = Math.floor(Focus.active / 60000), tm = Math.round(Focus.b.target_ms / 60000), key = Focus.due ? 'due' : m;
+    // 平时收着（题目是主角）：最后一分钟、到点了、或者有点晃（state 不是 on）才浮出来；说的还是「这一口气」，不说「你走神了」
+    const m = Math.floor(Focus.active / 60000), tm = Math.round(Focus.b.target_ms / 60000);
+    const show = Focus.due || Focus.state !== 'on' || Focus.b.target_ms - Focus.active <= 60000, key = (Focus.due ? 'due' : m) + (show ? '' : 'q');
+    el.classList.toggle('quiet', !show);
     if (el.dataset.k === String(key)) return;
     el.dataset.k = key;
     $('.fz-track i', el).style.width = Math.min(100, 100 * m / tm) + '%';
