@@ -3,16 +3,8 @@
 {% set st = me.status if me else 'unknown' %}
 <a href="/map/{{ pack.id }}" class="small">← {{ pack.subject_name }}知识地图</a>
 <h1>{{ kp.name }}</h1>
-<p class="muted small"><span class="for-grownups">{% if kp.name_en %}{{ kp.name_en }} · {% endif %}</span>{{ stage_label(kp.stage) }}<span class="for-grownups"> · {{ strand }}</span> {% if kp.hot %}· <span style="color:var(--warn)">{{ '重点' if pack.kind == 'course' else '考试常考' }}</span>{% endif %}{% if kp.evidence %}{% set evb = EVIDENCE.get(kp.evidence, ('', '')) %} · <span class="pill evb" title="证据牌：{{ evb[1] }}">{{ evb[0] }} {{ kp.evidence }}</span>{% endif %}
+<p class="muted small lsub"><span class="for-grownups">{% if kp.name_en %}{{ kp.name_en }} · {% endif %}</span>{{ stage_label(kp.stage) }}<span class="for-grownups"> · {{ strand }}</span> {% if kp.hot %}· {{ '重点' if pack.kind == 'course' else '考试常考' }}{% endif %}{% if kp.evidence %}{% set evb = EVIDENCE.get(kp.evidence, ('', '')) %} · <span class="pill evb" title="证据牌：{{ evb[1] }}">{{ evb[0] }} {{ kp.evidence }}</span>{% endif %}
  · <span class="pill st-{{ st }}">{{ STATUS_LABEL[st] }}</span></p>
-
-{% if ev %}<div class="evline small">
-  <span title="根据你每次作答估算的：蒙对、粗心都考虑进去了">🎯 把握 <b>{{ ev.p }}%</b></span>
-  {% if ev.recall is not none %}<span class="for-grownups" title="隔得越久越容易忘，这是估计的">🧠 估计还记得 <b>{{ ev.recall }}%</b></span>{% endif %}
-  <span class="for-grownups">✅ 答对过 {{ ev['items'] }} 道不同的题 · {{ ev.days }} 天 · {{ ev.fmts }} 种题型</span>
-  {% if ev.missing %}<span class="muted for-grownups">还差：{{ ev.missing|join('，') }}</span>{% elif ev.next %}<span class="muted for-grownups">约 {{ ev.next }} 天后再来看一眼</span>{% endif %}
-</div>{% endif %}
-
 {% set weak_pre = pre|selectattr('strength','equalto','必须')|rejectattr('m')|list + pre|selectattr('strength','equalto','必须')|selectattr('m')|selectattr('m.status','equalto','weak')|list %}
 {% if weak_pre %}
 <div class="hint">🧱 {{ '先补：' if simple else '先打地基：这个知识点要用到 ' }}{% for p in weak_pre %}<a href="/learn/{{ p.id }}">{{ p.name }}</a>{{ '、' if not loop.last }}{% endfor %}{% if not simple %}。如果下面的题做不出来，先去补它。{% endif %}</div>
@@ -29,16 +21,19 @@
 {% else %}{% set steps = [('why', '为什么学'), ('see', '看懂'), ('method', '方法'), ('practice', '练 3 题'), ('sum', '总结')] %}{% endif %}
 {% if readonly %}{% set steps = steps[:-1] %}{% endif %}
 
-<ol class="lbar" id="lbar">{% for id, label in steps %}<li data-step="{{ id }}"{% if loop.first %} class="cur"{% endif %}><button type="button">{{ label }}</button></li>{% endfor %}</ol>
-
-{# 只能在这里学的课、还没上过（app/testout.py）：已经懂的，考两道能自动判的题，都对就算上过这一课 #}
-{% if testout and not readonly %}<details class="ltestout small" id="testout"><summary>这一课你已经熟了？考我一下：{{ testout }} 道题都对就跳过这一课</summary><div id="tobox"></div></details>{% endif %}
+{# 步骤条和把握是背景（DESIGN 5.21）：细线 + 一行灰字，不和知识抢眼 #}
+<div class="lhead"><ol class="lbar" id="lbar">{% for id, label in steps %}<li data-step="{{ id }}"{% if loop.first %} class="cur"{% endif %}><button type="button" title="{{ label }}"><span>{{ label }}</span></button></li>{% endfor %}</ol><span class="lwhere" id="lwhere"></span></div>
+{% if ev and tone != 'kid' %}<details class="evmini small"><summary>把握 {{ ev.p }}%</summary><div class="evline">
+  {% if ev.recall is not none %}<span title="隔得越久越容易忘，这是估计的">🧠 估计还记得 <b>{{ ev.recall }}%</b></span>{% endif %}
+  <span>✅ 答对过 {{ ev['items'] }} 道不同的题 · {{ ev.days }} 天 · {{ ev.fmts }} 种题型</span>
+  {% if ev.missing %}<span class="muted">还差：{{ ev.missing|join('，') }}</span>{% elif ev.next %}<span class="muted">约 {{ ev.next }} 天后再来看一眼</span>{% endif %}
+</div></details>{% endif %}
 
 <div class="lflow">
 {% if revisit %}
 {# 成人课回访（app/lessons.py）：这一课以前学过，不再看一遍讲解。先回想（提取练习）→ 对照 → 新案例 → 用到自己身上 #}
 <section class="card lcard" data-step="recall">
-  <div class="ldo">这一步：先不看讲解，用一两句话说说这一课讲的是什么、什么情况下不适用</div>
+  <div class="ldo">先不看讲解，用一两句话说说这一课讲的是什么、什么情况下不适用</div>
   <textarea id="recalltxt" style="min-height:80px" placeholder="这一课说的是……；在……的情况下不适用"></textarea>
   <div class="lacts" id="recallgo"><button class="btn lg block">写好了，对照一下</button></div>
   <div id="recallcmp" hidden>
@@ -52,7 +47,7 @@
 {% endif %}
 {% if not think and not revisit %}
 <section class="card lcard" data-step="why">
-  <div class="ldo">{{ '这一步：先听个故事，想想为什么要学它' if not simple else '先听个故事 📖' }}</div>
+  <div class="ldo">{{ '先听个故事，想想为什么要学它' if not simple else '先听个故事 📖' }}</div>
   <div id="ctx" class="ctxbox"></div>
   {% if not simple %}{{ bridges_box() }}{% endif %}
   <div class="lacts"><button class="btn lg block lnext">带着这个问题，往下学 →</button></div>
@@ -61,8 +56,7 @@
 
 {% if not revisit %}
 <section class="card lcard" data-step="see"{% if not think %} hidden{% endif %}>
-  {% if not think %}<a href="#" class="lback">← 上一步</a>{% endif %}
-  <div class="ldo">{% if think %}这一步：先写下你自己的判断，再看不同的想法{% elif simple %}先猜一猜，再看懂 🤔{% else %}这一步：先猜一下，再看它到底是什么{% endif %}</div>
+  <div class="ldo">{% if think %}先写下你自己的判断，再看不同的想法{% elif simple %}先猜一猜，再看懂 🤔{% else %}先猜一下，再看它到底是什么{% endif %}</div>
   {% if not think and not readonly %}<div id="guess" hidden></div>{% endif %}
   <div id="seebody">
     <div class="lcore">{{ kp.desc }}</div>
@@ -73,40 +67,40 @@
       <textarea id="thinktxt" style="min-height:70px" placeholder="先别看讲解，写下你自己的判断和理由"></textarea></div>{% endif %}
     {% if not readonly %}<div id="teach" style="margin-top:10px">{% if think %}<button class="btn lg block" id="teachbtn">写好了，看看不同的想法</button>{% else %}<button class="linkbtn" id="teachbtn">{{ ASSISTANT_ICON }} {{ '讲给我听' if simple else '还不太懂？让' ~ ASSISTANT ~ '一步步讲给我听' }}</button>{% endif %}</div>{% endif %}
   </div>
-  <div class="lacts"{% if think and not readonly %} hidden{% endif %}><button class="btn lg block lnext">{{ '想好了，下一步 →' if think else '看懂了，下一步 →' }}</button></div>
+  <div class="lacts"{% if think and not readonly %} hidden{% endif %}><button class="btn lg block lnext">{{ '想好了，下一步 →' if think else '看懂了，下一步 →' }}</button>{% if not think %}<a href="#" class="lback">← 上一步</a>{% endif %}</div>
 </section>
 
 <section class="card lcard" data-step="method" hidden>
-  <a href="#" class="lback">← 上一步</a>
-  <div class="ldo">{{ '这一步：用这个方法把难题拆开' if think else ('记住方法，看一遍例题 ✍️' if simple else '这一步：记住方法，跟着例题走一遍') }}</div>
+  <div class="ldo">{{ '用这个方法把难题拆开' if think else ('记住方法，看一遍例题 ✍️' if simple else '记住方法，跟着例题走一遍') }}</div>
   <div class="lmethod">{{ kp.method }}</div>
   {% if not think %}<div id="worked"></div>{% endif %}
   {% if think or simple %}{{ bridges_box() }}{% endif %}
-  <div class="lacts"><button class="btn lg block lnext">{{ '记住了，去练题 →' if think else '记住了，去练 3 题 →' }}</button></div>
+  <div class="lacts"><button class="btn lg block lnext">{{ '记住了，去练题 →' if think else '记住了，去练 3 题 →' }}</button><a href="#" class="lback">← 上一步</a></div>
 </section>
 {% endif %}
 
 <section class="card lcard" data-step="practice" hidden>
-  <a href="#" class="lback">← 上一步</a>
   {% if readonly %}<div class="muted small">做题和总结：孩子用自己的账号登录后在这里练习。</div>{% else %}
-  <div class="ldo">{{ '这一步：一个新的案例，用这一课的原则判断（以前做过的不再出）' if revisit else ('自己做 3 题 💪' if simple else '这一步：自己做题，错了先看解析，卡住可以回看方法') }}</div>
+  <div class="ldo">{{ '一个新的案例，用这一课的原则判断（以前做过的不再出）' if revisit else ('自己做 3 题 💪' if simple else '自己做题，错了先看解析，卡住可以回看方法') }}</div>
   <span class="muted small for-grownups">从简单的开始；错了会自动进错题本</span>
   <div id="items"></div>
   <details class="lpeek"><summary class="small">📖 回看方法</summary><div class="small">{{ kp.method }}</div></details>
+  <a href="#" class="lback">← 上一步</a>
   <div class="lacts" hidden><button class="btn lg block lnext">{{ '用到自己身上 →' if revisit else ('去写现在的想法 →' if think else '去总结 →') }}</button></div>{% endif %}
 </section>
 
 {% if not readonly %}
 <section class="card lcard" data-step="sum" hidden>
-  <a href="#" class="lback">← 上一步</a>
-  <div class="ldo">{{ '这一步：这周你手上哪件事可以这样做？写下来，下次回来对照' if revisit else ('这一步：对照一开始的判断，写下现在的想法' if think else ('用一句话说说 ✏️' if simple else '这一步：用自己的话说一句，它会变成以后的复习卡')) }}</div>
+  <div class="ldo">{{ '这周你手上哪件事可以这样做？写下来，下次回来对照' if revisit else ('对照一开始的判断，写下现在的想法' if think else ('用一句话说说 ✏️' if simple else '用自己的话说一句，它会变成以后的复习卡')) }}</div>
   {% if not think and not revisit %}<div class="lstarts"><span class="small muted">挑个开头：</span>{% for s0 in ['它的意思是', '做题时先', '最容易错的是'] %}<button type="button" class="chip">{{ s0 }}……</button>{% endfor %}</div>{% endif %}
   <textarea id="summary" style="min-height:80px" placeholder="{{ '这个知识点就是……' if simple else '用自己的话说：这个知识点就是……' }}"></textarea>
   <div id="sumnote" class="small muted"></div>
-  <div class="lacts"><button class="btn lg block" id="finish">完成这一项 ✓</button></div>
+  <div class="lacts"><button class="btn lg block" id="finish">完成这一项 ✓</button><a href="#" class="lback">← 上一步</a></div>
 </section>
 {% endif %}
 </div>
+{# 只能在这里学的课、还没上过（app/testout.py）：已经懂的，考两道能自动判的题，都对就算上过这一课 #}
+{% if testout and not readonly %}<details class="ltestout small" id="testout"><summary>已经熟了？考我一下：{{ testout }} 道题都对就跳过这一课 →</summary><div id="tobox"></div></details>{% endif %}
 
 <details class="kp-around"><summary class="quiet-h">🧭 前后的知识点{% if not simple %}<span class="muted small">：要先会的 {{ pre|length }} 个 · 学会后可以学 {{ post|length }} 个</span>{% endif %}</summary>
 <div class="grid">
@@ -124,7 +118,7 @@
 <script>
 const KP = {{ kp.id|tojson }}, TASK = {{ task|tojson }}, THINK = {{ (kp.think or '')|tojson }}, REVISIT = {{ revisit|tojson }};
 window.ASK_CTX = {kp: KP};
-// ---- 一步一张卡：进度条 + 上一步 / 下一步；孩子按顺序走（只能回看走过的），成人每一步都能点。今天内回来从上次那一步接着走
+// ---- 一步一张卡：进度条（细线 + 右边「方法 · 3/5」）+ 上一步 / 下一步；孩子按顺序走（只能回看走过的），成人每一步都能点。今天内回来从上次那一步接着走
 const Steps = {
   key: 'learnstep:' + KP + ':' + new Date().toDateString(), free: document.body.dataset.tone !== 'kid', max: 0, cur: 0,
   ids() { return $$('#lbar li').map(li => li.dataset.step); },
@@ -135,6 +129,7 @@ const Steps = {
     ids.forEach((id, j) => { this.sec(id).hidden = j !== i; });
     $$('#lbar li').forEach((li, j) => { li.className = j === i ? 'cur' : j <= this.max ? 'done' : '';
       $('button', li).disabled = !this.free && j > this.max; });
+    $('#lwhere').textContent = `${$$('#lbar li')[i].textContent} · ${i + 1}/${ids.length}`;
     try { localStorage.setItem(this.key, JSON.stringify({id: ids[i], max: ids[this.max]})); } catch (e) {}
     if (scroll) $('#lbar').scrollIntoView({behavior: 'smooth', block: 'start'});
     this.onEnter && this.onEnter(ids[i]);
@@ -207,7 +202,7 @@ if ($('#teachbtn')) $('#teachbtn').onclick = async () => {
       (t.steps || []).map((s, i) => `<p><b>${i + 1}. ${esc(s.title)}</b><br>${esc(s.text).replace(/\n/g, '<br>')}</p>` + qFig(s.fig)).join('') +
       (THINK && t.example ? `<p><b>再想一步：</b>${esc(t.example.q)}<br><span class="muted">→ ${esc(t.example.a)}</span></p>` : '') +
       (t.terms && t.terms.length ? '<p class="small">' + t.terms.map(x => `<span class="pill">${esc(x.en)} = ${esc(x.zh)}</span>`).join(' ') + '</p>' : '') +
-      (THINK && t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '') +
+      (THINK && t.remember ? `<p class="lremember">${esc(t.remember)}</p>` : '') +
       (THINK && t.action ? `<p><b>本周试一试：</b>${esc(t.action)}</p>` : '') + '</div>';
   } catch (e) { look.stop(); $('#teach').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
   if (think) $('.lacts', Steps.sec('see')).hidden = false;
@@ -218,7 +213,7 @@ function showWorked() {
   getTeach().then(t => {
     seekIn(w, look.stop());
     w.innerHTML = (t.example ? `<div class="lworked"><b>✍️ 看我做一遍</b><div>${esc(t.example.q)}</div>${qFig(t.example.fig)}<div class="lworked-a">${esc(t.example.a).replace(/\n/g, '<br>')}</div></div>` : '') +
-      (t.remember ? `<div class="hint">📌 ${esc(t.remember)}</div>` : '') +
+      (t.remember ? `<p class="lremember">${esc(t.remember)}</p>` : '') +
       (t.action ? `<p class="laction"><b>🧪 本周试一试：</b>${esc(t.action)}</p>` : '');
   }).catch(() => { look.stop(); w.innerHTML = ''; });
 }

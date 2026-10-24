@@ -43,3 +43,25 @@ def test_learn_page_is_step_cards():
         db.run("UPDATE contents SET status='retired' WHERE kind='teach' AND kp_id=?", kp2["id"])
         mine = bank.save_content("teach", {"steps": [{"title": "作者", "text": "人写的"}]}, kp2["id"], "", "G6", origin="author")
         assert c.get("/api/teach/MATH-PRE-UNIT").json()["content_id"] == mine
+
+
+def test_learn_page_knowledge_is_the_hero():
+    """知识和题目是主角（DESIGN 5.21）：步骤条、把握、考我一下、上一步都退到背景；每题不飞 +1、不弹连对胶囊、不冒星星。"""
+    from pathlib import Path
+    with TestClient(app) as c:
+        if not auth.by_email("admin@x.com"):
+            c.post("/register", data={"email": "admin@x.com", "password": "secret1", "name": "站长"})
+        pa = auth.create_user("hero-p@x.com", "secret1", "家长", "parent")
+        auth.create_user("hero-k@x.com", "2580", "小宝", "kid", parent_id=pa, grade="G6")
+        c.post("/logout")
+        c.post("/login", data={"email": "hero-k@x.com", "password": "2580"})
+        page = c.get("/learn/MATH-PRE-UNIT").text
+    assert 'id="lwhere"' in page and "evline" not in page and "evmini" not in page  # 孩子不看「把握 %」
+    assert "这一步：" not in page
+    flow = page[page.index('<div class="lflow">'):page.index('<details class="kp-around">')]
+    assert flow.count('class="lback"') >= 3 and '<a href="#" class="lback">← 上一步</a></div>' in flow  # 上一步跟着主按钮
+    js = Path("app/static/app.js").read_text(encoding="utf-8")
+    combo = js[js.index("const Combo = {"):js.index("const AUTO_NEXT_MS")]
+    assert "cheer(" not in combo and "#combo" not in combo and "Juice.plus" not in combo and "toast(" not in combo
+    assert "J.plus" not in Path("app/static/juice.js").read_text(encoding="utf-8")
+    assert "el.classList.toggle('quiet', !show)" in js  # 「这一口气」平时收着

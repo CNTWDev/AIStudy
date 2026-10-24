@@ -296,10 +296,6 @@ details.card>summary{cursor:pointer;list-style:none}details.card>summary::-webki
 .finding{border-left:4px solid var(--line);padding:6px 10px;margin:6px 0;background:var(--bg);border-radius:0 8px 8px 0}
 .finding.sev3{border-color:var(--warn)}.finding.sev2{border-color:var(--learn)}.finding.sev1{border-color:var(--brand)}
 /* 连对 / 随手查 / 探索地图 / 前方 / 知识背景 */
-#combo{position:fixed;right:16px;top:110px;background:#fff4d6;color:#8a5a00;border:1px solid #f1d38a;padding:6px 12px;border-radius:99px;font-weight:700;z-index:60;opacity:0;transform:scale(.8);transition:opacity .25s,transform .25s;pointer-events:none}
-#combo.on{opacity:1;transform:scale(1)}
-@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
-#combo.bump{animation:bump .35s ease-out}
 #qlpanel{position:fixed;left:16px;right:16px;top:64px;margin:0 auto;max-width:560px;max-height:70vh;overflow:auto;background:var(--card,#fff);border:1px solid var(--line,#ddd);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:12px;z-index:90;display:none}
 #qlpanel.on{display:block;animation:pop .25s ease-out}
 .explore .bar{height:10px;border-radius:99px;background:var(--line,#e5e5e5);overflow:hidden;margin:4px 0 10px}
@@ -317,10 +313,9 @@ details.card>summary{cursor:pointer;list-style:none}details.card>summary::-webki
 #selmenu button:hover{background:rgba(255,255,255,.15)}
 
 /* 跟自己比：专注计时 + 和「上周的我」赛跑 */
-.runbar{position:sticky;top:8px;z-index:5;background:var(--card,#fff);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin:8px 0}
-.runbar .rt{font-variant-numeric:tabular-nums}
-.race{position:relative;height:22px;margin-top:6px;background:linear-gradient(90deg,var(--line) 0,var(--line) 100%) center/100% 4px no-repeat}
-.race i{position:absolute;top:0;font-style:normal;transform:translateX(-50%);transition:left .6s ease;font-size:16px;line-height:22px}
+.runbar{margin:2px 0 12px;font-size:12px;color:var(--faint)}.runbar .row{gap:8px;font-size:12px}
+.race{position:relative;height:18px;margin-top:2px;background:linear-gradient(90deg,var(--line) 0,var(--line) 100%) center/100% 3px no-repeat}
+.race i{position:absolute;top:0;font-style:normal;transform:translateX(-50%);transition:left .6s ease;font-size:13px;line-height:18px}
 .race .me::before{content:"🏃"}
 .race .ghost{opacity:.45}.race .ghost::before{content:"👻"}
 .wkcard{border:2px solid #f1d38a;background:rgba(224,161,0,.07)}
@@ -375,7 +370,7 @@ input[type=file]:hover{border-color:var(--brand-3)}
 input[type=file]::file-selector-button{font:inherit;font-weight:600;border:0;border-radius:10px;background:var(--brand);color:var(--on-brand);padding:9px 14px;margin-right:12px;cursor:pointer}
 details:not(.card)>summary{cursor:pointer}
 .flagrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}.flagrow .linkbtn{font-size:12.5px;color:var(--muted)}
-.evline{display:flex;flex-wrap:wrap;gap:6px 14px;background:var(--line-2);border-radius:12px;padding:8px 12px;margin:0 0 12px}
+.evline{display:flex;flex-wrap:wrap;gap:4px 14px;color:var(--muted)}
 /* 题目里的代码（编程课：读代码、填代码） */
 .q pre.code{margin:8px 0;padding:10px 12px;border-radius:10px;background:var(--line-2);font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto;white-space:pre}
 /* 乐园 */
@@ -492,7 +487,7 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 
 /* ---------- 题目的统一展示（作答版 / 带答案版，见 app.js qView、_ui.html question） ---------- */
 .qc-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:4px}
-.qc-stem{font-weight:650;font-size:16.5px;line-height:1.6;white-space:pre-line}
+.qc-stem{font-weight:650;font-size:19px;line-height:1.6;white-space:pre-line}
 .qc-n{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;border-radius:8px;background:var(--brand-2);color:var(--brand-ink);font-size:13px;font-weight:700;margin-right:8px;vertical-align:1px}
 .qc-zh{color:var(--muted);font-size:14px;margin-top:2px}
 /* 题目上的图：画的图跟着文字颜色（深色模式自动变色），原卷照片垫白底；点一下放大 */
@@ -800,7 +795,7 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 /* 带答案的题（错题本、试卷）：不是按钮，就不要厚度 */
 [data-skin=kid] .opt.static{box-shadow:none;border-width:2px;border-color:var(--k-card-edge);font-weight:600}
 [data-skin=kid] .opt.static.right{border-color:var(--mint);background:var(--mint-2)}[data-skin=kid] .opt.static.wrong{border-color:var(--coral);background:var(--coral-2)}
-[data-skin=kid] .qc-stem{font-size:18px;font-weight:700}
+[data-skin=kid] .qc-stem{font-size:21px;font-weight:700}
 /* 答完的反馈：答对蹦一下，答错轻轻摇一下（不是惩罚，只是「这里不对」） */
 [data-skin=kid] .fb{border-radius:18px;border:2px solid transparent}
 [data-skin=kid] .fb.ok{border-color:color-mix(in srgb,var(--mint) 45%,transparent);background:var(--mint-2)}
@@ -913,31 +908,42 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .dsc-near{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;background:var(--ok-2);margin-bottom:4px}
 
 /* ===== 知识点学习页：一步一张卡（learn.html，见 docs/DESIGN.md 5.32） ===== */
-.lbar{display:flex;gap:6px;margin:16px 0 10px;padding:0;list-style:none}
+.lhead{display:flex;align-items:center;gap:12px;margin:14px 0 6px}
+.lbar{display:flex;flex:1;gap:4px;margin:0;padding:0;list-style:none}
 .lbar li{flex:1;min-width:0}
-.lbar button{width:100%;background:none;border:0;padding:0;cursor:pointer;color:var(--faint);font:inherit;font-size:12px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lbar button::before{content:"";display:block;height:8px;border-radius:99px;background:var(--line-2);box-shadow:inset 0 0 0 1px var(--line);margin-bottom:5px}
-.lbar .done button{color:var(--muted)}.lbar .done button::before{background:var(--ok);box-shadow:none}
-.lbar .cur button{color:var(--ink);font-weight:700}.lbar .cur button::before{background:var(--brand);box-shadow:none}
+.lbar button{display:block;width:100%;height:14px;background:none;border:0;padding:5px 0;cursor:pointer}
+.lbar button span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.lbar button::before{content:"";display:block;height:4px;border-radius:99px;background:var(--line)}
+.lbar .done button::before{background:var(--faint);opacity:.6}
+.lbar .cur button::before{background:var(--brand)}
+.lwhere{font-size:12px;color:var(--faint);white-space:nowrap}
+.evmini{margin:0 0 6px;color:var(--faint)}.evmini>summary{cursor:pointer;list-style:none;display:inline}.evmini>summary::-webkit-details-marker{display:none}
+.evmini>summary::after{content:" ›"}.evmini[open]>summary::after{content:" ⌄"}.evmini .evline{margin:6px 0 0}
 .lbar button:disabled{cursor:default}
 .lcard{margin-top:6px}
-.lcard .lback{display:inline-block;font-size:13px;margin-bottom:8px}
-.ldo{background:var(--brand-2);color:var(--brand-ink);border-radius:12px;padding:8px 12px;font-size:14px;font-weight:700;margin:0 0 14px}
-.lcore{font-size:19px;font-weight:700;line-height:1.55;padding:12px 14px;background:var(--bg);border-radius:14px;margin:0 0 10px}
+.lcard .lback{display:inline-block;font-size:13px;color:var(--faint);margin-top:10px}
+.ldo{color:var(--faint);font-size:13px;margin:0 0 10px}[data-skin=kid] .ldo{display:none}
+.lcore{font-size:22px;font-weight:700;line-height:1.6;margin:2px 0 14px}
 .lstory{font-size:17px;line-height:1.75;margin-top:0}
 .lq{font-size:17px;font-weight:700;padding:12px 14px;border-radius:14px;background:var(--sky-2);margin:4px 0 12px}
-.lmethod{font-size:16px;line-height:1.75}
-.lworked{margin:12px 0;padding:12px 14px;border-radius:14px;background:var(--bg);border:1px dashed var(--line)}
+.lmethod{font-size:20px;font-weight:600;line-height:1.8;margin:2px 0 18px}
+.lworked{margin:0 0 18px;padding:2px 0 2px 16px;border-left:3px solid var(--line);font-size:17px;line-height:1.75}.lworked>b{display:block;font-size:13px;font-weight:500;color:var(--faint)}
+.lremember{font-size:17px;margin:0 0 14px}.lremember::before{content:"「"}.lremember::after{content:"」"}
 .lworked-a{margin-top:6px;color:var(--muted)}
 .lteach{margin-top:4px;padding-top:10px;border-top:1px dashed var(--line)}
 .lbridges{margin-top:12px}
-.lacts{margin-top:18px}
-.ltestout{margin:0 0 10px}.ltestout>summary{cursor:pointer;color:var(--brand-ink)}.ltestout>div{margin-top:8px}
-.lpeek{margin-top:10px}.lpeek>summary{cursor:pointer;color:var(--brand-ink)}.lpeek>div{margin-top:6px;padding:10px 12px;background:var(--bg);border-radius:12px}
+.lacts{margin-top:22px;display:flex;flex-direction:column;align-items:center;gap:2px}.lacts .btn.block{align-self:stretch}
+[data-skin=kid] .lacts .lback{margin-top:8px}
+/* 成人：读起来像一本书，卡片不加框，主按钮不满宽，上一步跟在它旁边 */
+body:not([data-skin=kid]) .lcard{background:none;border:0;box-shadow:none;padding:6px 0 0}
+body:not([data-skin=kid]) .lacts{flex-direction:row;gap:16px}body:not([data-skin=kid]) .lacts .btn.block{align-self:auto;width:auto;padding-left:28px;padding-right:28px}body:not([data-skin=kid]) .lacts .lback{margin:0}
+.ltestout{margin:22px 0 0}.ltestout>summary{cursor:pointer;color:var(--faint);list-style:none}.ltestout>summary::-webkit-details-marker{display:none}.ltestout>div{margin-top:8px}
+.lpeek{margin-top:10px}.lpeek>summary{cursor:pointer;color:var(--faint)}.lpeek>div{margin-top:6px;padding:10px 12px;background:var(--bg);border-radius:12px}
 .lguess{margin-top:0}.lguess-r{margin-top:8px;font-weight:600}
 .lstarts{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:8px}.lstarts .chip{cursor:pointer}
 #guess{margin-bottom:12px}#guess .lskip{margin-top:4px}
 .kp-around{margin-top:22px}
+.lsub .pill{background:none;padding:0;color:inherit;font-weight:400}
 [data-skin=kid] .lcard{border:var(--k-edge) solid var(--k-ink);box-shadow:0 6px 0 var(--k-ink)}
 #teachbtn.linkbtn{color:var(--brand-ink);padding-left:0}.kp-around>summary{cursor:pointer}
 
@@ -988,14 +994,14 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .fzbar .fz-track i{display:block;height:100%;width:0;background:var(--sun,var(--brand));border-radius:99px}
 .fzbar .fz-n{font-variant-numeric:tabular-nums;white-space:nowrap}
 .fzbar .fz-pause{padding:0 4px;font-size:16px;line-height:1}
-.fzbar.due{color:var(--ink)}.fzbar.due .fz-track i{background:var(--ok)}
+.fzbar.quiet{display:none}.fzbar.due{color:var(--ink)}.fzbar.due .fz-track i{background:var(--ok)}
 .fz-line{display:flex;gap:2px;height:10px;margin:12px 0 8px}
 .fz-line i{min-width:3px;border-radius:99px;background:var(--line-2,var(--line))}
 .fz-line i.on{background:var(--sun,var(--brand))}
 .fz-say{margin:4px 0;font-size:15px}.fz-news{margin:0 0 10px;color:var(--brand-ink);font-weight:600;font-size:14px}
 .fz-sheet .fs-end{margin-top:8px}
 .fz-back{margin:0 0 10px}
-.fz-on .runbar .row>span:first-child,.fz-on .runbar .rpb{display:none}
+.fz-on .runbar .rpb{display:none}
 .q.fz-nudge,.fz-nudge .q{outline:3px solid var(--sun,var(--brand));outline-offset:4px;border-radius:12px;transition:outline-color .4s}
 /* 5.37 孩子登录：这台设备上登录过的孩子点头像、输 4 位数字。小伙伴说话；页面上只有一件事（选人 / 输数字） */
 .kl{max-width:440px;margin:16px auto 0;display:grid;gap:16px}
@@ -1096,15 +1102,12 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .diary-acts,.diary-nav{max-width:36em;margin:0 auto 14px}.diary-nav{display:flex;justify-content:space-between;gap:12px}
 .diary-edit label{display:block;margin:0 0 12px;font-size:14px;color:var(--muted)}.diary-edit input,.diary-edit textarea{display:block;width:100%;margin-top:4px;font-size:16px;line-height:1.8}
 
-/* 手感（juice.js，DESIGN 5.52）：答完按下去沉一下再弹回（打击停顿）；+1 飞进「这一项 N 道」；答对的「下一题」上走一道进度条，走完自己翻 */
+/* 手感（juice.js，DESIGN 5.52）：答完按下去沉一下再弹回（打击停顿）；答对的「下一题」上走一道进度条，走完自己翻 */
 @keyframes jthunk{0%,12%{transform:scale(.96)}55%{transform:scale(1.04)}100%{transform:none}}
 .j-thunk,[data-skin=kid] .opt.right.j-thunk:not(.static){animation:jthunk .42s cubic-bezier(.3,1.6,.5,1)}
-.j-bump{animation:bump .35s ease-out}
-.j-plus{position:fixed;z-index:100;pointer-events:none;margin:-12px 0 0 -14px;font-weight:800;font-size:18px;color:var(--ok,#1f9d55);transition:transform .45s cubic-bezier(.5,0,.7,1),opacity .45s;text-shadow:0 1px 0 var(--card,#fff)}
 .runbar .rn{font-variant-numeric:tabular-nums}.runbar .rn b{display:inline-block}
-.runbar #combo{position:static;padding:1px 9px;font-size:13px;opacity:0;transform:none;transition:opacity .2s}
-.runbar #combo.on{opacity:1}
-.runbar .rsnd{font-size:16px;line-height:1;padding:2px 4px;text-decoration:none}
+.hardnote{color:var(--ok);font-weight:600;margin:0 0 6px}
+.runbar .rsnd{font-size:13px;line-height:1;padding:2px 4px;text-decoration:none;opacity:.7}
 .nextbtn.auto{position:relative;overflow:hidden}
 .nextbtn.auto::after{content:"";position:absolute;left:0;bottom:0;height:4px;width:100%;background:currentColor;opacity:.35;transform-origin:left;animation:jauto var(--auto,.8s) linear forwards}
 @keyframes jauto{from{transform:scaleX(0)}to{transform:scaleX(1)}}
