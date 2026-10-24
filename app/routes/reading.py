@@ -95,13 +95,26 @@ def reading_today(request: Request, lang: str = "en"):
     return reading_list(request, lang, daily=True)
 
 
+READ_TASKS = ("read_en", "read_zh", "listen")
+
+
+def _reading_page(request: Request, k: dict, lang: str = "en", daily: bool = False, **extra):
+    """阅读页是来读的：先是今天要读的，再是每天的新闻、在读的书、读过的短文；自己找文章读的工具放在最下面。
+    从每日任务进来、今天还没有短文（daily）：写短文的工具就是这一页要做的事，放到最上面打开。"""
+    from ..library_web import in_progress
+    rows = db.q("SELECT id, title, lang, source, minutes, finished_at, created_at FROM readings "
+                "WHERE user_id=? AND source NOT LIKE 'news:%' ORDER BY created_at DESC, id DESC LIMIT 60", k["id"])
+    tasks = [t for t in engine.plan_of_today(k["id"]) if t.get("type") in READ_TASKS]
+    return render(request, "reading_list.html", rows=rows, lang=lang if lang in ("en", "zh") else "en", daily=daily,
+                  tasks=tasks, next_task=next((t for t in tasks if not t.get("done")), None),
+                  news_days=news.archive(k), books=in_progress(k["id"])[:6], today=db.today().isoformat(),
+                  yesterday=(db.today() - timedelta(days=1)).isoformat(),
+                  cross={l: engine.cross_topics(k["id"], l) for l in ("en", "zh")}, **extra)
+
+
 @router.get("/reading", response_class=HTMLResponse)
 def reading_list(request: Request, lang: str = "en", daily: bool = False):
-    k = kid_or_redirect(request)
-    rows = db.q("SELECT id, title, lang, source, minutes, finished_at, created_at FROM readings WHERE user_id=? ORDER BY id DESC LIMIT 50", k["id"])
-    lang = lang if lang in ("en", "zh") else "en"
-    return render(request, "reading_list.html", rows=rows, lang=lang, daily=daily, today_r=_today_reading(k["id"], lang),
-                  cross={l: engine.cross_topics(k["id"], l) for l in ("en", "zh")})
+    return _reading_page(request, kid_or_redirect(request), lang, daily)
 
 
 @router.post("/reading/new")
@@ -135,9 +148,7 @@ def reading_url(request: Request, url: str = Form(...), lang: str = Form("")):
     try:
         a = webpage.article(url)
     except webpage.FetchError as e:
-        rows = db.q("SELECT id, title, lang, source, minutes, finished_at, created_at FROM readings WHERE user_id=? ORDER BY id DESC LIMIT 50", k["id"])
-        return render(request, "reading_list.html", rows=rows, lang="en", url_error=str(e), url=url, status_code=400,
-                      cross={l: engine.cross_topics(k["id"], l) for l in ("en", "zh")})
+        return _reading_page(request, k, url_error=str(e), url=url, status_code=400)
     lang = lang if lang in ("en", "zh") else a["lang"]
     rid = db.insert("INSERT INTO readings(user_id,lang,title,body,source,created_at) VALUES(?,?,?,?,?,?)",
                     k["id"], lang, a["title"], a["body"], "web:" + a["url"][:500], db.now())

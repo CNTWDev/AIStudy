@@ -17,6 +17,19 @@ def _main():
 
 @router.get("/news")
 def news_today(request: Request, level: str = ""):
+    return _open(request, level)
+
+
+@router.get("/news/{pick_id}")
+def news_day(request: Request, pick_id: int, level: str = ""):
+    """阅读页新闻列表里点开往天的一条（换难度也留在这一天）。"""
+    pick = db.one("SELECT * FROM news_picks WHERE id=?", pick_id)
+    if not pick:
+        raise HTTPException(404, "没有这条新闻")
+    return _open(request, level, pick)
+
+
+def _open(request: Request, level: str, pick=None):
     m = _main()
     k = m.kid_or_redirect(request)
     if level in news.levels():  # 孩子自己换难度：记住，以后都按这个级别
@@ -25,7 +38,7 @@ def news_today(request: Request, level: str = ""):
         db.run("UPDATE users SET settings=? WHERE id=?", db.jdump(st), k["id"])
         k = {**k, "settings": db.jdump(st)}
     try:
-        rid = news.open_for(k)
+        rid = news.open_for(k, pick)
     except llm.LLMError as e:
         # 孩子看不懂 AI 的报错：换成今天的英文短文，读完一样算完成「英文阅读」（报错写进日志给管理员看）
         log.warning("news article for user %s failed: %s", k["id"], e)
