@@ -50,6 +50,17 @@ document.getElementById('gboard').addEventListener('click', e => {
   if (m) { m.closest('.gb-tab').classList.add('all'); m.remove(); }
 });
 </script>
+{# 脚本出错、开局面板还空着：在面板上说出来（别只剩一个空框），能刷新，也知道是哪里坏了 #}
+<script>
+addEventListener('error', e => {
+  const p = document.querySelector('.pl-start .pl-panel');
+  if (!p || p.childElementCount) return;
+  const src = e.filename || (e.target && e.target.src) || '', where = src ? ` · ${src.split('/').pop().split('?')[0]}${e.lineno ? ':' + e.lineno : ''}` : '';
+  p.innerHTML = '<p><b>游戏没加载好</b></p><p class="muted small"></p><button type="button" class="btn">刷新一下</button>';
+  p.querySelector('.muted').textContent = (e.message || '脚本没下载下来') + where;
+  p.querySelector('button').onclick = () => location.reload();
+}, true);
+</script>
 <script src="/static/play/engine.js?v={{ ASSET_V }}"></script>
 <script src="/static/play/art.js?v={{ ASSET_V }}"></script>
 <script src="/static/play/quiz.js?v={{ ASSET_V }}"></script>
