@@ -31,7 +31,8 @@ def test_nickname_rules():
     with TestClient(app):
         _, k = _kid("nk", name="王小明")
         u = auth.get_user(k)
-        for bad in ("", "王小明", "小明同学", "x" * 11, "QQ12345678", "a@b"):
+        for bad in ("", "王小明", "小明同学", "x" * 11, "QQ12345678", "a@b",
+                    "大傻 逼", "你是SB", "垃圾王", "加我微信", "vx小明", "管理员", "beejoy老师"):
             try:
                 auth.set_nickname(u, bad)
                 raise AssertionError(bad)
@@ -40,6 +41,19 @@ def test_nickname_rules():
         assert auth.set_nickname(u, " 闪电  小队长 ") == "闪电 小队长"
         assert auth.public_name(auth.get_user(k)) == "闪电 小队长"
         assert auth.public_name({"id": 7, "nickname": ""}) == "小玩家7"
+
+
+def test_park_home_edits_nickname():
+    """乐园首页最上面就能看到、改自己的昵称（以前只有进了联网游戏的大厅才能改）。"""
+    with TestClient(app) as c:
+        _kid("park", name="李小花")
+        _login(c, "park")
+        page = c.get("/arena").text
+        assert 'id="ah-nick"' in page and "还没起" in page and "起一个" in page
+        assert _nick(c, "小花").status_code == 400 and "名字" in _nick(c, "小花").json()["detail"]
+        assert _nick(c, "彩虹飞侠").status_code == 200
+        page = c.get("/arena").text
+        assert "<b>彩虹飞侠</b>" in page and "改一改" in page
 
 
 def test_public_and_code_rooms():

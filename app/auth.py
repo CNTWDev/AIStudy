@@ -94,6 +94,12 @@ def validate_pw(pw: str) -> str:
 
 
 NICK_MAX = 10
+# 昵称是公开的（别的家庭的孩子看得到）：骂人和不雅的词、联系方式、冒充大人或网站的都不行。比较时去掉空格、统一小写。
+NICK_RUDE = ("傻逼", "煞笔", "傻b", "sb", "妈的", "他妈", "你妈", "草泥马", "操你", "滚蛋", "去死", "垃圾", "废物", "智障", "白痴",
+             "弱智", "脑残", "贱", "婊", "屎", "屁眼", "鸡巴", "色情", "黄色", "裸", "做爱", "强奸", "杀人", "fuck", "shit",
+             "bitch", "dick", "porn", "sex")
+NICK_CONTACT = ("微信", "vx", "wx", "qq", "电话", "手机", "加我", "http", "www", ".com", ".cn")
+NICK_FAKE = ("管理员", "官方", "客服", "老师", "系统", "admin", "beejoy")
 
 
 def set_nickname(user: dict, nick: str) -> str:
@@ -114,8 +120,13 @@ def check_nickname(name: str, nick: str) -> str:
     given = name[1:] if len(name) >= 3 else ""   # 名（不带姓）也不行
     if len(name) >= 2 and (name in nick or nick in name or (given and given in nick)):
         raise ValueError("昵称别用自己的名字，起一个外号吧")
-    if re.search(r"\d{5,}|@", nick):
-        raise ValueError("昵称里不要放电话、邮箱这类信息")
+    flat = re.sub(r"\s+", "", nick).lower()
+    if re.search(r"\d{5,}|@", flat) or any(w in flat for w in NICK_CONTACT):
+        raise ValueError("昵称里不要放电话、微信、邮箱这类信息")
+    if any(w in flat for w in NICK_RUDE):
+        raise ValueError("这个昵称大家看了会不舒服，换一个好听的吧")
+    if any(w in flat for w in NICK_FAKE):
+        raise ValueError("别人会以为你是老师或网站的工作人员，换一个吧")
     return nick
 
 

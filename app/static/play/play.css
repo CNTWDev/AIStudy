@@ -148,6 +148,11 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 .ah-hero h1{margin:0;font-size:24px}
 .ah-hero .lv{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;margin:6px 0 2px}
 .ah-hero .lv i{flex:1;max-width:220px;height:12px;border-radius:99px;background:rgba(255,255,255,.7);border:2px solid var(--pl-ink);overflow:hidden}.ah-hero .lv i b{display:block;height:100%;background:var(--pl-sun)}
+.ah-nick{margin:4px 0 2px}.ah-nick-show{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-weight:800;font-size:14px}
+.ah-nick-show b{font-size:16px;display:inline-block}.ah-nick-show.done b{animation:sppop .5s cubic-bezier(.2,.9,.3,1.6)}
+.ah-nick-row{display:flex;gap:6px;flex-wrap:wrap}.ah-nick-row input{flex:1;min-width:8em;max-width:220px;font-size:16px;border:3px solid var(--pl-ink);border-radius:14px;padding:4px 10px}
+.ah-nick-err{color:#c2247a;font-size:13px;font-weight:800;margin:4px 0 0}
+@media (prefers-color-scheme:dark){.ah-nick-err{color:#ff8fc8}}
 .ah-time{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 .ah-time span{background:rgba(255,255,255,.75);border:2px solid var(--pl-ink);border-radius:99px;padding:2px 10px;font-size:13px;font-weight:800;color:var(--pl-ink)}
 .ah-lock{background:var(--warn-2);border:2px dashed var(--warn);color:var(--warn);border-radius:18px;padding:12px 14px;font-weight:700;margin:0 0 12px;display:flex;align-items:center;gap:10px}
@@ -307,6 +312,7 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 .bd-nick-h{font-size:18px;font-weight:900}.bd-nick p{margin:6px 0;font-size:14px;font-weight:700}
 .bd-nick-row{display:flex;gap:8px}.bd-nick-row input{flex:1;min-width:0;font-size:16px;border:3px solid var(--pl-ink);border-radius:14px;padding:8px 12px}
 .bd-nick-err{color:#c2247a;min-height:1em}
+.bd-nick-mine{margin:0 0 10px;font-size:14px;font-weight:700}.bd-nick-mine .bd-nick-row{margin-top:6px}.bd-nick-mine .bd-nick-err{min-height:0;margin:4px 0 0}
 @media (prefers-color-scheme:dark){.bd-nick{background:linear-gradient(135deg,#4a3d12,#3a2540);color:#fff3c4}}
 /* 句子补洞的题（quiz.js：it.cloze）：句子靠左读，洞是一条虚线，答完把词填进去 */
 .aq-q.cloze{font-size:22px;text-align:left;line-height:1.55;font-weight:800}

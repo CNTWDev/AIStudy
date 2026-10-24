@@ -144,6 +144,23 @@
       Art.portrait(b.querySelector('canvas'), b.dataset.av, 'win');
     } catch (e) { alert(e.message); }
   });
+  const nick = document.getElementById('ah-nick');   // 昵称：就地改，改好了马上换上
+  if (nick) {
+    const show = nick.querySelector('.ah-nick-show'), row = nick.querySelector('.ah-nick-row'), err = nick.querySelector('.ah-nick-err'), inp = nick.nickname;
+    const open = on => { show.hidden = on; row.hidden = !on; err.hidden = true; if (on) { inp.focus(); inp.select(); } };
+    nick.querySelector('.ah-nick-edit').onclick = () => { Play.sfx.play('click'); open(true); };
+    nick.querySelector('.ah-nick-back').onclick = () => open(false);
+    nick.onsubmit = async e => {
+      e.preventDefault();
+      try {
+        const v = (await api('/api/arena/nickname', {nickname: inp.value})).nickname;
+        show.querySelector('b').textContent = inp.value = v;
+        nick.querySelector('.ah-nick-edit').textContent = '✏️ 改一改';
+        open(false); Play.sfx.play('pop');
+        show.classList.remove('done'); void show.offsetWidth; show.classList.add('done');
+      } catch (x) { err.textContent = x.message; err.hidden = false; Play.sfx.play('wrong'); }
+    };
+  }
   me.onclick = () => document.querySelector('.ah-avatars').scrollIntoView({behavior: 'smooth', block: 'center'});
 
   if (window.NEW_STICKERS && NEW_STICKERS.length) {

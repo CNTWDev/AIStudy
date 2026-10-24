@@ -182,3 +182,4 @@ def test_board_asks_for_nickname():
         boards.refresh()
         page = c.get("/boards").text
         assert "给自己起个昵称" not in page
+        assert "榜上大家看到的你叫 <b>太极高手</b>" in page and "bd-nick-edit" in page   # 起过了也能在这里改

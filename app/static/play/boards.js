@@ -19,7 +19,9 @@
     })(t0);
   }
 
-  const nick = document.getElementById('bd-nick');   // 还没起昵称：起好就刷新，榜上马上换成新昵称
+  const nick = document.getElementById('bd-nick');   // 起昵称、改昵称：好了就刷新，榜上马上换成新昵称
+  const edit = nick && nick.querySelector('.bd-nick-edit');
+  if (edit) edit.onclick = () => { nick.querySelector('.bd-nick-row').hidden = false; edit.hidden = true; nick.nickname.focus(); nick.nickname.select(); };
   if (nick) nick.addEventListener('submit', async e => {
     e.preventDefault();
     const err = nick.querySelector('.bd-nick-err');
