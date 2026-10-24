@@ -117,3 +117,14 @@ def test_kid_switches_theme(monkeypatch):
         assert "data-look" not in page and "/theme.css" not in page
         assert 'name="look"' not in c.get("/settings").text
         assert "没有这个主题" in c.post("/settings/look", data={"look": "space"}).text
+
+
+def test_default_palette_easy_on_eyes():
+    """默认配色「暖阳」（DESIGN 5.53）：底不是近黑/纯白，深色里主按钮不像一盏灯，app.css 的默认值和 honey 主题一致。"""
+    t = theme.LOOKS["honey"]
+    assert _lum(t["dark"]["bg"]) > 0.01 and _lum(t["light"]["card"]) < 0.98 and _lum(t["dark"]["ink"]) < 0.8
+    assert _ratio(t["dark"]["brand"], t["dark"]["bg"]) <= 9
+    css = (theme.BUILTIN_DIR.parent / "static" / "app.css").read_text(encoding="utf-8")
+    light, dark = css.split("*{box-sizing", 1)[0].split("@media (prefers-color-scheme:dark)", 1)
+    for k in ("bg", "card", "ink", "brand", "on-brand", "brand-ink"):
+        assert f"--{k}:{t['light'][k]};" in light and f"--{k}:{t['dark'][k]};" in dark, k

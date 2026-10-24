@@ -1,19 +1,19 @@
 /* ===== 设计基础：颜色、字号、间距（孩子用：字大一点、点击区域大一点、主次分明） =====
    品牌 beejoy：蜂蜜色。--brand 是实心填充（按钮、进度、选中），文字用 --brand-ink（蜂蜜色字在浅底上看不清）。 */
 @font-face{font-family:"Fredoka";font-weight:600;font-display:swap;src:url(/static/fonts/fredoka-600.woff2) format("woff2");unicode-range:U+0020-007E,U+00B7,U+00D7,U+2190,U+2192}
-:root{--bg:#faf6ec;--card:#fff;--ink:#2b2118;--muted:#6e6455;--faint:#978c78;--line:#ece3cf;--line-2:#f4eee1;
---brand:#f6b400;--brand-d:#e5a300;--brand-2:#fff4cf;--brand-3:#ffe08a;--brand-ink:#8a5300;--brand-ink-d:#6e4200;--on-brand:#2b2118;--on-warn:#fff;
---warn:#c2410c;--warn-2:#fff1e6;--ok:#15803d;--ok-2:#e7f6ec;--learn:#b45309;--learn-2:#fef6e4;--unk:#9aa0a6;
---sun:#f5b301;--sun-2:#fff6d6;--sky:#2f6fdc;--sky-2:#e9f0fd;--coral:#e0573a;--coral-2:#fdeee9;--violet:#6d4fd8;--violet-2:#f0ecfd;--wing:#d6eeff;
+:root{--bg:#f8f4ec;--card:#fffcf6;--ink:#3a3026;--muted:#6b6152;--faint:#958a78;--line:#eae2d2;--line-2:#f2ece1;
+--brand:#f5ba45;--brand-d:#ecac33;--brand-2:#fcf0d4;--brand-3:#f6dc9e;--brand-ink:#8a5a10;--brand-ink-d:#6e470c;--on-brand:#3a2a12;--on-warn:#fff;
+--warn:#c0562a;--warn-2:#fbeee6;--ok:#2a7f4e;--ok-2:#e8f4ec;--learn:#b45309;--learn-2:#fef6e4;--unk:#9aa0a6;
+--sun:#f5b301;--sun-2:#fdf3da;--sky:#2f6fdc;--sky-2:#e9f0fd;--coral:#e0573a;--coral-2:#fdeee9;--violet:#6d4fd8;--violet-2:#f0ecfd;--wing:#d6eeff;
 --radius:20px;--r-sm:12px;--shadow:0 1px 2px rgba(43,33,24,.04),0 6px 20px rgba(43,33,24,.06);--shadow-lg:0 12px 32px rgba(43,33,24,.16);
---ring:0 0 0 4px rgba(246,180,0,.3);--heat-0:#efe8d8;--heat-1:#ffe9a8;--heat-2:#ffd25c;--heat-3:#f6b400;--heat-4:#c98a00;
+--ring:0 0 0 4px rgba(245,186,69,.35);--heat-0:#eee8dc;--heat-1:#fbe6b4;--heat-2:#f8d27a;--heat-3:#f0b545;--heat-4:#c8932e;
 --f-round:"Fredoka",ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
-@media (prefers-color-scheme:dark){:root{--bg:#16130f;--card:#211d17;--ink:#f3ecdd;--muted:#b4a991;--faint:#8c8371;--line:#352e24;--line-2:#2a251d;
---brand:#ffc21a;--brand-d:#ffd45c;--brand-2:#3a2f12;--brand-3:#5a4614;--brand-ink:#ffcb3d;--brand-ink-d:#ffdd80;--on-brand:#2b2118;--on-warn:#2b2118;
---warn:#fb923c;--warn-2:#3a2417;--ok:#4ade80;--ok-2:#173022;--learn:#fbbf24;--learn-2:#33290f;
---sun:#fbbf24;--sun-2:#3a3010;--sky:#7aa7ff;--sky-2:#1c2740;--coral:#ff8a70;--coral-2:#3a221c;--violet:#a893ff;--violet-2:#2a2342;--wing:#bfe3ff;
---shadow:0 1px 2px rgba(0,0,0,.3);--shadow-lg:0 12px 32px rgba(0,0,0,.5);--ring:0 0 0 4px rgba(255,194,26,.3);
---heat-0:#2a251d;--heat-1:#4a3a12;--heat-2:#7a5c10;--heat-3:#c08d0e;--heat-4:#ffc21a}}
+@media (prefers-color-scheme:dark){:root{--bg:#23211e;--card:#2c2926;--ink:#e6dfd2;--muted:#ada391;--faint:#8a8172;--line:#3c3732;--line-2:#322e2a;
+--brand:#e2b862;--brand-d:#eac478;--brand-2:#3a3225;--brand-3:#584a30;--brand-ink:#ddb467;--brand-ink-d:#eac888;--on-brand:#211a10;--on-warn:#2b2118;
+--warn:#e39a6c;--warn-2:#3a2a22;--ok:#79bf8e;--ok-2:#22312a;--learn:#d9b05c;--learn-2:#352d20;
+--sun:#fbbf24;--sun-2:#3a3324;--sky:#7aa7ff;--sky-2:#1c2740;--coral:#ff8a70;--coral-2:#3a221c;--violet:#a893ff;--violet-2:#2a2342;--wing:#bfe3ff;
+--shadow:0 1px 2px rgba(0,0,0,.3);--shadow-lg:0 12px 32px rgba(0,0,0,.5);--ring:0 0 0 4px rgba(226,184,98,.3);
+--heat-0:#322e2a;--heat-1:#4a3e27;--heat-2:#6e5a33;--heat-3:#a7843f;--heat-4:#e2b862}}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;-webkit-font-smoothing:antialiased}
 a{color:var(--brand-ink);text-decoration:none}a:hover{color:var(--brand-ink-d)}
@@ -431,7 +431,7 @@ body:has(#pl)::before{display:none}
 /* 成人：同一套颜色和组件，收一点「童趣」——小伙伴不在卡片上飞，乐园渐变也不出现 */
 [data-tone=adult]{--radius:16px}
 /* 深色底上，小伙伴身上的深色线条（触角、b 的竖）会看不见：加一圈浅色描边，像贴纸 */
-@media (prefers-color-scheme:dark){.mascot{filter:drop-shadow(0 0 .6px #f3ecdd) drop-shadow(0 0 .6px #f3ecdd)}
+@media (prefers-color-scheme:dark){.mascot{filter:drop-shadow(0 0 .6px #e6dfd2) drop-shadow(0 0 .6px #e6dfd2)}
 }
 #askbtn .mascot{width:26px;height:26px;filter:none}@media (max-width:480px){#askbtn .mascot{width:36px;height:36px}}
 #askbtn{background:var(--card);color:var(--ink);border:2.5px solid var(--brand);box-shadow:0 6px 18px rgba(43,33,24,.18)}#askbtn:hover .mascot{transform:rotate(-8deg) scale(1.08)}#askbtn .mascot{transition:transform .2s}
@@ -762,9 +762,9 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 /* ===== 孩子风格（body[data-skin=kid]，见 docs/DESIGN.md 5.30） =====
    和乐园答题卡同一种样子：能按的东西有一圈深色描边、底下一道实心「厚度」，按下去会沉一下；装东西的卡片只有浅色厚边，不抢眼。
    动画只用在「我做了什么」之后（按下、答对、答错、做完），读题、想题的时候页面不动。成人学习者、家长、管理员不加这一层；游戏页有自己的样子。 */
-[data-skin=kid]{--k-ink:#3b2c1c;--k-edge:2.5px;--k-drop:0 4px 0 var(--k-ink);--k-drop-sm:0 3px 0 var(--k-ink);--k-press:0 1px 0 var(--k-ink);
---k-card-edge:#eadcbf;--k-card-drop:0 5px 0 #eadcbf;--mint:#23a872;--mint-2:#dcf5ea;--radius:24px;--r-sm:16px}
-@media (prefers-color-scheme:dark){[data-skin=kid]{--k-ink:#6b5b43;--k-card-edge:#3a3227;--k-card-drop:0 5px 0 #0d0b08;--mint:#4ade80;--mint-2:#173022}}
+[data-skin=kid]{--k-ink:#4a3a28;--k-edge:2.5px;--k-drop:0 4px 0 var(--k-ink);--k-drop-sm:0 3px 0 var(--k-ink);--k-press:0 1px 0 var(--k-ink);
+--k-card-edge:#e8dcc4;--k-card-drop:0 5px 0 #e8dcc4;--mint:#23a872;--mint-2:#dcf5ea;--radius:24px;--r-sm:16px}
+@media (prefers-color-scheme:dark){[data-skin=kid]{--k-ink:#5e5141;--k-card-edge:#3d3731;--k-card-drop:0 5px 0 #171513;--mint:#79bf8e;--mint-2:#22312a}}
 /* 字：标题、数字、按钮用圆体，粗一点 */
 [data-skin=kid] :is(h1,h2,h3,.btn,.num-big,.qc-key,.step .num,.flb-prog,.fb-v,.toast,.nx-t,.sec-card>b,.fs-h b){font-family:var(--f-round),-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
 [data-skin=kid] h1{font-size:28px;font-weight:800}[data-skin=kid] h2{font-weight:800}
