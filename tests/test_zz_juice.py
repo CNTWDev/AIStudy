@@ -124,3 +124,13 @@ def test_answer_card_owns_streak():
     for name in ("mix.html", "learn.html", "warmup.html", "trace.html"):
         html = (ROOT / "templates" / name).read_text(encoding="utf-8")
         assert "nextUp(" in html and not re.search(r"下一题 →'?}?</button>", html), name
+
+
+def test_scripts_read_theme_through_window():
+    """主题（window.LOOK）只有选了主题的人页面上才有：脚本里直接写 LOOK 要先 const LOOK = window.LOOK || {}，
+    不然没主题的人一进游戏就报「LOOK is not defined」，整个游戏白屏（2026-10-24）。"""
+    for f in list((ROOT / "static").glob("*.js")) + list((ROOT / "static" / "play").glob("*.js")):
+        js = f.read_text(encoding="utf-8")
+        bare = re.findall(r"(?<![\w.])LOOK\.", js)
+        if bare:
+            assert re.search(r"const LOOK = window\.LOOK \|\| \{\}", js), f.name
