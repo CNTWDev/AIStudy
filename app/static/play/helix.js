@@ -266,20 +266,22 @@
     }
     if (gate && (down || s.dropAfter && s.snap == null)) dropGate();
   }
-  function snapNext(dir) {   // 下面那一层，往 dir 那边第一个能掉下去的洞，转到它正中间
+  function snapNext(dir) {   // 下面那一层，往 dir 那边下一个能掉下去的洞（不算球现在所在的这个），转到它正中间
     const s = S, row = s.rows[s.next];
     if (!row) return;
     const open = j => row.broken || (row.gate ? row.q && openOpt(row.q, row.q.holeOf[j]) : row.cells[j] === 'g');
     const base = s.snap ?? s.rot, a = mod(BALL_A - base - row.ang, Math.PI * 2), cur = Math.floor(a / SEC) % N;
-    let j = cur;
-    while (open(j) && j !== mod(cur - dir * N, N)) { j = mod(j + dir, N); if (j === cur) break; }   // 先离开现在这个洞
-    for (let k = 0; k < N && !open(j); k++) j = mod(j + dir, N);
-    if (!open(j)) return;
-    let e = j;
-    while (open(mod(e + dir, N)) && mod(e + dir, N) !== j) e = mod(e + dir, N);   // 洞有几格宽：转到中间
-    const mid = (dir > 0 ? j + (mod(e - j, N) + 1) / 2 : e + (mod(j - e, N) + 1) / 2) * SEC;
-    const delta = dir < 0 ? mod(a - mid, Math.PI * 2) : -mod(mid - a, Math.PI * 2);
-    s.snap = base + delta; s.w = 0;
+    let best = null;
+    for (let j = 0; j < N; j++) {   // 每个洞（连着的几格）从第一格算起
+      if (!open(j) || open(mod(j - 1, N))) continue;
+      let n = 1;
+      while (n < N && open(mod(j + n, N))) n++;
+      if (mod(cur - j, N) < n) continue;   // 球就在这个洞上：跳过它，去下一个
+      const mid = (j + n / 2) * SEC, d = dir > 0 ? mod(mid - a, Math.PI * 2) : mod(a - mid, Math.PI * 2);
+      if (best == null || d < best) best = d;
+    }
+    if (best == null) return;
+    s.snap = base - dir * best; s.w = 0;
     Play.sfx.play('swing');
   }
 
