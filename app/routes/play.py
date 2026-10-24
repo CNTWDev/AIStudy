@@ -18,7 +18,7 @@ router = APIRouter()
 @router.get("/arena", response_class=HTMLResponse)
 def arena_home(request: Request):
     k = kid_or_redirect(request)
-    return render(request, "arena.html", a=arena.hub(k), invites=rooms.invites(k), board_tip=boards.nudge(dict(k), park=True))
+    return render(request, "arena.html", a=arena.hub(k), nick=(k["nickname"] or "").strip(), invites=rooms.invites(k), board_tip=boards.nudge(dict(k), park=True))
 
 
 @router.get("/arena/{game}", response_class=HTMLResponse)

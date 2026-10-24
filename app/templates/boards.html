@@ -43,13 +43,22 @@
 {# ② 我的名次 #}
 {% if b.kid %}
 {# 还没起昵称：先起一个（榜上没起昵称的显示「小玩家 + 编号」，不显示名字；家长 2026-10-18 定的） #}
-{% if not parent_id and b.on_board and not (viewer_kid.nickname or '').strip() %}
+{% if not parent_id and b.on_board %}{% set nk = (viewer_kid.nickname or '').strip() %}
+{% if not nk %}
 <form class="bd-card bd-nick" id="bd-nick">
   <div class="bd-nick-h">😎 给自己起个昵称吧！</div>
   <p>榜上现在叫你「{{ b.me_name }}」。起一个外号，大家在榜上就看到它（别用自己的真名哦）。</p>
   <div class="bd-nick-row"><input name="nickname" maxlength="10" placeholder="比如：闪电小队长" autocomplete="off" required><button type="submit" class="btn">就叫这个</button></div>
   <p class="bd-nick-err" aria-live="polite"></p>
 </form>
+{% else %}
+{# 起过了：一行小字，想改点「改一改」就地改 #}
+<form class="bd-nick-mine" id="bd-nick" autocomplete="off">
+  <span>😎 榜上大家看到的你叫 <b>{{ nk }}</b></span> <button type="button" class="btn sm ghost bd-nick-edit">✏️ 改一改</button>
+  <div class="bd-nick-row" hidden><input name="nickname" maxlength="10" value="{{ nk }}" aria-label="新昵称" required><button type="submit" class="btn sm">就叫这个</button></div>
+  <p class="bd-nick-err" aria-live="polite"></p>
+</form>
+{% endif %}
 {% endif %}
 <div class="bd-card bd-me">
 {% if b.mine %}

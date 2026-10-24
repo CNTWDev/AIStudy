@@ -7,6 +7,12 @@
   <canvas id="ah-me" data-avatar="{{ a.avatar }}" title="换个角色" role="button" tabindex="0"></canvas>
   <div class="grow">
     <h1>🎮 乐园</h1>
+    {# 昵称：和别的家庭的小伙伴一起玩、上排行榜时大家只看到它；点「改一改」就在这里改 #}
+    <form class="ah-nick" id="ah-nick" autocomplete="off">
+      <div class="ah-nick-show">😎 昵称 <b>{{ nick or '还没起' }}</b> <button type="button" class="btn sm ghost ah-nick-edit">✏️ {{ '改一改' if nick else '起一个' }}</button></div>
+      <div class="ah-nick-row" hidden><input name="nickname" maxlength="10" placeholder="比如：闪电小队长" value="{{ nick }}" aria-label="新昵称"><button type="submit" class="btn sm">就叫这个</button><button type="button" class="btn sm ghost ah-nick-back">算了</button></div>
+      <p class="ah-nick-err" aria-live="polite" hidden></p>
+    </form>
     <div class="lv"><span>Lv.{{ a.level.level }}</span><i><b style="width:{{ a.level.pct }}%"></b></i><small>再答对 {{ a.level.to_next }} 题升级</small></div>
     <div class="ah-time">
       {% if S.unlimited %}<span>⏱ 今天不限时</span>{% elif S.base %}<span>⏱ 今天还能玩 {{ (S.left / 60)|round(0, 'floor')|int }} 分钟</span>{% endif %}
