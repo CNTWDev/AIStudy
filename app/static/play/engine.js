@@ -152,9 +152,12 @@
   };
 
   // ---------------------------------------------------------------- 音效：合成器、全站开关都在 juice.js（学习页答题也用），游戏照旧叫 Play.sfx
-  const store = {get(k, d) { const v = Juice.store.get(k); return v === null ? d : v === '1'; }, set: Juice.store.set};
-  const tone = Juice.tone, ac = Juice.ac;
-  Play.sfx = Juice.sfx;
+  // juice.js 没加载到（旧页面缓存、网络断了一下）也不能让游戏白屏：没声音照样玩
+  const J = window.Juice || {store: {get: () => null, set() {}}, tone() {}, ac: () => null, bus: () => null,
+                             sfx: {on: false, play() {}, toggle: () => false, unlock() {}}, buzz() {}};
+  const store = {get(k, d) { const v = J.store.get(k); return v === null ? d : v === '1'; }, set: J.store.set};
+  const tone = J.tone, ac = J.ac;
+  Play.sfx = J.sfx;
 
   // ---------------------------------------------------------------- 背景音乐（简单的循环旋律）
   Play.music = {
@@ -165,7 +168,7 @@
     start(tempo) {
       if (!this.on || this.timer) return;
       const a = ac(); if (!a) return;
-      if (!this.gain) { this.gain = a.createGain(); this.gain.gain.value = 0.35; this.gain.connect(Juice.bus()); }
+      if (!this.gain) { this.gain = a.createGain(); this.gain.gain.value = 0.35; this.gain.connect(J.bus()); }
       const beat = 60 / (tempo || 132);
       const scale = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16];
       this.timer = setInterval(() => {
