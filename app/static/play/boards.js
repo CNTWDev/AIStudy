@@ -19,9 +19,7 @@
     })(t0);
   }
 
-  const nick = document.getElementById('bd-nick');   // 起昵称、改昵称：好了就刷新，榜上马上换成新昵称
-  const edit = nick && nick.querySelector('.bd-nick-edit');
-  if (edit) edit.onclick = () => { nick.querySelector('.bd-nick-row').hidden = false; edit.hidden = true; nick.nickname.focus(); nick.nickname.select(); };
+  const nick = document.getElementById('bd-nick');   // 还没起昵称：起好就刷新，榜上马上换成新昵称
   if (nick) nick.addEventListener('submit', async e => {
     e.preventDefault();
     const err = nick.querySelector('.bd-nick-err');
@@ -30,6 +28,32 @@
     const d = await r.json().catch(() => ({}));
     if (!r.ok) { err.textContent = d.error || d.detail || '这个昵称不行，换一个试试'; return; }
     location.reload();
+  });
+
+  // 起过昵称：点榜上自己的名字（带「我」的那个），弹出来就地改
+  document.querySelectorAll('.bd-nick-me').forEach(btn => btn.onclick = () => {
+    const old = btn.firstChild.textContent.trim();
+    const pop = document.createElement('div');
+    pop.className = 'bd-pop';
+    pop.innerHTML = `<form class="bd-card bd-nick bd-pop-card" autocomplete="off">
+      <div class="bd-nick-h">😎 改个昵称</div>
+      <p>榜上和一起玩的小伙伴只看到昵称，别用自己的真名哦。</p>
+      <div class="bd-nick-row"><input name="nickname" maxlength="10" required aria-label="新昵称"><button type="submit" class="btn">就叫这个</button></div>
+      <p class="bd-nick-err" aria-live="polite"></p>
+      <button type="button" class="btn ghost sm bd-pop-x">算了</button></form>`;
+    document.body.appendChild(pop);
+    const f = pop.querySelector('form');
+    f.nickname.value = old; f.nickname.focus(); f.nickname.select();
+    const close = () => pop.remove();
+    pop.querySelector('.bd-pop-x').onclick = close;
+    pop.onclick = e => { if (e.target === pop) close(); };
+    document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); } });
+    f.onsubmit = async e => {
+      e.preventDefault();
+      try { await api('/api/arena/nickname', {nickname: f.nickname.value}); }
+      catch (x) { f.querySelector('.bd-nick-err').textContent = x.message; return; }
+      location.reload();
+    };
   });
 
   if (window.BD_PARTY && !still) {

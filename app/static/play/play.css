@@ -312,7 +312,11 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 .bd-nick-h{font-size:18px;font-weight:900}.bd-nick p{margin:6px 0;font-size:14px;font-weight:700}
 .bd-nick-row{display:flex;gap:8px}.bd-nick-row input{flex:1;min-width:0;font-size:16px;border:3px solid var(--pl-ink);border-radius:14px;padding:8px 12px}
 .bd-nick-err{color:#c2247a;min-height:1em}
-.bd-nick-mine{margin:0 0 10px;font-size:14px;font-weight:700}.bd-nick-mine .bd-nick-row{margin-top:6px}.bd-nick-mine .bd-nick-err{min-height:0;margin:4px 0 0}
+.bd-nick-me{font:inherit;font-weight:800;color:inherit;background:none;border:0;padding:2px 6px;border-radius:10px;cursor:pointer;text-align:left}
+.bd-podium .bd-nick-me{border:2px dashed currentColor;text-align:center}.bd-nick-me .pen{font-size:11px;margin-left:3px}
+.bd-nick-me:hover,.bd-nick-me:focus-visible{background:rgba(255,210,63,.25)}
+.bd-pop{position:fixed;inset:0;z-index:60;background:rgba(20,16,40,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.bd-pop-card{width:100%;max-width:380px;margin:0}.bd-pop-card .bd-pop-x{margin-top:4px}
 @media (prefers-color-scheme:dark){.bd-nick{background:linear-gradient(135deg,#4a3d12,#3a2540);color:#fff3c4}}
 /* 句子补洞的题（quiz.js：it.cloze）：句子靠左读，洞是一条虚线，答完把词填进去 */
 .aq-q.cloze{font-size:22px;text-align:left;line-height:1.55;font-weight:800}

@@ -45,7 +45,9 @@ def arena_start(request: Request, body: dict = Body(...)):
 @router.post("/api/arena/nickname")
 def arena_nickname(request: Request, body: dict = Body(...)):
     try:
-        return {"nickname": auth.set_nickname(kid_or_redirect(request), str(body.get("nickname") or ""))}
+        nick = auth.set_nickname(kid_or_redirect(request), str(body.get("nickname") or ""))
+        boards.refresh()   # 榜上马上换成新昵称（别的孩子看到的也是）
+        return {"nickname": nick}
     except ValueError as e:
         raise HTTPException(400, str(e))
 
