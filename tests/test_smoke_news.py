@@ -136,7 +136,7 @@ def test_news_failure_sends_kid_to_short_article(monkeypatch):
     """新闻没写出来（AI 出错）：孩子看到的不是 AI 的报错，而是去读今天的英文短文（读完一样算完成英文阅读）。"""
     from app import llm
 
-    def broken(user):
+    def broken(user, pick=None):
         raise llm.LLMError("AI 返回格式不对，请再试一次")
     monkeypatch.setattr(news, "open_for", broken)
     with TestClient(__import__("app.main", fromlist=["app"]).app) as c:
@@ -171,3 +171,30 @@ def test_cut_off_json_is_retried_with_more_room():
     with pytest.raises(LLMError, match="截断"):
         service._complete_json(p, ChatRequest(task="news_write", system="", user="", max_tokens=12000))
     assert p.limits == [12000, service.MAX_RETRY_TOKENS]
+
+
+def test_reading_page_lists_news_by_day():
+    """阅读页：新闻一天一条按日期排、能点开往天的；读过的标「读完」；写短文的工具在最下面收起来。"""
+    from datetime import timedelta
+    with TestClient(__import__("app.main", fromlist=["app"]).app) as c:
+        c.post("/login", data={"email": "newsk8@x.com", "password": "2580"})
+        k = db.one("SELECT * FROM users WHERE email='newsk8@x.com'")
+        band = news.band_of(news.level_for(k))
+        old_day = (db.today() - timedelta(days=3)).isoformat()
+        pid = db.insert("INSERT INTO news_picks(day,band,source_id,source_name,license,title,url,published,summary,facts,why,topic,subjects,alts,created_at) "
+                        "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", old_day, band, "x", "ESA", "pd", "Rocket test goes well",
+                        "https://example.com/r", old_day, "", "facts " * 100, "", "太空", "[]", "[]", db.now())
+        page = c.get("/reading").text
+        assert f'href="/news/{pid}"' in page and "Rocket test goes well" in page and "每日新闻" in page
+        assert page.index("每日新闻") < page.index("想读点别的") and '<details class="card rd-make" id="make" >' in page  # 收起来
+        r = c.get(f"/news/{pid}", follow_redirects=False)
+        assert r.status_code == 303
+        rid = int(r.headers["location"].rsplit("/", 1)[1])
+        assert db.one("SELECT source FROM readings WHERE id=?", rid)["source"].startswith(f"news:{pid}:")
+        assert c.get(f"/news/{pid}", follow_redirects=False).headers["location"] == r.headers["location"]  # 再点还是这一篇
+        c.post(f"/api/reading/{rid}/finish", json={"minutes": 3, "answers": {}})
+        row = next(n for n in news.archive(k) if n["id"] == pid)
+        assert row["state"] == "done"
+        assert "读完" in c.get("/reading").text
+        assert c.get("/news/999999").status_code == 404
+        c.get("/logout")

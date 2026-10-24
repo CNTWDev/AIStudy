@@ -5,7 +5,7 @@
 <h1>{{ r.title }}</h1>
 {% if news %}{% set pk = news.pick %}
 <p class="small muted">📰 {% if pk %}根据 {{ pk.source_name }} {{ pk.day }} 的报道改写 · <a href="{{ pk.url }}" target="_blank" rel="noopener noreferrer">原文链接</a>（{{ news.license }}）{% else %}每日新闻{% endif %}</p>
-<div class="chips" style="margin:0 0 10px">{% for L in news.levels %}<a class="chip{{ ' on' if L.id == news.level }}" href="/news?level={{ L.id }}" title="{{ L.who }}">{{ L.name }}<span class="sub">{{ L.who }}</span></a>{% endfor %}</div>
+<div class="chips" style="margin:0 0 10px">{% for L in news.levels %}<a class="chip{{ ' on' if L.id == news.level }}" href="/news{{ '/%d' % pk.id if pk }}?level={{ L.id }}" title="{{ L.who }}">{{ L.name }}<span class="sub">{{ L.who }}</span></a>{% endfor %}</div>
 {% if news.background %}<div class="hint" style="margin-bottom:10px">🧭 <b>读前了解：</b>{{ news.background }}</div>{% endif %}
 {% if news.glossary %}<details class="card small" style="margin-bottom:10px"><summary>🔑 先看看这 {{ news.glossary|length }} 个关键词（点词看详细解释）</summary>
 <div class="chips">{% for g in news.glossary %}<button type="button" class="chip gl" data-w="{{ g.w }}">{{ g.w }}<span class="sub">{{ g.zh }}</span></button>{% endfor %}</div></details>{% endif %}

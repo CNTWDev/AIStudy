@@ -71,16 +71,22 @@ def _check_goals(uid: int, bid: str) -> dict | None:
 
 # ================================================================== 孩子：书架、书、读
 
+def in_progress(uid: int) -> list[dict]:
+    """在读的书（最近翻过的在前）：书架和阅读页都用。"""
+    out = []
+    for r in db.q("SELECT * FROM book_progress WHERE user_id=? ORDER BY updated_at DESC", uid):
+        b, t = library.books.get(r["book_id"]), library.text(r["book_id"])
+        if b and t and library.available(r["book_id"]):
+            out.append({**b, "p": dict(r), "n_pages": t["n_pages"]})
+    return out
+
+
 @router.get("/books", response_class=HTMLResponse)
 def shelf(request: Request, lang: str = ""):
     m = _main()
     k = m.kid_or_redirect(request, manage=True)
     lang = lang if lang in ("en", "zh") else ""
-    reading = []
-    for r in db.q("SELECT * FROM book_progress WHERE user_id=? ORDER BY updated_at DESC", k["id"]):
-        b, t = library.books.get(r["book_id"]), library.text(r["book_id"])
-        if b and t and library.available(r["book_id"]):
-            reading.append({**b, "p": dict(r), "n_pages": t["n_pages"]})
+    reading = in_progress(k["id"])
     books = library.shelf(lang)
     grade = k["grade"] or ""
     for b in books:

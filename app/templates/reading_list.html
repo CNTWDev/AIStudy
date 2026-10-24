@@ -1,25 +1,15 @@
 {% extends "base.html" %}
 {% block body %}
+{% macro day_label(d) %}{% if d == today %}今天{% elif d == yesterday %}昨天{% else %}{{ d[5:7]|int }}月{{ d[8:10]|int }}日{% endif %}{% endmacro %}
+{% macro state_pill(st, minutes=None) %}{% if st == 'done' %}<span class="pill st-mastered">✓ 读完{% if minutes %} {{ minutes }} 分钟{% endif %}</span>{% elif st == 'started' %}<span class="pill st-learning">读到一半</span>{% else %}<span class="pill rd-new">没读</span>{% endif %}{% endmacro %}
 <div class="ph"><h1>{{ '今天的阅读' if daily else '阅读' }}</h1></div>
-{% if today_r %}
-<a class="card today-read" href="/reading/{{ today_r.id }}">
-  <span class="tr-e">{{ '📖' if not today_r.finished_at else '✅' }}</span>
-  <span class="grow"><b>{{ '接着读今天这篇' if not today_r.finished_at else '今天已经读完' }}：{{ today_r.title }}</b>
-    <span class="small muted for-grownups">{{ '每天读一篇就够，读完做几道小题就打卡' if not today_r.finished_at else '想多读可以在下面再写一篇，或者去书库读名著' }}</span></span>
-  <span class="btn {{ '' if not today_r.finished_at else 'ghost' }}">{{ '去读 →' if not today_r.finished_at else '看看' }}</span>
-</a>
-{% elif daily %}
-<p class="lead" style="margin-top:6px">{% if simple %}今天还没读，点「✨ 生成短文」开始 👇{% else %}今天还没读。点下面的「✨ 生成短文」，AI 按你的水平写一篇（话题不选也行）；读完做几道小题就完成。{% endif %}</p>
-{% endif %}
-{% set nt = news_today_title(user) if user and user.role == 'kid' and lang == 'en' else None %}
-{% if nt or not daily %}<a class="tile" href="/news" style="margin:10px 0"><span class="e">📰</span><span><b>今日新闻{% if nt %}：{{ nt }}{% endif %}</b><span class="for-grownups">每天从世界各地的新闻里选一条最值得知道的，按你的水平写成英文短文；不懂的词点一下就查</span></span></a>{% endif %}
-{% if not daily %}<a class="tile" href="/books" style="margin:10px 0"><span class="e">📚</span><span><b>书库：读名著原文</b><span class="for-grownups">《爱丽丝》《绿野仙踪》《西游记》……一页一页读，不认识的词点一下，读累了点 ▶ 听</span></span></a>
-<p class="lead for-grownups">大量读是提分的根本。读的时候<b>点一下不懂的词</b>就能查，觉得有用就收藏，收藏的词会自动进入复习。</p>
-{% endif %}
 
-<div class="card">
+{# 1. 今天要读的：这一页唯一的实心按钮。从每日任务进来、今天还没有短文时，写短文就是要做的事 #}
+{% if daily %}
+<details class="card rd-make" id="make" {{ 'open' if daily or url_error }}>
+  <summary><b>{{ '✨ 先写一篇今天的短文' if daily else '✨ 想读点别的？' }}</b><span class="small muted"> {{ ASSISTANT or '小伙伴' }}按你的水平写一篇{{ '，读完做几道小题就完成' if daily else '，或者贴链接、贴课文' }}</span></summary>
   <div class="tabset" role="tablist">
-    <button type="button" role="tab" data-tab="ai" aria-selected="{{ 'false' if url_error else 'true' }}">✨ AI 写一篇</button>
+    <button type="button" role="tab" data-tab="ai" aria-selected="{{ 'false' if url_error else 'true' }}">✨ 写一篇</button>
     <button type="button" role="tab" data-tab="url" aria-selected="{{ 'true' if url_error else 'false' }}">🔗 贴链接</button>
     <button type="button" role="tab" data-tab="paste" aria-selected="false">📋 贴课文</button>
   </div>
@@ -40,7 +30,7 @@
           <label><input type="radio" name="length" value="长一些，300-400 词（中文 1000 字左右）"><span>长</span></label>
         </div></div>
     </div>
-    <label for="topic">想读什么？<span class="faint" style="font-weight:400">（不填就由 AI 挑）</span></label>
+    <label for="topic">想读什么？<span class="faint" style="font-weight:400">（不填就让{{ ASSISTANT or '小伙伴' }}挑）</span></label>
     <input type="text" id="topic" name="topic" placeholder="写一个话题，或点下面的建议" autocomplete="off" maxlength="60">
     <div class="chips" id="topics">
       {% for l in ('en', 'zh') %}{% for c in (cross or {}).get(l, []) %}<button type="button" class="chip" data-lang="{{ l }}" data-topic="{{ c.topic }}" title="用{{ '英文' if l == 'en' else '中文' }}读读{{ c.subject }}课学过的内容">🔗 {{ c.kp.name }}<span class="sub">{{ c.subject }}</span></button>{% endfor %}{% endfor %}
@@ -78,18 +68,126 @@
     <label for="pbody">正文</label><textarea id="pbody" name="body" required placeholder="把要读的段落粘贴到这里" style="min-height:180px"></textarea>
     <button class="btn lg block" style="margin-top:14px">开始读</button>
   </form>
+</details>
+{% elif tasks %}
+<div class="card hero focus rd-hero">
+  <div class="nx-l">{{ '今天要读的' if next_task else '今天要读的都读完啦 🎉' }}</div>
+  {% for t in tasks %}<a class="rd-task {{ 'ok' if t.done }}" href="{{ t.url }}"><span class="ck">{{ '✓' if t.done else loop.index }}</span><span class="grow">{{ t.title }}</span></a>{% endfor %}
+  {% if next_task %}<a class="btn lg block go" href="{{ next_task.url }}">📖 去读</a>
+  {% else %}<p class="small muted" style="margin:8px 0 0">还想读？下面的新闻、书和短文都可以接着读。</p>{% endif %}
 </div>
+{% elif news_days and news_days[0].day == today %}{% set n = news_days[0] %}
+<div class="card hero focus rd-hero">
+  <div class="nx-l">📰 今日新闻</div>
+  <div class="nx-t">{{ n.title }}</div>
+  <a class="btn lg block go" href="/news/{{ n.id }}">{{ '再看看' if n.state == 'done' else '📖 去读' }}</a>
+</div>
+{% endif %}
 
-<h2>我读过的 {% if rows %}<span class="muted small" style="font-weight:400">{{ rows|length }} 篇</span>{% endif %}</h2>
-{% for r in rows %}
-<a class="kp" href="/reading/{{ r.id }}">
-  <span class="pill" style="background:{{ 'var(--sky-2)' if r.lang == 'en' else 'var(--coral-2)' }};color:{{ 'var(--sky)' if r.lang == 'en' else 'var(--coral)' }}">{{ 'EN' if r.lang == 'en' else '中' }}</span>
-  <span class="n"><b style="font-weight:600">{{ r.title }}</b><br><span class="tiny faint">{{ r.created_at[:10] }} · {{ '网页' if (r.source or '').startswith('web:') else 'AI 写的' if r.source == 'ai' else '自己粘贴' }}</span></span>
-  {% if r.finished_at %}<span class="pill st-mastered">✓ 读完 {{ r.minutes }} 分钟</span>{% else %}<span class="pill st-learning">接着读</span>{% endif %}
-</a>
-{% else %}
-<div class="empty card"><div class="e">📚</div><b>还没有读过</b>选上面任意一种方式，开始第一篇吧。</div>
+{# 2. 每日新闻：一天一条，按日期排，点开就读 #}
+{% if news_days %}
+<h2 class="rd-h">📰 每日新闻<span class="small muted">每天世界上最值得知道的一件事，按你的水平写成英文</span></h2>
+{% for n in news_days %}{% if loop.index == 8 %}<details class="kp-more"><summary class="small">更早的 {{ loop.length - 7 }} 天</summary>{% endif %}
+<a class="kp rd-row" href="/news/{{ n.id }}">
+  <span class="rd-day {{ 'now' if n.day == today }}">{{ day_label(n.day) }}</span>
+  <span class="n"><b>{{ n.title }}</b><br><span class="tiny faint">{% if n.topic %}{{ n.topic }} · {% endif %}{{ n.source_name }}</span></span>
+  {{ state_pill(n.state) }}
+</a>{% if loop.last and loop.length > 7 %}</details>{% endif %}
 {% endfor %}
+{% endif %}
+
+{# 3. 在读的书 #}
+<h2 class="rd-h">📚 {{ '在读的书' if books else '书库' }}<a class="small" href="/books">去书库挑书 ›</a></h2>
+{% if books %}
+<div class="shelf">{% for b in books %}
+  <a class="book" href="/books/{{ b.id }}/p/{{ [b.p.page + 1, b.n_pages]|min }}" style="--h:{{ (b.id|length * 47) % 360 }}">
+    <span class="cover">{{ b.emoji }}</span><b>{{ b.title_zh or b.title }}</b>
+    <span class="small muted">{% if b.p.finished_at %}读完啦 🎉{% else %}第 {{ b.p.page }} / {{ b.n_pages }} 页{% endif %}</span>
+    <span class="daybar"><span style="width:{{ 100 * b.p.page / b.n_pages }}%"></span></span>
+  </a>{% endfor %}</div>
+{% else %}
+<a class="tile" href="/books" style="margin:10px 0"><span class="e">📚</span><span><b>读名著原文</b><span class="for-grownups">《爱丽丝》《绿野仙踪》《西游记》……一页一页读，不认识的词点一下，读累了点 ▶ 听</span></span></a>
+{% endif %}
+
+{# 4. 读过的短文：每天写的、贴的、网页的，按日期排 #}
+{% if rows %}
+<h2 class="rd-h">✍️ 每天的短文<span class="small muted">{{ rows|length }} 篇</span></h2>
+{% for r in rows %}{% if loop.index == 8 %}<details class="kp-more"><summary class="small">更早的 {{ loop.length - 7 }} 篇</summary>{% endif %}
+<a class="kp rd-row" href="/reading/{{ r.id }}">
+  <span class="rd-day {{ 'now' if r.created_at[:10] == today }}">{{ day_label(r.created_at[:10]) }}</span>
+  <span class="n"><b>{{ r.title }}</b><br><span class="tiny faint">{{ '英文' if r.lang == 'en' else '中文' }} · {{ '网页' if (r.source or '').startswith('web:') else '写给你的' if r.source == 'ai' else '自己贴的' }}</span></span>
+  {{ state_pill('done' if r.finished_at else 'started', r.minutes) }}
+</a>{% if loop.last and loop.length > 7 %}</details>{% endif %}
+{% endfor %}
+{% endif %}
+
+{# 5. 自己找一篇读：不是来这页的主要目的，放最下面，收起来 #}
+{% if not daily %}
+<details class="card rd-make" id="make" {{ 'open' if daily or url_error }}>
+  <summary><b>{{ '✨ 先写一篇今天的短文' if daily else '✨ 想读点别的？' }}</b><span class="small muted"> {{ ASSISTANT or '小伙伴' }}按你的水平写一篇{{ '，读完做几道小题就完成' if daily else '，或者贴链接、贴课文' }}</span></summary>
+  <div class="tabset" role="tablist">
+    <button type="button" role="tab" data-tab="ai" aria-selected="{{ 'false' if url_error else 'true' }}">✨ 写一篇</button>
+    <button type="button" role="tab" data-tab="url" aria-selected="{{ 'true' if url_error else 'false' }}">🔗 贴链接</button>
+    <button type="button" role="tab" data-tab="paste" aria-selected="false">📋 贴课文</button>
+  </div>
+
+  {# 1. AI 按孩子的水平写一篇 #}
+  <form class="tabpane" data-pane="ai" method="post" action="/reading/new" {{ 'hidden' if url_error }}>
+    <input type="hidden" name="mode" value="ai">
+    <div class="row" style="align-items:flex-start;gap:4px 14px">
+      <div><label>语言</label>
+        <div class="seg">
+          <label><input type="radio" name="lang" value="en" {{ 'checked' if lang != 'zh' }}><span>英文</span></label>
+          <label><input type="radio" name="lang" value="zh" {{ 'checked' if lang == 'zh' }}><span>中文</span></label>
+        </div></div>
+      <div><label>长度</label>
+        <div class="seg">
+          <label><input type="radio" name="length" value="很短，80-120 词（中文 300 字左右）"><span>短</span></label>
+          <label><input type="radio" name="length" value="" checked><span>标准</span></label>
+          <label><input type="radio" name="length" value="长一些，300-400 词（中文 1000 字左右）"><span>长</span></label>
+        </div></div>
+    </div>
+    <label for="topic">想读什么？<span class="faint" style="font-weight:400">（不填就让{{ ASSISTANT or '小伙伴' }}挑）</span></label>
+    <input type="text" id="topic" name="topic" placeholder="写一个话题，或点下面的建议" autocomplete="off" maxlength="60">
+    <div class="chips" id="topics">
+      {% for l in ('en', 'zh') %}{% for c in (cross or {}).get(l, []) %}<button type="button" class="chip" data-lang="{{ l }}" data-topic="{{ c.topic }}" title="用{{ '英文' if l == 'en' else '中文' }}读读{{ c.subject }}课学过的内容">🔗 {{ c.kp.name }}<span class="sub">{{ c.subject }}</span></button>{% endfor %}{% endfor %}
+      {% for t in ['🦖 恐龙', '🚀 太空', '⚽ 足球', '🐼 动物', '🧪 科学小实验', '🌍 环保', '🎨 艺术家', '🕵️ 侦探故事'] %}<button type="button" class="chip" data-topic="{{ t[2:] }}">{{ t }}</button>{% endfor %}
+    </div>
+    <p class="field-tip for-grownups">💡 英文短文会自动用上你最近要复习的生词，读着读着就记住了。</p>
+    <button class="btn lg block" style="margin-top:14px" data-busy="正在写，大约半分钟…">✨ 生成短文</button>
+  </form>
+
+  {# 2. 把别的网站上的文章放进阅读器 #}
+  <form class="tabpane" data-pane="url" method="post" action="/reading/url" id="urlform" {{ '' if url_error else 'hidden' }} novalidate>
+    <p class="muted small for-grownups" style="margin:0 0 10px">在别的网站看到想读的文章？把链接贴进来，正文会放进这里的阅读器，同样能点词查、能收藏。</p>
+    <div class="ig">
+      <span class="ig-ico">🔗</span>
+      <input type="text" name="url" id="url" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" value="{{ url or '' }}" placeholder="https://…" aria-label="文章链接">
+      <button type="button" class="btn soft" id="pastebtn" hidden>粘贴</button>
+      <button class="btn" data-busy="正在打开…">打开</button>
+    </div>
+    <div class="err" id="urlerr" {{ '' if url_error else 'hidden' }}>{{ url_error or '' }}</div>
+    <ul class="small muted for-grownups" style="margin:12px 0 0;padding-left:20px;line-height:1.8">
+      <li>适合：新闻、科普、百科、故事这类以文字为主的网页。</li>
+      <li>要登录、要付费、视频页打不开时，可以把文字复制下来，用「贴课文」。</li>
+    </ul>
+  </form>
+
+  {# 3. 自己的书、课文 #}
+  <form class="tabpane" data-pane="paste" method="post" action="/reading/new" hidden>
+    <input type="hidden" name="mode" value="paste">
+    <label>语言</label>
+    <div class="seg">
+      <label><input type="radio" name="lang" value="en" checked><span>英文</span></label>
+      <label><input type="radio" name="lang" value="zh"><span>中文</span></label>
+    </div>
+    <label for="ptitle">标题</label><input type="text" id="ptitle" name="title" placeholder="例如：Charlotte's Web 第 3 章">
+    <label for="pbody">正文</label><textarea id="pbody" name="body" required placeholder="把要读的段落粘贴到这里" style="min-height:180px"></textarea>
+    <button class="btn lg block" style="margin-top:14px">开始读</button>
+  </form>
+</details>
+{% endif %}
+<p class="small muted for-grownups" style="margin-top:14px">大量读是提分的根本。读的时候点一下不懂的词就能查，觉得有用就收藏，收藏的词会自动进入复习。</p>
 
 <script>
 // 标签页切换

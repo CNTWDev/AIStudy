@@ -293,10 +293,17 @@ def levels_in_use() -> set[str]:
     return {level_for(u) for u in db.q("SELECT grade, settings FROM users WHERE role='kid'")}
 
 
-def open_for(user) -> int | None:
-    """孩子打开今天的新闻：返回阅读记录 id（第一次打开时建一条）；还没有新闻返回 None。"""
+def pick_on(day: str, band: str):
+    return db.one("SELECT * FROM news_picks WHERE day=? AND band=? ORDER BY id DESC LIMIT 1", day, band)
+
+
+def open_for(user, pick=None) -> int | None:
+    """孩子打开一天的新闻（不指定就是今天的）：返回阅读记录 id（第一次打开时建一条）；还没有新闻返回 None。
+    往天的新闻这个级别还没人读过，就现在写（只写一次，大家共用）。"""
     level = level_for(user)
-    pick = latest_pick(band_of(level))
+    if pick is not None and pick["band"] != band_of(level):  # 换了难度跨到另一组：用同一天那一组的新闻
+        pick = pick_on(pick["day"], band_of(level)) or pick
+    pick = pick or latest_pick(band_of(level))
     if not pick:
         return None
     source = f"news:{pick['id']}:{level}"
@@ -307,6 +314,32 @@ def open_for(user) -> int | None:
     return db.insert("INSERT INTO readings(user_id,lang,title,body,source,level,questions,content_id,created_at) VALUES(?,?,?,?,?,?,?,?,?)",
                      user["id"], "en", body.get("title") or pick["title"], body.get("body", ""), source, level,
                      db.jdump(body.get("questions", [])), cid, db.now())
+
+
+def archive(user, days: int = 14) -> list[dict]:
+    """阅读页上的新闻列表：最近每天一条（按这个孩子的级别那一组），标题尽量用改写后的，标上读完 / 读到一半 / 没读。"""
+    level = level_for(user)
+    picks = db.q("SELECT id, day, title, topic, source_name FROM news_picks WHERE band=? AND day<=? ORDER BY day DESC, id DESC LIMIT ?",
+                 band_of(level), db.today().isoformat(), days * 2)
+    mine = {}
+    for r in db.q("SELECT id, title, source, finished_at FROM readings WHERE user_id=? AND source LIKE 'news:%' ORDER BY id", user["id"]):
+        m = re.fullmatch(r"news:(\d+):\w+", r["source"])
+        if m:
+            old = mine.get(int(m.group(1)))
+            if not old or (r["finished_at"] and not old["finished_at"]):
+                mine[int(m.group(1))] = r
+    written = {r["topic"]: r["title"] for r in db.q(
+        "SELECT topic, title FROM contents WHERE kind='news' AND grade=? AND status='active' AND topic IN (%s)"
+        % ",".join("?" * len(picks)), level, *[f"news:{p['id']}" for p in picks])} if picks else {}
+    out, seen = [], set()
+    for p in picks:
+        if p["day"] in seen:
+            continue
+        seen.add(p["day"])
+        r = mine.get(p["id"])
+        out.append({**p, "title": (r and r["title"]) or written.get(f"news:{p['id']}") or p["title"],
+                    "state": "done" if r and r["finished_at"] else "started" if r else ""})
+    return out[:days]
 
 
 def today_title(user) -> str | None:
