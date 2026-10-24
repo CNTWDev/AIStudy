@@ -288,17 +288,16 @@ function show() {
     submit: (answer, self, ms, extra, onPart) => { lastAnswer = answer; return api('/api/answer', base(self ? {self, ms} : {answer, ms, ...extra}), {onPart}); },
     dontKnow: () => api('/api/answer', base({dont_know: true})), ladder: true,
     onDone: res => {
-      Run.hit(!!res.correct); Combo.hit(!!res.correct, box); celebrate(res, box);
+      Run.hit(!!res.correct); celebrate(res, box);
       if (p) { if (res.correct) right++; }
       else if (res.correct) { right++; wrongStreak = 0; } else { wrong++; wrongStreak++; }
       if (g && res.answer_index != null) {
         const was = g.i === +res.answer_index;
         box.insertAdjacentHTML('beforeend', `<div class="small lguess-r">${res.correct ? (was ? '开头就猜对了，现在也做对了 👍' : '开头猜错了，现在做对了，这就是刚学会的 🎉') : (was ? '开头猜对了，这次没做对，看看解析' : '看看解析，再回看一下方法')}</div>`);
       }
-      const nx = document.createElement('div'); nx.className = 'row'; nx.style.marginTop = '10px';
-      nx.innerHTML = `<button class="btn">${idx + 1 < items.length ? '下一题 →' : '看看结果 →'}</button>` + (wrongStreak >= 2 && !res.trace && {{ pre|length }} ? `<a class="btn ghost" href="#" onclick="$('.kp-around').open=true;$('.kp-around').scrollIntoView({behavior:'smooth'});return false">🧱 退一步：先练要用到的基础</a>` : '');
-      nx.querySelector('.btn').onclick = () => { idx++; show(); };
-      box.appendChild(nx);
+      // 开头猜过、学完又做对的那句话要看一眼，等久一点再翻
+      nextUp(box, idx + 1 < items.length ? '下一题 →' : '看看结果 →', () => { idx++; show(); }, res, {wait: g || res.lit ? 1800 : 0,
+        extra: wrongStreak >= 2 && !res.trace && {{ pre|length }} ? `<a class="btn ghost" href="#" onclick="$('.kp-around').open=true;$('.kp-around').scrollIntoView({behavior:'smooth'});return false">🧱 退一步：先练要用到的基础</a>` : ''});
       // 今天第二次卡在这个点（或点了「还不会」）：当场追根，几道小题找出是哪块基础没打牢（app/trace.py）
       if (res.trace) {
         const tb = document.createElement('div'); tb.className = 'hint tracebtn';
@@ -352,10 +351,7 @@ Steps.init();
       submit: (answer, self, ms, extra, onPart) => api('/api/answer', {item_id: it.id, kp_id: KP, request_id: it.request_id, answer, ms, ...extra}, {onPart}),
       onDone: res => {
         if (res.correct) ok.push(it.id);
-        const nx = document.createElement('div'); nx.className = 'row'; nx.style.marginTop = '10px';
-        nx.innerHTML = `<button class="btn">${idx + 1 < items.length ? '下一题 →' : '看看结果 →'}</button>`;
-        nx.querySelector('.btn').onclick = () => { idx++; show(); };
-        q.appendChild(nx);
+        nextUp(q, idx + 1 < items.length ? '下一题 →' : '看看结果 →', () => { idx++; show(); }, res);
       }
     });
   };

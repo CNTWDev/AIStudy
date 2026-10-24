@@ -604,6 +604,7 @@
       const p = stopPlay();
       if (def.verdict && res && !res.error) ({result, title, why} = Object.assign({result, title, why}, def.verdict(res, result)));
       Play.sfx.play(result === 'win' ? 'win' : result === 'lose' ? 'lose' : 'pop');
+      if (result === 'win') Juice.buzz('done');
       let mine = null;
       try { mine = await api(`/api/arena/${match.match_id}/end`, {result, stats: stats || {}}); } catch (e) { /* 对局已经结束了 */ }
       const head = title || (multi ? {win: '🎉 我们一起过关了！', lose: '💪 差一点！', draw: '🤝 平局', quit: '这一关先停下了'}

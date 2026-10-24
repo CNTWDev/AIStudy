@@ -5,7 +5,7 @@ import re
 
 from fastapi import HTTPException
 
-from . import coach, db, discuss, engine, explore, itemtypes, trace
+from . import ability, coach, db, discuss, engine, explore, itemtypes, trace
 from .catalog import catalog
 
 
@@ -77,10 +77,14 @@ def _answer(user_id, body):
     else:
         correct = engine.check_answer(it, body.get("answer"))
     old = (db.one("SELECT status FROM mastery WHERE user_id=? AND kp_id=?", user_id, kp_id) or {}).get("status")
+    # 对他来说的难题答对了（答之前估的把握低）：前端给一个更亮的音，「这题很多人会错」（真实的惊喜，不是随机发的）
+    p_exp = ability.expect(user_id, kp_id, it) if correct and mode != "helped" and not review else None
     status = engine.record_attempt(user_id, {**it, "judge": "ai"} if review else it, kp_id, mode, bool(correct), answer,
                                    ms=body.get("ms"), weight=weight)
     out = {"correct": bool(correct), **itemtypes.reveal(it), "status": status, "status_label": engine.STATUS_LABEL[status],
            **(review or {})}
+    if p_exp is not None and p_exp < HARD_P:
+        out["hard"] = True
     if row["purpose"] == "combine" and mode in ("practice", "preview"):
         _combine_evidence(user_id, it, kp_id, bool(correct))
     if mode == "probe":
@@ -94,6 +98,7 @@ def _answer(user_id, body):
 
 
 
+HARD_P = 0.4   # 答之前估的答对把握低于这个还做对了，算「难题答对」
 COMBINE_WEIGHT = 0.5
 # 点了「还不会」、跟着一步步做完以后马上试的那道（mode=helped）：刚看完讲解答对多半是短时记忆，只算一小份证据；
 # 做错了也不进错题本（原题已经在里面了），明天换新题再考
