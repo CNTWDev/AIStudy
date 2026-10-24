@@ -209,7 +209,9 @@ def board(kid: dict | None, metric: str = "streak", scope: str = "all", game: st
     if week:
         week["left"] = 7 - db.today().weekday()   # 这周还剩几天（连今天）
     n = TOP_GAME if game else TOP
-    top = [{**r, "me": bool(kid) and r["id"] == kid["id"]} for r in ranked[:n]]
+    # 自己那一行用现在的昵称和角色：榜单缓存一分钟，刚改了昵称不能看到上下两个名字
+    mine_now = {"name": auth.public_name(kid), "avatar": awards.avatar(kid)} if kid else {}
+    top = [{**r, "me": True, **mine_now} if kid and r["id"] == kid["id"] else {**r, "me": False} for r in ranked[:n]]
     return {"metric": metric, "metrics": METRICS, "unit": UNITS[metric], "scope": scope, "city": city_label(city), "city_ok": city_ok,
             "top": top, "mine": mine, "ahead": ahead, "to_top": to_top, "moved": moved, "week": week, "top_n": TOP,
             "on_board": bool(kid) and on_board(kid), "counts": me, "mine_value": me.get(key, 0) if kid else 0,

@@ -182,4 +182,23 @@ def test_board_asks_for_nickname():
         boards.refresh()
         page = c.get("/boards").text
         assert "给自己起个昵称" not in page
-        assert "榜上大家看到的你叫 <b>太极高手</b>" in page and "bd-nick-edit" in page   # 起过了也能在这里改
+        assert "榜上大家看到的你叫" not in page   # 乐园首页能改了，这里不再多一句
+
+
+def test_board_name_click_to_edit_and_fresh():
+    """榜上自己那一行：点名字就地改昵称；刚改的昵称马上换上（榜单缓存着也一样），上下不会是两个名字。"""
+    with TestClient(app) as c:
+        _, k = _family("ne", name="赵六六")
+        auth.set_nickname(auth.get_user(k), "旧名字")
+        _days(k, range(0, 40))   # 连续 40 天：在领奖台上
+        boards.refresh()
+        c.cookies.clear()
+        c.post("/login", data={"email": "bd-ne@x.com", "password": "2580"})
+        page = c.get("/boards?metric=streak").text
+        assert 'class="nm bd-nick-me"' in page and "旧名字<i>我</i>" in page
+        boards.board(None, "streak")   # 缓存里是旧名字
+        auth.set_nickname(auth.get_user(k), "新名字")
+        page = c.get("/boards?metric=streak").text
+        assert "新名字<i>我</i>" in page and "旧名字" not in page
+        assert c.post("/api/arena/nickname", json={"nickname": "又一个"}).status_code == 200   # 改了就刷新：别人看到的也是新的
+        assert "又一个" in [r["name"] for r in boards.board(None, "streak")["top"]]
