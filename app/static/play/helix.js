@@ -46,7 +46,7 @@
   function fresh(lv, avatar) {
     lv = lv || DEMO;
     return {mode: 'preview', lv, rows: build(lv), avatar: avatar || 'mint', rot: 0, w: 0, hold: 0, snap: null, dropAfter: false,
-            y: 0.45, vy: 0, next: 0, cam: -0.2, streak: 0, fire: false, safe: 0, squash: 0,
+            y: 0.45, vy: 0, next: 0, cam: 1 - BR - 0.6, lift: 0, streak: 0, fire: false, safe: 0, squash: 0,
             honey: 0, gatesOk: 0, gatesDone: 0, free: 0, falls: 0, limit: 600, winT: 0, sent: false, flags: 0, ghostTold: false};
   }
   const theme = () => (S.lv.world && S.lv.world.scene) || 'day';
@@ -236,7 +236,9 @@
       if (gt && gt.armed && !gt.done && gt.right < 0 && gt.free < GATE_FREE) { const d = Math.min(dt, GATE_FREE - gt.free); gt.free += d; s.free += d; }
       if (c && c.elapsed() >= s.limit) { s.mode = 'done'; sh.toast('⏰ 时间到！', 'warn'); setTimeout(() => report('lose'), 900); }
     }
-    s.cam = Math.max(s.cam, s.cam + (s.y - 0.6 - s.cam) * Math.min(1, dt * 6));   // 镜头只往下走，球在上面三分之一
+    s.lift += ((s.mode === 'gate' || s.mode === 'wait' ? 1 : 0) - s.lift) * Math.min(1, dt * 5);   // 停在题门上：画面往下让一点，后面的答案牌不被题挡住
+    const floor = Math.min(s.next, s.rows.length) + 1 - BR;   // 镜头跟着球脚下那一层走（不跟着弹上弹下），只往下走
+    s.cam = Math.max(s.cam, s.cam + (Math.max(s.y, floor) - 0.6 - s.cam) * Math.min(1, dt * 6));
     if (c && c.net && (sendT -= dt) <= 0 && s.mode !== 'win') { sendT = 0.25; c.net.send({t: 'hx', n: s.next, f: s.fire ? 1 : 0}); }
     hudTick();
   }
@@ -286,10 +288,10 @@
   }
 
   // ------------------------------------------------------------ 画面
-  function geo() {   // 层距 PX 小、塔窄一点：球在上面三分之一（镜头 y - 0.6），下面两层整层都在画面里，看得见刺和洞
+  function geo() {   // 层距 PX 小、塔窄一点：球落脚的那层在 1/3 高（镜头 y - 0.6），下面两层连前沿都在画面里、在底下的提示条上面，看得见刺和洞
     const W = stage.W, H = stage.H, side = W >= 640;
     const R = Math.min(side ? 170 : W * 0.36, H * 0.28), CX = side ? W / 2 - 10 : W / 2 - 6;
-    return {W, H, R, RP: R * 0.2, K: 0.34, CX, PX: H * 0.24, TOP: H * 0.22, TH: Math.max(7, R * 0.08)};
+    return {W, H, R, RP: R * 0.2, K: 0.34, CX, PX: H * 0.22, TOP: H * (0.17 + 0.1 * (S ? S.lift : 0)), TH: Math.max(7, R * 0.08)};
   }
   const sy = (g, y) => g.TOP + (y - S.cam) * g.PX;
   const P = (g, a, y, r) => [g.CX + r * Math.cos(a), y + r * g.K * Math.sin(a)];
@@ -425,11 +427,11 @@
     }
     items.sort((p, r) => p.depth - r.depth);
     for (const {o, a, depth} of items) {   // 牌子立在洞口外沿：前面的挂在圆盘边下面（球挡不住），后面的立在边上
-      const [x, ry] = P(g, a, y, g.R * 1.08), k = (0.78 + 0.22 * (depth + 1) / 2) * Math.max(0.8, g.R / 150);
+      const [x, ry] = P(g, a, y, g.R * (depth < 0 ? 1.08 + 0.3 * depth : 1.08)), k = (0.78 + 0.22 * (depth + 1) / 2) * Math.max(0.8, g.R / 150);
       const text = q.item.options[o], tried = q.tried.has(o), right = q.done && o === q.right, on = o === sel && !tried;
       ctx.globalAlpha = depth < -0.3 ? 0.8 : 1;
       ctx.font = `900 ${Math.round(24 * k)}px ${FONT}`;
-      const w = Math.max(54 * k, ctx.measureText(text).width + 22 * k), h = 38 * k, cy = ry + (depth > 0 ? depth * (g.TH + h * 0.6) : depth * h * 0.25);   // 后面的贴着边，不钻到题牌底下
+      const w = Math.max(54 * k, ctx.measureText(text).width + 22 * k), h = 38 * k, cy = ry + (depth > 0 ? depth * (g.TH + h * 0.6) : 0);   // 后面的往里收到圆盘上，不钻到题牌底下
       const x0 = x - w / 2, y0 = cy - h / 2;
       ctx.fillStyle = tried ? '#ddd6e8' : right ? '#c9f2d3' : on ? '#fff1b8' : '#fff';
       Play.roundRect(ctx, x0, y0, w, h, 11 * k); ctx.fill();
