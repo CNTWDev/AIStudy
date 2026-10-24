@@ -16,11 +16,8 @@ async function load() {
     show();
   } catch (e) { $('#wbox').innerHTML = `<div class="err">${esc(e.message)}</div>`; }
 }
-function next(box) {
-  const nx = document.createElement('div'); nx.className = 'row'; nx.style.marginTop = '10px';
-  nx.innerHTML = `<button class="btn">${idx + 1 >= items.length ? '完成热身' : '下一题 →'}</button>`;
-  nx.querySelector('.btn').onclick = () => { idx++; show(); };
-  box.appendChild(nx);
+function next(box, res) {
+  nextUp(box, idx + 1 >= items.length ? '完成热身' : '下一题 →', () => { idx++; show(); }, res, {wait: res && res.lit ? 1800 : 0});
 }
 function show() {
   bar();
@@ -42,7 +39,7 @@ function show() {
         .then(r => ({correct: r.correct, answer: r.answer, explain: r.correct ? '' : (r.added ? '已放进单词复习，明天开始记。' : '')})),
       dontKnow: () => api('/api/warmup/word', {word: it.word.w, list: it.word.list, recheck: !!it.word.recheck, dont_know: true})
         .then(r => ({dont_know: true, answer: r.answer, explain: '已放进单词复习，明天开始记。'})),
-      onDone: res => { if (res.correct) right++; else found++; Run.hit(!!res.correct); Combo.hit(!!res.correct, box); if (res.correct) say(it.word.w); next(box); },
+      onDone: res => { if (res.correct) right++; else found++; Run.hit(!!res.correct); if (res.correct) say(it.word.w); next(box, res); },
     });
   } else {
     const p = it.probe;
@@ -54,7 +51,7 @@ function show() {
         if (res.correct) right++; else found++;
         if (res.lit) lit++;
         Run.hit(!!res.correct);
-        Combo.hit(!!res.correct, box); celebrate(res, box); next(box);
+        celebrate(res, box); next(box, res);
       },
     });
   }

@@ -89,6 +89,8 @@ def render(request: Request, name: str, status_code: int = 200, **ctx):
             "ASSISTANT_ICON": sitecfg.get("assistant_icon"), "tone": ui_tone(kid or user), "look": theme.look_of(kid or user)}
     # simple：孩子自己在看（不是家长、不是成人学习者）——少字多图，说明文字只给家长看（docs/KID_UX.md）
     base["simple"] = bool(user and user["role"] == "kid" and base["tone"] == "kid")
+    # teen：初中以上的孩子，答题的声音和画面换干净一点的一套（app/static/juice.js）
+    base["teen"] = bool(base["tone"] == "kid" and growth.teen_of(kid or user))
     return templates.TemplateResponse(request, name, {**base, **ctx}, status_code=status_code)
 
 def _flow_here(request: Request, kid) -> dict | None:

@@ -2,7 +2,7 @@
    Play.stage    画布：固定逻辑高度、宽度跟屏幕比例走，按设备像素比画得清楚
    Play.loop     主循环：固定步长更新、切到后台自动暂停
    Play.FX       特效：粒子、飘字、冲击波、震屏
-   Play.sfx      音效：用 Web Audio 现场合成，不用下载素材；可以静音（记在本机）
+   Play.sfx      音效：就是 Juice.sfx（app/static/juice.js），全站一个开关
    Play.music    背景音乐：几小节轻快的循环
    Play.scene    背景：天空、云、远山、草地、星星
    Play.input    键盘 + 触屏按钮
@@ -151,73 +151,10 @@
     ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
   };
 
-  // ---------------------------------------------------------------- 音效（Web Audio 合成）
-  const store = {get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v === '1'; } catch (e) { return d; } },
-                 set(k, v) { try { localStorage.setItem(k, v ? '1' : '0'); } catch (e) { /* 隐私模式 */ } }};
-  let AC = null, master = null;
-  function ac() {
-    if (!AC) {
-      const C = window.AudioContext || window.webkitAudioContext;
-      if (!C) return null;
-      AC = new C(); master = AC.createGain(); master.gain.value = 0.5; master.connect(AC.destination);
-    }
-    if (AC.state === 'suspended') AC.resume();
-    return AC;
-  }
-  // 主题的音色（DESIGN 5.45）：旋律类的音（三角波）换成主题的波形，整体按主题升降；噪声类（打击、爆炸）不变
-  const LOOK = window.LOOK || {}, PITCH = LOOK.pitch || 1;
-  function tone(f, t0, dur, o) {
-    const a = ac(); if (!a) return;
-    o = Object.assign({type: 'sine', vol: 0.25, slide: 0, attack: 0.005}, o || {});
-    if (LOOK.wave && o.type === 'triangle') { o.type = LOOK.wave; if (LOOK.wave === 'square') o.vol *= 0.6; }  // 方波听着更响，压一点
-    f *= PITCH;
-    const osc = a.createOscillator(), g = a.createGain();
-    osc.type = o.type; osc.frequency.setValueAtTime(f, t0);
-    if (o.slide) osc.frequency.exponentialRampToValueAtTime(Math.max(30, f + o.slide), t0 + dur);
-    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(o.vol, t0 + o.attack);
-    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-    osc.connect(g); g.connect(o.dest || master); osc.start(t0); osc.stop(t0 + dur + 0.02);
-  }
-  function noise(t0, dur, o) {
-    const a = ac(); if (!a) return;
-    o = Object.assign({vol: 0.25, freq: 1200, q: 1}, o || {});
-    const len = Math.ceil(a.sampleRate * dur), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
-    const src = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
-    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = o.freq; f.Q.value = o.q; g.gain.value = o.vol;
-    src.connect(f); f.connect(g); g.connect(master); src.start(t0);
-  }
-  const SFX = {
-    click: t => tone(660, t, 0.06, {type: 'triangle', vol: 0.15}),
-    pop: t => tone(520, t, 0.09, {type: 'sine', vol: 0.22, slide: 400}),
-    coin: t => { tone(988, t, 0.08, {type: 'square', vol: 0.12}); tone(1319, t + 0.07, 0.16, {type: 'square', vol: 0.12}); },
-    right: t => [523, 659, 784, 1047].forEach((f, i) => tone(f, t + i * 0.07, 0.14, {type: 'triangle', vol: 0.2})),
-    crit: t => [523, 784, 1047, 1319, 1568].forEach((f, i) => tone(f, t + i * 0.06, 0.18, {type: 'square', vol: 0.12})),
-    wrong: t => { tone(330, t, 0.16, {type: 'sawtooth', vol: 0.12, slide: -120}); tone(247, t + 0.15, 0.22, {type: 'sawtooth', vol: 0.12, slide: -80}); },
-    freeze: t => { for (let i = 0; i < 5; i++) tone(1800 + i * 300, t + i * 0.04, 0.12, {type: 'sine', vol: 0.06}); },
-    jump: t => tone(300, t, 0.16, {type: 'square', vol: 0.1, slide: 500}),
-    swing: t => noise(t, 0.12, {vol: 0.18, freq: 2400, q: 0.7}),
-    hit: t => { noise(t, 0.1, {vol: 0.35, freq: 900, q: 0.8}); tone(160, t, 0.12, {type: 'square', vol: 0.15, slide: -80}); },
-    hurt: t => tone(220, t, 0.18, {type: 'sawtooth', vol: 0.12, slide: -100}),
-    power: t => { tone(220, t, 0.5, {type: 'sawtooth', vol: 0.1, slide: 880}); noise(t + 0.35, 0.3, {vol: 0.3, freq: 600}); },
-    laser: t => tone(1400, t, 0.18, {type: 'square', vol: 0.08, slide: -1100}),
-    shield: t => tone(600, t, 0.2, {type: 'sine', vol: 0.15, slide: 300}),
-    buy: t => [784, 988, 1175].forEach((f, i) => tone(f, t + i * 0.05, 0.1, {type: 'triangle', vol: 0.15})),
-    whoosh: t => noise(t, 0.3, {vol: 0.2, freq: 800, q: 0.5}),
-    boom: t => { noise(t, 0.5, {vol: 0.45, freq: 300, q: 0.6}); tone(90, t, 0.4, {type: 'sine', vol: 0.3, slide: -50}); },
-    star: t => [1047, 1319, 1568].forEach((f, i) => tone(f, t + i * 0.05, 0.25, {type: 'sine', vol: 0.12})),
-    go: t => { tone(523, t, 0.12, {type: 'square', vol: 0.12}); tone(1047, t + 0.12, 0.3, {type: 'square', vol: 0.14}); },
-    tick: t => tone(880, t, 0.05, {type: 'square', vol: 0.08}),
-    win: t => [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => tone(f, t + i * 0.11, 0.2, {type: 'triangle', vol: 0.2})),
-    lose: t => [392, 349, 330, 262].forEach((f, i) => tone(f, t + i * 0.18, 0.3, {type: 'triangle', vol: 0.16})),
-    sticker: t => [784, 1047, 1319, 1568, 2093].forEach((f, i) => tone(f, t + i * 0.08, 0.3, {type: 'sine', vol: 0.12})),
-  };
-  Play.sfx = {
-    on: store.get('play.sfx', true),
-    play(name, delay) { if (!this.on || !SFX[name]) return; const a = ac(); if (a) SFX[name](a.currentTime + (delay || 0)); },
-    toggle() { this.on = !this.on; store.set('play.sfx', this.on); return this.on; },
-    unlock() { ac(); },
-  };
+  // ---------------------------------------------------------------- 音效：合成器、全站开关都在 juice.js（学习页答题也用），游戏照旧叫 Play.sfx
+  const store = {get(k, d) { const v = Juice.store.get(k); return v === null ? d : v === '1'; }, set: Juice.store.set};
+  const tone = Juice.tone, ac = Juice.ac;
+  Play.sfx = Juice.sfx;
 
   // ---------------------------------------------------------------- 背景音乐（简单的循环旋律）
   Play.music = {
@@ -228,12 +165,12 @@
     start(tempo) {
       if (!this.on || this.timer) return;
       const a = ac(); if (!a) return;
-      if (!this.gain) { this.gain = a.createGain(); this.gain.gain.value = 0.35; this.gain.connect(master); }
+      if (!this.gain) { this.gain = a.createGain(); this.gain.gain.value = 0.35; this.gain.connect(Juice.bus()); }
       const beat = 60 / (tempo || 132);
       const scale = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16];
       this.timer = setInterval(() => {
-        if (!AC) return;
-        const t = AC.currentTime + 0.05, i = this.step++;
+        const A = ac(); if (!A) return;
+        const t = A.currentTime + 0.05, i = this.step++;
         const m = this.melody[i % this.melody.length];
         if (m >= 0) tone(523.25 * Math.pow(2, m / 12), t, beat * 0.8, {type: 'triangle', vol: 0.06, dest: this.gain});
         if (i % 2 === 0) tone(130.81 * Math.pow(2, scale[this.bass[(i / 2) % this.bass.length]] / 12), t, beat * 1.6, {type: 'sine', vol: 0.09, dest: this.gain});

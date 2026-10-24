@@ -147,6 +147,7 @@ class ArenaQuiz {
   }
   showRight(res) {
     window.Play && Play.sfx.play(res.crit ? 'crit' : 'right');
+    window.Juice && Juice.buzz(res.crit || res.special ? 'combo' : 'right');   // 手机上轻轻一震（juice.js）
     this.confetti();
     this.o.onXP && this.o.onXP(res);
     this.el.querySelector('.aq-streak').textContent = res.streak >= 2 ? `🔥 连对 ${res.streak}` : '';

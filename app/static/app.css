@@ -1095,3 +1095,16 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .diary .tags{margin-top:10px}
 .diary-acts,.diary-nav{max-width:36em;margin:0 auto 14px}.diary-nav{display:flex;justify-content:space-between;gap:12px}
 .diary-edit label{display:block;margin:0 0 12px;font-size:14px;color:var(--muted)}.diary-edit input,.diary-edit textarea{display:block;width:100%;margin-top:4px;font-size:16px;line-height:1.8}
+
+/* 手感（juice.js，DESIGN 5.52）：答完按下去沉一下再弹回（打击停顿）；+1 飞进「这一项 N 道」；答对的「下一题」上走一道进度条，走完自己翻 */
+@keyframes jthunk{0%,12%{transform:scale(.96)}55%{transform:scale(1.04)}100%{transform:none}}
+.j-thunk,[data-skin=kid] .opt.right.j-thunk:not(.static){animation:jthunk .42s cubic-bezier(.3,1.6,.5,1)}
+.j-bump{animation:bump .35s ease-out}
+.j-plus{position:fixed;z-index:100;pointer-events:none;margin:-12px 0 0 -14px;font-weight:800;font-size:18px;color:var(--ok,#1f9d55);transition:transform .45s cubic-bezier(.5,0,.7,1),opacity .45s;text-shadow:0 1px 0 var(--card,#fff)}
+.runbar .rn{font-variant-numeric:tabular-nums}.runbar .rn b{display:inline-block}
+.runbar #combo{position:static;padding:1px 9px;font-size:13px;opacity:0;transform:none;transition:opacity .2s}
+.runbar #combo.on{opacity:1}
+.runbar .rsnd{font-size:16px;line-height:1;padding:2px 4px;text-decoration:none}
+.nextbtn.auto{position:relative;overflow:hidden}
+.nextbtn.auto::after{content:"";position:absolute;left:0;bottom:0;height:4px;width:100%;background:currentColor;opacity:.35;transform-origin:left;animation:jauto var(--auto,.8s) linear forwards}
+@keyframes jauto{from{transform:scaleX(0)}to{transform:scaleX(1)}}

@@ -183,6 +183,10 @@ function renderItem(box, item, opts) {
     `<div class="hintbox"></div><div class="fbbox"></div></div>`;
   box.innerHTML = html;
   box.classList.add('askable'); box.dataset.askItem = item.item_id || item.id || ''; delete box.dataset.answered;
+  // 孩子做自动判分的题（选择、填空）：选择题点一下就交；答对了「下一题」自己翻过去（nextUp）。开放题、思辨题照旧慢慢来
+  const quick = Juice.who() !== 'adult' && (W === 'choice' || W === 'text') && !opts.confirm;
+  if (quick) box.dataset.quick = '1'; else delete box.dataset.quick;
+  if (quick && W === 'choice') $('.submit', box).hidden = true;
   let chosen = null;
   const _done = opts.onDone;
   opts.onDone = res => {
@@ -193,7 +197,11 @@ function renderItem(box, item, opts) {
   };
   const t0 = Date.now(), a0 = Away.now();  // 做题用时：系统用它发现「会做但很慢」；切到别的页面的时间不算
   const took = () => Date.now() - t0 - (Away.now() - a0);
-  $$('.opt', box).forEach(b => b.onclick = () => { $$('.opt', box).forEach(x => x.classList.remove('sel')); b.classList.add('sel'); chosen = b.dataset.i; });
+  $$('.opt', box).forEach(b => b.onclick = () => {
+    if (box.dataset.answered || box.dataset.pending || b.disabled) return;
+    $$('.opt', box).forEach(x => x.classList.remove('sel')); b.classList.add('sel'); chosen = b.dataset.i;
+    if (quick) $('.submit', box).click();
+  });
   const hb = $('.hintbtn', box);
   let hinted = false;
   if (hb) hb.onclick = () => { hinted = true; $('.hintbox', box).innerHTML = `<div class="hint" style="margin-top:8px">💡 ${esc(item.hint)}</div>`; hb.remove(); };
@@ -213,6 +221,7 @@ function renderItem(box, item, opts) {
       if (!res) return;  // 返回空：页面自己接着走（小测直接下一题），这里不再显示讲解
       $$('.opt', box).forEach(b => b.disabled = true);
       $$('.submit,.hintbtn,.dkbtn', box).forEach(b => b.remove());
+      Combo.hit(false, null, res);  // 「还不会」不算错：连对悄悄归零，不出声
       if (opts.ladder) return walkThrough(box, item, res, opts);
       $('.fbbox', box).innerHTML = feedback(res, {choice: W === 'choice'});
       opts.onDone && opts.onDone(res);
@@ -227,6 +236,7 @@ function renderItem(box, item, opts) {
     // 思辨题、AI 点评的开放题要等 AI 想十几秒：按下就锁住、显示它在做什么，写出来一段就先看一段（aiWait）
     const wait = W === 'discuss' || (W === 'self' && item.coach) ? aiWait(btn, $('.fbbox', box), W === 'discuss' ? 'discuss' : 'review', ans) : null;
     if (!wait) btn.disabled = true;
+    if (quick) { Juice.press(); box.dataset.pending = '1'; }  // 按下就有回应，不等服务器判完；判完之前不能改选
     try {
       const res = await opts.submit(answer, undefined, took(), W === 'discuss' && item.rethink ? {rethink: item.rethink} : undefined, wait && wait.part);
       if (wait) wait.end();
@@ -248,10 +258,15 @@ function renderItem(box, item, opts) {
       if (W === 'choice') $$('.opt', box).forEach(b => { if (b.dataset.i === chosen) b.classList.add(res.correct ? 'right' : 'wrong'); b.disabled = true; });
       $('.fbbox', box).innerHTML = feedback(res, {choice: W === 'choice', mine: W === 'choice' ? '' : answer});
       btn.remove(); if (dk) dk.remove();
-      if (res.correct) cheer(box);
+      delete box.dataset.pending;
+      Combo.hit(!!res.correct, W === 'choice' ? $(`.opt[data-i="${chosen}"]`, box) : $('.ans', box) || box, res);
       Focus.rt(!!res.correct, took());
       opts.onDone && opts.onDone(res);
-    } catch (e) { if (wait) wait.fail(); else btn.disabled = false; $('.fbbox', box).innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+    } catch (e) {
+      if (wait) wait.fail(); else btn.disabled = false;
+      delete box.dataset.pending;
+      $('.fbbox', box).innerHTML = `<div class="err">${esc(e.message)}</div>`;
+    }
   };
   Focus.onRender(box, item);
 }
@@ -483,6 +498,7 @@ const Flow = {
     document.body.appendChild(m);
     const go = $('.fs-next', m); if (go) setTimeout(() => go.focus(), 50);
     const mile = st.grow && st.grow.milestones.length;
+    if (st.just || sec || st.all_done) Juice.done();   // 一项做完：过关的和弦 + 长一点的震动
     if (st.all_done || sec || mile) confetti(); else if (st.just) cheer($('.fs-card', m));
     const tn = $('.fs-total', m); if (tn) countUp(tn, +tn.dataset.from, +tn.dataset.to);
     $('.fs-x', m).onclick = () => { m.remove(); if (nx) Flow.pill(nx); };
@@ -723,20 +739,64 @@ document.addEventListener('DOMContentLoaded', () => {
   $$('#askchips button').forEach(b => b.onclick = () => Ask.send(b.textContent));
 });
 
-/* ---------- 激励：连对、点亮知识点（少而有效：只奖励真实的进步） ---------- */
+/* ---------- 激励：每答一题的即时反馈、连对、点亮知识点（少而有效：只奖励真实的进步） ----------
+   答题卡（renderItem）答完一题就调 Combo.hit，页面不用管：声音和震动在 Juice（juice.js），这里管连对和画面。
+   每道自动判分的题都飞一个「+1」进「这一项 N 道」（答错也算，积少成多数的是答了几道）；答对「叮咚」，连对一题升一个音；
+   连对 3/5/10 一个小和弦，小学的孩子再冒几颗星星；难题答对（res.hard）说一句。答错一个柔的「嗒」，连对悄悄归零。
+   成人不显示连对，声音默认关。 */
 const Combo = {
   n: 0,
-  hit(ok, el) {
+  hit(ok, el, res) {
+    res = res || {};
     Combo.n = ok ? Combo.n + 1 : 0;
+    const who = Juice.who();
+    if (!res.dont_know) { Juice.answer(ok, {el, streak: Combo.n, hard: res.hard}); Juice.plus(el, $('#runbar .rn')); }
+    if (ok && res.hard && who !== 'adult') toast(who === 'teen' ? '💪 这道题不简单，做对了' : '💪 这题很多人会错，你做对了！', 1800);
     let b = $('#combo');
-    if (!b) { b = document.createElement('div'); b.id = 'combo'; document.body.appendChild(b); }
+    if (who === 'adult') return;
+    if (!b) { b = document.createElement('div'); b.id = 'combo'; ($('#runbar .rn') || document.body).insertAdjacentElement('afterend', b); }
     if (Combo.n >= 2) {
-      b.textContent = `连对 ×${Combo.n} ${Combo.n >= 5 ? '🔥🔥' : '🔥'}`;
-      b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump', 'on');
-      if (Combo.n === 3 || Combo.n === 5 || Combo.n % 10 === 0) cheer(el || b);
+      b.textContent = `🔥 ×${Combo.n}`;
+      b.classList.add('on'); Juice.bump(b);
+      if (who === 'kid' && (Combo.n === 3 || Combo.n === 5 || Combo.n % 10 === 0)) cheer(el || b);
     } else b.classList.remove('on');
   },
 };
+/* 「下一题」：自动判分的题答对了，0.8 秒后自己翻过去（按钮上走一道进度条）；答错停下来看讲解。回车 = 点它。
+   这期间在页面上点了别的（看解析、选字、点提示），就不自动翻了。opts.wait 改等多久（有话要孩子看完时） */
+const AUTO_NEXT_MS = 800;
+function nextUp(box, label, go, res, opts) {
+  opts = opts || {};
+  const nx = document.createElement('div'); nx.className = 'row nextrow'; nx.style.marginTop = '10px';
+  nx.innerHTML = `<button class="btn nextbtn">${label}</button>` + (opts.extra || '');
+  box.appendChild(nx);
+  const btn = $('.nextbtn', nx);
+  let timer = 0;
+  const stop = e => {
+    if (e && e.target.closest && e.target.closest('.nextbtn')) return;
+    clearTimeout(timer); btn.classList.remove('auto'); removeEventListener('pointerdown', stop, true);
+  };
+  btn.onclick = () => { stop(); if (btn.disabled) return; btn.disabled = true; go(); };
+  const card = box.matches('[data-quick]') ? box : $('[data-quick]', box);
+  if (res && res.correct && !res.dont_know && card) {
+    const ms = opts.wait || AUTO_NEXT_MS;
+    btn.style.setProperty('--auto', ms + 'ms'); btn.classList.add('auto');
+    timer = setTimeout(() => { if (btn.isConnected && !document.hidden) btn.click(); else stop(); }, ms);
+    addEventListener('pointerdown', stop, true);
+  }
+  return nx;
+}
+/* 电脑上手不离键盘：1–4 / A–D 选选项（页面上只有一道没答的题时），回车点「下一题」 */
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey || !e.target.closest || e.target.closest('input, textarea, select, [contenteditable]')) return;
+  if (e.key === 'Enter') { const b = $$('.nextbtn').filter(x => !x.disabled && x.offsetParent).pop(); if (b) { e.preventDefault(); b.click(); } return; }
+  const m = /^[1-8]$/.test(e.key) ? +e.key - 1 : 'abcdefgh'.indexOf(e.key.toLowerCase());
+  if (m < 0 || e.key.length !== 1) return;
+  const open = $$('[data-quick]').filter(x => !x.dataset.answered && $('.opt', x));
+  if (open.length !== 1) return;
+  const o = $(`.opt[data-i="${m}"]`, open[0]);
+  if (o && !o.disabled) { e.preventDefault(); o.click(); }
+});
 /* 答题结果里带 lit：第一次掌握这个知识点 → 点亮 */
 function celebrate(res, el) {
   if (res && res.lit) {
@@ -759,12 +819,17 @@ const Run = {
     let el = $('#runbar');
     if (!el) {
       el = document.createElement('div'); el.id = 'runbar'; el.className = 'runbar';
-      el.innerHTML = `<div class="row small"><span>⏱ 专注 <b class="rt">0:00</b></span><span class="muted rpb"></span><span class="grow"></span><span class="rg muted"></span></div>` +
+      // 📚 这一项答了几道（每答一题飞一个 +1 进来，Combo.hit）；🔊 全站一个声音开关（游戏里的也是它）
+      el.innerHTML = `<div class="row small"><span>⏱ 专注 <b class="rt">0:00</b></span><span class="rn" hidden>📚 这一项 <b>0</b> 道</span><span class="muted rpb"></span><span class="grow"></span><span class="rg muted"></span>` +
+        `<button type="button" class="linkbtn rsnd" title="答题的声音和震动"></button></div>` +
         (opts.race === false ? '' : `<div class="race"><i class="ghost" title="上周的我"></i><i class="me" title="我"></i></div>`);
       if (opts.mount) opts.mount.insertAdjacentElement('beforebegin', el);
       else ($('main h1') || document.body).insertAdjacentElement('afterend', el);
     }
     Run.el = el;
+    const snd = $('.rsnd', el), paint = () => { snd.textContent = Juice.sfx.on ? '🔊' : '🔇'; snd.setAttribute('aria-label', Juice.sfx.on ? '关掉声音' : '打开声音'); };
+    snd.onclick = () => { Juice.sfx.toggle(); paint(); if (Juice.sfx.on) Juice.sfx.play('ding'); };
+    paint();
     Focus.ensure({reading: kind === 'read'});
     api('/api/records/' + kind).then(r => { Run.pb = r.pb; Run.ghost = r.ghost; Run.draw(); }).catch(() => {});
     if (!Run.bound) {
@@ -791,6 +856,7 @@ const Run = {
   draw() {
     const el = Run.el; if (!el) return;
     $('.rt', el).textContent = Run.mmss(Run.active);
+    const rn = $('.rn', el); rn.hidden = !Run.n; $('b', rn).textContent = Run.n;
     if (Run.pb && Run.pb.focus >= 60000) $('.rpb', el).textContent = `· 最长 ${Run.mmss(Run.pb.focus)}` + (Run.active > Run.pb.focus ? ' 🔥 正在破纪录' : '');
     const race = $('.race', el);
     if (!race) return;

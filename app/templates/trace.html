@@ -55,10 +55,7 @@ async function step() {
       onDone: res => {
         done.push({kp: s.kp, name: s.name, correct: !!res.correct, kind: s.kind});
         chain(null);
-        const nx = document.createElement('div'); nx.className = 'row'; nx.style.marginTop = '10px';
-        nx.innerHTML = `<button class="btn">${res.result ? '看结果' : '下一题 →'}</button>`;
-        nx.querySelector('.btn').onclick = () => res.result ? showResult(res.result) : step();
-        box.appendChild(nx);
+        nextUp(box, res.result ? '看结果' : '下一题 →', () => res.result ? showResult(res.result) : step(), res);
       },
     });
   } catch (e) { $('#tbox').innerHTML = `<div class="err">${esc(e.message)}</div>`; }

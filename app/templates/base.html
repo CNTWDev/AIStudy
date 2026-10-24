@@ -13,9 +13,10 @@
 <meta name="theme-color" content="{{ look.light.bg if look and look.light.bg else '#FBF7EC' }}" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="{{ look.dark.bg if look and look.dark.bg else '#16130F' }}" media="(prefers-color-scheme: dark)">
 <script>window.TTS_LANGS = {{ (tts_info().langs if user else [])|tojson }};</script>
+<script src="/static/juice.js?v={{ ASSET_V }}"></script>
 <script src="/static/app.js?v={{ ASSET_V }}"></script>
 </head>
-<body data-tone="{{ tone }}"{% if user and user.role == 'kid' %} data-kid="1"{% endif %}{% if simple %} data-simple="1"{% endif %}{% if look %} data-look="{{ look.id }}"{% endif %}{% block skin %}{% if tone == 'kid' %} data-skin="kid"{% endif %}{% endblock %}>
+<body data-tone="{{ tone }}"{% if user and user.role == 'kid' %} data-kid="1"{% endif %}{% if simple %} data-simple="1"{% endif %}{% if teen %} data-teen="1"{% endif %}{% if look %} data-look="{{ look.id }}"{% endif %}{% block skin %}{% if tone == 'kid' %} data-skin="kid"{% endif %}{% endblock %}>
 {# 小伙伴（问{{ ASSISTANT }} 的那个形象）：等 AI 写内容时由它出来「翻书」（app.js 的 seek，DESIGN 5.34）。没单独设图标就用孩子选的形象 #}
 {% if user and user.role == 'kid' %}<script>window.ME = {call: {{ ((user.nickname or '').strip() or user.name)|tojson }}};</script>{% endif %}
 {# 主题（DESIGN 5.45）：乐园的描边颜色和音色跟着孩子选的主题走（art.js、engine.js 读它） #}
