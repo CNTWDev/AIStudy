@@ -332,7 +332,7 @@ def word_stats(user_id: int) -> dict:
 
 
 def pick_words(user_id: int, n: int) -> list[dict]:
-    """抽 n 个旧词做四选一：优先测得少、离当前年级近的词表。干扰项取同一词表里别的词义。"""
+    """抽 n 个旧词做四选一：先是往前补的词（app/wordpick.py），不够再按词表补（优先测得少、离当前年级近的词表）。干扰项取同一词表里别的词义。"""
     lists = word_lists(user_id)
     if not lists or n <= 0:
         return []
@@ -357,7 +357,21 @@ def pick_words(user_id: int, n: int) -> list[dict]:
                         "zh": f"{w.get('pos', '')} · {len(w['w'])} 个字母 · 首字母 {w['w'][0]}",
                         "word": {"w": w["w"], "list": wl["id"], "pos": w.get("pos", ""), "title": wl["title"], "recheck": 1}})
             break
-    for _ in range(n - len(out)):
+    # 抽哪几个旧词走统一的出词（app/wordpick.py 的往前补）：学校已经教过、这里还没见过的词，离现在越近越先
+    from . import wordpick
+    for w in wordpick.old_words(user_id, n - len(out), skip={d.lower() for d in done}):
+        wl = content.word_lists.get(w["list"])
+        zhs = list({x["zh"] for x in (wl or {}).get("words", []) if x.get("zh") and x["zh"] != w["zh"]})
+        if not wl or len(zhs) < 3:
+            continue
+        done.add(w["w"])
+        if wl["id"] in stats:
+            stats[wl["id"]]["tested"] += 1
+        opts = random.sample(zhs, 3) + [w["zh"]]
+        random.shuffle(opts)
+        out.append({"id": "w:" + w["w"], "type": "mcq", "q": f"{w['w']}  的意思是？", "options": opts,
+                    "word": {"w": w["w"], "list": wl["id"], "pos": w.get("pos", ""), "title": wl["title"]}})
+    for _ in range(n - len(out)):   # 往前补的词不够（刚开始、低年级）：按词表估词汇量的老办法补上
         wl = max(lists, key=lambda x: weight(x) + random.random() * 0.05)
         pool = [w for w in wl["words"] if w["w"].lower() not in have and w["w"] not in done and w.get("zh")]
         if len(pool) < 4:

@@ -253,7 +253,7 @@ def outcome_tasks(t, mastery: dict | None = None) -> list[dict]:
                   "minutes": 8, "url": f"/learn/{kp_id}?task=weak", "id": f"{pid}-1"}]
     elif t["result"] == "lang":
         tasks = [{"type": "words", "for": kp_id, "title": f"术语过关：{name}", "why": "中文会做、英文卡住了：先把这几个英文词弄熟",
-                  "minutes": 5, "url": "/review?group=words", "id": f"{pid}-0"}]
+                  "minutes": 5, "url": "/words/go", "id": f"{pid}-0"}]
     elif t["result"] == "self":
         tasks = [{"type": "weak", "kp": kp_id, "title": f"换个讲法再学：{name}", "why": "要用到的基础你都会，是这一个本身还没弄懂",
                   "minutes": 10, "url": f"/learn/{kp_id}?task=weak", "id": f"{pid}-0"}]

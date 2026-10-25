@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block body %}
-<div class="row"><h1 class="grow">{{ {"words":"单词","mistakes":"错题重做","other":"复习卡片"}.get(group, "复习") }}</h1>{% if group == 'words' %}<a class="btn ghost sm" href="/words/map">🔤 单词包</a>{% endif %}<a class="btn ghost sm" href="/words">生词本 / 错题本</a></div>
+<div class="row"><h1 class="grow">{{ "抓词" if set_mode else {"words":"单词","mistakes":"错题重做","other":"复习卡片"}.get(group, "复习") }}</h1>{% if group == 'words' %}<a class="btn ghost sm" href="/words/map">🔤 {{ "抓词首页" if set_mode else "单词包" }}</a>{% endif %}<a class="btn ghost sm" href="/words">{{ "单词本" if set_mode else "生词本 / 错题本" }}</a></div>
 <p class="muted small for-grownups">{% if group == 'mistakes' %}错题原样再做一遍。隔天连续做对 2 次，会换一道同类的新题，也做对了就过关；过关 3 周后再回头看一眼。
+{% elif set_mode %}一组 8 个词左右：到期要复习的先来，再学几个新词、认一认以前学过的。新词先猜、再看用法，隔开几个别的词再回来认一次；认识的词点「我认识」，拼对了就不用学。做完一组可以再来一组，还送一局单词跑酷。
 {% elif group == 'words' %}新词先猜意思、再看例句，隔开几个别的词再回来认一次（马上考只是在考刚才的印象）。同一个词一次只考一个方向；学过的词隔 1、2、4、7 天回来，一次比一次难：选、补句子、拼、听写（前几轮用字母块拼，后面自己打，打不出来可以要字母块）。答错了隔几张再来一次。
 {% else %}每张都要作答。答对了下次隔得更久；答错了隔几张再来一次。{% endif %}</p>
 <div class="card flash" id="flash"><span class="loading">加载中</span></div>
@@ -15,11 +16,17 @@ const KIND = {word: '生词', term: '术语', mistake: '错题', kp: '知识点'
 const GROUP = {{ group|tojson }}, TASK = {words: 'words', mistakes: 'mistakes', other: 'review'}[GROUP];
 const RUNKIND = {words: 'words', mistakes: 'mistakes'}[GROUP] || 'review';
 async function load() {
-  const cards = (await api('/api/review/due' + (GROUP ? '?group=' + GROUP : ''))).cards;
+  queue = []; back = []; n = 0; known = 0; total = 0; again.clear();
+  let cards;
+  if (SET) {
+    const r = await api('/api/words/set', {});
+    setId = r.id; cards = r.cards;
+    hadDue = hadDue || cards.some(c => c.role === 'due');
+  } else cards = (await api('/api/review/due' + (GROUP ? '?group=' + GROUP : ''))).cards;
   const isNew = c => (c.quiz || {}).mode === 'learn', fresh = cards.filter(isNew), old = cards.filter(c => !isNew(c));
   while (fresh.length || old.length) { if (fresh.length) queue.push({c: fresh.shift()}); if (old.length) queue.push({c: old.shift()}); }
   total = queue.length;
-  if (total) Run.start(RUNKIND, {total, mount: $('#flash')});
+  if (total && !Run.on) Run.start(RUNKIND, {total, mount: $('#flash')});
   show();
 }
 const left = () => queue.length + back.length + 1;
@@ -40,13 +47,15 @@ function nextStep() {
   return s;
 }
 const post = (c, body, onPart) => api('/api/review/' + c.id + '/answer', body, {onPart});
+const ROLE = {new: ' · 新词', check: ' · 认一认：以前学过吗', push: ' · 再难一点'};
 function head(c, extra) {
-  return `<div class="muted small">${KIND[c.kind] || c.kind}${c.kp_name ? ' · ' + esc(c.kp_name) : ''}${extra || ''} · 还剩 ${left()} 张</div>`;
+  const role = !extra && c.role && ROLE[c.role] && (c.role !== 'new' || (c.quiz || {}).mode !== 'learn') ? ROLE[c.role] : '';
+  return `<div class="muted small">${KIND[c.kind] || c.kind}${c.kp_name ? ' · ' + esc(c.kp_name) : ''}${extra || role} · 还剩 ${left()} 张</div>`;
 }
 function nextBtn(box, res, c, q) {
   Run.hit(!!res.correct);
   if (res.correct) { known++; cheer(box); }
-  else if (c.kind !== 'mistake' && c.kind !== 'kp') retry(c, q);  // 生词答错：隔几个再来一次
+  else if (c.kind !== 'mistake' && c.kind !== 'kp' && !res.learn_next) retry(c, q);  // 生词答错：隔几个再来一次（认一认没认出来的：下一组先学它）
   // 「下一张」跟别的做题页的「下一题」一样（nextUp）：正中间，孩子做原题答对了自己翻；焦点放上去，写完单词回车就是下一张
   const nx = nextUp(box, '下一张 →', show, res, {wait: res.passed || res.kept ? 1800 : 0});
   $('.nextbtn', nx).focus({preventScroll: true});
@@ -54,6 +63,7 @@ function nextBtn(box, res, c, q) {
 function show() {
   const box = $('#flash');
   cur = nextStep();
+  if (!cur && SET) return setDone(box);
   if (!cur) {
     box.innerHTML = `<div class="face pop">🎉 ${total ? '完成了！答对 ' + known + ' 张' : '现在没有要复习的'}</div>` +
       (TASK ? '' : '<a class="btn" href="/go">接着做今天的任务 →</a>');
@@ -68,7 +78,36 @@ function show() {
   if (WORD_MODES.includes(q.mode)) return showWord(box, c, q, cur.learn);
   showSelf(box, c);
 }
-const WORD_MODES = ['meaning', 'choice', 'spell', 'dictate', 'cloze', 'cloze_spell'];
+/* 抓词（/words/go，app/wordpick.py）：一组一组来，做完有小结、再来一组、送一局单词跑酷 */
+const SET = {{ (set_mode or false)|tojson }};
+let setId = null, hadDue = false;
+const WORD_MODES = ['meaning', 'choice', 'spell', 'dictate', 'cloze', 'cloze_spell', 'use'];
+const USE_TIP = {collocation: '哪个能和它搭在一起？', pattern: '哪个放进去句子才对？', error: '这句话里哪个词用错了？'};
+
+/* 一组做完：小结（新抓住的、找回来的、认识的、更熟了的、还调皮的；认识的词前后各多少），再来一组 / 用这组词跑一局 */
+async function setDone(box) {
+  if (!setId) {
+    box.innerHTML = `<div class="face pop">🎉 今天的词都抓完了</div><p class="muted small">新词明天再学，记得更牢。</p>` +
+      acts('<a class="btn" href="/words/map">回抓词</a>');
+    return;
+  }
+  if (total) Run.finish();
+  const r = await api(`/api/words/set/${setId}/done`, {});
+  const line = (icon, label, ws) => ws.length ? `<div class="ws-line"><b>${icon} ${label} ${ws.length} 个</b> <span class="muted">${ws.map(esc).join('  ')}</span></div>` : '';
+  box.innerHTML = `<div class="ws-sum pop"><div class="ws-h">这一组</div>` +
+    line('✓', '新抓住', r.new) + line('✓', '找回来', r.back) + line('✓', '认识的', r.known) + line('↑', '更熟了', r.up) +
+    (r.wobbly.length ? `<div class="ws-line"><b>· 还调皮的 ${r.wobbly.length} 个</b> <span class="muted">${r.wobbly.map(esc).join('  ')}（一会儿、明天还会来找你）</span></div>` : '') +
+    `<div class="ws-n">我认识的词 <b>${r.known_before}</b>${r.known_total > r.known_before ? ` → <b>${r.known_total}</b>` : ''}</div>` +
+    (!r.more ? '<p class="small muted">今天的词都抓完了。新词明天再学，睡一觉记得更牢。</p>' : r.room ? '' : '<p class="small muted">今天的新词够啦，明天学的会记得更牢。再来一组，把认得的词变成会用的。</p>') +
+    `</div>` + acts((r.more ? '<button class="btn" id="again">再来一组</button>' : '<a class="btn" href="/words/map">回抓词</a>'),
+                    r.reward ? `<a class="btn soft" href="/arena/runner?reward=${setId}">🏃 用这组词跑一局</a>` : '');
+  if (r.new.length + r.known.length) confetti();
+  if ($('#again', box)) $('#again', box).onclick = () => { box.innerHTML = '<span class="loading">加载中</span>'; load(); };
+  if (hadDue && !r.due_left) {   // 今天的单词任务就是这几组：到期的都做完了，这一项已经打勾（/api/words/set/<id>/done）
+    hadDue = false;
+    box.insertAdjacentHTML('beforeend', '<p class="small" style="text-align:center">✓ 今天的单词做完了 · <a href="/go">接着做今天的任务 ›</a></p>');
+  }
+}
 
 /* 错题重做 / 知识点题：原题原样（选项齐全），系统判对错 */
 function showItem(box, c, q) {
@@ -103,7 +142,7 @@ function showItem(box, c, q) {
 }
 
 /* 句子补洞：____ 画成一个洞，补好以后把词填进去 */
-const gapHtml = (q, word) => esc(q).replace('____', word ? `<b class="gap full">${esc(word)}</b>` : '<span class="gap"></span>');
+const gapHtml = (q, word) => esc(q).replace(/_{3,}/, word ? `<b class="gap full">${esc(word)}</b>` : '<span class="gap"></span>');
 /* 答完的反馈：对了说补上了 / 对了，错了说差一点、告诉他是哪个词（认意思：是哪个意思），隔几张它还会再来 */
 function wordFb(box, res, q, answer, c) {
   const cloze = q.mode === 'cloze' || q.mode === 'cloze_spell';
@@ -115,7 +154,11 @@ function wordFb(box, res, q, answer, c) {
     ((q.mode === 'dictate' || cloze) && res.meaning ? `<div class="small">${esc(res.answer)}：${esc(res.meaning.split('\n')[0])}</div>` : '') +
     (res.example ? `<div class="small">例：${esc(res.example)}</div>` : '') +
     (/^[A-Za-z]/.test(res.answer) ? ` <button class="btn ghost sm" onclick='say(${esc(JSON.stringify(sayIt))})'>🔊</button>` : '') +
-    (!res.correct && !again.has(c.id) && c.kind !== 'mistake' ? '<div class="small muted">隔几张，这个词还会再来一次。</div>' : '') + `</div>`;
+    (res.explain ? `<div class="small">${esc(res.explain)}</div>` : '') +
+    (res.hook ? `<div class="small wu-hook">💡 ${esc(res.hook)}</div>` : '') +
+    (res.known === true ? '<div class="small">认识！这个词不用学了，过几天再来看看它。</div>' : '') +
+    (res.learn_next ? '<div class="small muted">没关系，下一组先把它学一遍。</div>' :
+     !res.correct && res.known !== false && !again.has(c.id) && c.kind !== 'mistake' ? '<div class="small muted">隔几张，这个词还会再来一次。</div>' : '') + `</div>`;
   if (/^[A-Za-z]/.test(res.answer)) say(sayIt);
 }
 
@@ -129,8 +172,11 @@ function showLearn(box, c, q) {
     if (!q.guess.length) return step2();
     box.innerHTML = head(c, ' · 新词') + `<div class="face" style="min-height:120px"><div class="lw">${esc(q.word)} ${say1}</div>` +
       (ex ? `<div class="small lx">${hl}</div>` : '') + `<div class="muted small" style="margin-top:6px">新词来了，先猜猜它是什么意思？猜错也没关系。</div></div>` +
-      `<div style="text-align:left">${q.guess.map(o => `<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
+      `<div style="text-align:left">${q.guess.map(o => `<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>` +
+      (q.known ? acts('', '<button class="linkbtn" id="iknow">✋ 我认识</button>') : '');
     freshGuard(box); wire(); say(q.word, 'en', 'word');
+    // 「我认识」：马上出一道更难的（看中文拼出来）。拼对了就不用学，拼不对接着看揭晓
+    if ($('#iknow', box)) $('#iknow', box).onclick = () => showWord(box, c, q.known, {known: 1, fail: step2});
     $$('.opt', box).forEach(b => b.onclick = () => {
       guess = b.dataset.v;
       $$('.opt', box).forEach(x => { x.disabled = true; if (x.dataset.v === q.meaning) x.classList.add('right'); else if (x === b) x.classList.add('wrong'); });
@@ -141,6 +187,7 @@ function showLearn(box, c, q) {
     box.innerHTML = head(c, ' · 新词') + `<div class="face" style="min-height:120px"><div class="lw">${esc(q.word)} ${say1}</div>` +
       `<div>${q.pos ? `<span class="muted small">${esc(q.pos)}</span> ` : ''}${esc(q.meaning)}</div>` +
       (ex ? `<div class="small lx" style="margin-top:8px">${hl} <button class="btn ghost sm" data-say="${esc(ex.en)}">🔊</button></div><div class="small muted">${esc(ex.zh)}</div>` : '') +
+      usageHtml(q) +
       `<div class="muted small" style="margin-top:8px">读一读，记一记。过一会儿它会回来找你。</div>` +
       `</div>` + acts('<button class="btn" id="use">记下了 →</button>');
     freshGuard(box);
@@ -155,11 +202,28 @@ function showLearn(box, c, q) {
   step1();
 }
 
+/* 用法卡（app/words.py usage_view）：常这么用、一家人、别弄混、记忆钩子；一二年级的具体名词配一个图标。
+   从哪一路来的也说一句：联想来的（学过的词的一家人）、课本外的常用词 */
+function usageHtml(q) {
+  const u = q.usage || {}, say = t => `<button class="btn ghost sm" data-say="${esc(t)}">🔊</button>`;
+  const blk = (t, rows) => rows.length ? `<div class="wu-b"><b>${t}</b>${rows.join('')}</div>` : '';
+  const from = q.line === 'related' && q.root ? `<div class="small muted">🔗 从学过的 <b>${esc(q.root)}</b> 联想来的一家人</div>`
+    : q.line === 'out' ? '<div class="small muted">🌍 课本外的常用词</div>' : '';
+  const body = blk('✏️ 常这么用', (u.phrases || []).map(p => `<div>${esc(p.en)} ${say(p.en)} <span class="muted">${esc(p.zh)}</span></div>`)) +
+    blk('🌱 一家人', (u.family || []).map(f => `<div>${esc(f.w)} <span class="muted">${esc(f.pos || '')} ${esc(f.zh)}</span></div>`)) +
+    blk('⚠️ 别弄混', (u.confuse || []).map(x => `<div>${esc(x.w)} <span class="muted">${esc(x.zh)}${x.tip ? '：' + esc(x.tip) : ''}</span></div>`)) +
+    (u.hook ? `<div class="wu-b wu-hook">💡 ${esc(u.hook)}</div>` : '');
+  return (u.icon ? `<div class="wu-icon" aria-hidden="true">${esc(u.icon)}</div>` : '') + from + (body ? `<div class="wu">${body}</div>` : '');
+}
+
 /* 单词：新词回来认意思 → 看意思选单词（四选一）/ 放回句子里 → 看意思写单词 → 和听音写单词、自己拼进句子里轮换（app/recall.py） */
 function showWord(box, c, q, learn) {
   const speak = /^[A-Za-z]/.test(c.front) ? `<button class="btn ghost sm" id="say">🔊</button>` : '';
-  const dictate = q.mode === 'dictate', cloze = q.mode === 'cloze' || q.mode === 'cloze_spell', meaning = q.mode === 'meaning', pick = meaning || q.mode === 'choice' || q.mode === 'cloze';
-  let html = head(c, learn ? ' · 刚才的新词，还认得吗' : dictate ? ' · 听写' : cloze ? ' · 补句子' : '') + (dictate
+  const dictate = q.mode === 'dictate', cloze = q.mode === 'cloze' || q.mode === 'cloze_spell', meaning = q.mode === 'meaning', use = q.mode === 'use';
+  const pick = meaning || use || q.mode === 'choice' || q.mode === 'cloze', known = learn && learn.known;
+  let html = head(c, known ? ' · 我认识？拼出来看看' : learn ? ' · 刚才的新词，还认得吗' : q.probe ? ROLE.check : dictate ? ' · 听写' : cloze ? ' · 补句子' : use ? ' · 会用吗' : '') + (use
+    ? `<div class="face cloze" style="min-height:120px"><div class="cz">${gapHtml(q.q)}</div><div class="muted small">${USE_TIP[q.kind] || ''}</div></div>`
+    : dictate
     ? `<div class="face" style="min-height:120px"><button class="btn lg" id="say">🔊 听一听</button><div class="muted small" style="margin-top:8px">听读音，写出这个${c.kind === 'term' ? '术语' : '单词'}（可以多听几遍）</div></div>`
     : cloze ? `<div class="face cloze" style="min-height:120px"><div class="cz">${gapHtml(q.q)}</div><div class="muted small">${q.mode === 'cloze' ? '哪个词能补上这个洞？' : esc(q.hint) + ' · 把它拼进去'}</div></div>`
     : meaning ? `<div class="face" style="min-height:120px"><div class="lw">${esc(q.q)} ${speak}</div><div class="muted small">它是什么意思？</div></div>`
@@ -200,9 +264,14 @@ function showWord(box, c, q, learn) {
   if (dictate || meaning) say(q.say || c.front, 'en', 'word');
   const done = async (answer, el) => {
     $$('.opt,.ltile,#go,#back,#abc,#dk', box).forEach(b => b.disabled = true);
-    const res = await post(c, Object.assign({answer, mode: q.mode, q: q.q, dont_know: answer === null, tiles: usedTiles}, learn || {}));
+    const res = await post(c, Object.assign({answer, mode: q.mode, q: q.q, dont_know: answer === null, tiles: usedTiles, push: q.push || 0}, learn || {}));
     if (pick) $$('.opt', box).forEach(b => { if (b.dataset.v === (res.pick || res.answer)) b.classList.add('right'); else if (b === el) b.classList.add('wrong'); });
     wordFb(box, res, q, answer, c);
+    if (known && !res.correct) {   // 「我认识」没拼对：不算错，接着看这个词的揭晓（照常学）
+      Run.hit(false);
+      $('.fbbox', box).insertAdjacentHTML('beforeend', '<div class="small muted">没关系，先学一下它。</div>');
+      return nextUp(box, '看看这个词 →', learn.fail, res);
+    }
     nextBtn(box, res, c, q);
   };
   $$('.opt', box).forEach(b => b.onclick = () => done(b.dataset.v, b));

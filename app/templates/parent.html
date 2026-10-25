@@ -69,6 +69,9 @@
       {% for g in c.stages %}<div class="row"><span style="min-width:5.5em">{{ g.label }}</span><span class="bar grow" style="margin:0"><span style="width:{{ g.pct }}%"></span></span>
         <span class="muted nw">{{ g.known }}/{{ g.total }}{% if g.inferred %} · 推断 {{ g.inferred }}{% endif %}{% if g.weak %} · <span style="color:var(--warn)">薄弱 {{ g.weak }}</span>{% endif %}</span></div>{% endfor %}</div>{% endfor %}
   </details>{% endif %}
+  {% if k.zc %}{% set z = k.zc %}{# 抓词（app/wordpick.py）：这一周新学几个、抓牢几个，隔几天还记得多少，每天新词上限跟着它自动调 #}
+  <p class="small" style="margin:6px 0">🔤 单词这一周：新学 {{ z.week_new }} 个，已经抓牢 {{ z.week_caught|length }} 个{% if z.week_caught %}（{{ z.week_caught|join('、') }}）{% endif %}{% if z.sets %} · 抓词做了 {{ z.sets }} 组{% endif %} · 认识的词一共 {{ z.known }} 个
+    <br><span class="muted">{% if z.keep is not none %}隔几天再见到的词，{{ z.keep }}% 还记得；{% endif %}每天最多学 {{ z.cap }} 个新词（记得的少就自动少学，记得牢就多学）。</span></p>{% endif %}
   {% if k.arena.week_answered or k.arena.week_minutes %}<p class="small" style="margin:6px 0">🎮 乐园本周：玩了 {{ k.arena.week_minutes }} 分钟，答题 {{ k.arena.week_answered }} 道（对 {{ k.arena.week_right }} 道）{% if k.arena.week_focus %}，专注值 {{ k.arena.week_focus }}{% endif %} · 乐园 Lv.{{ k.arena.level }}，贴纸 {{ k.arena.stickers }} 张 · 每天 {{ '不玩' if k.arena.minutes == 0 else ('不限时' if k.arena.minutes < 0 else k.arena.minutes ~ ' 分钟') }}，{{ k.arena.rule }}</p>{% endif %}
   {% if k.trend %}<div class="trend-mini"><p class="small" style="margin:6px 0 4px">📊 {{ trend_words(k.trend.series[0]) }} · <a href="/parent/kids/{{ k.u.id }}#acc-trend">看每天的曲线 →</a></p>{{ trend_ui.spark(k.trend) }}</div>{% endif %}
   {% if k.weekly %}<p class="small" style="margin:6px 0">📈 上周进步（{{ k.weekly.from[5:] }}~{{ k.weekly.to[5:] }}）：{{ k.weekly.lines|join('；') }}</p>{% endif %}

@@ -633,6 +633,8 @@ def diag_report(request: Request, sid: int):
 @router.get("/review", response_class=HTMLResponse)
 def review_page(request: Request, group: str = ""):
     kid_or_redirect(request)
+    if group == "words":   # 单词复习就是抓词的一组（/words/go），老链接也去那里
+        return RedirectResponse("/words/go", 303)
     return render(request, "review.html", group=group if group in engine.CARD_GROUPS else "")
 
 

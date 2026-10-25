@@ -29,7 +29,8 @@ log = logging.getLogger("aistudy.words")
 
 UNIT = 12                 # 词表没分组时，每组几个词
 STRIDE = 3                # 一组里隔几个挑一个（同一天的新词不挨着）
-TIERS = {"copy": 1, "read": 1, "listen": 2, "reverse": 3, "choice": 3, "tiles": 3, "spell": 4, "dictate": 4, "cloze": 5}   # tiles：用字母块拼对（还不算自己拼得出）
+TIERS = {"copy": 1, "read": 1, "listen": 2, "reverse": 3, "choice": 3, "tiles": 3, "spell": 4, "dictate": 4, "cloze": 5, "use": 5}
+# tiles：用字母块拼对（还不算自己拼得出）；use：用法题（选搭配、句型补全、找错词，用法卡里 AI 写好的）
 LEVEL_NAME = {0: "还没学", 1: "认得", 2: "听得出", 3: "想得起", 4: "拼得出", 5: "用得对"}
 CAUGHT = 3                # 到「想得起」（隔天也想得起来）算抓牢了
 BACKLOG_HALF, BACKLOG_STOP = 40, 80   # 欠着要复习的词这么多：新词减半 / 先不加新词
@@ -190,23 +191,6 @@ def school_unit(user_id: int, wl: dict) -> int | None:
     return None
 
 
-def _pick(wl: dict, skip: set[str], n: int, start: int | None = None) -> list[tuple[int, dict]]:
-    """从还有没学的词的那一组起，隔着挑 n 个：[(第几组, 词)]。
-    start：学校正在上的那一组——先学它，再补前面落下的，最后才往后学。"""
-    out = []
-    us = list(enumerate(units(wl)))
-    if start is not None and 0 <= start < len(us):
-        us = [us[start]] + us[:start] + us[start + 1:]
-    for ui, u in us:
-        left = [(i, w) for i, w in enumerate(u["words"]) if w.get("zh") and w["w"].lower() not in skip]
-        left.sort(key=lambda x: (x[0] % STRIDE, x[0]))
-        for _, w in left[:n - len(out)]:
-            out.append((ui, w))
-        if len(out) >= n:
-            break
-    return out
-
-
 def due_backlog(user_id: int) -> int:
     return (db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind IN ('word','term') AND due<=? AND reviews>0",
                    user_id, db.today().isoformat()) or {}).get("n") or 0
@@ -217,15 +201,16 @@ def _added_today(user_id: int) -> dict[str, int]:
     out: dict[str, int] = {}
     for r in db.q("SELECT extra FROM cards WHERE user_id=? AND kind IN ('word','term') AND created_at>=?", user_id, db.today().isoformat()):
         ex = db.jload(r["extra"], {}) or {}
-        if ex.get("new") and ex.get("list"):
-            out[ex["list"]] = out.get(ex["list"], 0) + 1
+        k = ex.get("for") or ex.get("list")   # for：算在哪个包今天的新词数里（往外、联想的词来自别的词表）
+        if ex.get("new") and k:
+            out[k] = out.get(k, 0) + 1
     return out
 
 
 def daily_new(user_id: int) -> int:
     """排今天的计划时，从主包里把今天的新词放进单词卡（今天学），每个包补到今天该有的个数（家长白天调多了，当天就补上）。
-    返回新加了几个。"""
-    from . import engine
+    挑哪几个词走统一的出词（app/wordpick.py：跟课本为主，跟上了再往外、联想）；加起来不超过今天的新词上限。返回新加了几个。"""
+    from . import wordpick
     today = db.today().isoformat()
     todo = [a for a in attached(user_id) if a["on"] and a["main"] and a["per_day"] > 0]
     if not todo:
@@ -233,17 +218,18 @@ def daily_new(user_id: int) -> int:
     backlog = due_backlog(user_id)
     scale = 0 if backlog >= BACKLOG_STOP else 0.5 if backlog >= BACKLOG_HALF else 1
     done = _added_today(user_id)
-    skip = _have(user_id) | _known(user_id)
+    pool = wordpick.Pool(user_id)
+    room = wordpick.cap(user_id, pool) - wordpick.new_today(user_id)
+    skip: set[str] = set()
     added = 0
     for a in todo:
         wl = a["pack"]
-        n = max(0, int(a["per_day"] * scale + 0.5) - done.get(wl["id"], 0))
-        if not n:
+        n = min(room - added, max(0, int(a["per_day"] * scale + 0.5) - done.get(wl["id"], 0)))
+        if n <= 0:
             continue
-        for ui, w in _pick(wl, skip, n, school_unit(user_id, wl)):
+        for w in wordpick.new_words(user_id, n, skip, pack=None if wl is pool.main else wl, p=pool):
             skip.add(w["w"].lower())
-            if engine.add_card(user_id, "term" if is_terms(wl) else "word", w["w"], w["zh"],
-                               {"pos": w.get("pos", ""), "list": wl["id"], "unit": ui, "new": 1}, w.get("kp") or None, due=db.today()):
+            if wordpick.add_new(user_id, {**w, "list": w.get("list") or ("" if w.get("line") == "related" else wl["id"]), "count_as": wl["id"]}):
                 added += 1
         if db.one("SELECT 1 FROM word_packs WHERE user_id=? AND pack_id=?", user_id, wl["id"]):
             db.run("UPDATE word_packs SET last_day=? WHERE user_id=? AND pack_id=?", today, user_id, wl["id"])
@@ -259,7 +245,7 @@ def log_answer(user_id: int, list_id: str, word: str, correct: bool, tier: str, 
     """一次单词作答记进学习记录（所有地方都走这里）：tier 是题型（read / listen / reverse / spell / dictate / cloze）。"""
     from . import evidence
     evidence.log(user_id, "word", f"{list_id or ''}:{word}", "answer", correct=correct, mode=mode, weight=weight,
-                 fmt="recall" if TIERS.get(tier, 1) >= 4 and tier != "cloze" else "choice", dont_know=dont_know, data={"tier": tier})
+                 fmt="recall" if TIERS.get(tier, 1) >= 4 and tier not in ("cloze", "use") else "choice", dont_know=dont_know, data={"tier": tier})
 
 
 # 单词跑酷（app/arena/games/runner.py）里一个词给多少提示，跟着这个词的等级走：新词整个词淡淡地写在上面照着拼（copy），
@@ -282,15 +268,18 @@ def _tier(r) -> int:
 
 def ladder(user_id: int) -> dict[str, dict]:
     """每个答过的词：{level 0-5, ok（答对过）, wobbly（最近一次答错了）}，小写词为键。
-    level：两个不同的日子都在这一级或更难的题上答对过。老的单词卡（以前的复习没记事件）按复习轮数补一个下限。"""
+    level：两个不同的日子都在这一级或更难的题上答对过（游戏里的不算，只算 ok）。老的单词卡（以前的复习没记事件）按复习轮数补一个下限。"""
     days: dict[str, dict[int, set]] = {}
     last: dict[str, bool] = {}
-    for r in db.q("SELECT target_id, correct, fmt, data, created_at FROM events WHERE user_id=? AND target='word' AND kind='answer' "
+    ok: set[str] = set()
+    for r in db.q("SELECT target_id, correct, fmt, data, mode, created_at FROM events WHERE user_id=? AND target='word' AND kind='answer' "
                   "ORDER BY id", user_id):
         w = r["target_id"].rsplit(":", 1)[-1].lower()
         last[w] = bool(r["correct"])
         if r["correct"]:
-            days.setdefault(w, {}).setdefault(_tier(r), set()).add(str(r["created_at"])[:10])
+            ok.add(w)
+            if r["mode"] != "game":   # 游戏里答对只算认识（见过），升级靠学的地方（抓词、复习、快练、热身）：游戏冒充不了学习
+                days.setdefault(w, {}).setdefault(_tier(r), set()).add(str(r["created_at"])[:10])
     out = {}
     for w in last:
         by = days.get(w, {})
@@ -299,7 +288,7 @@ def ladder(user_id: int) -> dict[str, dict]:
             if len(set().union(*[d for k, d in by.items() if k >= t] or [set()])) >= 2:
                 level = t
                 break
-        out[w] = {"level": level, "ok": bool(by), "wobbly": not last[w]}
+        out[w] = {"level": level, "ok": w in ok, "wobbly": not last[w]}
     for c in db.q("SELECT LOWER(front) AS f, box FROM cards WHERE user_id=? AND kind IN ('word','term') AND box>0", user_id):
         floor = CAUGHT if c["box"] >= 3 else 1
         cur = out.setdefault(c["f"], {"level": 0, "ok": True, "wobbly": False})
@@ -431,8 +420,121 @@ def write_examples(words: list[dict], b: str, user_id: int | None = None) -> int
     return n
 
 
-def wanted(user_id: int, limit: int = 40) -> list[dict]:
-    """这个人接下来要用例句的词（今天的新词、到期的复习词、正在学的那一组），还没有例句的。"""
+# ------------------------------------------------------------------ 用法卡（AI 写一次，按学段存，所有人复用；表 word_usage）
+# 一个词：常这么用（搭配、句型）、一家人（词形）、易混词、几道用法题（选搭配 / 句型补全 / 找错词）、
+# 具体名词的一个图标（只给小学一二年级看）；记忆钩子（拆词、词根、联想）只给反复忘的词，用到时才补写（write_hooks）。
+# 按学段给的量不一样（usage_view）：小学少给，成人多给。
+
+USAGE_SHOW = {"primary": {"phrases": 1, "family": 0, "confuse": 1}, "secondary": {"phrases": 3, "family": 3, "confuse": 2},
+              "adult": {"phrases": 4, "family": 4, "confuse": 2}}
+HOOK_LAPSES = 2           # 忘过几次的词才给记忆钩子
+USE_KINDS = ("collocation", "pattern", "error")
+
+
+def usage_of(words: list[str], b: str) -> dict[str, dict]:
+    """{小写词: 用法卡}，只有写好了的词。"""
+    ws = sorted({w.lower() for w in words if w})
+    out = {}
+    for i in range(0, len(ws), 200):
+        part = ws[i:i + 200]
+        for r in db.q(f"SELECT word, data FROM word_usage WHERE band=? AND word IN ({','.join('?' * len(part))})", b, *part):
+            d = db.jload(r["data"], {}) or {}
+            if d:
+                out[r["word"]] = d
+    return out
+
+
+def usage_view(word: str, b: str, grade: str = "") -> dict | None:
+    """学习卡上给孩子看的那一份：按学段取几条；图标只给一二年级。没写好返回 None。"""
+    from .catalog import stage_rank
+    d = usage_of([word], b).get(word.lower())
+    if not d:
+        return None
+    n = USAGE_SHOW.get(b, USAGE_SHOW["secondary"])
+    out = {"phrases": (d.get("phrases") or [])[:n["phrases"]], "family": (d.get("family") or [])[:n["family"]],
+           "confuse": (d.get("confuse") or [])[:n["confuse"]], "hook": d.get("hook") or ""}
+    if b == "primary" and grade and stage_rank(grade) <= 2 and d.get("icon"):
+        out["icon"] = d["icon"]
+    return out if any(out.values()) else None
+
+
+def use_item(word: str, b: str, rng: random.Random) -> dict | None:
+    """一道用法题（选搭配 / 句型补全 / 找错词）：{kind, q, options, answer}，没有就 None。"""
+    got = [u for u in (usage_of([word], b).get(word.lower()) or {}).get("use") or [] if u.get("q") and u.get("answer") in (u.get("options") or [])]
+    return rng.choice(got) if got else None
+
+
+def _clean_usage(word: str, x: dict) -> dict:
+    """AI 写回来的用法卡：每块只留格式对的，数量封顶；用法题的答案要在选项里。"""
+    def strs(o, *keys, cap=60):
+        return {k: str(o.get(k) or "").strip()[:cap] for k in keys}
+    phrases = [strs(p, "en", "zh", cap=80) for p in (x.get("phrases") or []) if isinstance(p, dict) and p.get("en")][:4]
+    family = [strs(f, "w", "pos", "zh") for f in (x.get("family") or []) if isinstance(f, dict) and f.get("w")
+              and str(f["w"]).lower() != word.lower() and f.get("zh")][:4]
+    confuse = [strs(c, "w", "zh", "tip", cap=80) for c in (x.get("confuse") or []) if isinstance(c, dict) and c.get("w")][:2]
+    use = []
+    for u in x.get("use") or []:
+        if not isinstance(u, dict):
+            continue
+        opts = [str(o).strip()[:40] for o in (u.get("options") or []) if str(o).strip()][:4]
+        ans = str(u.get("answer") or "").strip()[:40]
+        if u.get("kind") in USE_KINDS and u.get("q") and ans in opts and len(set(opts)) == len(opts) >= 2:
+            use.append({"kind": u["kind"], "q": str(u["q"]).strip()[:200], "options": opts, "answer": ans,
+                        "explain": str(u.get("explain") or "").strip()[:160]})
+    icon = str(x.get("icon") or "").strip()
+    return {"phrases": phrases, "family": family, "confuse": confuse, "use": use[:3], "icon": icon if 0 < len(icon) <= 4 else ""}
+
+
+def write_usage(words: list[dict], b: str, user_id: int | None = None) -> int:
+    """请 AI 给这些词（{w, zh, pos}）写用法卡，存起来。返回存了几个词。"""
+    if not words or not llm.enabled():
+        return 0
+    from .llm import tasks
+    data = tasks.word_usage(words, b, user_id=user_id)
+    asked = {y["w"].lower() for y in words}
+    n = 0
+    for x in data.get("words") or []:
+        w = str((x or {}).get("w") or "").strip()
+        if not w or w.lower() not in asked or db.one("SELECT 1 FROM word_usage WHERE word=? AND band=?", w.lower(), b):
+            continue
+        got = _clean_usage(w, x)
+        if not any(got.values()):
+            continue
+        db.run("INSERT INTO word_usage(word, band, data, created_at) VALUES(?,?,?,?)", w.lower(), b, db.jdump(got), db.now())
+        n += 1
+    return n
+
+
+def write_hooks(words: list[dict], b: str, user_id: int | None = None) -> int:
+    """反复忘的词：请 AI 写一句记忆钩子（拆词、词根、发音联想），补进这个词的用法卡。"""
+    if not words or not llm.enabled():
+        return 0
+    from .llm import tasks
+    data = tasks.word_hooks(words, b, user_id=user_id)
+    n = 0
+    for x in data.get("words") or []:
+        w, hook = str((x or {}).get("w") or "").strip().lower(), str((x or {}).get("hook") or "").strip()[:120]
+        r = db.one("SELECT id, data FROM word_usage WHERE word=? AND band=?", w, b) if w and hook else None
+        if r:
+            d = db.jload(r["data"], {}) or {}
+            if not d.get("hook"):
+                db.run("UPDATE word_usage SET data=? WHERE id=?", db.jdump({**d, "hook": hook}), r["id"])
+                n += 1
+    return n
+
+
+def wanted_hooks(user_id: int, limit: int = 10) -> list[dict]:
+    """忘过 HOOK_LAPSES 次以上、用法卡写好了、还没有记忆钩子的词。"""
+    rows = db.q("SELECT front, back FROM cards WHERE user_id=? AND kind='word' AND lapses>=? ORDER BY lapses DESC LIMIT 60", user_id, HOOK_LAPSES)
+    b = band(_user(user_id)["grade"])
+    have = usage_of([r["front"] for r in rows], b)
+    return [{"w": r["front"], "zh": (r["back"] or "").split("\n")[0][:40]} for r in rows
+            if r["front"].lower() in have and not have[r["front"].lower()].get("hook")][:limit]
+
+
+def wanted(user_id: int, limit: int = 40, what: str = "examples") -> list[dict]:
+    """这个人接下来要用例句（what='usage'：用法卡）的词（今天的新词、到期的复习词、正在学的那一组），还没写好的。"""
+    from . import wordpick
     rows = db.q("SELECT front, back, extra FROM cards WHERE user_id=? AND kind IN ('word','term') AND due<=? ORDER BY due LIMIT 80",
                 user_id, (db.today() + timedelta(days=1)).isoformat())
     cand = [{"w": r["front"], "zh": (r["back"] or "").split("\n")[0][:40], "pos": (db.jload(r["extra"], {}) or {}).get("pos", "")}
@@ -440,11 +542,10 @@ def wanted(user_id: int, limit: int = 40) -> list[dict]:
     have = _have(user_id)
     for a in attached(user_id):
         if a["on"] and a["main"]:
-            for w in _pick(a["pack"], set(), UNIT):   # 正在学的那一组（游戏里补句子也常用到）
-                cand.append(w[1])
+            cand += wordpick.book_line(wordpick.Pool(user_id), a["pack"], set(), UNIT, ahead=False)   # 正在学的那一组（游戏里补句子也常用到）
             cand += [w for u in units(a["pack"]) for w in u["words"] if w["w"].lower() in have][:30]
     b = band(_user(user_id)["grade"])
-    done = examples([c["w"] for c in cand], b)
+    done = (usage_of if what == "usage" else examples)([c["w"] for c in cand], b)
     out, seen = [], set()
     for c in cand:
         k = c["w"].lower()
@@ -484,6 +585,15 @@ def _prepare_run(user_id: int, k: tuple) -> None:
                 _prep_used[k] = _prep_used.get(k, 0) + 1
             if not write_examples(ws, b, user_id):
                 break
+        for what, write in (("usage", write_usage), ("hooks", write_hooks)):   # 用法卡、反复忘的词的记忆钩子：一样只往前备一步
+            ws = wanted_hooks(user_id) if what == "hooks" else wanted(user_id, BATCH, what="usage")
+            if not ws:
+                continue
+            with _lock:
+                if _prep_used.get(k, 0) >= PREP_PER_DAY + 2:
+                    break
+                _prep_used[k] = _prep_used.get(k, 0) + 1
+            write(ws, b, user_id)
     except Exception:  # noqa: BLE001  写不成就先用不带句子的题型
         log.exception("word examples failed: user %s", user_id)
     finally:

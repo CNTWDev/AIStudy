@@ -2,11 +2,12 @@
 from fastapi import APIRouter
 from fastapi import Body, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from .. import auth, bank, config, db, engine, evidence, itemtypes, llm, news, recall, webpage
+from .. import arena, auth, bank, config, db, engine, evidence, itemtypes, llm, news, recall, webpage
 import re
 from datetime import timedelta
 from ..web import (
     _auto_collect,
+    _review_tasks_done,
     _has_card,
     _lang_of,
     _reading_view,
@@ -41,16 +42,65 @@ def words(request: Request, kind: str = "word"):
 
 @router.get("/words/map", response_class=HTMLResponse)
 def words_map(request: Request, msg: str = ""):
-    """我的词：认识的词一共多少（只增不减），每个单词包一组一组抓牢了几个（app/words.py）。
-    孩子的包由家长在学习安排里管；自己安排学习的成人在这里加、停。"""
-    from .. import words
+    """抓词的首页：一个大按钮「来一组」（app/wordpick.py），认识的词一共多少（只增不减）、抓牢了多少，
+    每个单词包一组一组抓牢了几个（app/words.py）。孩子的包由家长在学习安排里管；自己安排学习的成人在这里加、停。"""
+    from .. import words, wordpick
     k = kid_or_redirect(request, manage=True)
     me = auth.require_user(request)
     mine = me["id"] == k["id"] and auth.self_managed(me)
     st = words.stats(k["id"])
     due = (db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind IN ('word','term') AND due<=?", k["id"], db.today().isoformat()) or {}).get("n") or 0
+    today = db.today().isoformat()
+    home = {"caught": sum(1 for v in words.ladder(k["id"]).values() if v["level"] >= words.CAUGHT),
+            "new_today": wordpick.new_today(k["id"]), "room": wordpick.room_today(k["id"]), "cap": wordpick.cap(k["id"]),
+            "sets": (db.one("SELECT COUNT(*) AS n FROM word_sets WHERE user_id=? AND day=? AND done_at IS NOT NULL", k["id"], today) or {}).get("n") or 0,
+            "free": arena.free_for(k, arena.GAMES["runner"])}
     return render(request, "words_map.html", st=st, can_edit=mine, can_play=me["id"] == k["id"], msg=msg, lad_names=words.LEVEL_NAME,
-                  shelves=words.shelves(k["id"]), due=due)
+                  shelves=words.shelves(k["id"]), due=due, home=home, set_size=wordpick.SET_SIZE)
+
+
+@router.get("/words/go", response_class=HTMLResponse)
+def words_go(request: Request):
+    """抓词的一组（app/wordpick.py make_set）：复习页的那一套（先猜、隔开再考、一次一个方向），做完有小结、再来一组、送一局跑酷。"""
+    kid_or_redirect(request)
+    return render(request, "review.html", group="words", set_mode=True)
+
+
+@router.post("/api/words/set")
+def words_set(request: Request):
+    """开一组：到期的（含今天的新词）→ 新词 → 往前补的认一认 → 往上推一级。"""
+    from .. import wordpick
+    k = kid_or_redirect(request)
+    s = wordpick.make_set(k["id"])
+    out = []
+    for c, role in s["cards"]:
+        q = recall.push_quiz(k["id"], c) if role == "push" else recall.quiz(k["id"], c)
+        if not q or q.get("mode") == "later":
+            continue
+        d = dict(c)
+        d["extra"] = db.jload(c["extra"], {})
+        d["kp_name"] = ""
+        d["quiz"], d["role"] = q, role
+        out.append(d)
+    words_mod_prepare(k["id"])
+    return {"id": s["id"], "cards": out, "room": s["room"]}
+
+
+def words_mod_prepare(uid: int) -> None:
+    from .. import words
+    words.prepare(uid)   # 后台把接下来的例句、用法卡备好（只往前备一步）
+
+
+@router.post("/api/words/set/{sid}/done")
+def words_set_done(request: Request, sid: int):
+    """一组做完：小结（新抓住、找回来、认识的、更熟了、还调皮的；认识的词前后各多少），能不能再来一组，送不送一局跑酷。"""
+    from .. import wordpick
+    k = kid_or_redirect(request)
+    r = wordpick.summary(k["id"], sid)
+    if r is None:
+        raise HTTPException(404, "没有这一组")
+    _review_tasks_done(k["id"])
+    return r
 
 
 @router.get("/words/pack/{pack_id}", response_class=HTMLResponse)

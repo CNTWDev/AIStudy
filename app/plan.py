@@ -154,7 +154,7 @@ def src_words(c: Ctx) -> list[dict]:
     old = len(due) - new
     title = "单词：" + "，".join(x for x in (f"{new} 个新词" if new else "", f"复习 {old} 个" if old else "") if x)
     return [{"type": "words", "title": title, "why": "新词先猜意思，再放进句子里用一次；答错的一会儿还会再来",
-             "minutes": min(15, 3 + new + len(due) // 4), "url": "/review?group=words"}]
+             "minutes": min(15, 3 + new + len(due) // 4), "url": "/words/go"}]
 
 
 def src_mistakes(c: Ctx) -> list[dict]:

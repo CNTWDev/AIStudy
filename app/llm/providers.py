@@ -183,6 +183,16 @@ class MockProvider(Provider):
             return json.dumps({"words": [{"w": w, "sentences": [{"en": f"Look, I can see the [[{w}]] today.", "zh": f"看，今天我看到了 {w}。"},
                                                                   {"en": f"We talk about the [[{w}]] at school.", "zh": f"我们在学校说起 {w}。"}]}
                                          for w in ws]}, ensure_ascii=False)
+        if req.task in ("word_usage", "word_hooks"):   # 照提示词里的词各写一份（用法题的答案在选项里）
+            import re
+            ws = re.findall(r"^- ([A-Za-z][A-Za-z '\-]*)（", req.user, re.M)
+            if req.task == "word_hooks":
+                return json.dumps({"words": [{"w": w, "hook": f"把 {w} 拆开记"} for w in ws]}, ensure_ascii=False)
+            return json.dumps({"words": [{"w": w, "phrases": [{"en": f"a {w} day", "zh": f"{w} 的一天"}],
+                                          "family": [{"w": f"{w}ful", "pos": "adj.", "zh": f"{w} 的"}],
+                                          "confuse": [{"w": w[::-1], "zh": "反过来", "tip": "字母顺序不一样"}],
+                                          "use": [{"kind": "collocation", "q": f"We have ___ {w}.", "options": ["a", "an", "the"], "answer": "a", "explain": "示例"}],
+                                          "icon": "🍎" if w.startswith("a") else ""} for w in ws]}, ensure_ascii=False)
         return json.dumps(MOCK.get(req.task, {}), ensure_ascii=False)
 
 

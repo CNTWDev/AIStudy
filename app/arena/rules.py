@@ -105,8 +105,8 @@ def seconds_today(kid_id: int, max_seconds: dict | None = None) -> int:
     day = db.today().isoformat()
     now = _ts(db.now())
     total = 0
-    for m in db.q("SELECT game, started_at, ended_at, seconds, data FROM arena_matches WHERE user_id=? AND started_at>=?",
-                  kid_id, day):
+    for m in db.q("SELECT game, started_at, ended_at, seconds, data FROM arena_matches WHERE user_id=? AND started_at>=? "
+                  "AND mode<>'reward'", kid_id, day):   # 做完一组抓词送的那一局不算游戏时间
         if m["ended_at"]:
             total += m["seconds"] or 0
         else:
