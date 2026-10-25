@@ -154,6 +154,14 @@ def reading_url(request: Request, url: str = Form(...), lang: str = Form("")):
     return RedirectResponse(f"/reading/{rid}", 303)
 
 
+def _quoted(learn, body: str) -> list[dict]:
+    """「这篇值得学的」只留真在正文里的句子（AI 偶尔会改写或编一句）：比的时候不管空格和标点。"""
+    def norm(t):
+        return "".join(ch for ch in (t or "").lower() if ch.isalnum())
+    text = norm(body)
+    return [x for x in learn or [] if isinstance(x, dict) and len(norm(x.get("text"))) >= 4 and norm(x.get("text")) in text][:3]
+
+
 @router.get("/reading/{rid}", response_class=HTMLResponse)
 def reading_view(request: Request, rid: int):
     k = kid_or_redirect(request)
@@ -165,7 +173,7 @@ def reading_view(request: Request, rid: int):
     answers = db.jload(r["answers"], None) if r["finished_at"] else None
     c = db.one("SELECT body FROM contents WHERE id=?", r["content_id"]) if r["source"] == "ai" and r["content_id"] else None
     extra = db.jload(c["body"], {}) if c else {}
-    return render(request, "reading.html", r=r, learn=[x for x in extra.get("learn") or [] if x.get("text")][:3],
+    return render(request, "reading.html", r=r, learn=_quoted(extra.get("learn"), r["body"]),
                   think=extra.get("think") or "", paras=[p for p in r["body"].split("\n") if p.strip()],
                   questions=[{"q": q["q"], "options": q.get("options", [])} for q in qs], news=news.reading_extra(r),
                   done_views=[_reading_view(q, (answers or {}).get(str(i))) for i, q in enumerate(qs)] if answers is not None else None,

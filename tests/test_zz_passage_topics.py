@@ -57,7 +57,8 @@ def test_daily_one_tap_writes_with_pick_and_feedback(monkeypatch):
     def spy(*a, **kw):
         seen.append(kw)
         out = real(*a, **kw)
-        return {**out, "body": out["body"] + uuid.uuid4().hex, "title": f"今天的美文 {len(seen)}"}
+        return {**out, "body": out["body"] + uuid.uuid4().hex, "title": f"今天的美文 {len(seen)}",
+                "learn": out["learn"] + [{"text": "A sentence the passage never had.", "note": "编的"}]}
     monkeypatch.setattr(llm, "make_passage", spy)
     with TestClient(app) as c:
         uid = _kid(c)
@@ -72,6 +73,7 @@ def test_daily_one_tap_writes_with_pick_and_feedback(monkeypatch):
         row = db.one("SELECT c.topic, c.gen_meta FROM readings r JOIN contents c ON c.id=r.content_id WHERE r.id=?", rid)
         assert row["topic"].startswith("auto:") and db.jload(row["gen_meta"])["pick"]["genre"] == kw["pick"]["genre"]
         page = c.get(f"/reading/{rid}").text
+        assert "never had" not in page  # 不在正文里的句子不显示
         assert 'id="after"' in page and "这篇值得学的" in page and "想一想" in page and 'data-feel="like"' in page
         c.post(f"/api/reading/{rid}/finish", json={"answers": {"0": 1}, "minutes": 3})
         assert c.post(f"/api/reading/{rid}/feel", json={"feel": "like"}).json()["feel"] == "like"
