@@ -39,7 +39,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 2, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -380,19 +380,46 @@ def discuss_close(item: dict, kp: dict, pack, grade: str, twist: str, turns: lis
     return ask_json("discuss_close", _tutor(grade), user, user_id=user_id, effort="medium", max_tokens=1500, cache=False)
 
 
-def make_passage(lang: str, grade: str, topic: str, length: str, review_words: list[str], user_id=None) -> dict:
+def make_passage(lang: str, grade: str, topic: str, length: str, review_words: list[str], user_id=None,
+                 pick: dict | None = None, avoid: list[str] = ()) -> dict:
+    """每日短文：要有课本选文的水准（语言精美、有值得学的句式或语法），寓教于乐，读完知道得更广、想得更深。
+    pick 是系统替孩子定的话题（app/passage_topics.py）；孩子自己写了话题就用 topic。"""
     from ..catalog import stage_label
+    adult = _adult(grade)
     words = f"尽量自然地用上这些正在复习的词：{', '.join(review_words[:8])}。" if review_words else ""
+    genre = (pick or {}).get("genre") or ""
+    kind = genre or ("文章" if lang == "zh" else "短文")
     if lang == "en":
-        spec = f"写一篇适合{stage_label(grade)}中国学生的英文短文，用词比他的水平略高一点点（i+1），{length}。"
+        spec = (f"写一篇适合{stage_label(grade)}中国学生的英文{kind}，用词比他的水平略高一点点（i+1），{length}。"
+                "要像好的英文课本选文那样有水准：用词准确生动，自然地用上一两种这个年级值得学的语法结构或句式"
+                "（比如定语从句、现在完成时、被动语态、比较结构，挑适合这个年级的），不要为了用而堆砌。")
     else:
-        spec = f"写一篇适合{stage_label(grade)}学生的中文短文，{length}，语言规范优美但不难懂。"
+        spec = (f"写一篇适合{stage_label(grade)}学生的中文{kind}，{length}。"
+                "要像语文课本里选的文章那样有水准：语言精美、准确、有节奏，自然地用上一两处值得学的写法"
+                "（比喻、排比、对比、细节描写、过渡和照应等），不堆砌辞藻，不难懂。")
+    if pick and pick.get("exam") and genre and not adult:
+        spec += f"这是考试常考的文体，要写出{genre}应有的结构和特点，让孩子读完对这种文体更熟。"
+    if topic:
+        about = f"主题：{topic}。"
+    elif pick:
+        about = f"领域：{pick['name']}。" + (f"具体写：{pick['angle']}。" if pick.get("angle") else
+                                             f"在这个领域里自己挑一个具体、新鲜的切入点（可以参考但不限于：{pick['ideas']}）。")
+    else:
+        about = f"主题：{'职场、社会、经济或科学话题' if adult else '孩子感兴趣的日常、自然或科学话题'}。"
+    teach = ("" if adult else
+             "寓教于乐：不说教、不喊口号，但读完要让孩子知道得更广一点、想得更深一点——一个道理、一种看事情的角度，或一个值得追问的问题。")
+    past = f"他最近读过这些，这篇的话题和写法都不要和它们重复：{'；'.join(avoid[:14])}。" if avoid else ""
     user = (
-        f"{spec}主题：{topic or ('职场、社会、经济或科学话题' if _adult(grade) else '孩子感兴趣的日常、自然或科学话题')}。{words}不要照搬已有出版物。\n"
+        f"{spec}{about}{teach}{past}{words}不要照搬已有出版物。\n"
         "再出 3 道阅读理解选择题（考概括、细节、词义各一）。\n"
-        '输出：{"title":"..","body":"正文，段落之间用\\n\\n分隔","questions":[{"q":"..","options":["..","..","..",".."],"answer":0,"explain":"中文解析"}]}'
+        "再从正文里挑 2-3 句最值得学的句子，用一句中文说清好在哪（用了什么修辞、句式或语法）；"
+        "最后给一个读完想一想的开放问题（中文，没有标准答案）。\n"
+        '输出：{"title":"..","topic":"一句话说这篇写的是什么","body":"正文，段落之间用\\n\\n分隔",'
+        '"questions":[{"q":"..","options":["..","..","..",".."],"answer":0,"explain":"中文解析"}],'
+        '"learn":[{"text":"原文里的一句","note":"好在哪"}],"think":".."}'
     )
-    return ask_json("passage", _tutor(grade) + ("" if _adult(grade) else "你也是儿童读物作者。"), user, user_id=user_id, effort="medium", cache=False)
+    return ask_json("passage", _tutor(grade) + ("" if adult else "你也是给孩子写美文的儿童文学作家，文字常被选进语文课本。"),
+                    user, user_id=user_id, effort="medium", cache=False)
 
 
 def book_guide(book: dict, ch: int, chapter_title: str, text: str, grade: str, user_id=None) -> dict:

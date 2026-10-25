@@ -242,22 +242,33 @@ def context(kp: dict, grade: str, user_id=None) -> dict:
 
 
 def passage(user_id: int, lang: str, grade: str, topic: str, length: str, review_words: list[str]) -> tuple[dict, int]:
-    """阅读短文：同语言、同年级、同话题、这个孩子没读过的库存短文先用（含要复习的词多的优先）；没有就现场写一篇存下。"""
+    """阅读短文：孩子没写话题，就由系统定今天写什么（app/passage_topics.py）。
+    同语言、同年级、同话题、这个孩子没读过、和他最近读的不重样的库存短文先用（含要复习的词多的优先）；没有就现场写一篇存下。"""
+    from . import passage_topics as pt
+    pick = None if topic.strip() else pt.pick(user_id, lang, grade)
+    key = (topic.strip() or pick["key"])[:200]
+    past = pt.recent(user_id, lang, pt.RECENT)
     read = [r["content_id"] for r in db.q("SELECT content_id FROM readings WHERE user_id=? AND content_id IS NOT NULL", user_id)]
-    if topic:
-        rows = db.q("SELECT id, body FROM contents WHERE kind='passage' AND status='active' AND lang=? AND grade=? AND topic=?"
-                    + (f" AND id NOT IN ({','.join('?' * len(read))})" if read else "") + " ORDER BY uses, id",
-                    lang, grade, topic.strip()[:200], *read)
-        if rows:  # 用得少的、含要复习的词多的优先
-            def score(r):
-                text = (db.jload(r["body"], {}).get("body") or "").lower()
-                return -sum(w.lower() in text for w in review_words)
-            r = min(rows, key=score)
-            db.run("UPDATE contents SET uses=uses+1 WHERE id=?", r["id"])
-            return db.jload(r["body"], {}), r["id"]
-    body = llm.make_passage(lang, grade, topic, length, review_words, user_id=user_id)
-    cid = save_content("passage", body, "", lang, grade, topic=topic.strip(), title=body.get("title", ""),
-                       meta=gen_meta("passage", length=length, words=review_words[:8]), created_by=user_id)
+    rows = db.q("SELECT id, title, body FROM contents WHERE kind='passage' AND status='active' AND lang=? AND grade=? AND topic=?"
+                + (f" AND id NOT IN ({','.join('?' * len(read))})" if read else "") + " ORDER BY uses, id",
+                lang, grade, key, *read)
+    rows = [r for r in rows if not pt.repeats(r["title"], db.jload(r["body"], {}).get("topic") or "", past)]
+    if rows:  # 用得少的、含要复习的词多的优先
+        def score(r):
+            text = (db.jload(r["body"], {}).get("body") or "").lower()
+            return -sum(w.lower() in text for w in review_words)
+        r = min(rows, key=score)
+        db.run("UPDATE contents SET uses=uses+1 WHERE id=?", r["id"])
+        return db.jload(r["body"], {}), r["id"]
+    avoid = [p["title"] for p in past]
+    body = llm.make_passage(lang, grade, topic, length, review_words, user_id=user_id, pick=pick, avoid=avoid)
+    if pick and pt.repeats(body.get("title", ""), body.get("topic") or "", past):  # 还是写到了最近读过的：换个切入点再写一次，只重写一次
+        body = llm.make_passage(lang, grade, topic, length, review_words, user_id=user_id, pick=pick,
+                                avoid=[body.get("title", "")] + avoid)
+    meta = gen_meta("passage", length=length, words=review_words[:8])
+    if pick:
+        meta["pick"] = {k: pick[k] for k in ("source", "domain", "angle", "genre", "exam")}
+    cid = save_content("passage", body, "", lang, grade, topic=key, title=body.get("title", ""), meta=meta, created_by=user_id)
     return body, cid
 
 
