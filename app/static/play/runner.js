@@ -1,7 +1,8 @@
 /* 单词跑酷：三条跑道往前冲，← → 换道、↑ 跳，按顺序撞上对的字母把词拼出来；石头要躲开，栏杆要跳过去。
    拼哪个词、给几档提示由服务器按这个人的单词等级定（app/arena/games/runner.py、sources.WordSource._run）：
      hint 0 整个词淡淡地写在上面照着拼（新词）；1 只给中文和首字母；2 只给中文和读音（🔊 可以再听）。
-   一个词拼完报一次作答：一路没撞错字母算拼对；撞错过报撞到的那串字母；对的字母错过两次、系统把它亮出来了，算「不会」。
+   只有下一个该拼的字母算对：撞到哪个字母当场对着 need() 判；拼上一个，前面已经摆出来的字母排都换成下一个要的。
+   一个词拼完报一次作答，报的是一路撞到的那串字母，服务器对着这个词判；对的字母错过两次、系统把它亮出来了，算「不会」。
    撞错字母只减速、亮出要的那个字母，不算摔；撞上石头、没跳过栏杆才摔倒：外壳盖上题目（就是正在拼的这个词），答对 1 道就起来。
    画面是往远处收的三条跑道（近大远小）：z 是离角色多远，越远越小、越靠近地平线。 */
 (function () {
@@ -59,12 +60,11 @@
     if (S.hint === 2 || S.hint === 0) say();
   }
   function say() { if (S.word && typeof Speak !== 'undefined') Speak.play(S.word, 'en', 'word'); }
-  const need = () => S.word[S.got] ? S.word[S.got].toLowerCase() : '';
 
   async function finishWord() {
     const it = S.item, typed = S.typed, slip = S.slip, helped = S.helped;
     S.item = null; S.word = '';
-    const body = !slip && helped ? {item_id: it.id, dont_know: true} : {item_id: it.id, answer: slip ? typed : it.run.w};
+    const body = !slip && helped ? {item_id: it.id, dont_know: true} : {item_id: it.id, answer: typed};
     let res = null;
     try { res = await api(`/api/arena/${c.match.match_id}/a`, body); } catch (e) { /* 过期了（摔倒时被换了一道）：接着跑 */ }
     S.done++;
@@ -82,22 +82,58 @@
     nextWord();
   }
 
+  // ------------------------------------------------------------ 字母：只有下一个该拼的字母算对
+  const need = () => S.word[S.got] ? S.word[S.got].toLowerCase() : '';
+  const shuffled = () => [0, 1, 2].sort(() => Math.random() - 0.5);
+  function letterRow(z, lanes) {   // 一排字母：要的那个 + 一两个混淆的
+    const want = need(), k = (S.lv.words > 6 || S.hint > 0) ? 2 : 1;   // 新词只放一个混淆的字母
+    S.objs.push({kind: 'letter', z, lane: lanes[0], ch: want});
+    const pool = (SIMILAR[want] || '') + S.word.toLowerCase().replace(want, '') + 'aeiourstnl';
+    const used = new Set([want]);
+    for (let i = 1; i <= k; i++) {
+      let ch = '';
+      for (let tries = 0; tries < 12 && (!ch || used.has(ch)); tries++) ch = pool[Math.floor(Math.random() * pool.length)];
+      if (!ch || used.has(ch)) continue;
+      used.add(ch); S.objs.push({kind: 'letter', z, lane: lanes[i], ch});
+    }
+  }
+  function eat(o) { o.ch === need() ? rightLetter(o) : wrongLetter(o); }   // 撞上的时候才判：摆出来时要的字母，这会儿可能已经拼过了
+  function restock() {   // 拼上一个字母：前面摆好的字母排换成下一个要的（不换的话一路都是刚拼过的那个，rabbit 连撞 6 个 R 也拼完了）
+    const rows = new Set();
+    for (const o of S.objs) if (o.kind === 'letter' && !o.gone) { o.gone = true; if (o.z > HIT_Z) rows.add(o.z); }
+    if (S.got < S.word.length) for (const z of rows) letterRow(z, shuffled());
+  }
+  function rightLetter(o) {
+    const s = S;
+    s.typed += o.ch; s.got++; s.miss = 0;
+    if (s.reveal < s.got) s.reveal = s.got;
+    Play.sfx.play('coin');
+    const p = proj(0, s.x);
+    fx.burst(p.x, p.y - 70, {n: 12, colors: ['#ffd23f', '#7bdff2', '#fff'], speed: 220});
+    fx.text(p.x, p.y - 110, o.ch.toUpperCase(), {color: '#2fa84f', size: 34});
+    restock();
+    buildWord();
+    if (s.got >= s.word.length) finishWord();
+  }
+  function wrongLetter(o) {
+    const s = S;
+    s.typed += o.ch; s.slip = true; s.slow = 1.1; s.combo = 0;
+    s.reveal = Math.max(s.reveal, s.got + 1);   // 亮出要的那个字母
+    Play.sfx.play('wrong'); fx.shake(5, 0.2); fx.flash('rgba(255,120,120,.35)', 0.15);
+    const p = proj(0, s.x);
+    fx.text(p.x, p.y - 110, `要的是 ${need().toUpperCase()}`, {color: '#e0475b', size: 26});
+    buildWord();
+  }
+  function missed() {   // 要的字母从旁边过去了：再来一次；错过两次就亮出来（这个词算「不会」）
+    const s = S;
+    s.miss++;
+    if (s.miss >= 2 && s.reveal <= s.got) { s.reveal = s.got + 1; s.helped = true; sh.toast(`要找的是 ${need().toUpperCase()}`, 'warn'); buildWord(); }
+  }
+
   // ------------------------------------------------------------ 一排一排地摆：字母排（要的字母 + 混淆的字母）、障碍排（石头、栏杆、金币）
   function spawnRow(z) {
-    const n = S.rowN++, lanes = [0, 1, 2].sort(() => Math.random() - 0.5);
-    if (S.word && S.got < S.word.length && n % 2 === 0) {
-      const want = need(), k = (S.lv.words > 6 || S.hint > 0) ? 2 : 1;   // 新词只放一个混淆的字母
-      S.objs.push({kind: 'letter', z, lane: lanes[0], ch: want, ok: true});
-      const pool = (SIMILAR[want] || '') + S.word.toLowerCase().replace(want, '') + 'aeiourstnl';
-      const used = new Set([want]);
-      for (let i = 1; i <= k; i++) {
-        let ch = '';
-        for (let tries = 0; tries < 12 && (!ch || used.has(ch)); tries++) ch = pool[Math.floor(Math.random() * pool.length)];
-        if (!ch || used.has(ch)) continue;
-        used.add(ch); S.objs.push({kind: 'letter', z, lane: lanes[i], ch, ok: false});
-      }
-      return;
-    }
+    const n = S.rowN++, lanes = shuffled();
+    if (S.word && S.got < S.word.length && n % 2 === 0) { letterRow(z, lanes); return; }
     if (S.mode !== 'play' || n < 2) { S.objs.push({kind: 'coin', z, lane: lanes[0]}); return; }
     if (Math.random() < S.lv.bars) {   // 栏杆：横着一两条道，跳过去
       const w = Math.random() < 0.4 ? 3 : 1;
@@ -136,9 +172,9 @@
     const myLane = Math.round(s.x);
     for (const o of s.objs) {
       if (o.gone || o.z > HIT_Z || o.z < -0.6) continue;
-      if (o.lane !== myLane) { if (o.kind === 'letter' && o.ok && !o.passed && o.z < 0) { o.passed = true; missed(); } continue; }
+      if (o.lane !== myLane) { if (o.kind === 'letter' && o.ch === need() && !o.passed && o.z < 0) { o.passed = true; missed(); } continue; }
       if (o.kind === 'coin') { o.gone = true; s.coins++; Play.sfx.play('coin'); const p = proj(0, s.x); fx.burst(p.x, p.y - 60, {n: 6, colors: ['#ffd23f', '#fff'], speed: 140}); }
-      else if (o.kind === 'letter') { o.gone = true; o.ok ? rightLetter(o) : wrongLetter(o); }
+      else if (o.kind === 'letter') { o.gone = true; eat(o); }
       else if (s.safe <= 0 && s.mode === 'play' && !(o.kind === 'bar' && s.h > 0.35)) { o.gone = true; fall(o); return; }
     }
     s.objs = s.objs.filter(o => !o.gone && o.z > -1.5);
@@ -154,31 +190,6 @@
   function moveLane(d) { const to = Play.clamp(S.lane + d, 0, 2); if (to !== S.lane) { S.lane = to; Play.sfx.play('swing'); } }
   function jump() { if (S.jumpT === 0) { S.jumpT = 0.001; Play.sfx.play('jump'); } }
 
-  function rightLetter(o) {
-    const s = S;
-    s.typed += o.ch; s.got++; s.miss = 0;
-    if (s.reveal < s.got) s.reveal = s.got;
-    Play.sfx.play('coin');
-    const p = proj(0, s.x);
-    fx.burst(p.x, p.y - 70, {n: 12, colors: ['#ffd23f', '#7bdff2', '#fff'], speed: 220});
-    fx.text(p.x, p.y - 110, o.ch.toUpperCase(), {color: '#2fa84f', size: 34});
-    buildWord();
-    if (s.got >= s.word.length) finishWord();
-  }
-  function wrongLetter(o) {
-    const s = S;
-    s.typed += o.ch; s.slip = true; s.slow = 1.1; s.combo = 0;
-    s.reveal = Math.max(s.reveal, s.got + 1);   // 亮出要的那个字母
-    Play.sfx.play('wrong'); fx.shake(5, 0.2); fx.flash('rgba(255,120,120,.35)', 0.15);
-    const p = proj(0, s.x);
-    fx.text(p.x, p.y - 110, `要的是 ${need().toUpperCase()}`, {color: '#e0475b', size: 26});
-    buildWord();
-  }
-  function missed() {   // 要的字母从旁边过去了：再来一次；错过两次就亮出来（这个词算「不会」）
-    const s = S;
-    s.miss++;
-    if (s.miss >= 2 && s.reveal <= s.got) { s.reveal = s.got + 1; s.helped = true; sh.toast(`要找的是 ${need().toUpperCase()}`, 'warn'); buildWord(); }
-  }
   function fall(o) {
     const s = S;
     s.mode = 'fall'; s.fallT = 0; s.falls++; s.combo = 0;

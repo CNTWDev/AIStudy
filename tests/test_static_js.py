@@ -88,3 +88,49 @@ def test_revive_rule_is_one_correct_answer_for_every_game():
         js = f.read_text(encoding="utf-8")
         assert not re.search(r"revive\s*:\s*\{[^}]*\b(need|grow)\s*:", js), f"{f.name} 自己改了复活要答几道题"
         assert "多欠" not in js, f"{f.name} 还在说答错多欠一道"
+
+
+def _runner_spell(word: str, hits: str, ahead: int = 2) -> dict:
+    """把单词跑酷「字母」那段脚本拿出来，用 node 跑：前面先摆好 ahead 排字母（都是摆的那一刻要的字母），
+    再按 hits 一个个撞上去（每撞一个，最近的那排先跑到角色跟前）。返回拼到第几个、撞到的那串、拼完报了没有、跑道上还摆着的一排排字母。"""
+    if not shutil.which("node"):
+        pytest.skip("没有 node")
+    js = (ROOT / "static" / "play" / "runner.js").read_text(encoding="utf-8")
+    seg = js[js.index("// ------------------------------------------------------------ 字母："):js.index("// ------------------------------------------------------------ 一排一排地摆")]
+    sim = """
+const HIT_Z = 0.9, SIMILAR = {}, fx = {burst() {}, text() {}, shake() {}, flash() {}}, Play = {sfx: {play() {}}}, sh = {toast() {}};
+const proj = () => ({x: 0, y: 0}), buildWord = () => {};
+let finished = null;
+const S = {word: %s, got: 0, typed: '', slip: false, miss: 0, reveal: 0, hint: 1, lv: {words: 4}, objs: []};
+function finishWord() { finished = S.typed; }
+""" % json.dumps(word) + seg + """
+for (let i = 0; i < %d; i++) letterRow(10 + i * 17, shuffled());
+for (const ch of %s) {
+  for (const o of S.objs) o.z -= 10;   // 往前跑一段：最近的那排到了跟前
+  eat({kind: 'letter', z: 0, ch});
+  S.objs = S.objs.filter(o => !o.gone);
+}
+console.log(JSON.stringify({got: S.got, typed: S.typed, slip: S.slip, finished, rows: Object.values(S.objs.reduce((m, o) => ((m[o.z] = m[o.z] || []).push(o.ch), m), {}))}));
+""" % (ahead, json.dumps(hits))
+    r = subprocess.run(["node", "-e", sim], capture_output=True, text=True, timeout=30)
+    assert r.returncode == 0, r.stderr
+    return json.loads(r.stdout)
+
+
+def test_runner_letters_in_order():
+    """单词跑酷只认下一个该拼的字母：rabbit 一直撞 R，只有第一个 R 算数，后面的都是撞错。
+    以前对不对是摆出来那一刻定的，前面早摆好的几排全是 R，撞几个都往前拼，拼完还直接报「rabbit」。"""
+    r = _runner_spell("rabbit", "rrrrrr")
+    assert r["got"] == 1 and r["slip"] and r["finished"] is None and r["typed"] == "rrrrrr"
+    # 拼上一个字母，前面已经摆好的那几排换成下一个要的：每排里都有 A
+    r = _runner_spell("rabbit", "r", ahead=3)
+    assert r["got"] == 1 and len(r["rows"]) == 2 and all("a" in row for row in r["rows"])
+    # 按顺序撞（双写的 bb 也是一个一个来）：拼完报的就是撞到的那串
+    r = _runner_spell("rabbit", "rabbit")
+    assert r["got"] == 6 and not r["slip"] and r["finished"] == "rabbit"
+    r = _runner_spell("rabbit", "rab", ahead=4)
+    assert r["rows"] and all("b" in row for row in r["rows"])
+    assert _runner_spell("rabbit", "rabbit", ahead=4)["rows"] == []   # 拼完了：剩下的字母都收走
+    # 撞错一个再撞对：照样往下拼，报上去的那串里有撞错的字母（服务器判没拼对）
+    r = _runner_spell("rabbit", "rabxbit")
+    assert r["finished"] == "rabxbit" and r["slip"]
