@@ -892,9 +892,8 @@ def test_curricula_layers_tracks_and_bridges():
         # 讲解存进题库大家共用；孩子已学的相关内容现场拼在前面
         t = c.get("/api/teach/PHY-IG-1.4-01").json()
         assert t["steps"] and any(b["name"] == catalog.kp("PSH-MECH-14")["name"] for b in t["bridge"])
-        # 英语阅读可以选「别的课学过的」话题
+        # 英语阅读的「别的课学过的」话题：每日短文定话题时的学校来源（app/passage_topics.py）
         assert any(t["kp"]["id"] in ("PSH-MECH-14", "PHY-IG-1.4-01") for t in engine.cross_topics(kid["id"], "en"))
-        assert "课学过的内容" in c.get("/reading").text
 
 
 def test_content_bank():

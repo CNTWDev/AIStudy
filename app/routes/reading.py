@@ -108,8 +108,7 @@ def _reading_page(request: Request, k: dict, lang: str = "en", daily: bool = Fal
     return render(request, "reading_list.html", rows=rows, lang=lang if lang in ("en", "zh") else "en", daily=daily,
                   tasks=tasks, next_task=next((t for t in tasks if not t.get("done")), None),
                   news_days=news.archive(k), books=in_progress(k["id"])[:6], today=db.today().isoformat(),
-                  yesterday=(db.today() - timedelta(days=1)).isoformat(),
-                  cross={l: engine.cross_topics(k["id"], l) for l in ("en", "zh")}, **extra)
+                  yesterday=(db.today() - timedelta(days=1)).isoformat(), **extra)
 
 
 @router.get("/reading", response_class=HTMLResponse)
@@ -155,6 +154,14 @@ def reading_url(request: Request, url: str = Form(...), lang: str = Form("")):
     return RedirectResponse(f"/reading/{rid}", 303)
 
 
+def _quoted(learn, body: str) -> list[dict]:
+    """「这篇值得学的」只留真在正文里的句子（AI 偶尔会改写或编一句）：比的时候不管空格和标点。"""
+    def norm(t):
+        return "".join(ch for ch in (t or "").lower() if ch.isalnum())
+    text = norm(body)
+    return [x for x in learn or [] if isinstance(x, dict) and len(norm(x.get("text"))) >= 4 and norm(x.get("text")) in text][:3]
+
+
 @router.get("/reading/{rid}", response_class=HTMLResponse)
 def reading_view(request: Request, rid: int):
     k = kid_or_redirect(request)
@@ -164,7 +171,10 @@ def reading_view(request: Request, rid: int):
     qs = db.jload(r["questions"], [])
     looked = db.q("SELECT query, result FROM lookups WHERE user_id=? AND reading_id=? ORDER BY id", k["id"], rid)
     answers = db.jload(r["answers"], None) if r["finished_at"] else None
-    return render(request, "reading.html", r=r, paras=[p for p in r["body"].split("\n") if p.strip()],
+    c = db.one("SELECT body FROM contents WHERE id=?", r["content_id"]) if r["source"] == "ai" and r["content_id"] else None
+    extra = db.jload(c["body"], {}) if c else {}
+    return render(request, "reading.html", r=r, learn=_quoted(extra.get("learn"), r["body"]),
+                  think=extra.get("think") or "", paras=[p for p in r["body"].split("\n") if p.strip()],
                   questions=[{"q": q["q"], "options": q.get("options", [])} for q in qs], news=news.reading_extra(r),
                   done_views=[_reading_view(q, (answers or {}).get(str(i))) for i, q in enumerate(qs)] if answers is not None else None,
                   dup=request.query_params.get("dup") == "1", is_today=r["created_at"] >= db.today().isoformat(),
@@ -277,6 +287,17 @@ def reading_finish(request: Request, rid: int, body: dict = Body(...)):
     engine._touch_day(k["id"])  # 在线阅读的时间由页面自动计时
     hit = engine.mark_task_by(k["id"], type="read_" + r["lang"], lang=r["lang"])
     return {"results": results, "flow": engine.flow_state(k["id"], hit[0]) if hit else None}
+
+
+@router.post("/api/reading/{rid}/feel")
+def reading_feel(request: Request, rid: int, body: dict = Body(...)):
+    """读完点「喜欢 / 一般」：喜欢过的领域以后多出现一些（app/passage_topics.py 的兴趣来源）。"""
+    k = kid_or_redirect(request)
+    feel = body.get("feel") if body.get("feel") in ("like", "meh") else ""
+    if not db.one("SELECT id FROM readings WHERE id=? AND user_id=? AND source='ai'", rid, k["id"]):
+        raise HTTPException(404)
+    db.run("UPDATE readings SET feel=? WHERE id=?", feel, rid)
+    return {"feel": feel}
 
 
 @router.get("/ext/me")
