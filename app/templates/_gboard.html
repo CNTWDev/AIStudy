@@ -1,0 +1,11 @@
+{# 这款游戏的榜（app/boards.py 的 live）：本周答对 / 一共答对，先看前 10 名，能展开到前 50 名；我的名次单独一行。
+   游戏页先画一次，之后 play/gboard.js 每几秒拉一次这一段（/arena/<游戏>/board），按 data-id 对上每个人让它跳 #}
+{% for b in (gb.game, gb.game_all) %}
+<div class="gb-tab board{{ ' on' if loop.first }}" data-tab="{{ b.metric }}">
+  {% for r in b.top %}<div class="brow{{ ' me' if r.me }}{{ ' more' if loop.index > 10 }}" data-id="{{ r.id }}" data-rank="{{ r.rank }}" data-v="{{ r.value }}"><span class="bk">{{ ['🥇','🥈','🥉'][r.rank - 1] if r.rank <= 3 else r.rank }}</span><b class="grow">{{ r.name }}{% if r.me %} <small>（我）</small>{% endif %}</b><span class="bv"><b>{{ r.value }}</b> 道</span></div>
+  {% else %}<div class="muted small">{{ '还没有人在这款游戏里答对题，玩一局你就是第 1 名。' if b.joined else '榜上还没有人。' }}</div>{% endfor %}
+  {% if b.top|length > 10 %}<button type="button" class="btn ghost sm" data-more>看前 {{ b.top|length }} 名</button>{% endif %}
+  {% if b.mine and b.mine.rank > b.top|length %}<div class="brow gap">⋯</div><div class="brow me" data-id="{{ b.mine.id }}" data-rank="{{ b.mine.rank }}" data-v="{{ b.mine.value }}"><span class="bk">{{ b.mine.rank }}</span><b class="grow">{{ b.mine.name }} <small>（我）</small></b><span class="bv"><b>{{ b.mine.value }}</b> 道</span></div>{% endif %}
+  <p class="gb-me">{% if b.mine %}我第 {{ b.mine.rank }} 名{% if b.mine.rank == 1 %}，保住它！{% elif b.ahead %}，再答对 {{ b.ahead }} 道超过前面一位{% endif %}{% elif b.on_board %}玩一局答对题就上榜{% else %}隐私模式：不上榜{% endif %}</p>
+</div>
+{% endfor %}

@@ -29,6 +29,7 @@ TOP = 10        # 总榜只列前 10 名（领奖台 + 榜上之星），不列�
 TOP_GAME = 50   # 单款游戏的榜：先看前 10 名，能展开到 50 名
 CITY_MIN = 5
 CACHE_S = 60    # 榜单 1 分钟算一次：玩一局回来就能看到名次变了
+LIVE_S = 3      # 游戏页上那款游戏的榜几秒一算（live：只数这款游戏答对几道，一条 SQL），页面看着时一直在跳
 _cache: dict = {}
 
 # 直辖市、特别行政区：省和市是一个
@@ -133,20 +134,28 @@ def _counts(kid_id: int) -> dict:
     return {**now, "prev": prev}
 
 
+def _roster() -> list[dict]:
+    """上榜的孩子：只显示昵称、角色和城市（缓存 CACHE_S 秒；隐私模式、改昵称时 refresh 马上重来）。"""
+    hit = _cache.get("r")
+    if hit and time.time() - hit[0] < CACHE_S:
+        return hit[1]
+    out = []
+    for u in db.q("SELECT k.*, p.city AS family_city FROM users k JOIN users p ON p.id=k.parent_id "
+                  "WHERE k.role='kid' AND k.status='active' ORDER BY k.id"):
+        u = dict(u)
+        if on_board(u):
+            out.append({"id": u["id"], "name": auth.public_name(u), "avatar": awards.avatar(u), "city": u["family_city"] or ""})
+    _cache["r"] = (time.time(), out)
+    return out
+
+
 def _entries() -> list[dict]:
     """上榜的孩子和他们的数字（缓存 CACHE_S 秒；日期变了马上重算）。"""
     today = db.today().isoformat()
     hit = _cache.get("v")
     if hit and hit[0] == today and time.time() - hit[1] < CACHE_S:
         return hit[2]
-    out = []
-    for u in db.q("SELECT k.*, p.city AS family_city FROM users k JOIN users p ON p.id=k.parent_id "
-                  "WHERE k.role='kid' AND k.status='active' ORDER BY k.id"):
-        u = dict(u)
-        if not on_board(u):
-            continue
-        out.append({"id": u["id"], "name": auth.public_name(u), "avatar": awards.avatar(u), "city": u["family_city"] or "",
-                    **_counts(u["id"])})
+    out = [{**r, **_counts(r["id"])} for r in _roster()]
     _cache["v"] = (today, time.time(), out)
     return out
 
@@ -165,6 +174,17 @@ def _rank(rows: list[dict], key: str, pick=None) -> list[dict]:
             rank, prev = i, val(r)
         out.append({"id": r["id"], "name": r["name"], "avatar": r.get("avatar"), "value": val(r), "rank": rank})
     return out
+
+
+def _standing(kid: dict | None, ranked: list[dict], n: int) -> tuple[list[dict], dict | None, int | None]:
+    """前 n 名（自己那一行标 me）、我的名次、再多少超过前面一位。"""
+    mine = next((r for r in ranked if kid and r["id"] == kid["id"]), None)
+    higher = [r["value"] for r in ranked if mine and r["value"] > mine["value"]]
+    ahead = min(higher) - mine["value"] + 1 if higher else None
+    # 自己那一行用现在的昵称和角色：榜单缓存一分钟，刚改了昵称不能看到上下两个名字
+    mine_now = {"name": auth.public_name(kid), "avatar": awards.avatar(kid)} if kid else {}
+    top = [{**r, "me": True, **mine_now} if kid and r["id"] == kid["id"] else {**r, "me": False} for r in ranked[:n]]
+    return top, mine, ahead
 
 
 def games() -> list[dict]:
@@ -190,11 +210,9 @@ def board(kid: dict | None, metric: str = "streak", scope: str = "all", game: st
     else:
         scope = "all"
     ranked = _rank(rows, key)
-    mine = next((r for r in ranked if kid and r["id"] == kid["id"]), None)
-    ahead = to_top = moved = None
+    top, mine, ahead = _standing(kid, ranked, TOP_GAME if game else TOP)
+    to_top = moved = None
     if mine:
-        higher = [r["value"] for r in ranked if r["value"] > mine["value"]]
-        ahead = min(higher) - mine["value"] + 1 if higher else None
         if mine["rank"] > TOP:
             to_top = ranked[TOP - 1]["value"] - mine["value"] + 1
         if metric not in UP:   # 名次变化：拿上周同一天为止的数字排一次
@@ -208,15 +226,31 @@ def board(kid: dict | None, metric: str = "streak", scope: str = "all", game: st
             {"now": me["week"], "prev": me["prev"]["week"]}) if kid else None
     if week:
         week["left"] = 7 - db.today().weekday()   # 这周还剩几天（连今天）
-    n = TOP_GAME if game else TOP
-    # 自己那一行用现在的昵称和角色：榜单缓存一分钟，刚改了昵称不能看到上下两个名字
-    mine_now = {"name": auth.public_name(kid), "avatar": awards.avatar(kid)} if kid else {}
-    top = [{**r, "me": True, **mine_now} if kid and r["id"] == kid["id"] else {**r, "me": False} for r in ranked[:n]]
     return {"metric": metric, "metrics": METRICS, "unit": UNITS[metric], "scope": scope, "city": city_label(city), "city_ok": city_ok,
             "top": top, "mine": mine, "ahead": ahead, "to_top": to_top, "moved": moved, "week": week, "top_n": TOP,
             "on_board": bool(kid) and on_board(kid), "counts": me, "mine_value": me.get(key, 0) if kid else 0,
             "game": game, "games": games(), "is_game": metric in GAME, "is_up": metric in UP,
             "people": len(ranked), "joined": len(_entries()), "kid": bool(kid), "me_name": auth.public_name(kid) if kid else ""}
+
+
+def live(kid: dict, game: str) -> dict:
+    """游戏页上这款游戏的榜：本周答对、一共答对（arena_game.html，页面看着的时候每几秒拉一次，play/gboard.js 让它跳）。
+    只数这款游戏里答对几道：一条 SQL，每款游戏缓存 LIVE_S 秒，几个孩子同时看也只算一次；谁上榜、叫什么跟 _roster
+    （隐私模式不上、只显示昵称）。和 board() 同样的名次规则，只是不等那 1 分钟的缓存。"""
+    today, hit = db.today().isoformat(), _cache.get(("live", game))
+    if hit and hit[0] == today and time.time() - hit[1] < LIVE_S:
+        rows = hit[2]
+    else:
+        sums = {r["user_id"]: (int(r["w"] or 0), int(r["t"] or 0)) for r in db.q(
+            "SELECT a.user_id, SUM(CASE WHEN substr(a.created_at, 1, 10) >= ? THEN a.correct ELSE 0 END) AS w, SUM(a.correct) AS t "
+            "FROM arena_answers a JOIN arena_matches m ON m.id=a.match_id WHERE m.game=? GROUP BY a.user_id", _monday(), game)}
+        rows = [{**r, "game": sums.get(r["id"], (0, 0))[0], "game_all": sums.get(r["id"], (0, 0))[1]} for r in _roster()]
+        _cache[("live", game)] = (today, time.time(), rows)
+    out = {}
+    for metric in ("game", "game_all"):
+        top, mine, ahead = _standing(kid, _rank(rows, metric), TOP_GAME)
+        out[metric] = {"metric": metric, "top": top, "mine": mine, "ahead": ahead, "on_board": on_board(kid), "joined": len(rows)}
+    return out
 
 
 def nudge(kid: dict, park: bool = False) -> str:
