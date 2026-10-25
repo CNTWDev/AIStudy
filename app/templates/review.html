@@ -47,9 +47,9 @@ function nextBtn(box, res, c, q) {
   Run.hit(!!res.correct);
   if (res.correct) { known++; cheer(box); }
   else if (c.kind !== 'mistake' && c.kind !== 'kp') retry(c, q);  // 生词答错：隔几个再来一次
-  const b = document.createElement('button'); b.className = 'btn'; b.style.marginTop = '12px'; b.textContent = '下一张 →';
-  b.onclick = show;
-  box.appendChild(b); b.focus();
+  // 「下一张」跟别的做题页的「下一题」一样（nextUp）：正中间，孩子做原题答对了自己翻；焦点放上去，写完单词回车就是下一张
+  const nx = nextUp(box, '下一张 →', show, res, {wait: res.passed || res.kept ? 1800 : 0});
+  $('.nextbtn', nx).focus({preventScroll: true});
 }
 function show() {
   const box = $('#flash');
@@ -130,7 +130,7 @@ function showLearn(box, c, q) {
     box.innerHTML = head(c, ' · 新词') + `<div class="face" style="min-height:120px"><div class="lw">${esc(q.word)} ${say1}</div>` +
       (ex ? `<div class="small lx">${hl}</div>` : '') + `<div class="muted small" style="margin-top:6px">新词来了，先猜猜它是什么意思？猜错也没关系。</div></div>` +
       `<div style="text-align:left">${q.guess.map(o => `<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
-    wire(); say(q.word, 'en', 'word');
+    freshGuard(box); wire(); say(q.word, 'en', 'word');
     $$('.opt', box).forEach(b => b.onclick = () => {
       guess = b.dataset.v;
       $$('.opt', box).forEach(x => { x.disabled = true; if (x.dataset.v === q.meaning) x.classList.add('right'); else if (x === b) x.classList.add('wrong'); });
@@ -142,7 +142,8 @@ function showLearn(box, c, q) {
       `<div>${q.pos ? `<span class="muted small">${esc(q.pos)}</span> ` : ''}${esc(q.meaning)}</div>` +
       (ex ? `<div class="small lx" style="margin-top:8px">${hl} <button class="btn ghost sm" data-say="${esc(ex.en)}">🔊</button></div><div class="small muted">${esc(ex.zh)}</div>` : '') +
       `<div class="muted small" style="margin-top:8px">读一读，记一记。过一会儿它会回来找你。</div>` +
-      `</div><button class="btn" id="use" style="margin-top:12px">记下了 →</button>`;
+      `</div>` + acts('<button class="btn" id="use">记下了 →</button>');
+    freshGuard(box);
     wire();
     $('#use', box).onclick = step3;
   }
@@ -169,15 +170,17 @@ function showWord(box, c, q, learn) {
     html += `<div class="muted small">${esc(q.shape)} · ${q.tiles && q.letters ? '用下面的字母拼出来' : '写出这个' + (c.kind === 'term' ? '术语' : '单词')}</div>` +
       `<div class="spell-in">${q.tiles && q.letters ? '' : `<div class="row" style="margin-top:8px"><input type="text" class="ans grow" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="写在这里">${dictate || cloze ? '' : speak}<button class="btn" id="go">提交</button></div>`}</div>`;
   }
-  html += `<div class="row" style="justify-content:center;margin-top:8px">${q.letters && !q.tiles ? '<button class="linkbtn" id="abc">🔤 给我字母</button>' : ''}<button class="linkbtn" id="dk">🤔 想不起来</button></div><div class="fbbox"></div>`;
+  // 「给我字母」「想不起来」是辅助的：跟别的题的「还不会」一样靠右（acts），不在「下一张」那个正中间的位置
+  html += acts('', (q.letters && !q.tiles ? '<button class="linkbtn" id="abc">🔤 给我字母</button>' : '') + '<button class="linkbtn" id="dk">🤔 想不起来</button>') + '<div class="fbbox"></div>';
   box.innerHTML = html;
+  freshGuard(box);
   let usedTiles = false;
   /* 字母块：这个词的字母 + 几个容易混的，每块用一次；点错了退一格（电脑上直接按键盘也行） */
   const tiles = () => {
     usedTiles = true;
     const built = [];
     $('.spell-in', box).innerHTML = `<div class="spell-built"></div><div class="ltiles">${q.letters.map((l, k) => `<button class="ltile" data-k="${k}">${esc(l)}</button>`).join('')}</div>` +
-      `<div class="row" style="justify-content:center;margin-top:8px"><button class="btn ghost" id="back">⌫ 退一格</button><button class="btn" id="go">好了</button></div>`;
+      acts('<button class="btn" id="go">好了</button>', '<button class="linkbtn" id="back">⌫ 退一格</button>');
     const draw = () => { $('.spell-built', box).innerHTML = built.map(k => `<b>${esc(q.letters[k])}</b>`).join('') + '<i></i>'; };
     const put = b => { if (b && !b.disabled) { built.push(+b.dataset.k); b.disabled = true; draw(); } };
     const undo = () => { const k = built.pop(); if (k != null) { $(`.ltile[data-k="${k}"]`, box).disabled = false; draw(); } };
@@ -221,8 +224,9 @@ function showSelf(box, c) {
     `<div class="face">${esc(c.front)}${ex.zh ? `<div class="muted small">${esc(ex.zh)}</div>` : ''}${ex.context ? `<div class="muted small">“${esc(ex.context)}”</div>` : ''}</div>` +
     `<div id="back" style="display:none"><div class="back">${esc(c.back).replace(/\n/g, '<br>')}${ex.example ? `<div class="small">例：${esc(ex.example)}</div>` : ''}${ex.my_answer ? `<div class="small">我当时答：${esc(ex.my_answer)}</div>` : ''}</div>` +
     `<div class="row" style="justify-content:center;margin-top:16px">${c.kind === 'word' || c.kind === 'phrase' ? `<button class="btn ghost" onclick="say(${esc(JSON.stringify(c.front))})">🔊</button>` : ''}<button class="btn warn" data-g="again">忘了</button><button class="btn ghost" data-g="hard">模糊</button><button class="btn" data-g="good">记得</button></div></div>` +
-    `<button class="btn" id="flip" style="margin-top:12px">先想一想，再翻面</button>`;
-  $('#flip').onclick = () => { $('#back').style.display = ''; $('#flip').remove(); };
+    `<div id="flipbar">${acts('<button class="btn" id="flip">先想一想，再翻面</button>')}</div>`;
+  freshGuard(box);
+  $('#flip').onclick = () => { $('#back').style.display = ''; $('#flipbar').remove(); };
   $$('#flash [data-g]').forEach(b => b.onclick = async () => {
     await api('/api/review/' + c.id, {grade: b.dataset.g});
     Run.hit(b.dataset.g === 'good');

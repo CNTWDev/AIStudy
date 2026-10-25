@@ -358,8 +358,12 @@ label:not(.seg *):has(>input[type=checkbox]),label:not(.seg *):has(>input[type=r
 .chrow:has(input[name=done_ch]:checked){background:var(--brand-2)}.chrow.cur{border-color:var(--brand)}
 label.chrow{border-style:dashed}
 .badge.warn{background:var(--warn)}
-.qacts{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}.qacts .submit{min-width:120px}.qacts .dkbtn{margin-left:auto}
-@media (max-width:480px){.qacts .submit{flex:1}}
+/* 做题卡的按钮行（app.js 的 acts，DESIGN 5.54）：主按钮正中间，辅助的靠右；左右两栏一样宽，主按钮永远在正中 */
+.qacts{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-top:14px}
+.qa-main{grid-column:2;display:flex;gap:10px;justify-content:center}.qa-main .btn{min-width:140px}
+.qa-aux{grid-column:3;justify-self:end;display:flex;flex-wrap:wrap;gap:2px 4px;align-items:center;justify-content:flex-end;text-align:right}
+.qa-aux .flagrow{margin:0;justify-content:flex-end}
+@media (max-width:480px){.qacts{grid-template-columns:1fr}.qa-main,.qa-aux{grid-column:1}.qa-main:empty{display:none}.qa-main .btn{flex:1}}
 header.top .me{color:var(--ink);font-weight:600;margin-right:4px}
 @media (max-width:420px){header.top .me .g{display:none}}
 .autosum{background:linear-gradient(135deg,var(--sun-2),color-mix(in srgb,var(--sun-2) 30%,var(--card)));border-radius:14px;padding:12px 14px;line-height:1.7}
@@ -1002,7 +1006,9 @@ body:not([data-skin=kid]) .lacts{flex-direction:row;gap:16px}body:not([data-skin
 .fz-sheet .fs-end{margin-top:8px}
 .fz-back{margin:0 0 10px}
 .fz-on .runbar .rpb{display:none}
-.q.fz-nudge,.fz-nudge .q{outline:3px solid var(--sun,var(--brand));outline-offset:4px;border-radius:12px;transition:outline-color .4s}
+/* 题卡上方留 10px：走神时那圈框（3px 粗 + 3px 外扩）画在空白里，不压住上面的「第 n 题」（2026-10-25） */
+.q.qc{margin-top:10px}
+.q.fz-nudge,.fz-nudge .q{outline:3px solid var(--sun,var(--brand));outline-offset:3px;border-radius:12px;transition:outline-color .4s}
 /* 5.37 孩子登录：这台设备上登录过的孩子点头像、输 4 位数字。小伙伴说话；页面上只有一件事（选人 / 输数字） */
 .kl{max-width:440px;margin:16px auto 0;display:grid;gap:16px}
 .kl-coach{display:flex;align-items:center;gap:10px}

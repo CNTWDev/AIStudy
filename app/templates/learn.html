@@ -292,7 +292,7 @@ function show() {
       }
       // 开头猜过、学完又做对的那句话要看一眼，等久一点再翻
       nextUp(box, idx + 1 < items.length ? '下一题 →' : '看看结果 →', () => { idx++; show(); }, res, {wait: g || res.lit ? 1800 : 0,
-        extra: wrongStreak >= 2 && !res.trace && {{ pre|length }} ? `<a class="btn ghost" href="#" onclick="$('.kp-around').open=true;$('.kp-around').scrollIntoView({behavior:'smooth'});return false">🧱 退一步：先练要用到的基础</a>` : ''});
+        extra: wrongStreak >= 2 && !res.trace && {{ pre|length }} ? `<a class="linkbtn" href="#" onclick="$('.kp-around').open=true;$('.kp-around').scrollIntoView({behavior:'smooth'});return false">🧱 退一步：先练要用到的基础</a>` : ''});
       // 今天第二次卡在这个点（或点了「还不会」）：当场追根，几道小题找出是哪块基础没打牢（app/trace.py）
       if (res.trace) {
         const tb = document.createElement('div'); tb.className = 'hint tracebtn';

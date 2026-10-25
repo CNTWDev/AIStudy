@@ -134,3 +134,37 @@ def test_scripts_read_theme_through_window():
         bare = re.findall(r"(?<![\w.])LOOK\.", js)
         if bare:
             assert re.search(r"const LOOK = window\.LOOK \|\| \{\}", js), f.name
+
+
+def test_new_item_ignores_the_second_click():
+    """连点「下一题」（或自动翻页那一刻刚好点下去）：第二下会落在新题同一个位置的按钮上（选项、「还不会」），
+    等于新题没看就交了。新题换上来后短时间内卡上的按钮不接点击（2026-10-25）。"""
+    js = (ROOT / "static" / "app.js").read_text(encoding="utf-8")
+    card = js[js.index("function renderItem("):js.index("function walkThrough(")]
+    assert "box.innerHTML = html;\n  freshGuard(box);" in card
+    guard = js[js.index("function freshGuard("):js.index("function renderItem(")]
+    assert "'click'" in guard and ", true)" in guard and "stopPropagation" in guard   # 捕获阶段拦，键盘选项的 click 也拦
+    ms = int(re.search(r"const FRESH_MS = (\d+);", js).group(1))
+    assert 400 <= ms <= 800  # 比连点两下的间隔长，又短到正常作答感觉不到
+
+
+def test_one_answer_button_row():
+    """做题卡的按钮行全站一个样子（DESIGN 5.54）：主按钮正中间（.qa-main），辅助的靠右（.qa-aux）。
+    「下一题」在正中、「还不会」在右边，连点两下不会落到新题的「还不会」上。"""
+    js = (ROOT / "static" / "app.js").read_text(encoding="utf-8")
+    card = js[js.index("function renderItem("):js.index("function walkThrough(")]
+    assert "acts(`<button class=\"btn submit\">" in card
+    aux = card[card.index("acts(`<button class=\"btn submit\">"):card.index("<div class=\"hintbox\">")]
+    assert "hintbtn" in aux and "dkbtn" in aux and 'class="linkbtn dkbtn"' in aux
+    nx = js[js.index("function nextUp("):js.index("/* 电脑上手不离键盘")]
+    assert "acts(`<button class=\"btn nextbtn\">" in nx and "flagrow" in nx
+    css = (ROOT / "static" / "app.css").read_text(encoding="utf-8")
+    assert ".qa-main{grid-column:2" in css and ".qa-aux{grid-column:3" in css
+    # 页面不再自己摆「下一题」「下一张」按钮，也不手写 qacts
+    for f in list((ROOT / "templates").rglob("*.html")) + [ROOT / "static" / "app.js"]:
+        src = f.read_text(encoding="utf-8")
+        assert not re.search(r"textContent = '下一(题|张) →'", src), f.name
+        assert src.count('class="qacts"') == (1 if f.name == "app.js" else 0), f.name
+    review = (ROOT / "templates" / "review.html").read_text(encoding="utf-8")
+    assert "nextUp(box, '下一张 →'" in review and review.count("freshGuard(box)") >= 3
+    assert 'justify-content:center;margin-top:8px">${q.letters' not in review   # 「想不起来」不在正中间
