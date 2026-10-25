@@ -9,22 +9,18 @@
     {"id": "npr", "name": "NPR", "url": "https://feeds.npr.org/1001/rss.xml", "license": "copyright", "topics": ["world", "economy"], "cn": false},
     {"id": "aljazeera", "name": "Al Jazeera", "url": "https://www.aljazeera.com/xml/rss/all.xml", "license": "copyright", "topics": ["world"], "cn": true},
     {"id": "cgtn-world", "name": "CGTN", "url": "https://www.cgtn.com/subscribe/rss/section/world.xml", "license": "copyright", "topics": ["world"], "cn": true},
-    {"id": "chinadaily-world", "name": "China Daily", "url": "https://www.chinadaily.com.cn/rss/world_rss.xml", "license": "copyright", "topics": ["world"], "cn": true},
-    {"id": "chinadaily-biz", "name": "China Daily", "url": "https://www.chinadaily.com.cn/rss/bizchina_rss.xml", "license": "copyright", "topics": ["economy"], "cn": true},
     {"id": "conversation", "name": "The Conversation", "url": "https://theconversation.com/global/articles.atom", "license": "cc-by-nd", "topics": ["science", "economy", "society"], "cn": true},
     {"id": "snexplores", "name": "Science News Explores", "url": "https://www.snexplores.org/feed", "license": "copyright", "topics": ["science"], "cn": true},
     {"id": "sciencedaily", "name": "ScienceDaily", "url": "https://www.sciencedaily.com/rss/top/science.xml", "license": "copyright", "topics": ["science"], "cn": true},
     {"id": "nasa", "name": "NASA", "url": "https://www.nasa.gov/news-release/feed/", "license": "pd", "topics": ["space", "science"], "cn": true},
     {"id": "esa", "name": "ESA", "url": "https://www.esa.int/rssfeed/Our_Activities/Space_Science", "license": "copyright", "topics": ["space"], "cn": true},
-    {"id": "voa-le", "name": "VOA Learning English", "url": "https://learningenglish.voanews.com/api/zmg_pebmyp", "license": "pd", "topics": ["world", "science"], "cn": false}
+    {"id": "voa-le", "name": "VOA Learning English", "url": "https://learningenglish.voanews.com/api/zmg_pebmyp", "license": "pd", "topics": ["world", "science"], "cn": false, "off": true, "_off": "2025-03 以后不再更新（2026-10-25 服务器上测过）"}
   ],
-  "_zh_note": "zh_sources：每周中文热点（app/news.py pick_week_zh）。每周一从这些源里给小学、中学各挑 5 件，中文每日短文抽到「新闻」时拿来写「这件事背后的知识或道理」，只用报道里的事实，注明出处。这些地址还没在正式服务器上测过：python -m app.cli news --sources 看哪些通，不通的会自动跳过，可以在 config/news.json 里换。",
+  "_zh_note": "zh_sources：每周中文热点（app/news.py pick_week_zh）。每周一从这些源里给小学、中学各挑 5 件，中文每日短文抽到「新闻」时拿来写「这件事背后的知识或道理」，只用报道里的事实，注明出处。2026-10-25 在正式服务器上测过（python -m app.cli news --sources），列出来的都能连上；人民网科技、科学网的 RSS 连不上，已去掉。",
   "zh_sources": [
     {"id": "chinanews-top", "name": "中国新闻网", "url": "https://www.chinanews.com.cn/rss/importnews.xml", "license": "copyright", "topics": ["society"], "cn": true},
     {"id": "chinanews-culture", "name": "中国新闻网", "url": "https://www.chinanews.com.cn/rss/culture.xml", "license": "copyright", "topics": ["culture"], "cn": true},
     {"id": "chinanews-sports", "name": "中国新闻网", "url": "https://www.chinanews.com.cn/rss/sports.xml", "license": "copyright", "topics": ["sports"], "cn": true},
-    {"id": "people-sci", "name": "人民网科技", "url": "http://scitech.people.com.cn/rss/it.xml", "license": "copyright", "topics": ["science", "tech"], "cn": true},
-    {"id": "sciencenet", "name": "科学网", "url": "https://news.sciencenet.cn/rss.aspx", "license": "copyright", "topics": ["science"], "cn": true},
     {"id": "ifanr", "name": "爱范儿", "url": "https://www.ifanr.com/feed", "license": "copyright", "topics": ["tech"], "cn": true},
     {"id": "bbc-zh", "name": "BBC 中文", "url": "https://feeds.bbci.co.uk/zhongwen/simp/rss.xml", "license": "copyright", "topics": ["world", "science"], "cn": false}
   ],
