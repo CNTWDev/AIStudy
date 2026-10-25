@@ -233,6 +233,7 @@ MOCK = {
                                "answer": 1, "explain": "第一句就说了 seed。"}],
                 "topic": "一颗种子遇到雨水发了芽", "learn": [{"text": "It rained, and the seed began to grow.", "note": "and 连起两件事，前因后果一下就清楚"}],
                 "think": "如果一直不下雨，种子会怎样？"},
+    "passage_check": {"ok": True},
     "context": {"story": "很久以前，人们为了公平地交换东西，需要一个大家都认可的办法。", "question": "怎样才能让每个人量出来的都一样？",
                 "fig": {"kind": "story", "beats": [{"when": "很久以前", "icon": "🦶", "text": "人们用脚和手臂当尺子，各地都不一样"},
                                                     {"when": "1790 年", "icon": "📏", "text": "法国科学家决定造一把大家都认的尺子"},

@@ -8,11 +8,11 @@
 from . import stream
 from .base import ChatRequest, LLMError, Provider, register
 from .service import ask_json, check, enabled, model_of, ping, reload, settings
-from .tasks import PROMPT_VERSION, ask_tutor, book_guide, discuss_close, discuss_turn, explain_sentence, generate_items, kp_context, lookup, make_passage, make_variant, news_pick, news_write, parse_paper, review_open, sentence_feedback, solve_item, teach
+from .tasks import PROMPT_VERSION, ask_tutor, book_guide, check_passage, discuss_close, discuss_turn, explain_sentence, generate_items, kp_context, lookup, make_passage, make_variant, news_pick, news_week_zh, news_write, parse_paper, review_open, sentence_feedback, solve_item, teach
 
 __all__ = [
     "PROMPT_VERSION", "stream",
     "ChatRequest", "LLMError", "Provider", "register", "ask_json", "check", "enabled", "model_of", "ping", "reload", "settings",
-    "ask_tutor", "book_guide", "discuss_close", "discuss_turn", "explain_sentence", "generate_items", "kp_context", "lookup", "make_passage", "make_variant", "news_pick", "news_write", "parse_paper", "review_open", "sentence_feedback",
+    "ask_tutor", "book_guide", "check_passage", "discuss_close", "discuss_turn", "explain_sentence", "generate_items", "kp_context", "lookup", "make_passage", "make_variant", "news_pick", "news_week_zh", "news_write", "parse_paper", "review_open", "sentence_feedback",
     "solve_item", "teach",
 ]

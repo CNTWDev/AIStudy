@@ -112,3 +112,75 @@ def test_liked_domains_come_back_more():
     assert pt.similar("候鸟怎么认路", "雨后的那股味道") < pt.SIMILAR
     assert pt.similar("鸟为什么会飞", "天为什么会黑") < pt.SIMILAR  # 只是句式一样不算重复
     assert pt.similar("Why Rain Smells Good", "The Good Smell After Rain") >= pt.SIMILAR
+
+
+def _only(monkeypatch, source):
+    monkeypatch.setattr(pt, "SOURCES", ((source, 1),))
+
+
+def test_season_and_textbook_sources(monkeypatch):
+    with TestClient(app) as c:
+        uid = _kid(c)
+    monkeypatch.setattr(db, "today", lambda: date(2026, 10, 25))
+    assert [e["name"] for e in pt.season_events(date(2026, 10, 25))] == ["霜降"]
+    assert "中秋节" in [e["name"] for e in pt.season_events(date(2026, 9, 24))]  # 农历节日按每年的公历日期
+    _only(monkeypatch, "season")
+    p = pt.pick(uid, "zh", "G8", rng=random.Random(1))
+    assert p["source"] == "season" and "霜降" in p["angle"] and pt.facty(p)
+
+    from app import schoolyear
+    from app.catalog import catalog
+    zh = next(pid for pid, pk in catalog.packs.items() if pk.lang == "zh" and not pk.standard)
+    db.run("INSERT INTO enrollments(user_id,pack_id,stage,active) VALUES(?,?,?,1)", uid, zh, "G8")
+    monkeypatch.setattr(schoolyear, "estimate", lambda u, e, *a, **kw: {"current": {"name": "第三单元 山水之美", "kps": []}})
+    _only(monkeypatch, "textbook")
+    p = pt.pick(uid, "zh", "G8", rng=random.Random(1))
+    assert p["source"] == "textbook" and "第三单元 山水之美" in p["angle"]
+    assert pt.pick(uid, "en", "G8", rng=random.Random(1))["source"] == "explore"  # 英语课本没选：退回拓展
+
+
+ZH_RSS = """<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>中文</title>
+<item><title>空间站完成新一轮实验</title><link>https://example.cn/a</link><pubDate>{d}</pubDate><description>航天员完成了实验。</description></item>
+<item><title>大熊猫宝宝满月</title><link>https://example.cn/b</link><pubDate>{d}</pubDate><description>熊猫宝宝满月了。</description></item>
+</channel></rss>"""
+
+
+def test_weekly_zh_news_feeds_passages_with_facts_and_check(monkeypatch):
+    from datetime import datetime, timezone
+    from app import news, webpage
+    now = datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S +0000")
+    monkeypatch.setattr(news, "fetch_source", lambda src: (news.parse_feed(ZH_RSS.format(d=now)), "") if src["id"] == "chinanews-top"
+                        else ([], "打不开"))
+    monkeypatch.setattr(webpage, "article", lambda url: {"body": "航天员在空间站里完成了三项材料实验，样品明年返回地面。" * 20})
+    res = news.pick_week_zh(force=True)
+    assert res["zh-secondary"] >= 1 and res["sources"]["chinanews-top"]["ok"]
+    rows = db.q("SELECT * FROM news_picks WHERE band='zh-secondary' AND day=?", news.week_of())
+    assert rows and "材料实验" in rows[0]["facts"]
+    assert news.pick_week_zh()["done"]  # 一周只挑一次
+
+    seen, checked = [], []
+
+    def write(*a, **kw):
+        seen.append(kw)
+        return {"title": "太空里的实验室", "topic": "空间站做实验", "body": f"空间站里有 99 个实验柜。{uuid.uuid4().hex}",
+                "questions": [{"q": "?", "options": ["a", "b"], "answer": 0}], "learn": [], "think": ""}
+
+    def check(body, lang, grade, user_id=None):
+        checked.append(body["title"])
+        return {"ok": False, "problems": ["实验柜数量材料里没有"],
+                "passage": {**body, "body": "空间站里有不少实验柜。" + uuid.uuid4().hex}}
+    monkeypatch.setattr(llm, "make_passage", write)
+    monkeypatch.setattr(llm, "check_passage", check)
+    _only(monkeypatch, "news")
+    with TestClient(app) as c:
+        uid = _kid(c)
+        r = c.post("/reading/new", data={"mode": "ai", "lang": "zh"}, follow_redirects=False)
+        rid = int(r.headers["location"].rsplit("/", 1)[1])
+        p = seen[-1]["pick"]
+        assert p["source"] == "news" and "材料实验" in p["facts"] and p["cite"] == "中国新闻网"
+        assert checked == ["太空里的实验室"]
+        row = db.one("SELECT r.body, c.gen_meta FROM readings r JOIN contents c ON c.id=r.content_id WHERE r.id=?", rid)
+        assert "99 个" not in row["body"] and "不少实验柜" in row["body"] and db.jload(row["gen_meta"])["checked"]["problems"] == ["实验柜数量材料里没有"]
+        assert "根据中国新闻网的报道写成" in c.get(f"/reading/{rid}").text
+        # 英文短文的新闻来源还是每天的英文新闻，不拿中文热点
+        assert all(not (x["source"] == "news" and "空间站" in x["angle"]) for x in [pt.pick(uid, "en", "G8", rng=random.Random(i)) for i in range(3)])

@@ -171,10 +171,11 @@ def reading_view(request: Request, rid: int):
     qs = db.jload(r["questions"], [])
     looked = db.q("SELECT query, result FROM lookups WHERE user_id=? AND reading_id=? ORDER BY id", k["id"], rid)
     answers = db.jload(r["answers"], None) if r["finished_at"] else None
-    c = db.one("SELECT body FROM contents WHERE id=?", r["content_id"]) if r["source"] == "ai" and r["content_id"] else None
+    c = db.one("SELECT body, gen_meta FROM contents WHERE id=?", r["content_id"]) if r["source"] == "ai" and r["content_id"] else None
     extra = db.jload(c["body"], {}) if c else {}
+    pick = (db.jload(c["gen_meta"], {}) if c else {}).get("pick") or {}
     return render(request, "reading.html", r=r, learn=_quoted(extra.get("learn"), r["body"]),
-                  think=extra.get("think") or "", paras=[p for p in r["body"].split("\n") if p.strip()],
+                  think=extra.get("think") or "", cite=pick.get("cite") if pick.get("source") == "news" else "", paras=[p for p in r["body"].split("\n") if p.strip()],
                   questions=[{"q": q["q"], "options": q.get("options", [])} for q in qs], news=news.reading_extra(r),
                   done_views=[_reading_view(q, (answers or {}).get(str(i))) for i, q in enumerate(qs)] if answers is not None else None,
                   dup=request.query_params.get("dup") == "1", is_today=r["created_at"] >= db.today().isoformat(),

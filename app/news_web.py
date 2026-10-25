@@ -65,8 +65,8 @@ def admin_news(request: Request, msg: str = ""):
         rows.append({**p, "subjects": db.jload(p["subjects"], []), "n_alts": len(db.jload(p["alts"], [])),
                      "levels": sorted(written.get(f"news:{p['id']}", [])), "n_read": n_read})
     c = news.cfg()
-    return _main().render(request, "admin_news.html", rows=rows, st=news.status(), sources=c.get("sources", []),
-                          levels=c.get("levels", {}), hour=c.get("hour", 6), bands=news.BANDS, LICENSE=news.LICENSE_LABEL,
+    return _main().render(request, "admin_news.html", rows=rows, st=news.status(), sources=c.get("sources", []) + c.get("zh_sources", []),
+                          levels=c.get("levels", {}), hour=c.get("hour", 6), bands=news.BAND_LABEL, LICENSE=news.LICENSE_LABEL,
                           ai=llm.enabled(), msg=msg)
 
 

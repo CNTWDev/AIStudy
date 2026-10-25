@@ -9,6 +9,7 @@
 {% if news.background %}<div class="hint" style="margin-bottom:10px">🧭 <b>读前了解：</b>{{ news.background }}</div>{% endif %}
 {% if news.glossary %}<details class="card small" style="margin-bottom:10px"><summary>🔑 先看看这 {{ news.glossary|length }} 个关键词（点词看详细解释）</summary>
 <div class="chips">{% for g in news.glossary %}<button type="button" class="chip gl" data-w="{{ g.w }}">{{ g.w }}<span class="sub">{{ g.zh }}</span></button>{% endfor %}</div></details>{% endif %}
+{% elif cite %}<p class="small muted">📰 根据{{ cite }}的报道写成（事实来自报道，文字是写给你的）</p>
 {% elif r.source and r.source.startswith('web:') %}<p class="small muted">来自 <a href="{{ r.source[4:] }}" target="_blank" rel="noopener noreferrer">{{ r.source[4:].split('/')[2] if r.source[4:].count('/') >= 2 else r.source[4:] }}</a>（只供自己学习阅读）</p>{% endif %}
 <p class="muted small" id="lookhint">{{ '👆 点单词就能查。' if simple and r.lang == 'en' else ('👆 选中字词就能查。' if simple else ('点一下不懂的单词就能查。' if r.lang == 'en' else '用手指长按/鼠标选中不懂的字词就能查；点一个句子可以问「这句什么意思」。')) }} 已查 <span id="nlook">{{ looked|length }}</span> 个。</p>
 {% set can_listen = r.lang == 'en' and questions and done_views is none %}

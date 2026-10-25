@@ -266,8 +266,17 @@ def passage(user_id: int, lang: str, grade: str, topic: str, length: str, review
         body = llm.make_passage(lang, grade, topic, length, review_words, user_id=user_id, pick=pick,
                                 avoid=[body.get("title", "")] + avoid)
     meta = gen_meta("passage", length=length, words=review_words[:8])
+    if pick and pt.facty(pick):  # 讲真事的（说明文、人物、新闻、时令……）：写完再核一遍事实，错了就用改好的
+        try:
+            chk = llm.check_passage(body, lang, grade, user_id=user_id)
+        except llm.LLMError:
+            chk = {"ok": True, "skipped": True}
+        fixed = chk.get("passage") if not chk.get("ok") else None
+        if isinstance(fixed, dict) and isinstance(fixed.get("body"), str) and fixed["body"].strip() and isinstance(fixed.get("questions"), list):
+            body = {**body, **fixed}
+        meta["checked"] = {"ok": bool(chk.get("ok")), "problems": [str(x)[:200] for x in chk.get("problems") or []][:5]}
     if pick:
-        meta["pick"] = {k: pick[k] for k in ("source", "domain", "angle", "genre", "exam")}
+        meta["pick"] = {k: pick.get(k, "") for k in ("source", "domain", "angle", "genre", "exam", "cite")}
     cid = save_content("passage", body, "", lang, grade, topic=key, title=body.get("title", ""), meta=meta, created_by=user_id)
     return body, cid
 

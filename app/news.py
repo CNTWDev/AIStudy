@@ -21,7 +21,7 @@ import threading
 import time
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 
 from . import bank, config, db, llm, webpage
@@ -30,6 +30,10 @@ from .catalog import is_adult, stage_rank
 log = logging.getLogger("aistudy.news")
 JOB = "news"
 BANDS = {"secondary": "中学", "primary": "小学"}
+ZH_BANDS = {"zh-secondary": "secondary", "zh-primary": "primary"}  # 每周中文热点（中文短文的新闻来源，app/passage_topics.py）
+BAND_LABEL = {**BANDS, "zh-secondary": "中文热点·中学", "zh-primary": "中文热点·小学"}
+ZH_PER_WEEK = 5
+ZH_FRESH_HOURS = (24 * 7, 24 * 10)
 LICENSE_LABEL = {"pd": "公有领域", "cc-by-nd": "CC BY-ND，可原样转载", "copyright": "版权归原媒体"}
 FREE_LICENSES = ("pd", "cc-by-nd")
 MIN_FACTS = 400       # 事实材料少于这么多字就不用这条（AI 容易编）
@@ -127,10 +131,11 @@ def fetch_source(src: dict) -> tuple[list[dict], str]:
     return items, "" if items else "没读到新闻条目（不是 RSS / Atom，或者是空的）"
 
 
-def collect(now: datetime | None = None) -> tuple[list[dict], dict]:
-    """抓所有新闻源，返回 (候选新闻, 每个源的状态)。"""
+def collect(now: datetime | None = None, sources: list[dict] | None = None,
+            fresh_hours: tuple = FRESH_HOURS) -> tuple[list[dict], dict]:
+    """抓所有新闻源（默认英文的 sources；每周中文热点传 zh_sources），返回 (候选新闻, 每个源的状态)。"""
     now = now or datetime.now(timezone.utc)
-    srcs = [s for s in cfg().get("sources", []) if s.get("url") and not s.get("off")]
+    srcs = [s for s in (cfg().get("sources", []) if sources is None else sources) if s.get("url") and not s.get("off")]
     status, pool = {}, []
     with ThreadPoolExecutor(max_workers=6) as ex:
         for src, (items, err) in zip(srcs, ex.map(fetch_source, srcs)):
@@ -141,7 +146,7 @@ def collect(now: datetime | None = None) -> tuple[list[dict], dict]:
             for it in items[:PER_SOURCE]:
                 pool.append({**it, "source_id": src["id"], "source_name": src["name"],
                              "license": src.get("license", "copyright"), "topics": src.get("topics", [])})
-    for hours in FRESH_HOURS:
+    for hours in fresh_hours:
         cands = [c for c in pool if c["published"] is None or now - c["published"] <= timedelta(hours=hours)]
         if len(cands) >= 10:
             break
@@ -225,6 +230,48 @@ def pick_today(force: bool = False) -> dict:
             res[band] = "AI 选出的新闻都取不到足够的事实材料"
             continue
         res[band] = _save_pick(day, band, _plain(c), facts, alts)
+    return res
+
+
+def week_of(day=None) -> str:
+    d = day or db.today()
+    return (d - timedelta(days=d.weekday())).isoformat()
+
+
+def pick_week_zh(force: bool = False) -> dict:
+    """每周中文热点：从中文新闻、科普源（zh_sources）里给小学、中学各挑 ZH_PER_WEEK 件这一周最值得知道的事，
+    连同事实材料存进 news_picks（band = zh-primary / zh-secondary，第 n 件的 day = 这周的第 n 天）。孩子不直接读它：
+    中文每日短文抽到「新闻」来源时，拿一件来写「这件事背后的知识或道理」，事实只用材料里的。"""
+    week = week_of()
+    if not force and db.one("SELECT id FROM news_picks WHERE day=? AND band LIKE 'zh-%'", week):
+        return {"week": week, "done": True}
+    srcs = cfg().get("zh_sources") or []
+    if not srcs:
+        return {"week": week, "skipped": "没配中文新闻源（content/news.json 的 zh_sources）"}
+    cands, status = collect(sources=srcs, fresh_hours=ZH_FRESH_HOURS)
+    res = {"week": week, "sources": status, "candidates": len(cands)}
+    if not cands:
+        res["error"] = "中文新闻源都没抓到这一周的内容"
+        return res
+    brief = [{"i": i, "source": c["source_name"], "title": c["title"], "summary": c["summary"]} for i, c in enumerate(cands)]
+    ranks = llm.news_week_zh(brief, week, ZH_PER_WEEK)
+    end = (date.fromisoformat(week) + timedelta(days=6)).isoformat()
+    for band, key in ZH_BANDS.items():  # 一天一件：第 n 件记在这周的第 n 天（news_picks 每天每组一条）
+        db.run("DELETE FROM news_picks WHERE band=? AND day>=? AND day<=?", band, week, end)
+        n = 0
+        for x in ranks.get(key) or []:
+            try:
+                c = cands[int(x.get("i"))]
+            except (TypeError, ValueError, IndexError):
+                continue
+            facts = facts_for(c)
+            if facts:
+                day = (date.fromisoformat(week) + timedelta(days=n)).isoformat()
+                _save_pick(day, band, _plain({**c, "why": x.get("why", ""), "topic": x.get("topic", "")}), facts, [])
+                n += 1
+            if n >= ZH_PER_WEEK:
+                break
+        res[band] = n
     return res
 
 
@@ -400,6 +447,14 @@ def run_daily(force: bool = False) -> dict:
             if res.get("done") and last.get("day") == res["day"]:
                 res = {**last, **res}  # 保留上次抓取时各个源的状态
             res["written"] = []
+            zh = last.get("zh_week") or {}
+            if force or zh.get("week") != week_of() or (zh.get("error") and zh.get("tried_at", "") < (now - timedelta(minutes=RETRY_MINUTES)).isoformat()):
+                try:
+                    zh = {**pick_week_zh(force=force), "tried_at": now.isoformat(timespec="seconds")}
+                except llm.LLMError as e:
+                    zh = {"week": week_of(), "error": str(e)[:300], "tried_at": now.isoformat(timespec="seconds")}
+                res["sources"] = {**(res.get("sources") or {}), **zh.pop("sources", {})}
+            res["zh_week"] = zh
             for level in sorted(levels_in_use()):
                 pick = latest_pick(band_of(level))
                 if pick and pick["day"] == db.today().isoformat():
