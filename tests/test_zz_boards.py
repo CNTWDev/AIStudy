@@ -126,6 +126,46 @@ def test_game_board():
         assert "泡泡堂榜" in c.get("/boards?metric=game&game=bubble").text
 
 
+def test_live_game_board():
+    """游戏页上的榜实时跳：只数这款游戏、不等 1 分钟的缓存；隐私模式不上；只要榜那一段，带 data-id 给页面对上每个人。"""
+    with TestClient(app) as c:
+        _, a = _family("la")
+        _, b = _family("lb")
+        _, hid = _family("lh")
+        auth.set_nickname(auth.get_user(b), "追风")
+        auth.set_private(hid, True)
+        monday = boards._monday()
+
+        def play(k, game, n, day=monday):
+            mid = db.insert("INSERT INTO arena_matches(user_id, game, mode, started_at) VALUES(?,?,?,?)", k, game, "team", day + "T08:00:00")
+            for i in range(n):
+                db.run("INSERT INTO arena_answers(user_id, match_id, kp_id, family, level, correct, created_at) VALUES(?,?,?,?,?,?,?)",
+                       k, mid, f"z{i}", "add", 1, 1, day + "T09:00:00")
+
+        play(a, "snake", 9)                 # 别的游戏不算
+        play(b, "snake", 1)
+        play(a, "bubble", 2, "2000-01-03")  # 上周以前：只算一共答对
+        play(hid, "bubble", 30)             # 隐私模式：不上榜
+        boards.refresh()
+        ours = lambda t: [(x["id"], x["value"]) for x in t if x["id"] in (a, b, hid)]   # 前面的测试里也有人玩过泡泡堂
+        r = boards.live(dict(auth.get_user(a)), "bubble")
+        assert ours(r["game"]["top"]) == [] and r["game_all"]["mine"]["value"] == 2
+        play(b, "bubble", 3)
+        boards._cache.pop(("live", "bubble"), None)   # 过了 LIVE_S 秒（1 分钟的榜单缓存不用等）
+        r = boards.live(dict(auth.get_user(a)), "bubble")
+        assert ours(r["game"]["top"]) == [(b, 3)] and r["game"]["mine"] is None
+        assert ours(r["game_all"]["top"]) == [(b, 3), (a, 2)] and r["game_all"]["ahead"] == 2
+        arena.set_game_unlock(a, "free")
+        c.post("/login", data={"email": "bd-la@x.com", "password": "2580"})
+        page = c.get("/arena/bubble").text
+        assert 'data-live="/arena/bubble/board"' in page and "gboard.js" in page
+        part = c.get("/arena/bubble/board")
+        assert part.status_code == 200 and part.headers["cache-control"] == "no-store"
+        assert f'data-id="{b}"' in part.text and "追风" in part.text and "<html" not in part.text
+        assert "再答对 2 道超过前面一位" in part.text
+        assert c.get("/arena/nope/board").status_code == 404
+
+
 def test_empty_board_explains_and_admin_can_view():
     """没人上榜：写明白要家长打开；家长没选孩子、管理员也能看榜。"""
     with TestClient(app) as c:

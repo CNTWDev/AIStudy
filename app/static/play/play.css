@@ -306,6 +306,13 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 .bd-confetti i{position:absolute;top:-12px;width:8px;height:14px;border-radius:2px;animation:bdfall 2.6s cubic-bezier(.3,.6,.5,1) forwards}
 @keyframes bdfall{to{transform:translate(var(--x),105vh) rotate(var(--r));opacity:.9}}
 @media (prefers-reduced-motion:reduce){.bd *{animation:none!important}}
+.gb-tab .brow{position:relative;border-radius:12px}.gb-tab .brow .bk{display:inline-block;backface-visibility:hidden}.gb-tab .bv{position:relative}
+.gb-plus{position:absolute;right:calc(100% + 6px);top:0;font-style:normal;font-weight:900;font-size:13px;color:#e8590c;pointer-events:none;animation:gbplus 1.1s ease-out forwards}
+@keyframes gbplus{from{opacity:0;transform:translateY(4px)}20%{opacity:1}to{opacity:0;transform:translateY(-16px)}}
+.gb-tab .brow.gb-up{animation:gbup 1.4s ease-out}.gb-tab .brow.gb-new{animation:gbnew .6s ease-out}
+@keyframes gbup{0%,30%{background:rgba(255,200,40,.45)}}
+@keyframes gbnew{from{opacity:0;transform:translateX(-12px)}}
+@media (prefers-color-scheme:dark){.gb-plus{color:#ffc94d}}
 .gb-tab .brow.more{display:none}.gb-tab.all .brow.more{display:flex}.gb-tab > .btn{margin:6px auto 4px;display:block}
 .pl-paused{position:fixed;z-index:55;background:rgba(43,35,64,.6)}
 .bd-nick{background:linear-gradient(135deg,#fff1c1,#ffe0ef);color:#3a2a00;animation:sppop .6s cubic-bezier(.2,.9,.3,1.6) both}

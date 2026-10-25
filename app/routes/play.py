@@ -11,6 +11,7 @@ from ..arena import bus, rooms
 from ..web import (
     kid_or_redirect,
     render,
+    templates,
 )
 
 router = APIRouter()
@@ -34,7 +35,17 @@ def arena_game(request: Request, game: str):
     if a["locked"] and not rooms.playing(room):   # 还不能玩：回乐园首页，那里写着为什么、去做任务
         return RedirectResponse("/arena?locked=1", 303)
     return render(request, "arena_game.html", g=g, game=game, a=a, me=rooms.member(k), room=room, back="/words/map" if free else "/arena",
-                  lobby=rooms.lobby(k, game) if g.multi else None, gb=boards.board(dict(k), "game", "all", game), gba=boards.board(dict(k), "game_all", "all", game))
+                  lobby=rooms.lobby(k, game) if g.multi else None, gb=boards.live(dict(k), game))
+
+
+@router.get("/arena/{game}/board", response_class=HTMLResponse)
+def arena_game_board(request: Request, game: str):
+    """游戏页上的榜，页面看着的时候每几秒拉一次（play/gboard.js）：只要榜那一段，不要整页。"""
+    k = kid_or_redirect(request)
+    if game not in arena.GAMES:
+        raise HTTPException(404)
+    return templates.TemplateResponse(request, "_gboard.html", {"gb": boards.live(dict(k), game)},
+                                      headers={"Cache-Control": "no-store"})
 
 
 @router.post("/api/arena/start")
