@@ -159,6 +159,22 @@ function qView(v, num) {
   return wrap.innerHTML;
 }
 
+/* 做题卡的按钮行，全站一个样子（DESIGN 5.54）：主按钮（提交、下一题、看懂了…）永远在正中间，一次只有一个；
+   辅助的（提示、还不会、有问题、退一步…）靠右、小一号的文字按钮。孩子不用每页重新找按钮，
+   上一题的「下一题」（正中间）和新题的「还不会」（右边）也就不会叠在一个位置上 */
+const acts = (main, aux) => `<div class="qacts"><div class="qa-main">${main || ''}</div><div class="qa-aux">${aux || ''}</div></div>`;
+/* 新题刚换上来的 0.6 秒里，卡上的按钮（选项、提交、提示、「还不会」）不接点击：连点「下一题」、或者自动翻页那一刻刚好点下去，
+   第二下会落在新题同一个位置上，等于这道题没看就交了 / 点了「还不会」。键盘选项走的也是 click，一样拦住。
+   0.6 秒比连点两下的间隔长，又短到没人来得及读完题，正常作答感觉不到 */
+const FRESH_MS = 600;
+function freshGuard(box) {
+  box._born = performance.now();
+  if (box._guarded) return;
+  box._guarded = true;
+  box.addEventListener('click', e => {
+    if (performance.now() - box._born < FRESH_MS && e.target.closest && e.target.closest('button, .opt')) { e.preventDefault(); e.stopPropagation(); }
+  }, true);
+}
 /* 题目组件：渲染一道题（不带答案），作答后在同一张卡上显示带答案的版本，再调用 onDone(result) */
 function renderItem(box, item, opts) {
   opts = opts || {};
@@ -176,12 +192,13 @@ function renderItem(box, item, opts) {
     html += `<div class="row" style="margin-top:8px"><input type="text" class="ans grow" placeholder="你的答案" autocomplete="off">` +
       (item.unit ? `<span class="muted">${esc(item.unit)}</span>` : '') + `</div>`;
   }
-  html += `<div class="qacts">` +
-    `<button class="btn submit">${W === 'discuss' ? '说说我的想法' : W === 'self' ? (item.coach ? '提交，看点评' : '看参考答案') : '提交'}</button>` +
-    (item.hint ? `<button class="btn soft hintbtn">💡 提示</button>` : '') +
-    (opts.dontKnow && W !== 'discuss' ? `<button class="linkbtn dkbtn">🤔 ${esc(opts.dkLabel || '这道题还不会')}</button>` : '') + `</div>` +
+  html += acts(`<button class="btn submit">${W === 'discuss' ? '说说我的想法' : W === 'self' ? (item.coach ? '提交，看点评' : '看参考答案') : '提交'}</button>`,
+    (item.hint ? `<button class="linkbtn hintbtn">💡 提示</button>` : '') +
+    (opts.dontKnow && W !== 'discuss' ? `<button class="linkbtn dkbtn">🤔 ${esc(opts.dkLabel || '这道题还不会')}</button>` : '')) +
     `<div class="hintbox"></div><div class="fbbox"></div></div>`;
   box.innerHTML = html;
+  freshGuard(box);
+  const bar = $('.qacts', box);  // 答完（或点了「还不会」）整行拿掉：提交、提示、还不会都用不上了，「下一题」会在下面出来
   box.classList.add('askable'); box.dataset.askItem = item.item_id || item.id || ''; delete box.dataset.answered;
   // 孩子做自动判分的题（选择、填空）：选择题点一下就交；答对了「下一题」自己翻过去（nextUp）。开放题、思辨题照旧慢慢来
   const quick = Juice.who() !== 'adult' && (W === 'choice' || W === 'text') && !opts.confirm;
@@ -220,7 +237,7 @@ function renderItem(box, item, opts) {
       const res = await opts.dontKnow();
       if (!res) return;  // 返回空：页面自己接着走（小测直接下一题），这里不再显示讲解
       $$('.opt', box).forEach(b => b.disabled = true);
-      $$('.submit,.hintbtn,.dkbtn', box).forEach(b => b.remove());
+      bar.remove();
       Combo.hit(false, null, res);  // 「还不会」不算错：连对悄悄归零，不出声
       if (opts.ladder) return walkThrough(box, item, res, opts);
       $('.fbbox', box).innerHTML = feedback(res, {choice: W === 'choice'});
@@ -245,7 +262,7 @@ function renderItem(box, item, opts) {
       if (res.reveal) {
         $('.fbbox', box).innerHTML = `<div class="fb dk">` + qAns({answer: res.answer, points: res.points}).replace('<dt>答案</dt>', '<dt>参考答案</dt>') +
           `<div class="row" style="margin-top:10px"><span>${isSimple() ? '你答到了吗？' : '对照要点，你答到了吗？'}</span><button class="btn sm selfok">基本答到</button><button class="btn ghost sm selfno">还差一些</button></div></div>`;
-        btn.remove();
+        bar.remove();
         const go = async v => {
           const r2 = await opts.submit(answer, v, took());
           $('.selfok', box).closest('.row').remove();
@@ -257,7 +274,7 @@ function renderItem(box, item, opts) {
       }
       if (W === 'choice') $$('.opt', box).forEach(b => { if (b.dataset.i === chosen) b.classList.add(res.correct ? 'right' : 'wrong'); b.disabled = true; });
       $('.fbbox', box).innerHTML = feedback(res, {choice: W === 'choice', mine: W === 'choice' ? '' : answer});
-      btn.remove(); if (dk) dk.remove();
+      bar.remove();
       delete box.dataset.pending;
       Combo.hit(!!res.correct, W === 'choice' ? $(`.opt[data-i="${chosen}"]`, box) : $('.ans', box) || box, res);
       Focus.rt(!!res.correct, took());
@@ -285,7 +302,7 @@ function walkThrough(box, item, res, opts) {
       `<div class="fb-note">${isSimple() ? '📒 记下了，明天换一道新题再来' : '已放进错题本：明天换一道新题来考你，不再做这道原题。'}</div>`;
     if (twinP) {
       const tb = document.createElement('div'); tb.className = 'help3';
-      tb.innerHTML = `<button type="button" class="btn soft">🔁 ${isSimple() ? '试一道一样的' : '趁热试一道一样的'}</button>`;
+      tb.innerHTML = acts(`<button type="button" class="btn soft">🔁 ${isSimple() ? '试一道一样的' : '趁热试一道一样的'}</button>`);
       ctl.appendChild(tb);
       $('button', tb).onclick = async () => {
         $('button', tb).disabled = true;
@@ -306,7 +323,7 @@ function walkThrough(box, item, res, opts) {
   const next = () => {
     ol.insertAdjacentHTML('beforeend', `<li>${esc(steps[i]).replace(/\n/g, '<br>')}</li>`); i++;
     if (i >= steps.length) return end();
-    ctl.innerHTML = `<button type="button" class="btn sm">看懂了，下一步 →</button>`;
+    ctl.innerHTML = acts(`<button type="button" class="btn">看懂了，下一步 →</button>`);
     $('.btn', ctl).onclick = next;
   };
   if (steps.length) next(); else end();
@@ -327,7 +344,7 @@ function coachRound(box, res, opts, took) {
     h += (hit.length ? `<ul class="coach-checks">${hit.map(li).join('')}</ul>` : '') +
       (miss ? `<div class="fb-note">还有 ${miss} 个要点没想到，先别看答案，再想一步。</div>` : '') +
       `<div class="coach-fu"><div class="fb-v">🤔 追问：${esc(res.followup)}</div>` +
-      `<textarea class="ans" placeholder="接着写你的想法"></textarea><div class="qacts"><button class="btn sm fubtn">回答追问</button></div></div></div>`;
+      `<textarea class="ans" placeholder="接着写你的想法"></textarea>${acts('<button class="btn fubtn">回答追问</button>')}</div></div>`;
   }
   $('.fbbox', box).insertAdjacentHTML('beforeend', h);
   if (res.done) { if (res.correct) cheer(box); opts.onDone && opts.onDone(res); return; }
@@ -379,9 +396,9 @@ function discussRound(box, res, opts, took) {
     h = `<div class="fb dk dsc-turn"><div class="small">写下你现在的结论，再看看几种都有道理的看法。</div></div>`;
   }
   h += `<div class="dsc-ctl">` + (res.can_continue ? `<textarea class="ans dsc-more" placeholder="接着说：同意、反驳、补充，或者反问"></textarea>` +
-    `<div class="qacts"><button class="btn sm dsc-go">接着说</button><button class="btn ghost sm dsc-end-btn">我想好了，写结论</button></div>` : '') +
+    acts('<button class="btn dsc-go">接着说</button>', '<button class="linkbtn dsc-end-btn">我想好了，写结论</button>') : '') +
     `<div class="dsc-close" ${res.can_continue ? 'hidden' : ''}><textarea class="ans dsc-c" placeholder="我现在的结论是……"></textarea>` +
-    `<input type="text" class="ans dsc-a" placeholder="${esc(actLabel)}（可以不写）"><div class="qacts"><button class="btn sm dsc-done">写好了</button></div></div></div>`;
+    `<input type="text" class="ans dsc-a" placeholder="${esc(actLabel)}（可以不写）">${acts('<button class="btn dsc-done">写好了</button>')}</div></div>`;
   fb.insertAdjacentHTML('beforeend', h);
   const ctl = fb.lastElementChild;
   const err = e => ctl.insertAdjacentHTML('beforeend', `<div class="err">${esc(e.message)}</div>`);
@@ -761,8 +778,10 @@ const Combo = {
 const AUTO_NEXT_MS = 800;
 function nextUp(box, label, go, res, opts) {
   opts = opts || {};
-  const nx = document.createElement('div'); nx.className = 'row nextrow'; nx.style.marginTop = '10px';
-  nx.innerHTML = `<button class="btn nextbtn">${label}</button>` + (opts.extra || '');
+  const nx = document.createElement('div'); nx.className = 'nextrow';
+  nx.innerHTML = acts(`<button class="btn nextbtn">${label}</button>`, opts.extra);
+  const flag = $$('.flagrow', box).find(f => !f.closest('.qa-aux'));  // 「🚩 这道题有问题？」也是辅助的：跟「下一题」一行，靠右
+  if (flag) $('.qa-aux', nx).appendChild(flag);
   box.appendChild(nx);
   const btn = $('.nextbtn', nx);
   let timer = 0;

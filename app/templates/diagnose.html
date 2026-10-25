@@ -34,10 +34,10 @@ async function next() {
     $('#box').innerHTML = head + '<div id="q"></div>';
     renderItem($('#q'), r.item, {
       submit: (answer, self) => api(`/api/diag/${sid}/answer`, self ? {self: self === 'ok' ? 'know' : 'dont'} : {answer}),
-      // 「不会，跳过」和别的页面的「这道题还不会」一样，放在提交那一行的右边（小测不讲解，直接下一题）
+      // 「不会，跳过」和别的页面的「这道题还不会」一样，放在提交那一行的右边（小测不讲解，直接下一题）；「下一题」在正中间（acts）
       dontKnow: async () => { await api(`/api/diag/${sid}/answer`, {answer: '', self: 'dont'}); next(); },
       dkLabel: '不会，跳过',
-      onDone: () => { const b = document.createElement('button'); b.className = 'btn'; b.style.marginTop = '10px'; b.textContent = '下一题 →'; b.onclick = next; $('#q').appendChild(b); }
+      onDone: () => nextUp($('#q'), '下一题 →', next)
     });
   } else {
     $('#box').innerHTML = head + `<p><b>${esc(r.kp.desc)}</b></p><p class="muted small">自测：${esc(r.kp.probe)}</p>` +
