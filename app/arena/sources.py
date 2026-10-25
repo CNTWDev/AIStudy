@@ -26,7 +26,7 @@ import random
 import re
 from datetime import timedelta
 
-from .. import ability, db, engine, evidence, explore, itemtypes, quickgen
+from .. import ability, db, engine, evidence, explore, itemtypes, quickgen, wordpick
 from .. import words as words_mod
 from ..catalog import catalog, stage_rank
 from ..content import content
@@ -296,16 +296,10 @@ class WordSource(Source):
         wl = rng.choice(g["levels"][lv])
         words = [w for w in wl["words"] if w.get("zh")]
         cards = [c for c in self._my_cards(ctx) if (c["kind"] == "word") == (g["family"] == "words")]
-        due = [c for c in cards if str(c["due"]) <= db.today().isoformat()]
-        if due and rng.random() < 0.4:      # 今天该复习的生词 / 术语卡先出：答了就算复习过
-            c = rng.choice(due)
-            w = {"w": c["front"], "zh": c["back"], "kp": c["kp_id"], "card": c["id"]}
-        elif cards and rng.random() < 0.2:  # 别的生词卡也常拿出来见见
-            c = rng.choice(cards)
-            w = {"w": c["front"], "zh": c["back"], "kp": c["kp_id"]}
-        else:   # 最近几天答对过的词先不出（换别的词，知识面更宽）；整张词表都答对过了才轮回来
-            known = self._known(ctx)
-            w = next((x for x in rng.sample(words, min(len(words), 12)) if x["w"].lower() not in known), None) or rng.choice(words)
+        ctx.get_or("known_recent", lambda: self._known(ctx))
+        # 挑哪个词走统一的出词（app/wordpick.py）：到期的先，过去学过的词轮着来，再是这张词表里最近没答对过的；
+        # 做完一组抓词送的那一局（word_set）只出那一组的词
+        w = wordpick.practice(ctx.kid["id"], rng, words, cards, ctx)
         cloze = None
         if fmt == "cloze":
             w, cloze = self._cloze(ctx, g, wl, words, w, rng)
@@ -628,7 +622,7 @@ def next_item(kid: dict, st: dict, target: float, rng: random.Random, mode: str 
     ctx = Ctx(kid)
     seen = st.setdefault("seen", [])
     run = st.setdefault("run", {})
-    ctx.update(served=set(seen), run=run)
+    ctx.update(served=set(seen), run=run, word_set=st.get("word_set"))
     for _ in range(PICK_TRIES):
         it = pick(kid, target, rng, ctx, mode, ask, shape)
         if key(it) not in seen:

@@ -46,7 +46,7 @@
     const data = JSON.parse(root.dataset.info || '{}');
     const G = data.game, TOTAL = G.total || 0, multi = G.players[1] > 1, me0 = data.me;
     const quizMode = def.quiz || 'modal';
-    const BACK = data.back || '/arena', BACK_TEXT = BACK === '/arena' ? '回乐园' : '回我的词';   // 成人从「我的词」进学单词的游戏
+    const BACK = data.back || '/arena', BACK_TEXT = BACK === '/arena' ? '回乐园' : '回抓词';   // 成人、做完一组送的那一局从「抓词」进学单词的游戏
     const RV = Object.assign({verb: '复活', done: '🎉 复活啦！'}, def.revive);
     const device = deviceId();
     const sh = {root, def, data, canvas: $('canvas'), hud: $('.pl-hud'), ctrl: $('.pl-ctrl'), dock: $('.pl-dock'),
@@ -398,7 +398,8 @@
     async function startLevel(play, resume, joining) {
       if (cur || gone || state === 'take') return;
       Play.sfx.unlock();
-      try { match = await api('/api/arena/start', {game: G.id, session: play.session, resume: resume && resume.match}); }
+      // reward：做完一组抓词送的那一局（只出那一组的词、不算游戏时间），只用一次
+      try { match = await api('/api/arena/start', {game: G.id, session: play.session, resume: resume && resume.match, reward: data.reward || null}); data.reward = 0; }
       catch (e) { sh.toast(e.message, 'warn'); if (net) net.send({t: 'cant', why: e.message}); if (!joining) showRoom(); return; }
       if (play.n && play.stage) known[play.n] = play.stage;
       cur = play; previewN = play.n || 1; state = 'play'; over.hidden = true; endEl.hidden = true;

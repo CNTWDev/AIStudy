@@ -23,18 +23,22 @@ def arena_home(request: Request):
 
 
 @router.get("/arena/{game}", response_class=HTMLResponse)
-def arena_game(request: Request, game: str):
-    """所有游戏一个页面：外壳 shell.js（单机、联网都是它），玩法 <游戏>.js。"""
+def arena_game(request: Request, game: str, reward: int = 0):
+    """所有游戏一个页面：外壳 shell.js（单机、联网都是它），玩法 <游戏>.js。
+    reward：做完一组抓词送的那一局（app/wordpick.py）：只出那一组的词、不算游戏时间，玩完回抓词。"""
+    from .. import wordpick
     k = kid_or_redirect(request)
     if game not in arena.GAMES:
         raise HTTPException(404)
     g, a, room = arena.GAMES[game], arena.hub(k), rooms.my_room(k, game)
-    free = arena.free_for(k, g)   # 成人玩学单词的游戏：不受乐园时长限制，从「我的词」进来，返回也回那里
+    gift = bool(reward) and g.study and wordpick.reward_ok(k["id"], reward)
+    free = arena.free_for(k, g) or gift   # 成人玩学单词的游戏：不受乐园时长限制，从「我的词」进来，返回也回那里
     if free:
         a = {**a, "locked": "", "status": {**a["status"], "unlimited": True}}
     if a["locked"] and not rooms.playing(room):   # 还不能玩：回乐园首页，那里写着为什么、去做任务
         return RedirectResponse("/arena?locked=1", 303)
     return render(request, "arena_game.html", g=g, game=game, a=a, me=rooms.member(k), room=room, back="/words/map" if free else "/arena",
+                  reward=reward if gift else 0,
                   lobby=rooms.lobby(k, game) if g.multi else None, gb=boards.live(dict(k), game))
 
 
@@ -50,7 +54,7 @@ def arena_game_board(request: Request, game: str):
 
 @router.post("/api/arena/start")
 def arena_start(request: Request, body: dict = Body(...)):
-    return arena.start(kid_or_redirect(request), str(body.get("game") or ""), body.get("session"), body.get("resume"))
+    return arena.start(kid_or_redirect(request), str(body.get("game") or ""), body.get("session"), body.get("resume"), body.get("reward"))
 
 
 @router.post("/api/arena/nickname")

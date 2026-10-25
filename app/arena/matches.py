@@ -51,14 +51,18 @@ def ghost(kid_id: int) -> dict | None:
     return None
 
 
-def start(kid: dict, game: str, session=None, resume=None) -> dict:
+def start(kid: dict, game: str, session=None, resume=None, reward=None) -> dict:
     """我自己的一局答题（每个孩子各一局，题按自己的学习情况出，见 sources.pick）。session：房间里正在玩的那一局（sessions.py），对局挂在它下面。
-    resume：刷新、换设备回到这一局时，接着用原来的对局（还开着的话）。"""
+    resume：刷新、换设备回到这一局时，接着用原来的对局（还开着的话）。
+    reward：做完一组抓词送的那一局（word_sets.id，app/wordpick.py）：只出那一组的词，不算乐园的游戏时间（mode='reward'）。"""
+    from .. import wordpick
     g = get(game)
     st = status(kid)
-    if rules.free_for(kid, g):   # 成人玩学单词的游戏：自己安排时间，不受乐园的时长和解锁限制
+    gift = wordpick.take_reward(kid["id"], reward) if reward and g.study and not session else None
+    free = rules.free_for(kid, g) or gift is not None
+    if free:   # 成人玩学单词的游戏、做完一组送的那一局：不受乐园的时长和解锁限制
         st = {**st, "left": rules.UNLIMITED_SECONDS, "unlimited": True}
-    why = "" if rules.free_for(kid, g) else rules.locked_reason(st)
+    why = "" if free else rules.locked_reason(st)
     if why:
         raise ArenaError(why, 403)
     sid = None
@@ -74,8 +78,13 @@ def start(kid: dict, game: str, session=None, resume=None) -> dict:
             return {"match_id": old["id"], "seconds_left": st["left"], "unlimited": st["unlimited"], "avatar": awards.avatar(kid), "ghost": ghost(kid["id"]) if game == "race" else None, "target": g.target}
     for m in db.q("SELECT id, game, started_at FROM arena_matches WHERE user_id=? AND ended_at IS NULL", kid["id"]):
         _close(m["id"], m["started_at"], "quit", {}, GAMES[m["game"]].max_seconds if m["game"] in GAMES else 600)
+    data = {"streak": 0, "fast_wrongs": 0}
+    if gift:
+        data["word_set"] = gift
     mid = db.insert("INSERT INTO arena_matches(user_id, game, mode, started_at, data, session_id) VALUES(?,?,?,?,?,?)",
-                    kid["id"], game, "solo" if not g.multi else "team", db.now(), db.jdump({"streak": 0, "fast_wrongs": 0}), sid)
+                    kid["id"], game, "reward" if gift else "solo" if not g.multi else "team", db.now(), db.jdump(data), sid)
+    if gift:
+        wordpick.bind_reward(kid["id"], reward, mid)
     return {"match_id": mid, "seconds_left": st["left"], "unlimited": st["unlimited"], "avatar": awards.avatar(kid),
             "ghost": ghost(kid["id"]) if game == "race" else None, "target": g.target}
 

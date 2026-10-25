@@ -95,7 +95,7 @@
 
 <div class="card" id="words">
   <div class="card-h"><span class="ico">🔤</span><h3>单词包</h3></div>
-  <p class="muted small">按年级和选的课自动挂好了，一般不用改。每天的新词从标着「每天新词」的包里来：已经会的跳过，同一组里隔着挑（意思挨着的词不在同一天学），先学一遍再进复习。要复习的词欠得多，新词会自动少加。{{ k.name }} 认识的词：<b>{{ wstats.known }}</b> 个。</p>
+  <p class="muted small">按年级和选的课自动挂好了，一般不用改。每天的新词从标着「每天新词」的包里来：已经会的跳过，同一组里隔着挑（意思挨着的词不在同一天学），先学一遍再进复习。要复习的词欠得多，新词会自动少加。孩子想多学，可以在「抓词」里一组一组接着做（每天新词有上限，隔几天还记得的多就自动多学、少就少学）；跟上学校以后，新词一半往后学、一半学课本外的常用词，抓牢的词还会带出它的一家人。{{ k.name }} 认识的词：<b>{{ wstats.known }}</b> 个。</p>
   {% for a in wpacks %}{% set st = wstats.packs|selectattr('id', 'equalto', a.pack.id)|first %}
   <form method="post" action="/parent/kids/{{ k.id }}/tracks" class="wp-row{{ ' off' if not a.on }}">
     <input type="hidden" name="kind" value="words"><input type="hidden" name="ref" value="{{ a.pack.id }}">

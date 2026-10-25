@@ -41,7 +41,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 3, "passage_check": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 3, "passage_check": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1, "word_usage": 1, "word_hooks": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -627,3 +627,45 @@ def word_examples(words: list[dict], band: str, user_id=None) -> dict:
         '输出：{"words":[{"w":"apple","sentences":[{"en":"I ate an [[apple]] after lunch.","zh":"午饭后我吃了一个苹果。"}]}]}'
     )
     return ask_json("word_examples", "你是一位很会写例句的英语老师。", user, user_id=user_id, effort="low", max_tokens=4000)
+
+
+WORD_USE_BAND = {
+    "primary": "小学生：搭配只写最常用的 1～2 个；用法题用最简单的句子；易混词只写真的常混的（形近、音近）",
+    "secondary": "初中生：搭配、句型写 2～3 个（课本和中考常考的）；词形写同一家的名词、动词、形容词、副词",
+    "adult": "成年人：搭配写 3～4 个（工作、生活里真实常用的），标出正式 / 口语；词形写全",
+}
+
+
+def word_usage(words: list[dict], band: str, user_id=None) -> dict:
+    """给一批单词写用法卡（app/words.py：按学段存一份，所有人复用）：搭配、句型、一家人、易混词、用法题、具体名词的图标。"""
+    lines = "\n".join(f"- {w['w']}（{w.get('pos', '')} {w.get('zh', '')}）" for w in words)
+    user = (
+        f"给{WORD_BAND.get(band, WORD_BAND['secondary'])}写单词的用法卡，帮他们不只认得这个词，还会用。{WORD_USE_BAND.get(band, '')}。\n"
+        "每个词写：\n"
+        "1. phrases：常这么用——固定搭配或句型，英文 + 中文，比如 {\"en\":\"decide to do sth\",\"zh\":\"决定做某事\"}。\n"
+        "2. family：同一家的词（词形变化出来的另一个词，比如 decide → decision、decisive），每个给词性和中文意思；没有就空着。\n"
+        "3. confuse：容易和它弄混的词（形近、音近、意思近），给一句怎么分：{\"w\":\"divide\",\"zh\":\"分开\",\"tip\":\"decide 是拿主意，divide 是分开\"}；没有就空着。\n"
+        "4. use：1～2 道用法题，考会不会用（不是考意思）。kind 是 collocation（选搭配：make / do / take ___ a decision）、"
+        "pattern（句型补全：She decided ___ home. 选 to go）或 error（找错词：句子里一个词用错了，选项是句子里的几个词，答案是用错的那个）。"
+        "q 里用 ___ 表示空；options 3～4 个；answer 必须和其中一个选项一字不差；explain 一句中文。\n"
+        "5. icon：如果是一眼能画出来的具体东西（动物、食物、文具、交通工具……），给一个最贴切的 emoji；抽象的词给空字符串。\n"
+        "内容积极，不写考试、成绩、受伤、吓人的事。\n"
+        f"词：\n{lines}\n"
+        '输出：{"words":[{"w":"decide","phrases":[{"en":"decide to do sth","zh":"决定做某事"}],'
+        '"family":[{"w":"decision","pos":"n.","zh":"决定"}],"confuse":[],'
+        '"use":[{"kind":"pattern","q":"We decided ___ the park.","options":["go to","to go to","going to"],"answer":"to go to","explain":"decide to do：决定做某事"}],'
+        '"icon":""}]}'
+    )
+    return ask_json("word_usage", "你是一位很会教词汇用法的英语老师。", user, user_id=user_id, effort="low", max_tokens=6000)
+
+
+def word_hooks(words: list[dict], band: str, user_id=None) -> dict:
+    """反复忘的词：每个写一句记忆钩子（拆词、词根词缀、发音联想、画面），帮孩子记住。"""
+    lines = "\n".join(f"- {w['w']}（{w.get('zh', '')}）" for w in words)
+    user = (
+        f"这些英文单词，{WORD_BAND.get(band, WORD_BAND['secondary'])}已经忘过好几次了。每个词写一句中文的记忆钩子（不超过 40 字）：\n"
+        "优先拆词（sun + flower）、词根词缀（re- 再次）、和学过的词连起来；其次是读音或画面联想。不用谐音梗硬凑，要真的帮人记住拼写和意思。\n"
+        f"词：\n{lines}\n"
+        '输出：{"words":[{"w":"sunflower","hook":"sun 太阳 + flower 花：向着太阳的花"}]}'
+    )
+    return ask_json("word_hooks", "你是一位很会帮学生记单词的英语老师。", user, user_id=user_id, effort="low", max_tokens=2000)

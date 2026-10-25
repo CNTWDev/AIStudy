@@ -1089,6 +1089,19 @@ body:not([data-skin=kid]) .lacts{flex-direction:row;gap:16px}body:not([data-skin
 .wp-lv.lv1{background:#cfe3ff}.wp-lv.lv2{background:#9cc6ff}.wp-lv.lv3{background:#5aa0f5}.wp-lv.lv4{background:#2f7be0}.wp-lv.lv5{background:#1b55b0}
 .wp-legend{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:4px 4px 10px}.wp-legend .wp-lv{margin-right:2px}
 .wm-shelf summary{cursor:pointer;padding:2px 0}.wm-shelf[open] summary{margin-bottom:6px}
+/* 抓词（DESIGN 5.58）：首页一个主按钮「来一组」；一组做完的小结；学习卡上的用法卡 */
+.zc-h{margin:0 0 12px;font-size:1.25em}
+.btn.zc-go{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;max-width:360px;margin:0 auto 14px;min-height:72px;font-size:20px}
+.btn.zc-go small{font-size:13px;font-weight:600;opacity:.85;margin-top:2px}
+.zc-nums{display:flex;flex-wrap:wrap;gap:8px 28px}
+.ws-sum{text-align:left;max-width:520px;margin:0 auto}
+.ws-h{font-weight:800;font-size:1.1em;margin-bottom:8px}
+.ws-line{padding:6px 0;border-top:1px solid var(--line-2);line-height:1.6}.ws-line:first-of-type{border-top:0}
+.ws-n{margin:12px 0 4px;font-size:1.05em}.ws-n b{color:var(--brand);font-size:1.3em}
+.wu{text-align:left;margin-top:10px;display:grid;gap:8px}
+.wu-b{font-size:14px;line-height:1.6}.wu-b>b{display:block;font-size:13px;color:var(--muted)}
+.wu-hook{color:var(--brand)}
+.wu-icon{font-size:3em;line-height:1.1;margin:6px 0}
 /* 迭代日记（管理后台 /admin/diary，app/diary.py）：像翻一本本子——时间线一行一篇，读的时候宽度收窄、行距放大、段间留白 */
 .diary-month{margin:18px 0 6px;font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.05em}
 .diary-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);overflow:hidden}

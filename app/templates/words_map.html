@@ -1,14 +1,24 @@
 {% extends "base.html" %}
 {# 单词（app/words.py，DESIGN 5.41/5.42）：认识的词只增不减；今天的新词；我的单词包一组一组抓牢了几个；单词包书架。说状态，不打分（DESIGN 5.22）。 #}
 {% block body %}
-<div class="card hero wm-hero">
-  <div class="wm-n"><b>{{ st.known }}</b><span>个我认识的词</span></div>
-  <p class="small for-grownups">答对过一次就算认识，这个数只会越来越多。隔天还想得起来的词，算抓牢了。</p>
-  {% if st.wobbly %}<p class="small muted">还没抓牢、明天还会来找你的：{{ st.wobbly|join('、') }}</p>{% endif %}
-  {% if due %}<a href="/review?group=words" class="btn nw">今天的单词 {{ due }} 个</a>{% endif %}
+{# 抓词（app/wordpick.py，DESIGN 5.58）：全页只有一个主按钮「来一组」；一组 8 个词左右，做完可以再来一组，送一局跑酷。 #}
+<div class="card hero wm-hero zc-hero">
+  <h1 class="zc-h">🔤 抓词</h1>
+  {% if can_play %}
+  <a href="/words/go" class="btn lg zc-go">{{ '再来一组' if home.sets else '来一组' }}<small>{{ set_size }} 个词 · 大约 5 分钟</small></a>
+  {% endif %}
+  <div class="zc-nums">
+    <div class="wm-n"><b>{{ st.known }}</b><span>个我认识的词</span></div>
+    <div class="wm-n"><b>{{ home.caught }}</b><span>个抓牢了</span></div>
+  </div>
+  <p class="small">{% if home.new_today or home.sets %}今天：新词 {{ home.new_today }} 个{% if home.sets %}，做了 {{ home.sets }} 组{% endif %}。{% endif %}
+    {% if due %}还有 {{ due }} 个词在等你。{% elif not home.room %}今天的新词够啦，明天学的会记得更牢。{% endif %}</p>
+  <p class="small for-grownups">答对过一次就算认识，这个数只会越来越多。隔天还想得起来的词，算抓牢了。每天最多学 {{ home.cap }} 个新词：隔几天还记得的多，就多学；记得的少，就少学、多复习。</p>
+  {% if st.wobbly %}<p class="small muted">还没抓牢、一会儿还会来找你的：{{ st.wobbly|join('、') }}</p>{% endif %}
 </div>
-{% if can_play %}{# 单词跑酷（app/arena/games/runner.py）：词按我会到哪一级来出；成人不占游戏时间，从这里进 #}
-<a href="/arena/runner" class="card wm-play row"><span class="wm-play-i">🏃</span><span class="grow"><b>单词跑酷</b><br><span class="small muted for-grownups">换道、跳过栏杆，撞上对的字母把词拼出来。词按你会到哪一级来出，越熟提示越少。</span></span><span class="btn">去跑</span></a>
+{% if can_play %}{# 单词跑酷（app/arena/games/runner.py）：词按我会到哪一级来出。孩子做完一组送一局（不算游戏时间）；成人不占游戏时间，从这里进 #}
+{% if home.free %}<a href="/arena/runner" class="card wm-play row"><span class="wm-play-i">🏃</span><span class="grow"><b>单词跑酷</b><br><span class="small muted for-grownups">换道、跳过栏杆，撞上对的字母把词拼出来。词按你会到哪一级来出，越熟提示越少。</span></span><span class="btn soft">去跑</span></a>
+{% else %}<div class="card wm-play row"><span class="wm-play-i">🏃</span><span class="grow"><b>单词跑酷</b><br><span class="small muted">做完一组，就用这组词跑一局（不算游戏时间，每天送 3 局）</span></span></div>{% endif %}
 {% endif %}
 {% if msg %}<div class="card flash-msg">{{ msg }}</div>{% endif %}
 <h2 class="wm-h">我的单词包</h2>
