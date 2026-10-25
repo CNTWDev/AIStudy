@@ -28,28 +28,11 @@
   <div class="pl-ctrl"></div>
   <div class="pl-dock" hidden></div>
 </div>
-{# 这款游戏的榜（app/boards.py）：本周答对 / 一共答对，先看前 10 名，能展开到前 50 名；我的名次单独一行 #}
-{% macro gtab(b, on) %}
-<div class="gb-tab board{{ ' on' if on }}" data-tab="{{ b.metric }}">
-  {% for r in b.top %}<div class="brow{{ ' me' if r.me }}{{ ' more' if loop.index > 10 }}"><span class="bk">{{ ['🥇','🥈','🥉'][r.rank - 1] if r.rank <= 3 else r.rank }}</span><b class="grow">{{ r.name }}{% if r.me %} <small>（我）</small>{% endif %}</b><span class="bv">{{ r.value }} 道</span></div>
-  {% else %}<div class="muted small">{{ '还没有人在这款游戏里答对题，玩一局你就是第 1 名。' if b.joined else '榜上还没有人。' }}</div>{% endfor %}
-  {% if b.top|length > 10 %}<button type="button" class="btn ghost sm" data-more>看前 {{ b.top|length }} 名</button>{% endif %}
-  {% if b.mine and b.mine.rank > b.top|length %}<div class="brow gap">⋯</div><div class="brow me"><span class="bk">{{ b.mine.rank }}</span><b class="grow">{{ b.mine.name }} <small>（我）</small></b><span class="bv">{{ b.mine.value }} 道</span></div>{% endif %}
-  <p class="gb-me">{% if b.mine %}我第 {{ b.mine.rank }} 名{% if b.mine.rank == 1 %}，保住它！{% elif b.ahead %}，再答对 {{ b.ahead }} 道超过前面一位{% endif %}{% elif b.on_board %}玩一局答对题就上榜{% else %}隐私模式：不上榜{% endif %}</p>
-</div>
-{% endmacro %}
-<div class="gboard" id="gboard">
+<div class="gboard" id="gboard" data-live="/arena/{{ game }}/board">
   <div class="gb-h"><b>🏆 {{ g.name }}榜</b><span class="gb-tabs"><button type="button" class="on" data-show="game">本周答对</button><button type="button" data-show="game_all">一共答对</button></span></div>
-  {{ gtab(gb, true) }}{{ gtab(gba, false) }}
+  {% include "_gboard.html" %}
 </div>
-<script>
-document.getElementById('gboard').addEventListener('click', e => {
-  const t = e.target.closest('[data-show]'), m = e.target.closest('[data-more]');
-  if (t) { for (const x of document.querySelectorAll('#gboard [data-show]')) x.classList.toggle('on', x === t);
-           for (const x of document.querySelectorAll('#gboard .gb-tab')) x.classList.toggle('on', x.dataset.tab === t.dataset.show); }
-  if (m) { m.closest('.gb-tab').classList.add('all'); m.remove(); }
-});
-</script>
+<script src="/static/play/gboard.js?v={{ ASSET_V }}"></script>
 {# 脚本出错、开局面板还空着：在面板上说出来（别只剩一个空框），能刷新，也知道是哪里坏了 #}
 <script>
 addEventListener('error', e => {
