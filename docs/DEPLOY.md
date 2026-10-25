@@ -122,6 +122,8 @@ sudo /opt/aistudy/install.sh check --llm     # --llm 会真实调用一次 AI，
 **试卷拍照解析**要用能看图片的模型：Claude 可以直接用；用 DeepSeek 时给 `[tasks.paper]` 单独指定通义千问的视觉模型（`qwen-vl-max`，见 `config/llm.toml` 底部注释），或者导入时粘贴文字。
 试卷照片存在 `/opt/aistudy/data/papers/`；`install.sh backup` 只备份数据库，照片如需保留请一并拷贝。
 
+**日记的钥匙**：孩子日记（DESIGN 5.57）加密存放，钥匙在 `/opt/aistudy/data/secrets/daybook.key`（第一次有人记日记时生成），录音在 `/opt/aistudy/data/daybook/`。钥匙丢了日记就打不开了：备份数据库时把这两个也拷走。
+
 ## 5. 升级
 
 ```bash

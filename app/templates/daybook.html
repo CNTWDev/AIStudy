@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% import "_daybook.html" as d with context %}
+{% block body %}
+{% set p = page or {'day': today, 'mood': None, 'notes': [], 'city': '', 'sky': None, 'shared': False} %}
+<div class="db-cover cv-{{ cover.id }}">
+  <span class="db-ci">{{ cover.icon }}</span>
+  <div class="grow"><h1>我的日记</h1><div class="db-sub">{{ cover.name }} · 一共记了 <b>{{ book.days }}</b> 天</div></div>
+  <span class="db-lock" title="只有你看得到">🔒</span>
+</div>
+
+<div class="card db-page" id="today">
+  <div class="db-h"><b>{{ label }}</b>
+    <span id="dbplace">{{ d.place(p if p.city else {'city': home, 'sky': p.sky}) }}</span>
+    <button type="button" class="linkbtn" id="away">{{ '换个城市' if p.city and p.city != home else '我今天不在家' }}</button></div>
+  <div class="db-cityform" hidden><input type="text" id="cityin" maxlength="12" placeholder="今天在哪个城市？" aria-label="城市">
+    <button type="button" class="btn soft sm" id="citysave">好了</button><button type="button" class="btn ghost sm" id="locate">📍 定位一下</button></div>
+
+  <div class="db-q">{{ '今天心情怎么样？点一下就算记了' if not p.mood else '今天的心情' }}</div>
+  <div class="db-moods">{% for k, e, n in moods %}<button type="button" data-m="{{ k }}" class="{{ 'sel' if p.mood and p.mood.id == k }}" aria-label="{{ n }}"><span>{{ e }}</span><small>{{ n }}</small></button>{% endfor %}</div>
+
+  {% if p.notes %}<div class="db-notes">{{ d.notes(p, '/daybook/voice/', True) }}</div>{% endif %}
+
+  <div class="db-write">
+    <textarea id="note" rows="3" maxlength="2000" placeholder="{{ prompt }}" aria-label="想写点什么"></textarea>
+    <div class="db-acts">
+      <button type="button" class="btn ghost" id="rec" hidden>🎙️ 录一段话</button>
+      <button type="button" class="btn" id="save">记下来</button>
+    </div>
+    <p class="tiny faint db-tip">写一个字、一句话都行。懒得打字？点手机键盘上的 🎤 说出来，它会帮你变成字。</p>
+  </div>
+  {{ d.share(p, has_parent) }}
+</div>
+
+{% if low %}<div class="note-bar db-low">🫂 这几天好像不太开心。不开心也没关系，写下来会好一点。{% if has_parent %}想让爸爸妈妈知道的话，可以点上面的「给爸爸妈妈看这一天」。{% endif %}</div>{% endif %}
+
+{% if back %}
+<a class="card db-back" href="/daybook/day/{{ back.day }}">
+  <div class="db-h"><b>📖 {{ back.ago }}</b>{{ d.place(back) }}</div>
+  <div class="db-bk">{% if back.mood %}<span class="db-bm">{{ back.mood.emoji }}</span>{% endif %}
+    <span>{% set first = back.notes|selectattr('text')|first %}{% if first %}{{ first.text[:80] }}{{ '…' if first.text|length > 80 }}{% elif back.notes %}🎙️ 那天你说了一段话{% else %}那天你选了「{{ back.mood.name }}」{% endif %}</span></div>
+</a>
+{% endif %}
+
+<div class="card db-cal">
+  <div class="db-h"><a class="linkbtn" href="/daybook?m={{ cal.prev }}" aria-label="上个月">‹</a><b class="grow" style="text-align:center">{{ cal.title }} · 记了 {{ cal.n }} 天</b>{% if cal.next %}<a class="linkbtn" href="/daybook?m={{ cal.next }}" aria-label="下个月">›</a>{% else %}<span class="linkbtn" style="visibility:hidden">›</span>{% endif %}</div>
+  <div class="db-grid">{% for w in '一二三四五六日' %}<i class="wd">{{ w }}</i>{% endfor %}
+    {% for c in cal.cells %}{% if c is none %}<i></i>{% elif c.has %}<a href="/daybook/day/{{ c.day }}" class="has {{ 'td' if c.today }}"><span>{{ c.mood.emoji if c.mood else '✏️' }}</span><small>{{ c.n }}</small></a>{% else %}<i class="{{ 'td' if c.today }} {{ 'fu' if c.future }}"><small>{{ c.n }}</small></i>{% endif %}{% endfor %}</div>
+</div>
+
+<div class="card db-book">
+  <div class="db-h"><b>📔 我的本子</b>{% if book.next %}<span class="muted small">再记 {{ book.to_next }} 天解锁{{ book.next.name }}</span>{% endif %}</div>
+  <div class="db-covers">{% for c in book.covers %}<button type="button" class="cv cv-{{ c.id }} {{ 'lock' if not c.open }} {{ 'cur' if c.id == cover.id }}" data-c="{{ c.id }}" {{ 'disabled' if not c.open }} title="{{ c.name }}{% if not c.open %} · 记满 {{ c.days }} 天解锁{% endif %}"><span>{{ c.icon if c.open else '🔒' }}</span><small>{{ c.name if c.open else c.days ~ ' 天' }}</small></button>{% endfor %}</div>
+  <div class="db-q" style="margin-top:12px">邮戳 <span class="muted small">遇到新的天气、去了新的城市，记一笔就盖一个</span></div>
+  <div class="db-stamps">{% for s in book.stamps %}<span class="stamp" title="第一次：{{ s.first }}"><b>{{ s.icon }}</b><small>{{ s.name }}</small></span>{% endfor %}
+    {% for s in book.sky_left %}<span class="stamp lock" title="还没遇到"><b>{{ s.icon }}</b><small>{{ s.name }}</small></span>{% endfor %}</div>
+</div>
+
+{{ d.promise(HOTLINE, has_parent) }}
+
+<script>
+const DB = {day: {{ today|tojson }}, home: {{ home|tojson }}};
+function dbAfter(r, msg) {
+  const n = r.new || {}, lines = [];
+  if (n.first_today) lines.push('记下啦 +1 ⭐');
+  if (n.cover) lines.push(`解锁了${n.cover.icon} ${n.cover.name}`);
+  (n.stamps || []).forEach(s => lines.push(`收到一枚 ${s.icon} ${s.name}`));
+  try { sessionStorage.setItem('dbMsg', JSON.stringify({text: lines.length ? lines.join(' · ') : msg, big: !!(n.cover || (n.stamps || []).length)})); } catch (e) {}
+  location.reload();
+}
+(function () {
+  let m = null; try { m = JSON.parse(sessionStorage.getItem('dbMsg') || 'null'); sessionStorage.removeItem('dbMsg'); } catch (e) {}
+  if (m && m.text) { toast(m.text, m.big ? 4000 : 2200); if (m.big) confetti(); }
+})();
+$$('.db-moods button').forEach(b => b.onclick = async () => {
+  try { dbAfter(await api('/api/daybook/mood', {mood: b.dataset.m}), '心情换好了'); } catch (e) { toast(e.message); }
+});
+$('#save').onclick = async () => {
+  const t = $('#note').value.trim();
+  if (!t) { $('#note').focus(); return; }
+  try { dbAfter(await api('/api/daybook/note', {text: t}), '记下来了'); } catch (e) { toast(e.message); }
+};
+$$('.db-del').forEach(b => b.onclick = async () => {
+  const n = b.closest('.db-note');
+  if (!confirm('删掉这一段？删了就找不回来了')) return;
+  try { await api('/api/daybook/delete', {day: n.dataset.day, id: n.dataset.id}); n.remove(); } catch (e) { toast(e.message); }
+});
+$$('.db-share').forEach(b => b.onclick = async () => {
+  const on = b.dataset.on !== '1';
+  if (on && !confirm('给爸爸妈妈看这一天写的？以后随时可以收回。')) return;
+  try { await api('/api/daybook/share', {day: b.dataset.day, on}); dbAfter({}, on ? '爸爸妈妈能看这一天了' : '收回了，只有你看得到'); } catch (e) { toast(e.message); }
+});
+$$('.db-covers button:not([disabled])').forEach(b => b.onclick = async () => {
+  try { await api('/api/daybook/cover', {cover: b.dataset.c}); dbAfter({}, '换好封面了'); } catch (e) { toast(e.message); }
+});
+$('#away').onclick = () => { const f = $('.db-cityform'); f.hidden = !f.hidden; if (!f.hidden) $('#cityin').focus(); };
+async function setCity(body) {
+  try { dbAfter(await api('/api/daybook/city', body), '今天在' + (body.city || '这里')); } catch (e) { toast(e.message); }
+}
+$('#citysave').onclick = () => { const c = $('#cityin').value.trim(); if (c) setCity({city: c}); };
+$('#locate').onclick = () => {
+  if (!navigator.geolocation) { toast('这台设备定不了位，写一下城市名吧'); return; }
+  // 位置只用来认出是哪个城市：服务器换成城市名以后就丢掉，不存
+  navigator.geolocation.getCurrentPosition(p => setCity({lat: p.coords.latitude, lon: p.coords.longitude}),
+    () => toast('没拿到位置，写一下城市名吧'), {timeout: 10000, maximumAge: 600000, enableHighAccuracy: false});
+};
+// 天气：页面先出来，再去查（查不到就不显示）
+if (!$('#dbplace .db-place') || !/°/.test($('#dbplace').textContent)) api('/api/daybook/sky').then(r => {
+  if (r.sky) $('#dbplace').innerHTML = `<span class="db-place">${r.city ? '📍 ' + esc(r.city) : ''} · ${r.sky.icon} ${esc(r.sky.word)} ${r.sky.lo}~${r.sky.hi}°</span>`;
+}).catch(() => {});
+// 录一段话：原声存起来（加密），以后回看能听到自己当时的声音
+(function () {
+  if (!window.MediaRecorder || !navigator.mediaDevices) return;
+  const btn = $('#rec'); btn.hidden = false;
+  let rec = null, chunks = [], t0 = 0, timer = null;
+  const type = ['audio/webm', 'audio/mp4', 'audio/ogg'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
+  btn.onclick = async () => {
+    if (rec && rec.state === 'recording') { rec.stop(); return; }
+    let stream;
+    try { stream = await navigator.mediaDevices.getUserMedia({audio: true}); } catch (e) { toast('没打开话筒。也可以点键盘上的 🎤 说成字'); return; }
+    chunks = []; rec = new MediaRecorder(stream, type ? {mimeType: type} : undefined);
+    rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+    rec.onstop = async () => {
+      clearInterval(timer); stream.getTracks().forEach(t => t.stop());
+      const secs = Math.round((Date.now() - t0) / 1000);
+      btn.textContent = '🎙️ 录一段话'; btn.classList.remove('rec');
+      if (secs < 1) return;
+      const blob = new Blob(chunks, {type: (rec.mimeType || type || 'audio/webm').split(';')[0]});
+      const fd = new FormData(); fd.append('file', blob, 'voice'); fd.append('secs', secs);
+      btn.disabled = true;
+      try {
+        const r = await fetch('/api/daybook/voice', {method: 'POST', body: fd});
+        const j = await r.json(); if (!r.ok) throw new Error(j.error || '没存上');
+        dbAfter(j, '录好了');
+      } catch (e) { toast(e.message); btn.disabled = false; }
+    };
+    rec.start(); t0 = Date.now(); btn.classList.add('rec');
+    const tick = () => { const s = Math.round((Date.now() - t0) / 1000); btn.textContent = `⏹ 停 · ${s} 秒`; if (s >= 60) rec.stop(); };
+    tick(); timer = setInterval(tick, 500);
+  };
+})();
+</script>
+{% endblock %}

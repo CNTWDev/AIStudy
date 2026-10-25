@@ -511,7 +511,7 @@ const Flow = {
       <div class="fs-prog"><span>今天 ${st.done}/${st.total}</span><i><b style="width:${Math.round(100 * st.done / st.total)}%"></b></i></div>
       ${nx ? `<a class="fs-next" href="${esc(nx.url)}"><span class="fs-k">下一项 · 第 ${nx.n} 项${nx.minutes ? ' · 约 ' + nx.minutes + ' 分钟' : ''}</span><b>${esc(nx.title)}</b>${nx.why && !isSimple() ? `<span class="fs-why">${esc(nx.why)}</span>` : ''}<span class="btn lg block fs-go">继续 →</span></a>`
         : `<div class="fs-end"><a class="btn lg" href="/sprint">⚡ 还想做？来冲刺</a><a class="btn soft lg" href="/arena">🎮 去乐园</a></div>`}
-      <div class="fs-alt">${sec && nx ? '<button type="button" class="linkbtn fs-rest">☕ 休息 3 分钟</button>' : ''}<a class="linkbtn" href="/today${st.all_done ? '#daylog' : ''}">${st.all_done ? '📝 写一句一日记录' : '回到今天'}</a></div></div>`;
+      <div class="fs-alt">${sec && nx ? '<button type="button" class="linkbtn fs-rest">☕ 休息 3 分钟</button>' : ''}<a class="linkbtn" href="/today${st.all_done ? '#daylog' : ''}">${st.all_done ? '📝 写一句一日记录' : '回到今天'}</a>${st.all_done && st.diary === false ? '<a class="linkbtn" href="/daybook">📔 记两句日记</a>' : ''}</div></div>`;
     document.body.appendChild(m);
     const go = $('.fs-next', m); if (go) setTimeout(() => go.focus(), 50);
     const mile = st.grow && st.grow.milestones.length;
@@ -1001,7 +1001,7 @@ const SelMenu = {
 };
 document.addEventListener('DOMContentLoaded', () => {
   const b = $('#qlbtn'); if (b) b.onclick = e => { e.preventDefault(); QuickLook.open(); };
-  if (!document.body.dataset.kid) return;  // 只有孩子账号在学习状态下才有划词菜单
+  if (!document.body.dataset.kid || document.body.dataset.private) return;  // 只有孩子账号在学习状态下才有划词菜单；日记页没有（小助手不读日记）
   let t = null;
   const later = () => { clearTimeout(t); t = setTimeout(SelMenu.show, 250); };
   document.addEventListener('mouseup', later);
@@ -1394,7 +1394,7 @@ function seekIn(el, waited) { if (waited && el) { el.classList.remove('seek-in')
 const Beat = {
   acc: 0, last: Date.now(), tick: Date.now(),
   init() {
-    if (!document.body.dataset.kid) return;
+    if (!document.body.dataset.kid || document.body.dataset.private) return;   // 写日记不算学习时长
     ['pointerdown', 'keydown', 'scroll', 'touchstart', 'wheel', 'input'].forEach(e => addEventListener(e, () => { Beat.last = Date.now(); }, {passive: true, capture: true}));
     document.addEventListener('visibilitychange', () => { Beat.tick = Date.now(); if (document.hidden) Beat.send(true); else Beat.last = Date.now(); });
     addEventListener('pagehide', () => Beat.send(true));

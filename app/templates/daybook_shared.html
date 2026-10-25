@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% import "_daybook.html" as d with context %}
+{% block body %}
+<a href="/parent" class="small">← 家长页</a>
+<h1>{{ k.name }}给你看的日记</h1>
+<p class="muted small">日记是 {{ k.name }} 自己的本子，家长页看不到内容。这里只有 TA 自己点了「给爸爸妈妈看」的那几天，TA 随时可以收回。
+  TA 愿意给你看，说明信任你：看完别追问、别批评，可以当面抱一抱，或者说一句「谢谢你告诉我」。</p>
+{% for p in pages %}
+<div class="card db-page">
+  <div class="db-h"><b>{{ p.label }}</b>{{ d.place(p) }}</div>
+  {% if p.mood %}<div class="db-big">{{ p.mood.emoji }} <span>{{ p.mood.name }}</span></div>{% endif %}
+  <div class="db-notes">{{ d.notes(p, '/parent/kids/' ~ k.id ~ '/daybook/' ~ p.day ~ '/voice/') }}</div>
+</div>
+{% else %}<div class="card"><p class="muted">现在没有分享给你的日记。</p></div>{% endfor %}
+{% endblock %}

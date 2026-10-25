@@ -5,7 +5,8 @@
 
 【{{ k.name }}】
 上周学了 {{ k.days }} 天（共 7 天），一共 {{ k.minutes }} 分钟，答题 {{ k.attempts }} 道{% if k.split %}（{{ k.split }}）{% endif %}。{% if k.streak %}现在连续学习 {{ k.streak }} 天。{% endif %}
-{% if k.total %}{{ k.total }}。孩子在网站上看到的也是这组数，可以照着夸具体的事。
+{% if k.diary %}上周记了 {{ k.diary }} 天日记（内容只有孩子自己看得到）。
+{% endif %}{% if k.total %}{{ k.total }}。孩子在网站上看到的也是这组数，可以照着夸具体的事。
 {% endif %}{% if k.lines %}
 比再上一周进步的地方：
 {% for l in k.lines %}

@@ -107,8 +107,9 @@ def today(request: Request):
     tot, teen = growth.totals(k["id"]), growth.teen_of(k)
     hello = growth.hello(k["id"], tot, teen, settled, weekly) if me["role"] == "kid" else ""
     pop = growth.milestones(k["id"], tot, teen) if me["role"] == "kid" else []   # 在冲刺、乐园里跨过的：回到今天页庆祝
-    from .. import discuss, journal
-    return render(request, "today.html", t=t, play=play, day=day, settled=settled, exams=exams, board_tip=boards.nudge(dict(k)),
+    from .. import daybook, discuss, journal
+    diary = daybook.today_mood(k["id"]) if me["role"] == "kid" else None   # 家长查看今天页：日记连记没记都不显示
+    return render(request, "today.html", t=t, diary=diary, play=play, day=day, settled=settled, exams=exams, board_tip=boards.nudge(dict(k)),
                   rethink=len(discuss.due(k["id"])), journal_due=len(journal.due(k["id"])),
                   goals=streak.GOALS, sprint_best=sprint.best_day(k["id"]), play_locked=arena.locked_reason(play),
                   due=len(engine.due_cards(k["id"], 99)), progress_ask=engine.progress_prompt(k), streak=st, badges=engine.badges(st), cal=cal, week=cal[-7:],
