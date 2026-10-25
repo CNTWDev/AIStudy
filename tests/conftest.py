@@ -14,6 +14,7 @@ os.environ["MAIL_PROVIDER"] = "mock"  # 发信：信放进 mailer.SENT，不联�
 os.environ["AISTUDY_JOBS"] = "0"  # 不开后台题库流水线（测试里直接调用 bankflow.run_once）
 os.environ["AISTUDY_PREFETCH"] = "off"  # 不提前备题（app/prefetch.py）；测 prefetch 的用例自己打开
 os.environ["REGISTRATION"] = "invite"
+os.environ["AISTUDY_WEATHER"] = "off"  # 日记的天气、定位换城市不联网（app/daybook.py）；测的用例自己换掉 _fetch_sky / _reverse
 os.environ["METHODS_FILE"] = os.path.join(os.environ["DATA_DIR"], "no-methods.toml")  # 不受本机 config/methods.toml 影响
 
 if os.environ.get("TEST_DATABASE_URL"):  # 测试库每次清空重建

@@ -200,7 +200,8 @@ def kid_brief(k) -> dict:
             "weak": [catalog.kp(w["kp_id"]) for w in weak[:5]], "weak_n": len(weak),
             "due": len(engine.due_cards(k["id"], 500)), "weekly": records.weekly(k["id"]),
             "words": db.one("SELECT COUNT(*) AS n FROM cards WHERE user_id=? AND kind='word'", k["id"])["n"],
-            "arena": arena.parent_summary(k), "focus": focus.parent_summary(k), "trend": records.accuracy_trend(k["id"], 14), "school": _school_progress(k)}
+            "arena": arena.parent_summary(k), "focus": focus.parent_summary(k), "trend": records.accuracy_trend(k["id"], 14), "school": _school_progress(k),
+            "diary": _diary_brief(k)}
 
 
 def adult_brief(k) -> dict:
@@ -209,7 +210,13 @@ def adult_brief(k) -> dict:
     cal = engine.calendar(k["id"], weeks=1)
     return {"u": k, "adult": True, "streak": engine.streak(k["id"]),
             "week_days": sum(1 for d in cal if d["minutes"] or d["checked"]),
-            "trend": records.accuracy_trend(k["id"], 14), "weekly": records.weekly(k["id"])}
+            "trend": records.accuracy_trend(k["id"], 14), "weekly": records.weekly(k["id"]), "diary": _diary_brief(k)}
+
+
+def _diary_brief(k) -> dict:
+    """家长页上和日记有关的只有：这一周记了几天、TA 自己分享了几天（内容只有本人看得到，app/daybook.py）。"""
+    from . import daybook
+    return {"week": daybook.week_days(k["id"]), "shared": daybook.shared_count(k["id"])}
 
 
 def _school_progress(k) -> list[dict]:

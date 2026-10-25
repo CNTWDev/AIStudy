@@ -1117,3 +1117,53 @@ body:not([data-skin=kid]) .lacts{flex-direction:row;gap:16px}body:not([data-skin
 .nextbtn.auto{position:relative;overflow:hidden}
 .nextbtn.auto::after{content:"";position:absolute;left:0;bottom:0;height:4px;width:100%;background:currentColor;opacity:.35;transform-origin:left;animation:jauto var(--auto,.8s) linear forwards}
 @keyframes jauto{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+/* ---------- 我的日记（app/daybook.py，DESIGN 5.57）：一个安静的本子。封面按累计天数解锁，心情一点就算记了 ---------- */
+.quick a.qdiary{border:2px solid color-mix(in srgb,var(--violet) 40%,transparent);background:linear-gradient(135deg,var(--violet-2),var(--card) 70%)}
+.db-cover{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:var(--radius);margin:0 0 14px;color:var(--ink);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--cv) 30%,var(--card)),color-mix(in srgb,var(--cv) 10%,var(--card)));border:2px solid color-mix(in srgb,var(--cv) 45%,transparent);box-shadow:var(--shadow)}
+.db-cover h1{margin:0;font-size:22px}.db-sub{color:var(--muted);font-size:13px;margin-top:2px}.db-ci{font-size:44px;line-height:1}.db-lock{font-size:20px;opacity:.7}
+.cv-sprout{--cv:var(--ok)}.cv-rainbow{--cv:var(--coral)}.cv-stars{--cv:var(--violet)}.cv-rocket{--cv:var(--sky)}.cv-crown{--cv:var(--sun)}
+.db-page{position:relative}
+.db-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.db-h b{font-size:15px}
+.db-place{font-size:13px;color:var(--muted)}
+.db-cityform{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}.db-cityform input{flex:1;min-width:140px}
+.db-q{font-weight:600;margin:4px 0 8px}
+.db-moods{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
+.db-moods button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 2px 8px;border-radius:16px;background:var(--card);
+  border:2px solid var(--line);box-shadow:0 3px 0 var(--line);cursor:pointer;color:var(--ink);transition:transform .1s,box-shadow .1s,border-color .15s}
+.db-moods button span{font-size:30px;line-height:1}.db-moods button small{font-size:12px;color:var(--muted)}
+.db-moods button:active{transform:translateY(3px);box-shadow:0 0 0 var(--line)}
+.db-moods button.sel{border-color:var(--brand);background:var(--brand-2);box-shadow:0 3px 0 var(--brand)}
+.db-notes{display:flex;flex-direction:column;gap:8px;margin:0 0 12px}
+.db-note{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--line-2)}
+.db-t{font-size:12px;color:var(--faint);padding-top:2px;min-width:3em}.db-x{flex:1;min-width:0;white-space:pre-wrap;word-break:break-word;line-height:1.6}
+.db-x audio{width:100%;max-width:320px;height:36px}.db-del{color:var(--faint)}
+.db-write textarea{width:100%;min-height:84px;resize:vertical;line-height:1.6}
+.db-acts{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}.db-acts .btn{min-width:7em}
+#rec.rec{border-color:var(--coral);color:var(--coral);animation:dbpulse 1.2s ease-in-out infinite}
+@keyframes dbpulse{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--coral) 20%,transparent)}}
+@media (prefers-reduced-motion:reduce){#rec.rec{animation:none}}
+.db-tip{margin:8px 0 0}
+.db-share{display:block;width:100%;margin-top:12px;padding:10px 12px;border-radius:12px;border:1.5px dashed var(--line);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;text-align:left}
+.db-share.on{border-style:solid;border-color:var(--sky);color:var(--ink);background:var(--sky-2)}
+.db-low{background:var(--violet-2)}
+a.db-back{display:block;color:var(--ink)}.db-bk{display:flex;gap:10px;align-items:center}.db-bm{font-size:30px}
+.db-big{font-size:30px;margin:0 0 10px}.db-big span{font-size:15px;color:var(--muted);vertical-align:middle}
+.db-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.db-grid>*{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;border-radius:10px;font-style:normal}
+.db-grid .wd{min-height:auto;font-size:12px;color:var(--faint)}
+.db-grid small{font-size:11px;color:var(--faint)}.db-grid a.has{background:var(--brand-2);color:var(--ink)}.db-grid a.has span{font-size:20px;line-height:1.1}
+.db-grid .td{outline:2px solid var(--brand);outline-offset:-2px}.db-grid .fu{opacity:.35}
+.db-covers{display:flex;gap:8px;flex-wrap:wrap}
+.db-covers .cv{display:flex;flex-direction:column;align-items:center;gap:2px;width:72px;padding:10px 4px;border-radius:14px;cursor:pointer;color:var(--ink);
+  background:color-mix(in srgb,var(--cv) 18%,var(--card));border:2px solid color-mix(in srgb,var(--cv) 40%,transparent);box-shadow:0 3px 0 color-mix(in srgb,var(--cv) 40%,transparent)}
+.db-covers .cv span{font-size:26px}.db-covers .cv small{font-size:11px}
+.db-covers .cv.cur{border-color:var(--brand);box-shadow:0 3px 0 var(--brand)}
+.db-covers .cv.lock{filter:grayscale(1);opacity:.5;cursor:default;box-shadow:none}
+.db-stamps{display:flex;gap:8px;flex-wrap:wrap}
+.stamp{display:flex;flex-direction:column;align-items:center;width:66px;padding:8px 2px;border:2px dashed color-mix(in srgb,var(--coral) 55%,transparent);border-radius:10px;transform:rotate(-3deg)}
+.stamp:nth-child(2n){transform:rotate(2deg)}.stamp b{font-size:24px}.stamp small{font-size:11px;color:var(--muted);text-align:center}
+.stamp.lock{filter:grayscale(1);opacity:.35;border-color:var(--line)}
+.db-promise{margin:18px 4px 8px;font-size:13px;color:var(--muted);line-height:1.7}.db-promise p{margin:0 0 4px}
+@media (max-width:420px){.db-moods{gap:5px}.db-moods button span{font-size:26px}.db-moods button small{font-size:11px}}

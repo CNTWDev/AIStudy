@@ -13,6 +13,7 @@
       <div class="muted small">登录名 {{ account_name(k.u) }} · 学习由 TA 自己安排</div></div>
   </div>
   <p class="small" style="margin:8px 0">🔥 连续 {{ k.streak }} 天 · 这一周学了 {{ k.week_days }} 天</p>
+  {% if k.diary.week or k.diary.shared %}<p class="small" style="margin:6px 0">📔 这一周记了 {{ k.diary.week }} 天日记<span class="muted">（日记只有 TA 自己看得到）</span>{% if k.diary.shared %} · <a href="/parent/kids/{{ k.u.id }}/daybook">TA 给你看的 {{ k.diary.shared }} 天 ›</a>{% endif %}</p>{% endif %}
   {% if k.trend %}<div class="trend-mini"><p class="small" style="margin:6px 0 4px">📊 {{ trend_words(k.trend.series[0]) }}</p>{{ trend_ui.spark(k.trend) }}</div>{% endif %}
   {% if k.weekly %}<p class="small" style="margin:6px 0">📈 上周进步（{{ k.weekly.from[5:] }}~{{ k.weekly.to[5:] }}）：{{ k.weekly.lines|join('；') }}</p>{% endif %}
   <div class="pacts"><a class="btn sm" href="/parent/kids/{{ k.u.id }}">学习报告</a> <a href="/parent/kids/{{ k.u.id }}/edit">资料与密码</a></div>
@@ -39,6 +40,7 @@
     · 今天 {{ f.blocks }} 口气，撑住 {{ f.held }} 口{% if f.longest_min %}，最长一口气{{ f.longest_min }}分钟{% endif %}
     · 离开 {{ f.leaves }} 次{% if f.leaves %}，共{{ f.away_min }}分钟{% endif %}{% if f.slips %} · 会的题突然错了 {{ f.slips }} 次{% endif %}
     {% if f.where %}<br><span class="muted">这一周离开多在：{% for w in f.where %}{{ w.task }}（{{ w.n }} 次{% if w.what %}，多是{{ w.what }}{% endif %}）{{ '；' if not loop.last }}{% endfor %}。{% if f.where|selectattr('what', 'equalto', '在等题')|list %}在等题时离开的算系统的问题，不算孩子的。{% endif %}</span>{% endif %}</p>{% endif %}
+  {% if k.diary.week or k.diary.shared %}<p class="small" style="margin:6px 0">📔 这一周记了 {{ k.diary.week }} 天日记<span class="muted">（日记只有 TA 自己看得到）</span>{% if k.diary.shared %} · <a href="/parent/kids/{{ k.u.id }}/daybook">TA 给你看的 {{ k.diary.shared }} 天 ›</a>{% endif %}</p>{% endif %}
   {% if k.weak %}<p class="small">最需要补：{% for w in k.weak %}<span class="pill st-weak">{{ w.name }}</span> {% endfor %}</p>{% endif %}
   <div class="pacts">
     <a class="btn sm" href="/parent/kids/{{ k.u.id }}">学习报告</a>
