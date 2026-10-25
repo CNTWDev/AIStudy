@@ -273,6 +273,7 @@ def main(argv) -> int:
         from . import news
         if "--sources" in args:
             cands, status = news.collect()
+            status.update(news.collect(sources=news.cfg().get("zh_sources") or [], fresh_hours=news.ZH_FRESH_HOURS)[1])
             for sid, st in status.items():
                 print(("  [ OK ] " if st["ok"] else "  [FAIL] ") + f"{sid:18} {st['name']}：" +
                       (f"{st['n']} 条，最新 {st['newest']}" if st["ok"] else st["error"]))
@@ -283,8 +284,8 @@ def main(argv) -> int:
         res = news.run_daily(force=True)
         res.pop("sources", None)
         print(res)
-        for p in db.q("SELECT day, band, source_name, title, why FROM news_picks WHERE day=?", db.today().isoformat()):
-            print(f"  {news.BANDS[p['band']]}：{p['title']}（{p['source_name']}）— {p['why']}")
+        for p in db.q("SELECT day, band, source_name, title, why FROM news_picks WHERE day IN (?, ?)", db.today().isoformat(), news.week_of()):
+            print(f"  {news.BAND_LABEL.get(p['band'], p['band'])}：{p['title']}（{p['source_name']}）— {p['why']}")
     elif cmd == "mark-weak":
         from . import curriculum_admin
         curriculum_admin.refresh(force=True)

@@ -2,18 +2,21 @@
 
 孩子不挑话题：点一下「写一篇」，系统按「领域 × 切入点 × 体裁」替他定好今天写什么。
 - 领域轮换：最近 3 天读过的领域不再用，一周内同一领域最多 2 次，读得越来越广。
-- 切入点四路来源（按权重抽）：拓展（最久没读的领域）、学校（别的学科最近学的知识点）、
-  兴趣（读完点过「喜欢」的领域）、新闻（这几天每日新闻背后的知识）。来源用不上就退回拓展。
+- 切入点六路来源（按权重抽，读得广为先）：拓展（最久没读的领域）、学校（别的学科最近学的知识点）、
+  课本（语文 / 英语课本正在学的单元，写同主题、同作者或相关背景）、兴趣（读完点过「喜欢」的领域）、
+  新闻（英文：这几天的每日新闻；中文：每周中文热点，带真实报道的材料）、时令（节气、传统节日、纪念日，content/calendar.json）。
+  来源用不上就退回拓展。
 - 体裁轮换兼顾考试：中考 / IGCSE 要考的文体占多数，连着两篇不是考试文体，下一篇一定是。
 - 最近 14 篇的标题交给 AI「不要重复」；写完再查一次，太像就换个切入点重写一次。
 记录写在这篇短文的 contents.gen_meta["pick"] 里，最近读过什么直接从 readings 查，不用新表。
 """
 from __future__ import annotations
 
+import json
 import random
-from datetime import timedelta
+from datetime import date, timedelta
 
-from . import catalog, db
+from . import catalog, config, db
 
 # 领域：(key, 名称, 举几个切入点给 AI 参考)
 DOMAINS = {
@@ -72,7 +75,9 @@ GENRES = {
     ("en", "adult"): [("essay", False), ("feature article", False), ("case story", False), ("profile", False)],
 }
 
-SOURCES = (("explore", 40), ("school", 25), ("interest", 20), ("news", 15))  # 读得广为先
+SOURCES = (("explore", 35), ("school", 15), ("textbook", 10), ("interest", 15), ("news", 15), ("season", 10))  # 读得广为先
+SEASON_DAYS = (-2, 5)  # 节气、节日前 2 天到后 5 天里可以写它
+FACTY = {"说明文", "人物小传", "小科普", "fact file", "report", "article", "feature article", "profile"}
 RECENT = 14          # 交给 AI「不要重复」的标题数
 FRESH_DAYS = 3       # 这几天读过的领域不再用
 WEEK_MAX = 2         # 一周内同一领域最多几次
@@ -83,6 +88,37 @@ def stage(grade: str) -> str:
     if catalog.is_adult(grade):
         return "adult"
     return "primary" if catalog.stage_rank(grade) <= 6 else "school"
+
+
+def calendar() -> dict:
+    for p in (config.BASE_DIR / "config" / "calendar.json", config.BASE_DIR / "content" / "calendar.json"):
+        if p.exists():
+            try:
+                return json.loads(p.read_text(encoding="utf-8"))
+            except ValueError:
+                pass
+    return {}
+
+
+def season_events(day: date) -> list[dict]:
+    """这几天的节气、传统节日、纪念日：[{name, kind, day}]，离今天近的在前。"""
+    cal, out = calendar(), []
+    for y in (day.year - 1, day.year, day.year + 1):
+        rows = [(x["md"], x["name"], "节气") for x in cal.get("terms", [])] + [(x["md"], x["name"], "纪念日") for x in cal.get("days", [])]
+        rows += [(md, name, "传统节日") for name, md in (cal.get("lunar", {}).get(str(y)) or {}).items()]
+        for md, name, kind in rows:
+            try:
+                d = date(y, int(md[:2]), int(md[3:5]))
+            except ValueError:
+                continue
+            if SEASON_DAYS[0] <= (d - day).days <= SEASON_DAYS[1]:
+                out.append({"name": name, "kind": kind, "day": d})
+    return sorted(out, key=lambda e: abs((e["day"] - day).days))
+
+
+def facty(p: dict) -> bool:
+    """这篇要不要写完再核一遍事实：说明文、人物、新闻这类讲真事的。"""
+    return p.get("genre") in FACTY or p.get("source") in ("news", "school", "season")
 
 
 def recent(user_id: int, lang: str, n: int = 40) -> list[dict]:
@@ -154,19 +190,52 @@ def pick(user_id: int, lang: str, grade: str, rng: random.Random | None = None) 
         key, name, ideas = names[rng.choice(pool)]  # 喜欢过几次就有几份机会
         return {"source": "interest", "domain": key, "name": name, "angle": "", "ideas": ideas}
 
+    def textbook() -> dict | None:
+        """语文 / 英语课本正在学的那个单元：写同主题、同作者或相关背景的文章，不复述课文。"""
+        from . import schoolyear
+        user = db.one("SELECT * FROM users WHERE id=?", user_id)
+        for e in db.q("SELECT * FROM enrollments WHERE user_id=? AND active=1", user_id):
+            pk = catalog.catalog.packs.get(e["pack_id"])
+            if not pk or pk.lang != lang or "textbook" in blocked:
+                continue
+            est = schoolyear.estimate(dict(user), dict(e))
+            cur = est and est.get("current")
+            if not cur:
+                continue
+            names = "、".join(catalog.catalog.kps[k]["name"] for k in cur.get("kps", [])[:3] if k in catalog.catalog.kps)
+            angle = f"{pk.subject_name}课本正在学的「{cur['name']}」" + (f"（{names}）" if names else "") + \
+                    "：写一篇同主题、同作者或相关背景的文章，不复述课文"
+            if angle not in used_angles:
+                return {"source": "textbook", "domain": "textbook", "name": "课本延伸", "angle": angle, "ideas": ""}
+        return None
+
     def from_news() -> dict | None:
+        """英文读这几天的每日新闻背后的知识；中文读每周中文热点（app/news.py 每周挑的，带真实报道的材料）。"""
         if st == "adult" or "news" in blocked:
             return None
         band = "primary" if st == "primary" else "secondary"
-        since = (today - timedelta(days=5)).isoformat()
-        for n in db.q("SELECT title, why FROM news_picks WHERE band=? AND day>=? AND day<=? ORDER BY day DESC, id DESC LIMIT 6",
-                      band, since, today.isoformat()):
+        # 中文：这周和上周挑的几件（记在这周的第几天，不等到那天）；英文：这几天每天的那条
+        band, since, until = ((f"zh-{band}", today - timedelta(days=13), today + timedelta(days=6)) if lang == "zh"
+                              else (band, today - timedelta(days=5), today))
+        for n in db.q("SELECT title, why, facts, source_name FROM news_picks WHERE band=? AND day>=? AND day<=? ORDER BY day DESC, id",
+                      band, since.isoformat(), until.isoformat()):
             angle = f"新闻「{n['title']}」背后的知识或道理（不复述新闻本身）"
             if angle not in used_angles:
-                return {"source": "news", "domain": "news", "name": "新闻背后", "angle": angle, "ideas": n["why"] or ""}
+                return {"source": "news", "domain": "news", "name": "新闻背后", "angle": angle, "ideas": n["why"] or "",
+                        "facts": n["facts"] or "", "cite": n["source_name"] or ""}
         return None
 
-    ways = {"explore": explore, "school": school, "interest": interest, "news": from_news}
+    def season() -> dict | None:
+        if "season" in blocked:
+            return None
+        for ev in season_events(today):
+            angle = f"{ev['name']}（{ev['kind']}，{ev['day'].month} 月 {ev['day'].day} 日）"
+            if angle not in used_angles:
+                return {"source": "season", "domain": "season", "name": "时令", "angle": angle,
+                        "ideas": "它的来历、习俗、背后的自然或科学道理、古诗文里的它、今天的人怎么过"}
+        return None
+
+    ways = {"explore": explore, "school": school, "textbook": textbook, "interest": interest, "news": from_news, "season": season}
     src = rng.choices([s for s, _ in SOURCES], weights=[w for _, w in SOURCES])[0]
     p = ways[src]() or explore()
 
@@ -178,7 +247,3 @@ def pick(user_id: int, lang: str, grade: str, rng: random.Random | None = None) 
     genre, exam = rng.choice([g for g in genres if gpast.count(g[0]) == least])
     p.update(genre=genre, exam=exam, key=f"auto:{p['domain']}/{genre}" + (f"/{p['angle'][:80]}" if p["angle"] else ""))
     return p
-
-
-def avoid_titles(user_id: int, lang: str) -> list[str]:
-    return [p["title"] for p in recent(user_id, lang, RECENT)]

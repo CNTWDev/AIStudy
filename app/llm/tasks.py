@@ -1,5 +1,7 @@
 """具体的 AI 任务：每个函数拼好提示词，交给 service.ask_json。
 提示词只在这里改；换模型/换厂商改 config/llm.toml，不用动这里。"""
+import json
+
 from .service import ask_json
 
 
@@ -39,7 +41,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 2, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 3, "passage_check": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -409,8 +411,12 @@ def make_passage(lang: str, grade: str, topic: str, length: str, review_words: l
     teach = ("" if adult else
              "寓教于乐：不说教、不喊口号，但读完要让孩子知道得更广一点、想得更深一点——一个道理、一种看事情的角度，或一个值得追问的问题。")
     past = f"他最近读过这些，这篇的话题和写法都不要和它们重复：{'；'.join(avoid[:14])}。" if avoid else ""
+    facts = (pick or {}).get("facts") or ""
+    if facts:
+        about += (f"下面是{pick.get('cite') or '媒体'}的真实报道，只当事实材料用：讲到的事实只用材料里有的，不编造数字、日期和引语，"
+                  f"用自己的话写，不照抄原文。\n<<<\n{facts[:3000]}\n>>>\n")
     user = (
-        f"{spec}{about}{teach}{past}{words}不要照搬已有出版物。\n"
+        f"{spec}{about}{teach}{past}{words}不要照搬已有出版物；没有把握的数字、年份、人名和名人名言宁可不写，也不要编。\n"
         "再出 3 道阅读理解选择题（考概括、细节、词义各一）。\n"
         "再从正文里挑 2-3 句最值得学的句子，用一句中文说清好在哪（用了什么修辞、句式或语法）；"
         "最后给一个读完想一想的开放问题（中文，没有标准答案）。\n"
@@ -420,6 +426,36 @@ def make_passage(lang: str, grade: str, topic: str, length: str, review_words: l
     )
     return ask_json("passage", _tutor(grade) + ("" if adult else "你也是给孩子写美文的儿童文学作家，文字常被选进语文课本。"),
                     user, user_id=user_id, effort="medium", cache=False)
+
+
+def check_passage(body: dict, lang: str, grade: str, user_id=None) -> dict:
+    """说明文、人物、新闻这类讲真事的短文写完再核一遍：事实错了就改正文（只改错的地方），小题跟着改。
+    返回 {"ok": true} 或 {"ok": false, "problems": [..], "passage": 改好的整篇（同 make_passage 的格式）}。"""
+    from ..catalog import stage_label
+    user = (
+        f"下面是一篇给{stage_label(grade)}学生读的{'英文' if lang == 'en' else '中文'}短文（JSON）。请当事实核查编辑，逐句查："
+        "年份、数字、人名地名、科学原理、历史事件、引用的话是不是对的；拿不准、查不到出处的名人名言也算问题。\n"
+        f"{json.dumps(body, ensure_ascii=False)}\n"
+        "没有问题：输出 {\"ok\":true}。有问题：把错的地方改对（没把握的删掉），文笔和长度不变，小题、值得学的句子、想一想跟着改，"
+        '输出 {"ok":false,"problems":["哪一句、错在哪（中文一句）"],"passage":{和原文同样的字段}}。'
+    )
+    return ask_json("passage_check", TUTOR + "你也是严谨的事实核查编辑。", user, user_id=user_id, effort="low", max_tokens=6000, cache=False)
+
+
+def news_week_zh(candidates: list[dict], week: str, n: int = 5) -> dict:
+    """每周中文热点：从中文新闻、科普里给小学、中学各挑 n 件这一周最值得孩子知道的事（排好序）。"""
+    lines = "\n".join(f"[{c['i']}] ({c['source']}) {c['title']} — {c.get('summary', '')[:160]}" for c in candidates)
+    user = (
+        f"这一周从 {week} 开始。下面是中文新闻和科普网站这几天的内容（编号、来源、标题、摘要）：\n{lines}\n\n"
+        f"请给两组读者各选 {n} 件，按推荐顺序，彼此领域尽量不同（科技、太空、自然、文化、体育、社会、经济、健康……），"
+        "每一件会被写成一篇讲「这件事背后的知识或道理」的中文美文：\n"
+        "secondary（初中、高中）：重要、影响持续、能连到课本知识的。primary（小学）：孩子看得懂、有兴趣、正面的。\n"
+        "都不要选：犯罪、灾难伤亡、战争细节、名人八卦、广告软文、没证实的消息、有争议的政治话题。\n"
+        '输出：{"secondary":[{"i":编号,"why":"为什么值得孩子知道（一句）","topic":"science|tech|space|nature|culture|sports|society|economy|health"}],'
+        '"primary":[同样格式]}'
+    )
+    return ask_json("news_pick", "你是给中国中小学生编课外读物的资深编辑，只选事实可靠、立场客观的内容。", user,
+                    effort="medium", max_tokens=1500, cache=False)
 
 
 def book_guide(book: dict, ch: int, chapter_title: str, text: str, grade: str, user_id=None) -> dict:
