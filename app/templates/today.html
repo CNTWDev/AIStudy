@@ -100,6 +100,7 @@
   {% if play.base %}<a href="/arena" class="qplay {{ 'lock' if play_locked }}"><span class="qi">🎮</span><span style="flex:1;min-width:0"><b>乐园</b>
     <small>{% if play.need %}再完成 {{ play.need }} 项任务就能玩{% elif play.unlimited %}今天不限时{% elif play.left > 0 %}今天还能玩 {{ (play.left / 60)|int }} 分钟{% if play.can_bonus_all %} · 全做完再 +10{% endif %}{% else %}今天玩够啦，明天见{% endif %}</small>
     {% if play.need %}<span class="pbar"><i style="width:{{ (100 * play.done / (play.done + play.need))|round }}%"></i></span>{% endif %}</span></a>{% endif %}
+  {% if diary %}<a href="/daybook" class="qdiary"><span class="qi">📔</span><span><b>日记</b><small>{% if diary.marked %}今天记了 {{ diary.mood.emoji if diary.mood else '✏️' }}{% else %}想记点什么吗？只有你看得到{% endif %}</small></span></a>{% endif %}
   {% if total and day.sprint_open %}<a href="/sprint" class="qsprint"><span class="qi">⚡</span><span><b>冲刺</b><small>{% if day.sprint_points %}今天 {{ day.sprint_points }} 分{% if sprint_best %} · 纪录 {{ sprint_best }}{% endif %}{% else %}连对 ×2 ×3，换 ⭐{% endif %}</small></span></a>{% endif %}
 </div>
 {% endif %}
@@ -120,6 +121,7 @@
   <label>今天心情怎么样？</label>
   <div class="moods">{% for m, n in [('😄','超开心'),('🙂','还不错'),('😐','一般'),('😣','有点难'),('😴','好累')] %}<button data-m="{{ m }}" class="{{ 'sel' if rec.mood == m }}" title="{{ n }}" aria-label="{{ n }}">{{ m }}</button>{% endfor %}</div>
   <div class="ig"><input type="text" id="refl" value="{{ t.reflection }}" placeholder="想说点什么？" aria-label="想说点什么（选填）" maxlength="200"><button class="btn soft sm" id="savenote">保存</button></div>
+  {% if me.parent_id %}<p class="tiny faint" style="margin:6px 0 0">这一栏{{ '家长' if is_adult(me.grade) else '爸爸妈妈' }}能看到。只想自己看的，<a href="/daybook">写进日记</a>。</p>{% endif %}
   </div>
   <p class="small" id="checked" style="margin:10px 0 0" {{ '' if t.checked_in else 'hidden' }}>✅ 今天已经打卡啦</p>
   {% endif %}

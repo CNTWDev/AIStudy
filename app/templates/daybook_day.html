@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import "_daybook.html" as d with context %}
+{% block body %}
+<a href="/daybook" class="small">← 我的日记</a>
+<div class="card db-page">
+  <div class="db-h"><b>{{ label }}</b>{% if page %}{{ d.place(page) }}{% endif %}</div>
+  {% if page and (page.mood or page.notes) %}
+  {% if page.mood %}<div class="db-big">{{ page.mood.emoji }} <span>那天{{ page.mood.name }}</span></div>{% endif %}
+  <div class="db-notes">{{ d.notes(page, '/daybook/voice/', True) }}</div>
+  {{ d.share(page, has_parent) }}
+  {% else %}<div class="empty"><div class="e">📄</div><b>这一天没有记</b></div>{% endif %}
+</div>
+{{ d.promise(HOTLINE, has_parent) }}
+<script>
+$$('.db-del').forEach(b => b.onclick = async () => {
+  const n = b.closest('.db-note');
+  if (!confirm('删掉这一段？删了就找不回来了')) return;
+  try { await api('/api/daybook/delete', {day: n.dataset.day, id: n.dataset.id}); n.remove(); } catch (e) { toast(e.message); }
+});
+$$('.db-share').forEach(b => b.onclick = async () => {
+  const on = b.dataset.on !== '1';
+  if (on && !confirm('给爸爸妈妈看这一天写的？以后随时可以收回。')) return;
+  try { await api('/api/daybook/share', {day: b.dataset.day, on}); location.reload(); } catch (e) { toast(e.message); }
+});
+</script>
+{% endblock %}

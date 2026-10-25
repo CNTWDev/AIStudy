@@ -10,7 +10,7 @@ from .content import content
 from .methods import methods
 from .auth import LoginRequired
 from .web import render, kid_or_redirect, set_method
-from . import diary_web, library_web, news_web, tts_web
+from . import daybook_web, diary_web, library_web, news_web, tts_web
 
 @asynccontextmanager
 async def lifespan(app):
@@ -37,6 +37,7 @@ app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY, max_age=60 *
 
 app.include_router(news_web.router)
 app.include_router(diary_web.router)
+app.include_router(daybook_web.router)
 
 
 app.include_router(tts_web.router)

@@ -1,0 +1,27 @@
+{# 我的日记的一页（app/daybook.py）：孩子自己看、家长看分享的那一天，都用这一个。
+   voice：录音的地址前缀；edit：能不能删（只有孩子本人） #}
+{% macro place(p) %}{% if p.city or p.sky %}<span class="db-place">{% if p.city %}📍 {{ p.city }}{% endif %}{% if p.sky %} · {{ p.sky.icon }} {{ p.sky.word }} {{ p.sky.lo }}~{{ p.sky.hi }}°{% endif %}</span>{% endif %}{% endmacro %}
+
+{% macro notes(p, voice, edit=False) %}
+{% for n in p.notes %}
+<div class="db-note" data-id="{{ n.id }}" data-day="{{ p.day }}">
+  <span class="db-t">{{ n.time }}</span>
+  <div class="db-x">{% if n.voice %}<audio controls preload="none" src="{{ voice }}{{ n.voice }}"></audio>{% else %}{{ n.text }}{% endif %}</div>
+  {% if edit %}<button type="button" class="linkbtn db-del" title="删掉这一段" aria-label="删掉这一段">✕</button>{% endif %}
+</div>
+{% endfor %}
+{% endmacro %}
+
+{% macro share(p, has_parent) %}
+{% if has_parent and (p.mood or p.notes) %}
+<button type="button" class="db-share {{ 'on' if p.shared }}" data-day="{{ p.day }}" data-on="{{ 1 if p.shared else 0 }}">
+  {% if p.shared %}👀 爸爸妈妈能看这一天 · <u>收回</u>{% else %}🔒 只有我看得到 · <u>给爸爸妈妈看这一天</u>{% endif %}</button>
+{% endif %}
+{% endmacro %}
+
+{% macro promise(hotline, has_parent) %}
+<div class="db-promise">
+  <p>🔒 这是你自己的本子。{% if has_parent %}爸爸妈妈的页面里没有能打开它的地方，{% endif %}{{ ASSISTANT }}也不会读它。只有你登录了才看得到。</p>
+  <p class="faint">{{ hotline }}</p>
+</div>
+{% endmacro %}

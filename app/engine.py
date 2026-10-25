@@ -1088,6 +1088,9 @@ def flow_state(user_id: int, current: str | None = None) -> dict:
     # 刚好学完一节（而且前面几节也都完成了）：停一下、亮一格。先跳着做了后面的，不算「学完一节」
     if sc and sc["complete"] and len(secs) > 1 and not out["all_done"] and all(x["complete"] for x in secs[:sc["n"]]):
         out["section"] = {"n": sc["n"], "of": len(secs), "left": sum(1 for x in secs if not x["complete"]), "base": sc["n"] == 1}
+    if out["all_done"]:   # 全做完了，今天还没记日记：顺带提一句（选做，不算进清单）
+        from . import daybook
+        out["diary"] = daybook.marked_today(user_id)
     if out["just"]:   # 这一项 → 今天 → 一共（app/growth.py）
         from . import growth
         u = db.one("SELECT grade FROM users WHERE id=?", user_id)
@@ -1183,12 +1186,13 @@ def badges(n: int) -> dict:
 
 
 def total_stars(user_id: int) -> int:
-    """⭐ = 完成的任务数（只看做没做，不看对错）+ 冲刺分换的星（每天每 10 分一颗，见 app/sprint.py）。"""
+    """⭐ = 完成的任务数（只看做没做，不看对错）+ 冲刺分换的星（每天每 10 分一颗，见 app/sprint.py）+ 记了日记的天数（app/daybook.py）。"""
     from . import sprint
     n = 0
     for r in db.q("SELECT plan FROM days WHERE user_id=?", user_id):
         n += sum(1 for t in db.jload(r["plan"], []) if t.get("done"))
-    return n + sum(sprint.stars_by_day(user_id).values())
+    from . import daybook
+    return n + sum(sprint.stars_by_day(user_id).values()) + daybook.days(user_id)
 
 
 def streak(user_id: int) -> int:
