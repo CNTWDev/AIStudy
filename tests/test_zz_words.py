@@ -167,6 +167,11 @@ def test_runner_game(monkeypatch):
         ev = db.one("SELECT data FROM events WHERE user_id=? AND target='word' ORDER BY id DESC LIMIT 1", k["id"])
         assert (db.jload(ev["data"], {}) or {}).get("tier") in words.RUN_HINTS
 
+        # 只撞了一串首字母（rabbit 撞 6 个 R）：报上来的就是这串，服务器对着词判，不算拼对
+        q = matches.question(k, m["match_id"], random.Random(5))["item"]
+        w = q["run"]["w"]
+        assert not matches.answer(k, m["match_id"], q["id"], w[0] * len(w))["correct"]
+
         # 撞错过字母：报撞到的那串，算没拼对，词进复习
         q = matches.question(k, m["match_id"], random.Random(4))["item"]
         res = matches.answer(k, m["match_id"], q["id"], q["run"]["w"] + "x")
