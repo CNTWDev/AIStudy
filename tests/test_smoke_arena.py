@@ -220,9 +220,9 @@ def test_word_and_bank_sources(monkeypatch):
         kid = dict(db.one("SELECT * FROM users WHERE email='wk@x.com'"))
         assert arena.game_unlock(kid) == "free"
         ws = sources.weights(kid)
-        assert "words" in ws and "math" in ws
+        assert "words" in ws and "math" not in ws   # 只学英语：出单词和英语题库的题，不出口算（题只出自在学的课）
         rng = random.Random(1)
-        assert {sources.pick(kid, 0.75, rng)["src"] for _ in range(40)} >= {"words", "math"}   # 按自己的科目混着出
+        assert {sources.pick(kid, 0.75, rng)["src"] for _ in range(40)} >= {"words"}
         src, ctx, rng = sources.SOURCES["words"], sources.Ctx(kid), random.Random(5)
         for _ in range(30):
             it = src.pick(kid, ctx, 0.8, rng)
