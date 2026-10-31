@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="/static/play/mp.css?v={{ ASSET_V }}">
 {% if g.css %}<link rel="stylesheet" href="/static/play/{{ game }}.css?v={{ ASSET_V }}">{% endif %}
 {% set info = {'game': g.describe(), 'me': me, 'room': room, 'lobby': lobby, 'avatar': a.avatar, 'left': a.status.left, 'unlimited': a.status.unlimited,
-               'locked': a.locked, 'need': a.status.need, 'back': back, 'ghost': a.ghost, 'level': a.level.level, 'reward': reward} %}
+               'locked': a.locked, 'need': a.status.need, 'back': back, 'ghost': a.ghost, 'level': a.level.level, 'reward': reward, 'join': join} %}
 <div id="pl" class="pl pl-{{ game }}{{ ' pl-mp' if g.multi }}" data-info='{{ info|tojson }}'>
   <div class="pl-top">
     <a href="{{ back }}" class="pl-back" aria-label="{{ '回单词' if back != '/arena' else '回乐园' }}">‹</a>

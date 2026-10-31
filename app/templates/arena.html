@@ -32,7 +32,7 @@
 
 <a class="ah-invite ah-board" href="/boards?metric=game"><span class="i">🏆</span><span class="grow"><b>乐园榜</b> · {{ board_tip or '比一比这周谁答对的题多' }}</span><span class="btn sm">去看</span></a>
 {% for inv in invites %}
-<a class="ah-invite" {% if a.locked %}role="button" data-locked{% else %}href="/arena/{{ inv.game }}"{% endif %}><span class="i">{{ inv.icon }}</span><span class="grow"><b>{{ inv.host.name }}</b> 开了「{{ inv.name }}」的房间，在等你一起玩！</span><span class="btn sm">去加入</span></a>
+<a class="ah-invite" {% if a.locked %}role="button" data-locked{% else %}href="/arena/{{ inv.game }}?join={{ inv.id }}"{% endif %}><span class="i">{{ inv.icon }}</span><span class="grow"><b>{{ inv.host.name }}</b> 开了「{{ inv.name }}」的房间，在等你一起玩！</span><span class="btn sm">去加入</span></a>
 {% endfor %}
 <div class="ah-games">
 {% for g in a.games %}{% set id = g.id %}

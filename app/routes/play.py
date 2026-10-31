@@ -23,9 +23,10 @@ def arena_home(request: Request):
 
 
 @router.get("/arena/{game}", response_class=HTMLResponse)
-def arena_game(request: Request, game: str, reward: int = 0):
+def arena_game(request: Request, game: str, reward: int = 0, join: int = 0):
     """所有游戏一个页面：外壳 shell.js（单机、联网都是它），玩法 <游戏>.js。
-    reward：做完一组抓词送的那一局（app/wordpick.py）：只出那一组的词、不算游戏时间，玩完回抓词。"""
+    reward：做完一组抓词送的那一局（app/wordpick.py）：只出那一组的词、不算游戏时间，玩完回抓词。
+    join：乐园首页「X 开了房间，在等你」点进来的那个房间：直接加入它（我原来在别的房间就先离开），不回我原来的房间。"""
     from .. import wordpick
     k = kid_or_redirect(request)
     if game not in arena.GAMES:
@@ -38,7 +39,7 @@ def arena_game(request: Request, game: str, reward: int = 0):
     if a["locked"] and not rooms.playing(room):   # 还不能玩：回乐园首页，那里写着为什么、去做任务
         return RedirectResponse("/arena?locked=1", 303)
     return render(request, "arena_game.html", g=g, game=game, a=a, me=rooms.member(k), room=room, back="/words/map" if free else "/arena",
-                  reward=reward if gift else 0,
+                  reward=reward if gift else 0, join=join if g.multi and join != room else 0,
                   lobby=rooms.lobby(k, game) if g.multi else None, gb=boards.live(dict(k), game))
 
 
