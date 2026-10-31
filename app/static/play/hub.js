@@ -11,7 +11,7 @@
     const ctx = cv.getContext('2d'), H = 150, s = r.height / H, W = r.width / s;
     ctx.setTransform(s * dpr, 0, 0, s * dpr, 0, 0);
     const av = me.dataset.avatar, g = cv.dataset.preview, ground = 128;
-    const theme = {stickman: 'sunset', race: 'day', defense: 'candy', runner: 'day', helix: 'day'}[g] || 'day';
+    const theme = {stickman: 'sunset', race: 'day', defense: 'candy', runner: 'day', helix: 'day', jump: 'day'}[g] || 'day';
     if (multi(ctx, g, W, H, t, av)) return;
     Play.scene.sky(ctx, W, H, theme);
     Play.scene.drawClouds(ctx, W, theme, t * (g === 'race' ? 4 : 1));
@@ -55,6 +55,19 @@
       }
       const by = 52 - Math.abs(Math.sin(t * 5)) * 26;
       ctx.fillStyle = Art.avatar(av).main; ctx.beginPath(); ctx.arc(cx, by, 9, 0, 7); ctx.fill(); ctx.strokeStyle = '#2b2340'; ctx.lineWidth = 2; ctx.stroke();
+    } else if (g === 'jump') {   // 往上跳：小蜜蜂在几块板之间往上弹，背景慢慢往下沉
+      const sink = (t * 18) % 60;
+      for (const [x, y, sp] of [[0.3, 120, 0], [0.62, 84, 1], [0.38, 48, 0], [0.7, 12, 0]]) {
+        const px = W * x, py = y + sink;
+        ctx.fillStyle = '#e8a300'; ctx.strokeStyle = '#2b2340'; ctx.lineWidth = 2; Play.roundRect(ctx, px - 24, py, 48, 12, 6); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#ffc21a'; Play.roundRect(ctx, px - 24, py, 48, 8, 5); ctx.fill(); ctx.stroke();
+        if (sp) { ctx.fillStyle = '#ff5a4f'; Play.roundRect(ctx, px + 4, py - 12, 16, 6, 3); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(px + 8, py); ctx.lineTo(px + 16, py - 4); ctx.lineTo(px + 8, py - 8); ctx.stroke(); }
+      }
+      const k = (t * 0.9) % 1, bx = W * (0.3 + 0.32 * k), by = 112 - Math.sin(k * Math.PI) * 70;
+      ctx.fillStyle = '#ffcf2e'; ctx.strokeStyle = '#2b2340'; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.ellipse(bx, by, 10, 12, 0, 0, 7); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#2b2340'; ctx.fillRect(bx - 10, by + 3, 20, 3);
+      ctx.fillStyle = '#eaf7ff'; ctx.beginPath(); ctx.ellipse(bx - 8, by - 12, 6, 8, -0.5, 0, 7); ctx.ellipse(bx + 8, by - 12, 6, 8, 0.5, 0, 7); ctx.fill(); ctx.stroke();
     } else if (g === 'defense') {
       Art.castle(ctx, 70, ground, 0.55, 1, t);
       Art.hero(ctx, 70, ground - 66, {avatar: av, pose: 'charge', t, scale: 0.5});

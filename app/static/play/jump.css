@@ -1,0 +1,39 @@
+/* 往上跳：天空柱竖着，画面要高。电脑横屏左边一列卡片（关卡、用时、蜂蜜、连跳、题板），窄屏收成顶上一行；题板的题在天空柱正上方 */
+.pl-jump .pl-stage{height:clamp(460px,calc(100vh - 150px),1000px)}
+.jp-layer{position:absolute;inset:0;pointer-events:none;z-index:2;--col-l:0px;--col-w:100%}
+.jp-side{position:absolute;left:10px;right:34px;top:10px;display:flex;gap:6px;flex-wrap:nowrap}
+.jp-card{background:#fff;border:3px solid var(--pl-ink);box-shadow:0 3px 0 var(--pl-ink);border-radius:14px;padding:1px 10px;font-weight:900;color:var(--pl-ink);line-height:1.35;display:flex;gap:6px;align-items:baseline;white-space:nowrap}
+.jp-card small{font-size:12px;font-weight:700;color:var(--muted)}
+.jp-card b{font-size:16px;font-variant-numeric:tabular-nums}
+.jp-row{display:contents}
+.jp-where,.jp-was,.jp-gates small,.jp-clock small,.jp-row .jp-card:first-child small{display:none}
+.jp-clock{gap:8px}.jp-clock>span{display:flex;gap:5px;align-items:baseline}
+.jp-combo{color:#e0573a}
+.jp-stars{display:flex;gap:4px;align-self:center}
+.jp-stars i{width:18px;height:18px;border-radius:6px;border:2.5px solid var(--pl-ink);background:#f3efe7;font-style:normal;display:grid;place-items:center;font-size:11px}
+.jp-stars i.ok{background:#ffc21a}.jp-stars i.ok::before{content:"★"}
+.jp-layer.wide .jp-side{left:clamp(16px,3vw,56px);right:auto;top:clamp(16px,4vh,48px);width:min(300px,calc(var(--col-l) - 40px));flex-direction:column;gap:14px;flex-wrap:nowrap}
+.jp-layer.wide .jp-card{flex-direction:column;align-items:flex-start;gap:0;border-radius:20px;box-shadow:0 4px 0 var(--pl-ink);padding:8px 16px}
+.jp-layer.wide .jp-card small{font-size:14px;letter-spacing:.5px}
+.jp-layer.wide .jp-card b{font-size:30px;line-height:1.15}
+.jp-layer.wide .jp-where{display:flex}.jp-layer.wide .jp-where b{font-size:24px}
+.jp-layer.wide .jp-clock{flex-direction:row;justify-content:space-between;align-items:flex-end}
+.jp-layer.wide .jp-clock>span{flex-direction:column;gap:0}
+.jp-layer.wide .jp-was{display:flex;align-items:flex-end}.jp-layer.wide .jp-was b{font-size:20px;color:var(--muted)}
+.jp-layer.wide .jp-row{display:flex;gap:14px}.jp-layer.wide .jp-row .jp-card{flex:1}
+.jp-layer.wide .jp-gates small,.jp-layer.wide .jp-clock small,.jp-layer.wide .jp-row .jp-card:first-child small{display:block}
+.jp-layer.wide .jp-stars{gap:8px;margin-top:4px;align-self:flex-start}
+.jp-layer.wide .jp-stars i{width:40px;height:40px;border-radius:13px;border-width:3px;font-size:20px}
+.jp-q{position:absolute;top:52px;left:calc(var(--col-l) + var(--col-w) / 2);transform:translate(-50%,-6px);width:min(440px,calc(var(--col-w) - 24px));
+  background:#fff;border:4px solid var(--pl-ink);box-shadow:0 6px 0 var(--pl-ink);border-radius:24px;padding:8px 16px 10px;text-align:center;opacity:0;transition:opacity .2s,transform .2s}
+.jp-q.on{opacity:1;transform:translate(-50%,0)}
+.jp-layer.wide .jp-q{top:clamp(16px,4vh,44px)}
+.jp-layer.mp .jp-q{top:92px}.jp-layer.mp .jp-side{top:56px}.jp-layer.mp.wide .jp-q{top:64px}.jp-layer.mp.wide .jp-side{top:64px}
+.jp-topic{font-size:13px;font-weight:700;color:var(--muted)}
+.jp-text{display:flex;gap:8px;align-items:center;justify-content:center;font-size:clamp(26px,4.2vh,40px);font-weight:900;color:var(--pl-ink);line-height:1.2}
+.jp-q.long .jp-text{font-size:19px}
+.jp-say{border:3px solid var(--pl-ink);box-shadow:0 3px 0 var(--pl-ink);background:#ffe9a8;border-radius:12px;font-size:18px;padding:0 6px;cursor:pointer;pointer-events:auto}
+.jp-tip{font-size:13px;font-weight:700;color:var(--muted);margin-top:2px}
+.jp-sub{display:block;font-size:14px;font-weight:700;color:var(--muted);margin-top:2px}
+.pl-jump .pl-toast{top:auto;bottom:18px}   /* 上面是题板的题，提示放到下面，不挡题 */
+.jp-layer:not(.wide) .jp-time::before{content:"⏱ "}
