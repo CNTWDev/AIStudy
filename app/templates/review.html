@@ -2,6 +2,7 @@
 {% block body %}
 <div class="row"><h1 class="grow">{{ "抓词" if set_mode else {"words":"单词","mistakes":"错题重做","other":"复习卡片"}.get(group, "复习") }}</h1>{% if group == 'words' %}<a class="btn ghost sm" href="/words/map">🔤 {{ "抓词首页" if set_mode else "单词包" }}</a>{% endif %}<a class="btn ghost sm" href="/words">{{ "单词本" if set_mode else "生词本 / 错题本" }}</a></div>
 <p class="muted small for-grownups">{% if group == 'mistakes' %}错题原样再做一遍。隔天连续做对 2 次，会换一道同类的新题，也做对了就过关；过关 3 周后再回头看一眼。
+{% elif set_mode and day_task %}今天要做的单词一组一组来：新词先猜、再看用法，隔开几个别的词再回来认一次；学过的词换一种方式考。做完一组接着下一组，今天的都做完了，这一项就完成，接着做下一项。
 {% elif set_mode %}一组 8 个词左右：到期要复习的先来，再学几个新词、认一认以前学过的。新词先猜、再看用法，隔开几个别的词再回来认一次；认识的词点「我认识」，拼对了就不用学。做完一组可以再来一组，还送一局单词跑酷。
 {% elif group == 'words' %}新词先猜意思、再看例句，隔开几个别的词再回来认一次（马上考只是在考刚才的印象）。同一个词一次只考一个方向；学过的词隔 1、2、4、7 天回来，一次比一次难：选、补句子、拼、听写（前几轮用字母块拼，后面自己打，打不出来可以要字母块）。答错了隔几张再来一次。
 {% else %}每张都要作答。答对了下次隔得更久；答错了隔几张再来一次。{% endif %}</p>
@@ -19,7 +20,7 @@ async function load() {
   queue = []; back = []; n = 0; known = 0; total = 0; again.clear();
   let cards;
   if (SET) {
-    const r = await api('/api/words/set', {});
+    const r = await api('/api/words/set', {task: DAY});
     setId = r.id; cards = r.cards;
     hadDue = hadDue || cards.some(c => c.role === 'due');
   } else cards = (await api('/api/review/due' + (GROUP ? '?group=' + GROUP : ''))).cards;
@@ -78,14 +79,20 @@ function show() {
   if (WORD_MODES.includes(q.mode)) return showWord(box, c, q, cur.learn);
   showSelf(box, c);
 }
-/* 抓词（/words/go，app/wordpick.py）：一组一组来，做完有小结、再来一组、送一局单词跑酷 */
-const SET = {{ (set_mode or false)|tojson }};
+/* 抓词（/words/go，app/wordpick.py）：一组一组来。两个场合（DAY）：
+   自己来抓词——做完有小结、再来一组、送一局单词跑酷；
+   今天清单里的「单词」（wordpick.TASK_URL）——一组只出今天要做的词，做完一组接着下一组，都做完了像别的任务一样弹出下一项 */
+const SET = {{ (set_mode or false)|tojson }}, DAY = SET && {{ (day_task or false)|tojson }};
 let setId = null, hadDue = false;
 const WORD_MODES = ['meaning', 'choice', 'spell', 'dictate', 'cloze', 'cloze_spell', 'use'];
 const USE_TIP = {collocation: '哪个能和它搭在一起？', pattern: '哪个放进去句子才对？', error: '这句话里哪个词用错了？'};
 
 /* 一组做完：小结（新抓住的、找回来的、认识的、更熟了的、还调皮的；认识的词前后各多少），再来一组 / 用这组词跑一局 */
 async function setDone(box) {
+  if (!setId && DAY) {
+    box.innerHTML = `<div class="face pop">🎉 今天的单词做完了</div>` + acts('<a class="btn" href="/go">接着做今天的任务 →</a>');
+    return finishTask('words');
+  }
   if (!setId) {
     box.innerHTML = `<div class="face pop">🎉 今天的词都抓完了</div><p class="muted small">新词明天再学，记得更牢。</p>` +
       acts('<a class="btn" href="/words/map">回抓词</a>');
@@ -93,11 +100,8 @@ async function setDone(box) {
   }
   if (total) Run.finish();
   const r = await api(`/api/words/set/${setId}/done`, {});
-  const line = (icon, label, ws) => ws.length ? `<div class="ws-line"><b>${icon} ${label} ${ws.length} 个</b> <span class="muted">${ws.map(esc).join('  ')}</span></div>` : '';
-  box.innerHTML = `<div class="ws-sum pop"><div class="ws-h">这一组</div>` +
-    line('✓', '新抓住', r.new) + line('✓', '找回来', r.back) + line('✓', '认识的', r.known) + line('↑', '更熟了', r.up) +
-    (r.wobbly.length ? `<div class="ws-line"><b>· 还调皮的 ${r.wobbly.length} 个</b> <span class="muted">${r.wobbly.map(esc).join('  ')}（一会儿、明天还会来找你）</span></div>` : '') +
-    `<div class="ws-n">我认识的词 <b>${r.known_before}</b>${r.known_total > r.known_before ? ` → <b>${r.known_total}</b>` : ''}</div>` +
+  if (DAY) return dayDone(box, r);
+  box.innerHTML = `<div class="ws-sum pop">${setSum(r)}` +
     (!r.more ? '<p class="small muted">今天的词都抓完了。新词明天再学，睡一觉记得更牢。</p>' : r.room ? '' : '<p class="small muted">今天的新词够啦，明天学的会记得更牢。再来一组，把认得的词变成会用的。</p>') +
     `</div>` + acts((r.more ? '<button class="btn" id="again">再来一组</button>' : '<a class="btn" href="/words/map">回抓词</a>'),
                     r.reward ? `<a class="btn soft" href="/arena/runner?reward=${setId}">🏃 用这组词跑一局</a>` : '');
@@ -107,6 +111,25 @@ async function setDone(box) {
     hadDue = false;
     box.insertAdjacentHTML('beforeend', '<p class="small" style="text-align:center">✓ 今天的单词做完了 · <a href="/go">接着做今天的任务 ›</a></p>');
   }
+}
+
+/* 这一组的小结（两个场合都用）：新抓住的、找回来的、认识的、更熟了的、还调皮的；认识的词前后各多少 */
+function setSum(r) {
+  const line = (icon, label, ws) => ws.length ? `<div class="ws-line"><b>${icon} ${label} ${ws.length} 个</b> <span class="muted">${ws.map(esc).join('  ')}</span></div>` : '';
+  return `<div class="ws-h">这一组</div>` +
+    line('✓', '新抓住', r.new) + line('✓', '找回来', r.back) + line('✓', '认识的', r.known) + line('↑', '更熟了', r.up) +
+    (r.wobbly.length ? `<div class="ws-line"><b>· 还调皮的 ${r.wobbly.length} 个</b> <span class="muted">${r.wobbly.map(esc).join('  ')}（一会儿、明天还会来找你）</span></div>` : '') +
+    `<div class="ws-n">我认识的词 <b>${r.known_before}</b>${r.known_total > r.known_before ? ` → <b>${r.known_total}</b>` : ''}</div>`;
+}
+/* 今天清单里的「单词」做完一组：还有今天要做的词，就接着下一组；都做完了，这一项打勾（/api/words/set/<id>/done），弹出下一项。
+   再来一组、送一局跑酷是抓词自己的，不在这里 */
+function dayDone(box, r) {
+  const left = r.due_left;
+  box.innerHTML = `<div class="ws-sum pop">${setSum(r)}</div>` +
+    acts(left ? `<button class="btn" id="again">下一组 →<small>今天的单词还剩 ${left} 个</small></button>` : '<a class="btn" href="/go">接着做今天的任务 →</a>');
+  if (r.new.length + r.known.length) confetti();
+  if (left) $('#again', box).onclick = () => { box.innerHTML = '<span class="loading">加载中</span>'; load(); };
+  else finishTask('words');
 }
 
 /* 错题重做 / 知识点题：原题原样（选项齐全），系统判对错 */

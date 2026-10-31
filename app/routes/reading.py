@@ -1,6 +1,6 @@
 """reading HTTP routes. Learning commands live in app.learning."""
 from fastapi import APIRouter
-from fastapi import Body, Form, HTTPException, Request
+from fastapi import Body, Form, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from .. import arena, auth, bank, config, db, engine, evidence, itemtypes, llm, news, recall, webpage
 import re
@@ -60,18 +60,20 @@ def words_map(request: Request, msg: str = ""):
 
 
 @router.get("/words/go", response_class=HTMLResponse)
-def words_go(request: Request):
-    """抓词的一组（app/wordpick.py make_set）：复习页的那一套（先猜、隔开再考、一次一个方向），做完有小结、再来一组、送一局跑酷。"""
+def words_go(request: Request, from_: str = Query("", alias="from")):
+    """抓词的一组（app/wordpick.py make_set）：复习页的那一套（先猜、隔开再考、一次一个方向）。
+    两个场合同一个页面：自己来抓词，做完有小结、再来一组、送一局跑酷；从今天的清单来（wordpick.TASK_URL），
+    一组只出今天要做的词，一组接一组做到这一项完成，然后像别的任务一样弹出下一项。"""
     kid_or_redirect(request)
-    return render(request, "review.html", group="words", set_mode=True)
+    return render(request, "review.html", group="words", set_mode=True, day_task=from_ == "today")
 
 
 @router.post("/api/words/set")
-def words_set(request: Request):
-    """开一组：到期的（含今天的新词）→ 新词 → 往前补的认一认 → 往上推一级。"""
+def words_set(request: Request, body: dict = Body(default={})):
+    """开一组：到期的（含今天的新词）→ 新词 → 往前补的认一认 → 往上推一级。task：每日任务里，只出到期的。"""
     from .. import wordpick
     k = kid_or_redirect(request)
-    s = wordpick.make_set(k["id"])
+    s = wordpick.make_set(k["id"], due_only=bool(body.get("task")))
     out = []
     for c, role in s["cards"]:
         q = recall.push_quiz(k["id"], c) if role == "push" else recall.quiz(k["id"], c)
