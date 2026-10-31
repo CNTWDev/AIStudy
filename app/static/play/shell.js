@@ -30,7 +30,9 @@
      ctx.reviving 我在答题；ctx.deaths() 大家一共倒下几次；ctx.roleIndex(r) 角色是第几个；
      ctx.slot(id) 这个人是第几个（按角色排，0 起，对应关卡里的 1～4 号出生点，人少时也是连着的）
    设备：每个页面一个设备号（刷新不变）。服务器记着每个账号在哪台设备上玩（app/arena/rooms.py）：另一台设备上正在玩，
-   就先问要不要换过来；换走了的那台下次存档时被告知，停下来。 */
+   就先问要不要换过来；换走了的那台下次存档时被告知，停下来。
+   退出（DESIGN 5.61）：孩子自己点的退出就是真的离开——暂停面板「不玩了，回大厅」、左上角 ‹、房间里「退出房间」都走 leaveRoom，
+   让出座位，回来进的是大厅；只有刷新、换设备、被打断才接着玩。 */
 (function () {
   const PlayShell = window.PlayShell = {};
   const root = document.getElementById('pl');
@@ -298,14 +300,33 @@
       previewN = room.level || 1;
       if (state === 'room') showRoom();
     }
-    async function backToLobby() {
+    // 离开房间（房间里点「退出房间」、玩的时候暂停了点「退出，回大厅」、点左上角 ‹）：正在玩就先停下这一关、告诉队友，
+    // 再真的让出座位（服务器 rooms.leave：这一局记成退出，房主走了换人当）。这样回乐园再点这款游戏，进的是大厅，
+    // 能看到、能加入别人（比如爸爸妈妈）开的房间，不会又被拉回原来那一局。只是刷新、换设备才接着玩。
+    async function leaveRoom() {
+      let ended = null;
+      if (cur) {
+        send({t: 'over', why: `${nameOf(me0.id)}退出了`, result: 'quit', res: {result: 'quit', session: cur.session}});
+        stopPlay(); endEl.hidden = true;
+        if (match) ended = api(`/api/arena/${match.match_id}/end`, {result: 'quit', stats: {}}).catch(() => {});
+      }
       if (room) { try { await roomApi('leave'); } catch (e) { /* 房间已经关了 */ } }
+      await ended;
       if (net) { net.send({t: 'room'}); net.close(); net = null; }
-      online.clear();
+      online.clear(); room = null;
+    }
+    async function backToLobby() {
+      await leaveRoom();
       if (!multi) { location.href = BACK; return; }
       try { lobby = await api(`/api/games/${G.id}/lobby`); } catch (e) { /* 用旧的 */ }
       showLobby();
     }
+    const backLink = root.querySelector('.pl-back');
+    if (multi && backLink) backLink.addEventListener('click', e => {   // 联网游戏点 ‹：离开房间再走（最多等 2 秒）
+      if (!room) return;
+      e.preventDefault(); gone = true;
+      Promise.race([leaveRoom(), new Promise(r => setTimeout(r, 2000))]).finally(() => { location.href = backLink.href; });
+    });
     async function rejoin(fresh) {   // 回到正在玩的这一局（fresh：房主刚开的新一局，和房主一起倒数；不然是队友还在玩，接着玩）
       if (resuming || cur || gone) return;
       resuming = true;
@@ -544,8 +565,12 @@
       const who = by === me0.id ? '你' : nameOf(by);
       pauseEl.querySelector('.pl-panel').innerHTML = `<div class="pl-title">⏸ ${esc(who)}暂停了</div>
         <p class="small">${multi ? '谁都可以点继续，大家一起倒数 3 秒再开始。' : '休息一下，准备好了点继续，倒数 3 秒再开始。'}暂停的时间不算用时，也不算今天玩游戏的时间。</p>
-        <button type="button" class="btn lg block pl-go pl-resume">▶ 继续</button>`;
+        <button type="button" class="btn lg block pl-go pl-resume">▶ 继续</button>
+        <button type="button" class="btn ghost block pl-quit" style="margin-top:8px">${multi ? '🚪 不玩了，回大厅' : '🚪 这一局不玩了'}</button>
+        ${multi ? '<p class="small muted">回大厅能看到别人开的房间，比如爸爸妈妈开的，点一下就加入。</p>' : ''}`;
       pauseEl.querySelector('.pl-resume').onclick = () => { send({t: 'resume'}); doResume(me0.id); };
+      // 退出这一关：联网的离开房间回大厅（leaveRoom），单机的这一局记成退出、看结算（下次进来从选关开始，不再接着这一局）
+      pauseEl.querySelector('.pl-quit').onclick = () => { pauseEl.hidden = true; if (multi) backToLobby(); else finish('quit', {}, '这一局先不玩了'); };
       pauseEl.hidden = false; pauseBtn.hidden = true;
       Play.sfx.play('click');
     }
@@ -678,6 +703,7 @@
     // ---------------------------------------------------------------- 打开页面：回到我的房间（刷新了、换了设备），正在玩就接着玩
     if (data.locked) over.classList.add('locked');
     if (!multi) { panel.innerHTML = `<div class="pl-title">${esc(G.icon)} ${esc(G.name)}</div>`; enter(post('/api/rooms', {game: G.id})); }
+    else if (data.join) { panel.innerHTML = '<div class="pl-title">正在加入房间…</div>'; joinRoom(data.join); }   // 从「X 在等你」点进来
     else if (data.room) { panel.innerHTML = '<div class="pl-title">正在回到房间…</div>'; enter(post(`/api/rooms/${data.room}/enter`)); }
     else showLobby();
     return sh;
