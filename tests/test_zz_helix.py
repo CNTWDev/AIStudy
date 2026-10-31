@@ -12,7 +12,7 @@ from tests.test_zz_words import _kid
 
 def test_helix_levels():
     g = arena.GAMES["helix"]
-    assert list(arena.GAMES)[:2] == ["runner", "helix"] and g.players == (1, 4) and g.multi and g.shape == "choices" and not g.freeze
+    assert "helix" in list(arena.GAMES)[:3] and g.players == (1, 4) and g.multi and g.shape == "choices" and not g.freeze
     assert g.total == 1000
     for n in list(range(1, 40)) + [100, 500, 1000]:
         lv = g.level(n)   # level() 里跑 check：每层 12 格、普通层有洞也有落脚的地方

@@ -38,6 +38,8 @@ def test_theme_complete_and_readable(tid):
             assert r >= 4.5, f"{tid} {mode}: --{fg} 在 --{bg} 上对比度 {r:.2f} < 4.5"
     assert t["mascot"] in brand.ALL and brand.mascot_svg(t["mascot"])
     assert t["play"].get("wave") in (None, *theme.PLAY_WAVES)
+    if t["play"].get("ink"):   # 乐园的描边画在亮的游戏画面上（白天的天空、白卡片）：要深，不能是深色模式的浅字
+        assert _ratio(t["play"]["ink"], "#ffffff") >= 7, f"{tid}: 乐园描边 {t['play']['ink']} 太浅"
 
 
 def test_first_batch():
