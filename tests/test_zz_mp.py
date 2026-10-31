@@ -93,8 +93,10 @@ def _family(tag):
     pid = auth.create_user(f"mp-p-{tag}@x.com", "secret1", "家长", "parent")
     a = auth.create_user(f"mp-a-{tag}@x.com", "2580", "姐姐", "kid", parent_id=pid, grade="G8")
     b = auth.create_user(f"mp-b-{tag}@x.com", "2580", "弟弟", "kid", parent_id=pid, grade="G3")
-    for k in (a, b):
+    for k, g in ((a, "G8"), (b, "G3")):
         arena.set_game_unlock(k, "free")
+        # 游戏的题只出自在学的课（sources.asks）：两个孩子都在学数学
+        db.run("INSERT INTO enrollments(user_id,pack_id,stage,active,track) VALUES(?,?,?,1,?)", k, "math-shanghai", g, None)
     return pid, a, b
 
 

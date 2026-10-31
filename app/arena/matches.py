@@ -65,6 +65,8 @@ def start(kid: dict, game: str, session=None, resume=None, reward=None) -> dict:
     why = "" if free else rules.locked_reason(st)
     if why:
         raise ArenaError(why, 403)
+    if not gift:
+        sources.asks(kid, g.ask)   # 这个人在这款游戏里出不了题（没学能出题的课、没有单词包）：开局前就说，不进了游戏才发现
     sid = None
     if session:
         s = db.one("SELECT s.id FROM game_sessions s JOIN room_members m ON m.room_id=s.room_id "

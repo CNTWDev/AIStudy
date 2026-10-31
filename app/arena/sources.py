@@ -2,6 +2,9 @@
 
 题不让孩子选，每个孩子出自己的题：pick 按这个孩子在学的科目、每个知识点的掌握度（个性化学习系统的记录）
 挑题源和知识点，难度按他自己的 θ 定。一起玩的孩子各答各的题，高中生和小学生一起玩也各自答得上。
+题只出自这个人在学的东西（在学的课、在用的单词包），知识点和每天的学习用同一把尺子筛（engine.Paused：
+退掉的课、不是给这群人的课、还没上过的课都不出）。一种都出不了就直说（asks），不拿一年级口算凑：
+成人没选数学课，游戏里就不出口算。
 
 一种题源要回答四个问题：
 - weight(kid, ctx)：这个孩子能不能用、出题时占多少（0 = 不能用）；
@@ -10,7 +13,7 @@
 - 每道题都带 dim（能力维度，存 θ）、family / level（难度 b 的校准单位）和 p（出题时预测的答对概率，公平看板用）。
 
 现有题源：
-- math：沪教版一到六年级的口算、短计算，按题族现场生成（app/quickgen.py），答案由程序算出；
+- math：一到初中的口算、短计算，按题族现场生成（app/quickgen.py），答案由程序算出；只给学数学、物理这些课的人；
 - words：英语核心词和教材术语（content/words_en.json 的词表 + 孩子自己的生词卡），四选一认词义；
 - bank：题库里孩子学过的知识点上的短选择题（AI 出过、存下来的题），任何学科都能用。
 加一种题源：写一个 Source 子类，登记到 SOURCES；游戏和经验值规则都不用改。
@@ -114,6 +117,7 @@ def _mcq(q: str, right: str, wrongs: list[str], rng: random.Random) -> dict:
 class Source:
     id = name = icon = desc = ""
     target_shift = 0.0   # 这种题本身更容易蒙对（四选一），目标答对率稍微调高一点
+    redraw = False       # 这次没出成，再抽一次可能就成（现场生成的题：换一族、换一级）
 
     def weight(self, kid: dict, ctx: Ctx) -> float:
         return 0.0
@@ -136,48 +140,64 @@ FAR_BEHIND = 3      # 比孩子低 3 个年级以上的口算，除非这个知�
 
 
 class MathSource(Source):
+    """只给在学数学（或学物理、化学这些用得上数学的课）的人出：没学数学的人（比如只选了成人课的家长）一道口算也不出。
+    知识点也按每天的学习同一把尺子筛（ctx.paused：退掉的课、不是给这群人的课、还没上过的课都不出），
+    比自己低 FAR_BEHIND 个年级以上的不出（查出薄弱的除外）。一个都剩不下就是这个人用不上口算（weight = 0），不拿一年级的题凑。"""
     id, name, icon, desc = "math", "口算和公式", "🔢", "口算、短计算、单位换算和代公式，数字现场生成"
+    redraw = True
+    USERS = {"math", "physics", "chemistry", "science", "economics"}   # 数学是这些课的地基（见 _meta/ladder.json）
 
     def _rank(self, ctx: Ctx) -> float:
         e = next((e for e in ctx.packs if catalog.packs[e["pack_id"]].subject == "math"), None)
         r = stage_rank(e["stage"]) if e else ctx.rank
         return r if r < 99 else 6.0
 
-    def pool(self, ctx: Ctx, target: float) -> list[tuple[str, float]]:
-        rank = self._rank(ctx)
-        enrolled = {e["pack_id"] for e in ctx.packs}
-        out = []
-        for fam, (kp_id, _, _) in quickgen.FAMILIES.items():
-            kp = catalog.kps.get(kp_id)
-            if not kp:
-                continue
-            if catalog.packs[kp["pack"]].subject != "math":   # 别的学科的基本功（物理的单位、公式）：只给报了那门课的孩子，按正在学的算
-                if not enrolled & set(catalog.kp_packs.get(kp_id, [])):
+    def _kps(self, ctx: Ctx) -> list[tuple[str, float]]:
+        """这个人能出的口算知识点和它的学段（和目标、这一局出过几道无关，一次出题只算一遍）。"""
+        def load():
+            if not self.USERS & ctx.subjects:
+                return []
+            rank, hold = self._rank(ctx), ctx.paused.kps
+            enrolled = {e["pack_id"] for e in ctx.packs}
+            out = []
+            for kp_id in quickgen.BY_KP:
+                kp = catalog.kps.get(kp_id)
+                if not kp or kp_id in hold:
                     continue
-                r = rank
-            elif stage_rank(kp["stage"]) > rank:
-                continue
-            else:
+                if catalog.packs[kp["pack"]].subject != "math":   # 别的学科的基本功（物理的单位、公式）：只给报了那门课的人，按正在学的算
+                    if enrolled & set(catalog.kp_packs.get(kp_id, [])):
+                        out.append((kp_id, rank))
+                    continue
                 r = stage_rank(kp["stage"])
                 status = (ctx.mastery.get(kp_id) or {}).get("status")
-                if rank - r >= FAR_BEHIND and status not in ("weak", "learning"):   # 初二做 10 以内加减没意义；查出薄弱了才出
+                if r > rank or (rank - r >= FAR_BEHIND and status not in ("weak", "learning")):   # 初二做 10 以内加减没意义；查出薄弱了才出
                     continue
+                out.append((kp_id, r))
+            return out
+        return ctx.get_or("math_kps", load)
+
+    def pool(self, ctx: Ctx, target: float) -> list[tuple[str, float]]:
+        rank = self._rank(ctx)
+        out = []
+        for kp_id, r in self._kps(ctx):
             w = _status_weight(ctx, kp_id, r < rank)
             theta, _ = kp_ability(ctx, kp_id, rank)
             # 这个知识点最合适的一级也离目标很远（太难或太简单）：少出，换别的知识点
-            w *= max(0.05, 1 - 2.5 * ability.fit_gap(theta, ability.calib(fam, quickgen.LEVELS), target))
+            w *= max(0.05, 1 - 2.5 * ability.fit_gap(theta, ability.calib(quickgen.BY_KP[kp_id], quickgen.LEVELS), target))
             out.append((kp_id, w / (1 + 0.35 * (rank - r)) / (1 + ctx.run.get(kp_id, 0))))   # 这一次里出过的少出
-        return out or [(quickgen.FAMILIES["add10"][0], 1.0)]
+        return out
 
     def weight(self, kid, ctx):
-        # 数学是理科的地基（见 _meta/ladder.json）：学物理、化学、科学、经济的孩子，口算和公式也多出一些
-        maths = {"math", "physics", "chemistry", "science", "economics"} & ctx.subjects
-        if ctx.rank > 9 and "physics" not in ctx.subjects:      # 高中生做小学口算没意思
+        if not self._kps(ctx):
+            return 0.0
+        if ctx.rank > 9 and "physics" not in ctx.subjects:      # 高中生做口算没意思，偶尔出
             return 0.15
-        return 1.0 if maths else 0.4
+        return 1.0
 
     def pick(self, kid, ctx, target, rng):
         pool = self.pool(ctx, target)
+        if not pool:
+            return None
         kp_id = rng.choices([k for k, _ in pool], weights=[w for _, w in pool])[0]
         fam = quickgen.BY_KP[kp_id]
         theta, _ = kp_ability(ctx, kp_id, self._rank(ctx))
@@ -200,6 +220,7 @@ class WordSource(Source):
     今天该复习的生词卡、术语卡先出（四成左右，答了就算复习过，按记忆模型排下次），别的生词卡也常拿出来见见。"""
     id, name, icon, desc = "words", "单词", "🔤", "英语单词和课本术语，四选一认意思"
     target_shift = 0.05
+    redraw = True
 
     @staticmethod
     def _lists(ctx: Ctx) -> list[dict]:
@@ -459,8 +480,10 @@ class BankSource(Source):
             tried.add(kp_id)
             theta, _ = kp_ability(ctx, kp_id)
             lv = ability.pick_level(theta, ability.calib("bank", quickgen.LEVELS), target, rng)
+            again = bool(ctx.get("again"))   # 别的题源也出不了：拿做错过的老题、这一局出过的题凑，不让这一局没题
             got = engine.items_for(kid["id"], kp_id, n=1, purpose="quick", grade=kid.get("grade") or "",
-                                   exclude=ctx.get("served") or (), ai=False, near_level=lv)
+                                   exclude=() if again else ctx.get("served") or (), ai=False, near_level=lv,
+                                   fallback=True if again else None)
             if not got:
                 prefetch.quick(kid["id"], kp_id, kid.get("grade") or "")
                 continue
@@ -569,33 +592,51 @@ def weights(kid: dict, ctx: Ctx | None = None) -> dict[str, float]:
 
 
 NO_SOURCE = {"words": "还没有单词包：孩子请家长在「学习安排 → 单词包」里加一个，自己学的在「我的词」里挑一个。"}
+NOTHING = ("游戏里的题都出自你正在学的课和单词包，现在还没有能在这里出的题。"
+           "孩子请家长在「学习安排」里加一门课或一个单词包；自己学的在「我的课程」「我的词」里加。")
+BUSY = "你在学的课题还在准备，过一会儿再来。"
+
+
+def asks(kid: dict, ask: tuple | None = None, ctx: Ctx | None = None) -> dict[str, float]:
+    """这个人在这款游戏里能出哪几种题、各占多少；一种都没有就说为什么（开局前先查，不让人进了游戏才发现没题）。"""
+    ws = weights(kid, ctx)
+    if ask:
+        if ask[0] not in ws:
+            raise ArenaError(NO_SOURCE.get(ask[0], NOTHING), 409)
+        return {ask[0]: 1.0}
+    if not ws:
+        raise ArenaError(NOTHING, 409)
+    return ws
 
 
 def pick(kid: dict, target: float, rng: random.Random, ctx: Ctx | None = None, mode: str = "game", ask: tuple | None = None,
          shape: str = "") -> dict:
-    """给这个孩子出一道题（游戏、冲刺都用它）：target 是目标答对率；mode = sprint 时也出听音题。
-    ask：只出一种题的游戏（单词跑酷：("words", "run")），只从这个题源出；这个人用不上它（没有单词包）就出不了，告诉他为什么。
-    shape = "choices"：题都写成 2～4 个短选项（as_choices），写不成的换别的题源。
-    抽中的题源这次出不了题（比如题库里一时没有新题、后台还在出），换别的题源。"""
+    """给这个人出一道题（游戏、冲刺都用它）：target 是目标答对率；mode = sprint 时也出听音题。
+    题只出自他在学的东西（asks）：没有就不出，不拿哪一级的口算凑。
+    ask：只出一种题的游戏（单词跑酷：("words", "run")），只从这个题源出。
+    shape = "choices"：题都写成 2～4 个短选项（as_choices），写不成的换一道、换别的题源。
+    抽中的题源这次出不了题（题库里一时没有新题、后台还在出），换别的题源；都出不了，再来一轮，这一轮题库的题可以拿老题凑。"""
     ctx = ctx or Ctx(kid)
     ctx["mode"], ctx["shape"] = mode, shape
-    shaped = (lambda x: x and as_choices(x, rng)) if shape == "choices" else (lambda x: x)
-    ws, it = weights(kid, ctx) or {"math": 1.0}, None
     if ask:
-        if ask[0] not in ws:
-            raise ArenaError(NO_SOURCE.get(ask[0], "这款游戏现在没有题可以出"), 409)
-        ws, ctx["ask_fmt"] = {ask[0]: 1.0}, ask[1] if len(ask) > 1 else None
-    while ws and not it:
-        sid = rng.choices(list(ws), weights=list(ws.values()))[0]
-        ws.pop(sid)
-        s = SOURCES[sid]
-        it = shaped(s.pick(kid, ctx, min(0.92, target + s.target_shift), rng))
-    for _ in range(PICK_TRIES):   # 口算总出得了（写成选项也总写得成：答案是程序算的数）
-        if it:
-            break
-        sid, it = "math", shaped(SOURCES["math"].pick(kid, ctx, target, rng))
-    it["src"] = sid
-    return it
+        ctx["ask_fmt"] = ask[1] if len(ask) > 1 else None
+    shaped = (lambda x: x and as_choices(x, rng)) if shape == "choices" else (lambda x: x)
+    ws = asks(kid, ask, ctx)
+    for again in (False, True):
+        ctx["again"] = again
+        left = dict(ws)
+        for _ in range(PICK_TRIES):   # 口算写成选项偶尔写不成（这一族不是数），同一个题源多抽几次
+            if not left:
+                break
+            sid = rng.choices(list(left), weights=list(left.values()))[0]
+            s = SOURCES[sid]
+            it = shaped(s.pick(kid, ctx, min(0.92, target + s.target_shift), rng))
+            if it:
+                it["src"] = sid
+                return it
+            if not s.redraw:
+                left.pop(sid)
+    raise ArenaError(BUSY, 503)
 
 
 # ------------------------------------------------------------------ 一次快练 / 一局游戏里的出题顺序（见文件开头）
