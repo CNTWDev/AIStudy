@@ -82,3 +82,30 @@ def test_jump_page_and_short_choices(monkeypatch):
             assert all(sources._width(o) <= sources.OPT_WIDTH for o in q["options"])
             res = matches.answer(k, m["match_id"], q["id"], "0")   # 落在第一块板上
             assert res["answer"][:2] in ("A.", "B.", "C.", "D.")   # 前端从这里知道对的是哪一块
+
+
+def test_gate_questions_survive_revive(monkeypatch):
+    """题板的题先要来摆好，半路倒下复活答了一道，走到题板再答还是那道题、判得对（以前共用一道「没答的题」，会被判成过期）。"""
+    with TestClient(app) as c:
+        k = _kid(c, monkeypatch, "jp2@x.com")
+        arena.set_game_unlock(k["id"], "free")
+        k = dict(db.one("SELECT * FROM users WHERE id=?", k["id"]))
+        mid = matches.start(k, "jump")["match_id"]
+        gate = matches.question(k, mid, random.Random(1), gate="jump5.0")["item"]
+        assert matches.question(k, mid, random.Random(2), gate="jump5.0")["item"]["id"] == gate["id"]   # 同一块题板还是同一道
+        panel = matches.question(k, mid, random.Random(3))["item"]   # 倒下了：复活答题
+        assert panel["id"] != gate["id"]
+        matches.answer(k, mid, panel["id"], "0")
+        res = matches.answer(k, mid, gate["id"], "0")
+        right = "ABCD".index(res["answer"][0])
+        assert res["correct"] == (right == 0)
+        with pytest.raises(arena.ArenaError):   # 答过了就不在手上了
+            matches.answer(k, mid, gate["id"], "0")
+        held = [matches.question(k, mid, random.Random(10 + i), gate=f"g{i}")["item"]["id"] for i in range(matches.GATE_KEEP + 2)]
+        st = db.jload(db.one("SELECT data FROM arena_matches WHERE id=?", mid)["data"], {})
+        assert len(st["gates"]) == matches.GATE_KEEP and held[-1] in {p["item"]["id"] for p in st["gates"].values()}
+    page = TestClient(app).get("/static/play/shell.js").text
+    for f in ("jump", "helix", "fly"):   # 三个有题板的游戏都走外壳的题板接口
+        js = TestClient(app).get(f"/static/play/{f}.js").text
+        assert "sh.gateAsk(" in js and "sh.gateAnswer(" in js and "/q`" not in js, f
+    assert "?gate=" in page and "lost" in page

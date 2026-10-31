@@ -65,7 +65,7 @@
     back.grow = -1;
     const row = s.rows[i];
     if (!row) return;
-    if (row.gate) return startGate(row);
+    if (row.gate) return startGate(row, i);
     Object.assign(to, {row, k: 0, grow: 1, smashed: new Set(), honey: row.honey, took: false});
   }
   function spikeAt(w, j) {   // 这一格的刺：中心高度、多深（0 = 没有 / 缩着 / 闪掉了）
@@ -88,9 +88,9 @@
   }
 
   // ------------------------------------------------------------ 题墙：在泡泡里停住，题来了点一下出发；撞到哪朵花就是哪个答案
-  function startGate(row) {
+  function startGate(row, i) {
     const s = S, to = side(s.dir);
-    s.gate = {row, side: to, item: null, tried: new Set(), right: -1, done: false, busy: false, k: 1, bloom: -1, bloomT: 0};
+    s.gate = {row, i, side: to, item: null, tried: new Set(), right: -1, done: false, busy: false, k: 1, bloom: -1, bloomT: 0};
     Object.assign(s.walls[to], {row: null, k: 0, grow: 0, honey: -1});
     s.mode = 'bubble'; s.vy = 0; s.soft = 1;
     s.pick = null;
@@ -99,11 +99,8 @@
   }
   async function loadGate(g) {
     try {
-      const r = await fetch(`/api/arena/${c.match.match_id}/q`);
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error || d.detail || '出错了');
-      g.item = d.item; g.k = Math.max(2, Math.min(4, (d.item.options || []).length));
-      if (d.item.say && typeof Speak !== 'undefined') Speak.play(d.item.say, 'en', 'word');
+      g.item = await sh.gateAsk('fly' + g.i); g.k = Math.max(2, Math.min(4, (g.item.options || []).length));
+      if (g.item.say && typeof Speak !== 'undefined') Speak.play(g.item.say, 'en', 'word');
     } catch (e) { g.done = true; g.right = 0; g.k = 1; sh.toast('题墙开着，直接撞过去吧', 'warn'); }
     buildQ();
   }
@@ -114,14 +111,12 @@
   async function choose(g, o) {   // 第一次撞到哪朵就是答案
     if (g.busy) return;
     g.busy = true; S.mode = 'wait'; S.vy = 0;
-    let res = null;
-    try { res = await api(`/api/arena/${c.match.match_id}/a`, {item_id: g.item.id, answer: String(o)}); } catch (e) { /* 过期了、断网了：当作看答案过 */ }
+    const a = await sh.gateAnswer(g.item, o);
     g.busy = false;
     if (S.mode !== 'wait' || S.gate !== g) return;
-    S.mode = 'play';
-    if (res && /^[A-H]\. /.test(res.answer || '')) g.right = 'ABCDEFGH'.indexOf(res.answer[0]);
-    if (!res || g.right < 0) g.right = o;
-    if (res && res.correct) {
+    S.mode = 'play'; g.right = a.right;
+    if (a.lost) { g.done = true; passGate(g, false); }   // 没答上（过期、断网）：当作看答案过，不算错
+    else if (a.correct) {
       g.done = true; S.gatesOk++;
       passGate(g, true);
     } else {

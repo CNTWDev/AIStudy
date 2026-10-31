@@ -89,19 +89,41 @@ def start(kid: dict, game: str, session=None, resume=None, reward=None) -> dict:
             "ghost": ghost(kid["id"]) if game == "race" else None, "target": g.target}
 
 
-def question(kid: dict, match_id, rng: random.Random | None = None) -> dict:
+GATE_KEEP = 6   # 一局里最多同时拿着几道题板的题（前面的题板先要来的、还没答的）
+
+
+def question(kid: dict, match_id, rng: random.Random | None = None, gate: str = "") -> dict:
+    """出一道题。gate 不写：答题面板（复活、常驻面板）那一道，没答之前再要还是它（90 秒内）；
+    gate 写了（题板、题门、题墙……画在游戏世界里的题，游戏先要来摆好）：每块题板各拿各的，答之前一直是它，
+    和答题面板互不相干。以前两边共用一道「没答的题」，题板的题先要来、半路倒下复活答掉了，走到题板再答就「过期」了。"""
     m = _match(kid, match_id)
     st, now = m["state"], time.time()
     if st.get("freeze_until", 0) > now:
         raise ArenaError("冷冻中，等一下再答", 423, freeze_ms=int((st["freeze_until"] - now) * 1000))
-    pend = st.get("pending")
-    if not pend or now - pend["issued"] > rules.PENDING_KEEP_S:
+    gate = str(gate or "")[:24]
+    gates = st.setdefault("gates", {})
+    pend = gates.get(gate) if gate else st.get("pending")
+    if not pend or (not gate and now - pend["issued"] > rules.PENDING_KEEP_S):
         g = get(m["game"])
         it = sources.next_item(kid, st, g.target, rng or random.Random(), ask=g.ask, shape=g.shape)
         pend = {"item": it, "issued": now}
-        st["pending"] = pend
+        if gate:
+            gates[gate] = pend
+            for k in sorted(gates, key=lambda k: gates[k]["issued"])[:-GATE_KEEP]:
+                gates.pop(k)
+        else:
+            st["pending"] = pend
         _save_state(m["id"], st)
     return {"item": sources.public(pend["item"])}
+
+
+def _take(st: dict, item_id: str):
+    """拿出要答的那道题（答题面板的，或者哪块题板的），答了就不在手上了；没有就是过期了。"""
+    if (st.get("pending") or {}).get("item", {}).get("id") == item_id:
+        return st.pop("pending")
+    gates = st.get("gates") or {}
+    key = next((k for k, p in gates.items() if p["item"]["id"] == item_id), None)
+    return gates.pop(key) if key is not None else None
 
 
 @db.atomic_user
@@ -109,8 +131,8 @@ def answer(kid: dict, match_id, item_id: str, ans, dont_know=False, rng: random.
     rng = rng or random.Random()
     m = _match(kid, match_id)
     st, now = m["state"], time.time()
-    pend = st.get("pending")
-    if not pend or pend["item"]["id"] != item_id:
+    pend = _take(st, item_id)
+    if not pend:
         raise ArenaError("这道题已经过期了，再点一次答题", 409)
     it = pend["item"]
     ms = int((now - pend["issued"]) * 1000)  # 用服务器计时，不信客户端
@@ -144,7 +166,6 @@ def answer(kid: dict, match_id, item_id: str, ans, dont_know=False, rng: random.
     d = st["dims"].setdefault(dim, [0, 0, it.get("topic", "")])
     d[0] += 1
     d[1] += 1 if correct else 0
-    st.pop("pending", None)
     _save_state(m["id"], st)
     db.run("INSERT INTO arena_answers(user_id,match_id,kp_id,family,level,q,p_pred,correct,ms,xp,created_at) "
            "VALUES(?,?,?,?,?,?,?,?,?,?,?)", kid["id"], m["id"], dim, fam, lv, it["q"][:200], it.get("p"),
@@ -170,6 +191,7 @@ def _close(match_id: int, started_at: str, result: str, stats: dict, cap: int = 
     secs = int(min(cap, max(0, (rules._ts(db.now()) - rules._ts(started_at)).total_seconds() - rules.paused_seconds(st))))
     st.pop("paused_at", None)
     st.pop("pending", None)
+    st.pop("gates", None)
     st["client"] = stats
     db.run("UPDATE arena_matches SET ended_at=?, seconds=?, result=?, data=? WHERE id=?",
            db.now(), secs, result, db.jdump(st), match_id)
