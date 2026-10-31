@@ -66,10 +66,8 @@
     if (g.q || !c) return;
     g.q = {item: null, right: -1, done: false, armed: false, free: 0, busy: false, tried: 0};
     try {
-      const r = await fetch(`/api/arena/${c.match.match_id}/q`);
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error || d.detail || '出错了');
-      g.q.item = d.item; g.opts = optsOf(g, Math.min(4, (d.item.options || []).length || 1));
+      g.q.item = await sh.gateAsk('jump' + g.y);
+      g.opts = optsOf(g, Math.min(4, (g.q.item.options || []).length || 1));
     } catch (e) { g.q.done = true; g.q.right = 0; g.opts = optsOf(g, 1); }
     if (S.gate === g) { pickSel(0); buildQ(); }
   }
@@ -103,14 +101,12 @@
       return wrong(g, o, true);
     }
     q.busy = true; S.mode = 'wait'; S.vy = 0; S.y = o.y; S.x = o.x;
-    let res = null;
-    try { res = await api(`/api/arena/${c.match.match_id}/a`, {item_id: q.item.id, answer: String(o.o)}); } catch (e) { /* 过期了、断网了：当作看答案过 */ }
+    const a = await sh.gateAnswer(q.item, o.o);
     q.busy = false;
     if (S.mode !== 'wait') return;
-    S.mode = 'play';
-    if (res && /^[A-H]\. /.test(res.answer || '')) q.right = 'ABCDEFGH'.indexOf(res.answer[0]);
-    if (!res || q.right < 0) q.right = o.o;
-    if (res && res.correct) { q.done = true; S.gatesOk++; passGate(g, o, true); }
+    S.mode = 'play'; q.right = a.right;
+    if (a.correct) { q.done = true; S.gatesOk++; passGate(g, o, true); }
+    else if (a.lost) { q.done = true; passGate(g, o, false); }   // 没答上（过期、断网）：当作看答案过，不算错
     else wrong(g, o, false);
     buildQ();
   }

@@ -25,6 +25,7 @@
      ctx.finish(result, report, title)   这一关结束：win / lose / draw / quit；report 是游戏报的数据（用时、分数、血量……），
                                          联网时只有开房间的人报过关，谁都可以报没过（时间到了）。report.why 写在结算上
      ctx.toast(文字, 'good' | 'warn')；ctx.elapsed() 这一关玩了多少秒
+     ctx.sh.gateAsk(哪一块) / ctx.sh.gateAnswer(题, 第几个)   题板的题（往上跳、向下跳、左右飞）：每块题板各拿各的题，见下面
    联网时还有：ctx.net 连接（net.js）；ctx.me / ctx.peer / ctx.peers {id, name, avatar, role}；ctx.host 我是不是开房间的（共享的东西由他算）；
      ctx.die() 我倒下了：题目盖在游戏上，答对 1 道就起来（答错、点「这题不会」都只是换一道，不加题）；ctx.rescue() 队友救了我；
      ctx.reviving 我在答题；ctx.deaths() 大家一共倒下几次；ctx.roleIndex(r) 角色是第几个；
@@ -54,6 +55,15 @@
     const panel = $('.pl-start .pl-panel'), over = $('.pl-start'), endEl = $('.pl-end'), stageEl = $('.pl-stage');
     sh.toast = (t, k) => Play.ui.toast($('.pl-toast'), t, k);
     sh.finish = finish;
+    // 题板（画在游戏世界里的题：题板、题门、题墙）：每块各拿各的题，和倒下复活的答题面板互不相干。
+    // gateAsk(哪一块) → 题；gateAnswer(题, 第几个) → {correct, right：对的是第几个, lost：没答上（过期、断网），当作看答案过}
+    sh.gateAsk = async key => (await api(`/api/arena/${sh.match.match_id}/q?gate=${encodeURIComponent(key)}`)).item;
+    sh.gateAnswer = async (item, i) => {
+      let res = null;
+      try { res = await api(`/api/arena/${sh.match.match_id}/a`, {item_id: item.id, answer: String(i)}); } catch (e) { /* 过期了、断网了 */ }
+      const right = res && res.correct ? i : res && /^[A-H]\. /.test(res.answer || '') ? 'ABCDEFGH'.indexOf(res.answer[0]) : -1;
+      return right < 0 ? {correct: false, right: i, lost: true} : {correct: !!res.correct, right, lost: false};
+    };
     sh.hudClock = text => { const c = sh.hud.querySelector('.mp-clock'); if (c) c.textContent = text; };
     if (quizMode === 'dock') root.classList.add('has-dock');
     Play.ui.soundButtons(root, def.tempo);

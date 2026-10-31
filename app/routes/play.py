@@ -75,8 +75,8 @@ def arena_avatar(request: Request, body: dict = Body(...)):
 
 
 @router.get("/api/arena/{match_id}/q")
-def arena_question(request: Request, match_id: int):
-    return arena.question(kid_or_redirect(request), match_id)
+def arena_question(request: Request, match_id: int, gate: str = ""):
+    return arena.question(kid_or_redirect(request), match_id, gate=gate)
 
 
 @router.post("/api/arena/{match_id}/a")

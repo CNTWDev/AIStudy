@@ -61,12 +61,7 @@
   async function loadGate(row) {
     if (row.q || !c) return;
     row.q = {item: null, holeOf: Array(N).fill(-1), tried: new Set(), right: -1, done: false, armed: false, free: 0, busy: false};
-    try {
-      const r = await fetch(`/api/arena/${c.match.match_id}/q`);
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error || d.detail || '出错了');
-      openGate(row, d.item);
-    } catch (e) { row.q.done = true; row.q.item = null; sh.toast('题门开着，直接掉下去吧', 'warn'); openGate(row, null); }
+    try { openGate(row, await sh.gateAsk('helix' + row.i)); } catch (e) { row.q.done = true; row.q.item = null; sh.toast('题门开着，直接掉下去吧', 'warn'); openGate(row, null); }
   }
   function openGate(row, it) {
     const g = row.q, k = it && it.options ? Math.min(4, it.options.length) : 1;
@@ -81,15 +76,13 @@
     const g = row.q;
     if (g.busy) return;
     g.busy = true; S.mode = 'wait'; S.vy = 0;
-    let res = null;
-    try { res = await api(`/api/arena/${c.match.match_id}/a`, {item_id: g.item.id, answer: String(j)}); } catch (e) { /* 过期了、断网了：当作看答案过 */ }
+    const a = await sh.gateAnswer(g.item, j);
     g.busy = false;
     if (S.mode !== 'wait') return;
-    S.mode = 'play';
-    if (res && /^[A-H]\. /.test(res.answer || '')) g.right = 'ABCDEFGH'.indexOf(res.answer[0]);
-    if (!res || g.right < 0) g.right = j;
+    S.mode = 'play'; g.right = a.right;
     S.gatesDone++;
-    if (res && res.correct) {
+    if (a.lost) { g.done = true; pass(row); }   // 没答上（过期、断网）：当作看答案过，不算错
+    else if (a.correct) {
       g.done = true; S.gatesOk++;
       Play.sfx.play('right'); fireOn('🎉 答对了，变火球！');
       pass(row);
