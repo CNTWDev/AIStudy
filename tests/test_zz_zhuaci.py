@@ -238,3 +238,46 @@ def test_parent_sees_word_week(monkeypatch):
         c.get("/logout")
         c.post("/login", data={"email": "mixp@x.com", "password": "secret1"})
         assert "单词这一周" in c.get("/parent").text
+
+
+def test_daily_task_set_goes_on_to_next_task(monkeypatch):
+    """今天清单里的「单词」和自己来抓词是同一个页面、两个场合：从清单来（wordpick.TASK_URL），一组只出今天要做的词，
+    做完一组接着下一组，都做完了这一项打勾、弹出下一项；不出「再来一组」、不送跑酷（那是抓词自己的）。"""
+    with TestClient(app) as c:
+        k = _kid(c, monkeypatch, "zc7@x.com")
+        monkeypatch.setattr(words, "school_unit", lambda uid, pack: 1 if pack["id"] == "en-sh-g3" else None)
+        db.run("DELETE FROM days WHERE user_id=?", k["id"])
+        plan = engine.today_plan(k["id"])["plan"]
+        task = next(t for t in plan if t["type"] == "words")
+        assert task["url"] == wordpick.TASK_URL
+        page = c.get(wordpick.TASK_URL).text
+        assert "DAY = SET &amp;&amp; true" in page or "DAY = SET && true" in page
+        assert "DAY = SET && false" in c.get("/words/go").text or "DAY = SET &amp;&amp; false" in c.get("/words/go").text
+
+        # 只出到期的（今天清单上写的那些），不添新词、认一认、往上推
+        due = engine.due_cards(k["id"], 300, "words")
+        r = c.post("/api/words/set", json={"task": True}).json()
+        assert r["cards"] and {x["role"] for x in r["cards"]} == {"due"} and len(r["cards"]) == min(len(due), wordpick.SET_SIZE)
+        # 还有今天要做的：这一项不打勾
+        db.run("UPDATE cards SET due=? WHERE id IN (%s)" % ",".join("?" * len(r["cards"])),
+               (db.today() + timedelta(days=1)).isoformat(), *[x["id"] for x in r["cards"]])
+        done = c.post(f"/api/words/set/{r['id']}/done", json={}).json()
+        left = done["due_left"]
+        assert left == len(due) - len(r["cards"])
+        if left:
+            assert not next(t for t in engine.plan_of_today(k["id"]) if t["type"] == "words").get("done")
+            db.run("UPDATE cards SET due=? WHERE user_id=? AND kind IN ('word','term')", (db.today() + timedelta(days=1)).isoformat(), k["id"])
+            r = c.post("/api/words/set", json={"task": True}).json()
+            assert r["id"] is None and not r["cards"]
+        else:
+            assert next(t for t in engine.plan_of_today(k["id"]) if t["type"] == "words").get("done")
+        # 都做完了：和别的任务一样，弹出下一项
+        flow = c.post("/api/plan/task-done", json={"type": "words"}).json()["flow"]
+        assert flow["just"] and (flow["next"] or flow["all_done"])
+        assert not flow["next"] or flow["next"]["id"] != task["id"]
+
+        # 升级前排好的清单（入口还是 /words/go）：读出来就带上「在今天的清单里」
+        row = db.one("SELECT plan FROM days WHERE user_id=? AND day=?", k["id"], db.today().isoformat())
+        old = [{**t, "url": "/words/go"} if t["type"] == "words" else t for t in db.jload(row["plan"], [])]
+        db.run("UPDATE days SET plan=? WHERE user_id=? AND day=?", db.jdump(old), k["id"], db.today().isoformat())
+        assert next(t for t in engine.plan_of_today(k["id"]) if t["type"] == "words")["url"] == wordpick.TASK_URL

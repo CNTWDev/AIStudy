@@ -23,6 +23,7 @@ from datetime import date, timedelta
 from . import db
 
 SET_SIZE = 8                  # 一组几个词
+TASK_URL = "/words/go?from=today"   # 每日任务里的「单词」：同一个抓词页，带着它来就是在今天的清单里——一组只出今天要做的词，做完进下一项
 SET_NEW_MAX = 3               # 一组里最多几个新词
 SET_BACK_MAX = 2              # 一组里最多几个「认一认」（往前补的词）
 CAP = {"primary": 15, "secondary": 20, "adult": 25}   # 每天新词上限（每日任务的新词 + 抓词里多学的）
@@ -385,8 +386,9 @@ def _push_cards(user_id: int, p: Pool, skip_ids: set[int], n: int) -> list:
     return rows[:n]
 
 
-def make_set(user_id: int, size: int = SET_SIZE) -> dict:
+def make_set(user_id: int, size: int = SET_SIZE, due_only: bool = False) -> dict:
     """抓词的一组：到期要复习的（含今天的新词）先 → 还能学新词就再加 1～3 个新词 → 往前补的词认一认 → 都没有了，把学过的词往上推一级。
+    due_only：每日任务里（TASK_URL）只出到期的——今天清单上写的就是这些词，多学的留给抓词自己。
     返回 {id, cards: [(卡片, 角色)], room}；角色：due / new / check / push。一个都没有返回 {id: None, cards: []}。"""
     from . import engine
     p = Pool(user_id)
@@ -394,6 +396,8 @@ def make_set(user_id: int, size: int = SET_SIZE) -> dict:
     due = list(engine.due_cards(user_id, 300, "words"))
     chosen = [(c, "due") for c in due[:size]]
     room = room_today(user_id, p)
+    if due_only:
+        size = len(chosen)
     if len(chosen) < size:
         k = min(SET_NEW_MAX, room, size - len(chosen))
         have = {c["front"].lower() for c, _ in chosen}

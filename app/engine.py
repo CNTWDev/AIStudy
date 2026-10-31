@@ -1052,10 +1052,14 @@ def plan_of_today(user_id: int) -> list[dict]:
 
 
 def _upgrade_urls(plan: list[dict]) -> list[dict]:
-    """升级前排好的清单：每日阅读的入口改成 /reading/today（今天读过就直接打开那篇）。"""
+    """升级前排好的清单：每日阅读的入口改成 /reading/today（今天读过就直接打开那篇）；
+    单词的入口带上「在今天的清单里」（wordpick.TASK_URL），做完进下一项，不是抓词自己的再来一组。"""
+    from . import wordpick
     for t in plan:
         if (t.get("url") or "").startswith("/reading?lang="):
             t["url"] = t["url"].replace("/reading?", "/reading/today?", 1)
+        elif t.get("type") == "words" and t.get("url") in ("/words/go", "/review?group=words"):
+            t["url"] = wordpick.TASK_URL
     return plan
 
 
