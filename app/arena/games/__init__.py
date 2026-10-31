@@ -165,9 +165,9 @@ class Game:
                 "stars": [{"key": k, "label": t} for k, t in self.stars], "total": self.total}
 
 
-from . import bubble, defense, duo, helix, jump, pingpong, race, runner, snake, stickman  # noqa: E402,F401  （登记游戏；首页按这个顺序）
+from . import bubble, defense, duo, fly, helix, jump, pingpong, race, runner, snake, stickman  # noqa: E402,F401  （登记游戏；首页按这个顺序）
 
-ORDER = ("runner", "jump", "helix", "stickman", "race", "defense", "duo", "bubble", "snake", "pingpong")
+ORDER = ("runner", "jump", "helix", "fly", "stickman", "race", "defense", "duo", "bubble", "snake", "pingpong")
 GAMES = {k: REGISTRY[k] for k in ORDER} | REGISTRY
 
 __all__ = ["REGISTRY", "GAMES", "Game", "get", "register"]

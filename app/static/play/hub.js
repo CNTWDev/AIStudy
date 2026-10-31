@@ -11,7 +11,7 @@
     const ctx = cv.getContext('2d'), H = 150, s = r.height / H, W = r.width / s;
     ctx.setTransform(s * dpr, 0, 0, s * dpr, 0, 0);
     const av = me.dataset.avatar, g = cv.dataset.preview, ground = 128;
-    const theme = {stickman: 'sunset', race: 'day', defense: 'candy', runner: 'day', helix: 'day', jump: 'day'}[g] || 'day';
+    const theme = {stickman: 'sunset', race: 'day', defense: 'candy', runner: 'day', helix: 'day', jump: 'day', fly: 'day'}[g] || 'day';
     if (multi(ctx, g, W, H, t, av)) return;
     Play.scene.sky(ctx, W, H, theme);
     Play.scene.drawClouds(ctx, W, theme, t * (g === 'race' ? 4 : 1));
@@ -68,6 +68,16 @@
       ctx.beginPath(); ctx.ellipse(bx, by, 10, 12, 0, 0, 7); ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#2b2340'; ctx.fillRect(bx - 10, by + 3, 20, 3);
       ctx.fillStyle = '#eaf7ff'; ctx.beginPath(); ctx.ellipse(bx - 8, by - 12, 6, 8, -0.5, 0, 7); ctx.ellipse(bx + 8, by - 12, 6, 8, 0.5, 0, 7); ctx.fill(); ctx.stroke();
+    } else if (g === 'fly') {   // 左右飞：两面墙中间来回飞，墙上有刺
+      const x0 = W / 2 - 70, x1 = W / 2 + 70, k = (t * 0.55) % 2, dir = k < 1 ? 1 : -1, f = k < 1 ? k : 2 - k;
+      ctx.fillStyle = '#ffc21a'; ctx.fillRect(x0 - 12, 6, 12, H - 12); ctx.fillRect(x1, 6, 12, H - 12);
+      ctx.strokeStyle = '#3a3026'; ctx.lineWidth = 2; ctx.strokeRect(x0 - 12, 6, 12, H - 12); ctx.strokeRect(x1, 6, 12, H - 12);
+      ctx.fillStyle = '#eef2f8';
+      for (const [x, y, d] of [[x0, 34, 1], [x0, 100, 1], [x1, 52, -1], [x1, 118, -1]]) { ctx.beginPath(); ctx.moveTo(x, y - 9); ctx.lineTo(x + d * 14, y); ctx.lineTo(x, y + 9); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+      const bx = x0 + 10 + f * 120, by = 78 + Math.sin(t * 5) * 6 - Math.sin(f * Math.PI) * 18;
+      ctx.fillStyle = '#eaf7ff'; ctx.beginPath(); ctx.ellipse(bx - 6, by - 11, 6, 8, -0.5, 0, 7); ctx.ellipse(bx + 6, by - 11, 6, 8, 0.5, 0, 7); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#ffcf2e'; ctx.beginPath(); ctx.ellipse(bx, by, 10, 11, dir * 0.2, 0, 7); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#3a3026'; ctx.fillRect(bx - 9, by + 3, 18, 3); ctx.beginPath(); ctx.arc(bx - 3 + dir, by - 3, 1.6, 0, 7); ctx.arc(bx + 3 + dir, by - 3, 1.6, 0, 7); ctx.fill();
     } else if (g === 'defense') {
       Art.castle(ctx, 70, ground, 0.55, 1, t);
       Art.hero(ctx, 70, ground - 66, {avatar: av, pose: 'charge', t, scale: 0.5});
