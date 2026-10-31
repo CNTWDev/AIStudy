@@ -3,7 +3,7 @@
 .mp-note{margin:6px 0 10px;color:var(--muted)}
 .mp-hint{font-size:12.5px;color:var(--muted);margin:8px 0 0}
 .mp-tip{font-size:13.5px;margin:4px 0 10px;background:var(--pl-soft);border-radius:12px;padding:6px 10px;text-align:left}
-.mp-invite{display:flex;align-items:center;gap:10px;text-align:left;border:3px solid var(--pl-ink);border-radius:18px;padding:8px 10px;margin:0 0 12px;background:var(--pl-sun);color:#3a2a00;animation:plpulse 1.4s infinite}
+.mp-invite{display:flex;align-items:center;gap:10px;text-align:left;border:3px solid var(--pl-ink);border-radius:18px;padding:8px 10px;margin:0 0 12px;background:var(--pl-sun);color:#3a2a00}
 .mp-invite .grow{flex:1;min-width:0}.mp-invite small{display:block;opacity:.8}.mp-invite .pl-go{font-size:17px;padding:8px 14px}
 .mp-face{width:44px;height:55px;flex:none}
 .mp-roles{display:flex;gap:10px;justify-content:center}
@@ -43,7 +43,13 @@
 @media (max-width:560px){.mp-mems{flex-wrap:wrap}.mp-amp{display:none}.mp-em{width:34px;height:34px;font-size:17px}}
 /* 房间分三种：家里 / 公开 / 密码；昵称 */
 .mp-invite.k-public{background:#e6f4ff;color:#12324d}.mp-invite.k-code{background:#f1e8ff;color:#2b1a4d}
-.mp-rooms{max-height:300px;overflow-y:auto;margin:0 0 6px}.mp-rooms .mp-invite{animation:none}.mp-rooms .mp-invite.k-family{animation:plpulse 1.4s infinite}
+/* 家里人开的房间在「叫你」：卡片自己不放大（它在能滚动的列表里，放大就撑出横向滚动条，裁掉又看不全），
+   只让外圈的光一闪一闪，卡片里的「加入！」轻轻跳；列表四周留出光圈的位置（负外边距抵掉，排版不动）。 */
+.mp-rooms{max-height:300px;overflow-y:auto;padding:10px;margin:-10px -10px -4px}
+.mp-rooms .mp-invite.k-family{animation:mpcall 1.4s ease-in-out infinite}.mp-rooms .mp-invite.k-family .mp-join{animation:mpbob 1.4s ease-in-out infinite}
+@keyframes mpcall{50%{box-shadow:0 0 0 8px rgba(255,210,63,.45)}}
+.mp-rooms .mp-invite .mp-join:active,.mp-rooms .mp-invite .mp-join.down{animation:none}   /* 按下去的那一下照常往下沉 */
+@keyframes mpbob{50%{transform:scale(1.06)}}
 .mp-pin-row{display:flex;gap:6px;margin-top:6px}.mp-pin-row input{flex:1;min-width:0;font-size:16px;letter-spacing:4px}
 .mp-roles{flex-wrap:wrap}
 .mp-kinds{display:flex;gap:8px;justify-content:center;margin:0 0 4px}
