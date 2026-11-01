@@ -462,12 +462,13 @@
         if (quizMode === 'dock') { quiz.el.classList.remove('wait'); quiz.load(); }
         def.begin(ctx); ctx.begun = true; pauseBtn.hidden = false;
         clearInterval(saveTimer);
-        if (def.save) { saveTimer = setInterval(save, 2000); save(); }
+        if (def.save) saveTimer = setInterval(save, 2000);
         if (resume) {
           if (net) net.send({t: 'need_world'});
           if (resume.need > 0) { ctx.reviving = true; ctx.need = REVIVE_NEED; send({t: 'rv', need: ctx.need}); Play.input.blocked = true; debtText(); hudDraw(); askNow(); }
           sh.toast('接着玩！', 'good');
         }
+        if (def.save) save();
       };
       if (resume) go(); else Play.ui.countdown($('.pl-cd'), go);
     }

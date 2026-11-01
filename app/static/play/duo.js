@@ -89,6 +89,7 @@
   }
 
   // ---------------------------------------------------------------- 我的角色
+  const inside = p => Number.isFinite(p.x) && Number.isFinite(p.y) && p.x >= T && p.x + CW <= MW - T && p.y >= 0 && p.y + CH <= MH - T;
   function spawn(role) {
     const s = Wd.starts[role];
     return {role, x: s.c * T + (T - CW) / 2, y: s.r * T + T - CH, vx: 0, vy: 0, g: false, face: 1, dead: false, ride: null,
@@ -129,6 +130,7 @@
       else { me.y = s.y + s.h; me.vy = 0; }
     }
     unstick();
+    if (!inside(me) || solids(me.x, me.y, CW, CH).some(s => hit({x: me.x, y: me.y, w: CW, h: CH}, s))) return die('crush');
     // 脚下是什么
     if (me.g && !me.ride) {
       const r = Math.floor((me.y + CH + 1) / T), cs = [Math.floor((me.x + 5) / T), Math.floor((me.x + CW - 5) / T)];
@@ -171,11 +173,12 @@
     if (mine) mp.net.send({t: 'lever', i: l.i, on});
   }
   function die(ch) {
-    me.dead = true; me.vx = me.vy = 0;
+    if (me.dead) return;
+    me.dead = true; me.door = false; me.vx = me.vy = 0;
     const c = POOL[ch] || POOL.G;
     fx.burst(me.x + CW / 2, me.y + CH / 2, {n: 26, colors: [c[0], c[2], '#fff'], speed: 260, size: 5, grav: 400});
     fx.shake(5, 0.25); Play.sfx.play('hurt');
-    mp.toast(me.role === 'fire' ? '哎呀，火苗碰到水了！答题复活' : ch === 'G' ? '碰到毒水了！答题复活' : '哎呀，水滴碰到岩浆了！答题复活', 'warn');
+    mp.toast(ch === 'crush' ? '被机关夹住了！答题复活' : me.role === 'fire' ? '哎呀，火苗碰到水了！答题复活' : ch === 'G' ? '碰到毒水了！答题复活' : '哎呀，水滴碰到岩浆了！答题复活', 'warn');
     mp.die();
   }
 
@@ -351,6 +354,8 @@
       if (rs && rs.me && typeof rs.me.x === 'number') {   // 接着玩：回到原来的位置（倒下着的话等答完题回到安全的地方）
         Object.assign(me, {x: rs.me.x, y: rs.me.y, safe: rs.me.safe || null, dead: !!rs.me.dead, inv: 1.2});
       }
+      if (!inside(me)) { const s = spawn(me.role); me.x = s.x; me.y = s.y; me.dead = true; }
+      if (me.dead) ctx.die();   // 恢复旧存档中丢失的答题状态
       if (ctx.level.tip && !rs) mp.toast(ctx.level.tip.split('。')[0], 'good');
       ctx.net.off('s', 'gem', 'lever');
       ctx.net.on('s', m => { peerRaw = m; peerTrack.push(m); });
@@ -363,7 +368,7 @@
     },
     onRevive() {
       if (!me) return;
-      const s = me.safe || spawn(me.role);
+      const s = me.safe && inside(me.safe) && !solids(me.safe.x, me.safe.y, CW, CH).some(o => hit({x: me.safe.x, y: me.safe.y, w: CW, h: CH}, o)) ? me.safe : spawn(me.role);
       me.x = s.x; me.y = s.y; me.vx = me.vy = 0; me.dead = false; me.inv = 1.2;
       fx.ring(me.x + CW / 2, me.y + CH / 2, {color: '#fff', width: 4, grow: 300, life: 0.4});
       Play.sfx.play('power');
