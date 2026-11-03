@@ -64,6 +64,8 @@ def test_daily_one_tap_writes_with_pick_and_feedback(monkeypatch):
         uid = _kid(c)
         _read(uid, "zh", db.today() - timedelta(days=1), {"source": "explore", "domain": "nature", "angle": "", "genre": "散文",
                                                           "exam": True, "key": "auto:nature/散文"}, "雨后泥土的味道")
+        # 别的测试存下的、话题恰好是今天这个 auto: 的库存短文会被先用上（就不写新的了）；这里测的是现场写，先把它们收起来
+        db.run("UPDATE contents SET status='retired' WHERE kind='passage' AND lang='zh' AND grade='G8' AND topic LIKE 'auto:%'")
         page = c.get("/reading/today?lang=zh").text
         assert "写一篇今天的短文" in page and 'id="topics"' not in page and 'name="topic"' in page  # 每日一键；自己挑话题收在下面
         r = c.post("/reading/new", data={"mode": "ai", "lang": "zh"}, follow_redirects=False)
