@@ -707,7 +707,7 @@
     const title = result === 'win'
       ? `🐝 到塔顶啦！<small class="jp-sub">${secs.toFixed(1)} 秒 · 题板一次答对 ${s.gatesOk}/${(s.lv.gates || []).length} · 🍯 ${s.honeyN}${s.free >= 1 ? ` · 想题的 ${Math.round(s.free)} 秒没算` : ''}</small>`
       : `⏰ 时间到，爬到 ${Math.round(s.top * M_PER_H)} 米<small class="jp-sub">下次接着跳</small>`;
-    c.finish(result, {seconds: secs, score: s.gatesOk}, title);
+    c.finish(result, {seconds: secs, score: s.gatesOk, far: s.top / s.lv.height}, title);
   }
 
   // ------------------------------------------------------------ 鼠标、手指

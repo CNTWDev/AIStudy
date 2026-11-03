@@ -334,3 +334,53 @@ body:has(#pl) nav.tabs,body:has(#pl) #askbtn{display:none!important}
 .aq-hint{font-size:14px;font-weight:700;color:var(--muted);margin:-6px 0 8px}
 @keyframes aqgap{0%{transform:translateY(-12px);opacity:0}100%{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.aq-gap.ok,.aq-gap.no{animation:none}}
+/* ===== 过关仪式（fanfare.js，DESIGN 5.64）：都放在 .pl-stage 里（它自己 overflow:hidden），不放在能滚动的结算面板里（5.62） ===== */
+.fx-back,.fx-front{position:absolute;top:0;right:0;bottom:0;left:0;pointer-events:none;overflow:hidden}
+.fx-back{z-index:5;background:radial-gradient(ellipse at 50% 42%,rgba(var(--ray),.12),rgba(43,35,64,.7) 80%);animation:fxfade .45s ease-out backwards}
+.fx-back.go{background:radial-gradient(ellipse at 50% 42%,rgba(var(--ray),.32),rgba(43,35,64,.66) 78%)}
+.fx-front{z-index:7}
+.fx-cv{position:absolute;top:0;left:0;width:100%;height:100%}
+.fx-rays,.fx-sweep,.fx-flash{display:none}
+.fx-back.go .fx-rays,.fx-back.go .fx-sweep,.fx-back.go .fx-flash{display:block}
+.fx-rays{position:absolute;left:50%;top:42%;width:2400px;height:2400px;margin:-1200px 0 0 -1200px;border-radius:50%;
+  background:repeating-conic-gradient(from 0deg,rgba(var(--ray),.5) 0 7deg,rgba(var(--ray),0) 7deg 20deg);
+  -webkit-mask:radial-gradient(circle closest-side,#000 0,rgba(0,0,0,.55) 14%,transparent 42%);mask:radial-gradient(circle closest-side,#000 0,rgba(0,0,0,.55) 14%,transparent 42%);
+  animation:fxrays 9s cubic-bezier(.15,.6,.35,1) forwards,fxfade .6s ease-out backwards;transition:opacity 1.5s}
+.fx-back.gold{--ray:255,214,90}
+.fx-back.gold .fx-rays{background:repeating-conic-gradient(from 0deg,rgba(var(--ray),.7) 0 9deg,rgba(var(--ray),0) 9deg 18deg)}
+.fx-back.rest .fx-rays{opacity:.5}
+.fx-sweep{position:absolute;top:-20%;bottom:-20%;left:0;width:36%;opacity:0;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,250,220,.75) 50%,rgba(255,255,255,0));animation:fxsweep .7s ease-in-out}
+.fx-flash{position:absolute;top:0;right:0;bottom:0;left:0;opacity:0;background:radial-gradient(circle at 50% 42%,#fff,rgba(255,255,255,.65) 35%,rgba(255,255,255,0) 75%);animation:fxflash .5s ease-out}
+.fx-gold{position:absolute;top:0;right:0;bottom:0;left:0;opacity:0;background:radial-gradient(circle at 50% 50%,rgba(255,240,170,.95),rgba(255,200,40,.55) 45%,rgba(255,180,0,0) 80%);animation:fxflash .7s ease-out}
+.fx-stamp{position:absolute;top:0;right:0;bottom:0;left:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:10%}
+.fx-stamp b{display:block;position:relative;font-size:clamp(48px,11vw,96px);line-height:1.05;font-weight:900;color:#ffd23f;letter-spacing:2px;white-space:nowrap;
+  -webkit-text-stroke:8px var(--pl-ink);paint-order:stroke fill;text-shadow:0 8px 0 var(--pl-ink);transform:rotate(-4deg);animation:fxstamp .55s cubic-bezier(.2,.9,.3,1.25) backwards}
+.fx-stamp span{display:block;margin:10px 0 0;background:var(--pl-pink);color:#fff;border:3px solid var(--pl-ink);border-radius:99px;padding:2px 16px;font-weight:900;font-size:18px;box-shadow:0 4px 0 var(--pl-ink);transform:rotate(3deg);animation:fxbadge .45s .35s cubic-bezier(.2,.9,.3,1.6) backwards}
+.fx-stamp i{position:absolute;left:50%;top:44%;font-style:normal;font-size:30px;color:#fff;opacity:0;text-shadow:0 0 12px rgba(255,230,140,.9);animation:fxtwinkle .9s ease-out}
+.fx-stamp i:nth-of-type(1){margin:-80px 0 0 -190px;animation-delay:.3s}
+.fx-stamp i:nth-of-type(2){margin:-110px 0 0 150px;font-size:38px;animation-delay:.42s}
+.fx-stamp i:nth-of-type(3){margin:30px 0 0 175px;font-size:24px;animation-delay:.55s}
+.fx-stamp.out,.fx-pal.out{opacity:0;animation:fxout .35s ease-in}
+.fx-stamp.calm b,.fx-stamp.calm span,.fx-pal.calm{animation:fxfade .3s backwards}
+.fx-pal{position:absolute;left:4%;bottom:4%;display:flex;align-items:flex-end;gap:6px;animation:fxpal .6s .25s cubic-bezier(.2,.9,.3,1.5) backwards}
+.fx-pal .mascot{width:clamp(72px,14vw,112px);height:auto;filter:drop-shadow(0 4px 0 rgba(43,35,64,.5))}
+.fx-pal em{font-style:normal;font-weight:900;font-size:16px;background:#fff;color:var(--pl-ink);border:3px solid var(--pl-ink);border-radius:16px 16px 16px 4px;padding:4px 12px;margin-bottom:40%;box-shadow:0 3px 0 var(--pl-ink);white-space:nowrap}
+.fx-pal .face-emo{font-size:72px;line-height:1}
+.pl-stage.fx-shake>canvas{animation:fxshake .42s ease-out}
+.pl-end.fx-win{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+.pl-end.fx-win .pl-panel{box-shadow:0 6px 0 var(--pl-ink),0 0 0 6px rgba(255,210,63,.45),0 0 70px 12px rgba(255,214,110,.5)}
+.pl-end.fx-win .ps-stars span.on{text-shadow:0 0 18px rgba(255,196,30,.85)}
+.ps-old{color:var(--muted);font-weight:700;margin-left:4px}.ps-old s{text-decoration-thickness:2px;text-decoration-color:var(--pl-pink)}
+.ps-far{margin:6px auto 2px;max-width:320px;font-size:13.5px;font-weight:800;color:var(--muted)}
+.ps-far i{display:block;height:12px;margin-top:4px;border-radius:99px;background:var(--pl-soft);border:2px solid var(--pl-ink);overflow:hidden}
+.ps-far i b{display:block;height:100%;background:linear-gradient(90deg,#ffd23f,#ff9f43);border-radius:99px}
+@keyframes fxfade{from{opacity:0}}
+@keyframes fxflash{from{opacity:.95}to{opacity:0}}
+@keyframes fxsweep{from{transform:translateX(-120%) skewX(-12deg);opacity:1}to{transform:translateX(320%) skewX(-12deg);opacity:1}}
+@keyframes fxrays{from{transform:rotate(0)}to{transform:rotate(110deg)}}
+@keyframes fxstamp{0%{transform:scale(2.8) rotate(-12deg);opacity:0}55%{transform:scale(.9) rotate(-3deg);opacity:1}100%{transform:scale(1) rotate(-4deg)}}
+@keyframes fxbadge{from{transform:scale(0) rotate(-20deg)}}
+@keyframes fxtwinkle{0%{opacity:0;transform:scale(0) rotate(0)}40%{opacity:1;transform:scale(1.3) rotate(90deg)}100%{opacity:0;transform:scale(.6) rotate(180deg)}}
+@keyframes fxout{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-30%) scale(.7)}}
+@keyframes fxpal{0%{transform:translateY(130%) rotate(-10deg)}60%{transform:translateY(-8%) rotate(6deg)}100%{transform:none}}
+@keyframes fxshake{15%{transform:translate(-7px,4px)}30%{transform:translate(6px,-5px)}45%{transform:translate(-4px,-3px)}60%{transform:translate(3px,3px)}80%{transform:translate(-1px,1px)}}

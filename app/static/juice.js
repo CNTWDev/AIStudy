@@ -85,6 +85,30 @@
     lose: t => [392, 349, 330, 262].forEach((f, i) => tone(f, t + i * 0.18, 0.3, {type: 'triangle', vol: 0.16})),
     sticker: t => [784, 1047, 1319, 1568, 2093].forEach((f, i) => tone(f, t + i * 0.08, 0.3, {type: 'sine', vol: 0.12})),
 
+    // ---- 过关（play/fanfare.js）。n = 1 过关，2 打通世界 / 全部打通（多一层低音、多一串亮晶晶）
+    fanfare: (t, n) => {
+      noise(t, 0.35, {vol: 0.12, freq: 3200, q: 0.6});                                   // 一阵风：章砸下来
+      [392, 392, 392].forEach((f, i) => tone(f, t + 0.05 + i * 0.1, 0.09, {type: 'square', vol: 0.09}));   // 号角：嗒嗒嗒——
+      [523.25, 659.25, 783.99, 1046.5].forEach(f => {                                      // ——当！大和弦
+        tone(f, t + 0.36, 1.3, {type: 'triangle', vol: 0.13, attack: 0.02});
+        tone(f * 1.006, t + 0.36, 1.1, {type: 'sawtooth', vol: 0.025, attack: 0.04});      // 一点点铜管的毛边
+      });
+      if (n > 1) {   // 打通世界：低音托住，和弦后面再接一小段旋律
+        tone(130.81, t + 0.36, 1.4, {type: 'triangle', vol: 0.2, attack: 0.02});
+        [[783.99, 0], [880, 0.16], [1046.5, 0.32], [1318.51, 0.48], [1567.98, 0.64]].forEach(([f, d]) => tone(f, t + 1.15 + d, d < 0.6 ? 0.18 : 0.8, {type: 'triangle', vol: 0.14}));
+        [261.63, 329.63, 392].forEach(f => tone(f, t + 1.79, 0.9, {type: 'triangle', vol: 0.1, attack: 0.03}));
+      }
+      const SP = [2093, 2349.3, 2637, 3136, 3520];                                        // 和弦上面撒一串亮晶晶
+      for (let i = 0; i < (n > 1 ? 9 : 5); i++) tone(SP[(i * 3) % SP.length], t + 0.55 + i * 0.07, 0.25, {type: 'sine', vol: 0.035});
+    },
+    rise: t => { tone(320, t, 0.55, {type: 'sine', vol: 0.07, slide: 900, attack: 0.25}); noise(t + 0.1, 0.45, {vol: 0.06, freq: 2600, q: 0.5}); },   // 定格：一声上扬的「嗖」
+    starN: (t, n) => {   // 第 n 颗星：一颗比一颗高
+      const i = Math.min(3, n) - 1, base = [1046.5, 1318.51, 1567.98][i];
+      [1, 1.25, 1.5].forEach((m, j) => tone(base * m, t + j * 0.045, 0.32, {type: 'sine', vol: 0.11}));
+      if (n >= 3) tone(base * 2, t + 0.14, 0.5, {type: 'sine', vol: 0.06});
+    },
+    burst: t => { noise(t, 0.22, {vol: 0.16, freq: 700, q: 0.7}); for (let i = 0; i < 6; i++) noise(t + 0.12 + Math.random() * 0.35, 0.03, {vol: 0.07, freq: 5000, q: 1}); },
+
     // ---- 学习页答题（Juice.answer / done 用）。n = 连对第几题
     tap: t => tone(1250, t, 0.03, {type: 'sine', vol: 0.05}),
     ding: (t, n) => {

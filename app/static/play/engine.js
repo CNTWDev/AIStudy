@@ -1,6 +1,6 @@
 /* 乐园小游戏的共用引擎（所有游戏都用，不依赖任何库）。
    Play.stage    画布：固定逻辑高度、宽度跟屏幕比例走，按设备像素比画得清楚
-   Play.loop     主循环：固定步长更新、切到后台自动暂停
+   Play.loop     主循环：固定步长更新、切到后台自动暂停；Play.slow 慢放（过关定格时 0.2）
    Play.FX       特效：粒子、飘字、冲击波、震屏
    Play.sfx      音效：就是 Juice.sfx（app/static/juice.js），全站一个开关
    Play.music    背景音乐：几小节轻快的循环
@@ -62,7 +62,7 @@
       if (!running) return;
       const dt = Math.min(0.1, (ts - last) / 1000 || 0); last = ts;
       if (!paused && !Play.frozen) {   // Play.frozen：外壳暂停了整个游戏
-        acc += dt;
+        acc += dt * (Play.slow || 1);   // Play.slow：过关那一下慢放（fanfare.js）
         let n = 0;
         while (acc >= STEP && n < 6) { update(STEP); acc -= STEP; n++; }
         if (n === 6) acc = 0;

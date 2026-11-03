@@ -25,6 +25,8 @@
     <div class="pl-over pl-paused" hidden><div class="pl-panel"></div></div>
     <div class="pl-over pl-end" hidden><div class="pl-panel"><div class="pl-sum"></div><div class="pl-row"></div></div></div>
   </div>
+  {# 过关仪式里打通世界时跳出来欢呼的小助手（fanfare.js 拿去用） #}
+  <template id="fx-pal">{% if ASSISTANT_ICON == '🙋' %}{{ mascot_svg(mascot_of(kid or user), 112, 'mascot', 'cheer') }}{% else %}<span class="face-emo">{{ ASSISTANT_ICON }}</span>{% endif %}</template>
   <div class="pl-ctrl"></div>
   <div class="pl-dock" hidden></div>
 </div>
@@ -47,6 +49,7 @@ addEventListener('error', e => {
 <script src="/static/play/engine.js?v={{ ASSET_V }}"></script>
 <script src="/static/play/art.js?v={{ ASSET_V }}"></script>
 <script src="/static/play/quiz.js?v={{ ASSET_V }}"></script>
+<script src="/static/play/fanfare.js?v={{ ASSET_V }}"></script>
 {% if g.multi %}<script src="/static/play/net.js?v={{ ASSET_V }}"></script>{% endif %}
 <script src="/static/play/shell.js?v={{ ASSET_V }}"></script>
 <script src="/static/play/{{ game }}.js?v={{ ASSET_V }}"></script>

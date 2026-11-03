@@ -563,7 +563,7 @@
     const title = result === 'win'
       ? `🌀 到底啦！<small class="hx-sub">${secs.toFixed(1)} 秒 · 题门一次答对 ${s.gatesOk}/${s.lv.gates || 0} · 🍯 ${s.honey}${s.free >= 1 ? ` · 想题的 ${Math.round(s.free)} 秒没算` : ''}</small>`
       : `⏰ 时间到，掉到第 ${s.next} 层<small class="hx-sub">下次接着跳</small>`;
-    c.finish(result, {seconds: secs, score: s.gatesOk}, title);
+    c.finish(result, {seconds: secs, score: s.gatesOk, far: s.next / s.rows.length}, title);
   }
 
   // ------------------------------------------------------------ 鼠标、手指：左右拖着转（拖多少转多少）；滚轮一格一格转；Shift 键
