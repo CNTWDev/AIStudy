@@ -15,6 +15,7 @@
        moreHint: '人多怪兽也多',   // 房间里还能进人时，后面接的一句（不写就不说）
        quizOpts: {rightHtml, wrongHtml, nextDelay},   // 答题面板的额外选项（quiz.js：答对、答错时多显示什么，答对后隔多久出下一题）
        pause(on, ms) {},         // 暂停 / 继续了（游戏循环外壳会停，自己用墙上时钟算时间的游戏在这里把暂停的 ms 补上）
+       finale(sh, {tier, scene}) {},   // 过关仪式里，这款游戏自己世界里的收尾（花开满墙、旗子放烟花……；不写就只有通用的光和彩带，见 fanfare.js）
        verdict(res) {},          // 对战：这一局对我来说是赢还是输 → {result, title, why}（res 是房主报的结果）
        save() {},                // 我自己的状态，每 2 秒存到服务器（写了它，刷新、换设备才能接着玩）
        saveWorld() {}, loadWorld(w) {}, peerView(id) {}, loadMe(v) {},   // 联网：共享的世界、我这里看到的队友 id（重连时以在线的人为准）
@@ -23,7 +24,8 @@
      ctx.level 这一关（app/arena/games/：关卡文件，或者服务器按进度算的参数）；ctx.seed 大家一样的随机种子；ctx.match 我的答题对局
      ctx.quiz 答题面板；ctx.resume 接着玩时的存档 {me, world}（不是接着玩就是 null）；ctx.sh 外壳
      ctx.finish(result, report, title)   这一关结束：win / lose / draw / quit；report 是游戏报的数据（用时、分数、血量……），
-                                         联网时只有开房间的人报过关，谁都可以报没过（时间到了）。report.why 写在结算上
+                                         联网时只有开房间的人报过关，谁都可以报没过（时间到了）。report.why 写在结算上；
+                                         没过关时 report.far（0～1）= 这一关走到了多远，结算上画一条「走到了 N%」
      ctx.toast(文字, 'good' | 'warn')；ctx.elapsed() 这一关玩了多少秒
      ctx.sh.gateAsk(哪一块) / ctx.sh.gateAnswer(题, 第几个)   题板的题（往上跳、向下跳、左右飞）：每块题板各拿各的题，见下面
    联网时还有：ctx.net 连接（net.js）；ctx.me / ctx.peer / ctx.peers {id, name, avatar, role}；ctx.host 我是不是开房间的（共享的东西由他算）；
@@ -72,7 +74,7 @@
     if (def.input) Play.input.init(def.input);
 
     let lobby = data.lobby, room = null, net = null, state = 'lobby', page = 0, poll = 0, gone = false;
-    let ctx = null, cur = null, match = null, quiz = null, t0 = 0, myDeaths = 0, peerDeaths = 0, byeTimer = 0, saveTimer = 0, resuming = false;
+    let ctx = null, cur = null, match = null, quiz = null, t0 = 0, myDeaths = 0, peerDeaths = 0, byeTimer = 0, saveTimer = 0, resuming = false, fx = null;   // fx：这一关的过关仪式（fanfare.js）
     const online = new Set(), peerPlaying = {};
     const ROLES = Object.fromEntries(G.roles.map(r => [r.id, r]));
     const roleOf = r => ROLES[r] || {name: r, icon: ''};
@@ -611,11 +613,13 @@
         return;
       }
       ctx.finishing = true;
+      if (result === 'win') cheerStart();   // 过关仪式的定格不等服务器
       const rep = Object.assign({seconds: +ctx.elapsed().toFixed(1), deaths: ctx.deaths()}, report);
       let res;
       try { res = await roomApi('finish', {session: cur.session, result, report: rep}); }
       catch (e) { res = {error: e.message, n: cur.n, result, ...rep, stars: 0, checks: {}}; }
       res.session = cur.session;
+      if (report.far > 0 && report.far < 1) res.far = Math.max(1, Math.min(99, Math.round(report.far * 100)));   // 没过关：走到了百分之几（温和的一版，不是失败）
       send(result === 'win' ? {t: 'done', res} : {t: 'over', why: report.why, res});
       endLevel(result, res, title, report.why, report);
     }
@@ -640,10 +644,12 @@
       if (!cur) return;
       const p = stopPlay();
       if (def.verdict && res && !res.error) ({result, title, why} = Object.assign({result, title, why}, def.verdict(res, result)));
-      Play.sfx.play(result === 'win' ? 'win' : result === 'lose' ? 'lose' : 'pop');
-      if (result === 'win' && window.Juice) Juice.buzz('done');
-      let mine = null;
-      try { mine = await api(`/api/arena/${match.match_id}/end`, {result, stats: stats || {}}); } catch (e) { /* 对局已经结束了 */ }
+      if (result === 'win') cheerStart(p);   // 过关仪式（fanfare.js）：联网的队友收到房主的「过关了」才从这里开始
+      else if (fx) { fx.stop(); fx = null; }
+      if (fx) fx.go(cheer(res));
+      else Play.sfx.play(result === 'win' ? 'win' : result === 'lose' ? 'lose' : 'pop');
+      const ended = api(`/api/arena/${match.match_id}/end`, {result, stats: stats || {}}).catch(() => null);   // 对局已经结束了：null
+      const [mine] = await Promise.all([ended, fx && fx.ready]);   // 章盖完再出结算面板；这一秒正好等服务器
       const head = title || (multi ? {win: '🎉 我们一起过关了！', lose: '💪 差一点！', draw: '🤝 平局', quit: '这一关先停下了'}
                                    : {win: '🏆 你赢了！', lose: '💪 差一点！再来一局', draw: '🤝 平局', quit: '这局结束了'})[result];
       let h = `<div class="pl-title ${result === 'win' ? 'win' : 'lose'}">${head}</div>${why ? `<p>${esc(why)}</p>` : ''}`;
@@ -652,18 +658,33 @@
       h += personal(mine);
       showEnd(h, res, p);
       const st = [].concat(((res && res.stickers) || {})[String(me0.id)] || [], (mine && mine.stickers) || []);
-      if (res && res.stars) Play.sfx.play('star');
-      if (st.length) stickers(st);
+      const fx0 = fx;
+      if (fx) { fx.stars(endEl); fx = null; }
+      else if (res && res.stars) Play.sfx.play('star');
+      if (st.length) setTimeout(() => { if (state === 'end' && !endEl.hidden) stickers(st); }, fx0 ? 1500 : 0);   // 过关时先看星星亮完，再出贴纸
       if (res && res.progress && room) { room.progress = res.progress; if (res.next) room.level = res.next; }
+    }
+    function cheerStart(p) {   // ① 定格：碰到终点那一刻就开始；这一关的世界决定光芒和彩带的样子
+      if (fx || !window.Fanfare) return;
+      const w = ((p || cur || {}).stage || {}).world || {};
+      fx = Fanfare.play(stageEl, {scene: w.scene || '', until: endEl});
+    }
+    function cheer(res) {   // ② 庆祝演哪一档：全部打通 > 打通一个世界 > 过关；破了纪录章下面多一枚「新纪录！」
+      const ok = res && !res.error;
+      const tier = ok && res.all_clear && res.first_clear ? 'all' : ok && res.world && res.world.done ? 'world' : 'win';
+      const stamp = {all: '全部打通！', world: '世界打通！'}[tier] || (!TOTAL ? '赢啦！' : multi ? '一起过关！' : '过关！');
+      const badge = ok && res.new_best && res.prev_best != null ? '新纪录！' : '';
+      return {tier, stamp, badge, finale: def.finale ? o => def.finale(sh, o) : null};
     }
     function stageHtml(res) {
       const lv = lvAt(res.n) || {name: res.name};
       const stars = G.stars.map((s, i) => `<span class="${res.checks && res.checks[s.key] ? 'on' : ''}" style="animation-delay:${0.25 + i * 0.3}s">★</span>`).join('');
       const how = G.stars.map(s => `<span class="${res.checks && res.checks[s.key] ? 'ok' : ''}">${res.checks && res.checks[s.key] ? '✓' : '·'} ${esc(s.key === 'time' && lv.par ? `${lv.par} 秒内` : s.label)}</span>`).join('');
       let rec = '';
-      if (res.result === 'win' && G.record && res.value != null) rec = `<div class="mp-time">${G.record === 'seconds' ? '⏱' : '🏅'} ${fmtRecord(res.value)}${res.new_best && res.prev_best ? ' <b class="ps-best">新纪录！</b>' : res.prev_best ? `<small>（${multi ? '我们的' : ''}纪录 ${fmtRecord(res.best)}）</small>` : ''}</div>`;
+      if (res.result === 'win' && G.record && res.value != null) rec = `<div class="mp-time">${G.record === 'seconds' ? '⏱' : '🏅'} ${fmtRecord(res.value)}${res.new_best && res.prev_best ? ` <b class="ps-best">新纪录！</b><small class="ps-old">原来 <s>${fmtRecord(res.prev_best)}</s></small>` : res.prev_best ? `<small>（${multi ? '我们的' : ''}纪录 ${fmtRecord(res.best)}）</small>` : ''}</div>`;
       else if (res.new_best && res.prev_best == null && !G.record && res.first_clear === false) rec = '<div class="ps-best">新纪录！</div>';
       return `<div class="pl-stage-res"><div class="ps-n">第 ${res.n} 关${lv.name && lv.name !== `第 ${res.n} 关` ? ` · ${esc(lv.name)}` : ''}</div><div class="ps-stars">${stars}</div><div class="ps-how">${how}</div>${rec}
+        ${res.result === 'lose' && res.far > 0 ? `<div class="ps-far">这一关走到了 ${res.far}%<i><b style="width:${res.far}%"></b></i></div>` : ''}
         ${res.result !== 'win' ? `<p class="small">${esc(G.stars[0] ? G.stars[0].label : '过关')}就能拿第 1 颗星。</p>` : ''}
         ${res.unlocked ? `<div class="ps-unlock">${res.unlocked.icon} 解锁了 <b>${esc(res.unlocked.name)}</b>：${esc(res.unlocked.how)}</div>` : ''}
         ${res.all_clear && res.first_clear ? `<div class="ps-unlock">🏆 全部 ${TOTAL} 关都打通了！</div>`

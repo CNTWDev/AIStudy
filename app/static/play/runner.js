@@ -329,7 +329,7 @@
     const title = result === 'win'
       ? `🏃 拼好了 ${s.done} 个词，冲过终点！<small class="rn-sub">${secs} 秒 · 一次拼对 ${s.clean} 个 · 🪙 ${s.coins}</small>`
       : `⏰ 时间到，拼好了 ${s.done} 个词<small class="rn-sub">下次接着跑</small>`;
-    c.finish(result, {seconds: secs, score: s.clean}, title);
+    c.finish(result, {seconds: secs, score: s.clean, far: s.done / s.lv.words}, title);
   }
 
   // ------------------------------------------------------------ 手机：左右滑换道、往上滑跳（屏幕下面也有按钮）

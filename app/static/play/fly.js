@@ -731,7 +731,7 @@
     const best = s.lv.best, title = result === 'win'
       ? `🌼 花路走完啦！<small class="fy-sub">🍯 ${s.honey}${best != null ? (s.honey > best ? ` · 新纪录，多了 ${s.honey - best} 滴` : ` · 纪录 ${best}`) : ''} · 题墙一次撞对 ${s.gatesOk}/${s.lv.gates || 0} · 一口气最多 ×${s.best}</small>`
       : `⏰ 时间到，碰到第 ${s.n} 下<small class="fy-sub">下次接着飞</small>`;
-    c.finish(result, {seconds: +seconds().toFixed(1), score: s.honey, gates: s.gatesOk}, title);
+    c.finish(result, {seconds: +seconds().toFixed(1), score: s.honey, gates: s.gatesOk, far: s.n / s.rows.length}, title);
   }
 
   // ------------------------------------------------------------ 开始
