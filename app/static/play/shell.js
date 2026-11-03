@@ -27,7 +27,8 @@
                                          联网时只有开房间的人报过关，谁都可以报没过（时间到了）。report.why 写在结算上；
                                          没过关时 report.far（0～1）= 这一关走到了多远，结算上画一条「走到了 N%」
      ctx.toast(文字, 'good' | 'warn')；ctx.elapsed() 这一关玩了多少秒
-     ctx.sh.gateAsk(哪一块) / ctx.sh.gateAnswer(题, 第几个)   题板的题（往上跳、向下跳、左右飞）：每块题板各拿各的题，见下面
+     ctx.sh.gateAsk(哪一块) / ctx.sh.gateAnswer(题, 第几个)   题板的题（往上跳、向下跳、左右飞）：每块题板各拿各的题，见下面；
+                                         排序题（一笔连花路）交答案用 ctx.sh.gateSend(题, 连过的花用 | 连起来)
    联网时还有：ctx.net 连接（net.js）；ctx.me / ctx.peer / ctx.peers {id, name, avatar, role}；ctx.host 我是不是开房间的（共享的东西由他算）；
      ctx.die() 我倒下了：题目盖在游戏上，答对 1 道就起来（答错、点「这题不会」都只是换一道，不加题）；ctx.rescue() 队友救了我；
      ctx.reviving 我在答题；ctx.deaths() 大家一共倒下几次；ctx.roleIndex(r) 角色是第几个；
@@ -67,6 +68,11 @@
       try { res = await api(`/api/arena/${sh.match.match_id}/a`, {item_id: item.id, answer: String(i)}); } catch (e) { /* 过期了、断网了 */ }
       const right = res && res.correct ? i : res && /^[A-H]\. /.test(res.answer || '') ? 'ABCDEFGH'.indexOf(res.answer[0]) : -1;
       return right < 0 ? {correct: false, right: i, lost: true} : {correct: !!res.correct, right, lost: false};
+    };
+    // 排序题（一笔连花路）：answer 是这一关先后连过的花（连错的也算）用 | 连起来；→ {correct, lost}
+    sh.gateSend = async (item, answer) => {
+      try { const res = await api(`/api/arena/${sh.match.match_id}/a`, {item_id: item.id, answer: String(answer)}); return {correct: !!res.correct, lost: false}; }
+      catch (e) { return {correct: false, lost: true}; }
     };
     sh.hudClock = text => { const c = sh.hud.querySelector('.mp-clock'); if (c) c.textContent = text; };
     if (quizMode === 'dock') root.classList.add('has-dock');

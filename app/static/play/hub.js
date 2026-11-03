@@ -68,6 +68,15 @@
       ctx.beginPath(); ctx.ellipse(bx, by, 10, 12, 0, 0, 7); ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#2b2340'; ctx.fillRect(bx - 10, by + 3, 20, 3);
       ctx.fillStyle = '#eaf7ff'; ctx.beginPath(); ctx.ellipse(bx - 8, by - 12, 6, 8, -0.5, 0, 7); ctx.ellipse(bx + 8, by - 12, 6, 8, 0.5, 0, 7); ctx.fill(); ctx.stroke();
+    } else if (g === 'link') {   // 一笔连花路：小格子花园，一条蜜色的线一格一格走满
+      const n = 4, cs = Math.min(26, (H - 30) / n), x0 = W / 2 - cs * n / 2, y0 = 12;
+      const path = [0, 1, 5, 4, 8, 12, 13, 9, 10, 14, 15, 11, 7, 6, 2, 3], k = Math.floor((t * 4) % (path.length + 6));
+      const at = i => [x0 + (i % n + 0.5) * cs, y0 + (Math.floor(i / n) + 0.5) * cs];
+      ctx.fillStyle = '#fff6df'; ctx.strokeStyle = '#3a3026'; ctx.lineWidth = 2.5; Play.roundRect(ctx, x0 - 6, y0 - 6, cs * n + 12, cs * n + 12, 10); ctx.fill(); ctx.stroke();
+      for (let i = 0; i < n * n; i++) { const [x, y] = at(i); ctx.fillStyle = path.indexOf(i) < k && path.indexOf(i) >= 0 ? '#ffeaa6' : (i % 2 ? '#d3efb4' : '#c4e7a0'); ctx.fillRect(x - cs / 2 + 1.5, y - cs / 2 + 1.5, cs - 3, cs - 3); }
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      for (const [col, lw] of [['#3a3026', cs * 0.34], ['#ffc21a', cs * 0.22]]) { ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.beginPath(); path.slice(0, Math.max(1, Math.min(k, path.length))).forEach((v, i) => ctx[i ? 'lineTo' : 'moveTo'](...at(v))); ctx.stroke(); }
+      for (const [v, s] of [[0, '1'], [9, '2'], [6, '3'], [3, '4']]) { const [x, y] = at(v); ctx.fillStyle = path.indexOf(v) < k ? '#ffd84a' : '#fff'; ctx.strokeStyle = '#3a3026'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, cs * 0.34, 0, 7); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#3a3026'; ctx.font = `900 ${Math.round(cs * 0.42)}px "Baloo 2", system-ui`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(s, x, y + 1); }
     } else if (g === 'fly') {   // 左右飞：两面墙中间来回飞，墙上有刺
       const x0 = W / 2 - 70, x1 = W / 2 + 70, k = (t * 0.55) % 2, dir = k < 1 ? 1 : -1, f = k < 1 ? k : 2 - k;
       ctx.fillStyle = '#ffc21a'; ctx.fillRect(x0 - 12, 6, 12, H - 12); ctx.fillRect(x1, 6, 12, H - 12);
