@@ -1,0 +1,27 @@
+/* 一笔连花路：花园在中间；上面一条是用时、走了几格（左边），这一关的顺序（中间）；下面是操作提示和「帮帮我」 */
+.pl-link .pl-stage{height:clamp(460px,80vh,780px);touch-action:none}
+@media (orientation:landscape) and (max-height:540px){.pl-link .pl-stage{height:calc(100vh - 110px)}}
+.lk-layer{position:absolute;inset:0;padding:10px 12px;pointer-events:none;z-index:2;display:flex;flex-direction:column;justify-content:space-between}
+.lk-layer.mp{top:46px}
+.lk-top{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:start;width:100%}
+.lk-side{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.lk-chip{background:#fff;border:3px solid var(--pl-ink);box-shadow:0 3px 0 var(--pl-ink);border-radius:14px;padding:2px 10px;font-size:17px;font-weight:900;color:var(--pl-ink);white-space:nowrap;line-height:1.35}
+.lk-q{justify-self:center;max-width:min(460px,100%);background:#fff;border:4px solid var(--pl-ink);box-shadow:0 5px 0 var(--pl-ink);border-radius:22px;padding:6px 18px 9px;text-align:center;opacity:0;transition:opacity .2s}
+.lk-q.on{opacity:1}
+.lk-topic{font-size:12px;font-weight:700;color:var(--muted)}
+.lk-text{display:flex;gap:8px;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:var(--pl-ink);line-height:1.2}
+.lk-say{border:3px solid var(--pl-ink);background:#ffe9a8;border-radius:10px;font-size:15px;padding:0 5px;cursor:pointer;box-shadow:0 2px 0 var(--pl-ink);pointer-events:auto}
+.lk-got{font-size:20px;font-weight:800;color:var(--muted);letter-spacing:1px;margin-top:2px;white-space:nowrap}
+.lk-got span{display:inline;color:#c9bfae}.lk-got span.on{color:#e08a00}
+.lk-bot{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.lk-tip{background:rgba(255,255,255,.85);border-radius:99px;padding:3px 12px;font-size:13px;font-weight:700;color:var(--muted)}
+.lk-help{pointer-events:auto;white-space:nowrap;flex:none;background:#fff;border:3px solid var(--pl-ink);border-bottom-width:6px;border-radius:16px;padding:6px 16px;font-size:18px;font-weight:900;color:var(--pl-ink);cursor:pointer}
+.lk-help:active{transform:translateY(2px);border-bottom-width:4px}
+.lk-help:disabled{opacity:.45;cursor:default}
+.lk-sub{display:block;font-size:14px;font-weight:700;color:var(--muted);margin-top:2px}
+@media (max-width:760px){
+  .lk-top{grid-template-columns:1fr}.lk-side{flex-direction:row;flex-wrap:wrap;gap:5px}
+  .lk-chip{font-size:13px;padding:1px 7px;border-width:2.5px}.lk-text{font-size:20px}.lk-got{font-size:16px}
+  .lk-tip{font-size:11px}.lk-help{font-size:16px;padding:5px 12px}
+}
+.pl-link .pl-toast{top:auto;bottom:64px}   /* 上面是题卡，提示放到下面 */

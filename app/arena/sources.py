@@ -297,6 +297,8 @@ class WordSource(Source):
         fm = dict(self.FORMATS["core" if g["family"] == "words" else "terms"])
         if ctx.get("shape") == "choices":   # 题要写成几个短选项的游戏（向下跳）：只出认意思、看中文选英文
             fm = {k: v for k, v in fm.items() if k in ("read", "reverse")}
+        if ctx.get("shape") == "sequence":   # 排序题（一笔连花路）：把词拼出来，字母写在花上
+            return "spell"
         if ctx.get("mode") != "sprint":   # 听音只在快练和冲刺里出（有「不会」可点）；游戏里可能关着声音
             fm.pop("listen", None)
         return rng.choices(list(fm), weights=list(fm.values()))[0]
@@ -572,6 +574,57 @@ def as_choices(it: dict, rng: random.Random) -> dict | None:
     return out
 
 
+SEQ_MATH = 5        # 排序题：几个算式按得数排
+SEQ_TOKEN = 8       # 花上写得下几个字（算式去掉空格以后）
+SEQ_WORD = (3, 8)   # 拼的词几个字母
+
+
+def as_sequence(it: dict, rng: random.Random) -> dict | None:
+    """把一道题写成「排序题」（一笔连花路：花上写 tokens，按顺序连）：
+    - 拼单词（words 题源出的拼写题）：tokens 是这个词的字母，按顺序拼出来；
+    - 口算（math 题源）：同一题族、同一级再现场生成几道，tokens 是算式，按得数从小到大；
+    其余写不成的返回 None（换一道、换别的题源）。答案是 tokens 用 | 连起来的一串：前端把这一关先后连过的花
+    （连错的也算）照样连起来交上来，一步没错才对。排一串算式比算一道难，换个题族单独校准（<题族>:seq），能力值还是同一个。"""
+    if it.get("word") and it.get("type") == "fill" and it.get("fmt") == "spell":
+        w = it["word"].strip().lower()
+        if not (w.isascii() and w.isalpha() and SEQ_WORD[0] <= len(w) <= SEQ_WORD[1]):
+            return None
+        out = {k: v for k, v in it.items() if k not in ("letters", "keypad")}
+        return {**out, "q": f"「{it['zh']}」怎么拼？", "answer": ["|".join(w)],
+                "seq": {"tokens": list(w), "rule": "拼出这个词", "zh": it["zh"]}}
+    fam = it.get("family")
+    if it.get("type") != "num" or fam not in quickgen.FAMILIES or not it.get("level"):
+        return None
+
+    def expr(q: str) -> str | None:
+        m = re.fullmatch(r"\s*([0-9.]+(?:\s*[+−×÷]\s*[0-9.]+)+)\s*=\s*\?\s*", q)
+        e = m and m.group(1).replace(" ", "")
+        return e if e and len(e) <= SEQ_TOKEN else None
+
+    got: dict[float, str] = {}
+    if (e := expr(it["q"])) is None:
+        return None
+    got[float(it["answer"])] = e
+    for _ in range(40):
+        if len(got) >= SEQ_MATH:
+            break
+        x = quickgen.generate(fam, it["level"], rng)
+        if x.get("type") == "num" and (e := expr(x["q"])) and float(x["answer"]) not in got:
+            got[float(x["answer"])] = e
+    if len(got) < SEQ_MATH:
+        return None
+    vals = sorted(got)
+    tokens = [got[v] for v in vals]
+    family = f"{fam}:seq"
+    b = ability.calib(family, [it["level"]])[it["level"]][0]
+    h = hashlib.sha1("|".join(tokens).encode()).hexdigest()[:10]
+    return {**{k: v for k, v in it.items() if k not in ("tol", "keypad", "unit")},
+            "id": f"seq-{fam}-{h}", "type": "fill", "q": "按得数从小到大连", "answer": ["|".join(tokens)],
+            "explain": "  <  ".join(f"{t}={_fmt_num(v)}" for t, v in zip(tokens, vals)),
+            "family": family, "b": b, "p": round(ability.sigmoid(it.get("theta", 0) - b), 4),
+            "seq": {"tokens": tokens, "vals": [_fmt_num(v) for v in vals], "rule": "按得数从小到大连"}}
+
+
 def _reshuffle(it: dict, rng: random.Random) -> dict:
     """选项打乱，答案跟着换（再考一次时也换个位置，不让孩子记位置）。"""
     if it.get("type") != "mcq":
@@ -614,13 +667,14 @@ def pick(kid: dict, target: float, rng: random.Random, ctx: Ctx | None = None, m
     """给这个人出一道题（游戏、冲刺都用它）：target 是目标答对率；mode = sprint 时也出听音题。
     题只出自他在学的东西（asks）：没有就不出，不拿哪一级的口算凑。
     ask：只出一种题的游戏（单词跑酷：("words", "run")），只从这个题源出。
-    shape = "choices"：题都写成 2～4 个短选项（as_choices），写不成的换一道、换别的题源。
+    shape = "choices"：题都写成 2～4 个短选项（as_choices）；"sequence"：排序题（as_sequence）。写不成的换一道、换别的题源。
     抽中的题源这次出不了题（题库里一时没有新题、后台还在出），换别的题源；都出不了，再来一轮，这一轮题库的题可以拿老题凑。"""
     ctx = ctx or Ctx(kid)
     ctx["mode"], ctx["shape"] = mode, shape
     if ask:
         ctx["ask_fmt"] = ask[1] if len(ask) > 1 else None
-    shaped = (lambda x: x and as_choices(x, rng)) if shape == "choices" else (lambda x: x)
+    shaped = (lambda x: x and as_choices(x, rng)) if shape == "choices" else \
+        (lambda x: x and as_sequence(x, rng)) if shape == "sequence" else (lambda x: x)
     ws = asks(kid, ask, ctx)
     for again in (False, True):
         ctx["again"] = again
@@ -697,4 +751,4 @@ def public(it: dict) -> dict:
     return {"id": it["id"], "q": it["q"], "type": t.id, "widget": t.widget, "unit": it.get("unit", ""),
             "options": it.get("options"), "keypad": keypad, "topic": it.get("topic", ""), "src": it.get("src", ""),
             "say": it.get("say", ""), "letters": it.get("letters"), "cloze": bool(it.get("cloze")), "hint": it.get("hint", ""),
-            "run": it.get("run"), "retry": bool(it.get("retry"))}
+            "run": it.get("run"), "seq": it.get("seq"), "retry": bool(it.get("retry"))}

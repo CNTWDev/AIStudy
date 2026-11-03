@@ -1,0 +1,113 @@
+"""一笔连花路（app/arena/games/link.py、static/play/link.js）：关卡都走得满（每个点正好一次）、每个世界的新东西、
+几个人一起的星星、排序题（拼单词的字母、按得数排的算式）和交答案。"""
+import random
+
+from fastapi.testclient import TestClient
+
+from app import arena, db
+from app.arena import matches, sources
+from app.arena.games.link import graph, is_path
+from app.main import app
+from tests.test_zz_game_questions import _user
+from tests.test_zz_words import _kid
+
+
+def test_link_levels():
+    g = arena.GAMES["link"]
+    assert list(arena.GAMES)[:5] == ["runner", "jump", "helix", "fly", "link"] and g.players == (1, 4) and g.multi
+    assert g.shape == "sequence" and not g.freeze and g.record == "seconds" and g.total == 1000 and g.per_world == 6
+    for n in list(range(1, 37)) + list(range(37, 1001, 23)) + [1000]:
+        lv = g.level(n)   # level() 里跑 check：path 走满整张图
+        adj = graph(lv)
+        assert is_path(adj, lv["path"]), n
+        w, scene = (n - 1) // 6, g.world_of(n)["scene"]
+        hexed = w % 5 == 4
+        assert (lv["kind"] == "hex") == hexed and lv["tut"] == (n <= 2)
+        if not hexed:
+            assert bool(lv["walls"]) == (w >= 1), n                 # 篱笆小院起有篱笆
+            assert bool(lv["bridges"]) == (w >= 2), n               # 小溪起有小桥：横竖各走一次（两个点都在路上）
+        assert bool(lv["warps"]) == (w >= 3), n                     # 魔法花园起有魔法花
+        rows, cols = lv["rows"], lv["cols"]
+        for a, b in lv["walls"]:                                   # 篱笆只围在两个相邻格中间，路不从那里走
+            assert abs(a - b) in (1, cols) and frozenset((a, b)) not in {frozenset((x % (rows * cols), y % (rows * cols))) for x, y in zip(lv["path"], lv["path"][1:])}
+        for b in lv["bridges"]:
+            assert b in lv["path"] and rows * cols + b in lv["path"]
+        assert scene in ("day", "candy", "night", "sunset")
+    assert g.level(1)["rows"] == 4 and g.level(1000)["rows"] > g.level(30)["rows"]
+    assert g.level(9) == g.level(9)   # 种子固定，每次一样
+    assert g.title(7).startswith("篱笆小院") and g.title(31).startswith("晴空花园 2")
+
+
+def test_link_bad_level_is_refused():
+    g = arena.GAMES["link"]
+    lv = dict(g.level(3))
+    lv["path"] = lv["path"][:-1]   # 少走一格
+    try:
+        g.check(lv, "x")
+        raise AssertionError("少走一格也通过了")
+    except ValueError:
+        pass
+
+
+def test_link_stars_for_teams():
+    g = arena.GAMES["link"]
+    lv = g.level(5)
+    rep = g.clean(lv, {"seconds": 40, "deaths": 0, "gates": 1})
+    assert g.checks(lv, rep, None) == {"clear": True, "safe": True, "gates": True}
+    assert g.checks(lv, g.clean(lv, {"deaths": 1, "gates": 0}), None) == {"clear": True, "safe": False, "gates": False}
+    assert g.checks(g.level(1), g.clean(g.level(1), {"gates": 0}), None)["gates"]   # 教玩法的关没有题
+    team = g.for_team(lv, 3)
+    assert team["team"] == 3 and "team" not in lv
+    assert g.checks(team, {"deaths": 2, "gates": 1}, None) == {"clear": True, "safe": True, "gates": True}
+    assert g.checks(team, {"deaths": 3, "gates": 0}, None) == {"clear": True, "safe": False, "gates": False}
+
+
+def test_link_spelling_sequence(monkeypatch):
+    """学英语的孩子：花上写一个词的字母，按顺序拼出来；交上来的是先后连过的花，一步没错才对。"""
+    with TestClient(app) as c:
+        k = _kid(c, monkeypatch, "lk1@x.com")
+        arena.set_game_unlock(k["id"], "free")
+        k = dict(db.one("SELECT * FROM users WHERE id=?", k["id"]))
+        page = c.get("/arena/link")
+        assert page.status_code == 200 and "/static/play/link.js" in page.text and "/static/play/link.css" in page.text
+        m = matches.start(k, "link")
+        seen = 0
+        for i in range(6):
+            q = matches.question(k, m["match_id"], random.Random(i), gate=f"link{i}")["item"]
+            seq = q["seq"]
+            assert seq and seq["zh"] and 3 <= len(seq["tokens"]) <= 8 and all(len(t) == 1 and t.isalpha() for t in seq["tokens"])
+            ans = "|".join(seq["tokens"])
+            if i % 2:   # 中间连错过一次
+                ans = "|".join(seq["tokens"][:1] + ["?"] + seq["tokens"][1:])
+            res = matches.answer(k, m["match_id"], q["id"], ans)
+            assert res["correct"] == (i % 2 == 0)
+            if not res["correct"]:
+                assert res["freeze_ms"] == 0   # 不冷冻
+            seen += 1
+        assert seen == 6
+
+
+def test_link_math_sequence_is_sorted():
+    with TestClient(app):
+        kid = _user("lk-m@x.com", "G3", ["math-shanghai"])
+        rng, st = random.Random(5), {}
+        got = [sources.next_item(kid, st, 0.75, rng, shape="sequence") for _ in range(20)]
+        maths = [it for it in got if it["src"] == "math"]
+        assert maths
+        for it in maths:
+            seq = it["seq"]
+            assert len(seq["tokens"]) == sources.SEQ_MATH and all(len(t) <= sources.SEQ_TOKEN for t in seq["tokens"])
+            vals = [float(v) for v in seq["vals"]]
+            assert vals == sorted(vals) and len(set(vals)) == len(vals)        # 得数从小到大、不重复
+            assert it["family"].endswith(":seq") and it["answer"] == ["|".join(seq["tokens"])]
+            assert sources.public(it)["seq"] == seq and "answer" not in sources.public(it)
+        assert all(it["src"] != "bank" for it in got)   # 题库的选择题排不成顺序，不出
+
+
+def test_link_front_end_uses_shared_shell():
+    with TestClient(app) as c:
+        js = c.get("/static/play/link.js").text
+        shell = c.get("/static/play/shell.js").text
+    assert "sh.gateAsk(" in js and "sh.gateSend(" in js and "sh.gateSend = " in shell
+    assert "finale()" in js and "far:" in js and "c.die()" in js   # 过关仪式的收尾、没过关走了多远、帮帮我 = 答对 1 道
+    assert "function graph(lv)" in js and "hexNbs" in js
