@@ -14,6 +14,8 @@ path 是生成时找到的一条走满全图的路（每个点正好一次）：
 不要求唯一解（顺序是知识，蒙不出来）。花摆在 path 上（前端按题的个数均匀摆，第一朵是起点、最后一朵是蜂巢）。
 前 2 关是教玩法的（tut）：花上写 1、2、3，不出题。
 每个世界加一样新东西，从那个世界起一直有：篱笆小院起有篱笆、小溪起有小桥、魔法花园起有魔法花；蜂巢世界是六边形格子。
+- 几个人一起：每人一个自己的花园（seats，按角色），是同一关转过、翻过、倒过来走的样子——一样大、一样难，
+  路却各不一样，看了别人的线也抄不了（variant）；右边小窗也只亮走过的格子，不画线。
 - 三颗星：大家都走满；没用「帮帮我」（几个人一起，每多 1 人多放宽 1 次）；每一步都一次连对（同上）。
 """
 import random
@@ -143,6 +145,40 @@ def is_path(adj: dict[int, set[int]], path: list[int]) -> bool:
     return len(path) == len(adj) == len(set(path)) and all(b in adj[a] for a, b in zip(path, path[1:]))
 
 
+def variant(lv: dict, k: int) -> dict:
+    """第 k 种样子（k = 0 原样）：整个花园转一转、翻一翻，或者把路倒过来走（起点和蜂巢对调）。图的形状没变，难度一样，
+    路换了位置。方格是正方形，有 8 种转法；六边形格（奇数行往右错半格）只有一种翻法还是同样的格子：
+    行数是单数时上下翻，双数时转半圈。转了 90° 的话，小桥上横着、竖着那两次也跟着对调。只换格子号，不重新找路。"""
+    rows, cols, n, hexed = lv["rows"], lv["cols"], lv["rows"] * lv["cols"], lv.get("kind", "sq") == "hex"
+    if hexed:
+        flips = [(False, False, False), (False, True, rows % 2 == 0)]   # (先沿对角翻, 再上下翻, 再左右翻)
+    else:   # 原样、转 90°、上下翻、沿另一条对角翻（前 4 个给 4 个人），再是转半圈、左右翻、沿对角翻、转 270°
+        flips = [(False, False, False), (True, False, True), (False, True, False), (True, True, True),
+                 (False, True, True), (False, False, True), (True, False, False), (True, True, False)]
+    m = len(flips)
+    t, v, h = flips[k % m]
+    back = (k // m) % 2 == 1                                  # 转法用完了，再倒过来走
+
+    def cell(i: int) -> int:
+        r, c = divmod(i, cols)
+        if t:
+            r, c = c, r
+        return (rows - 1 - r if v else r) * cols + (cols - 1 - c if h else c)
+
+    bridges = set(lv.get("bridges") or [])
+
+    def slot(x: int) -> int:
+        i = x % n
+        vert = (x >= n) != (t and i in bridges)
+        return cell(i) + (n if vert else 0)
+
+    path = [slot(x) for x in lv["path"]]
+    return {**lv, "walls": sorted(sorted((cell(a), cell(b))) for a, b in lv.get("walls") or []),
+            "bridges": sorted(cell(b) for b in bridges),
+            "warps": [sorted((cell(a), cell(b))) for a, b in lv.get("warps") or []],
+            "path": path[::-1] if back else path, "seed": (lv.get("seed", 0) + k * 7919) % (1 << 30)}
+
+
 def turns(lv: dict, path: list[int]) -> int:
     """路拐了几个弯（方格）：弯多的路走起来有意思，挑它。"""
     n, cols = lv["rows"] * lv["cols"], lv["cols"]
@@ -235,7 +271,12 @@ class Link(Game):
         return {**out, "best": best}
 
     def for_team(self, lv, k):
-        return {**lv, "team": max(1, k)} if k > 1 else lv
+        """几个人一起：每个角色一个自己的花园（seats），前端按自己的角色取。同一关换个样子，一样难，路各不一样。"""
+        if k <= 1:
+            return lv
+        keep = ("kind", "rows", "cols", "walls", "bridges", "warps", "path", "seed")
+        seats = {role: {f: x for f, x in variant(lv, i).items() if f in keep} for i, role in enumerate(self.roles)}
+        return {**lv, "team": k, "seats": seats}
 
     def clean(self, lv, rep):
         out = super().clean(lv, rep)
