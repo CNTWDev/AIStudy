@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from app import arena, db
 from app.arena import matches, sources
-from app.arena.games.link import graph, is_path
+from app.arena.games.link import graph, is_path, variant
 from app.main import app
 from tests.test_zz_game_questions import _user
 from tests.test_zz_words import _kid
@@ -60,6 +60,37 @@ def test_link_stars_for_teams():
     assert team["team"] == 3 and "team" not in lv
     assert g.checks(team, {"deaths": 2, "gates": 1}, None) == {"clear": True, "safe": True, "gates": True}
     assert g.checks(team, {"deaths": 3, "gates": 0}, None) == {"clear": True, "safe": False, "gates": False}
+
+
+def test_link_each_player_gets_own_garden():
+    """几个人一起：每人一个花园（同一关转过、翻过或倒着走），一样大、一样难，路各不一样——一个人走满了，别人照着抄不了。"""
+    g = arena.GAMES["link"]
+    assert "seats" not in g.for_team(g.level(9), 1)   # 一个人玩：原样
+    for n in (1, 3, 9, 15, 20, 27, 100, 145, 250, 1000):
+        lv = g.level(n)
+        team = g.for_team(lv, 4)
+        seats = team["seats"]
+        assert list(seats) == list(g.roles) and seats["sun"]["path"] == lv["path"]   # 第一个角色原样
+        cells = set()
+        for role, st in seats.items():
+            v = {**lv, **st}
+            adj = graph(v)
+            assert is_path(adj, v["path"]), (n, role)
+            assert len(adj) == len(graph(lv)) and v["rows"] == lv["rows"] and v["kind"] == lv["kind"]
+            assert len(v["walls"]) == len(lv["walls"]) and len(v["bridges"]) == len(lv["bridges"]) and len(v["warps"]) == len(lv["warps"])
+            for b in v["bridges"]:
+                assert b in v["path"] and v["rows"] * v["cols"] + b in v["path"]
+            cells.add(tuple(x % (v["rows"] * v["cols"]) for x in v["path"]))
+        assert len(cells) == 4, n   # 四个人的路都不一样
+        # 拿别人的路在自己的花园里走：走不通（或者起点、终点不一样）
+        mine, theirs = {**lv, **seats["berry"]}, seats["sun"]["path"]
+        assert not (is_path(graph(mine), theirs) and theirs[0] == mine["path"][0] and theirs[-1] == mine["path"][-1]), n
+    for n in (13, 145):   # 方格 8 种样子、六边形 4 种，都走得满、都不一样
+        lv = g.level(n)
+        k = 8 if lv["kind"] == "sq" else 4
+        assert len({tuple(variant(lv, i)["path"]) for i in range(k)}) == k
+    js = open("app/static/play/link.js", encoding="utf-8").read()
+    assert "seatOf(S.base, p.role)" in js and "lineTo' : 'moveTo'](cx, cy)" not in js   # 小窗按他的花园画，不画线
 
 
 def test_link_spelling_sequence(monkeypatch):

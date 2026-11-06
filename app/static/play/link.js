@@ -61,10 +61,12 @@
   const DEMO = {kind: 'sq', rows: 4, cols: 4, walls: [], bridges: [], warps: [], tut: true, seed: 3,
                 path: [0, 1, 5, 4, 8, 12, 13, 9, 10, 14, 15, 11, 7, 6, 2, 3]};
 
-  function fresh(lv, avatar) {
-    lv = lv && lv.path ? lv : DEMO;
-    const n = lv.rows * lv.cols, adj = graph(lv);
-    return {mode: 'preview', lv, n, adj, total: adj.size, avatar: avatar || 'sun', theme: (lv.world && lv.world.scene) || 'day',
+  // 几个人一起时服务器给每个角色一个花园（lv.seats，link.py 的 variant）：同一关转过、翻过或倒着走，一样难、路不一样
+  const seatOf = (lv, role) => (lv && lv.seats && lv.seats[role]) ? {...lv, ...lv.seats[role]} : lv;
+  function fresh(base, avatar, role) {
+    base = base && base.path ? base : DEMO;
+    const lv = seatOf(base, role), n = lv.rows * lv.cols, adj = graph(lv);
+    return {mode: 'preview', base, lv, n, adj, total: adj.size, avatar: avatar || 'sun', theme: (lv.world && lv.world.scene) || 'day',
             item: null, tokens: [], vals: null, flowers: new Map(), hive: -1,
             path: [lv.path[0]], step: 1, tries: [], wrong: {}, glow: null, hint: null, shake: null, warn: '',
             helps: 0, gatesOk: 0, bloomT: -1, limit: 600, sent: false, beeT: 0, beeFrom: null};
@@ -412,17 +414,23 @@
     Play.roundRect(ctx, x - w / 2, y - cs * 0.13, w, cs * 0.26, cs * 0.13); ctx.fill(); ctx.stroke();
     ctx.fillStyle = INK; ctx.font = `900 ${Math.round(cs * 0.17)}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(t, x, y + 1);
   }
-  function minis(g, P) {   // 宽屏右边：大家的小花园（太小看不清花上的字，只看连到哪了）
+  // 宽屏右边：大家的小花园。每人的花园是同一关换了个样子（seatOf），小窗按他自己的花园画；
+  // 只亮他走过的格子、标出他的小蜜蜂在哪，不画线——看得出谁连到哪了，抄不了路
+  function minis(g, P) {
     const ps = others().filter(p => mates[p.id] && mates[p.id].p);
     const x = g.W - g.side + 10, w = g.side - 30;
     ps.forEach((p, k) => {
-      const m = mates[p.id], y = 120 + k * (w + 44), lv = S.lv, cs = w / Math.max(lv.cols, lv.rows), done = new Set(m.p.map(cellOf));
+      const m = mates[p.id], y = 120 + k * (w + 44), lv = seatOf(S.base, p.role), n = lv.rows * lv.cols;
+      const cs = w / Math.max(lv.cols, lv.rows), done = new Set(m.p.map(v => v % n));
       ctx.fillStyle = INK; Play.roundRect(ctx, x - 6, y - 6 + 5, w + 12, w + 12, 14); ctx.fill();
       ctx.fillStyle = P.frame; ctx.strokeStyle = INK; ctx.lineWidth = 3; Play.roundRect(ctx, x - 6, y - 6, w + 12, w + 12, 14); ctx.fill(); ctx.stroke();
       const cc = i => [x + (i % lv.cols + 0.5 + (lv.kind === 'hex' && Math.floor(i / lv.cols) % 2 ? 0.5 : 0)) * cs * (lv.kind === 'hex' ? 0.92 : 1), y + (Math.floor(i / lv.cols) + 0.5) * cs];
-      for (let i = 0; i < S.n; i++) { const [cx, cy] = cc(i); ctx.fillStyle = done.has(i) ? P.lit2 : (i % 2 ? P.a : P.b); ctx.fillRect(cx - cs / 2 + 1.5, cy - cs / 2 + 1.5, cs - 3, cs - 3); }
-      ctx.strokeStyle = BODY[p.role] ? BODY[p.role][1] : '#ffc21a'; ctx.lineWidth = cs * 0.3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-      ctx.beginPath(); m.p.forEach((v, i) => { const [cx, cy] = cc(cellOf(v)); ctx[i ? 'lineTo' : 'moveTo'](cx, cy); }); ctx.stroke();
+      const col = (BODY[p.role] || BODY.sun)[0];
+      for (let i = 0; i < n; i++) { const [cx, cy] = cc(i); ctx.fillStyle = done.has(i) ? P.lit2 : (i % 2 ? P.a : P.b); ctx.fillRect(cx - cs / 2 + 1.5, cy - cs / 2 + 1.5, cs - 3, cs - 3); }
+      if (m.p.length && !m.done) {   // 他的小蜜蜂在哪
+        const [hx, hy] = cc(m.p[m.p.length - 1] % n);
+        ctx.fillStyle = col; ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(hx, hy, cs * 0.3, 0, 7); ctx.fill(); ctx.stroke();
+      }
       const pct = Math.round(m.p.length / S.total * 100);
       ctx.fillStyle = INK; ctx.font = `800 15px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
       ctx.fillText(`${m.done ? '🏁 ' : ''}${p.name} · ${pct}%`, x + w / 2, y + w + 26);
@@ -568,19 +576,19 @@
     Play.loop(update, render).start();
   }
   function ready() {
-    S = fresh(S && S.mode !== 'preview' ? S.lv : null, sh.data.avatar); plant(['1', '2', '3', '4']);
+    S = fresh(S && S.mode !== 'preview' ? S.base : null, sh.data.avatar); plant(['1', '2', '3', '4']);
     fx.parts = []; fx.texts = []; hud = null; mates = {};
     if (hudEl) hudEl.innerHTML = '';
   }
   function begin(cx) {
     c = cx; mates = {}; sendT = 0; dirty = true;
     if (cx.net) { cx.net.off('lk'); cx.net.on('lk', onMate); }
-    S = fresh(cx.level && cx.level.path ? cx.level : null, (cx.match && cx.match.avatar) || sh.data.avatar);
+    S = fresh(cx.level && cx.level.path ? cx.level : null, (cx.match && cx.match.avatar) || sh.data.avatar, cx.me && cx.me.role);
     S.limit = Math.max(30, Math.min(600, (cx.match && !cx.match.unlimited && cx.match.seconds_left) || 600));
     Play.input.clear();
     buildHud();
     loadSeq();
-    sh.toast(others().length ? '同一个花园各连各的，看谁先走满！' : S.lv.tut ? '从小蜜蜂出发，按 1、2、3 连，走满每一格！' : '想好顺序，从小蜜蜂出发！', 'good');
+    sh.toast(others().length ? '每人一个花园，一样大、一样难，看谁先走满！' : S.lv.tut ? '从小蜜蜂出发，按 1、2、3 连，走满每一格！' : '想好顺序，从小蜜蜂出发！', 'good');
   }
 
   const rules = [
@@ -590,7 +598,7 @@
     '往回拖就撤销；点线上哪一格，就退回到那一格。电脑上方向键也能走，退格撤销',
     '卡住了点「<b>帮帮我</b>」：答对 1 道题，后面 3 格亮起来',
     '篱笆过不去；小桥那一格横着、竖着能各走一次；两朵<b>魔法花</b>之间能直接连过去',
-    '几个人一起：同一个花园各连各的，<b>谁先走满谁第一</b>，大家都走满才过关',
+    '几个人一起：<b>每人一个花园</b>（同一关转一转、翻一翻，一样难），<b>谁先走满谁第一</b>，大家都走满才过关',
   ];
 
   PlayShell.init({
