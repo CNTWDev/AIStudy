@@ -1,12 +1,16 @@
 """一笔连花路（app/arena/games/link.py、static/play/link.js）：关卡都走得满（每个点正好一次）、每个世界的新东西、
 几个人一起的星星、排序题（拼单词的字母、按得数排的算式）和交答案。"""
+import json
 import random
+import shutil
+import subprocess
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app import arena, db
 from app.arena import matches, sources
-from app.arena.games.link import graph, is_path, variant
+from app.arena.games.link import ends_ok, graph, is_path, variant
 from app.main import app
 from tests.test_zz_game_questions import _user
 from tests.test_zz_words import _kid
@@ -47,6 +51,57 @@ def test_link_bad_level_is_refused():
         raise AssertionError("少走一格也通过了")
     except ValueError:
         pass
+
+
+# 有小桥、魔法花的关（小溪起），方格和六边形都有
+_SPECIAL = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 37, 41, 44, 145, 250, 333, 1000]
+
+
+def test_link_ends_on_plain_cells():
+    """起点和蜂巢不落在小桥、魔法花上，也不是同一格：小桥那一格路要走两次，以前起点和蜂巢会落进同一格，两朵花的字叠在一起。"""
+    g = arena.GAMES["link"]
+    for n in _SPECIAL:
+        lv = g.level(n)
+        for k in range(8):
+            v = variant(lv, k)
+            n_cells, p = v["rows"] * v["cols"], v["path"]
+            assert ends_ok(v, p), (n, k)
+            assert p[0] % n_cells != p[-1] % n_cells and p[0] < n_cells and p[-1] < n_cells
+            assert not {p[0], p[-1]} & (set(v["bridges"]) | {x for w in v["warps"] for x in w}), (n, k)
+    lv = g.level(41)
+    b, p = lv["bridges"][0], lv["path"]
+    assert not ends_ok(lv, [b] + p[1:]) and not ends_ok(lv, [lv["rows"] * lv["cols"] + b] + p[1:-1] + [b])
+    assert not ends_ok({**lv, "warps": [[p[0], p[5]]]}, p)
+
+
+def test_link_flowers_one_per_cell():
+    """前端摆花（link.js spots）：拿出来用 node 跑——每朵花一格，不叠；中间的花不在小桥、魔法花上；起点、蜂巢在两头。"""
+    if not shutil.which("node"):
+        pytest.skip("没有 node")
+    g = arena.GAMES["link"]
+    js = open("app/static/play/link.js", encoding="utf-8").read()
+    rng = js[js.index("  function rng(seed)"):js.index("\n", js.index("  function rng(seed)"))]
+    spots = js[js.index("  function spots(lv, k)"):js.index("  const room = ")]
+    lvs = [variant(g.level(n), k) for n in [1, 3, 7] + _SPECIAL for k in range(4)]
+    sim = rng + spots + f"""
+const out = [];
+for (const lv of {json.dumps(lvs)}) for (const k of [2, 3, 5, 7, 9, 12, 99]) out.push(spots(lv, k));
+console.log(JSON.stringify(out));
+"""
+    r = subprocess.run(["node", "-e", sim], capture_output=True, text=True, timeout=30)
+    assert r.returncode == 0, r.stderr
+    got, i = json.loads(r.stdout), 0
+    for lv in lvs:
+        n, p = lv["rows"] * lv["cols"], lv["path"]
+        bad = set(lv["bridges"]) | {x for w in lv["warps"] for x in w}
+        room = sum(1 for x in p[1:-1] if x < n and x not in bad) + 2
+        for k in [2, 3, 5, 7, 9, 12, 99]:
+            at = got[i]
+            i += 1
+            assert len(at) == min(k, room) and at[0] == 0 and at[-1] == len(p) - 1
+            assert at == sorted(set(at))                                         # 按路上的先后，不重复
+            assert len({p[j] % n for j in at}) == len(at)                        # 一格一朵，不叠
+            assert all(p[j] < n and p[j] not in bad for j in at[1:-1])           # 不在小桥、魔法花上
 
 
 def test_link_stars_for_teams():

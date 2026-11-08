@@ -74,20 +74,30 @@
   const cellOf = v => v % S.n;
   const isBridgeSlot = v => v >= S.n;
 
-  // 花摆在 path 上：k 朵，起点、终点固定，中间均匀摆、按种子错开一点；不摆在小桥、魔法花上
-  function plant(tokens) {
-    const s = S, L = s.lv.path.length, k = tokens.length, r = rng(s.lv.seed || 1);
-    const bad = new Set([...(s.lv.bridges || []), ...(s.lv.warps || []).flat()]);
+  // 花摆在 path 上：k 朵，起点、终点固定（服务器保证两头在普通格子上），中间均匀摆、按种子错开一点。
+  // 中间的花只摆在普通格子上（不在小桥、魔法花上），一格一朵：先挑出能摆的位置，再从里面按顺序挑，不会叠在一起
+  function spots(lv, k) {
+    const n = lv.rows * lv.cols, L = lv.path.length, r = rng(lv.seed || 1);
+    const bad = new Set([...(lv.bridges || []), ...(lv.warps || []).flat()]);
+    const ok = [];
+    for (let j = 1; j < L - 1; j++) if (lv.path[j] < n && !bad.has(lv.path[j])) ok.push(j);
+    k = Math.max(2, Math.min(k, ok.length + 2));
     const at = [0];
-    for (let i = 1; i < k - 1; i++) {
-      let j = Math.round(i * (L - 1) / (k - 1) + (r() - 0.5) * Math.min(2, (L - 1) / (k - 1) * 0.6));
-      j = Math.max(at[i - 1] + 1, Math.min(L - 1 - (k - 1 - i), j));
-      while (j < L - (k - 1 - i) && (isBridgeSlot(s.lv.path[j]) || bad.has(cellOf(s.lv.path[j])))) j++;
-      at.push(j);
+    for (let i = 1, q = -1; i < k - 1; i++) {
+      const want = i * (L - 1) / (k - 1) + (r() - 0.5) * Math.min(2, (L - 1) / (k - 1) * 0.6);
+      let p = ok.findIndex(j => j >= want);
+      if (p < 0) p = ok.length - 1;
+      q = Math.max(q + 1, Math.min(ok.length - (k - 1 - i), p));
+      at.push(ok[q]);
     }
     at.push(L - 1);
+    return at;
+  }
+  const room = lv => spots(lv, Infinity).length;   // 这一关最多摆几朵花
+  function plant(tokens) {
+    const s = S, at = spots(s.lv, tokens.length);
     s.flowers = new Map(at.map((j, i) => [s.lv.path[j], i]));
-    s.hive = s.lv.path[L - 1];
+    s.hive = s.lv.path[s.lv.path.length - 1];
     s.tokens = tokens;
     s.tries = [tokens[0]];
     s.step = 1;
@@ -101,7 +111,7 @@
       if (S !== s) return;
       if (!it.seq || !it.seq.tokens || it.seq.tokens.length < 2) throw new Error('no seq');
       s.item = it; s.vals = it.seq.vals || null;
-      plant(it.seq.tokens.slice(0, Math.max(2, Math.min(it.seq.tokens.length, L))));
+      plant(it.seq.tokens.slice(0, room(s.lv)));
       if (it.say && typeof Speak !== 'undefined') Speak.play(it.say, 'en', 'word');
     } catch (e) {
       if (S !== s) return;

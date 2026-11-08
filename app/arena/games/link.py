@@ -10,7 +10,8 @@
 - walls：[[a, b]] 两格中间有篱笆，走不过去（只在方格上）；
 - bridges：[a] 这一格有小桥，横着、竖着可以各走一次（小桥竖着走的那一次记成 N + a，N = 格子数）；
 - warps：[[a, b]] 两朵魔法花，在一朵上可以直接连到另一朵。
-path 是生成时找到的一条走满全图的路（每个点正好一次）：保证这一关走得通；孩子走出别的路也算，
+path 是生成时找到的一条走满全图的路（每个点正好一次）：保证这一关走得通；起点和蜂巢在普通格子上（ends_ok），
+每朵花一格，字不会叠在一起；孩子走出别的路也算，
 不要求唯一解（顺序是知识，蒙不出来）。花摆在 path 上（前端按题的个数均匀摆，第一朵是起点、最后一朵是蜂巢）。
 前 2 关是教玩法的（tut）：花上写 1、2、3，不出题。
 每个世界加一样新东西，从那个世界起一直有：篱笆小院起有篱笆、小溪起有小桥、魔法花园起有魔法花；蜂巢世界是六边形格子。
@@ -130,13 +131,27 @@ def starts(lv: dict, adj: dict[int, set[int]]) -> list[int]:
     return [v for v in nodes if color[v] == big]
 
 
+def special(lv: dict) -> set[int]:
+    """有小桥、魔法花的格子：起点和蜂巢不能在这里（小桥那一格路要走两次，起点和蜂巢会落进同一格叠在一起；
+    魔法花上本来画着一朵紫花，再摆一朵字花也叠在一起）。"""
+    return set(lv.get("bridges") or []) | {v for w in lv.get("warps") or [] for v in w}
+
+
+def ends_ok(lv: dict, path: list[int]) -> bool:
+    """路的两头（起点、蜂巢）都在普通的格子上：不在小桥、魔法花上，也不是同一格。"""
+    n, bad = lv["rows"] * lv["cols"], special(lv)
+    a, b = path[0], path[-1]
+    return a < n and b < n and a != b and a not in bad and b not in bad
+
+
 def find(lv: dict, rng: random.Random, tries: int = 40) -> list[int] | None:
-    """换几个起点找走满的路（一个起点搜不通很快放弃，换下一个）。"""
+    """换几个起点找走满的路（一个起点搜不通很快放弃，换下一个）；两头要落在普通格子上（ends_ok）。"""
     adj = graph(lv)
-    ok = starts(lv, adj)
-    for _ in range(tries):
+    bad = special(lv)
+    ok = [v for v in starts(lv, adj) if v < lv["rows"] * lv["cols"] and v not in bad]
+    for _ in range(tries if ok else 0):
         p = walk(adj, rng, rng.choice(ok), budget=3000)
-        if p:
+        if p and ends_ok(lv, p):
             return p
     return None
 
@@ -259,11 +274,11 @@ class Link(Game):
     def check(self, lv, name):
         try:
             ok = 2 <= lv["rows"] <= 9 and 2 <= lv["cols"] <= 9 and lv.get("kind", "sq") in ("sq", "hex") \
-                and is_path(graph(lv), lv["path"])
+                and is_path(graph(lv), lv["path"]) and ends_ok(lv, lv["path"])
         except (KeyError, TypeError, IndexError):
             ok = False
         if not ok:
-            raise ValueError(f"{self.id}/{name}: path 要走满整张图（每个点正好一次，一步一格）")
+            raise ValueError(f"{self.id}/{name}: path 要走满整张图（每个点正好一次，一步一格），起点和蜂巢在普通格子上")
 
     def stage(self, n, prog):
         out = super().stage(n, prog)
