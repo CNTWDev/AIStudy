@@ -625,6 +625,24 @@ def as_sequence(it: dict, rng: random.Random) -> dict | None:
             "seq": {"tokens": tokens, "vals": [_fmt_num(v) for v in vals], "rule": "按得数从小到大连"}}
 
 
+# 题的样子（游戏要的 shape）→ 怎么把一道题写成这样（写不成返回 None）
+SHAPES = {"": lambda it, rng: it, "choices": as_choices, "sequence": as_sequence}
+# 答题面板（倒下复活、「帮帮我」、常驻面板，static/play/quiz.js）画得出来的样子。
+# 排序题只能画在游戏世界里（一笔连花路的花上，按顺序连），面板上画不出来：放进面板就成了让人
+# 照着「按得数从小到大连」打字，拼单词的答案也成了 a|p|p|l|e，打对了也判错。
+PANEL_SHAPES = {"", "choices"}
+
+
+def panel_shape(shape: str) -> str:
+    """答题面板上出什么样子的题：游戏的样子面板画得出来就照它（向下跳的复活题也是选一个），画不出来就出普通题。"""
+    return shape if shape in PANEL_SHAPES else ""
+
+
+def shape_of(it: dict) -> str:
+    """这道题是按什么样子出的（再考一次时只回到同样子的地方：排序题回花上，普通题回面板）。"""
+    return it.get("shape", "sequence" if it.get("seq") else "")
+
+
 def _reshuffle(it: dict, rng: random.Random) -> dict:
     """选项打乱，答案跟着换（再考一次时也换个位置，不让孩子记位置）。"""
     if it.get("type") != "mcq":
@@ -673,8 +691,7 @@ def pick(kid: dict, target: float, rng: random.Random, ctx: Ctx | None = None, m
     ctx["mode"], ctx["shape"] = mode, shape
     if ask:
         ctx["ask_fmt"] = ask[1] if len(ask) > 1 else None
-    shaped = (lambda x: x and as_choices(x, rng)) if shape == "choices" else \
-        (lambda x: x and as_sequence(x, rng)) if shape == "sequence" else (lambda x: x)
+    shaped = SHAPES[shape]
     ws = asks(kid, ask, ctx)
     for again in (False, True):
         ctx["again"] = again
@@ -684,9 +701,10 @@ def pick(kid: dict, target: float, rng: random.Random, ctx: Ctx | None = None, m
                 break
             sid = rng.choices(list(left), weights=list(left.values()))[0]
             s = SOURCES[sid]
-            it = shaped(s.pick(kid, ctx, min(0.92, target + s.target_shift), rng))
+            it = s.pick(kid, ctx, min(0.92, target + s.target_shift), rng)
+            it = it and shaped(it, rng)
             if it:
-                it["src"] = sid
+                it.update(src=sid, shape=shape)
                 return it
             if not s.redraw:
                 left.pop(sid)
@@ -710,7 +728,7 @@ def next_item(kid: dict, st: dict, target: float, rng: random.Random, mode: str 
     """这一次（st 是这次快练 / 这一局的状态，调用方负责存）的下一题。"""
     n = st.get("n", 0)
     st["n"] = n + 1
-    due = next((r for r in st.get("retry", []) if r["at"] <= n), None)
+    due = next((r for r in st.get("retry", []) if r["at"] <= n and shape_of(r["item"]) == shape), None)
     if due:
         st["retry"].remove(due)
         return _reshuffle({**due["item"], "retry": True}, rng)

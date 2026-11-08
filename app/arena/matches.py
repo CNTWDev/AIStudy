@@ -107,7 +107,9 @@ def question(kid: dict, match_id, rng: random.Random | None = None, gate: str = 
     pend = gates.get(gate) if gate else st.get("pending")
     if not pend or (not gate and now - pend["issued"] > rules.PENDING_KEEP_S):
         g = get(m["game"])
-        it = sources.next_item(kid, st, g.target, rng or random.Random(), ask=g.ask, shape=g.shape)
+        # 题板（gate）按游戏要的样子出；答题面板只出面板画得出来的（排序题只能画在花上）
+        shape = g.shape if gate else sources.panel_shape(g.shape)
+        it = sources.next_item(kid, st, g.target, rng or random.Random(), ask=g.ask, shape=shape)
         pend = {"item": it, "issued": now}
         if gate:
             gates[gate] = pend

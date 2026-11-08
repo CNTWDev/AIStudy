@@ -118,6 +118,35 @@ def test_link_spelling_sequence(monkeypatch):
         assert seen == 6
 
 
+def test_link_help_panel_asks_plain_questions(monkeypatch):
+    """「帮帮我」盖上来的答题面板画不出排序题：面板里出普通题（拼写就是打整个词），排序题只上花。
+    以前面板也拿排序题：出现「按得数从小到大连」让人打字，拼写的答案成了 a|p|p|l|e，打对了也判错。
+    答错了隔几道再考：花上的回花上，面板的回面板，不串。"""
+    with TestClient(app) as c:
+        k = _kid(c, monkeypatch, "lk-help@x.com")
+        arena.set_game_unlock(k["id"], "free")
+        k = dict(db.one("SELECT * FROM users WHERE id=?", k["id"]))
+        m = matches.start(k, "link")
+        mid = m["match_id"]
+        for i in range(12):
+            q = matches.question(k, mid, random.Random(100 + i))["item"]            # 面板（gate 不写）
+            assert not q["seq"] and "从小到大" not in q["q"] and "|" not in str(q.get("options") or ""), q
+            st = matches._match(k, mid)["state"]
+            it = st["pending"]["item"]
+            assert sources.shape_of(it) == ""
+            if it.get("fmt") == "spell":                                            # 拼写：打整个词，算对
+                assert matches.answer(k, mid, q["id"], it["word"].upper())["correct"]
+            elif i % 3 == 0:                                                        # 故意答错，排进再考
+                matches.answer(k, mid, q["id"], "不对")
+            else:
+                ans = it["answer"][0] if isinstance(it["answer"], list) else it["answer"]
+                assert matches.answer(k, mid, q["id"], ans)["correct"]
+            g = matches.question(k, mid, random.Random(200 + i), gate=f"link{i}")["item"]   # 花上（题板）
+            assert g["seq"] and g["seq"]["tokens"], g
+            matches.answer(k, mid, g["id"], "?" if i % 2 else "|".join(g["seq"]["tokens"]))
+        assert sources.panel_shape("sequence") == "" and sources.panel_shape("choices") == "choices"
+
+
 def test_link_math_sequence_is_sorted():
     with TestClient(app):
         kid = _user("lk-m@x.com", "G3", ["math-shanghai"])
