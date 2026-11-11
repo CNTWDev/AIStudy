@@ -1,0 +1,38 @@
+/* 翻花田：花田在中间；上面一排计数（用时、还睡着几只、翻开多少、蜂蜜），下面「翻开 / 插花」两个大按钮；题格的题卡盖在花田上 */
+.pl-mines .pl-stage{height:clamp(480px,82vh,800px);touch-action:none}
+@media (orientation:landscape) and (max-height:540px){.pl-mines .pl-stage{height:calc(100vh - 110px)}}
+.mn-layer{position:absolute;inset:0;padding:10px 12px;pointer-events:none;z-index:2;display:flex;flex-direction:column;justify-content:space-between}
+.mn-layer.mp{top:46px}
+.mn-top{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.mn-chip{background:#fff;border:3px solid var(--pl-ink);box-shadow:0 3px 0 var(--pl-ink);border-radius:14px;padding:2px 12px;font-size:17px;font-weight:900;color:var(--pl-ink);white-space:nowrap;line-height:1.4}
+.mn-q{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,calc(100% - 24px));pointer-events:auto;background:#fff;border:4px solid var(--pl-ink);box-shadow:0 7px 0 var(--pl-ink);border-radius:26px;padding:12px 18px 14px;text-align:center;animation:mn-in .22s ease-out}
+.mn-q[hidden]{display:none}
+@keyframes mn-in{from{transform:translate(-50%,-44%) scale(.92);opacity:0}to{transform:translate(-50%,-50%);opacity:1}}
+.mn-layer.asking::before{content:"";position:absolute;inset:0;background:rgba(42,32,24,.28);pointer-events:auto}
+.mn-topic{font-size:13px;font-weight:700;color:var(--muted)}
+.mn-text{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:var(--pl-ink);line-height:1.2;margin:6px 0 12px}
+.mn-q.long .mn-text{font-size:24px}
+.mn-say{border:3px solid var(--pl-ink);background:#ffe9a8;border-radius:12px;font-size:18px;padding:2px 7px;cursor:pointer;box-shadow:0 3px 0 var(--pl-ink)}
+.mn-say[hidden]{display:none}
+.mn-opts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.mn-opt{background:#fff;border:3px solid var(--pl-ink);border-bottom-width:7px;border-radius:18px;padding:10px 12px;font-size:22px;font-weight:900;color:var(--pl-ink);cursor:pointer;min-height:56px}
+.mn-opt:active{transform:translateY(3px);border-bottom-width:4px}
+.mn-opt.no{opacity:.4;text-decoration:line-through;cursor:default}
+.mn-opt.yes{background:#ffd84a;animation:mn-glow 1s ease-in-out 3}
+@keyframes mn-glow{50%{box-shadow:0 0 0 6px rgba(255,200,40,.45)}}
+.mn-foot{font-size:14px;color:var(--muted);margin-top:10px}
+.mn-later{margin-top:8px;background:none;border:0;color:var(--muted);font-size:14px;text-decoration:underline;cursor:pointer}
+.mn-bot{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.mn-modes{display:flex;gap:10px;pointer-events:auto}
+.mn-mode{background:#fff;border:3px solid var(--pl-ink);border-bottom-width:7px;border-radius:18px;padding:8px 20px;font-size:20px;font-weight:900;color:var(--pl-ink);cursor:pointer;white-space:nowrap}
+.mn-mode.on{background:#ffc21a}
+.mn-mode:active{transform:translateY(3px);border-bottom-width:4px}
+.mn-tip{background:rgba(255,255,255,.85);border-radius:99px;padding:3px 12px;font-size:13px;font-weight:700;color:var(--muted)}
+.mn-sub{display:block;font-size:14px;font-weight:700;color:var(--muted);margin-top:2px}
+@media (max-width:760px){
+  .mn-top{gap:5px}.mn-chip{font-size:12px;padding:1px 6px;border-width:2.5px}
+  .mn-text{font-size:26px}.mn-q.long .mn-text{font-size:20px}.mn-opt{font-size:20px}
+  .mn-modes{width:100%}.mn-mode{flex:1;font-size:18px;padding:8px 6px}
+  .mn-tip{font-size:11px}
+}
+.pl-mines .pl-toast{top:auto;bottom:96px}
