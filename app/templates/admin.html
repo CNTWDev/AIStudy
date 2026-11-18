@@ -430,10 +430,15 @@ $('#bpf').onsubmit = async e => {
       if (!res.ok) throw new Error(r.detail || res.statusText);
       $('#sttmsg').textContent = '';
       const t = r.transcribe, a = r.assess;
-      $('#sttout').innerHTML = r.error ? `<div class="err">${esc(r.error)}</div>` : `<div><b>转出来的字</b>（${t.ms} 毫秒）：${esc(t.text) || '（空）'}</div>
+      const au = r.audio, inf = (t && t.info) || {};
+      const audioLine = au ? `<div class="muted">录到 ${au.secs} 秒 · 最响 ${Math.round(au.peak * 100)}%${au.peak < 0.02 ? ' · <b style="color:var(--coral)">几乎是静音：浏览器可能用错了麦克风，或没给话筒权限</b>' : ''} · <a href="#" id="sttplay">▶ 听听录到的</a></div>` : '';
+      const why = t && !t.text ? (inf.silent ? '识别服务说：没听到人声（' + esc(inf.code) + '）' : inf.raw ? '识别服务回的原话：' + esc(inf.raw) : '') : '';
+      $('#sttout').innerHTML = audioLine + (r.error ? `<div class="err">${esc(r.error)}</div>` : `<div><b>转出来的字</b>（识别用了 ${t.ms} 毫秒）：${esc(t.text) || '（空）'}</div>
+        ${why ? `<div class="muted" style="word-break:break-all">${why}${inf.logid ? ' · 请求编号 ' + esc(inf.logid) : ''}</div>` : ''}
         <div class="muted">开口用时 ${fmt(t.metrics.latency, '秒')} · 卡顿 ${fmt(t.metrics.pauses, '次')} · 说中文 ${t.metrics.zh} 处 · ${t.words.length ? '有每个词的时间' : '没有每个词的时间'}</div>
         ${a ? `<div style="margin-top:6px"><b>发音评测</b>（${a.ms} 毫秒）：${Object.entries(a.scores || {}).map(([k, v]) => `${esc(k)} ${Math.round(v)}`).join(' · ')}</div>
-        <div>${(a.words || []).map(w => `<span class="sk-word${w.error && w.error !== 'None' ? ' pron' : ''}">${esc(w.text)}</span>`).join('')}</div>` : ''}`;
+        <div>${(a.words || []).map(w => `<span class="sk-word${w.error && w.error !== 'None' ? ' pron' : ''}">${esc(w.text)}</span>`).join('')}</div>` : ''}`);
+      const pb = $('#sttplay'); if (pb) pb.onclick = e => { e.preventDefault(); new Audio(URL.createObjectURL(blob)).play(); };
     } catch (e) { $('#sttmsg').textContent = '失败：' + e.message; }
   };
 })();
