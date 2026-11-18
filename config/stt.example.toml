@@ -23,12 +23,16 @@ provider = "none"
 provider = "none"
 
 # ---- 字节火山 · 豆包大模型录音文件识别（极速版）：中英夹说、每个词的时间都有
-# 火山引擎控制台 → 豆包语音 → 开通「录音文件识别 极速版」→ 拿 API Key（新控制台）
+# BytePlus 控制台 → 语音（Speech）→ 开通「录音文件识别 极速版」→ 拿 API Key
+# 两个站点接口一样，但钥匙不通用：钥匙在哪个站申请的，region 就填哪个
+#   cn   = 火山引擎国内站（console.volcengine.com）
+#   intl = BytePlus 国际站（console.byteplus.com，新加坡节点，离日本服务器最近；默认）
 [volcengine]
+region = "intl"
 api_key = ""                        # 新控制台：X-Api-Key
 # app_id = ""                       # 老控制台：App ID + Access Token 二选一
 # access_token = ""
-# resource_id = "volc.bigasr.auc_turbo"
+# resource_id = ""                  # 一般不用填：cn 默认 volc.bigasr.auc_turbo，intl 默认 volc.seedasr.auc_turbo
 
 # ---- 阿里云百炼 · Qwen3-ASR-Flash：中英文都能认；文档没写有没有每个词的时间（没有的话开口用时、卡顿是粗略值）
 [aliyun]
