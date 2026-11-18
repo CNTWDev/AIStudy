@@ -159,13 +159,16 @@ class Volcengine(Transcriber):
             h["X-Api-Key"] = str(self.cfg["api_key"]).strip()
         else:
             h["X-Api-App-Key"], h["X-Api-Access-Key"] = str(self.cfg["app_id"]).strip(), str(self.cfg["access_token"]).strip()
-        body = {"user": {"uid": str(self.cfg.get("app_id") or "beejoy")},
-                "audio": {"data": base64.b64encode(wav).decode(), "format": "wav", "rate": 16000, "bits": 16, "channel": 1},
+        audio = {"data": base64.b64encode(wav).decode(), "format": "wav", "rate": 16000, "bits": 16, "channel": 1}
+        if self.cfg.get("language"):   # 一般不填：不指定语言才认得出中英夹说
+            audio["language"] = str(self.cfg["language"])
+        body = {"user": {"uid": str(self.cfg.get("app_id") or "beejoy")}, "audio": audio,
                 "request": {"model_name": self.cfg.get("model") or "bigmodel", "enable_punc": True, "show_utterances": True}}
         r = self._post(self.cfg.get("base_url") or (self.site[0] + self.PATH), headers=h, json=body)
         code = r.headers.get("X-Api-Status-Code", "20000000")
-        if code == "20000003":   # 没说话
-            return Transcript(text="", provider=self.name)
+        info = {"code": code, "logid": r.headers.get("X-Tt-Logid", "")}
+        if code == "20000003":   # 厂商说：没听到人声
+            return Transcript(text="", provider=self.name, info={**info, "silent": True})
         if code != "20000000":
             raise STTError(f"{self.label}返回 {code}：{r.headers.get('X-Api-Message', '')}{_logid(r)}")
         d = r.json()
@@ -173,7 +176,9 @@ class Volcengine(Transcriber):
         words = [Word(w.get("text", ""), w["start_time"] / 1000, w["end_time"] / 1000)
                  for u in res.get("utterances") or [] for w in u.get("words") or [] if w.get("text", "").strip()]
         dur = (d.get("audio_info") or {}).get("duration") or 0
-        return Transcript(text=res.get("text", ""), words=words, duration=dur / 1000, provider=self.name)
+        if not res.get("text"):
+            info["raw"] = json.dumps(d, ensure_ascii=False)[:400]
+        return Transcript(text=res.get("text", ""), words=words, duration=dur / 1000, provider=self.name, info=info)
 
 
 # ------------------------------------------------------------------ 阿里云百炼：Qwen3-ASR-Flash（国际站 / 国内站）

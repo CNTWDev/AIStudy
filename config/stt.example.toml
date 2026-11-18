@@ -32,6 +32,7 @@ region = "intl"
 api_key = ""                        # 新控制台：X-Api-Key
 # app_id = ""                       # 老控制台：App ID + Access Token 二选一
 # access_token = ""
+# language = "en-US"               # 一般不填（不指定才认得出中英夹说）；认不出字时可以试着填上
 # resource_id = ""                  # 一般不用填：cn 默认 volc.bigasr.auc_turbo，intl 默认 volc.seedasr.auc_turbo
 
 # ---- 阿里云百炼 · Qwen3-ASR-Flash：中英文都能认；文档没写有没有每个词的时间（没有的话开口用时、卡顿是粗略值）

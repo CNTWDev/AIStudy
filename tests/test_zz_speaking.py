@@ -278,3 +278,36 @@ def test_volcengine_sites(monkeypatch):
     v = Volcengine({"api_key": "k", "region": "us"}, 5)
     assert not v.ready()[0] and "intl" in v.ready()[1]
     assert "BytePlus" in Volcengine({"api_key": "k", "region": "intl"}, 5).label
+
+
+def test_admin_try_shows_audio_and_vendor_reason(monkeypatch):
+    """后台「试一下」认不出字时要看得出原因：录到几秒、有多响（静音一眼看出），厂商回了什么。"""
+    import io as _io
+    import struct
+    import wave as _wave
+    import httpx
+    from app.stt.providers import Volcengine
+    from app.stt.wav import wav_peak
+    assert wav_peak(WAV) == 0
+    buf = _io.BytesIO()
+    with _wave.open(buf, "wb") as w:
+        w.setnchannels(1); w.setsampwidth(2); w.setframerate(16000)
+        w.writeframes(struct.pack("<4h", 0, 16384, -8192, 0))
+    assert wav_peak(buf.getvalue()) == 0.5
+    r = speaking.test_engine(WAV)
+    assert r["audio"] == {"secs": 3.0, "peak": 0.0} and "info" in r["transcribe"]
+    seen = {}
+
+    def silent(url, headers=None, json=None, **k):
+        seen["audio"] = json["audio"]
+        return httpx.Response(200, headers={"X-Api-Status-Code": "20000003", "X-Tt-Logid": "L1"}, json={}, request=httpx.Request("POST", url))
+    monkeypatch.setattr(httpx, "post", silent)
+    tr = Volcengine({"api_key": "k", "language": "en-US"}, 5).transcribe(WAV, ["en"])
+    assert tr.text == "" and tr.info == {"code": "20000003", "logid": "L1", "silent": True}
+    assert seen["audio"]["language"] == "en-US"   # 配了 language 才带上
+
+    def empty(url, headers=None, json=None, **k):
+        return httpx.Response(200, json={"result": {"text": ""}, "audio_info": {"duration": 3000}}, request=httpx.Request("POST", url))
+    monkeypatch.setattr(httpx, "post", empty)
+    tr = Volcengine({"api_key": "k"}, 5).transcribe(WAV, ["en"])
+    assert tr.info["code"] == "20000000" and '"duration": 3000' in tr.info["raw"]

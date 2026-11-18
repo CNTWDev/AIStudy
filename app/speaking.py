@@ -31,6 +31,7 @@ from . import config, db, llm
 from .catalog import is_adult
 from .stt import STTError, Speech, Transcript, load_settings
 from .stt.providers import norm_word
+from .stt.wav import wav_peak
 
 PACK_DIR = config.BASE_DIR / "content" / "speaking"
 STT_CONFIG_FILE = Path(os.environ.get("STT_CONFIG_FILE", config.BASE_DIR / "config" / "stt.toml"))
@@ -743,11 +744,11 @@ def test_engine(wav: bytes) -> dict:
     sp = engine()
     out = {"status": sp.status()}
     try:
-        sp.check_wav(wav)
+        out["audio"] = {"secs": round(sp.check_wav(wav), 1), "peak": round(wav_peak(wav), 3)}
         t0 = time.monotonic()
         tr = sp.transcribe(wav, ["en", "zh"])
         out["transcribe"] = {"text": tr.text, "ms": int((time.monotonic() - t0) * 1000), "metrics": metrics(tr),
-                             "words": [w.__dict__ for w in tr.words[:60]]}
+                             "words": [w.__dict__ for w in tr.words[:60]], "info": tr.info}
         if sp.can("unscripted"):
             t0 = time.monotonic()
             a = sp.assess(wav, "en-US", "")

@@ -36,6 +36,7 @@ class Transcript:
     words: list[Word] = field(default_factory=list)
     duration: float = 0.0
     provider: str = ""
+    info: dict = field(default_factory=dict)   # 厂商给的诊断信息（状态码、请求编号），后台「试一下」显示，不存库
 
     @property
     def timed(self) -> bool:
