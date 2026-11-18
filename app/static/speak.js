@@ -3,20 +3,34 @@
 
 /* ---------------------------------------------------------------- 录音 */
 const Rec = {
-  ctx: null, stream: null, node: null, src: null, bufs: [], rate: 48000, t0: 0, level: 0,
+  ctx: null, stream: null, node: null, src: null, bufs: [], rate: 48000, t0: 0, level: 0, peak: 0, heardAt: 0,
+  SILENT: 0.01,   // 最响也不到 1%：当成没录到声音（麦克风没权限、选错了设备、静音了）
   ok() { return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && (window.AudioContext || window.webkitAudioContext)); },
+  get device() { try { return localStorage.getItem('sk-mic') || ''; } catch (e) { return ''; } },
+  set device(id) { try { localStorage.setItem('sk-mic', id || ''); } catch (e) {} },
+  async devices() {
+    try { return (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audioinput' && d.deviceId); } catch (e) { return []; }
+  },
   async start() {
     Speak.stop();
-    this.stream = await navigator.mediaDevices.getUserMedia({audio: {channelCount: 1, echoCancellation: true, noiseSuppression: true}});
+    const base = {channelCount: 1, echoCancellation: true, noiseSuppression: true};
+    try {
+      this.stream = await navigator.mediaDevices.getUserMedia({audio: this.device ? {...base, deviceId: {exact: this.device}} : base});
+    } catch (e) {   // 选过的麦克风拔掉了：换回系统默认
+      if (!this.device || (e.name !== 'OverconstrainedError' && e.name !== 'NotFoundError')) throw e;
+      this.device = '';
+      this.stream = await navigator.mediaDevices.getUserMedia({audio: base});
+    }
     const AC = window.AudioContext || window.webkitAudioContext;
     this.ctx = this.ctx || new AC();
     if (this.ctx.state === 'suspended') await this.ctx.resume();
-    this.rate = this.ctx.sampleRate; this.bufs = []; this.level = 0;
+    this.rate = this.ctx.sampleRate; this.bufs = []; this.level = 0; this.peak = 0; this.heardAt = 0;
     this.src = this.ctx.createMediaStreamSource(this.stream);
     this.node = this.ctx.createScriptProcessor(4096, 1, 1);
     this.node.onaudioprocess = e => {
       const d = e.inputBuffer.getChannelData(0); this.bufs.push(new Float32Array(d));
-      let m = 0; for (let i = 0; i < d.length; i += 16) m = Math.max(m, Math.abs(d[i])); this.level = m;
+      let m = 0; for (let i = 0; i < d.length; i += 16) m = Math.max(m, Math.abs(d[i]));
+      this.level = m; this.peak = Math.max(this.peak, m); if (m > this.SILENT && !this.heardAt) this.heardAt = performance.now();
     };
     this.src.connect(this.node); this.node.connect(this.ctx.destination);
     this.t0 = performance.now();
@@ -50,17 +64,31 @@ const Rec = {
   },
 };
 
+/* 没录到声音时的说明 + 选麦克风（电脑上常见：浏览器没拿到系统的麦克风权限，或用了另一个输入设备） */
+const MIC_HELP = '没收到声音。Mac：系统设置 → 隐私与安全性 → 麦克风，打开浏览器；也看看下面选的是不是你在用的麦克风。';
+async function micPicker(box) {
+  if (!box) return;
+  const ds = await Rec.devices();
+  if (ds.length < 2) { box.innerHTML = ''; return; }
+  const cur = Rec.device;
+  box.innerHTML = `<label class="sk-micsel">麦克风 <select>${ds.map((d, i) => `<option value="${esc(d.deviceId)}"${d.deviceId === cur || (!cur && d.deviceId === 'default') ? ' selected' : ''}>${esc(d.label || '麦克风 ' + (i + 1))}</option>`).join('')}</select></label>`;
+  box.querySelector('select').onchange = e => { Rec.device = e.target.value; toast('换好了，再说一次'); };
+}
+
 /* 话筒按钮：按住说、松开结束；轻点一下 = 开始，再点一下 = 结束（说长一点不用一直按着）。
    onClip(blob, secs) 返回 Promise；期间按钮转圈。 */
 function micButton(el, o) {
   const max = o.max || 90;
   let state = 'idle', downAt = 0, timer = null, wave = null;
   const hint = o.hint ? $(o.hint) : null, idleHint = hint ? hint.innerHTML : '';
+  const picker = document.createElement('div'); (hint || el).after(picker);
+  micPicker(picker);   // 有好几个麦克风（并且浏览器已经给过权限）才显示
   const set = s => { state = s; el.classList.toggle('rec', s === 'rec'); el.classList.toggle('busy', s === 'busy'); el.disabled = s === 'busy' || s === 'off'; };
   const tick = () => {
     const s = (performance.now() - Rec.t0) / 1000;
     if (hint) hint.innerHTML = `<b class="sk-time">${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}</b> · ${o.tapMode ? '再点一下结束' : '松开结束'}<br>${esc(o.recHint || '')}`;
     if (wave) { const bars = $$('i', wave), h = Math.min(1, Rec.level * 3); bars.forEach((b, i) => { b.style.height = (6 + h * 30 * (0.4 + 0.6 * Math.abs(Math.sin(s * 7 + i)))) + 'px'; }); }
+    if (hint && s > 2.5 && !Rec.heardAt) hint.innerHTML += `<br><span class="sk-err">${MIC_HELP}</span>`;
     if (s >= max) finish();
   };
   const begin = async () => {
@@ -77,6 +105,10 @@ function micButton(el, o) {
     if (wave) wave.hidden = true;
     const {blob, secs} = Rec.stop();
     if (secs < 0.6) { set('idle'); if (hint) hint.innerHTML = idleHint; return; }
+    if (Rec.peak < Rec.SILENT) {   // 录到的是静音：不送去识别，直接说清楚，给出选麦克风
+      set('idle'); if (hint) hint.innerHTML = `<span class="sk-err">${MIC_HELP}</span>`;
+      micPicker(picker); return;
+    }
     set('busy'); if (hint) hint.innerHTML = '正在听你说的…';
     let err = '';
     try { await o.onClip(blob, secs); } catch (e) { err = e.message || '没传上，再说一次'; toast(err); }

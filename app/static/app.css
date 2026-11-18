@@ -1197,6 +1197,7 @@ a.db-back{display:block;color:var(--ink)}.db-bk{display:flex;gap:10px;align-item
 .sk-mic:active{transform:scale(.96)}.sk-mic svg{width:38px;height:38px;color:var(--on-brand)}
 .sk-mic.rec{background:var(--coral);box-shadow:0 0 0 12px color-mix(in srgb,var(--coral) 14%,transparent),0 0 0 26px color-mix(in srgb,var(--coral) 7%,transparent)}
 .sk-mic.rec svg{color:#fff}.sk-mic.busy{opacity:.6}.sk-mic.busy svg{animation:skpulse 1s infinite}.sk-mic:disabled{cursor:default}
+.sk-micsel{display:flex;justify-content:center;align-items:center;gap:6px;font-size:13px;color:var(--muted);margin:6px 0}.sk-micsel select{width:auto;max-width:70vw;font-size:13px;padding:4px 8px}
 .sk-err{color:var(--coral);font-weight:600;word-break:break-all}
 .sk-mic.sm{width:76px;height:76px}.sk-mic.sm svg{width:30px;height:30px}
 @keyframes skpulse{50%{opacity:.35}}
