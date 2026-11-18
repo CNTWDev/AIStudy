@@ -254,3 +254,27 @@ def test_engine_errors_are_kept_for_admin(monkeypatch):
     monkeypatch.setattr(httpx, "post", lambda *a, **k: resp403)
     with pytest.raises(speaking.STTError, match="HTTP 403（45000030）：resource not granted.*LOG7"):
         v.transcribe(WAV, ["en", "zh"])
+
+
+def test_volcengine_sites(monkeypatch):
+    """火山引擎国内站和 BytePlus 国际站：接口一样、钥匙不通用，按 region 选地址和资源。"""
+    import httpx
+    from app.stt.providers import Volcengine
+    seen = {}
+
+    def fake(url, headers=None, json=None, **k):
+        seen.update(url=url, headers=headers, body=json)
+        return httpx.Response(200, json={"result": {"text": "hi", "utterances": [{"words": [{"text": "hi", "start_time": 300, "end_time": 600}]}]},
+                                         "audio_info": {"duration": 1000}}, request=httpx.Request("POST", url))
+    monkeypatch.setattr(httpx, "post", fake)
+    tr = Volcengine({"api_key": " k \n", "region": "intl"}, 5).transcribe(WAV, ["en", "zh"])
+    assert seen["url"] == "https://voice.ap-southeast-1.bytepluses.com/api/v3/auc/bigmodel/recognize/flash"
+    assert seen["headers"]["X-Api-Resource-Id"] == "volc.seedasr.auc_turbo" and seen["headers"]["X-Api-Key"] == "k"
+    assert "language" not in seen["body"]["audio"]   # 中英夹说：不指定语言
+    assert tr.text == "hi" and tr.words[0].start == 0.3
+    assert Volcengine({"api_key": "k"}, 5).site[0].endswith("bytepluses.com")   # 不填 region：默认国际站（服务器在日本）
+    Volcengine({"api_key": "k", "region": "cn"}, 5).transcribe(WAV, ["en"])
+    assert seen["url"].startswith("https://openspeech.bytedance.com/") and seen["headers"]["X-Api-Resource-Id"] == "volc.bigasr.auc_turbo"
+    v = Volcengine({"api_key": "k", "region": "us"}, 5)
+    assert not v.ready()[0] and "intl" in v.ready()[1]
+    assert "BytePlus" in Volcengine({"api_key": "k", "region": "intl"}, 5).label

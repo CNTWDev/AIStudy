@@ -127,33 +127,47 @@ class MockAssessor(Assessor):
 
 @transcriber("volcengine")
 class Volcengine(Transcriber):
-    """POST https://openspeech.bytedance.com/api/v3/auc/bigmodel/recognize/flash
-    新控制台只要 X-Api-Key；老控制台要 app_id + access_token（X-Api-App-Key / X-Api-Access-Key）。时间单位是毫秒。"""
+    """豆包大模型录音文件识别（极速版），两个站点接口一样，钥匙不通用：
+      region = "intl" 默认（服务器在日本，就近走国际站）
+      region = "cn"   火山引擎（国内站）openspeech.bytedance.com，资源 volc.bigasr.auc_turbo
+      region = "intl" BytePlus（国际站，新加坡）voice.ap-southeast-1.bytepluses.com，资源 volc.seedasr.auc_turbo
+    新控制台只要 X-Api-Key；老控制台要 app_id + access_token（X-Api-App-Key / X-Api-Access-Key）。时间单位是毫秒。
+    不指定语言：中英夹说要靠它自己认。"""
     caps = frozenset({"word_times", "mixed"})
-    label = "字节火山（豆包语音识别）"
-    URL = "https://openspeech.bytedance.com/api/v3/auc/bigmodel/recognize/flash"
+    label = "BytePlus（豆包语音识别 · 国际站）"
+    SITES = {"cn": ("https://openspeech.bytedance.com", "volc.bigasr.auc_turbo", "字节火山（豆包语音识别）"),
+             "intl": ("https://voice.ap-southeast-1.bytepluses.com", "volc.seedasr.auc_turbo", "BytePlus（豆包语音识别 · 国际站）")}
+    PATH = "/api/v3/auc/bigmodel/recognize/flash"
+    URL = SITES["intl"][0] + PATH
+
+    def __init__(self, cfg: dict, timeout: float = 30):
+        super().__init__(cfg, timeout)
+        self.site = self.SITES.get(str(cfg.get("region") or "intl").lower(), self.SITES["intl"])
+        self.label = self.site[2]
 
     def ready(self):
+        if str(self.cfg.get("region") or "intl").lower() not in self.SITES:
+            return False, f"[volcengine] region 只能是 cn（火山引擎国内站）或 intl（BytePlus 国际站），现在是「{self.cfg['region']}」"
         if self.cfg.get("api_key") or (self.cfg.get("app_id") and self.cfg.get("access_token")):
             return True, ""
         return False, "config/stt.toml 的 [volcengine] 还没填 api_key（或老控制台的 app_id + access_token）"
 
     def transcribe(self, wav, langs, expect=""):
-        h = {"X-Api-Resource-Id": self.cfg.get("resource_id") or "volc.bigasr.auc_turbo",
+        h = {"X-Api-Resource-Id": self.cfg.get("resource_id") or self.site[1],
              "X-Api-Request-Id": str(uuid.uuid4()), "X-Api-Sequence": "-1"}
         if self.cfg.get("api_key"):
-            h["X-Api-Key"] = self.cfg["api_key"]
+            h["X-Api-Key"] = str(self.cfg["api_key"]).strip()
         else:
-            h["X-Api-App-Key"], h["X-Api-Access-Key"] = str(self.cfg["app_id"]), self.cfg["access_token"]
+            h["X-Api-App-Key"], h["X-Api-Access-Key"] = str(self.cfg["app_id"]).strip(), str(self.cfg["access_token"]).strip()
         body = {"user": {"uid": str(self.cfg.get("app_id") or "beejoy")},
-                "audio": {"data": base64.b64encode(wav).decode(), "format": "wav"},
+                "audio": {"data": base64.b64encode(wav).decode(), "format": "wav", "rate": 16000, "bits": 16, "channel": 1},
                 "request": {"model_name": self.cfg.get("model") or "bigmodel", "enable_punc": True, "show_utterances": True}}
-        r = self._post(self.cfg.get("base_url") or self.URL, headers=h, json=body)
+        r = self._post(self.cfg.get("base_url") or (self.site[0] + self.PATH), headers=h, json=body)
         code = r.headers.get("X-Api-Status-Code", "20000000")
         if code == "20000003":   # 没说话
             return Transcript(text="", provider=self.name)
         if code != "20000000":
-            raise STTError(f"字节火山返回 {code}：{r.headers.get('X-Api-Message', '')}{_logid(r)}")
+            raise STTError(f"{self.label}返回 {code}：{r.headers.get('X-Api-Message', '')}{_logid(r)}")
         d = r.json()
         res = d.get("result") or {}
         words = [Word(w.get("text", ""), w["start_time"] / 1000, w["end_time"] / 1000)
