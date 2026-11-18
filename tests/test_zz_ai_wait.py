@@ -116,4 +116,5 @@ def test_every_ai_reply_button_uses_the_one_wait():
         assert call in js, call
     for page in ("learn.html", "mix.html", "thinking.html", "warmup.html", "review.html"):
         assert "{onPart}" in (ROOT / "templates" / page).read_text(encoding="utf-8"), page
-    assert llm.stream.FIELDS.keys() == {"discuss", "discuss_close", "review"}
+    assert llm.stream.FIELDS.keys() == {"discuss", "discuss_close", "review", "speak_rewrite", "speak_chat"}
+    assert "aiWait(btn, $('#rwbox'), 'speak_rewrite')" in (ROOT / "templates" / "speak_scene.html").read_text(encoding="utf-8")

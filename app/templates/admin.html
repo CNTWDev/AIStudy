@@ -392,6 +392,47 @@ $('#bpf').onsubmit = async e => {
 </div>
 {% endif %}
 {% if tab == 'system' %}
+{% set CAPN = {'word_times': '每个词的时间', 'mixed': '中英混说', 'scripted': '跟读评分', 'unscripted': '自由说评分', 'phoneme': '音素', 'prosody': '语调'} %}
+<div class="card" id="sttcard">
+  <h3 style="margin-top:0">语音引擎（开口练）· 试一下</h3>
+  <div class="tw"><table class="kv">
+    {% for kind, label in [('transcribe', '转文字'), ('assess', '发音评测')] %}{% set x = stt_status[kind] %}
+    <tr><td>{{ label }}</td><td>{% if x.on %}<b>可用</b> · {{ x.label or x.name }}{% else %}<b>未开启</b>{% if x.name %} · {{ x.name }}{% endif %} · {{ x.why }}{% endif %}
+      {% if x.caps %}<div class="muted small">会：{% for c in x.caps %}{{ CAPN.get(c, c) }}{{ '、' if not loop.last }}{% endfor %}</div>{% endif %}</td></tr>
+    {% endfor %}
+  </table></div>
+  <p class="muted small">在服务器 config/stt.toml 里选厂商、填 key（模板 config/stt.example.toml），改完点「重新读配置」，不用重启。发音评测不是每家都有：没配就只看「哪个词没被识别出来」。</p>
+  <div class="row" style="align-items:center;gap:10px"><button class="btn sm" type="button" id="sttrec">● 按一下开始录</button>
+    <button class="btn ghost sm" type="button" id="sttreload">重新读配置</button><span class="muted small" id="sttmsg"></span></div>
+  <div id="sttout" class="small" style="margin-top:8px"></div>
+</div>
+<script src="/static/speak.js?v={{ ASSET_V }}"></script>
+<script>
+(() => {
+  let on = false;
+  $('#sttreload').onclick = async () => { try { const r = await api('/api/admin/stt/reload', {}); toast(r.transcribe.on ? '转文字可用：' + (r.transcribe.label || r.transcribe.name) : '转文字未开启：' + r.transcribe.why); setTimeout(() => location.reload(), 600); } catch (e) { toast(e.message); } };
+  $('#sttrec').onclick = async () => {
+    if (!on) {
+      if (!Rec.ok()) { toast('这个浏览器录不了音'); return; }
+      try { await Rec.start(); } catch (e) { toast('没打开话筒'); return; }
+      on = true; $('#sttrec').textContent = '■ 说完了'; $('#sttmsg').textContent = '用英文说一两句，可以夹中文'; return;
+    }
+    on = false; $('#sttrec').textContent = '● 按一下开始录';
+    const {blob} = Rec.stop(); $('#sttmsg').textContent = '识别中…';
+    const fd = new FormData(); fd.append('file', blob, 'clip.wav');
+    try {
+      const res = await fetch('/api/admin/stt/test', {method: 'POST', body: fd}), r = await res.json();
+      if (!res.ok) throw new Error(r.detail || res.statusText);
+      $('#sttmsg').textContent = '';
+      const t = r.transcribe, a = r.assess;
+      $('#sttout').innerHTML = r.error ? `<div class="err">${esc(r.error)}</div>` : `<div><b>转出来的字</b>（${t.ms} 毫秒）：${esc(t.text) || '（空）'}</div>
+        <div class="muted">开口用时 ${fmt(t.metrics.latency, '秒')} · 卡顿 ${fmt(t.metrics.pauses, '次')} · 说中文 ${t.metrics.zh} 处 · ${t.words.length ? '有每个词的时间' : '没有每个词的时间'}</div>
+        ${a ? `<div style="margin-top:6px"><b>发音评测</b>（${a.ms} 毫秒）：${Object.entries(a.scores || {}).map(([k, v]) => `${esc(k)} ${Math.round(v)}`).join(' · ')}</div>
+        <div>${(a.words || []).map(w => `<span class="sk-word${w.error && w.error !== 'None' ? ' pron' : ''}">${esc(w.text)}</span>`).join('')}</div>` : ''}`;
+    } catch (e) { $('#sttmsg').textContent = '失败：' + e.message; }
+  };
+})();
+</script>
 <div class="card" id="ttscard">
   <h3 style="margin-top:0">朗读：挑声音、试语速</h3>
   <p class="muted small">现在的语速：单词 {{ tts_speeds.word }} · 句子 {{ tts_speeds.sentence }} · 阅读/听书 {{ tts_speeds.passage }}。同一段文字按 {{ tts_audition|join('、') }} 各生成一次（只花一次钱，以后试听读缓存），听完把合适的值写进 config/tts.toml 的 [speed]。</p>

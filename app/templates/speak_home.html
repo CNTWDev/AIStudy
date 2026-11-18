@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}开口练 · {{ SITE }}{% endblock %}
+{% block body %}
+<div class="sk-top"><h1>开口练</h1><span class="r">英语口语{% if lib %} · 表达库 {{ lib }} 个{% endif %}</span></div>
+{% if not engine.transcribe.on %}
+<div class="note-bar">语音识别还没配置好：{{ engine.transcribe.why }}。{% if user.is_admin or user.role == 'admin' %}<a href="/admin?tab=system#sttcard">去管理页</a>{% else %}请管理员在服务器的 config/stt.toml 里选一家。{% endif %}</div>
+{% endif %}
+
+<div class="card sk-hero">
+  {% if st.practiced %}<div class="sk-lbl">今天已经练过了 ✓{% if st.scenes %} · {{ st.scenes }} 个场景{% endif %}{% if st.chats %} · 聊了 {{ st.chats }} 局{% endif %}</div>{% else %}<div class="sk-lbl">今天的场景</div>{% endif %}
+  {% if nxt %}
+  <h2>{{ nxt.title }}</h2>
+  <div class="small muted" style="margin:6px 0 14px">{% if due %}复习 {{ due }} 个表达 · {% endif %}1 个场景 · 约 10 分钟 · {{ nxt.group }}</div>
+  <a class="btn" href="/speak/go" style="width:100%">{{ '再说一件' if st.practiced else '开始' }}</a>
+  {% endif %}
+  <div class="row" style="justify-content:space-between;margin-top:12px;font-size:13px;flex-wrap:wrap;gap:6px">
+    {% if due %}<a class="faint" href="/speak/review">只有 3 分钟？做完复习也算</a>{% else %}<span class="faint">今天没有要复习的表达</span>{% endif %}
+    <a href="#own" id="ownbtn" style="font-weight:600">我有件事要说 ›</a>
+  </div>
+  <form method="post" action="/speak/own" id="own" hidden style="margin-top:12px">
+    <textarea name="text" maxlength="400" placeholder="用中文写一两句：在什么场合、对谁、要说什么。比如：下午和供应商开会，要说明年量翻倍，希望单价降 10%。" style="min-height:84px"></textarea>
+    <button class="btn soft" style="margin-top:8px">就练这件事</button>
+    <p class="tiny faint" style="margin:6px 0 0">只有你自己看得到，不会进任何公共内容。</p>
+  </form>
+</div>
+
+<div class="card">
+  <div class="sk-lbl">和 AI 聊下去 · 它扮演一个人，你们轮流说</div>
+  {% for p in plays %}
+  <a class="sk-opt" href="/speak/play/{{ p.id }}"><div class="oi">聊</div><div style="min-width:0"><div class="n">{{ p.title }}</div><div class="m">{{ p.setup }}</div></div><span class="go">›</span></a>
+  {% endfor %}
+  <details><summary class="small" style="cursor:pointer;color:var(--brand-ink);font-weight:600">自己出一局</summary>
+    <form method="post" action="/speak/play" style="margin-top:8px">
+      <textarea name="text" maxlength="300" placeholder="一句话：对方是谁、要聊什么。比如：美国客户觉得我们报价太高，我要说服他。" style="min-height:70px"></textarea>
+      <button class="btn soft" style="margin-top:8px">开始聊</button>
+    </form>
+  </details>
+</div>
+
+<div class="quick">
+  <a href="/speak/records"><span class="qi">📈</span><span><b>我的口语</b><small>三个数 · 表达库 · 回听录音</small></span></a>
+  <a href="/speak/review"><span class="qi">🔁</span><span><b>复习表达</b><small>{% if due %}{{ due }} 个到期{% else %}今天的复习完了{% endif %}</small></span></a>
+</div>
+
+<div class="card">
+  <div class="sk-lbl">设置</div>
+  {% for p in packs %}
+  <label class="sk-switch"><div class="grow"><b>{{ p.name }}</b> <span class="pill">{{ '美式' if p.accent|lower == 'en-us' else '英式' }}</span><small>{{ p.blurb }}</small></div>
+    <input type="checkbox" class="pk" value="{{ p.id }}" {{ 'checked' if p.id in prefs.packs }}></label>
+  {% endfor %}
+  <label class="sk-switch"><div class="grow"><b>放进每天的任务</b><small>打开后，今天页会多一张「开口练」的卡。默认关：口语是想练就来的独立功能。</small></div>
+    <input type="checkbox" id="daily" {{ 'checked' if prefs.daily }}></label>
+</div>
+<script>
+$('#ownbtn').onclick = e => { e.preventDefault(); $('#own').hidden = !$('#own').hidden; if (!$('#own').hidden) $('#own textarea').focus(); };
+const savePrefs = async () => {
+  const packs = $$('.pk').filter(x => x.checked).map(x => x.value);
+  if (!packs.length) { toast('至少开一个课程包'); $$('.pk')[0].checked = true; return; }
+  try { await api('/api/speak/prefs', {packs, daily: $('#daily').checked}); toast('改好了'); } catch (e) { toast(e.message); }
+};
+$$('.pk').forEach(x => { x.onchange = savePrefs; }); $('#daily').onchange = savePrefs;
+</script>
+{% endblock %}

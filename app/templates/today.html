@@ -93,8 +93,17 @@
   {% if total and not all_done %}<p class="tiny faint" style="margin:10px 0 0">{% if readonly %}不会的题点「这道题还不会」就行，坚持比做对更重要：每完成一项得一颗 ⭐。 {% else %}做完一项得一颗 ⭐ · {% endif %}<a href="/progress">{{ '学习进度和考试日期' if is_adult(me.grade) else '学校学到哪了？' }}</a></p>{% endif %}
 </div>
 
+{% if speak and speak.daily %}
+<div class="card sk-hero">
+  <div class="sk-lbl">开口练{% if speak.state.practiced %} · 今天练过了 ✓{% endif %}</div>
+  {% if speak.scene %}<div style="font-size:18px;font-weight:800">{{ speak.scene.title }}</div>
+  <div class="small muted" style="margin:4px 0 12px">{% if speak.state.review_left %}复习 {{ speak.state.review_left }} 个表达 · {% endif %}1 个场景 · 约 10 分钟</div>{% endif %}
+  <a class="btn" href="/speak/go" style="width:100%">{{ '再说一件' if speak.state.practiced else '开始' }}</a>
+</div>
+{% endif %}
 {% if not readonly %}
 <div class="quick">
+  {% if speak and not speak.daily %}<a href="/speak"><span class="qi">🗣️</span><span><b>开口练</b><small>{% if speak.state.practiced %}今天练过了 ✓{% else %}说一件真事 · 约 10 分钟{% endif %}</small></span></a>{% endif %}
   <a href="/review"><span class="qi">🔁</span><span><b>复习</b><small>{% if due %}有 {{ due }} 张卡到期{% else %}今天的卡都复习完了{% endif %}</small></span></a>
   <a href="/words/map"><span class="qi">🔤</span><span><b>抓词</b><small>来一组 · 单词包</small></span></a>
   {% if play.base %}<a href="/arena" class="qplay {{ 'lock' if play_locked }}"><span class="qi">🎮</span><span style="flex:1;min-width:0"><b>乐园</b>

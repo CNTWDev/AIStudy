@@ -1,0 +1,10 @@
+{# 口语「开口练」共用的小部件 #}
+{% macro mic(id='mic', small=false) %}<button type="button" class="sk-mic{{ ' sm' if small }}" id="{{ id }}" aria-label="按住说话"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>{% endmacro %}
+{% macro wave(id='wave') %}<div class="sk-wave" id="{{ id }}" hidden>{% for _ in range(14) %}<i></i>{% endfor %}</div>{% endmacro %}
+{% macro steps(cur) %}<div class="sk-steps" id="sksteps">{% for n in ['复习', '先说', '地道版', '跟读', '再说'] %}<span class="{{ 'c' if loop.index0 == cur else ('d' if loop.index0 < cur) }}" data-step="{{ loop.index0 }}">{{ n }}</span>{% endfor %}</div>{% endmacro %}
+{% macro choices(plays) %}
+<div class="sk-lbl" style="padding-left:4px">还想说一会儿？</div>
+{% for p in plays[:1] %}<a class="sk-opt" href="/speak/play/{{ p.id }}"><div class="oi">聊</div><div><div class="n">和 AI 聊下去</div><div class="m">{{ p.who }}（{{ p.role }}）· {{ p.title }}</div></div><span class="go">›</span></a>{% endfor %}
+<a class="sk-opt" href="/speak/go?skip=1"><div class="oi">再</div><div><div class="n">再说一件</div><div class="m">下一个场景，或者今天真要讲的事</div></div><span class="go">›</span></a>
+<p class="sk-hint" style="min-height:0"><a href="/speak" style="color:var(--ink);font-weight:600">先到这里</a> · 多练不算任务，明天也不会变多</p>
+{% endmacro %}

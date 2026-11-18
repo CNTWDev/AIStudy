@@ -41,7 +41,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 3, "passage_check": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1, "word_usage": 1, "word_hooks": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 3, "passage_check": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1, "word_usage": 1, "word_hooks": 1, "speak_rewrite": 1, "speak_scene": 1, "speak_chat": 1, "speak_chat_close": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -669,3 +669,71 @@ def word_hooks(words: list[dict], band: str, user_id=None) -> dict:
         '输出：{"words":[{"w":"sunflower","hook":"sun 太阳 + flower 花：向着太阳的花"}]}'
     )
     return ask_json("word_hooks", "你是一位很会帮学生记单词的英语老师。", user, user_id=user_id, effort="low", max_tokens=2000)
+
+
+# ------------------------------------------------------------------ 口语「开口练」（app/speaking.py）
+# 学习者是成年人，口语基础弱、怕出错：只改一处、不打分、不说「错了」；地道版只比他高一点点，长度和他说的差不多。
+
+def _speak_sys(accent: str) -> str:
+    side = "美式（American English）" if accent.lower().startswith("en-us") else "英式（British English）"
+    return ("你是一位很会教成年人开口说英语的教练。学习者是中国的职场成年人，口语基础弱，习惯先想中文再翻译，怕语法出错。"
+            f"你给的英文一律用{side}的地道说法和拼写，口语化、自然，像母语同事在工作里会说的，不要书面腔和生僻词。"
+            "你写给学习者看的中文说明简短、平等、不夸张，不说「错了」「不对」，不打分。")
+
+
+def speak_rewrite(scene: dict, said: str, accent: str, chunks: list[dict], user_id=None) -> dict:
+    """第 2 步「看地道版」：把学习者刚才说的话（可能中英夹杂）改成母语者会说的版本。"""
+    ref = ""
+    if scene.get("model"):
+        ref = f"参考说法（写课程的人写的，不要照抄，只是给你看这个场景大概怎么说）：{scene['model']}\n"
+    if chunks:
+        ref += "这个场景准备好的表达块（学习者的话里用得上就优先用这些）：" + "；".join(f"{c['en']}（{c['zh']}）" for c in chunks) + "\n"
+    user = (f"场景：{scene.get('situation', '')}\n要说清：{'、'.join(scene.get('goals') or [])}\n{ref}"
+            f"学习者刚才说的（语音转文字，可能夹着中文，可能有口误和重复）：{said or '（几乎没说出来）'}\n\n"
+            "请：\n"
+            "- native：把学习者想表达的意思（以他说的为准，没说到的要点可以按场景补一句）写成母语者在这个场合会说的话。"
+            "长度和他说的差不多（2 到 4 句），只比他的水平高一点点，用他下次能记住、能说出口的表达，不要炫技。\n"
+            "- chunks：从 native 里挑最值得学的 3 个（最多 3 个）「表达块」：整块拿来就能用的短语或句式，不是单个生词。"
+            "每个给 en（就是 native 里的写法；中间可省略的部分写成 ...，比如 push ... back）、zh（简短中文意思）、"
+            "yours（学习者刚才是怎么说这个意思的，原样引用他的话，包括他说的中文；他没说到就写「没说到」）。"
+            "学习者说中文的地方，优先变成表达块。\n"
+            "- fix：只挑一处最影响对方理解、或者最常见的语法问题（不是用词地道不地道，那是 chunks 的事）："
+            "wrong（他原话里那几个词）、right（改好的那几个词）、why（一句中文说明规则）、kind（这类问题的名字，4 到 8 个字，"
+            "比如「过去的事用过去式」「名词复数」「第三人称单数」，同一类问题每次用同一个名字）。没有值得改的就给 null。\n"
+            '输出：{"native":"..","chunks":[{"en":"..","zh":"..","yours":".."}],"fix":{"wrong":"..","right":"..","why":"..","kind":".."}}')
+    return ask_json("speak_rewrite", _speak_sys(accent), user, user_id=user_id, effort="low", max_tokens=1500, cache=False)
+
+
+def speak_scene(text: str, accent: str, user_id=None) -> dict:
+    """「我有件事要说」：学习者用中文写了一件真要说的事，整理成场景卡（只属于他，不进公共库）。"""
+    user = (f"学习者写的（他接下来真要用英文说的一件事）：{text}\n\n"
+            "整理成一张场景卡：title（10 个字以内，中文）、situation（中文，一两句：在什么场合、对谁、要说什么）、"
+            "goals（要说清的 2 到 3 点，每点 8 个字以内）。不要编他没说的事实，缺的就留给他自己说。\n"
+            '输出：{"title":"..","situation":"..","goals":[".."]}')
+    return ask_json("speak_scene", _speak_sys(accent), user, user_id=user_id, effort="low", max_tokens=600, cache=False)
+
+
+def _chat_log(turns: list[dict]) -> str:
+    return "\n".join(f"{'对方' if t['who'] == 'ai' else '学习者'}：{t['text']}" for t in turns)
+
+
+def speak_chat(play: dict, turns: list[dict], accent: str, user_id=None) -> dict:
+    """「和 AI 聊下去」的一轮：AI 扮演场景里的人，回学习者一句。"""
+    user = (f"你在角色扮演，扮演：{play.get('persona') or play.get('setup')}\n"
+            f"学习者要练的：{play.get('goal', '')}\n对话到现在（学习者的话是语音转文字，可能夹中文）：\n{_chat_log(turns)}\n\n"
+            "用这个角色的身份回学习者一句：英文，1 到 3 句，口语，语速感觉像真人说话；不要纠正他的英文，不要跳出角色，"
+            "学习者夹了中文就当你听懂了、自然地接下去；对方说得好就让步一点，说得含糊就追问一点，让对话有来有回。\n"
+            '输出：{"reply":".."}')
+    return ask_json("speak_chat", _speak_sys(accent), user, user_id=user_id, effort="low", max_tokens=400, cache=False)
+
+
+def speak_chat_close(play: dict, turns: list[dict], accent: str, user_id=None) -> dict:
+    """聊完：和场景练习一样，只给 3 个表达块 + 只改一处。"""
+    user = (f"刚才的角色扮演：{play.get('setup', '')}\n学习者要练的：{play.get('goal', '')}\n对话：\n{_chat_log(turns)}\n\n"
+            "请：\n"
+            "- note：一句中文，说他这次做得最好的一点（具体，引用他的话）。\n"
+            "- chunks：最多 3 个他下次能用上的表达块（en 用 ... 表示可省略的部分、zh、yours = 他在对话里是怎么说这个意思的，原样引用；"
+            "优先挑他说中文或说得很绕的地方）。\n"
+            "- fix：只挑一处最值得改的语法问题，格式 {wrong,right,why,kind}，没有就 null。\n"
+            '输出：{"note":"..","chunks":[{"en":"..","zh":"..","yours":".."}],"fix":null}')
+    return ask_json("speak_chat_close", _speak_sys(accent), user, user_id=user_id, effort="low", max_tokens=1200, cache=False)

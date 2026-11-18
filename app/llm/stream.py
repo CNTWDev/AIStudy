@@ -14,6 +14,8 @@ FIELDS = {
     "discuss": ("steelman", "answer", "challenge"),
     "discuss_close": ("shift", "own", "watch"),
     "review": ("feedback", "followup"),
+    "speak_rewrite": ("native",),
+    "speak_chat": ("reply",),
 }
 _sink: ContextVar = ContextVar("llm_stream_sink", default=None)
 
