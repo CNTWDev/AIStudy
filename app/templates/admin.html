@@ -404,6 +404,7 @@ $('#bpf').onsubmit = async e => {
   <p class="muted small">在服务器 config/stt.toml 里选厂商、填 key（模板 config/stt.example.toml），改完点「重新读配置」，不用重启。发音评测不是每家都有：没配就只看「哪个词没被识别出来」。</p>
   <div class="row" style="align-items:center;gap:10px"><button class="btn sm" type="button" id="sttrec">● 按一下开始录</button>
     <button class="btn ghost sm" type="button" id="sttreload">重新读配置</button><span class="muted small" id="sttmsg"></span></div>
+  <div id="sttmic"></div>
   <div id="sttout" class="small" style="margin-top:8px"></div>
   <details class="small" style="margin-top:10px" {{ 'open' if stt_errors }}><summary>最近出的错（{{ stt_errors|length }}）</summary>
     {% for e in stt_errors %}<div style="margin-top:6px"><span class="muted">{{ e.created_at[5:16]|replace('T', ' ') }} · {{ '转文字' if e.kind == 'transcribe' else '发音评测' }} · {{ e.provider }}{% if e.step %} · {{ e.step }}{% endif %}</span><br><code style="white-space:pre-wrap;word-break:break-all">{{ e.message }}</code></div>
@@ -414,15 +415,23 @@ $('#bpf').onsubmit = async e => {
 <script src="/static/speak.js?v={{ ASSET_V }}"></script>
 <script>
 (() => {
-  let on = false;
+  let on = false, meter = null;
+  micPicker($('#sttmic'));
   $('#sttreload').onclick = async () => { try { const r = await api('/api/admin/stt/reload', {}); toast(r.transcribe.on ? '转文字可用：' + (r.transcribe.label || r.transcribe.name) : '转文字未开启：' + r.transcribe.why); setTimeout(() => location.reload(), 600); } catch (e) { toast(e.message); } };
   $('#sttrec').onclick = async () => {
     if (!on) {
       if (!Rec.ok()) { toast('这个浏览器录不了音'); return; }
       try { await Rec.start(); } catch (e) { toast('没打开话筒'); return; }
-      on = true; $('#sttrec').textContent = '■ 说完了'; $('#sttmsg').textContent = '用英文说一两句，可以夹中文'; return;
+      on = true; $('#sttrec').textContent = '■ 说完了';
+      const t0 = performance.now();
+      meter = setInterval(() => {   // 实时音量：说话时条在动，没声音一眼看出来
+        const n = Math.round(Math.min(1, Rec.level * 3) * 10);
+        $('#sttmsg').innerHTML = `音量 <code>${'▮'.repeat(n)}${'▯'.repeat(10 - n)}</code>` +
+          (performance.now() - t0 > 2500 && !Rec.heardAt ? `<br><span class="sk-err">${MIC_HELP}</span>` : ' 用英文说一两句，可以夹中文');
+      }, 150);
+      return;
     }
-    on = false; $('#sttrec').textContent = '● 按一下开始录';
+    on = false; clearInterval(meter); $('#sttrec').textContent = '● 按一下开始录'; micPicker($('#sttmic'));
     const {blob} = Rec.stop(); $('#sttmsg').textContent = '识别中…';
     const fd = new FormData(); fd.append('file', blob, 'clip.wav');
     try {
