@@ -405,6 +405,11 @@ $('#bpf').onsubmit = async e => {
   <div class="row" style="align-items:center;gap:10px"><button class="btn sm" type="button" id="sttrec">● 按一下开始录</button>
     <button class="btn ghost sm" type="button" id="sttreload">重新读配置</button><span class="muted small" id="sttmsg"></span></div>
   <div id="sttout" class="small" style="margin-top:8px"></div>
+  <details class="small" style="margin-top:10px" {{ 'open' if stt_errors }}><summary>最近出的错（{{ stt_errors|length }}）</summary>
+    {% for e in stt_errors %}<div style="margin-top:6px"><span class="muted">{{ e.created_at[5:16]|replace('T', ' ') }} · {{ '转文字' if e.kind == 'transcribe' else '发音评测' }} · {{ e.provider }}{% if e.step %} · {{ e.step }}{% endif %}</span><br><code style="white-space:pre-wrap;word-break:break-all">{{ e.message }}</code></div>
+    {% else %}<div class="muted" style="margin-top:6px">没有出过错。</div>{% endfor %}
+    <p class="muted" style="margin:6px 0 0">时间是服务器时间（UTC）。服务器日志里也有：<code>journalctl -u aistudy | grep STT</code></p>
+  </details>
 </div>
 <script src="/static/speak.js?v={{ ASSET_V }}"></script>
 <script>
