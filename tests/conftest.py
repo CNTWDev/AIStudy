@@ -15,6 +15,8 @@ os.environ["AISTUDY_JOBS"] = "0"  # 不开后台题库流水线（测试里直�
 os.environ["AISTUDY_PREFETCH"] = "off"  # 不提前备题（app/prefetch.py）；测 prefetch 的用例自己打开
 os.environ["REGISTRATION"] = "invite"
 os.environ["AISTUDY_WEATHER"] = "off"  # 日记的天气、定位换城市不联网（app/daybook.py）；测的用例自己换掉 _fetch_sky / _reverse
+os.environ["STT_CONFIG_FILE"] = os.path.join(os.environ["DATA_DIR"], "no-stt.toml")
+os.environ["STT_PROVIDER"] = "mock"  # 口语的转文字 / 发音评测用假引擎（app/stt），不联网
 os.environ["METHODS_FILE"] = os.path.join(os.environ["DATA_DIR"], "no-methods.toml")  # 不受本机 config/methods.toml 影响
 
 if os.environ.get("TEST_DATABASE_URL"):  # 测试库每次清空重建

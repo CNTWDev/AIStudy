@@ -116,12 +116,12 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
     elif tab == "log":
         ctx["events"] = db.q("SELECT * FROM auth_events ORDER BY id DESC LIMIT 300")
     elif tab == "system":
-        from .. import migrate
+        from .. import migrate, speaking
         ctx["admins"] = [u for u in users if u["role"] == "admin" or u["is_admin"]]
         ctx.update(reg_mode=sitecfg.registration(), reg_modes=sitecfg.REG_MODES, site={k: sitecfg.get(k) for k in sitecfg.DEFAULTS},
                    llm_status=llm.check(), migrations=migrate.status(), tts_status=tts_web.check(), tts_stats=tts_web.stats(),
                    tts_speeds=tts_web.service().s.speeds, tts_audition=tts_web.AUDITION_SPEEDS,
-                   version=_version(), db_dialect=db.DIALECT, mail_status=mailer.check(), mail_recent=mailer.recent(10))
+                   version=_version(), db_dialect=db.DIALECT, mail_status=mailer.check(), mail_recent=mailer.recent(10), stt_status=speaking.engine().status())
     ctx["me"] = a
     return render(request, "admin.html", **ctx)
 

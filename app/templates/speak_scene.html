@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% from "_speak.html" import mic, wave, steps, choices %}
+{% block title %}{{ sc.title }} · 开口练{% endblock %}
+{% block body %}
+<div class="sk-top"><a href="/speak" class="linkbtn" aria-label="回到开口练">‹</a><h1>开口练</h1><span class="r">{{ sc.group }}</span></div>
+{{ steps(1) }}
+<div id="stage"></div>
+<div id="after" hidden>{{ choices(plays) }}</div>
+<template id="mictpl">{{ wave() }}{{ mic() }}<div class="sk-hint" id="hint"></div></template>
+<script src="/static/speak.js?v={{ ASSET_V }}"></script>
+<script>
+const S = {id: {{ s.id }}, data: {{ s.data|tojson }}, accent: {{ accent|lower|tojson }}, sc: {{ sc|tojson }},
+           assess: {{ assess|tojson }}, timed: {{ timed|tojson }}};
+const stage = $('#stage');
+const setStep = n => $$('#sksteps span').forEach((x, i) => { x.className = i < n ? 'd' : i === n ? 'c' : ''; });
+const micHtml = () => $('#mictpl').innerHTML;
+const sceneCard = (small) => `<div class="card"><div class="sk-lbl">场景 · ${esc(S.sc.title)}</div>
+  <div class="sk-scene"${small ? ' style="font-size:15px"' : ''}>${esc(S.sc.situation)}</div>
+  ${(S.sc.goals || []).length ? `<div class="sk-goals">要说清：${S.sc.goals.map(esc).join(' · ')}</div>` : ''}</div>`;
+
+/* 第 1 步：先说 */
+function step1() {
+  setStep(1);
+  const f = S.data.first;
+  stage.innerHTML = sceneCard() + (f ? `<div class="card"><div class="sk-lbl">你说的</div><div class="sk-en">${markZh(f.text) || '<span class="muted">（没听清，可以再说一次）</span>'}</div>
+      ${S.data.again ? againCard() : ''}
+      <div class="row" style="margin-top:14px;gap:10px"><button class="btn ghost" id="redo">再说一次</button><button class="btn" id="go2">看地道版</button></div></div>`
+    : `<div id="micbox">${micHtml()}</div>`);
+  if (f) { $('#go2').onclick = step2; $('#redo').onclick = () => { S.data.first = null; step1(); }; return; }
+  $('#hint').innerHTML = '按住说，松开结束<br>卡住就说中文，没关系。这一遍不评分。';
+  micButton($('#mic'), {hint: '#hint', wave: '#wave', recHint: '卡住就说中文，没关系。这一遍不评分。', onClip: async blob => {
+    const r = await sendClip('/api/speak/clip', blob, {session: S.id, step: 'first'});
+    S.data.first = {clip: r.clip, text: r.text, metrics: r.metrics}; S.data.rewrite = null;
+    if (r.again) S.data.again = r.again;
+    step1();
+  }});
+}
+function againCard() {
+  const a = S.data.again, m0 = a.first.metrics || {}, m1 = S.data.first.metrics || {};
+  return `<div class="sk-fix" style="border-left-color:var(--brand);background:var(--brand-2)"><div class="lbl" style="color:var(--brand-ink)">一个月前的你 · ${esc(a.day)}</div>
+    <div class="row" style="gap:14px;flex-wrap:wrap">${clipBtn(a.first.clip, '那时')}${clipBtn(S.data.first.clip, '今天')}</div>
+    <div class="small muted" style="margin-top:4px">卡顿 ${fmt(m0.pauses)} → ${fmt(m1.pauses)} 次 · 说中文 ${m0.zh} → ${m1.zh} 处</div></div>`;
+}
+
+/* 第 2 步：看地道版 */
+async function step2() {
+  setStep(2);
+  if (!S.data.rewrite) {
+    stage.innerHTML = `<div class="card"><div class="sk-lbl">你说的</div><div class="sk-en">${markZh(S.data.first.text)}</div></div><div id="rwbox"></div>`;
+    const btn = document.createElement('button'); btn.className = 'btn'; btn.hidden = true; $('#rwbox').after(btn);
+    const w = aiWait(btn, $('#rwbox'), 'speak_rewrite');
+    try { S.data.rewrite = await api('/api/speak/rewrite', {session: S.id}, {onPart: w.part}); w.end(); }
+    catch (e) { w.fail(); $('#rwbox').innerHTML = `<div class="card"><p class="muted">${esc(e.message)}</p><button class="btn" onclick="step2()">再试一次</button></div>`; return; }
+  }
+  const r = S.data.rewrite;
+  stage.innerHTML = `<div class="card"><div class="row" style="justify-content:space-between"><div class="sk-lbl" style="margin:0">母语者会这样说</div>${playBtn(r.native, S.accent, '听一遍')}</div>
+      <div class="sk-en" style="margin-top:8px">${markChunks(r.native, r.chunks)}</div></div>
+    ${r.chunks.length ? `<div class="card"><div class="sk-lbl">今天学 ${r.chunks.length} 个表达</div>${chunkList(r.chunks)}</div>` : ''}
+    ${fixBox(r.fix)}
+    <details class="small muted" style="margin:0 4px 12px"><summary style="cursor:pointer">你刚才说的</summary><p>${markZh(S.data.first.text)}</p></details>
+    <button class="btn" id="go3" style="width:100%">去跟读</button>`;
+  $('#go3').onclick = () => step3(0);
+}
+
+/* 第 3 步：跟读 */
+function step3(i) {
+  setStep(3);
+  const sents = S.data.rewrite.sentences, sent = sents[i];
+  const tries = ((S.data.shadow || {})[i] || {}).tries || 0;
+  stage.innerHTML = (i ? `<div class="card" style="padding:12px 16px"><div class="small faint">${esc(sents[i - 1])}</div></div>` : '') +
+    `<div class="card" style="border-color:var(--brand-3)"><div class="row" style="justify-content:space-between"><div class="sk-lbl" style="margin:0">听一句，跟一句 · 第 ${i + 1} 句 / 共 ${sents.length} 句</div></div>
+      <div class="sk-big" id="sent" style="margin:8px 0 10px">${markChunks(sent, S.data.rewrite.chunks)}</div>
+      <div class="small muted" id="sres">${S.assess ? '灰色的词没被听到，波浪线是读得不太准的。' : '说完以后，没被听到的词会变灰。'}</div>
+      <div class="sk-dots" style="margin-top:12px" id="dots"></div></div>
+    <div class="row" style="gap:10px;margin:6px 0 4px"><button class="btn soft" id="again">▶ 再听</button><button class="btn soft" id="slow">慢一点</button></div>
+    <div id="micbox">${micHtml()}</div>
+    <p class="sk-hint" style="min-height:0;margin-top:4px"><a href="#" id="next" style="font-weight:600">${i + 1 < sents.length ? '下一句 ›' : '跟读完了，不看稿再说一遍 ›'}</a></p>`;
+  const dots = n => { $('#dots').innerHTML = [0, 1, 2].map(k => `<i class="${k < n ? 'd' : ''}"></i>`).join('') + `<span class="small faint" style="margin-left:6px">第 ${Math.min(n + 1, 3)} 遍 / 最多 3 遍</span>`; };
+  dots(tries);
+  const play = () => Speak.play(sent, S.accent, 'sentence');
+  $('#again').onclick = () => { Speak.setSlow(false); play(); };
+  $('#slow').onclick = () => { Speak.setSlow(true); play().finally(() => Speak.setSlow(false)); };
+  $('#next').onclick = e => { e.preventDefault(); Speak.stop(); i + 1 < sents.length ? step3(i + 1) : step4(); };
+  $('#hint').innerHTML = '听完按住跟读';
+  if (!tries) setTimeout(play, 300);
+  const m = micButton($('#mic'), {hint: '#hint', wave: '#wave', recHint: '跟着刚才的节奏说', onClip: async blob => {
+    const r = await sendClip('/api/speak/clip', blob, {session: S.id, step: 'shadow:' + i});
+    (S.data.shadow = S.data.shadow || {})[i] = {tries: r.tries};
+    $('#sent').innerHTML = r.marks.map(w => `<span class="sk-word${w.ok ? '' : ' miss'}${w.pron ? ' pron' : ''}">${esc(w.w)}</span>`).join('');
+    const miss = r.marks.filter(w => !w.ok).length, pron = r.marks.filter(w => w.pron);
+    $('#sres').innerHTML = miss || pron.length
+      ? `${miss ? `${miss} 个词没被听到。` : ''}${pron.length ? `${pron.map(w => `<b>${esc(w.w)}</b>`).join('、')} 读得不太准。` : ''}再来一遍试试。`
+      : '<b class="ok" style="color:var(--ok)">每个词都说出来了 ✓</b>';
+    dots(r.tries);
+    if (r.tries >= 3 || (!miss && !pron.length)) $('#next').classList.add('btn');
+  }});
+}
+
+/* 第 4 步：不看稿再说一遍 */
+function step4() {
+  setStep(4);
+  if (S.data.retell) return done();
+  stage.innerHTML = `<div class="card"><div class="sk-lbl">不看稿，把这件事再说一遍</div><div class="sk-scene" style="font-size:15px">${esc(S.sc.title)}</div>
+      <div class="sk-goals">试着用上：${S.data.rewrite.chunks.map(c => `<span class="pill">${esc(c.zh)}</span>`).join(' ')}</div></div>
+    <div id="micbox">${micHtml()}</div>`;
+  $('#hint').innerHTML = '按住说，松开结束';
+  micButton($('#mic'), {hint: '#hint', wave: '#wave', recHint: '想不起来就用自己的话说', onClip: async blob => {
+    const r = await sendClip('/api/speak/clip', blob, {session: S.id, step: 'retell'});
+    S.data.retell = {clip: r.clip, text: r.text}; S.data.compare = r.compare; S.data.learned = r.learned;
+    done();
+  }});
+}
+function done() {
+  setStep(5);
+  const r = S.data.rewrite, n = r.chunks.length;
+  stage.innerHTML = `<div class="card"><div class="sk-lbl">不看稿，你这一遍说的</div><div class="sk-en">${markChunks(S.data.retell.text, r.chunks)}</div></div>
+    <div class="card">${compareTable(S.data.compare || [])}
+      <div class="row" style="margin-top:10px;gap:16px">${clipBtn(S.data.first.clip, '听第一遍')}${clipBtn(S.data.retell.clip, '听这一遍')}</div>
+      ${S.timed ? '' : '<p class="tiny faint" style="margin:6px 0 0">现在用的语音识别给不出每个词的时间，开口用时和卡顿暂时算不了。</p>'}</div>
+    <p class="sk-note">${n ? `${n} 个表达存进了「我的表达库」，明天开始回来复习。` : ''}今天的已经练完了。</p>`;
+  $('#after').hidden = false; stage.appendChild($('#after'));
+}
+
+const d = S.data;
+if (d.retell) step4(); else if (d.rewrite && d.shadow) step3(Math.min(Object.keys(d.shadow).length, d.rewrite.sentences.length - 1));
+else if (d.rewrite) step2(); else step1();
+</script>
+{% endblock %}

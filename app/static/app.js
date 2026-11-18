@@ -582,12 +582,14 @@ const Speak = {
   /* 读一段文字，读完返回 true；被打断（又点了别的）返回 false。role：听力对话里的角色（F 女 / M 男 / C 孩子 / N 旁白） */
   async play(text, lang, use, role) {
     text = String(text || '').trim(); if (!text) return false;
-    lang = (lang || Speak.langOf(text)).slice(0, 2).toLowerCase();
+    // lang 可以带口音（en-us / en-gb，口语课程包按包配）：服务器有这个口音的声音就用，没有用这种语言的默认声音
+    const full = (lang || Speak.langOf(text)).toLowerCase();
+    lang = full.slice(0, 2);
     use = use || Speak.useOf(text);
     Speak.stop();
     const my = Speak.n;
     let url = '';
-    if (Speak.server(lang)) { try { url = (await api('/api/tts', {text, lang, use, role: role || ''})).url || ''; } catch (e) {} }
+    if (Speak.server(lang)) { try { url = (await api('/api/tts', {text, lang: full, use, role: role || ''})).url || ''; } catch (e) {} }
     if (my !== Speak.n) return false;
     if (url) { try { return await Speak.file(url, my); } catch (e) { if (my !== Speak.n) return false; } }
     return Speak.browser(text, lang, use, my, role);
@@ -1320,6 +1322,9 @@ const SEEK = {
     steps: [['🔍', '读懂你的判断和理由'], ['🧠', '分析：哪里最有力，哪里还没想到'], ['💬', '写回应，再提一个新挑战']]}),
   discuss_close: () => ({t: '正在对照你这一路的想法', long: '这次想得久一点，再等几秒',
     steps: [['🔁', '对照你开头和现在的想法'], ['🧭', '和几种成熟的看法比一比'], ['⚠️', '找出这个结论在什么情况下会出问题']]}),
+  speak_rewrite: () => ({t: '正在把你的话改成地道说法', long: '这次想得久一点，再等几秒',
+    steps: [['👂', '读懂你想表达的意思'], ['✍️', '改成母语者会说的版本'], ['🔍', '挑 3 个最值得学的表达，只改 1 处']]}),
+  speak_chat: () => ({t: '对方正在想怎么回你', steps: [['👂', '听懂你说的'], ['💬', '回你一句']]}),
   review: () => ({t: '正在看你的回答', long: '这次想得久一点，再等几秒',
     steps: [['🔍', '诊断：逐条对照要点'], ['🧠', '分析：找出最关键的缺口'], ['✍️', '给出建议：写点评和追问']]}),
 };
@@ -1367,6 +1372,8 @@ const AIDRAFT = {  // 边写边看时先放哪几栏，和正式卡片同样的�
   discuss: [['steelman', '💡 '], ['answer', '<b>你问的：</b>'], ['challenge', '🤔 ']],
   discuss_close: [['shift', ''], ['own', '✨ 你自己的东西：'], ['watch', '⚠️ 值得留意：']],
   review: [['feedback', ''], ['followup', '🤔 追问：']],
+  speak_rewrite: [['native', '']],
+  speak_chat: [['reply', '']],
 };
 function aiWait(btn, box, kind, ...inputs) {
   const label = btn.innerHTML;

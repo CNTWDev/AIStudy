@@ -197,6 +197,17 @@ class MockProvider(Provider):
 
 
 MOCK = {
+    "speak_rewrite": {"native": "Quick update on the new app: we're pushing the launch back two weeks. Testing turned up an issue with payments. No need to worry, though. We'll use the time to get it fixed properly.",
+                      "chunks": [{"en": "push ... back", "zh": "推迟", "yours": "推迟"},
+                                 {"en": "turn up an issue", "zh": "发现了问题", "yours": "we find some problem"},
+                                 {"en": "get it fixed", "zh": "把它修好", "yours": "把它修好"}],
+                      "fix": {"wrong": "we find", "right": "we found", "why": "说已经发生的事，动词用过去式。", "kind": "过去的事用过去式"}},
+    "speak_scene": {"title": "下午和供应商谈价", "situation": "下午和供应商开会，你要说明年的量会翻倍，希望单价降 10%。", "goals": ["量会翻倍", "希望降价 10%"]},
+    "speak_chat": {"reply": "OK, I see. But how can I be sure it won't slip again?"},
+    "speak_chat_close": {"note": "你先表示理解，再讲原因，对方的情绪就下来了。",
+                         "chunks": [{"en": "I completely understand", "zh": "我完全理解", "yours": "I understand"},
+                                    {"en": "make it up to you", "zh": "补偿你", "yours": "补偿"}],
+                         "fix": {"wrong": "we will to fix", "right": "we will fix", "why": "will 后面直接跟动词原形。", "kind": "will 后用原形"}},
     "book_guide": {"gist": "示例：主人公出发去冒险，路上交到了第一个朋友。", "hook": "读读看：主人公为什么要出发？",
                    "words": [{"w": "kite", "zh": "风筝"}, {"w": "hill", "zh": "小山"}],
                    "quiz": [{"q": "示例：主人公带了什么去小山？", "options": ["风筝", "皮球", "书包"], "answer": 0, "explain": "第一段就写了。"},

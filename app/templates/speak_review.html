@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "_speak.html" import mic, wave, steps %}
+{% block title %}复习表达 · 开口练{% endblock %}
+{% block body %}
+<div class="sk-top"><a href="/speak" class="linkbtn" aria-label="回到开口练">‹</a><h1>开口练</h1><span class="r" id="cnt"></span></div>
+{% if then %}{{ steps(0) }}{% endif %}
+<div id="stage"></div>
+<template id="mictpl">{{ wave() }}{{ mic() }}<div class="sk-hint" id="hint"></div></template>
+<script src="/static/speak.js?v={{ ASSET_V }}"></script>
+<script>
+const ITEMS = {{ items|tojson }}, THEN = {{ then|tojson }}, ACCENT = {{ accent|lower|tojson }};
+const stage = $('#stage');
+let k = 0;
+function show() {
+  if (k >= ITEMS.length) return finish();
+  const c = ITEMS[k];
+  $('#cnt').textContent = `复习 ${k + 1} / ${ITEMS.length}`;
+  stage.innerHTML = `<div class="card" style="text-align:center;padding:26px 16px"><div class="sk-lbl">用英文说</div>
+      <div style="font-size:24px;font-weight:800;margin:6px 0">${esc(c.zh || c.en)}</div>
+      <div class="small faint">${c.box ? `第 ${c.box + 1} 次复习` : '第 1 次复习'}</div></div>
+    <div id="res"></div><div id="micbox">${$('#mictpl').innerHTML}</div>`;
+  $('#hint').innerHTML = '按住说一句完整的话，松开结束<br><a href="#" id="peek">想不起来，看看</a>';
+  $('#peek').onclick = e => { e.preventDefault(); result(null); };
+  micButton($('#mic'), {hint: '#hint', wave: '#wave', onClip: async blob => { result(await sendClip('/api/speak/review/clip', blob, {chunk: c.id})); }});
+}
+function result(r) {
+  const c = ITEMS[k];
+  $('#micbox').remove();
+  $('#res').innerHTML = `<div class="card">${r ? `<div class="sk-lbl">你说的</div><div class="sk-en">${markChunks(r.text, [c]) || '<span class="muted">（没听清）</span>'}</div>` : ''}
+      <div class="sk-lbl" style="margin-top:12px">常见说法</div>
+      <div class="sk-en row" style="gap:8px;flex-wrap:nowrap">${playBtn(c.say, ACCENT)}<span>${markChunks(c.say, [c])}</span></div>
+      ${r ? (r.hit ? '<div class="small" style="color:var(--ok);font-weight:700;margin-top:10px">✓ 关键表达说出来了</div>' : '<div class="small muted" style="margin-top:10px">这次没听到这个表达</div>') : ''}</div>
+    <div class="row" style="gap:10px"><button class="btn ghost" id="no">没说出来</button><button class="btn" id="yes">说出来了</button></div>
+    <p class="sk-hint" style="min-height:0">没说出来的，明天再来一次</p>`;
+  if (r && !r.hit) { $('#no').className = 'btn'; $('#yes').className = 'btn ghost'; }
+  const grade = async ok => { try { await api('/api/speak/review/grade', {chunk: c.id, ok}); } catch (e) { toast(e.message); return; } k++; show(); };
+  $('#yes').onclick = () => grade(true); $('#no').onclick = () => grade(false);
+  if (!r) Speak.play(c.say, ACCENT, 'sentence');
+}
+function finish() {
+  $('#cnt').textContent = '';
+  stage.innerHTML = `<div class="card" style="text-align:center;padding:26px 16px"><div style="font-size:22px;font-weight:800">${ITEMS.length ? '今天的复习做完了 ✓' : '今天没有要复习的表达'}</div>
+      <p class="muted small">${ITEMS.length ? '保底的那几分钟已经算今天练过了。' : '学过的表达过一天就会回来。'}</p></div>
+    ${THEN ? '<a class="btn" style="width:100%" href="/speak/go?skip=1">去今天的场景</a><p class="sk-hint" style="min-height:0"><a href="/speak" style="color:var(--ink);font-weight:600">先到这里</a></p>' : '<a class="btn" style="width:100%" href="/speak">回到开口练</a>'}`;
+}
+show();
+</script>
+{% endblock %}

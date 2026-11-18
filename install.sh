@@ -322,6 +322,10 @@ setup_config() {
     cp "$APP_DIR/config/tts.example.toml" "$APP_DIR/config/tts.toml"
     ok "已生成 config/tts.toml（朗读：要用时填写 Cartesia 的 api_key 和声音）"
   fi
+  if [[ ! -f "$APP_DIR/config/stt.toml" ]]; then
+    cp "$APP_DIR/config/stt.example.toml" "$APP_DIR/config/stt.toml"
+    ok "已生成 config/stt.toml（语音引擎：口语练习要用时选厂商、填钥匙）"
+  fi
   if [[ ! -f "$APP_DIR/config/mail.toml" ]]; then
     cp "$APP_DIR/config/mail.example.toml" "$APP_DIR/config/mail.toml"
     ok "已生成 config/mail.toml（发邮件给家长：要用时填写发信服务的 SMTP 账号，见 docs/MAIL.md）"
@@ -332,8 +336,8 @@ fix_permissions() {
   id "$SERVICE_USER" >/dev/null 2>&1 || useradd --system --home-dir "$APP_DIR" --shell /usr/sbin/nologin "$SERVICE_USER" 2>/dev/null \
     || useradd -r -d "$APP_DIR" -s /sbin/nologin "$SERVICE_USER"
   chown -R "$SERVICE_USER:$SERVICE_USER" "$APP_DIR/data"
-  chown "root:$SERVICE_USER" "$(ENV_FILE)" "$APP_DIR/config/llm.toml" "$APP_DIR/config/tts.toml" "$APP_DIR/config/mail.toml"
-  chmod 640 "$(ENV_FILE)" "$APP_DIR/config/llm.toml" "$APP_DIR/config/tts.toml" "$APP_DIR/config/mail.toml"
+  chown "root:$SERVICE_USER" "$(ENV_FILE)" "$APP_DIR/config/llm.toml" "$APP_DIR/config/tts.toml" "$APP_DIR/config/stt.toml" "$APP_DIR/config/mail.toml"
+  chmod 640 "$(ENV_FILE)" "$APP_DIR/config/llm.toml" "$APP_DIR/config/tts.toml" "$APP_DIR/config/stt.toml" "$APP_DIR/config/mail.toml"
 }
 
 # ---------------------------------------------------------------- Python 依赖

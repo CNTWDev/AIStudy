@@ -1,0 +1,48 @@
+# beejoy 的语音引擎配置（转文字 + 发音评测，app/stt/）。口语「开口练」要用。
+# 使用方法：复制为 config/stt.toml（install.sh 会自动复制），选好厂商、填上钥匙，然后重启服务：
+#     sudo systemctl restart aistudy
+# 改完到 管理 → 系统 →「语音引擎 · 试一下」录一句话，看识别结果和用时；几家都填了钥匙的，可以在那里换着比。
+#
+# config/stt.toml 里有密钥，已被 .gitignore 忽略，不会提交到 git。任何值都可以写成 "${环境变量名}"。
+#
+# 两种能力分开选，可以混搭：
+#   转文字（几乎每家都有）：volcengine（字节火山，推荐）/ aliyun / cartesia / azure / none
+#   发音评测（只有少数几家有，可以不配）：azure / none
+#     不配发音评测，跟读那一步显示「哪个词没被识别出来」；配上以后再多显示「哪个音没读准」。
+
+# 一段录音最长多少秒；每人每天、全站每天最多送去识别多少秒（发音评测另算，不在这里）
+max_seconds = 90
+daily_seconds_per_user = 1800
+daily_seconds_total = 36000
+timeout = 30
+
+[transcribe]
+provider = "none"
+
+[assess]
+provider = "none"
+
+# ---- 字节火山 · 豆包大模型录音文件识别（极速版）：中英夹说、每个词的时间都有
+# 火山引擎控制台 → 豆包语音 → 开通「录音文件识别 极速版」→ 拿 API Key（新控制台）
+[volcengine]
+api_key = ""                        # 新控制台：X-Api-Key
+# app_id = ""                       # 老控制台：App ID + Access Token 二选一
+# access_token = ""
+# resource_id = "volc.bigasr.auc_turbo"
+
+# ---- 阿里云百炼 · Qwen3-ASR-Flash：中英文都能认；文档没写有没有每个词的时间（没有的话开口用时、卡顿是粗略值）
+[aliyun]
+api_key = ""                        # 百炼控制台的 API Key（sk-...）
+region = "intl"                     # intl = 国际站（新加坡，服务器在日本用这个）；cn = 国内站
+model = "qwen3-asr-flash"
+
+# ---- Cartesia · ink-whisper：一次只认一种语言，中英夹说里的中文多半认不出
+[cartesia]
+api_key = "${CARTESIA_API_KEY}"     # 可以和朗读（config/tts.toml）共用一把钥匙
+model = "ink-whisper"
+
+# ---- 微软 Azure 语音：既能转文字（只认一种语言），也能做发音评测（跟读 + 自由说；语调分只有美式 en-US）
+# Azure 门户 → 语音服务（Speech）→ 区域选 japaneast → 拿「密钥 1」。每月 5 小时免费。
+[azure]
+api_key = ""
+region = "japaneast"

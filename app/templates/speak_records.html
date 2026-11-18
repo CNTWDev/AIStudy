@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}我的口语 · 开口练{% endblock %}
+{% block body %}
+<div class="sk-top"><a href="/speak" class="linkbtn" aria-label="回到开口练">‹</a><h1>我的口语</h1><span class="r">最近 4 周</span></div>
+
+<div class="card">
+  <div class="sk-lbl">三个数 · 只和上个月的自己比</div>
+  <div id="metrics"></div>
+  <p class="tiny faint" style="margin:8px 0 0">开口用时：每个场景第一遍，到说出第一个英文词用了几秒。卡顿：每分钟停顿超过 2 秒的次数。用上：学过的表达在说话里出现的次数。</p>
+</div>
+
+{% if r.month_ago %}{% set m = r.month_ago %}
+<div class="card" style="border-color:var(--brand-3)">
+  <div class="sk-lbl">一个月前的你 · {{ m.day }}</div>
+  <div style="font-weight:700;margin-bottom:8px">{{ m.scene.title }}</div>
+  <div class="row" style="gap:14px;flex-wrap:wrap"><span id="oldclip"></span><a class="btn soft" href="/speak/scene/{{ m.scene.pack }}/{{ m.scene.id }}?again={{ m.session }}">今天再说一次</a></div>
+  <p class="tiny faint" style="margin:8px 0 0">说完会把那时和今天的录音放在一起听。</p>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="sk-tot"><div><b>{{ r.tot.chunks }}</b><span>表达库</span></div><div><b>{{ r.tot.scenes }}</b><span>说完的场景</span></div><div><b>{{ r.tot.chats }}</b><span>和 AI 聊</span></div></div>
+</div>
+
+{% if r.common %}
+<div class="card"><div class="sk-lbl">这周最常出现的一个</div>
+  <div><b>{{ r.common.kind }}</b> <span class="small muted">· {{ r.common.n }} 次</span></div>
+  <p class="small muted" style="margin:6px 0 0">只记这一个就够了，别的先不管。</p></div>
+{% endif %}
+
+<div class="card"><div class="sk-lbl">最近学的表达</div>
+  {% for c in r.recent %}<span class="pill" style="margin:0 6px 6px 0;display:inline-block" title="{{ c.zh }}">{{ c.en }}{% if c.used %} · 用上 {{ c.used }}{% endif %}</span>{% else %}<p class="small muted" style="margin:0">说完第一个场景，这里就有了。</p>{% endfor %}
+</div>
+
+<div class="card"><div class="sk-lbl">回听录音</div>
+  {% for h in hist %}
+  <div class="sk-metric"><div style="min-width:0"><div style="font-weight:600">{{ h.title }}</div><div class="k">{{ h.day }} · {{ '和 AI 聊' if h.kind == 'chat' else '场景' }}</div></div>
+    <div class="row" style="margin-left:auto;gap:10px;flex:none" data-first="{{ h.first or '' }}" data-retell="{{ h.retell or '' }}"></div></div>
+  {% else %}<p class="small muted" style="margin:0">还没有录音。</p>{% endfor %}
+  <p class="tiny faint" style="margin:8px 0 0">录音只有你自己听得到。</p>
+</div>
+
+<script src="/static/speak.js?v={{ ASSET_V }}"></script>
+<script>
+const W = {{ r.weeks|tojson }};
+const spark = (vals, low) => {
+  const pts = vals.map((v, i) => [i, v]).filter(p => p[1] !== null);
+  if (pts.length < 2) return '';
+  const ys = pts.map(p => p[1]), lo = Math.min(...ys), hi = Math.max(...ys), span = hi - lo || 1;
+  const xy = pts.map(([i, v]) => [6 + i * 30, 30 - ((v - lo) / span) * 22]);
+  const last = pts[pts.length - 1][1], prev = pts[pts.length - 2][1];
+  const good = low ? last <= prev : last >= prev;
+  const col = good ? 'var(--ok)' : 'var(--faint)';
+  return `<svg width="102" height="36" viewBox="0 0 102 36" aria-hidden="true"><polyline fill="none" stroke="${col}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${xy.map(p => p.join(',')).join(' ')}"/>${xy.map((p, k) => `<circle cx="${p[0]}" cy="${p[1]}" r="${k === xy.length - 1 ? 3.5 : 2}" fill="${col}"/>`).join('')}</svg>`;
+};
+const row = (k, key, unit, low) => {
+  const vals = W.map(w => w[key]), now = vals[vals.length - 1];
+  return `<div class="sk-metric"><div><div class="v">${fmt(now, unit)}</div><div class="k">${k} · 这周</div></div>${spark(vals, low)}</div>`;
+};
+$('#metrics').innerHTML = row('开口用时', 'latency', '秒', true) + row('卡顿', 'pauses', '次/分钟', true) + row('用上学过的表达', 'used', '次', false);
+{% if r.month_ago %}$('#oldclip').innerHTML = clipBtn({{ r.month_ago.first.clip|tojson }}, '那时');{% endif %}
+$$('[data-first]').forEach(x => { x.innerHTML = (x.dataset.first ? clipBtn(x.dataset.first, '第一遍') : '') + (x.dataset.retell ? clipBtn(x.dataset.retell, '再说') : ''); });
+</script>
+{% endblock %}
