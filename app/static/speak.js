@@ -78,9 +78,11 @@ function micButton(el, o) {
     const {blob, secs} = Rec.stop();
     if (secs < 0.6) { set('idle'); if (hint) hint.innerHTML = idleHint; return; }
     set('busy'); if (hint) hint.innerHTML = '正在听你说的…';
-    try { await o.onClip(blob, secs); } catch (e) { toast(e.message || '没传上，再说一次'); }
+    let err = '';
+    try { await o.onClip(blob, secs); } catch (e) { err = e.message || '没传上，再说一次'; toast(err); }
     if (state === 'busy') set('idle');
-    if (hint && state === 'idle') hint.innerHTML = idleHint;
+    // 出错的原话留在话筒下面，不会一闪就没（后台系统页「语音引擎」也记着）
+    if (hint && state === 'idle') hint.innerHTML = err ? `<span class="sk-err">${esc(err)}</span><br>再按住说一次试试` : idleHint;
   };
   el.addEventListener('pointerdown', e => {
     e.preventDefault();

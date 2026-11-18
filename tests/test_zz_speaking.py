@@ -224,3 +224,33 @@ def test_admin_try_engine():
         r = speaking.test_engine(WAV)
         assert r["transcribe"]["text"] and "ms" in r["transcribe"] and r["assess"]["scores"]
         assert speaking.test_engine(b"xx").get("error")
+
+
+def test_engine_errors_are_kept_for_admin(monkeypatch):
+    """厂商报错：页面上的原话会一闪而过，所以每次都记一条，后台系统页「语音引擎」卡片能看到（还有请求编号）。"""
+    import httpx
+    from app.stt.providers import MockTranscriber, Volcengine
+    with TestClient(app) as c:
+        uid = _adult(c)
+        sid = _sid(c.get("/speak/go", follow_redirects=False))
+
+        def boom(self, wav, langs, expect=""):
+            raise speaking.STTError("字节火山返回 45000151：audio format invalid（请求编号 abc123）")
+        monkeypatch.setattr(MockTranscriber, "transcribe", boom)
+        r = _post_clip(c, "/api/speak/clip", session=sid, step="first")
+        assert r.status_code == 503 and "45000151" in r.json()["detail"]
+        e = speaking.recent_errors(1)[0]
+        assert e["kind"] == "transcribe" and e["step"] == "first" and "abc123" in e["message"]
+        assert db.one("SELECT user_id FROM stt_errors ORDER BY id DESC LIMIT 1")["user_id"] == uid
+    # 火山的错误码和请求编号都进错误信息
+    v = Volcengine({"api_key": "k"}, 5)
+    resp = httpx.Response(200, headers={"X-Api-Status-Code": "45000001", "X-Api-Message": "invalid param", "X-Tt-Logid": "LOG9"},
+                          request=httpx.Request("POST", Volcengine.URL))
+    monkeypatch.setattr(httpx, "post", lambda *a, **k: resp)
+    with pytest.raises(speaking.STTError, match="45000001.*invalid param.*LOG9"):
+        v.transcribe(WAV, ["en", "zh"])
+    resp403 = httpx.Response(403, headers={"X-Api-Status-Code": "45000030", "X-Api-Message": "resource not granted", "X-Tt-Logid": "LOG7"},
+                             text="{}", request=httpx.Request("POST", Volcengine.URL))
+    monkeypatch.setattr(httpx, "post", lambda *a, **k: resp403)
+    with pytest.raises(speaking.STTError, match="HTTP 403（45000030）：resource not granted.*LOG7"):
+        v.transcribe(WAV, ["en", "zh"])

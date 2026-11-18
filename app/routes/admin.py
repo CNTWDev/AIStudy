@@ -121,7 +121,7 @@ def admin_home(request: Request, tab: str = "overview", msg: str = "", link: str
         ctx.update(reg_mode=sitecfg.registration(), reg_modes=sitecfg.REG_MODES, site={k: sitecfg.get(k) for k in sitecfg.DEFAULTS},
                    llm_status=llm.check(), migrations=migrate.status(), tts_status=tts_web.check(), tts_stats=tts_web.stats(),
                    tts_speeds=tts_web.service().s.speeds, tts_audition=tts_web.AUDITION_SPEEDS,
-                   version=_version(), db_dialect=db.DIALECT, mail_status=mailer.check(), mail_recent=mailer.recent(10), stt_status=speaking.engine().status())
+                   version=_version(), db_dialect=db.DIALECT, mail_status=mailer.check(), mail_recent=mailer.recent(10), stt_status=speaking.engine().status(), stt_errors=speaking.recent_errors(10))
     ctx["me"] = a
     return render(request, "admin.html", **ctx)
 

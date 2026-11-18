@@ -53,8 +53,18 @@ class _Base:
         except httpx.HTTPError as e:
             raise STTError(f"{self.label or self.name} 连不上：{type(e).__name__}") from e
         if r.status_code >= 400:
-            raise STTError(f"{self.label or self.name} 返回 {r.status_code}：{r.text[:200]}")
+            msg = r.headers.get("X-Api-Message") or r.text[:300]
+            code = r.headers.get("X-Api-Status-Code")
+            raise STTError(f"{self.label or self.name} 返回 HTTP {r.status_code}{f'（{code}）' if code else ''}：{msg}{_logid(r)}")
         return r
+
+
+def _logid(r) -> str:
+    """厂商给的请求编号：找厂商客服查问题时要用。"""
+    for k in ("X-Tt-Logid", "X-Request-Id", "apim-request-id", "X-Acs-Request-Id"):
+        if r.headers.get(k):
+            return f"（请求编号 {r.headers[k]}）"
+    return ""
 
 
 class Transcriber(_Base):
@@ -143,7 +153,7 @@ class Volcengine(Transcriber):
         if code == "20000003":   # 没说话
             return Transcript(text="", provider=self.name)
         if code != "20000000":
-            raise STTError(f"字节火山返回 {code}：{r.headers.get('X-Api-Message', '')}")
+            raise STTError(f"字节火山返回 {code}：{r.headers.get('X-Api-Message', '')}{_logid(r)}")
         d = r.json()
         res = d.get("result") or {}
         words = [Word(w.get("text", ""), w["start_time"] / 1000, w["end_time"] / 1000)

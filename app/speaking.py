@@ -17,6 +17,7 @@
 """
 import difflib
 import json
+import logging
 import os
 import re
 import secrets
@@ -41,6 +42,7 @@ PAUSE = 2.0                            # 两个词之间停多久算「卡住」
 CHAT_MAX = 8                           # 聊一局最多几轮
 CLIP_MAX = 4 * 1024 * 1024             # 一段录音最大字节数（16kHz 16 位单声道 ≈ 2 分钟）
 _CJK = re.compile(r"[㐀-鿿]")
+log = logging.getLogger(__name__)
 
 
 class SpeakError(HTTPException):
@@ -354,6 +356,7 @@ def transcribe(user, wav: bytes, step: str, session_id=None, expect: str = "", a
     try:
         tr = sp.transcribe(wav, [accent.split("-")[0], "zh"], expect)
     except STTError as e:
+        record_error("transcribe", str(e), step, user["id"])
         raise SpeakError(503, f"语音识别出错了：{e}")
     cid = secrets.token_hex(12)
     f = clip_file(user["id"], cid)
@@ -368,14 +371,31 @@ def transcribe(user, wav: bytes, step: str, session_id=None, expect: str = "", a
 def _assess(clip: dict, wav: bytes, accent: str, reference: str):
     try:
         a = engine().assess(wav, accent, reference)
-    except STTError:
-        return None   # 评测是锦上添花：出错就当没配
+    except STTError as e:
+        record_error("assess", str(e), "shadow")
+        return None   # 评测是锦上添花：出错就当没配（记下来，后台看得到）
     if a is not None:
         db.run("UPDATE speak_clips SET assess=? WHERE id=?", db.jdump(a.to_dict()), clip["clip"])
     return a
 
 
 # ------------------------------------------------------------------ 一次练习
+
+def record_error(kind: str, message: str, step: str = "", user_id=None) -> None:
+    """语音引擎出错：写进服务器日志，再存一条（后台系统页「语音引擎」卡片上看最近的）。"""
+    sp = engine()
+    prov = sp.s.transcribe if kind == "transcribe" else sp.s.assess
+    log.warning("STT %s error (%s, step=%s, user=%s): %s", kind, prov, step, user_id, message)
+    try:
+        db.run("INSERT INTO stt_errors(user_id,kind,provider,step,message,created_at) VALUES(?,?,?,?,?,?)",
+               user_id, kind, prov, step[:40], message[:1000], db.now())
+    except Exception:   # 记错误本身不能再让请求失败
+        log.exception("could not store STT error")
+
+
+def recent_errors(limit: int = 10) -> list[dict]:
+    return [dict(r) for r in db.q("SELECT kind, provider, step, message, created_at FROM stt_errors ORDER BY id DESC LIMIT ?", limit)]
+
 
 def _session(user_id: int, sid: int) -> dict:
     r = db.one("SELECT * FROM speak_sessions WHERE id=? AND user_id=?", sid, user_id)
@@ -734,4 +754,5 @@ def test_engine(wav: bytes) -> dict:
             out["assess"] = {"ms": int((time.monotonic() - t0) * 1000), **(a.to_dict() if a else {})}
     except STTError as e:
         out["error"] = str(e)
+        record_error("transcribe" if "transcribe" not in out else "assess", str(e), "admin-test")
     return out
