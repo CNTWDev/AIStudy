@@ -64,15 +64,39 @@ const Rec = {
   },
 };
 
-/* 没录到声音时的说明 + 选麦克风（电脑上常见：浏览器没拿到系统的麦克风权限，或用了另一个输入设备） */
-const MIC_HELP = '没收到声音。Mac：系统设置 → 隐私与安全性 → 麦克风，打开浏览器；也看看下面选的是不是你在用的麦克风。';
+/* 换麦克风：收在话筒右下角一个小箭头里（像视频会议软件那样），平时不占地方。
+   有两个以上的麦克风、并且浏览器已经给过权限（才拿得到名字）才出现；没录到声音时自动打开。 */
+const MIC_HELP = '没收到声音。Mac：系统设置 → 隐私与安全性 → 麦克风，打开浏览器；也点话筒右下角的小箭头，看看选的是不是你在用的麦克风。';
+const MIC_CHEV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+/* 后台「语音引擎」测试页用的简单下拉框（练习页用下面的 micDevices） */
 async function micPicker(box) {
   if (!box) return;
-  const ds = await Rec.devices();
+  const ds = await Rec.devices(), cur = Rec.device;
   if (ds.length < 2) { box.innerHTML = ''; return; }
-  const cur = Rec.device;
   box.innerHTML = `<label class="sk-micsel">麦克风 <select>${ds.map((d, i) => `<option value="${esc(d.deviceId)}"${d.deviceId === cur || (!cur && d.deviceId === 'default') ? ' selected' : ''}>${esc(d.label || '麦克风 ' + (i + 1))}</option>`).join('')}</select></label>`;
-  box.querySelector('select').onchange = e => { Rec.device = e.target.value; toast('换好了，再说一次'); };
+  box.querySelector('select').onchange = e => { Rec.device = e.target.value; toast('换好了'); };
+}
+function micDevices(el) {
+  const w = document.createElement('span'); w.className = 'sk-micw'; el.before(w); w.append(el);
+  const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'sk-micdev'; btn.hidden = true;
+  btn.title = btn.ariaLabel = '换麦克风'; btn.innerHTML = MIC_CHEV;
+  const menu = document.createElement('div'); menu.className = 'sk-micmenu'; menu.hidden = true; menu.setAttribute('role', 'menu');
+  w.append(btn, menu);
+  let ds = [];
+  const close = () => { menu.hidden = true; btn.classList.remove('on'); };
+  const draw = () => {
+    const cur = Rec.device || 'default';
+    menu.innerHTML = '<div class="h">麦克风</div>' + ds.map((d, i) => `<button type="button" role="menuitemradio" aria-checked="${d.deviceId === cur}" data-id="${esc(d.deviceId)}">${esc(d.label || '麦克风 ' + (i + 1))}</button>`).join('');
+  };
+  const refresh = async () => { ds = await Rec.devices(); btn.hidden = ds.length < 2; if (btn.hidden) close(); else draw(); };
+  const open = () => { if (btn.hidden) return; draw(); menu.hidden = false; btn.classList.add('on'); };
+  btn.onclick = e => { e.stopPropagation(); menu.hidden ? open() : close(); };
+  menu.onclick = e => { const b = e.target.closest('[data-id]'); if (!b) return; e.stopPropagation(); Rec.device = b.dataset.id; close(); toast('换好了，再说一次'); };
+  document.addEventListener('click', e => { if (!w.contains(e.target)) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  try { navigator.mediaDevices.addEventListener('devicechange', refresh); } catch (e) {}
+  refresh();
+  return {refresh, open: async () => { await refresh(); open(); }};
 }
 
 /* 话筒按钮：按住说、松开结束；轻点一下 = 开始，再点一下 = 结束（说长一点不用一直按着）。
@@ -81,8 +105,7 @@ function micButton(el, o) {
   const max = o.max || 90;
   let state = 'idle', downAt = 0, timer = null, wave = null;
   const hint = o.hint ? $(o.hint) : null, idleHint = hint ? hint.innerHTML : '';
-  const picker = document.createElement('div'); (hint || el).after(picker);
-  micPicker(picker);   // 有好几个麦克风（并且浏览器已经给过权限）才显示
+  const mics = micDevices(el);
   const set = s => { state = s; el.classList.toggle('rec', s === 'rec'); el.classList.toggle('busy', s === 'busy'); el.disabled = s === 'busy' || s === 'off'; };
   const tick = () => {
     const s = (performance.now() - Rec.t0) / 1000;
@@ -96,6 +119,7 @@ function micButton(el, o) {
     if (!Rec.ok()) { toast('这个浏览器录不了音，换 Chrome 或 Safari 试试'); return; }
     set('rec');
     try { await Rec.start(); } catch (e) { set('idle'); toast('没打开话筒：请在浏览器里允许使用麦克风'); return; }
+    mics.refresh();   // 第一次给了权限后才拿得到麦克风的名字
     if (o.wave) { wave = $(o.wave); wave.hidden = false; }
     timer = setInterval(tick, 100); tick();
   };
@@ -107,7 +131,7 @@ function micButton(el, o) {
     if (secs < 0.6) { set('idle'); if (hint) hint.innerHTML = idleHint; return; }
     if (Rec.peak < Rec.SILENT) {   // 录到的是静音：不送去识别，直接说清楚，给出选麦克风
       set('idle'); if (hint) hint.innerHTML = `<span class="sk-err">${MIC_HELP}</span>`;
-      micPicker(picker); return;
+      mics.open(); return;
     }
     set('busy'); if (hint) hint.innerHTML = '正在听你说的…';
     let err = '';

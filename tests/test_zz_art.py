@@ -95,3 +95,13 @@ def test_every_page_has_a_width():
         assert "max-width:880px" not in x, f
     for name in ["login_pick", "settings", "learn", "review", "book_read", "daybook", "kid_form"]:
         assert "{% block width %}read{% endblock %}" in open(f"app/templates/{name}.html", encoding="utf-8").read(), name
+
+
+def test_mic_picker_tucked_away():
+    """换麦克风收在话筒右下角的小箭头里，不在每个话筒下面摆一个下拉框。"""
+    js = open("app/static/speak.js", encoding="utf-8").read()
+    assert "function micDevices(el)" in js and "mics.open()" in js and "mics.refresh()" in js
+    body = js[js.index("function micButton"):]
+    assert "micPicker(" not in body
+    css = open("app/static/app.css", encoding="utf-8").read()
+    assert ".sk-micdev{" in css and ".sk-micmenu{" in css
