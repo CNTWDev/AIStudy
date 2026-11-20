@@ -146,6 +146,19 @@ def api_review_grade(request: Request, body: dict = Body(...)):
     return sp.grade(u["id"], int(body.get("chunk") or 0), bool(body.get("ok")))
 
 
+@router.post("/api/speak/better")
+def api_better(request: Request, body: dict = Body(...)):
+    u = _me(request)
+    return sp.better(u, str(body.get("text") or ""), int(body.get("session") or 0) or None, str(body.get("key") or ""),
+                     int(body.get("chunk") or 0) or None)
+
+
+@router.post("/api/speak/say")
+async def api_say(request: Request, file: UploadFile = File(...), text: str = Form(...), session: int = Form(0)):
+    u = _me(request)
+    return sp.say(u, await _wav(file), text, session or None)
+
+
 @router.post("/api/speak/listen")
 def api_listen(request: Request, body: dict = Body(...)):
     u = _me(request)
