@@ -80,3 +80,10 @@ def test_one_page_width_rule():
     assert "--page-w:1120px" in art
     # 设置里的开关一行一个，不被通用 label 规则挤成两列
     assert "label.sk-switch:has(>input[type=checkbox]){display:flex" in css
+
+
+def test_wide_pages_opt_in():
+    for name in ["today", "subjects", "records", "words", "parent"]:
+        assert "{% block width %}wide{% endblock %}" in open(f"app/templates/{name}.html", encoding="utf-8").read(), name
+    base = open("app/templates/base.html", encoding="utf-8").read()
+    assert 'data-width="{{ width }}"' in base

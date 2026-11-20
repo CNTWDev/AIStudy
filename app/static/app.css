@@ -23,6 +23,10 @@ a{color:var(--brand-ink);text-decoration:none}a:hover{color:var(--brand-ink-d)}
 /* 版心（DESIGN 5.69）：页面宽 --page-w，顶栏和内容对齐同一条线；窄栏 --read-w；两栏 ≥1000px 主区 + --side-w */
 .wrap{max-width:var(--page-w);margin:0 auto;padding:8px var(--gutter) var(--nav-room);box-sizing:border-box}
 .narrow{max-width:var(--read-w);margin-left:auto;margin-right:auto}
+body[data-width=wide]{--page-w:1120px}body[data-width=read]{--page-w:calc(var(--read-w) + 2 * var(--gutter))}
+@media (min-width:1000px){body[data-width]{--gutter:24px}}
+/* 宽版里同类的小卡片两列排；一张卡也不会被拉得很长 */
+@media (min-width:1000px){body[data-width=wide] .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;align-items:start}body[data-width=wide] .grid2>.empty{grid-column:1/-1}}
 /* 顶栏 */
 header.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px max(var(--gutter),calc(50% - var(--page-w) / 2 + var(--gutter)));
 background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid transparent}
@@ -47,7 +51,7 @@ nav.tabs a.play.on{background:transparent}nav.tabs a.play.on .i{transform:transl
 /* 今天页：复习、单词本、乐园的快捷入口 */
 .quick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 14px}
 .quick a{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:18px;background:var(--card);border:1px solid var(--line);color:var(--ink);box-shadow:var(--shadow);min-width:0}
-.quick a .qi{font-size:26px;line-height:1}.quick a b{display:block;font-size:15px}.quick a small{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quick a>span{min-width:0}.quick a .qi{font-size:26px;line-height:1}.quick a b{display:block;font-size:15px}.quick a small{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .quick a.qplay{background:linear-gradient(135deg,#fff3c4,#ffe0ec 60%,#e9e0ff);border-color:#e6d6ff}
 .quick a.qplay.lock{filter:saturate(.55)}.quick a.qplay .pbar{display:block;height:5px;border-radius:9px;background:rgba(0,0,0,.08);margin-top:4px;overflow:hidden}
 .quick a.qplay .pbar i{display:block;height:100%;background:#9b7bff;border-radius:9px}
@@ -620,6 +624,14 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 /* 今天页：一块一块从上往下排，每块整行、高度跟内容走，不再左右两栏各自变高（DESIGN 5.35） */
 .today-main{display:flex;flex-direction:column;gap:14px;margin:14px 0}.today-main>*{margin:0!important}
 @media (min-width:760px){.today-main .quick{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}.today-main .quick a.qplay{grid-column:auto}}
+/* 宽版（≥1000px）：左边今天的任务，右边一栏放快捷入口和一日记录（DESIGN 5.69） */
+@media (min-width:1000px){body[data-width=wide] .today-main{display:grid;grid-template-columns:minmax(0,1fr) var(--side-w);align-items:start;gap:14px 20px}
+body[data-width=wide] .today-main>.tasks{grid-column:1;grid-row:1 / span 9}
+body[data-width=wide] .today-main>:not(.tasks){grid-column:2}
+body[data-width=wide] .today-main .quick{grid-template-columns:1fr 1fr}
+body[data-width=wide] .today-main .daylog .moods button{width:40px;height:40px;font-size:22px}
+body[data-width=wide] .today-main .dl-mood .ig{min-width:0;flex-basis:100%}
+body[data-width=wide] .today-main .daylog .card-h h3 .small{display:block;margin:4px 0 0}}
 /* 一日记录：小伙伴把今天学到的整理成一段话 + 两组知识点；心情一行 */
 .daylog .card-h h3 .small{font-weight:600;margin-left:6px}
 .autosum.with-face{display:flex;gap:12px;align-items:flex-start}

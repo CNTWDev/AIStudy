@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% import "_trend.html" as trend_ui %}
+{% block width %}wide{% endblock %}
 {% block body %}
 <div class="row"><h1 class="grow">家长页</h1><a class="linkbtn" href="/invite">邀请亲友</a> <a class="btn ghost sm" href="/parent/kids/new">＋ 添加孩子或家人</a></div>
 {% if not llm_enabled() %}<div class="hint">提示：服务器还没有配置 AI 密钥。诊断、练习（现成题库）、复习、记录都能用；查词、讲解、AI 出题和 AI 短文需要配置后才能用（见 docs/DEPLOY.md）。</div>{% endif %}

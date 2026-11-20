@@ -32,6 +32,7 @@
 <p class="muted small">这些是已经去掉的课留下的，先不叫你回来复习；重新选上这门课，就接着复习。</p>
 {% for c in cards %}{{ one(c, True) }}{% endfor %}</details>{% endif %}
 {% endmacro %}
+{% block width %}wide{% endblock %}
 {% block body %}
 <a href="/review" class="back">← 复习</a>
 <div class="row"><h1 class="grow">我的本子</h1><a class="btn ghost sm" href="/words/map">🔤 单词包</a></div>
@@ -41,11 +42,13 @@
 {% endfor %}
 </div>
 {% if kind == 'sentence' %}
+<div class="grid2">
 {% for s in sents %}
 <div class="card"><div><b>{{ s.word }}</b>：{{ s.sentence }} {{ '✅' if s.ok else '✏️' }}</div>
 {% if s.fb.corrected %}<div class="small">改正：{{ s.fb.corrected }}</div>{% endif %}
 {% if s.fb.better %}<div class="small muted">示范：{{ s.fb.better }}</div>{% endif %}</div>
 {% else %}<div class="empty card"><div class="e">✍️</div><b>还没有造句</b>在生词本里给单词造个句子，{{ ASSISTANT }}会帮你看看。</div>{% endfor %}
+</div>
 {% elif kind == 'mistake' %}
 <p class="muted small for-grownups">做错的题、点了「这道题还不会」的题都在这里，到时间会叫你回来：做错的原题第二天改一次，之后都换同类的新题（点了「还不会」的直接做新题），在不同的日子做对 2 道就过关；过关 3 周后再用一道新题回头看一眼，还会就真的掌握了。</p>
 {% for c in cards %}
@@ -53,9 +56,11 @@
 {% else %}{% if not paused %}<div class="empty card"><div class="e">🎯</div><b>错题本是空的</b>做错的题、点了「这道题还不会」的题，都会自动放进来。</div>{% endif %}{% endfor %}
 {{ paused_list(paused, mcard) }}
 {% else %}
+<div class="grid2">
 {% for c in cards %}
 {{ wcard(c) }}
 {% else %}{% if not paused %}<div class="empty card"><div class="e">🗒️</div><b>这里还是空的</b>阅读时点词收藏、做错的题，都会自动放进来。</div>{% endif %}{% endfor %}
+</div>
 {{ paused_list(paused, wcard) }}
 {% endif %}
 <script>
