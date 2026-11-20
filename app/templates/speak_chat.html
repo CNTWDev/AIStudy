@@ -45,9 +45,9 @@ async function end() {
   catch (e) { w.fail(); toast(e.message); draw(); }
 }
 function closed(c) {
-  $('#tail').innerHTML = c ? `${c.note ? `<div class="card"><div class="sk-lbl">这次做得最好的</div><div>${esc(c.note)}</div></div>` : ''}
-    ${(c.chunks || []).length ? `<div class="card"><div class="sk-lbl">今天学 ${c.chunks.length} 个表达</div>${chunkList(c.chunks)}</div>` : ''}
-    ${fixBox(c.fix)}
+  $('#tail').innerHTML = c ? `${cheer(`用英文聊了 ${mine()} 轮`, c.note ? `做得最好的：${esc(c.note)}` : '能接得住对方的话，就是真的在用英文了。', {big: true})}
+    ${(c.chunks || []).length ? rise(`<div class="card"><div class="sk-lbl">今天学 ${c.chunks.length} 个表达</div>${chunkList(c.chunks)}</div>`, 1) : ''}
+    ${rise(fixBox(c.fix), 2)}
     <p class="sk-note">${(c.chunks || []).length ? '这几个表达存进了「我的表达库」，明天开始回来复习。' : ''}</p>
     <a class="sk-opt" href="/speak"><div class="oi">再</div><div><div class="n">再来一局 / 再说一件</div><div class="m">回到开口练</div></div><span class="go">›</span></a>
     <p class="sk-hint" style="min-height:0"><a href="/speak" style="color:var(--ink);font-weight:600">先到这里</a> · 多练不算任务，明天也不会变多</p>` : '';

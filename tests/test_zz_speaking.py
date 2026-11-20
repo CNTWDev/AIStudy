@@ -79,6 +79,18 @@ def test_chunk_matching_with_gaps():
     assert speaking.used_chunks("make it easy for our team to start", [{"id": 9, "en": "make it easy for sb to"}]) == [9]
 
 
+
+def test_chunk_said_loosely():
+    """核心意思说出来就算：口头词、冠词、变形和识别听错一个字母都不影响；意思不对还是不算。"""
+    said = lambda text, en: speaking.used_chunks(text, [{"id": 1, "en": en}]) == [1]
+    assert said("uh, We bring AI to H devices.", "Basically, we bring AI to ...")
+    assert said("We need to get it fix by Friday.", "get it fixed")
+    assert said("Did they turn up a issue?", "turn up an issue")
+    assert said("We brought AI to phones", "we bring AI to ...")
+    assert not said("We want AI everywhere.", "Basically, we bring AI to ...")
+    assert not said("I got it.", "get it fixed")
+    assert not said("It is easy.", "make it easy for sb to")
+
 def test_packs_are_valid():
     for p in speaking.packs():
         assert p["accent"] in ("en-US", "en-GB") and p["groups"] and p["plays"]

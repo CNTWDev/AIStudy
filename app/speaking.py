@@ -205,10 +205,66 @@ def chunk_regex(en: str):
     return re.compile(r"(?<![\w'])" + pat + r"(?![\w'])", re.I)
 
 
+# 说话时常加、也常省的词：表达块里有它们，没说也算说出来了（Basically, we bring AI to … ≈ we bring AI to …；
+# a / an / the 识别和口语里都常常对不上）
+_SKIPPABLE = {"basically", "actually", "so", "well", "honestly", "frankly", "just", "really", "look", "listen",
+              "anyway", "ok", "okay", "um", "uh", "oh", "yeah", "now", "and", "but", "a", "an", "the"}
+
+
+def _stem(w: str) -> str:
+    """粗略的词干：fixed / fixing / fixes → fix，used / uses → use，stopped → stop。只用来比较两个词。"""
+    for suf in ("ing", "ed", "es", "s", "d"):
+        if w.endswith(suf) and len(w) - len(suf) >= 3:
+            w = w[:-len(suf)]
+            break
+    if len(w) >= 4 and w[-1] == w[-2] and w[-1] not in "lsz":
+        w = w[:-1]
+    return w[:-1] if len(w) >= 4 and w.endswith("e") else w
+
+
+def _same_word(a: str, b: str) -> bool:
+    """表达块里的一个词 a 和说出来的词 b 算不算同一个：变形（bring/brought、fix/fixed）和识别听错一个字母都算。"""
+    if a == b:
+        return True
+    if a in _IRREG:
+        return b in _IRREG[a].split("|")
+    if len(a) >= 3 and a.isalpha() and _stem(a) == _stem(b):
+        return True
+    if len(a) >= 5 and abs(len(a) - len(b)) <= 1:
+        return sum(x != y for x, y in zip(a, b)) + abs(len(a) - len(b)) <= 1
+    return False
+
+
+def _loose_hit(en: str, words: list[str]) -> bool:
+    """宽松地看这个表达说出来没有：去掉口头词、冠词和 sb/sth/...，剩下的词按顺序出现，相邻两个之间最多隔 3 个词；
+    5 个词以上的表达允许漏一个。只用来判断「说出来了」，页面上的高亮还是按 chunk_regex。"""
+    core = [w.strip(",.?!:;") for w in chunk_key(en).split()]
+    core = [w for w in core if w and w not in ("...", "sb", "sth")]
+    core = [w for w in core if w not in _SKIPPABLE] or core
+    if len(core) < 2:
+        return False
+    allow = 1 if len(core) >= 5 else 0
+    for start, w in enumerate(words):
+        for first in range(allow + 1):            # 允许漏一个时，也可以从第二个词开始
+            if not _same_word(core[first], w):
+                continue
+            missed, pos = first, start + 1
+            for c in core[first + 1:]:
+                hit = next((x for x in range(pos, min(len(words), pos + 4)) if _same_word(c, words[x])), None)
+                if hit is None:
+                    missed += 1
+                else:
+                    pos = hit + 1
+            if missed <= allow:
+                return True
+    return False
+
+
 def used_chunks(text: str, chunks: list[dict]) -> list[int]:
     t = " " + re.sub(r"[^\w'\s㐀-鿿]", " ", (text or "").replace("’", "'")) + " "
     t = re.sub(r"\s+", " ", t)
-    return [c["id"] for c in chunks if chunk_regex(c["en"]).search(t)]
+    words = t.lower().split()
+    return [c["id"] for c in chunks if chunk_regex(c["en"]).search(t) or _loose_hit(c["en"], words)]
 
 
 def _due(days: int) -> str:
@@ -547,18 +603,19 @@ def rewrite(user, sid: int) -> dict:
         native = str(r.get("native") or "").strip()
         raw = [c for c in r.get("chunks") or [] if isinstance(c, dict) and c.get("en")][:3]
         fix = r.get("fix") if isinstance(r.get("fix"), dict) and r["fix"].get("right") else None
+        good = str(r.get("good") or "").strip()[:80]
         src = "ai"
     except llm.LLMError as e:
         if not sc.get("model"):
             raise SpeakError(503, str(e))
-        native, raw, fix, src = sc["model"], [{**c, "yours": ""} for c in sc["chunks"]], None, "pack"
+        native, raw, fix, good, src = sc["model"], [{**c, "yours": ""} for c in sc["chunks"]], None, "", "pack"
     chunks = []
     for c in raw:
         en = str(c["en"]).strip()
         ex = next((x for x in sentences(native) if chunk_regex(en).search(" " + x + " ")), "")
         cid = chunk_upsert(en, str(c.get("zh") or ""), ex if src == "pack" else "", "pack" if src == "pack" else "ai")
         chunks.append({"id": cid, "en": en, "zh": str(c.get("zh") or ""), "yours": str(c.get("yours") or "")})
-    d["rewrite"] = {"native": native, "sentences": sentences(native), "chunks": chunks, "fix": fix, "src": src}
+    d["rewrite"] = {"good": good, "native": native, "sentences": sentences(native), "chunks": chunks, "fix": fix, "src": src}
     _save(s)
     return d["rewrite"]
 

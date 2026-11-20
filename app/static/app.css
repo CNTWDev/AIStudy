@@ -1234,5 +1234,23 @@ a.db-back{display:block;color:var(--ink)}.db-bk{display:flex;gap:10px;align-item
 .sk-tot{display:flex;text-align:center}.sk-tot div{flex:1}.sk-tot b{display:block;font-size:22px;font-weight:800}.sk-tot span{font-size:12px;color:var(--faint)}
 .sk-switch{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line-2)}.sk-switch:first-child{border-top:0}
 .sk-switch .grow{flex:1;min-width:0}.sk-switch small{display:block;color:var(--faint);font-size:12.5px}
+.sk-cheer{display:flex;align-items:center;gap:14px;background:var(--card);border:1.5px solid color-mix(in srgb,var(--ok) 40%,var(--line));
+  border-radius:16px;padding:14px 16px;margin-bottom:12px;animation:pop .45s ease-out both}
+.sk-cheer .t{font-size:17px;font-weight:800;line-height:1.35}.sk-cheer.big .t{font-size:20px}
+.sk-cheer .s{font-size:13.5px;color:var(--muted);margin-top:3px;line-height:1.6}
+.sk-cheer.soft{border-color:var(--brand-3)}
+.sk-badge{position:relative;width:44px;height:44px;flex:none;border-radius:50%;background:var(--ok);color:#fff;display:flex;align-items:center;justify-content:center;
+  animation:seekpop .5s .1s ease-out both}
+.sk-cheer.big .sk-badge{width:52px;height:52px}.sk-cheer.soft .sk-badge{background:var(--brand);color:var(--on-brand)}
+.sk-badge b{font-size:20px;line-height:1}
+.sk-badge svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;animation:skdraw .35s .35s ease-out both}
+.sk-badge i{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:var(--c);opacity:0;animation:skspark .7s ease-out both;pointer-events:none}
+@keyframes skdraw{from{stroke-dashoffset:24}}
+@keyframes skspark{0%{opacity:1;transform:none}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.4)}}
+.sk-rise{animation:seekin .45s ease-out both;animation-delay:var(--d,0s)}
+.sk-up{display:inline-block;margin-left:5px;font-size:12px;color:var(--ok);animation:seekpop .45s ease-out both;animation-delay:var(--d,.5s)}
+.sk-word.got{animation:skgot .4s ease-out both;animation-delay:var(--d,0s)}
+@keyframes skgot{0%{transform:translateY(0)}45%{transform:translateY(-6px);color:var(--ok)}100%{transform:none}}
+.btn.sk-yes{animation:kbounce .35s ease-out}
 .sk-note{font-size:13px;color:var(--muted);padding:0 4px}
 .sk-mini{display:flex;align-items:center;gap:12px}.sk-mini .qi{font-size:20px}

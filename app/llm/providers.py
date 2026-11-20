@@ -197,7 +197,8 @@ class MockProvider(Provider):
 
 
 MOCK = {
-    "speak_rewrite": {"native": "Quick update on the new app: we're pushing the launch back two weeks. Testing turned up an issue with payments. No need to worry, though. We'll use the time to get it fixed properly.",
+    "speak_rewrite": {"good": "「we find some problem」把出了什么事说清楚了，对方一听就懂。",
+                      "native": "Quick update on the new app: we're pushing the launch back two weeks. Testing turned up an issue with payments. No need to worry, though. We'll use the time to get it fixed properly.",
                       "chunks": [{"en": "push ... back", "zh": "推迟", "yours": "推迟"},
                                  {"en": "turn up an issue", "zh": "发现了问题", "yours": "we find some problem"},
                                  {"en": "get it fixed", "zh": "把它修好", "yours": "把它修好"}],

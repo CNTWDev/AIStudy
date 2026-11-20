@@ -41,7 +41,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 3, "passage_check": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1, "word_usage": 1, "word_hooks": 1, "speak_rewrite": 1, "speak_scene": 1, "speak_chat": 1, "speak_chat_close": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 3, "passage_check": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1, "word_usage": 1, "word_hooks": 1, "speak_rewrite": 2, "speak_scene": 1, "speak_chat": 1, "speak_chat_close": 1}
 
 
 def _audience(grade: str, pack) -> str:
@@ -678,7 +678,8 @@ def _speak_sys(accent: str) -> str:
     side = "美式（American English）" if accent.lower().startswith("en-us") else "英式（British English）"
     return ("你是一位很会教成年人开口说英语的教练。学习者是中国的职场成年人，口语基础弱，习惯先想中文再翻译，怕语法出错。"
             f"你给的英文一律用{side}的地道说法和拼写，口语化、自然，像母语同事在工作里会说的，不要书面腔和生僻词。"
-            "你写给学习者看的中文说明简短、平等、不夸张，不说「错了」「不对」，不打分。")
+            "你写给学习者看的中文说明简短、平等、不夸张，不说「错了」「不对」，不打分。"
+            "先说他做得好的地方，再给建议：鼓励要具体（引用他的话），不说空话。")
 
 
 def speak_rewrite(scene: dict, said: str, accent: str, chunks: list[dict], user_id=None) -> dict:
@@ -691,6 +692,8 @@ def speak_rewrite(scene: dict, said: str, accent: str, chunks: list[dict], user_
     user = (f"场景：{scene.get('situation', '')}\n要说清：{'、'.join(scene.get('goals') or [])}\n{ref}"
             f"学习者刚才说的（语音转文字，可能夹着中文，可能有口误和重复）：{said or '（几乎没说出来）'}\n\n"
             "请：\n"
+            "- good：一句中文（30 字以内），说他刚才这段话里做得最好的一点，要具体，引用他的原话"
+            "（比如用对了哪个说法、把哪个要点说清楚了、敢把整件事说完）。他几乎没说出来，就肯定他开口了。\n"
             "- native：把学习者想表达的意思（以他说的为准，没说到的要点可以按场景补一句）写成母语者在这个场合会说的话。"
             "长度和他说的差不多（2 到 4 句），只比他的水平高一点点，用他下次能记住、能说出口的表达，不要炫技。\n"
             "- chunks：从 native 里挑最值得学的 3 个（最多 3 个）「表达块」：整块拿来就能用的短语或句式，不是单个生词。"
@@ -700,7 +703,7 @@ def speak_rewrite(scene: dict, said: str, accent: str, chunks: list[dict], user_
             "- fix：只挑一处最影响对方理解、或者最常见的语法问题（不是用词地道不地道，那是 chunks 的事）："
             "wrong（他原话里那几个词）、right（改好的那几个词）、why（一句中文说明规则）、kind（这类问题的名字，4 到 8 个字，"
             "比如「过去的事用过去式」「名词复数」「第三人称单数」，同一类问题每次用同一个名字）。没有值得改的就给 null。\n"
-            '输出：{"native":"..","chunks":[{"en":"..","zh":"..","yours":".."}],"fix":{"wrong":"..","right":"..","why":"..","kind":".."}}')
+            '输出：{"good":"..","native":"..","chunks":[{"en":"..","zh":"..","yours":".."}],"fix":{"wrong":"..","right":"..","why":"..","kind":".."}}')
     return ask_json("speak_rewrite", _speak_sys(accent), user, user_id=user_id, effort="low", max_tokens=1500, cache=False)
 
 
