@@ -27,17 +27,20 @@ function show() {
 function result(r) {
   const c = ITEMS[k];
   $('#micbox').remove();
-  const top = !r ? cheer('想不起来很正常', '听一遍常见说法，跟着小声说一次。明天它还会回来，第二次就快了。', {soft: true, quiet: true, icon: '▶'})
+  // 系统认出说出来了，就直接记成说出来了，不再让人自己选；没认出（或点了「想不起来」）就记成明天再来，
+  // 留一个不显眼的「其实我说出来了」给识别听错的时候改（DESIGN 5.67：口语不严格判，多给机会说）
+  let ok = !!(r && r.hit);
+  const top = !r ? cheer('想不起来很正常', '听一遍常见说法，跟着说一遍。明天它还会回来，第二次就快了。', {soft: true, quiet: true, icon: '▶'})
     : r.hit ? cheer('说出来了！', `「${esc(c.en)}」正在变成你自己的。${c.box ? `这是第 ${c.box + 1} 次复习，越来越熟了。` : ''}`, {big: true})
-    : cheer('开口说了，这就有用', '对照下面的常见说法再读一遍，记得更牢。系统没认出这个表达不一定是你没说（语音识别也会听错），你觉得说出来了就点「说出来了」。', {soft: true, icon: '👏'});
+    : cheer('开口说了，这就有用', '对照下面的常见说法，跟着再说一遍，记得更牢。', {soft: true, icon: '👏'});
   $('#res').innerHTML = top + `<div class="card sk-rise" style="--d:.2s">${r ? `<div class="sk-lbl">你说的</div><div class="sk-en">${markChunks(r.text, [c]) || '<span class="muted">（没听清）</span>'}</div>` : ''}
       <div class="sk-lbl" style="margin-top:12px">常见说法</div>
       <div class="sk-en row" style="gap:8px;flex-wrap:nowrap">${playBtn(c.say, ACCENT)}<span>${markChunks(c.say, [c])}</span></div>
 </div>
-    <div id="echo"><p class="sk-hint" style="min-height:0;margin:0 0 10px"><a href="#" id="echobtn" style="font-weight:700">🎙 跟着常见说法再说一遍</a></p></div>
-    <div class="row" style="gap:10px"><button class="btn ghost" id="no">没说出来</button><button class="btn" id="yes">说出来了</button></div>
-    <p class="sk-hint" style="min-height:0">没说出来的，明天再来一次</p>`;
-  if (!r) { $('#no').className = 'btn'; $('#yes').className = 'btn ghost'; }
+    <div id="echo"><p class="sk-hint" style="min-height:0;margin:0 0 10px"><a href="#" id="echobtn" style="font-weight:700">🎙 ${ok ? '再说一遍' : '跟着常见说法再说一遍'}</a></p></div>
+    <button class="btn" id="next" style="width:100%">${k + 1 < ITEMS.length ? '下一个 ›' : '做完了 ›'}</button>
+    <p class="sk-hint" style="min-height:0" id="fixline">${ok ? '' : `这一个明天再来 · <a href="#" id="said" class="faint">其实我说出来了</a>`}</p>`;
+  const setOk = () => { ok = true; $('#fixline').innerHTML = ''; };
   // 多给一次开口：听完常见说法，跟着说一遍（说多少遍都行，每一遍都算开口时长）
   const echo = e => {
     e.preventDefault(); Speak.stop();
@@ -47,17 +50,18 @@ function result(r) {
       const x = await sendClip('/api/speak/review/clip', blob, {chunk: c.id});
       $('#echo').innerHTML = cheer(x.hit ? '这次说出来了！' : '又多说了一遍', x.text ? `你说的：${markChunks(x.text, [c])}` : '', {soft: !x.hit, icon: x.hit ? '' : '🎙', quiet: !x.hit}) +
         '<p class="sk-hint" style="min-height:0;margin:0 0 10px"><a href="#" id="echobtn" style="font-weight:700">🎙 再说一遍</a></p>';
-      if (x.hit) { $('#yes').className = 'btn'; $('#no').className = 'btn ghost'; }
+      if (x.hit) setOk();
       $('#echobtn').onclick = echo;
     }});
   };
-  $('#echobtn').onclick = echo;   // 只有点了「想不起来，看看」才默认是没说出来；识别结果只是参考，由本人定
-  const grade = async ok => {
+  $('#echobtn').onclick = echo;
+  const next = async () => {
     try { await api('/api/speak/review/grade', {chunk: c.id, ok, free: MORE}); } catch (e) { toast(e.message); return; }
-    if (ok) { said++; $('#yes').classList.add('sk-yes'); await new Promise(f => setTimeout(f, 320)); }
+    if (ok) { said++; $('#next').classList.add('sk-yes'); await new Promise(f => setTimeout(f, 320)); }
     k++; show();
   };
-  $('#yes').onclick = () => grade(true); $('#no').onclick = () => grade(false);
+  $('#next').onclick = next;
+  if ($('#said')) $('#said').onclick = e => { e.preventDefault(); setOk(); next(); };
   if (!r) Speak.play(c.say, ACCENT, 'sentence');
 }
 function finish() {
