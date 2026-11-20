@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% from "_speak.html" import mic, wave, steps %}
 {% block title %}复习表达 · 开口练{% endblock %}
+{% block art %}studio{% endblock %}
 {% block body %}
-<div class="sk-top"><a href="/speak" class="linkbtn" aria-label="回到开口练">‹</a><h1>开口练</h1><span class="r" id="cnt"></span></div>
+<div class="sk-top"><a href="/speak" class="linkbtn" aria-label="回到开口练">×</a><h1>开口练</h1><span class="r" id="cnt"></span></div>
 {% if then %}{{ steps(0) }}{% endif %}
 <div id="stage"></div>
 <template id="mictpl">{{ wave() }}{{ mic() }}<div class="sk-hint" id="hint"></div></template>
@@ -17,7 +18,7 @@ function show() {
   const c = ITEMS[k];
   $('#cnt').textContent = `${MORE ? '多说几个' : '复习'} ${k + 1} / ${ITEMS.length}`;
   stage.innerHTML = `<div class="card" style="text-align:center;padding:26px 16px"><div class="sk-lbl">用英文说</div>
-      <div style="font-size:24px;font-weight:800;margin:6px 0">${esc(c.zh || c.en)}</div>
+      <div class="sk-title" style="margin:6px 0">${esc(c.zh || c.en)}</div>
       <div class="small faint">${MORE ? '自由练，不影响复习安排' : c.box ? `第 ${c.box + 1} 次复习` : '第 1 次复习'}</div></div>
     <div id="res"></div><div id="micbox">${$('#mictpl').innerHTML}</div>`;
   $('#hint').innerHTML = '按住说一句完整的话，松开结束<br><a href="#" id="peek">想不起来，看看</a>';
@@ -38,8 +39,8 @@ function result(r) {
       <div class="sk-en row" style="gap:8px;flex-wrap:nowrap">${playBtn(c.say, ACCENT)}<span>${markChunks(c.say, [c])}</span></div>
 </div>
     <div id="rbetter"></div>
-    <div id="echo"><p class="sk-hint" style="min-height:0;margin:0 0 10px"><a href="#" id="echobtn" style="font-weight:700">🎙 ${ok ? '再说一遍' : '跟着常见说法再说一遍'}</a></p></div>
-    <button class="btn" id="next" style="width:100%">${k + 1 < ITEMS.length ? '下一个 ›' : '做完了 ›'}</button>
+    <div id="echo"><p class="sk-hint" style="min-height:0;margin:0 0 10px"><a href="#" id="echobtn" style="font-weight:700">${ok ? '再说一遍' : '跟着常见说法再说一遍'}</a></p></div>
+    <button class="btn" id="next" data-key="↵" style="width:100%">${k + 1 < ITEMS.length ? '下一个' : '做完了'}</button>
     <p class="sk-hint" style="min-height:0" id="fixline">${ok ? '' : `这一个明天再来 · <a href="#" id="said" class="faint">其实我说出来了</a>`}</p>`;
   const setOk = () => { ok = true; $('#fixline').innerHTML = ''; };
   // 多给一次开口：听完常见说法，跟着说一遍（说多少遍都行，每一遍都算开口时长）
@@ -50,7 +51,7 @@ function result(r) {
     micButton($('#mic'), {hint: '#hint', wave: '#wave', recHint: '照着上面那句说', onClip: async blob => {
       const x = await sendClip('/api/speak/review/clip', blob, {chunk: c.id});
       $('#echo').innerHTML = cheer(x.hit ? '这次说出来了！' : '又多说了一遍', x.text ? `你说的：${markChunks(x.text, [c])}` : '', {soft: !x.hit, icon: x.hit ? '' : '🎙', quiet: !x.hit}) +
-        '<p class="sk-hint" style="min-height:0;margin:0 0 10px"><a href="#" id="echobtn" style="font-weight:700">🎙 再说一遍</a></p>';
+        '<p class="sk-hint" style="min-height:0;margin:0 0 10px"><a href="#" id="echobtn" style="font-weight:700">再说一遍</a></p>';
       if (x.hit) setOk();
       $('#echobtn').onclick = echo;
     }});

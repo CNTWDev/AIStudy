@@ -696,6 +696,28 @@ def say(user, wav: bytes, text: str, sid: int | None = None) -> dict:
             "ok": got >= 0.75 * len(mk), "over": OVER_NOTE if c["over"] else ""}
 
 
+def goals(user, sid: int) -> dict:
+    """先说完：要说清的几点，说到了哪几点（打勾鼓励用，宽松；AI 不可用就不打勾，什么都不挡）。结果存在这一遍里。"""
+    s = _session(user["id"], sid)
+    d = s["data"]
+    first = d.get("first") or {}
+    gs = [str(g) for g in (scene_of(s).get("goals") or [])][:5]
+    if not gs or not first.get("text"):
+        return {"hit": []}
+    if isinstance(first.get("goals"), list):
+        return {"hit": first["goals"]}
+    try:
+        r = llm.speak_goals(gs, first["text"][:1500], accent_of(s), user_id=user["id"])
+    except llm.LLMError:
+        return {"hit": []}
+    raw = [h for h in (r.get("hit") or []) if isinstance(h, dict)]
+    hit = [{"ok": bool(h.get("ok")), "quote": str(h.get("quote") or "")[:60]} for h in raw][:len(gs)]
+    hit += [{"ok": False, "quote": ""}] * (len(gs) - len(hit))
+    first["goals"] = hit
+    _save(s)
+    return {"hit": hit}
+
+
 def rewrite(user, sid: int) -> dict:
     """第 2 步：地道版。AI 不可用时退回课程包里写好的参考说法（自己的场景就只能等 AI）。"""
     s = _session(user["id"], sid)

@@ -209,6 +209,7 @@ MOCK = {
     "speak_better": {"good": "「No need to worry」先安抚对方，很自然。",
                      "better": "So we are pushing the launch back two weeks. Testing turned up an issue with payments. No need to worry, we will use the time to get it fixed.",
                      "points": [{"wrong": "we are", "right": "we're", "zh": "我们正在", "why": "口语里常用缩写，听起来更自然。", "kind": "口语缩写"}]},
+    "speak_goals": {"hit": [{"ok": True, "quote": "two weeks"}, {"ok": True, "quote": "we find some problem"}, {"ok": False, "quote": ""}]},
     "speak_scene": {"title": "下午和供应商谈价", "situation": "下午和供应商开会，你要说明年的量会翻倍，希望单价降 10%。", "goals": ["量会翻倍", "希望降价 10%"]},
     "speak_chat": {"reply": "OK, I see. But how can I be sure it won't slip again?",
                    "better": "I completely understand. The delay is because testing turned up an issue with payments.",

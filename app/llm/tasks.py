@@ -41,7 +41,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 3, "passage_check": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1, "word_usage": 1, "word_hooks": 1, "speak_rewrite": 3, "speak_better": 1, "speak_scene": 1, "speak_chat": 2, "speak_chat_close": 2}
+PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 3, "passage_check": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1, "word_usage": 1, "word_hooks": 1, "speak_rewrite": 3, "speak_better": 1, "speak_goals": 1, "speak_scene": 1, "speak_chat": 2, "speak_chat_close": 2}
 
 
 def _audience(grade: str, pack) -> str:
@@ -695,6 +695,16 @@ def speak_better(text: str, accent: str, context: str = "", user_id=None) -> dic
             "- points：改了的地方，按重要程度最多 3 处：" + _POINTS + "。没有值得改的就给 []，不要硬找。\n"
             '输出：{"good":"..","better":"..","points":[{"wrong":"..","right":"..","zh":"..","why":"..","kind":".."}]}')
     return ask_json("speak_better", _speak_sys(accent), user, user_id=user_id, effort="low", max_tokens=900, cache=False)
+
+
+def speak_goals(goals: list[str], said: str, accent: str, user_id=None) -> dict:
+    """先说完：场景要说清的几点，他说到了哪几点（宽松：意思到了就算，说中文也算）。只用来打勾鼓励，不扣分。"""
+    user = ("要说清的几点：\n" + "\n".join(f"{i + 1}. {g}" for i, g in enumerate(goals)) +
+            f"\n\n学习者刚才说的（语音转文字，可能夹中文、有口误）：{said or '（几乎没说出来）'}\n\n"
+            "逐点判断他说到了没有：意思到了就算说到，夹着中文说的也算，从宽。每点给 ok（true/false）和 quote"
+            "（他原话里说到这一点的那几个词，原样引用，8 个词以内；没说到就给空字符串）。按顺序，一点一个。\n"
+            '输出：{"hit":[{"ok":true,"quote":".."}]}')
+    return ask_json("speak_goals", _speak_sys(accent), user, user_id=user_id, effort="low", max_tokens=400, cache=False)
 
 
 def speak_rewrite(scene: dict, said: str, accent: str, chunks: list[dict], user_id=None) -> dict:

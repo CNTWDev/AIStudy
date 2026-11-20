@@ -366,7 +366,7 @@ def test_listen_and_speak_totals():
         c.post("/api/speak/listen", json={"secs": 330})
         t = c.get("/api/speak/totals").json()
         assert t["listen"]["secs"] == 600 and t["listen"]["today"] == 600 and t["listen"]["reached"] == 10 and t["listen"]["next"] == 30
-        assert "一点一点攒起来" in c.get("/speak").text
+        assert "累计开口" in c.get("/speak").text and "Totals.hero" in c.get("/speak").text
 
 
 def test_shadow_marks_are_loose():
@@ -389,3 +389,15 @@ def test_better_then_say_it_again():
         assert {"marks", "got", "of", "ok"} <= r.keys() and r["of"] == len(b["better"].split())
         assert c.post("/api/speak/say", files={"file": ("clip.wav", WAV, "audio/wav")}, data={"text": " "}).status_code == 400
         assert speaking.records(uid)["common"]
+
+
+def test_goals_ticked_after_first_try():
+    """先说完：要说清的几点，AI 看说到了哪几点打勾；结果存下来，再要一次不再问 AI"""
+    with TestClient(app) as c:
+        _adult(c)
+        sid = _sid(c.get("/speak/go", follow_redirects=False))
+        assert c.post("/api/speak/goals", json={"session": sid}).json() == {"hit": []}   # 还没说
+        assert _post_clip(c, "/api/speak/clip", session=sid, step="first").status_code == 200
+        hit = c.post("/api/speak/goals", json={"session": sid}).json()["hit"]
+        assert hit and all(set(h) == {"ok", "quote"} for h in hit) and any(h["ok"] for h in hit)
+        assert c.post("/api/speak/goals", json={"session": sid}).json()["hit"] == hit

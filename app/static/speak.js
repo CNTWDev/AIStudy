@@ -126,6 +126,15 @@ function micButton(el, o) {
   el.addEventListener('pointerleave', () => { if (state === 'rec' && !o.tapMode && performance.now() - downAt > 450) finish(); });
   el.addEventListener('pointercancel', () => { if (state === 'rec' && !o.tapMode) finish(); });   // 来电、切走：说到哪算到哪
   el.addEventListener('contextmenu', e => e.preventDefault());
+  // 电脑上：按住空格说，松开结束（话筒在页面上、焦点不在输入框里时）
+  const typing = () => { const a = document.activeElement; return a && (a.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); };
+  const kd = e => {
+    if (!el.isConnected) { removeEventListener('keydown', kd); removeEventListener('keyup', ku); return; }
+    if (e.code !== 'Space' || typing() || el.closest('[hidden]')) return;
+    e.preventDefault(); if (!e.repeat && state === 'idle') { o.tapMode = false; begin(); }
+  };
+  const ku = e => { if (e.code === 'Space' && el.isConnected && state === 'rec' && !typing()) { e.preventDefault(); finish(); } };
+  addEventListener('keydown', kd); addEventListener('keyup', ku);
   return {off() { set('off'); }, on() { set('idle'); if (hint) hint.innerHTML = idleHint; }};
 }
 
@@ -177,6 +186,12 @@ const Totals = {
     };
     return line('累计开口', t.speak) + line('累计听', t.listen);
   },
+  /* 开口练首页的大数字（展厅）：累计开口，不满 1 小时按分钟，之后「6h12」；下面一行离下一站还差多少、累计听 */
+  hero(t) {
+    const m = Math.floor(t.speak.secs / 60), h = Math.floor(m / 60), left = Math.max(0, t.speak.next - m);
+    const big = h ? `<span data-from="0" data-to="${h}">${h}</span><i>h</i>${String(m % 60).padStart(2, '0')}` : `<span data-from="0" data-to="${m}">${m}</span><i>min</i>`;
+    return `<div class="v">${big}</div><div class="small">${left ? `离 ${milestone(t.speak.next)}，还差 ${dur(left * 60)}` : ''}${t.speak.today >= 60 ? ` · 今天 +${dur(t.speak.today)}` : ''}<br>累计听 ${dur(t.listen.secs)}</div>`;
+  },
   async show(box, after) {
     if (!box) return;
     Heard.flush();
@@ -214,17 +229,18 @@ document.addEventListener('click', e => {
 });
 /* 先鼓励，再建议（DESIGN 5.67）：每次说完，先把做到的、进步的地方放在最上面，带一下动效；建议排在后面，只给一条。
    动效只在本人说完、点完之后放一次；系统设置了「减少动态效果」就不动。 */
-const SPARK = ['var(--ok)', 'var(--brand)', 'var(--sun)', 'var(--sky)'];
+/* 鼓励的样子是「纸本」的展览标题（DESIGN 5.68）：标题一个字一个字落下来，几粒金点从标题末尾散开，下面一行说具体做到了什么。
+   soft：轻一点的鼓励（没散开的金点）；quiet：不放金点；big：说完一整件事时的大标题。o.icon 以前是徽章里的图标，现在不用。 */
 function cheer(title, sub, o = {}) {
-  const sparks = o.quiet ? '' : Array.from({length: 10}, (_, i) => {
-    const a = i / 10 * Math.PI * 2, r = 30 + (i % 3) * 7;
-    return `<i style="--dx:${Math.round(Math.cos(a) * r)}px;--dy:${Math.round(Math.sin(a) * r)}px;--c:${SPARK[i % 4]};animation-delay:${0.32 + (i % 3) * 0.04}s"></i>`;
+  const chars = [...String(title)], n = chars.length, sd = (0.08 + n * 0.055 + 0.2).toFixed(2);
+  const sparks = o.quiet || o.soft ? '' : Array.from({length: 7}, (_, i) => {
+    const a = -Math.PI * (0.15 + i * 0.12), r = 26 + (i % 3) * 12;
+    return `<i class="sp" style="--x:${Math.min(92, 8 + n * 7)}%;--dx:${Math.round(Math.cos(a) * r)}px;--dy:${Math.round(Math.sin(a) * r)}px;width:${6 - (i % 3)}px;height:${6 - (i % 3)}px"></i>`;
   }).join('');
-  const icon = o.icon ? `<b>${esc(o.icon)}</b>` : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
-  return `<div class="sk-cheer${o.soft ? ' soft' : ''}${o.big ? ' big' : ''}" role="status"><div class="sk-badge">${icon}${sparks}</div>
-    <div style="min-width:0"><div class="t">${esc(title)}</div>${sub ? `<div class="s">${sub}</div>` : ''}</div></div>`;
+  return `<div class="sk-cheer${o.soft ? ' soft' : ''}${o.big ? ' big' : ''}" role="status" style="--sd:${sd}s">` +
+    `<div class="t" aria-label="${esc(title)}">${chars.map((c, i) => `<span style="--i:${i}" aria-hidden="true">${esc(c)}</span>`).join('')}</div>${sparks}` +
+    `${sub ? `<div class="s">${sub}</div>` : ''}</div>`;
 }
-/* 数字从第一遍滚到这一遍 */
 function countUp(root) {
   $$('[data-to]', root).forEach(el => {
     const a = +el.dataset.from, b = +el.dataset.to, dec = String(el.dataset.to).includes('.') ? 1 : 0, t0 = performance.now();
@@ -249,6 +265,37 @@ function wins(rows) {
   });
 }
 /* 一组卡片依次浮上来 */
+/* 一屏两栏（DESIGN 5.68「展厅」）：左边一件大作品，右边一栏展签。手机上上下排，电脑上左右排 */
+const two = (main, side) => `<div class="sk-two"><div class="sk-main">${main}</div><aside class="sk-side">${side || ''}</aside></div>`;
+/* 说完：每个数一张卡，大数从第一遍滚到这一遍，变好了的右上角写变好了多少（DESIGN 5.68「工作台」） */
+function metricCards(rows) {
+  const n = v => Math.round(v * 10) / 10;
+  return `<div class="sk-mets">` + (rows || []).map((r, i) => {
+    const has = r.a !== null && r.a !== undefined && r.b !== null && r.b !== undefined;
+    const d = has ? (r.better === 'low' ? r.a - r.b : r.b - r.a) : 0;
+    const u = r.of !== undefined ? `/${r.of}` : r.unit === '秒' ? '″' : (r.unit || '');
+    const tag = d > 0 ? (r.of !== undefined ? `+${n(d)}` : r.better === 'low' ? `${r.unit === '秒' ? '快了' : '少了'} ${n(d)}${r.unit === '秒' ? '″' : ''}` : `+${n(d)}`) : '';
+    return `<div class="card sk-met sk-rise" style="--d:${(0.1 + i * 0.08).toFixed(2)}s"><div class="k"><span>${esc(r.k)}</span>${tag ? `<em>${tag}</em>` : ''}</div>` +
+      `<div class="v"><span${d > 0 ? ` data-from="${r.a}" data-to="${r.b}"` : ''}>${has ? r.b : esc(String(r.b ?? '—'))}</span><small>${esc(u)}</small></div>` +
+      `<div class="was">第一遍 ${r.a === null || r.a === undefined ? '—' : r.a + u}</div></div>`;
+  }).join('') + `</div>`;
+}
+/* 快捷键（电脑）：回车 = 这一屏的主按钮；R / S = 再听 / 慢一点；1 2 3 = 听今天的第几个表达。输入框里不算 */
+addEventListener('keydown', e => {
+  const a = document.activeElement;
+  if (e.metaKey || e.ctrlKey || e.altKey || (a && (a.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)))) return;
+  const vis = el => el && el.offsetParent !== null;
+  const k = e.key === 'Enter' ? '↵' : e.key.toUpperCase();
+  const b = [...document.querySelectorAll(`[data-key="${k}"]`)].filter(vis).pop();
+  if (b) { e.preventDefault(); b.click(); return; }
+  if (/^[1-3]$/.test(e.key)) { const c = [...document.querySelectorAll('.sk-list .li b')].filter(vis)[+e.key - 1]; if (c) { e.preventDefault(); c.closest('.li').click(); } }
+});
+/* 点一个表达（句子里的、列表里的）就念出来 */
+document.addEventListener('click', e => {
+  const c = e.target.closest('.sk-chunk, .sk-list .li'); if (!c || e.target.closest('a,button')) return;
+  const t = (c.matches('.li') ? $('b', c) : c).textContent.replace(/…|\.\.\./g, ' ').trim();
+  c.classList.add('saying'); Speak.stop(); Speak.play(t, (typeof S !== 'undefined' && S.accent) || (typeof ACCENT !== 'undefined' && ACCENT) || 'en-us', 'sentence').catch(() => {}).finally(() => c.classList.remove('saying'));
+});
 const rise = (html, i) => `<div class="sk-rise" style="--d:${(0.12 * i).toFixed(2)}s">${html}</div>`;
 
 function fmt(v, unit) { return v === null || v === undefined ? '—' : `${v}${unit ? ' ' + unit : ''}`; }
@@ -297,7 +344,7 @@ function betterBox(b, orig, o = {}) {
 }
 let _sayN = 0;
 function sayZone(text, o = {}) {
-  return `<div class="sk-sayz" data-text="${esc(text)}" data-session="${esc(o.session || '')}"><a href="#" class="sk-saybtn">🎙 照着说一遍</a></div>`;
+  return `<div class="sk-sayz" data-text="${esc(text)}" data-session="${esc(o.session || '')}"><a href="#" class="sk-saybtn">照着说一遍</a></div>`;
 }
 /* 点「照着说一遍」：就地放一个话筒，说完标出说对的词；说多少遍都行 */
 document.addEventListener('click', e => {
@@ -312,7 +359,7 @@ document.addEventListener('click', e => {
     const words = r.marks.map((w, k) => `<span class="sk-word${w.ok ? ' got' : ' miss'}" style="--d:${(k * 0.04).toFixed(2)}s">${esc(w.w)}</span>`).join('');
     z.innerHTML = (r.ok ? cheer('说顺了！', '改好的说法已经到你嘴边了。', {quiet: r.got < r.of}) :
       cheer(`说对了 ${r.got} / ${r.of} 个词`, '灰色的几个再来一遍，越说越顺。', {soft: true, quiet: true, icon: '🎙'})) +
-      `<div class="sk-en" style="margin:-4px 0 8px">${words}</div><a href="#" class="sk-saybtn">🎙 再说一遍</a>`;
+      `<div class="sk-en" style="margin:-4px 0 8px">${words}</div><a href="#" class="sk-saybtn">再说一遍</a>`;
   }});
 });
 

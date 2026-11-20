@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% from "_speak.html" import mic, wave %}
 {% block title %}和 AI 聊 · 开口练{% endblock %}
+{% block art %}studio{% endblock %}
 {% block body %}
 {% set pl = s.data.play %}
-<div class="sk-top"><a href="/speak" class="linkbtn" aria-label="回到开口练">‹</a><h1>和 AI 聊</h1><span class="r" id="cnt"></span></div>
+<div class="sk-top"><a href="/speak" class="linkbtn" aria-label="回到开口练">×</a><h1>和 AI 聊</h1><span class="r" id="cnt"></span></div>
 <div class="card" style="padding:12px 14px">
   <div class="small"><b>这一局</b>：{{ pl.setup }}{% if pl.goal %}<span class="faint"> 你要：{{ pl.goal }}</span>{% endif %}</div>
 </div>
