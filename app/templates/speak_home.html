@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}开口练 · {{ SITE }}{% endblock %}
+{% block art %}paper{% endblock %}
 {% block body %}
 <div class="sk-top"><h1>开口练</h1><span class="r">英语口语{% if lib %} · 表达库 {{ lib }} 个{% endif %}</span></div>
 {% if not engine.transcribe.on %}

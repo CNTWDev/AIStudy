@@ -214,17 +214,18 @@ document.addEventListener('click', e => {
 });
 /* 先鼓励，再建议（DESIGN 5.67）：每次说完，先把做到的、进步的地方放在最上面，带一下动效；建议排在后面，只给一条。
    动效只在本人说完、点完之后放一次；系统设置了「减少动态效果」就不动。 */
-const SPARK = ['var(--ok)', 'var(--brand)', 'var(--sun)', 'var(--sky)'];
+/* 鼓励的样子是「纸本」的展览标题（DESIGN 5.68）：标题一个字一个字落下来，几粒金点从标题末尾散开，下面一行说具体做到了什么。
+   soft：轻一点的鼓励（没散开的金点）；quiet：不放金点；big：说完一整件事时的大标题。o.icon 以前是徽章里的图标，现在不用。 */
 function cheer(title, sub, o = {}) {
-  const sparks = o.quiet ? '' : Array.from({length: 10}, (_, i) => {
-    const a = i / 10 * Math.PI * 2, r = 30 + (i % 3) * 7;
-    return `<i style="--dx:${Math.round(Math.cos(a) * r)}px;--dy:${Math.round(Math.sin(a) * r)}px;--c:${SPARK[i % 4]};animation-delay:${0.32 + (i % 3) * 0.04}s"></i>`;
+  const chars = [...String(title)], n = chars.length, sd = (0.08 + n * 0.055 + 0.2).toFixed(2);
+  const sparks = o.quiet || o.soft ? '' : Array.from({length: 7}, (_, i) => {
+    const a = -Math.PI * (0.15 + i * 0.12), r = 26 + (i % 3) * 12;
+    return `<i class="sp" style="--x:${Math.min(92, 8 + n * 7)}%;--dx:${Math.round(Math.cos(a) * r)}px;--dy:${Math.round(Math.sin(a) * r)}px;width:${6 - (i % 3)}px;height:${6 - (i % 3)}px"></i>`;
   }).join('');
-  const icon = o.icon ? `<b>${esc(o.icon)}</b>` : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
-  return `<div class="sk-cheer${o.soft ? ' soft' : ''}${o.big ? ' big' : ''}" role="status"><div class="sk-badge">${icon}${sparks}</div>
-    <div style="min-width:0"><div class="t">${esc(title)}</div>${sub ? `<div class="s">${sub}</div>` : ''}</div></div>`;
+  return `<div class="sk-cheer${o.soft ? ' soft' : ''}${o.big ? ' big' : ''}" role="status" style="--sd:${sd}s">` +
+    `<div class="t" aria-label="${esc(title)}">${chars.map((c, i) => `<span style="--i:${i}" aria-hidden="true">${esc(c)}</span>`).join('')}</div>${sparks}` +
+    `${sub ? `<div class="s">${sub}</div>` : ''}</div>`;
 }
-/* 数字从第一遍滚到这一遍 */
 function countUp(root) {
   $$('[data-to]', root).forEach(el => {
     const a = +el.dataset.from, b = +el.dataset.to, dec = String(el.dataset.to).includes('.') ? 1 : 0, t0 = performance.now();

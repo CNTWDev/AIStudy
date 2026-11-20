@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% from "_speak.html" import mic, wave, steps, choices %}
 {% block title %}{{ sc.title }} · 开口练{% endblock %}
+{% block art %}paper{% endblock %}
 {% block body %}
 <div class="sk-top"><a href="/speak" class="linkbtn" aria-label="回到开口练">‹</a><h1>开口练</h1><span class="r">{{ sc.group }}</span></div>
 {{ steps(1) }}
@@ -14,8 +15,8 @@ const S = {id: {{ s.id }}, data: {{ s.data|tojson }}, accent: {{ accent|lower|to
 const stage = $('#stage');
 const setStep = n => $$('#sksteps span').forEach((x, i) => { x.className = i < n ? 'd' : i === n ? 'c' : ''; });
 const micHtml = () => $('#mictpl').innerHTML;
-const sceneCard = (small) => `<div class="card"><div class="sk-lbl">场景 · ${esc(S.sc.title)}</div>
-  <div class="sk-scene"${small ? ' style="font-size:15px"' : ''}>${esc(S.sc.situation)}</div>
+const sceneCard = (small) => `<div class="card sk-hero"><div class="sk-lbl">场景</div>
+  ${small ? '' : `<h2 class="sk-title">${esc(S.sc.title)}</h2>`}<div class="sk-scene"${small ? ' style="font-size:15px"' : ''}>${esc(S.sc.situation)}</div>
   ${(S.sc.goals || []).length ? `<div class="sk-goals">要说清：${S.sc.goals.map(esc).join(' · ')}</div>` : ''}</div>`;
 
 /* 第 1 步：先说 */

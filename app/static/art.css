@@ -1,0 +1,148 @@
+/* ===== 艺术品风格「纸本」（DESIGN 5.68）：一页一个主角，字就是画面，只用一种亮色，动效是仪式，没有框 =====
+   页面在模板里写 {% block art %}paper{% endblock %} 就打开（body[data-art=paper]），只在打开的页面上生效。
+   第一批只有「开口练」；以后一页一页打开。浅色是纸和墨，深色是夜里的一束光（方向 B）。
+   中文标题用系统宋体（苹果设备自带），没有时退回黑体；英文句子和数字用 Fraunces（自带，OFL）。 */
+@font-face{font-family:"Fraunces";font-style:normal;font-weight:300 600;font-display:swap;src:url(/static/fonts/fraunces.woff2) format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2190-2193,U+2212,U+2215}
+@font-face{font-family:"Fraunces";font-style:italic;font-weight:300;font-display:swap;src:url(/static/fonts/fraunces-italic.woff2) format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2190-2193,U+2212,U+2215}
+
+body[data-art=paper]{
+  --bg:#f4efe6;--card:#f4efe6;--ink:#23201c;--muted:#5c564c;--faint:#736b5f;--line:#dcd3c4;--line-2:#e7e0d4;
+  --brand:#edb045;--brand-d:#e3a332;--brand-2:#f7e3b8;--brand-3:#efd08c;--brand-ink:#7a5410;--brand-ink-d:#5e400b;--on-brand:#23201c;
+  --ok:#44704f;--ok-2:#e3ebe2;--warn:#b5582c;--coral:#c4512f;
+  --mic:#23201c;--mic-ic:#edb045;--glow:transparent;
+  --f-serif:"Songti SC","STSong","Noto Serif SC","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif;
+  --f-latin:"Fraunces",Georgia,"Times New Roman",var(--f-serif)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) body[data-art=paper]{
+  --bg:#1b1915;--card:#1b1915;--ink:#ece5d7;--muted:#b3a999;--faint:#8c8475;--line:#36322b;--line-2:#2a2722;
+  --brand:#e2b862;--brand-d:#eac478;--brand-2:#3d3426;--brand-3:#5a4a2e;--brand-ink:#e8c47e;--brand-ink-d:#f0d49c;--on-brand:#1b1915;
+  --ok:#8cc79c;--ok-2:#23302a;--warn:#e39a6c;--coral:#e39a6c;
+  --mic:radial-gradient(circle at 50% 38%,#ffe2a8,#e2b862 48%,#a8752a);--mic-ic:#1b1915;--glow:rgba(232,182,92,.35)}}
+:root[data-theme=dark] body[data-art=paper]{
+  --bg:#1b1915;--card:#1b1915;--ink:#ece5d7;--muted:#b3a999;--faint:#8c8475;--line:#36322b;--line-2:#2a2722;
+  --brand:#e2b862;--brand-d:#eac478;--brand-2:#3d3426;--brand-3:#5a4a2e;--brand-ink:#e8c47e;--brand-ink-d:#f0d49c;--on-brand:#1b1915;
+  --ok:#8cc79c;--ok-2:#23302a;--warn:#e39a6c;--coral:#e39a6c;
+  --mic:radial-gradient(circle at 50% 38%,#ffe2a8,#e2b862 48%,#a8752a);--mic-ic:#1b1915;--glow:rgba(232,182,92,.35)}
+/* 深色：底下有一点暖光，像夜里桌上的一盏灯 */
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) body[data-art=paper]{background:radial-gradient(120% 60% at 50% 100%,#2a2419 0%,var(--bg) 60%) fixed var(--bg)}}
+:root[data-theme=dark] body[data-art=paper]{background:radial-gradient(120% 60% at 50% 100%,#2a2419 0%,var(--bg) 60%) fixed var(--bg)}
+
+/* —— 通用：去掉框、阴影和色块，只用留白和 1px 细线分层 —— */
+[data-art=paper] .wrap{max-width:620px;padding-top:4px}
+[data-art=paper] header.top{border-bottom:0}
+[data-art=paper] .card{background:none;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;padding:22px 0 20px;margin:0}
+[data-art=paper] .btn{border-radius:999px;min-height:54px;padding:12px 28px;font-size:16px;font-weight:600;letter-spacing:.06em;border:0;box-shadow:0 10px 30px -10px var(--glow)}
+[data-art=paper] .btn.soft,[data-art=paper] .btn.ghost{background:none;border:1px solid var(--line);color:var(--ink);box-shadow:none;min-height:46px;font-weight:500;letter-spacing:.02em}
+[data-art=paper] .btn.soft:hover,[data-art=paper] .btn.ghost:hover{border-color:var(--ink);background:none;color:var(--ink)}
+[data-art=paper] .pill{background:none;border:1px solid var(--line);color:var(--muted);font-weight:500}
+[data-art=paper] textarea,[data-art=paper] select{background:transparent;border:1px solid var(--line);border-radius:14px;color:var(--ink)}
+[data-art=paper] .quick{gap:0;grid-template-columns:1fr 1fr;margin:0}
+[data-art=paper] .quick a{background:none;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;padding:16px 0}
+[data-art=paper] .quick a .qi{display:none}
+[data-art=paper] .tiny,[data-art=paper] .small{line-height:1.7}
+/* 底部导航：只有字，当前的一页下面一个墨点 */
+[data-art=paper] nav.tabs{background:color-mix(in srgb,var(--bg) 90%,transparent);border:1px solid var(--line);box-shadow:none;padding:4px}
+[data-art=paper] nav.tabs a{font-size:13px;letter-spacing:.12em;padding:12px 4px 10px;gap:5px;color:var(--faint)}
+[data-art=paper] nav.tabs a .i{display:none}
+[data-art=paper] nav.tabs a::after{content:"";width:5px;height:5px;border-radius:50%;background:transparent}
+[data-art=paper] nav.tabs a.on,[data-art=paper] nav.tabs a.play.on{background:none;color:var(--ink);font-weight:600}
+[data-art=paper] nav.tabs a.on::after{background:var(--ink)}
+[data-art=paper] nav.tabs a:hover{background:none;color:var(--ink)}
+[data-art=paper] nav.tabs a.play{color:var(--faint)}
+
+/* —— 开口练 —— */
+[data-art=paper] .sk-top{margin:8px 0 6px}
+[data-art=paper] .sk-top h1{font:600 15px/1.4 var(--f-serif);letter-spacing:.32em}
+[data-art=paper] .sk-top .r{font:300 14px var(--f-latin);color:var(--faint);letter-spacing:.02em}
+[data-art=paper] .linkbtn{font-size:22px;line-height:1;padding:4px 8px 6px 0;color:var(--ink)}
+[data-art=paper] .linkbtn:hover{background:none}
+[data-art=paper] .sk-steps{gap:4px;margin:6px 0 26px}
+[data-art=paper] .sk-steps span{border-top:1px solid var(--line);border-radius:0;padding-top:9px;font-size:11px;letter-spacing:.12em}
+[data-art=paper] .sk-steps span.d{border-top:1px solid var(--ink)}
+[data-art=paper] .sk-steps span.c{border-top:3px solid var(--ink);padding-top:7px;color:var(--ink);font-weight:600}
+[data-art=paper] .sk-lbl,[data-art=paper] .sk-fix .lbl{font-size:11.5px;font-weight:400;letter-spacing:.22em;color:var(--faint);margin-bottom:10px}
+[data-art=paper] .sk-title{font:600 30px/1.35 var(--f-serif);letter-spacing:.02em;margin:0 0 16px;text-wrap:balance}
+[data-art=paper] .sk-scene{font-size:15.5px;line-height:1.9;color:var(--muted)}
+[data-art=paper] .sk-goals{font-size:13px;color:var(--faint);margin-top:14px}
+[data-art=paper] .sk-en{font:300 21px/1.6 var(--f-latin);letter-spacing:-.003em}
+[data-art=paper] .sk-big{font:300 30px/1.42 var(--f-latin);letter-spacing:-.01em}
+[data-art=paper] .sk-zh{background:none;padding:0 1px;color:var(--faint);font-family:var(--f-serif);font-size:.86em}
+/* 今天要学的表达：下面一道蜂蜜色的划痕，出现时从左往右画出来 */
+[data-art=paper] .sk-chunk{background:linear-gradient(var(--brand-2),var(--brand-2)) no-repeat 0 88%/100% 42%;box-shadow:none;border-radius:0;padding:0 1px;font-weight:inherit;
+  animation:artdraw .6s .25s cubic-bezier(.3,.7,.2,1) both}
+@keyframes artdraw{from{background-size:0% 42%}}
+[data-art=paper] .sk-list .li{border-top:1px solid var(--line);padding:13px 0}
+[data-art=paper] .sk-list .li:first-child{border-top:0}
+[data-art=paper] .sk-list b{font:600 16px var(--f-latin);letter-spacing:0}
+[data-art=paper] .sk-fix{background:none;border:0;border-left:2px solid var(--brand);border-radius:0;padding:2px 0 2px 16px;margin:18px 0}
+[data-art=paper] .sk-fix b{font-family:var(--f-latin);font-weight:600}
+
+/* 话筒：浅色是一块墨，中间一点蜂蜜色；深色是一颗会发光的球 */
+[data-art=paper] .sk-mic{background:var(--mic);box-shadow:0 0 40px 4px var(--glow);margin-top:22px}
+[data-art=paper] .sk-mic svg{color:var(--mic-ic);width:32px;height:32px}
+[data-art=paper] .sk-mic.rec{background:var(--mic);box-shadow:0 0 0 12px var(--bg),0 0 0 13px var(--brand),0 0 60px 10px var(--glow);animation:artbreathe 1.6s ease-in-out infinite}
+[data-art=paper] .sk-mic.rec svg{color:var(--mic-ic)}
+@keyframes artbreathe{50%{box-shadow:0 0 0 16px var(--bg),0 0 0 17px var(--brand),0 0 80px 16px var(--glow)}}
+[data-art=paper] .sk-wave{gap:4px;height:44px}
+[data-art=paper] .sk-wave i{width:2px;background:var(--ink);opacity:.85}
+[data-art=paper] .sk-hint{color:var(--faint);line-height:1.8}
+[data-art=paper] .sk-time{font:400 15px var(--f-latin);color:var(--ink)}
+[data-art=paper] .sk-play{color:var(--ink);font-weight:500}
+[data-art=paper] .sk-play i{background:none;box-shadow:inset 0 0 0 1px var(--line);width:28px;height:28px;font-size:9px}
+[data-art=paper] .sk-dots i{width:7px;height:7px;background:none;box-shadow:inset 0 0 0 1px var(--line)}
+[data-art=paper] .sk-dots i.d{background:var(--ink);box-shadow:none}
+[data-art=paper] .sk-word.miss{color:var(--faint);opacity:.55;text-decoration:none}
+
+/* 「还想说一会儿」这类选项：一行一行的目录，没有卡片 */
+[data-art=paper] .sk-opt{background:none;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;padding:15px 0;margin:0}
+[data-art=paper] .sk-opt:last-of-type{border-bottom:1px solid var(--line)}
+[data-art=paper] .sk-opt .oi{width:auto;height:auto;background:none;color:var(--faint);font:300 15px var(--f-serif);min-width:18px}
+[data-art=paper] .sk-opt .n{font-weight:500}
+[data-art=paper] .sk-opt .go{font:300 18px var(--f-latin);color:var(--faint)}
+[data-art=paper] .sk-opt+.sk-hint{margin-top:16px}
+[data-art=paper] .sk-opt:has(+ .sk-opt){border-bottom:0}
+
+/* 首页、记录页：像画册的目录页 */
+[data-art=paper] .sk-hero{border-top:0;padding-top:12px}
+[data-art=paper] .sk-hero h2{font:600 32px/1.32 var(--f-serif);letter-spacing:.02em;margin:4px 0 12px;text-wrap:balance}
+[data-art=paper] .sk-hero .btn{margin-top:6px}
+[data-art=paper] .sk-acc b,[data-art=paper] .sk-tot b,[data-art=paper] .sk-metric .v{font:300 30px/1.15 var(--f-latin);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+[data-art=paper] .sk-acc .bar{height:1px;background:var(--line);overflow:visible}
+[data-art=paper] .sk-acc .bar i{height:3px;margin-top:-1px;background:var(--ink)}
+[data-art=paper] .sk-acc+.sk-acc{border-top:0}
+[data-art=paper] .sk-metric{border-top:1px solid var(--line);padding:16px 0}
+[data-art=paper] .sk-switch{border-top:1px solid var(--line);padding:14px 0}
+[data-art=paper] .sk-tot b{font-size:34px}
+
+/* 和 AI 聊：没有气泡，像剧本 */
+[data-art=paper] .sk-bub{background:none;border:0;border-radius:0;padding:2px 0 2px 14px;max-width:92%;font-size:16px;line-height:1.7}
+[data-art=paper] .sk-bub.ai{border-left:1px solid var(--line);font-family:var(--f-latin);font-weight:300;font-size:18px}
+[data-art=paper] .sk-bub.me{border:0;border-right:2px solid var(--brand);padding:2px 14px 2px 0;text-align:right}
+[data-art=paper] .sk-who{font-weight:400;letter-spacing:.2em;font-size:11px;margin-top:6px}
+
+/* 第一遍和这一遍：大号细衬线数字，从第一遍滚到这一遍 */
+[data-art=paper] .sk-cmp{font-size:14px;grid-template-columns:1.2fr 1fr 1fr}
+[data-art=paper] .sk-cmp div{border-top:1px solid var(--line);padding:13px 0;display:flex;align-items:baseline}
+[data-art=paper] .sk-cmp .hd{border-top:0;font-weight:400;letter-spacing:.2em;font-size:11px}
+[data-art=paper] .sk-cmp div:not(.hd):nth-child(3n+2){font:300 20px var(--f-latin);color:var(--faint)}
+[data-art=paper] .sk-cmp div:not(.hd):nth-child(3n){font:300 24px var(--f-latin);font-variant-numeric:tabular-nums}
+[data-art=paper] .sk-cmp .now{font:300 28px var(--f-latin);color:var(--ok);font-variant-numeric:tabular-nums}
+[data-art=paper] .sk-note{color:var(--faint);padding:0}
+
+/* —— 先鼓励：像展览的标题，一个字一个字落下来，几粒金点散开（只放一次；减少动态效果时不动） —— */
+.sk-cheer{position:relative;padding:6px 0 22px}
+.sk-cheer .t{font:600 26px/1.3 var(--f-serif,serif);letter-spacing:.02em;text-wrap:balance;text-shadow:0 0 30px var(--glow,transparent)}
+.sk-cheer.big .t{font-size:40px;line-height:1.22}
+.sk-cheer .t span{display:inline-block;animation:artdrop .55s cubic-bezier(.3,1.5,.5,1) both;animation-delay:calc(var(--i) * 55ms + 80ms)}
+.sk-cheer .s{font-size:14.5px;line-height:1.8;color:var(--muted);margin-top:12px;animation:seekin .5s both;animation-delay:var(--sd,.5s)}
+.sk-cheer .s b{font-family:var(--f-latin,inherit);font-weight:500;color:var(--ink)}
+.sk-cheer.soft .t{font-size:22px}.sk-cheer.soft .s{margin-top:8px}
+.sk-cheer .sp{position:absolute;left:var(--x);top:18px;width:6px;height:6px;border-radius:50%;background:var(--brand);opacity:0;pointer-events:none;
+  animation:artspark 1.1s ease-out both;animation-delay:var(--sd,.5s)}
+@keyframes artdrop{from{opacity:0;transform:translateY(-.6em)}}
+@keyframes artspark{0%{opacity:0;transform:none}25%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.5)}}
+.sk-rise{animation:seekin .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d,0s)}
+.sk-up{display:inline-block;margin-left:5px;font-size:12px;color:var(--ok);animation:seekpop .45s ease-out both;animation-delay:var(--d,.5s)}
+.btn.sk-yes{animation:kbounce .35s ease-out}
+@media (prefers-reduced-motion:reduce){[data-art=paper] *,.sk-cheer *{animation:none!important}}

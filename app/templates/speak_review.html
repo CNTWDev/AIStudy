@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% from "_speak.html" import mic, wave, steps %}
 {% block title %}复习表达 · 开口练{% endblock %}
+{% block art %}paper{% endblock %}
 {% block body %}
 <div class="sk-top"><a href="/speak" class="linkbtn" aria-label="回到开口练">‹</a><h1>开口练</h1><span class="r" id="cnt"></span></div>
 {% if then %}{{ steps(0) }}{% endif %}
@@ -17,7 +18,7 @@ function show() {
   const c = ITEMS[k];
   $('#cnt').textContent = `${MORE ? '多说几个' : '复习'} ${k + 1} / ${ITEMS.length}`;
   stage.innerHTML = `<div class="card" style="text-align:center;padding:26px 16px"><div class="sk-lbl">用英文说</div>
-      <div style="font-size:24px;font-weight:800;margin:6px 0">${esc(c.zh || c.en)}</div>
+      <div class="sk-title" style="margin:6px 0">${esc(c.zh || c.en)}</div>
       <div class="small faint">${MORE ? '自由练，不影响复习安排' : c.box ? `第 ${c.box + 1} 次复习` : '第 1 次复习'}</div></div>
     <div id="res"></div><div id="micbox">${$('#mictpl').innerHTML}</div>`;
   $('#hint').innerHTML = '按住说一句完整的话，松开结束<br><a href="#" id="peek">想不起来，看看</a>';

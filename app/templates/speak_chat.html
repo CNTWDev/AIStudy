@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% from "_speak.html" import mic, wave %}
 {% block title %}和 AI 聊 · 开口练{% endblock %}
+{% block art %}paper{% endblock %}
 {% block body %}
 {% set pl = s.data.play %}
 <div class="sk-top"><a href="/speak" class="linkbtn" aria-label="回到开口练">‹</a><h1>和 AI 聊</h1><span class="r" id="cnt"></span></div>
