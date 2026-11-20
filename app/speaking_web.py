@@ -126,6 +126,12 @@ def api_rewrite(request: Request, body: dict = Body(...)):
     return streamed(request, lambda: sp.rewrite(u, int(body.get("session") or 0)))
 
 
+@router.post("/api/speak/goals")
+def api_goals(request: Request, body: dict = Body(...)):
+    u = _me(request)
+    return sp.goals(u, int(body.get("session") or 0))
+
+
 @router.post("/api/speak/review/clip")
 async def api_review_clip(request: Request, file: UploadFile = File(...), chunk: int = Form(...)):
     """复习：看中文说英文。识别出来的话里有没有这个表达，系统先帮着判一下，最后由本人点「说出来了 / 没说出来」。"""

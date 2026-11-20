@@ -1,4 +1,4 @@
-"""艺术品风格「展厅」（DESIGN 5.68）：页面自己声明打开，第一批只有开口练；没声明的页面不受影响；字体自带、颜色够清楚；电脑上能按住空格说。"""
+"""「工作台」样子（DESIGN 5.68）：页面自己声明打开，第一批只有开口练；没声明的页面不受影响；颜色够清楚；练习页是专注模式；电脑上有快捷键、能按住空格说。"""
 import re
 import uuid
 from pathlib import Path
@@ -17,12 +17,12 @@ def _adult(c):
     c.post("/login", data={"email": email, "password": "secret123"})
 
 
-def test_gallery_only_where_declared():
+def test_studio_only_where_declared():
     with TestClient(app) as c:
         _adult(c)
         for url in ("/speak", "/speak/records", "/speak/review"):
             page = c.get(url).text
-            assert 'data-art="gallery"' in page and "/static/art.css" in page, url
+            assert 'data-art="studio"' in page and "/static/art.css" in page, url
         today = c.get("/today").text
         assert "data-art=" not in today and "/static/art.css" not in today
 
@@ -39,9 +39,9 @@ def _ratio(a, b):
     return (la + 0.05) / (lb + 0.05)
 
 
-def test_gallery_tokens_readable_and_fonts_local():
+def test_studio_tokens_readable_and_fonts_local():
     css = (ROOT / "static" / "art.css").read_text(encoding="utf-8")
-    blocks = re.findall(r"body\[data-art=gallery\]\{([^}]*--bg:[^}]*)\}", css)
+    blocks = re.findall(r"body\[data-art=studio\]\{([^}]*--bg:[^}]*)\}", css)
     assert len(blocks) == 3   # 浅色，深色（跟系统），深色（手动）
     for b in blocks:
         tok = dict(re.findall(r"--([\w-]+):(#[0-9a-f]{6})", b))
@@ -52,16 +52,18 @@ def test_gallery_tokens_readable_and_fonts_local():
     # 字体都在自己服务器上（服务器在海外、孩子在国内，不能靠谷歌字体）
     for f in re.findall(r"url\((/static/fonts/[^)]+)\)", css):
         assert (ROOT / f.removeprefix("/")).exists(), f
-    assert "googleapis" not in css and (ROOT / "static" / "fonts" / "InstrumentSerif-OFL.txt").exists()
+    assert "googleapis" not in css
     # 减少动态效果时不动
     assert "prefers-reduced-motion" in css
 
 
-def test_gallery_practice_screens_are_quiet():
+def test_studio_practice_screens_are_quiet():
     """练习屏上没有顶栏、底栏；话筒在电脑上能按住空格；声纹够细够多"""
     css = (ROOT / "static" / "art.css").read_text(encoding="utf-8")
-    assert "[data-art=gallery] header.top,[data-art=gallery] nav.tabs" in css
+    assert "body[data-art=studio]:has(.sk-top .linkbtn) header.top" in css
+    assert "[data-key]::after" in css   # 快捷键写在按钮上
     js = (ROOT / "static" / "speak.js").read_text(encoding="utf-8")
     assert "e.code !== 'Space'" in js and "removeEventListener('keydown', kd)" in js
     tpl = (ROOT / "templates" / "_speak.html").read_text(encoding="utf-8")
     assert "range(40)" in tpl
+    assert "/api/speak/goals" in (ROOT / "templates" / "speak_scene.html").read_text(encoding="utf-8")

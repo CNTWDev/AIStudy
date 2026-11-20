@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}开口练 · {{ SITE }}{% endblock %}
-{% block art %}gallery{% endblock %}
+{% block art %}studio{% endblock %}
 {% block body %}
-<div class="sk-top"><a href="/" class="linkbtn" aria-label="回到首页">×</a><h1>开口练</h1><span class="r">英语口语{% if lib %} · 表达库 {{ lib }} 个{% endif %}</span></div>
+<div class="sk-top"><h1>开口练</h1><span class="r">英语口语{% if lib %} · 表达库 {{ lib }} 个{% endif %}</span></div>
 {% if not engine.transcribe.on %}
 <div class="note-bar">语音识别还没配置好：{{ engine.transcribe.why }}。{% if user.is_admin or user.role == 'admin' %}<a href="/admin?tab=system#sttcard">去管理页</a>{% else %}请管理员在服务器的 config/stt.toml 里选一家。{% endif %}</div>
 {% endif %}

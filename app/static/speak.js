@@ -267,17 +267,35 @@ function wins(rows) {
 /* 一组卡片依次浮上来 */
 /* 一屏两栏（DESIGN 5.68「展厅」）：左边一件大作品，右边一栏展签。手机上上下排，电脑上左右排 */
 const two = (main, side) => `<div class="sk-two"><div class="sk-main">${main}</div><aside class="sk-side">${side || ''}</aside></div>`;
-/* 说完那一屏的大数字：挑一个变好了的数（没有就挑第一个有数的），从第一遍滚到这一遍 */
-function heroNum(rows) {
-  const has = r => r.a !== null && r.a !== undefined && r.b !== null && r.b !== undefined;
-  const up = r => has(r) && (r.better === 'low' ? r.b < r.a : r.b > r.a);
-  const r = (rows || []).find(up) || (rows || []).find(has);
-  if (!r) return {html: '', row: null};
-  const u = r.of !== undefined ? `<small>/${r.of}</small>` : r.unit === '秒' ? '<small>″</small>' : '';
-  const a = r.of !== undefined ? `${r.a}/${r.of}` : `${r.a}${r.unit === '秒' ? '″' : r.unit ? ' ' + r.unit : ''}`;
-  return {row: r, html: `<div class="sk-heronum"><div class="v"><span${up(r) ? ` data-from="${r.a}" data-to="${r.b}"` : ''}>${r.b}</span>${u}</div>` +
-    `<div class="sk-lbl">${esc(r.k)} · 第一遍 ${esc(a)}</div></div>`};
+/* 说完：每个数一张卡，大数从第一遍滚到这一遍，变好了的右上角写变好了多少（DESIGN 5.68「工作台」） */
+function metricCards(rows) {
+  const n = v => Math.round(v * 10) / 10;
+  return `<div class="sk-mets">` + (rows || []).map((r, i) => {
+    const has = r.a !== null && r.a !== undefined && r.b !== null && r.b !== undefined;
+    const d = has ? (r.better === 'low' ? r.a - r.b : r.b - r.a) : 0;
+    const u = r.of !== undefined ? `/${r.of}` : r.unit === '秒' ? '″' : (r.unit || '');
+    const tag = d > 0 ? (r.of !== undefined ? `+${n(d)}` : r.better === 'low' ? `${r.unit === '秒' ? '快了' : '少了'} ${n(d)}${r.unit === '秒' ? '″' : ''}` : `+${n(d)}`) : '';
+    return `<div class="card sk-met sk-rise" style="--d:${(0.1 + i * 0.08).toFixed(2)}s"><div class="k"><span>${esc(r.k)}</span>${tag ? `<em>${tag}</em>` : ''}</div>` +
+      `<div class="v"><span${d > 0 ? ` data-from="${r.a}" data-to="${r.b}"` : ''}>${has ? r.b : esc(String(r.b ?? '—'))}</span><small>${esc(u)}</small></div>` +
+      `<div class="was">第一遍 ${r.a === null || r.a === undefined ? '—' : r.a + u}</div></div>`;
+  }).join('') + `</div>`;
 }
+/* 快捷键（电脑）：回车 = 这一屏的主按钮；R / S = 再听 / 慢一点；1 2 3 = 听今天的第几个表达。输入框里不算 */
+addEventListener('keydown', e => {
+  const a = document.activeElement;
+  if (e.metaKey || e.ctrlKey || e.altKey || (a && (a.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)))) return;
+  const vis = el => el && el.offsetParent !== null;
+  const k = e.key === 'Enter' ? '↵' : e.key.toUpperCase();
+  const b = [...document.querySelectorAll(`[data-key="${k}"]`)].filter(vis).pop();
+  if (b) { e.preventDefault(); b.click(); return; }
+  if (/^[1-3]$/.test(e.key)) { const c = [...document.querySelectorAll('.sk-list .li b')].filter(vis)[+e.key - 1]; if (c) { e.preventDefault(); c.closest('.li').click(); } }
+});
+/* 点一个表达（句子里的、列表里的）就念出来 */
+document.addEventListener('click', e => {
+  const c = e.target.closest('.sk-chunk, .sk-list .li'); if (!c || e.target.closest('a,button')) return;
+  const t = (c.matches('.li') ? $('b', c) : c).textContent.replace(/…|\.\.\./g, ' ').trim();
+  c.classList.add('saying'); Speak.stop(); Speak.play(t, (typeof S !== 'undefined' && S.accent) || (typeof ACCENT !== 'undefined' && ACCENT) || 'en-us', 'sentence').catch(() => {}).finally(() => c.classList.remove('saying'));
+});
 const rise = (html, i) => `<div class="sk-rise" style="--d:${(0.12 * i).toFixed(2)}s">${html}</div>`;
 
 function fmt(v, unit) { return v === null || v === undefined ? '—' : `${v}${unit ? ' ' + unit : ''}`; }

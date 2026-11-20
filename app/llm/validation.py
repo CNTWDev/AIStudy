@@ -12,7 +12,7 @@ REQUIRED = {
     'discuss': {'steelman': str, 'challenge': str}, 'discuss_close': {'shift': str},
     'word_examples': {'words': list}, 'word_usage': {'words': list}, 'word_hooks': {'words': list}, 'passage_check': {'ok': bool},
     'speak_rewrite': {'native': str, 'chunks': list}, 'speak_scene': {'situation': str},
-    'speak_chat': {'reply': str}, 'speak_better': {'better': str}, 'speak_chat_close': {'chunks': list},
+    'speak_chat': {'reply': str}, 'speak_better': {'better': str}, 'speak_goals': {'hit': list}, 'speak_chat_close': {'chunks': list},
 }
 
 
