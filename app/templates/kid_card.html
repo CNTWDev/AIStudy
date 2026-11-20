@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block width %}read{% endblock %}
 {% block body %}
 {# 家长刚添加完一个家人：照着这张卡告诉 TA 怎么登录。4 位数字只在这一次显示（存的是加密后的），忘了就在家长页重设。可以打印出来。 #}
 {% set pin_user = uses_pin(k) %}

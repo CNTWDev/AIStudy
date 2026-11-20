@@ -77,13 +77,21 @@ def test_one_page_width_rule():
     assert ".wrap{max-width:var(--page-w)" in css
     assert "calc(50% - var(--page-w) / 2 + var(--gutter))" in css
     assert "424px" not in css and "1160px" not in art
-    assert "--page-w:1120px" in art
+    assert "--page-w:1120px" in css
     # 设置里的开关一行一个，不被通用 label 规则挤成两列
     assert "label.sk-switch:has(>input[type=checkbox]){display:flex" in css
 
 
-def test_wide_pages_opt_in():
-    for name in ["today", "subjects", "records", "words", "parent"]:
-        assert "{% block width %}wide{% endblock %}" in open(f"app/templates/{name}.html", encoding="utf-8").read(), name
+def test_every_page_has_a_width():
+    """默认 1120 宽版；读和写为主的页面用 680 窄栏，顶栏不跟着变。"""
+    import glob, os
+    css = open("app/static/app.css", encoding="utf-8").read()
+    assert "body[data-width=read] .wrap{max-width:calc(var(--read-w) + 2 * var(--gutter))}" in css
     base = open("app/templates/base.html", encoding="utf-8").read()
     assert 'data-width="{{ width }}"' in base
+    for f in glob.glob("app/templates/*.html"):
+        x = open(f, encoding="utf-8").read()
+        assert "{% block width %}wide" not in x, f  # 宽版是默认，不用写
+        assert "max-width:880px" not in x, f
+    for name in ["login_pick", "settings", "learn", "review", "book_read", "daybook", "kid_form"]:
+        assert "{% block width %}read{% endblock %}" in open(f"app/templates/{name}.html", encoding="utf-8").read(), name

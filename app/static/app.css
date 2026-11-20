@@ -7,7 +7,7 @@
 --sun:#f5b301;--sun-2:#fdf3da;--sky:#2f6fdc;--sky-2:#e9f0fd;--coral:#e0573a;--coral-2:#fdeee9;--violet:#6d4fd8;--violet-2:#f0ecfd;--wing:#d6eeff;
 --radius:20px;--r-sm:12px;--shadow:0 1px 2px rgba(43,33,24,.04),0 6px 20px rgba(43,33,24,.06);--shadow-lg:0 12px 32px rgba(43,33,24,.16);
 --ring:0 0 0 4px rgba(245,186,69,.35);--heat-0:#eee8dc;--heat-1:#fbe6b4;--heat-2:#f8d27a;--heat-3:#f0b545;--heat-4:#c8932e;
---page-w:880px;--read-w:680px;--side-w:340px;--gutter:16px;--nav-room:calc(110px + env(safe-area-inset-bottom));
+--page-w:1120px;--read-w:680px;--side-w:340px;--gutter:16px;--nav-room:calc(110px + env(safe-area-inset-bottom));
 --f-round:"Fredoka",ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
 @media (prefers-color-scheme:dark){:root{--bg:#23211e;--card:#2c2926;--ink:#e6dfd2;--muted:#ada391;--faint:#8a8172;--line:#3c3732;--line-2:#322e2a;
 --brand:#e2b862;--brand-d:#eac478;--brand-2:#3a3225;--brand-3:#584a30;--brand-ink:#ddb467;--brand-ink-d:#eac888;--on-brand:#211a10;--on-warn:#2b2118;
@@ -23,10 +23,11 @@ a{color:var(--brand-ink);text-decoration:none}a:hover{color:var(--brand-ink-d)}
 /* 版心（DESIGN 5.69）：页面宽 --page-w，顶栏和内容对齐同一条线；窄栏 --read-w；两栏 ≥1000px 主区 + --side-w */
 .wrap{max-width:var(--page-w);margin:0 auto;padding:8px var(--gutter) var(--nav-room);box-sizing:border-box}
 .narrow{max-width:var(--read-w);margin-left:auto;margin-right:auto}
-body[data-width=wide]{--page-w:1120px}body[data-width=read]{--page-w:calc(var(--read-w) + 2 * var(--gutter))}
-@media (min-width:1000px){body[data-width]{--gutter:24px}}
+/* 窄栏页面：顶栏还是全站一样宽（换页时不跳），只有内容收窄居中 */
+body[data-width=read] .wrap{max-width:calc(var(--read-w) + 2 * var(--gutter))}
+@media (min-width:1000px){:root{--gutter:24px}}
 /* 宽版里同类的小卡片两列排；一张卡也不会被拉得很长 */
-@media (min-width:1000px){body[data-width=wide] .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;align-items:start}body[data-width=wide] .grid2>.empty{grid-column:1/-1}}
+@media (min-width:1000px){.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;align-items:start}.grid2>.empty{grid-column:1/-1}}
 /* 顶栏 */
 header.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px max(var(--gutter),calc(50% - var(--page-w) / 2 + var(--gutter)));
 background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid transparent}
@@ -625,13 +626,13 @@ background:linear-gradient(150deg,hsl(var(--h) 70% 88%),hsl(calc(var(--h) + 40) 
 .today-main{display:flex;flex-direction:column;gap:14px;margin:14px 0}.today-main>*{margin:0!important}
 @media (min-width:760px){.today-main .quick{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}.today-main .quick a.qplay{grid-column:auto}}
 /* 宽版（≥1000px）：左边今天的任务，右边一栏放快捷入口和一日记录（DESIGN 5.69） */
-@media (min-width:1000px){body[data-width=wide] .today-main{display:grid;grid-template-columns:minmax(0,1fr) var(--side-w);align-items:start;gap:14px 20px}
-body[data-width=wide] .today-main>.tasks{grid-column:1;grid-row:1 / span 9}
-body[data-width=wide] .today-main>:not(.tasks){grid-column:2}
-body[data-width=wide] .today-main .quick{grid-template-columns:1fr 1fr}
-body[data-width=wide] .today-main .daylog .moods button{width:40px;height:40px;font-size:22px}
-body[data-width=wide] .today-main .dl-mood .ig{min-width:0;flex-basis:100%}
-body[data-width=wide] .today-main .daylog .card-h h3 .small{display:block;margin:4px 0 0}}
+@media (min-width:1000px){.today-main{display:grid;grid-template-columns:minmax(0,1fr) var(--side-w);align-items:start;gap:14px 20px}
+.today-main>.tasks{grid-column:1;grid-row:1 / span 9}
+.today-main>:not(.tasks){grid-column:2}
+.today-main .quick{grid-template-columns:1fr 1fr}
+.today-main .daylog .moods button{width:40px;height:40px;font-size:22px}
+.today-main .dl-mood .ig{min-width:0;flex-basis:100%}
+.today-main .daylog .card-h h3 .small{display:block;margin:4px 0 0}}
 /* 一日记录：小伙伴把今天学到的整理成一段话 + 两组知识点；心情一行 */
 .daylog .card-h h3 .small{font-weight:600;margin-left:6px}
 .autosum.with-face{display:flex;gap:12px;align-items:flex-start}

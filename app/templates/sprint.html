@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}冲刺 · {{ SITE }}{% endblock %}
+{% block width %}read{% endblock %}
 {% block body %}
 <link rel="stylesheet" href="/static/play/play.css?v={{ ASSET_V }}">
 <div id="sp" class="sp" data-info='{{ {"open": open, "drill": drill, "drill_min": drill_min, "today": today_points, "best": best, "tier_at": tier_at, "goal_name": goal.goal_name, "goal_need": goal.goal_need or 0}|tojson }}'>

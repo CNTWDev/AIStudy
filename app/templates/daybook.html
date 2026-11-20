@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% import "_daybook.html" as d with context %}
+{% block width %}read{% endblock %}
 {% block body %}
 {% set p = page or {'day': today, 'mood': None, 'notes': [], 'city': '', 'sky': None, 'shared': False} %}
 <div class="db-cover cv-{{ cover.id }}">

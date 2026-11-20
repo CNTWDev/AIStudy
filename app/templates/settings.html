@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block width %}read{% endblock %}
 {% block body %}
 <h1>我的账号</h1>
 {% if user.must_change_pw %}<div class="err">你现在用的是临时密码。请先在下面改一个自己的新密码（「旧密码」填刚拿到的临时密码），改完就能正常使用了。</div>{% endif %}

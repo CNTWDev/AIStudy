@@ -9,7 +9,7 @@
 {# 艺术品风格（DESIGN 5.68）：页面写 {% block art %}paper{% endblock %} 就换成「纸本」，样子在 art.css #}
 <meta name="art" content="{% block art %}{% endblock %}">
 {% set art = self.art()|trim %}
-{# 版心（DESIGN 5.69）：页面写 {% block width %}wide{% endblock %}（1120）或 read（680 窄栏）；没写的还是旧的 880，分批换完后默认就是 wide #}
+{# 版心（DESIGN 5.69）：默认 1120 宽版；读和写为主的页面写 {% block width %}read{% endblock %}，变成 680 窄栏 #}
 <meta name="page-width" content="{% block width %}{% endblock %}">
 {% set width = self.width()|trim %}
 {% if art %}<link rel="stylesheet" href="/static/art.css?v={{ ASSET_V }}">{% endif %}

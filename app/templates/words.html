@@ -32,7 +32,6 @@
 <p class="muted small">这些是已经去掉的课留下的，先不叫你回来复习；重新选上这门课，就接着复习。</p>
 {% for c in cards %}{{ one(c, True) }}{% endfor %}</details>{% endif %}
 {% endmacro %}
-{% block width %}wide{% endblock %}
 {% block body %}
 <a href="/review" class="back">← 复习</a>
 <div class="row"><h1 class="grow">我的本子</h1><a class="btn ghost sm" href="/words/map">🔤 单词包</a></div>

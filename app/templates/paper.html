@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% import "_ui.html" as ui %}
+{% block width %}read{% endblock %}
 {% block body %}
 <a href="{{ '/mocks' if p.bank_paper_id else '/papers' }}" class="small">← {{ '模拟考' if p.bank_paper_id else '试卷' }}</a>
 <h1>{{ p.title }}</h1>

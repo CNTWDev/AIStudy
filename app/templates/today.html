@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% import "_ui.html" as ui %}
-{% block width %}wide{% endblock %}
 {% block body %}
 {% set done = t.plan|selectattr('done')|list|length %}
 {% set total = t.plan|length %}

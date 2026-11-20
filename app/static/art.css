@@ -190,7 +190,6 @@ body[data-art=studio]:has(.sk-top .linkbtn) .wrap{padding-top:0;padding-bottom:1
 
 /* —— 电脑：左边工作区，右边检查栏；话筒和主按钮回到页面里 —— */
 @media (min-width:1000px){
-  body[data-art=studio]{--page-w:1120px;--gutter:24px}
   [data-art=studio] .wrap{max-width:var(--page-w);padding-top:0}
   body[data-art=studio]:has(.sk-top .linkbtn) .wrap{padding-bottom:48px}
   [data-art=studio] .sk-top{margin:0 calc(-1 * var(--gutter)) 18px;padding:12px var(--gutter)}
