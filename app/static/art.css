@@ -149,11 +149,11 @@ body[data-art=studio]:has(.sk-top .linkbtn) .wrap{padding-top:0;padding-bottom:1
   position:fixed;left:0;right:0;bottom:0;z-index:7;padding:14px max(16px,env(safe-area-inset-left,0px)) calc(18px + env(safe-area-inset-bottom,0px));
   background:linear-gradient(transparent,var(--bg) 28%)}
 [data-art=studio] #micbox>*{grid-column:2}
-[data-art=studio] #micbox .sk-mic{grid-column:1;grid-row:1 / span 2;margin:0}
+[data-art=studio] #micbox .sk-micw{grid-column:1;grid-row:1 / span 2;margin:0}
 [data-art=studio] #micbox .sk-wave,[data-art=studio] #micbox .sk-hint{background:var(--card);border:1px solid var(--line)}
 [data-art=studio] #micbox .sk-wave{grid-row:1;height:34px;margin:0;border-radius:12px 12px 0 0;border-bottom:0;padding:0 12px;justify-content:space-between;gap:0}
 [data-art=studio] #micbox .sk-wave[hidden]{display:none}
-[data-art=studio] #micbox .sk-wave[hidden]+.sk-mic+.sk-hint{border-radius:12px}
+[data-art=studio] #micbox .sk-wave[hidden]+.sk-micw+.sk-hint{border-radius:12px}
 [data-art=studio] #micbox .sk-hint{grid-row:2;margin:0;min-height:0;padding:10px 12px;border-radius:0 0 12px 12px;text-align:left;font-size:12.5px;line-height:1.55;color:var(--muted)}
 [data-art=studio] #micbox:not(:has(.sk-wave:not([hidden]))) .sk-hint{border-radius:12px;grid-row:1 / span 2}
 [data-art=studio] .sk-mic{width:58px;height:58px;background:var(--brand);box-shadow:0 6px 18px -6px rgba(200,140,30,.6)}
@@ -162,7 +162,6 @@ body[data-art=studio]:has(.sk-top .linkbtn) .wrap{padding-top:0;padding-bottom:1
 [data-art=studio] .sk-mic.rec svg{color:var(--on-brand)}
 [data-art=studio] .sk-wave i{width:2px;border-radius:1px;background:var(--ink);opacity:.85}
 [data-art=studio] .sk-time{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
-[data-art=studio] .sk-micsel{grid-column:1 / -1;margin:6px 0 0}
 [data-art=studio] .sk-gobar{position:fixed;left:0;right:0;bottom:0;z-index:7;padding:14px max(16px,env(safe-area-inset-left,0px)) calc(18px + env(safe-area-inset-bottom,0px));
   background:linear-gradient(transparent,var(--bg) 28%)}
 [data-art=studio] .sk-gobar .btn{width:100%;min-height:52px;border-radius:12px;font-size:15px}
