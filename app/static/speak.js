@@ -162,18 +162,60 @@ document.addEventListener('click', e => {
   Speak.stop(); b.classList.add('saying');
   Speak.file('/speak/clip/' + b.dataset.clip, Speak.n).catch(() => toast('放不出来')).finally(() => b.classList.remove('saying'));
 });
+/* 先鼓励，再建议（DESIGN 5.67）：每次说完，先把做到的、进步的地方放在最上面，带一下动效；建议排在后面，只给一条。
+   动效只在本人说完、点完之后放一次；系统设置了「减少动态效果」就不动。 */
+const SPARK = ['var(--ok)', 'var(--brand)', 'var(--sun)', 'var(--sky)'];
+function cheer(title, sub, o = {}) {
+  const sparks = o.quiet ? '' : Array.from({length: 10}, (_, i) => {
+    const a = i / 10 * Math.PI * 2, r = 30 + (i % 3) * 7;
+    return `<i style="--dx:${Math.round(Math.cos(a) * r)}px;--dy:${Math.round(Math.sin(a) * r)}px;--c:${SPARK[i % 4]};animation-delay:${0.32 + (i % 3) * 0.04}s"></i>`;
+  }).join('');
+  const icon = o.icon ? `<b>${esc(o.icon)}</b>` : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  return `<div class="sk-cheer${o.soft ? ' soft' : ''}${o.big ? ' big' : ''}" role="status"><div class="sk-badge">${icon}${sparks}</div>
+    <div style="min-width:0"><div class="t">${esc(title)}</div>${sub ? `<div class="s">${sub}</div>` : ''}</div></div>`;
+}
+/* 数字从第一遍滚到这一遍 */
+function countUp(root) {
+  $$('[data-to]', root).forEach(el => {
+    const a = +el.dataset.from, b = +el.dataset.to, dec = String(el.dataset.to).includes('.') ? 1 : 0, t0 = performance.now();
+    if (isNaN(a) || isNaN(b) || a === b || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const step = t => {
+      const k = Math.min(1, (t - t0) / 800), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = (a + (b - a) * e).toFixed(dec);
+      if (k < 1) requestAnimationFrame(step);
+    };
+    el.textContent = a.toFixed(dec); requestAnimationFrame(step);
+  });
+}
+/* 和第一遍比，哪几样变好了（只说变好的，没变好的不提） */
+function wins(rows) {
+  const n = v => Math.round(v * 10) / 10;
+  return (rows || []).flatMap(r => {
+    if (r.of !== undefined) return r.b > 0 ? [`用上了 ${r.b} 个新表达`] : [];
+    if (r.a === null || r.a === undefined || r.b === null || r.b === undefined) return [];
+    const d = r.better === 'low' ? r.a - r.b : r.b - r.a;
+    if (d <= 0) return [];
+    return [{'秒': `开口快了 ${n(d)} 秒`, '次': `卡顿少了 ${n(d)} 次`, '处': `中文少了 ${n(d)} 处`}[r.unit] || `${r.k}好了 ${n(d)}`];
+  });
+}
+/* 一组卡片依次浮上来 */
+const rise = (html, i) => `<div class="sk-rise" style="--d:${(0.12 * i).toFixed(2)}s">${html}</div>`;
+
 function fmt(v, unit) { return v === null || v === undefined ? '—' : `${v}${unit ? ' ' + unit : ''}`; }
 function compareTable(rows) {
   return `<div class="sk-cmp"><div class="hd"></div><div class="hd">第一遍</div><div class="hd">这一遍</div>` +
-    rows.map(r => {
-      const better = r.better === 'low' ? r.b < r.a : r.b > r.a;
-      const b = r.of !== undefined ? `${r.b} / ${r.of}` : fmt(r.b, r.unit), a = r.of !== undefined ? `${r.a} / ${r.of}` : fmt(r.a, r.unit);
-      return `<div>${esc(r.k)}</div><div>${a}</div><div class="${better ? 'now' : ''}">${b}</div>`;
+    rows.map((r, i) => {
+      const has = r.a !== null && r.a !== undefined && r.b !== null && r.b !== undefined;
+      const better = has && (r.better === 'low' ? r.b < r.a : r.b > r.a);
+      const num = better ? `<span data-from="${r.a}" data-to="${r.b}">${r.b}</span>` : esc(String(r.b ?? '—'));
+      const b = r.of !== undefined ? `${num} / ${r.of}` : (has ? `${num}${r.unit ? ' ' + esc(r.unit) : ''}` : fmt(r.b, r.unit));
+      const a = r.of !== undefined ? `${r.a} / ${r.of}` : fmt(r.a, r.unit);
+      return `<div>${esc(r.k)}</div><div>${a}</div><div class="${better ? 'now' : ''}">${b}${better ? `<span class="sk-up" style="--d:${(0.5 + 0.1 * i).toFixed(1)}s">↑</span>` : ''}</div>`;
     }).join('') + `</div>`;
 }
 function fixBox(fix) {
   if (!fix) return '';
-  return `<div class="sk-fix"><div class="lbl">只改一处</div><div>${esc(fix.wrong)} → <b>${esc(fix.right)}</b></div><div class="small muted">${esc(fix.why || '')}</div></div>`;
+  return `<div class="sk-fix"><div class="lbl">再好一点 · 只改一处</div><div>${esc(fix.wrong)} → <b>${esc(fix.right)}</b></div><div class="small muted">${esc(fix.why || '')}</div></div>`;
 }
 function chunkList(chunks) {
   return `<div class="sk-list">` + chunks.map(c => `<div class="li"><div><b>${esc(c.en)}</b> <span class="small muted">${esc(c.zh)}</span>` +
