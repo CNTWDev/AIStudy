@@ -133,7 +133,10 @@ def test_scene_four_steps_then_review():
         rt = _post_clip(c, "/api/speak/clip", session=sid, step="retell").json()
         assert rt["learned"] == len(rw["chunks"]) and {x["k"] for x in rt["compare"]} >= {"开口用时", "说中文"}
         assert db.one("SELECT done_at FROM speak_sessions WHERE id=?", sid)["done_at"]
-        assert speaking.library_count(uid) == len(rw["chunks"])
+        # 表达块 + 「可以说得更好」里改好的说法（两到七个词的）都进表达库
+        fixes = [p for p in rw["points"] if 2 <= len(p["right"].split()) <= 7]
+        assert rw["better"] and rw["fix"] == rw["points"][0]
+        assert speaking.library_count(uid) == len(rw["chunks"]) + len(fixes)
         # 录音只有本人能听
         assert c.get(f"/speak/clip/{rt['clip']}").headers["content-type"] == "audio/wav"
         # 练完以后，今天练过了；到期之前没有复习
@@ -189,8 +192,9 @@ def test_chat_turns_and_close():
         t = _post_clip(c, "/api/speak/chat/turn", session=sid).json()
         assert t["me"] and t["reply"] and t["left"] == speaking.CHAT_MAX - 1 and not t.get("over")
         cl = c.post("/api/speak/chat/close", json={"session": sid}).json()
-        assert cl["note"] and cl["chunks"] and cl["fix"]["kind"]
-        assert speaking.library_count(uid) == len(cl["chunks"])
+        assert cl["note"] and cl["chunks"] and cl["fix"]["kind"] and cl["points"]
+        assert speaking.library_count(uid) == len(cl["chunks"]) + len(cl["points"])
+        assert t["better"]["text"] and db.jload(db.one("SELECT data FROM speak_sessions WHERE id=?", sid)["data"])["turns"][1]["better"]
         assert _post_clip(c, "/api/speak/chat/turn", session=sid).status_code == 400
         # 一句没说就退出：不留记录
         sid2 = _sid(c.get(f"/speak/play/{play['id']}", follow_redirects=False))
@@ -368,3 +372,20 @@ def test_listen_and_speak_totals():
 def test_shadow_marks_are_loose():
     mk = speaking.marks("We'll get it fixed properly.", "we will get it fix properlly")
     assert [m["ok"] for m in mk] == [False, True, True, True, True]
+
+
+def test_better_then_say_it_again():
+    """说完先夸再改一改（最多 3 处），改好的可以照着说，宽松判断，想说几遍都行；场景里的改法存下来，再打开不用再等。"""
+    with TestClient(app) as c:
+        uid = _adult(c)
+        sc = speaking.scenes(speaking.packs()[0]["id"])[0]
+        sid = _sid(c.get(f"/speak/scene/{speaking.packs()[0]['id']}/{sc['id']}", follow_redirects=False))
+        _post_clip(c, "/api/speak/clip", session=sid, step="first")
+        b = c.post("/api/speak/better", json={"session": sid, "key": "first"}).json()
+        assert b["good"] and b["better"] and 0 < len(b["points"]) <= 3
+        assert c.post("/api/speak/better", json={"session": sid, "key": "first"}).json() == b
+        assert c.post("/api/speak/better", json={"text": ""}).json()["points"] == []
+        r = c.post("/api/speak/say", files={"file": ("clip.wav", WAV, "audio/wav")}, data={"text": b["better"], "session": str(sid)}).json()
+        assert {"marks", "got", "of", "ok"} <= r.keys() and r["of"] == len(b["better"].split())
+        assert c.post("/api/speak/say", files={"file": ("clip.wav", WAV, "audio/wav")}, data={"text": " "}).status_code == 400
+        assert speaking.records(uid)["common"]

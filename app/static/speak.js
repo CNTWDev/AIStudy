@@ -296,6 +296,55 @@ function fixBox(fix) {
   if (!fix) return '';
   return `<div class="sk-fix"><div class="lbl">再好一点 · 只改一处</div><div>${esc(fix.wrong)} → <b>${esc(fix.right)}</b></div><div class="small muted">${esc(fix.why || '')}</div></div>`;
 }
+/* ---------------------------------------------------------------- 可以说得更好 + 照着说一遍（DESIGN 5.67）
+   先夸，再把他的话改一改（最多 3 处，每处一句为什么），改好的马上能照着说，宽松判断，想说几遍都行。纠正是建议，不是判错。 */
+const _w = w => w.toLowerCase().replace(/[^a-z0-9']/g, '');
+/* 改好的句子里，和原话不一样的词标出来 */
+function diffMark(orig, better) {
+  const a = (orig || '').split(/\s+/).map(_w), bw = (better || '').split(/\s+/).filter(Boolean), b = bw.map(_w);
+  const L = Array.from({length: a.length + 1}, () => new Array(b.length + 1).fill(0));
+  for (let i = a.length - 1; i >= 0; i--) for (let j = b.length - 1; j >= 0; j--)
+    L[i][j] = a[i] && a[i] === b[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const keep = new Set();
+  for (let i = 0, j = 0; i < a.length && j < b.length;) {
+    if (a[i] && a[i] === b[j]) { keep.add(j); i++; j++; } else if (L[i + 1][j] >= L[i][j + 1]) i++; else j++;
+  }
+  return bw.map((w, j) => keep.has(j) || !b[j] ? esc(w) : `<b class="sk-new">${esc(w)}</b>`).join(' ');
+}
+function pointList(points) {
+  return (points || []).length ? `<div class="sk-pts">${points.map((p, i) => `<div class="pt sk-rise" style="--d:${(0.25 + i * 0.1).toFixed(2)}s">` +
+    `<div>${p.wrong ? `<span class="was">${esc(p.wrong)}</span> → ` : ''}<b>${esc(p.right)}</b>${p.zh ? ` <span class="small muted">${esc(p.zh)}</span>` : ''}</div>` +
+    `${p.why ? `<div class="small muted">${esc(p.why)}</div>` : ''}</div>`).join('')}</div>` : '';
+}
+/* 「可以说得更好」卡：b = {better, points, good}，orig = 他的原话，o.session 照着说时带上 */
+function betterBox(b, orig, o = {}) {
+  if (!b || !b.better) return '';
+  const pts = b.points || [];
+  if (!pts.length) return `<div class="card sk-better">${cheer('这段说得很地道', '没有要改的地方。想更熟，就照着再说一遍。', {quiet: true, icon: '👍'})}${sayZone(b.better, o)}</div>`;
+  return `<div class="card sk-better sk-rise" style="--d:${o.delay || 0.15}s"><div class="row" style="justify-content:space-between"><div class="sk-lbl" style="margin:0">${esc(o.title || '可以说得更好')} · ${pts.length} 处</div>${playBtn(b.better, o.accent || 'en-us', '听一遍')}</div>
+    <div class="sk-en" style="margin-top:8px">${diffMark(orig, b.better)}</div>${pointList(pts)}${sayZone(b.better, o)}</div>`;
+}
+let _sayN = 0;
+function sayZone(text, o = {}) {
+  return `<div class="sk-sayz" data-text="${esc(text)}" data-session="${esc(o.session || '')}"><a href="#" class="sk-saybtn">照着说一遍</a></div>`;
+}
+/* 点「照着说一遍」：就地放一个话筒，说完标出说对的词；说多少遍都行 */
+document.addEventListener('click', e => {
+  const a = e.target.closest('.sk-saybtn'); if (!a) return;
+  e.preventDefault(); Speak.stop();
+  const z = a.closest('.sk-sayz'), n = ++_sayN, text = z.dataset.text;
+  z.innerHTML = `<div class="sk-wave" id="sw${n}" hidden>${'<i></i>'.repeat(14)}</div>` +
+    `<button type="button" class="sk-mic sm" id="sm${n}" aria-label="按住说话"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>` +
+    `<div class="sk-hint" id="sh${n}">照着上面改好的说，松开结束</div>`;
+  micButton($('#sm' + n), {hint: '#sh' + n, wave: '#sw' + n, recHint: '照着改好的说', onClip: async blob => {
+    const r = await sendClip('/api/speak/say', blob, {text, session: z.dataset.session || 0});
+    const words = r.marks.map((w, k) => `<span class="sk-word${w.ok ? ' got' : ' miss'}" style="--d:${(k * 0.04).toFixed(2)}s">${esc(w.w)}</span>`).join('');
+    z.innerHTML = (r.ok ? cheer('说顺了！', '改好的说法已经到你嘴边了。', {quiet: r.got < r.of}) :
+      cheer(`说对了 ${r.got} / ${r.of} 个词`, '灰色的几个再来一遍，越说越顺。', {soft: true, quiet: true, icon: '🎙'})) +
+      `<div class="sk-en" style="margin:-4px 0 8px">${words}</div><a href="#" class="sk-saybtn">再说一遍</a>`;
+  }});
+});
+
 function chunkList(chunks) {
   return `<div class="sk-list">` + chunks.map(c => `<div class="li"><div><b>${esc(c.en)}</b> <span class="small muted">${esc(c.zh)}</span>` +
     (c.yours ? `<div class="small faint">你刚才说的：${markZh(c.yours)}</div>` : '') + `</div></div>`).join('') + `</div>`;

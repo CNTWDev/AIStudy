@@ -125,6 +125,19 @@ body[data-art=gallery]{background:var(--bg);font-family:var(--f-sans)}
 [data-art=gallery] .sk-word.pron{text-decoration:underline wavy var(--faint) 1px;text-underline-offset:8px}
 [data-art=gallery] .sk-nextp{text-align:left;margin-top:14px!important}
 
+/* 你的话改一改：改了的词斜体、下面一道蜂蜜色细线；原来的说法划掉变淡；「照着说一遍」是一行字，点了就地出一粒光 */
+[data-art=gallery] .sk-new{background:none;border-radius:0;padding:0;color:var(--ink);font-weight:inherit;font-style:italic;box-shadow:inset 0 -1px 0 var(--brand)}
+[data-art=gallery] .sk-pts{margin-top:14px;border-bottom:1px solid var(--line)}
+[data-art=gallery] .sk-pts .pt{border-top:1px solid var(--line);padding:10px 0;font-size:13px;line-height:1.8}
+[data-art=gallery] .sk-pts .was{color:var(--faint);text-decoration-color:var(--faint)}
+[data-art=gallery] .sk-pts b{font:italic 400 19px var(--f-latin)}
+[data-art=gallery] .sk-sayz{margin-top:16px;text-align:left}
+[data-art=gallery] .sk-saybtn{font:400 12px var(--f-sans);letter-spacing:.24em;color:var(--ink);font-weight:400!important;border-bottom:1px solid var(--line);padding-bottom:3px}
+[data-art=gallery] .sk-sayz .sk-mic{height:110px}
+[data-art=gallery] .sk-better{margin-bottom:40px}
+[data-art=gallery] .sk-bline summary{color:var(--faint);font-weight:400;letter-spacing:.2em;font-size:11px}
+[data-art=gallery] .sk-bline .in{background:none;border:0;border-right:1px solid var(--line);border-radius:0;padding:4px 16px 4px 0}
+
 /* 「还想说一会儿」这类选项：一行一行的目录 */
 [data-art=gallery] .sk-opt{background:none;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;padding:15px 0;margin:0;gap:14px}
 [data-art=gallery] .sk-opt:hover{background:none;border-color:var(--line)}

@@ -19,7 +19,9 @@ const S = {id: {{ s.id }}, turns: {{ s.data.turns|tojson }}, who: {{ (pl.who or 
 const log = $('#log');
 const bubble = t => t.who === 'ai'
   ? `<div class="sk-who">${esc(S.who)}（AI）</div><div class="sk-bub ai" style="display:flex;gap:8px;align-items:flex-start">${playBtn(t.text, S.accent)}<span>${esc(t.text)}</span></div>`
-  : `<div class="sk-who me">你</div><div class="sk-bub me">${markZh(t.text) || '<span class="muted">（没听清）</span>'}</div>`;
+  : `<div class="sk-who me">你</div><div class="sk-bub me">${markZh(t.text) || '<span class="muted">（没听清）</span>'}</div>` +
+    (t.better ? `<details class="sk-bline"><summary>这句可以这样说 ›</summary><div class="in"><div class="row" style="gap:8px;flex-wrap:nowrap;align-items:flex-start">${playBtn(t.better.text, S.accent)}<span>${diffMark(t.text, t.better.text)}</span></div>` +
+      `${t.better.why ? `<div class="small muted" style="margin-top:4px">${esc(t.better.why)}</div>` : ''}${sayZone(t.better.text, {session: S.id})}</div></details>` : '');
 const mine = () => S.turns.filter(t => t.who === 'me').length;
 function draw() {
   log.innerHTML = S.turns.map(bubble).join('');
@@ -32,7 +34,7 @@ function draw() {
   $('#hint').innerHTML = '按住回答 · 卡住就说中文';
   micButton($('#mic'), {hint: '#hint', wave: '#wave', recHint: '卡住就说中文', onClip: async blob => {
     const r = await sendClip('/api/speak/chat/turn', blob, {session: S.id});
-    S.turns.push({who: 'me', text: r.me}, {who: 'ai', text: r.reply});
+    S.turns.push({who: 'me', text: r.me, better: r.better}, {who: 'ai', text: r.reply});
     draw(); scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
     Speak.play(r.reply, S.accent, 'sentence');
   }});
@@ -48,7 +50,8 @@ async function end() {
 function closed(c) {
   $('#tail').innerHTML = c ? `${cheer(`用英文聊了 ${mine()} 轮`, c.note ? `做得最好的：${esc(c.note)}` : '能接得住对方的话，就是真的在用英文了。', {big: true})}
     ${(c.chunks || []).length ? rise(`<div class="card"><div class="sk-lbl">今天学 ${c.chunks.length} 个表达</div>${chunkList(c.chunks)}</div>`, 1) : ''}
-    ${rise(fixBox(c.fix), 2)}
+    ${(c.points || []).length ? rise(`<div class="card sk-better"><div class="sk-lbl">这次最值得记的 ${c.points.length} 处</div>${pointList(c.points)}</div>`, 2) : rise(fixBox(c.fix), 2)}
+    ${S.turns.some(t => t.better) ? '<p class="sk-note" style="margin-top:-4px">上面每句你说的话下面，点「这句可以这样说」还能跟着说一遍。</p>' : ''}
     <p class="sk-note">${(c.chunks || []).length ? '这几个表达存进了「我的表达库」，明天开始回来复习。' : ''}</p>
     <div id="totals"></div>
     <a class="sk-opt" href="/speak"><div class="oi">再</div><div><div class="n">再来一局 / 再说一件</div><div class="m">回到开口练</div></div><span class="go">›</span></a>
