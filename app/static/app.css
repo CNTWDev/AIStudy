@@ -1256,5 +1256,11 @@ a.db-back{display:block;color:var(--ink)}.db-bk{display:flex;gap:10px;align-item
 .sk-acc .k{font-size:13px;color:var(--muted)}.sk-acc b{font-size:20px;font-weight:800}
 .sk-acc .bar{height:6px;border-radius:3px;background:var(--line-2);margin:8px 0 4px;overflow:hidden}
 .sk-acc .bar i{display:block;height:100%;width:var(--w);border-radius:3px;background:var(--ok);transform-origin:left;animation:jauto .9s .2s ease-out both}
+.sk-new{color:var(--ok);font-weight:700;background:var(--ok-2);border-radius:4px;padding:0 3px}
+.sk-pts{margin-top:10px}.sk-pts .pt{padding:8px 0;border-top:1px solid var(--line-2)}
+.sk-pts .was{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 60%,transparent)}
+.sk-sayz{margin-top:12px;text-align:center}.sk-sayz .sk-saybtn{font-weight:700}.sk-sayz .sk-cheer{text-align:left}
+.sk-bline{margin:-4px 0 12px auto;max-width:86%;font-size:13.5px}.sk-bline summary{cursor:pointer;color:var(--brand-ink);font-weight:600;text-align:right;list-style:none}
+.sk-bline summary::-webkit-details-marker{display:none}.sk-bline .in{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:6px}
 .sk-note{font-size:13px;color:var(--muted);padding:0 4px}
 .sk-mini{display:flex;align-items:center;gap:12px}.sk-mini .qi{font-size:20px}

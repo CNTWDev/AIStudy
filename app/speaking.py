@@ -577,6 +577,7 @@ def clip(user, sid: int, step: str, wav: bytes) -> dict:
         _count_use(user["id"], used)
         c["metrics"]["used"] = used
         d["first"] = {"clip": c["clip"], "text": c["text"], "metrics": c["metrics"]}
+        d.get("better", {}).pop("first", None)
         d.pop("rewrite", None)
         _save(s)
         return {"clip": c["clip"], "text": c["text"], "metrics": c["metrics"], "again": d.get("again"), "over": OVER_NOTE if c["over"] else ""}
@@ -606,6 +607,7 @@ def clip(user, sid: int, step: str, wav: bytes) -> dict:
         _count_use(user["id"], known_used)
         c["metrics"]["used"] = used_new
         d["retell"] = {"clip": c["clip"], "text": c["text"], "metrics": c["metrics"]}
+        d.get("better", {}).pop("retell", None)   # 换个说法再说一次：改法按新的这一遍重新看
         learned = learn(user["id"], [x["id"] for x in chunks], s["ref"] if s["ref"] != "own" else "own")
         d["compare"] = compare(d["first"]["metrics"], c["metrics"], len(chunks))
         _save(s, done=True)
@@ -622,6 +624,78 @@ def compare(first: dict, now: dict, n_chunks: int) -> list[dict]:
     return [r for r in rows if r["a"] is not None and r["b"] is not None]
 
 
+def _points(r: dict, legacy: str = "fix") -> list[dict]:
+    """AI 给的「可以说得更好」的几处：最多 3 处，只留有 right 的。"""
+    raw = r.get("points")
+    if not isinstance(raw, list):
+        raw = [r.get(legacy)] if isinstance(r.get(legacy), dict) else []
+    out = []
+    for p in raw:
+        if isinstance(p, dict) and str(p.get("right") or "").strip():
+            out.append({k: str(p.get(k) or "").strip() for k in ("wrong", "right", "zh", "why", "kind")})
+    return out[:3]
+
+
+def _learn_points(user_id: int, points: list[dict], ref: str) -> None:
+    """改好的说法进表达库：两到七个词的才算一个「说法」（单个词、整句都不进），过几天拿出来复习。"""
+    ids = []
+    for p in points:
+        n = len(p["right"].split())
+        if 2 <= n <= 7 and p.get("zh") and not _CJK.search(p["right"]):
+            ids.append(chunk_upsert(p["right"], p["zh"], "", "fix"))
+    if ids:
+        learn(user_id, ids, ref)
+
+
+def better(user, text: str = "", sid: int | None = None, key: str = "", chunk: int | None = None) -> dict:
+    """「可以说得更好」：先说哪里好，再把他的话改一改（最多 3 处）。场景里的按 key 存在这一次练习里，再打开不用再等 AI。"""
+    s = None
+    if sid:
+        s = _session(user["id"], sid)
+        cached = (s["data"].get("better") or {}).get(key)
+        if cached:
+            return cached
+        src = {"first": s["data"].get("first"), "retell": s["data"].get("retell")}.get(key) or {}
+        text = src.get("text") or ""
+    text = (text or "").strip()
+    if not text:
+        return {"good": "", "better": "", "points": []}
+    ctx = ""
+    if s and s["kind"] == "scene":
+        sc = scene_of(s)
+        ctx = sc.get("situation", "")
+    elif chunk:
+        c = known_chunk(user["id"], chunk)
+        ctx = f"看着中文「{c['zh']}」用英文说一句，要用上 {c['en']}" if c else ""
+    try:
+        r = llm.speak_better(text[:1500], accent_of(s) if s else "en-US", ctx, user_id=user["id"])
+    except llm.LLMError as e:
+        raise SpeakError(503, str(e))
+    out = {"good": str(r.get("good") or "")[:80], "better": str(r.get("better") or "").strip(), "points": _points(r)}
+    _learn_points(user["id"], out["points"], (s["ref"] if s else "review") or "review")
+    if s:
+        s["data"].setdefault("better", {})[key] = out
+        _save(s)
+    return out
+
+
+def say(user, wav: bytes, text: str, sid: int | None = None) -> dict:
+    """照着改好的说一遍：宽松判断（变形、听错一个字母都算），想说几遍都行，每一遍都算开口时长。"""
+    text = (text or "").strip()[:600]
+    if not text:
+        raise SpeakError(400, "没有要说的句子")
+    if sid:
+        _session(user["id"], sid)
+    c = transcribe(user, wav, "say", sid, expect=text)
+    if c["over"]:
+        mk = [{"w": w, "ok": True} for w in text.split()]
+    else:
+        mk = marks(text, c["text"])
+    got = sum(1 for m in mk if m["ok"])
+    return {"clip": c["clip"], "text": c["text"], "marks": mk, "got": got, "of": len(mk),
+            "ok": got >= 0.75 * len(mk), "over": OVER_NOTE if c["over"] else ""}
+
+
 def rewrite(user, sid: int) -> dict:
     """第 2 步：地道版。AI 不可用时退回课程包里写好的参考说法（自己的场景就只能等 AI）。"""
     s = _session(user["id"], sid)
@@ -634,20 +708,23 @@ def rewrite(user, sid: int) -> dict:
         r = llm.speak_rewrite(sc, d["first"]["text"], accent_of(s), pack_chunks, user_id=user["id"])
         native = str(r.get("native") or "").strip()
         raw = [c for c in r.get("chunks") or [] if isinstance(c, dict) and c.get("en")][:3]
-        fix = r.get("fix") if isinstance(r.get("fix"), dict) and r["fix"].get("right") else None
+        points = _points(r)
+        better_text = str(r.get("better") or "").strip()
         good = str(r.get("good") or "").strip()[:80]
         src = "ai"
     except llm.LLMError as e:
         if not sc.get("model"):
             raise SpeakError(503, str(e))
-        native, raw, fix, good, src = sc["model"], [{**c, "yours": ""} for c in sc["chunks"]], None, "", "pack"
+        native, raw, points, better_text, good, src = sc["model"], [{**c, "yours": ""} for c in sc["chunks"]], [], "", "", "pack"
     chunks = []
     for c in raw:
         en = str(c["en"]).strip()
         ex = next((x for x in sentences(native) if chunk_regex(en).search(" " + x + " ")), "")
         cid = chunk_upsert(en, str(c.get("zh") or ""), ex if src == "pack" else "", "pack" if src == "pack" else "ai")
         chunks.append({"id": cid, "en": en, "zh": str(c.get("zh") or ""), "yours": str(c.get("yours") or "")})
-    d["rewrite"] = {"good": good, "native": native, "sentences": sentences(native), "chunks": chunks, "fix": fix, "src": src}
+    _learn_points(user["id"], points, s["ref"] if s["ref"] != "own" else "own")
+    d["rewrite"] = {"good": good, "native": native, "sentences": sentences(native), "chunks": chunks,
+                    "better": better_text, "points": points, "fix": points[0] if points else None, "src": src}
     _save(s)
     return d["rewrite"]
 
@@ -697,13 +774,17 @@ def chat_turn(user, sid: int, wav: bytes) -> dict:
     turns.append({"who": "me", "text": c["text"], "clip": c["clip"], "metrics": c["metrics"]})
     _save(s)
     try:
-        reply = llm.speak_chat(s["data"]["play"], turns, accent_of(s), user_id=user["id"])["reply"]
+        r = llm.speak_chat(s["data"]["play"], turns, accent_of(s), user_id=user["id"])
     except llm.LLMError as e:
         raise SpeakError(503, str(e))
+    reply = r["reply"]
+    bt = str(r.get("better") or "").strip()
+    if bt and bt.lower().strip(" .!?") != c["text"].lower().strip(" .!?"):
+        turns[-1]["better"] = {"text": bt, "why": str(r.get("why") or "")[:120]}
     turns.append({"who": "ai", "text": reply})
     _save(s)
     left = CHAT_MAX - sum(1 for t in turns if t["who"] == "me")
-    return {"me": c["text"], "reply": reply, "left": left, "used": used}
+    return {"me": c["text"], "reply": reply, "left": left, "used": used, "better": turns[-2].get("better")}
 
 
 def chat_close(user, sid: int) -> dict:
@@ -722,9 +803,10 @@ def chat_close(user, sid: int) -> dict:
     for c in [c for c in r.get("chunks") or [] if isinstance(c, dict) and c.get("en")][:3]:
         cid = chunk_upsert(str(c["en"]), str(c.get("zh") or ""), "", "ai")
         chunks.append({"id": cid, "en": str(c["en"]), "zh": str(c.get("zh") or ""), "yours": str(c.get("yours") or "")})
-    fix = r.get("fix") if isinstance(r.get("fix"), dict) and r["fix"].get("right") else None
+    points = _points(r)
     learn(user["id"], [c["id"] for c in chunks], "chat:" + s["ref"])
-    s["data"]["close"] = {"note": str(r.get("note") or ""), "chunks": chunks, "fix": fix}
+    _learn_points(user["id"], points, "chat:" + s["ref"])
+    s["data"]["close"] = {"note": str(r.get("note") or ""), "chunks": chunks, "points": points, "fix": points[0] if points else None}
     _save(s, done=True)
     return s["data"]["close"]
 
@@ -798,13 +880,16 @@ def records(user_id: int) -> dict:
     tot = {"chunks": library_count(user_id),
            "scenes": db.one("SELECT COUNT(*) AS n FROM speak_sessions WHERE user_id=? AND kind='scene' AND done_at IS NOT NULL", user_id)["n"],
            "chats": db.one("SELECT COUNT(*) AS n FROM speak_sessions WHERE user_id=? AND kind='chat' AND done_at IS NOT NULL", user_id)["n"]}
-    # 这周最常犯的 1 个：地道版和聊天收尾里「只改一处」的 kind
+    # 这周最常出现的 1 类：地道版、再说一遍、聊天收尾里「可以说得更好」的 kind
     kinds: dict[str, int] = {}
     for r in db.q("SELECT data FROM speak_sessions WHERE user_id=? AND day>=?", user_id, (today - timedelta(days=6)).isoformat()):
         d = db.jload(r["data"], {}) or {}
-        for fix in ((d.get("rewrite") or {}).get("fix"), (d.get("close") or {}).get("fix")):
-            if fix and fix.get("kind"):
-                kinds[fix["kind"]] = kinds.get(fix["kind"], 0) + 1
+        pts = _points(d.get("rewrite") or {}) + _points(d.get("close") or {})
+        for b in (d.get("better") or {}).values():
+            pts += _points(b or {})
+        for p in pts:
+            if p.get("kind"):
+                kinds[p["kind"]] = kinds.get(p["kind"], 0) + 1
     common = max(kinds.items(), key=lambda kv: kv[1]) if kinds else None
     recent = [dict(r) for r in db.q("SELECT c.id, c.en, c.zh, m.used, m.box FROM speak_memory m JOIN speak_chunks c ON c.id=m.chunk_id "
                                     "WHERE m.user_id=? ORDER BY m.learned_at DESC LIMIT 12", user_id)]

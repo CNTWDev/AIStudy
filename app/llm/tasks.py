@@ -41,7 +41,7 @@ def _tutor(grade: str) -> str:
 
 # 提示词版本：改了某个任务的提示词就把它加 1。题库里的每条内容都记下当时的版本，
 # 以后可以按版本比较质量、批量重做旧版本生成的内容。
-PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 3, "passage_check": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1, "word_usage": 1, "word_hooks": 1, "speak_rewrite": 2, "speak_scene": 1, "speak_chat": 1, "speak_chat_close": 1}
+PROMPT_VERSION = {"book_guide": 1, "items": 6, "teach": 4, "context": 4, "passage": 3, "passage_check": 1, "variant": 3, "verify": 3, "news_pick": 1, "news_write": 1, "review": 1, "discuss": 1, "discuss_close": 1, "word_examples": 1, "word_usage": 1, "word_hooks": 1, "speak_rewrite": 3, "speak_better": 1, "speak_scene": 1, "speak_chat": 2, "speak_chat_close": 2}
 
 
 def _audience(grade: str, pack) -> str:
@@ -682,6 +682,21 @@ def _speak_sys(accent: str) -> str:
             "先说他做得好的地方，再给建议：鼓励要具体（引用他的话），不说空话。")
 
 
+_POINTS = "wrong（他原话里那几个词）、right（改好的那几个词）、zh（right 的中文意思，简短）、why（一句中文说明为什么这样说更好，平等、不说「错了」）、kind（这类问题的名字，4 到 8 个字，比如「过去的事用过去式」「名词复数」「用词更地道」，同一类问题每次用同一个名字）"
+
+
+def speak_better(text: str, accent: str, context: str = "", user_id=None) -> dict:
+    """说完一段（不看稿再说、复习时说的整句）：先说哪里好，再把他的话改一改，最多指出 3 处。纠正是建议，不是判错。"""
+    user = ((f"情境：{context}\n" if context else "") +
+            f"学习者刚才说的（语音转文字，可能夹中文、有口误和重复）：{text}\n\n"
+            "请：\n"
+            "- good：一句中文（30 字以内），具体说他这段话里做得好的一点，引用他的原话。\n"
+            "- better：保留他自己的句子结构和意思，只把语法和用词改对、中文换成英文；口误和重复去掉。他说得已经很地道就原样给回。\n"
+            "- points：改了的地方，按重要程度最多 3 处：" + _POINTS + "。没有值得改的就给 []，不要硬找。\n"
+            '输出：{"good":"..","better":"..","points":[{"wrong":"..","right":"..","zh":"..","why":"..","kind":".."}]}')
+    return ask_json("speak_better", _speak_sys(accent), user, user_id=user_id, effort="low", max_tokens=900, cache=False)
+
+
 def speak_rewrite(scene: dict, said: str, accent: str, chunks: list[dict], user_id=None) -> dict:
     """第 2 步「看地道版」：把学习者刚才说的话（可能中英夹杂）改成母语者会说的版本。"""
     ref = ""
@@ -700,10 +715,12 @@ def speak_rewrite(scene: dict, said: str, accent: str, chunks: list[dict], user_
             "每个给 en（就是 native 里的写法；中间可省略的部分写成 ...，比如 push ... back）、zh（简短中文意思）、"
             "yours（学习者刚才是怎么说这个意思的，原样引用他的话，包括他说的中文；他没说到就写「没说到」）。"
             "学习者说中文的地方，优先变成表达块。\n"
-            "- fix：只挑一处最影响对方理解、或者最常见的语法问题（不是用词地道不地道，那是 chunks 的事）："
-            "wrong（他原话里那几个词）、right（改好的那几个词）、why（一句中文说明规则）、kind（这类问题的名字，4 到 8 个字，"
-            "比如「过去的事用过去式」「名词复数」「第三人称单数」，同一类问题每次用同一个名字）。没有值得改的就给 null。\n"
-            '输出：{"good":"..","native":"..","chunks":[{"en":"..","zh":"..","yours":".."}],"fix":{"wrong":"..","right":"..","why":"..","kind":".."}}')
+            "- better：把他刚才说的话「改一改」：保留他自己的句子结构和意思，只把语法和用词改对、把中文换成英文，"
+            "不要改写成另一种说法（那是 native 的事）。\n"
+            "- points：better 里改了的地方，按重要程度挑最多 3 处（先改影响理解的语法，再改不地道的用词）：" + _POINTS + "。"
+            "他说得已经很好就给 []。\n"
+            '输出：{"good":"..","better":"..","native":"..","chunks":[{"en":"..","zh":"..","yours":".."}],'
+            '"points":[{"wrong":"..","right":"..","zh":"..","why":"..","kind":".."}]}')
     return ask_json("speak_rewrite", _speak_sys(accent), user, user_id=user_id, effort="low", max_tokens=1500, cache=False)
 
 
@@ -726,7 +743,9 @@ def speak_chat(play: dict, turns: list[dict], accent: str, user_id=None) -> dict
             f"学习者要练的：{play.get('goal', '')}\n对话到现在（学习者的话是语音转文字，可能夹中文）：\n{_chat_log(turns)}\n\n"
             "用这个角色的身份回学习者一句：英文，1 到 3 句，口语，语速感觉像真人说话；不要纠正他的英文，不要跳出角色，"
             "学习者夹了中文就当你听懂了、自然地接下去；对方说得好就让步一点，说得含糊就追问一点，让对话有来有回。\n"
-            '输出：{"reply":".."}')
+            "另外给 better：学习者最后一句话「改一改」后的英文（保留他的意思和结构，只改语法、用词，中文换成英文），"
+            "和 why（一句中文，说改了哪里、为什么；他说得已经很地道就 better 给 null）。better 只给学习者看，不出现在你的回复里。\n"
+            '输出：{"reply":"..","better":"..","why":".."}')
     return ask_json("speak_chat", _speak_sys(accent), user, user_id=user_id, effort="low", max_tokens=400, cache=False)
 
 
@@ -737,6 +756,6 @@ def speak_chat_close(play: dict, turns: list[dict], accent: str, user_id=None) -
             "- note：一句中文，说他这次做得最好的一点（具体，引用他的话）。\n"
             "- chunks：最多 3 个他下次能用上的表达块（en 用 ... 表示可省略的部分、zh、yours = 他在对话里是怎么说这个意思的，原样引用；"
             "优先挑他说中文或说得很绕的地方）。\n"
-            "- fix：只挑一处最值得改的语法问题，格式 {wrong,right,why,kind}，没有就 null。\n"
-            '输出：{"note":"..","chunks":[{"en":"..","zh":"..","yours":".."}],"fix":null}')
+            "- points：整段对话里最值得记的、可以说得更好的地方，最多 3 处：" + _POINTS + "。没有就 []。\n"
+            '输出：{"note":"..","chunks":[{"en":"..","zh":"..","yours":".."}],"points":[]}')
     return ask_json("speak_chat_close", _speak_sys(accent), user, user_id=user_id, effort="low", max_tokens=1200, cache=False)

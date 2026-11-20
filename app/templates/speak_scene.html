@@ -54,10 +54,10 @@ async function step2() {
   }
   const r = S.data.rewrite;
   stage.innerHTML = cheer('你说得不错', esc(r.good || '整件事你都说出来了。下面是同样的意思，母语者会怎么说，只比你高一点点。'), {quiet: true, icon: '👍', soft: true}) +
+    (r.better ? betterBox(r, S.data.first.text, {title: '你的话改一改', session: S.id, accent: S.accent, delay: 0.12}) : rise(fixBox(r.fix), 1)) +
     rise(`<div class="card"><div class="row" style="justify-content:space-between"><div class="sk-lbl" style="margin:0">母语者会这样说</div>${playBtn(r.native, S.accent, '听一遍')}</div>
-      <div class="sk-en" style="margin-top:8px">${markChunks(r.native, r.chunks)}</div></div>`, 1) +
-    (r.chunks.length ? rise(`<div class="card"><div class="sk-lbl">今天学 ${r.chunks.length} 个表达</div>${chunkList(r.chunks)}</div>`, 2) : '') +
-    rise(fixBox(r.fix), 3) + `
+      <div class="sk-en" style="margin-top:8px">${markChunks(r.native, r.chunks)}</div></div>`, 2) +
+    (r.chunks.length ? rise(`<div class="card"><div class="sk-lbl">今天学 ${r.chunks.length} 个表达</div>${chunkList(r.chunks)}</div>`, 3) : '') + `
     <details class="small muted" style="margin:0 4px 12px"><summary style="cursor:pointer">你刚才说的</summary><p>${markZh(S.data.first.text)}</p></details>
     <button class="btn" id="go3" style="width:100%">去跟读</button>`;
   $('#go3').onclick = () => step3(0);
@@ -122,11 +122,23 @@ function done() {
       <div class="row" style="margin-top:10px;gap:16px">${clipBtn(S.data.first.clip, '听第一遍')}${clipBtn(S.data.retell.clip, '听这一遍')}</div>
       ${S.timed ? '' : '<p class="tiny faint" style="margin:6px 0 0">现在用的语音识别给不出每个词的时间，开口用时和卡顿暂时算不了。</p>'}</div>
     <p class="sk-note">${n ? `${n} 个表达存进了「我的表达库」，明天开始回来复习。` : ''}今天的已经练完了。</p>
+    <div id="rtbetter"></div>
     <div id="totals"></div>`;
   $('#after').hidden = false; stage.appendChild($('#after'));
   if (S.sc.pack && S.sc.id && !$('#againopt')) $('#after .sk-lbl').insertAdjacentHTML('afterend',
     `<a class="sk-opt" id="againopt" href="/speak/scene/${encodeURIComponent(S.sc.pack)}/${encodeURIComponent(S.sc.id)}?again=${S.id}"><div class="oi">↻</div><div><div class="n">这个场景再说一遍</div><div class="m">趁热再说，和这一遍比一比</div></div><span class="go">›</span></a>`);
   Totals.show($('#totals'), 0.36);
+  loadBetter();
+}
+async function loadBetter() {
+  const box = $('#rtbetter'); if (!box || !S.data.retell.text) return;
+  box.innerHTML = '<p class="sk-note loading">正在看这一遍哪里还能说得更好</p>';
+  try {
+    const b = await api('/api/speak/better', {session: S.id, key: 'retell'});
+    box.innerHTML = betterBox(b, S.data.retell.text, {session: S.id, accent: S.accent, delay: 0.05}) +
+      '<p class="sk-hint" style="min-height:0;margin:0 0 12px"><a href="#" id="retry" style="font-weight:700">↻ 换个说法再说一次</a> · 不看稿，用上刚改的地方</p>';
+    $('#retry').onclick = e => { e.preventDefault(); S.data.retell = null; scrollTo({top: 0}); step4(); };
+  } catch (e) { box.innerHTML = ''; }
   countUp(stage);
 }
 
