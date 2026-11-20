@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 {% block title %}开口练 · {{ SITE }}{% endblock %}
-{% block art %}paper{% endblock %}
+{% block art %}gallery{% endblock %}
 {% block body %}
-<div class="sk-top"><h1>开口练</h1><span class="r">英语口语{% if lib %} · 表达库 {{ lib }} 个{% endif %}</span></div>
+<div class="sk-top"><a href="/" class="linkbtn" aria-label="回到首页">×</a><h1>开口练</h1><span class="r">英语口语{% if lib %} · 表达库 {{ lib }} 个{% endif %}</span></div>
 {% if not engine.transcribe.on %}
 <div class="note-bar">语音识别还没配置好：{{ engine.transcribe.why }}。{% if user.is_admin or user.role == 'admin' %}<a href="/admin?tab=system#sttcard">去管理页</a>{% else %}请管理员在服务器的 config/stt.toml 里选一家。{% endif %}</div>
 {% endif %}
 
+<div class="sk-two sk-home"><div class="sk-main"><div class="sk-lbl">累计开口</div><div id="hero" class="sk-big-total"></div></div><aside class="sk-side">
 <div class="card sk-hero">
   {% if st.practiced %}<div class="sk-lbl">今天已经练过了 ✓{% if st.scenes %} · {{ st.scenes }} 个场景{% endif %}{% if st.chats %} · 聊了 {{ st.chats }} 局{% endif %}</div>{% else %}<div class="sk-lbl">今天的场景</div>{% endif %}
   {% if nxt %}
@@ -24,8 +25,7 @@
     <p class="tiny faint" style="margin:6px 0 0">只有你自己看得到，不会进任何公共内容。</p>
   </form>
 </div>
-
-<div class="card"><div class="sk-lbl">一点一点攒起来 · 说得越多越好</div><div id="totals"></div></div>
+</aside></div>
 
 <div class="card">
   <div class="sk-lbl">和 AI 聊下去 · 它扮演一个人，你们轮流说</div>
@@ -64,5 +64,5 @@ const savePrefs = async () => {
 $$('.pk').forEach(x => { x.onchange = savePrefs; }); $('#daily').onchange = savePrefs;
 </script>
 <script src="/static/speak.js?v={{ ASSET_V }}"></script>
-<script>api('/api/speak/totals').then(t => { $('#totals').innerHTML = Totals.html(t); }).catch(() => {});</script>
+<script>api('/api/speak/totals').then(t => { $('#hero').innerHTML = Totals.hero(t); countUp($('#hero')); }).catch(() => {});</script>
 {% endblock %}

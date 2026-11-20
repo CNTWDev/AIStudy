@@ -362,7 +362,7 @@ def test_listen_and_speak_totals():
         c.post("/api/speak/listen", json={"secs": 330})
         t = c.get("/api/speak/totals").json()
         assert t["listen"]["secs"] == 600 and t["listen"]["today"] == 600 and t["listen"]["reached"] == 10 and t["listen"]["next"] == 30
-        assert "一点一点攒起来" in c.get("/speak").text
+        assert "累计开口" in c.get("/speak").text and "Totals.hero" in c.get("/speak").text
 
 
 def test_shadow_marks_are_loose():

@@ -126,6 +126,15 @@ function micButton(el, o) {
   el.addEventListener('pointerleave', () => { if (state === 'rec' && !o.tapMode && performance.now() - downAt > 450) finish(); });
   el.addEventListener('pointercancel', () => { if (state === 'rec' && !o.tapMode) finish(); });   // 来电、切走：说到哪算到哪
   el.addEventListener('contextmenu', e => e.preventDefault());
+  // 电脑上：按住空格说，松开结束（话筒在页面上、焦点不在输入框里时）
+  const typing = () => { const a = document.activeElement; return a && (a.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); };
+  const kd = e => {
+    if (!el.isConnected) { removeEventListener('keydown', kd); removeEventListener('keyup', ku); return; }
+    if (e.code !== 'Space' || typing() || el.closest('[hidden]')) return;
+    e.preventDefault(); if (!e.repeat && state === 'idle') { o.tapMode = false; begin(); }
+  };
+  const ku = e => { if (e.code === 'Space' && el.isConnected && state === 'rec' && !typing()) { e.preventDefault(); finish(); } };
+  addEventListener('keydown', kd); addEventListener('keyup', ku);
   return {off() { set('off'); }, on() { set('idle'); if (hint) hint.innerHTML = idleHint; }};
 }
 
@@ -176,6 +185,12 @@ const Totals = {
         `<div class="bar"><i style="--w:${pct}%"></i></div><div class="tiny faint">下一站 ${milestone(x.next)}</div></div>`;
     };
     return line('累计开口', t.speak) + line('累计听', t.listen);
+  },
+  /* 开口练首页的大数字（展厅）：累计开口，不满 1 小时按分钟，之后「6h12」；下面一行离下一站还差多少、累计听 */
+  hero(t) {
+    const m = Math.floor(t.speak.secs / 60), h = Math.floor(m / 60), left = Math.max(0, t.speak.next - m);
+    const big = h ? `<span data-from="0" data-to="${h}">${h}</span><i>h</i>${String(m % 60).padStart(2, '0')}` : `<span data-from="0" data-to="${m}">${m}</span><i>min</i>`;
+    return `<div class="v">${big}</div><div class="small">${left ? `离 ${milestone(t.speak.next)}，还差 ${dur(left * 60)}` : ''}${t.speak.today >= 60 ? ` · 今天 +${dur(t.speak.today)}` : ''}<br>累计听 ${dur(t.listen.secs)}</div>`;
   },
   async show(box, after) {
     if (!box) return;
@@ -250,6 +265,19 @@ function wins(rows) {
   });
 }
 /* 一组卡片依次浮上来 */
+/* 一屏两栏（DESIGN 5.68「展厅」）：左边一件大作品，右边一栏展签。手机上上下排，电脑上左右排 */
+const two = (main, side) => `<div class="sk-two"><div class="sk-main">${main}</div><aside class="sk-side">${side || ''}</aside></div>`;
+/* 说完那一屏的大数字：挑一个变好了的数（没有就挑第一个有数的），从第一遍滚到这一遍 */
+function heroNum(rows) {
+  const has = r => r.a !== null && r.a !== undefined && r.b !== null && r.b !== undefined;
+  const up = r => has(r) && (r.better === 'low' ? r.b < r.a : r.b > r.a);
+  const r = (rows || []).find(up) || (rows || []).find(has);
+  if (!r) return {html: '', row: null};
+  const u = r.of !== undefined ? `<small>/${r.of}</small>` : r.unit === '秒' ? '<small>″</small>' : '';
+  const a = r.of !== undefined ? `${r.a}/${r.of}` : `${r.a}${r.unit === '秒' ? '″' : r.unit ? ' ' + r.unit : ''}`;
+  return {row: r, html: `<div class="sk-heronum"><div class="v"><span${up(r) ? ` data-from="${r.a}" data-to="${r.b}"` : ''}>${r.b}</span>${u}</div>` +
+    `<div class="sk-lbl">${esc(r.k)} · 第一遍 ${esc(a)}</div></div>`};
+}
 const rise = (html, i) => `<div class="sk-rise" style="--d:${(0.12 * i).toFixed(2)}s">${html}</div>`;
 
 function fmt(v, unit) { return v === null || v === undefined ? '—' : `${v}${unit ? ' ' + unit : ''}`; }

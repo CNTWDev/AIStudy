@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% from "_speak.html" import mic, wave, steps, choices %}
 {% block title %}{{ sc.title }} · 开口练{% endblock %}
-{% block art %}paper{% endblock %}
+{% block art %}gallery{% endblock %}
 {% block body %}
-<div class="sk-top"><a href="/speak" class="linkbtn" aria-label="回到开口练">‹</a><h1>开口练</h1><span class="r">{{ sc.group }}</span></div>
+<div class="sk-top"><a href="/speak" class="linkbtn" aria-label="回到开口练">×</a><h1>开口练</h1><span class="r">{{ sc.group }}</span></div>
 {{ steps(1) }}
 <div id="stage"></div>
 <div id="after" hidden>{{ choices(plays) }}</div>
@@ -23,10 +23,10 @@ const sceneCard = (small) => `<div class="card sk-hero"><div class="sk-lbl">场�
 function step1() {
   setStep(1);
   const f = S.data.first;
-  stage.innerHTML = sceneCard() + (f ? (f.text ? cheer('开口了，最难的一步已经过去', '意思说出来就好。下一步把它换成母语者的说法。', {quiet: !!S.data.rewrite}) : '') + `<div class="card"><div class="sk-lbl">你说的</div><div class="sk-en">${markZh(f.text) || '<span class="muted">（没听清，可以再说一次）</span>'}</div>
-      ${S.data.again ? againCard() : ''}
-      <div class="row" style="margin-top:14px;gap:10px"><button class="btn ghost" id="redo">再说一次</button><button class="btn" id="go2">看地道版</button></div></div>`
-    : `<div id="micbox">${micHtml()}</div>`);
+  stage.innerHTML = f ? two(sceneCard(), (f.text ? cheer('开口了，最难的一步已经过去', '意思说出来就好。下一步把它换成母语者的说法。', {quiet: !!S.data.rewrite}) : '') + `<div class="card"><div class="sk-lbl">你说的</div><div class="sk-en">${markZh(f.text) || '<span class="muted">（没听清，可以再说一次）</span>'}</div>
+      ${S.data.again ? againCard() : ''}</div>
+      <div class="row sk-acts"><button class="btn ghost" id="redo">再说一次</button><button class="btn" id="go2">看地道版</button></div>`)
+    : two(sceneCard()) + `<div id="micbox">${micHtml()}</div>`;
   if (f) { $('#go2').onclick = step2; $('#redo').onclick = () => { S.data.first = null; step1(); }; return; }
   $('#hint').innerHTML = '按住说，松开结束<br>卡住就说中文，没关系。这一遍不评分。';
   micButton($('#mic'), {hint: '#hint', wave: '#wave', recHint: '卡住就说中文，没关系。这一遍不评分。', onClip: async blob => {
@@ -38,7 +38,7 @@ function step1() {
 }
 function againCard() {
   const a = S.data.again, m0 = a.first.metrics || {}, m1 = S.data.first.metrics || {};
-  return `<div class="sk-fix" style="border-left-color:var(--brand);background:var(--brand-2)"><div class="lbl" style="color:var(--brand-ink)">${a.day === new Date().toLocaleDateString('sv') ? '和上一遍比' : `一个月前的你 · ${esc(a.day)}`}</div>
+  return `<div class="sk-fix sk-again"><div class="lbl">${a.day === new Date().toLocaleDateString('sv') ? '和上一遍比' : `一个月前的你 · ${esc(a.day)}`}</div>
     <div class="row" style="gap:14px;flex-wrap:wrap">${clipBtn(a.first.clip, '那时')}${clipBtn(S.data.first.clip, '今天')}</div>
     <div class="small muted" style="margin-top:4px">卡顿 ${fmt(m0.pauses)} → ${fmt(m1.pauses)} 次 · 说中文 ${m0.zh} → ${m1.zh} 处</div></div>`;
 }
@@ -54,13 +54,13 @@ async function step2() {
     catch (e) { w.fail(); $('#rwbox').innerHTML = `<div class="card"><p class="muted">${esc(e.message)}</p><button class="btn" onclick="step2()">再试一次</button></div>`; return; }
   }
   const r = S.data.rewrite;
-  stage.innerHTML = cheer('你说得不错', esc(r.good || '整件事你都说出来了。下面是同样的意思，母语者会怎么说，只比你高一点点。'), {quiet: true, icon: '👍', soft: true}) +
-    rise(`<div class="card"><div class="row" style="justify-content:space-between"><div class="sk-lbl" style="margin:0">母语者会这样说</div>${playBtn(r.native, S.accent, '听一遍')}</div>
-      <div class="sk-en" style="margin-top:8px">${markChunks(r.native, r.chunks)}</div></div>`, 1) +
+  stage.innerHTML = two(cheer('你说得不错', esc(r.good || '整件事你都说出来了。下面是同样的意思，母语者会怎么说，只比你高一点点。'), {quiet: true, soft: true}) +
+    rise(`<div class="card sk-native"><div class="row" style="justify-content:space-between"><div class="sk-lbl" style="margin:0">母语者会这样说</div>${playBtn(r.native, S.accent, '听一遍')}</div>
+      <div class="sk-en" style="margin-top:8px">${markChunks(r.native, r.chunks)}</div></div>`, 1),
     (r.chunks.length ? rise(`<div class="card"><div class="sk-lbl">今天学 ${r.chunks.length} 个表达</div>${chunkList(r.chunks)}</div>`, 2) : '') +
     rise(fixBox(r.fix), 3) + `
-    <details class="small muted" style="margin:0 4px 12px"><summary style="cursor:pointer">你刚才说的</summary><p>${markZh(S.data.first.text)}</p></details>
-    <button class="btn" id="go3" style="width:100%">去跟读</button>`;
+    <details class="small muted" style="margin:0 0 12px"><summary style="cursor:pointer">你刚才说的</summary><p>${markZh(S.data.first.text)}</p></details>
+    <button class="btn sk-go" id="go3">去跟读</button>`);
   $('#go3').onclick = () => step3(0);
 }
 
@@ -69,14 +69,14 @@ function step3(i) {
   setStep(3);
   const sents = S.data.rewrite.sentences, sent = sents[i];
   const tries = ((S.data.shadow || {})[i] || {}).tries || 0;
-  stage.innerHTML = (i ? `<div class="card" style="padding:12px 16px"><div class="small faint">${esc(sents[i - 1])}</div></div>` : '') +
-    `<div class="card" style="border-color:var(--brand-3)"><div class="row" style="justify-content:space-between"><div class="sk-lbl" style="margin:0">听一句，跟一句 · 第 ${i + 1} 句 / 共 ${sents.length} 句</div></div>
+  stage.innerHTML = two((i ? `<div class="card sk-prev"><div class="small faint">${esc(sents[i - 1])}</div></div>` : '') +
+    `<div class="card"><div class="row" style="justify-content:space-between"><div class="sk-lbl" style="margin:0">听一句，跟一句 · 第 ${i + 1} 句 / 共 ${sents.length} 句</div></div>
       <div class="sk-big" id="sent" style="margin:8px 0 10px">${markChunks(sent, S.data.rewrite.chunks)}</div>
       <div class="small muted" id="sres">${S.assess ? '灰色的词没被听到，波浪线是读得不太准的。' : '说完以后，没被听到的词会变灰。'}</div>
-      <div class="sk-dots" style="margin-top:12px" id="dots"></div></div>
-    <div class="row" style="gap:10px;margin:6px 0 4px"><button class="btn soft" id="again">▶ 再听</button><button class="btn soft" id="slow">慢一点</button></div>
-    <div id="micbox">${micHtml()}</div>
-    <p class="sk-hint" style="min-height:0;margin-top:4px"><a href="#" id="next" style="font-weight:600">${i + 1 < sents.length ? '下一句 ›' : '跟读完了，不看稿再说一遍 ›'}</a></p>`;
+      <div class="sk-dots" style="margin-top:12px" id="dots"></div></div>`,
+    `<div class="row sk-acts"><button class="btn soft" id="again">▶ 再听</button><button class="btn soft" id="slow">慢一点</button></div>
+    <p class="sk-hint sk-nextp" style="min-height:0;margin-top:4px"><a href="#" id="next" style="font-weight:600">${i + 1 < sents.length ? '下一句' : '跟读完了，不看稿再说一遍'}</a></p>`) +
+    `<div id="micbox">${micHtml()}</div>`;
   const dots = n => { $('#dots').innerHTML = n ? Array.from({length: Math.min(n, 12)}, () => '<i class="d"></i>').join('') + `<span class="small faint" style="margin-left:6px">跟了 ${n} 遍${n >= 3 ? '，越说越顺' : ''} · 想跟几遍都行</span>` : '<span class="small faint">想跟几遍都行</span>'; };
   dots(tries);
   const play = () => Speak.play(sent, S.accent, 'sentence');
@@ -103,9 +103,9 @@ function step3(i) {
 function step4() {
   setStep(4);
   if (S.data.retell) return done();
-  stage.innerHTML = `<div class="card"><div class="sk-lbl">不看稿，把这件事再说一遍</div><div class="sk-scene" style="font-size:15px">${esc(S.sc.title)}</div>
-      <div class="sk-goals">试着用上：${S.data.rewrite.chunks.map(c => `<span class="pill">${esc(c.zh)}</span>`).join(' ')}</div></div>
-    <div id="micbox">${micHtml()}</div>`;
+  stage.innerHTML = two(`<div class="card"><div class="sk-lbl">不看稿，把这件事再说一遍</div><h2 class="sk-title">${esc(S.sc.title)}</h2></div>`,
+      `<div class="sk-goals"><div class="sk-lbl">试着用上</div>${S.data.rewrite.chunks.map(c => `<span class="pill">${esc(c.zh)}</span>`).join(' ')}</div>`) +
+    `<div id="micbox">${micHtml()}</div>`;
   $('#hint').innerHTML = '按住说，松开结束';
   micButton($('#mic'), {hint: '#hint', wave: '#wave', recHint: '想不起来就用自己的话说', onClip: async blob => {
     const r = await sendClip('/api/speak/clip', blob, {session: S.id, step: 'retell'});
@@ -116,15 +116,16 @@ function step4() {
 function done() {
   setStep(5);
   const r = S.data.rewrite, n = r.chunks.length, w = wins(S.data.compare);
-  stage.innerHTML = (w.length ? cheer('比第一遍更好了', w.map(x => `<b>${esc(x)}</b>`).join(' · '), {big: true})
-      : cheer('不看稿说完了一整遍', '这就是今天最大的进步。多说几次，下面这几个数会一点点变好。', {big: true})) +
-    rise(`<div class="card"><div class="sk-lbl">不看稿，你这一遍说的</div><div class="sk-en">${markChunks(S.data.retell.text, r.chunks)}</div></div>`, 1) +
-    `<div class="card sk-rise" style="--d:.24s">${compareTable(S.data.compare || [])}
+  const h = heroNum(S.data.compare);
+  stage.innerHTML = two((w.length ? cheer('比第一遍更好了', w.map(x => `<b>${esc(x)}</b>`).join(' · '), {big: true})
+      : cheer('不看稿说完了一整遍', '这就是今天最大的进步。多说几次，下面这几个数会一点点变好。', {big: true})) + h.html +
+    rise(`<div class="card"><div class="sk-lbl">不看稿，你这一遍说的</div><div class="sk-en">${markChunks(S.data.retell.text, r.chunks)}</div></div>`, 1),
+    `<div class="card sk-rise" style="--d:.24s">${compareTable((S.data.compare || []).filter(x => x !== h.row))}
       <div class="row" style="margin-top:10px;gap:16px">${clipBtn(S.data.first.clip, '听第一遍')}${clipBtn(S.data.retell.clip, '听这一遍')}</div>
       ${S.timed ? '' : '<p class="tiny faint" style="margin:6px 0 0">现在用的语音识别给不出每个词的时间，开口用时和卡顿暂时算不了。</p>'}</div>
     <p class="sk-note">${n ? `${n} 个表达存进了「我的表达库」，明天开始回来复习。` : ''}今天的已经练完了。</p>
-    <div id="totals"></div>`;
-  $('#after').hidden = false; stage.appendChild($('#after'));
+    <div id="totals"></div>`);
+  $('#after').hidden = false; $('.sk-side', stage).appendChild($('#after'));
   if (S.sc.pack && S.sc.id && !$('#againopt')) $('#after .sk-lbl').insertAdjacentHTML('afterend',
     `<a class="sk-opt" id="againopt" href="/speak/scene/${encodeURIComponent(S.sc.pack)}/${encodeURIComponent(S.sc.id)}?again=${S.id}"><div class="oi">↻</div><div><div class="n">这个场景再说一遍</div><div class="m">趁热再说，和这一遍比一比</div></div><span class="go">›</span></a>`);
   Totals.show($('#totals'), 0.36);
