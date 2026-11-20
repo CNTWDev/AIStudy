@@ -16,8 +16,8 @@ class STTSettings:
     assess: str = "none"                  # 发音评测用哪家：azure / mock / none（不配也能用）
     providers: dict = field(default_factory=dict)   # 名字 → 这家的配置（api_key、region……）
     max_seconds: int = 90                 # 一段录音最长多少秒
-    daily_seconds_per_user: int = 1800    # 每人每天最多送去识别多少秒（评测另算）
-    daily_seconds_total: int = 36000      # 全站每天
+    daily_seconds_per_user: int = 10800    # 每人每天最多送去识别多少秒（评测另算）
+    daily_seconds_total: int = 180000      # 全站每天
     timeout: float = 30
     source: str = ""
     error: str = ""

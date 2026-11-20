@@ -187,7 +187,7 @@ def test_chat_turns_and_close():
         page = c.get(f"/speak/s/{sid}")
         assert page.status_code == 200 and play["opener"][:20] in page.text
         t = _post_clip(c, "/api/speak/chat/turn", session=sid).json()
-        assert t["me"] and t["reply"] and t["left"] == speaking.CHAT_MAX - 1
+        assert t["me"] and t["reply"] and t["left"] == speaking.CHAT_MAX - 1 and not t.get("over")
         cl = c.post("/api/speak/chat/close", json={"session": sid}).json()
         assert cl["note"] and cl["chunks"] and cl["fix"]["kind"]
         assert speaking.library_count(uid) == len(cl["chunks"])
@@ -323,3 +323,48 @@ def test_admin_try_shows_audio_and_vendor_reason(monkeypatch):
     monkeypatch.setattr(httpx, "post", empty)
     tr = Volcengine({"api_key": "k"}, 5).transcribe(WAV, ["en"])
     assert tr.info["code"] == "20000000" and '"duration": 3000' in tr.info["raw"]
+
+
+def test_keep_talking_never_blocked(monkeypatch):
+    """多说多听：识别额度用完也照样录、照样算时长；聊天过了提示轮数也能接着聊；复习做完还能「再多说几个」，不改复习节奏。"""
+    with TestClient(app) as c:
+        uid = _adult(c)
+        ids = [speaking.chunk_upsert(f"keep talking phrase {n}", "测试") for n in range(3)]
+        speaking.learn(uid, ids, "test")
+        before = {r["chunk_id"]: r["due"] for r in db.q("SELECT chunk_id, due FROM speak_memory WHERE user_id=?", uid)}
+        page = c.get("/speak/review?more=1")
+        assert page.status_code == 200 and "keep talking phrase" in page.text
+        r = _post_clip(c, "/api/speak/review/clip", chunk=ids[0]).json()
+        assert "hit" in r and not r["over"]
+        assert c.post("/api/speak/review/grade", json={"chunk": ids[0], "ok": True, "free": True}).json()["free"]
+        after = {r["chunk_id"]: r["due"] for r in db.q("SELECT chunk_id, due FROM speak_memory WHERE user_id=?", uid)}
+        assert after == before
+        # 额度用完：不报错，录音存下，时长照算，只是不转文字
+        monkeypatch.setattr(speaking.engine().s, "daily_seconds_per_user", 1)
+        n0 = speaking.totals(uid)["speak"]["secs"]
+        r = _post_clip(c, "/api/speak/review/clip", chunk=ids[1])
+        assert r.status_code == 200 and r.json()["over"] and r.json()["text"] == ""
+        assert speaking.totals(uid)["speak"]["secs"] >= n0 + 2
+        monkeypatch.undo()
+        # 聊天过了 CHAT_HINT 轮还能接着说
+        play = speaking.packs()[0]["plays"][0]
+        sid = _sid(c.get(f"/speak/play/{play['id']}", follow_redirects=False))
+        for _ in range(speaking.CHAT_HINT + 1):
+            assert _post_clip(c, "/api/speak/chat/turn", session=sid).status_code == 200
+
+
+def test_listen_and_speak_totals():
+    with TestClient(app) as c:
+        uid = _adult(c)
+        t = c.get("/api/speak/totals").json()
+        assert t["speak"]["secs"] == 0 and t["listen"]["next"] == 10
+        c.post("/api/speak/listen", json={"secs": 650})   # 一次最多记 5 分钟
+        c.post("/api/speak/listen", json={"secs": 330})
+        t = c.get("/api/speak/totals").json()
+        assert t["listen"]["secs"] == 600 and t["listen"]["today"] == 600 and t["listen"]["reached"] == 10 and t["listen"]["next"] == 30
+        assert "一点一点攒起来" in c.get("/speak").text
+
+
+def test_shadow_marks_are_loose():
+    mk = speaking.marks("We'll get it fixed properly.", "we will get it fix properlly")
+    assert [m["ok"] for m in mk] == [False, True, True, True, True]

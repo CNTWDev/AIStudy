@@ -1252,5 +1252,9 @@ a.db-back{display:block;color:var(--ink)}.db-bk{display:flex;gap:10px;align-item
 .sk-word.got{animation:skgot .4s ease-out both;animation-delay:var(--d,0s)}
 @keyframes skgot{0%{transform:translateY(0)}45%{transform:translateY(-6px);color:var(--ok)}100%{transform:none}}
 .btn.sk-yes{animation:kbounce .35s ease-out}
+.sk-acc{padding:6px 0 10px}.sk-acc+.sk-acc{border-top:1px solid var(--line-2);padding-top:10px}
+.sk-acc .k{font-size:13px;color:var(--muted)}.sk-acc b{font-size:20px;font-weight:800}
+.sk-acc .bar{height:6px;border-radius:3px;background:var(--line-2);margin:8px 0 4px;overflow:hidden}
+.sk-acc .bar i{display:block;height:100%;width:var(--w);border-radius:3px;background:var(--ok);transform-origin:left;animation:jauto .9s .2s ease-out both}
 .sk-note{font-size:13px;color:var(--muted);padding:0 4px}
 .sk-mini{display:flex;align-items:center;gap:12px}.sk-mini .qi{font-size:20px}
