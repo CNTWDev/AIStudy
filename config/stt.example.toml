@@ -12,8 +12,8 @@
 
 # 一段录音最长多少秒；每人每天、全站每天最多送去识别多少秒（发音评测另算，不在这里）
 max_seconds = 90
-daily_seconds_per_user = 1800
-daily_seconds_total = 36000
+daily_seconds_per_user = 10800
+daily_seconds_total = 180000
 timeout = 30
 
 [transcribe]

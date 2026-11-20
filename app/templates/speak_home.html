@@ -24,6 +24,8 @@
   </form>
 </div>
 
+<div class="card"><div class="sk-lbl">一点一点攒起来 · 说得越多越好</div><div id="totals"></div></div>
+
 <div class="card">
   <div class="sk-lbl">和 AI 聊下去 · 它扮演一个人，你们轮流说</div>
   {% for p in plays %}
@@ -60,4 +62,6 @@ const savePrefs = async () => {
 };
 $$('.pk').forEach(x => { x.onchange = savePrefs; }); $('#daily').onchange = savePrefs;
 </script>
+<script src="/static/speak.js?v={{ ASSET_V }}"></script>
+<script>api('/api/speak/totals').then(t => { $('#totals').innerHTML = Totals.html(t); }).catch(() => {});</script>
 {% endblock %}

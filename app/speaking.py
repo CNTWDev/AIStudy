@@ -19,6 +19,7 @@ import difflib
 import json
 import logging
 import os
+import random
 import re
 import secrets
 from datetime import date, timedelta
@@ -40,7 +41,10 @@ CLIP_DIR = config.DATA_DIR / "speaking"
 REVIEW_CAP = 5                         # 每天最多复习几个表达（多的排队往后，哪天多练了，第二天也不会变多）
 STEPS = (1, 2, 4, 7, 14, 30, 60)       # 第几次说出来以后隔几天再来（前四步和单词一样 1/2/4/7）
 PAUSE = 2.0                            # 两个词之间停多久算「卡住」
-CHAT_MAX = 8                           # 聊一局最多几轮
+CHAT_HINT = 8                          # 聊到第几轮提一句「可以看看今天学到什么」（不强制结束）
+CHAT_MAX = 40                          # 一局的硬上限，只防意外（AI 每轮都要花钱）
+# 累计开口 / 听的里程碑（分钟）：从 10 分钟起步，刚开始练的人很快就能拿到第一次；一直到 1 万小时
+MILESTONES = [10, 30, 60, 180, 600, 1800, 6000, 18000, 60000, 180000, 600000]
 CLIP_MAX = 4 * 1024 * 1024             # 一段录音最大字节数（16kHz 16 位单声道 ≈ 2 分钟）
 _CJK = re.compile(r"[㐀-鿿]")
 log = logging.getLogger(__name__)
@@ -230,8 +234,11 @@ def _same_word(a: str, b: str) -> bool:
         return b in _IRREG[a].split("|")
     if len(a) >= 3 and a.isalpha() and _stem(a) == _stem(b):
         return True
-    if len(a) >= 5 and abs(len(a) - len(b)) <= 1:
-        return sum(x != y for x, y in zip(a, b)) + abs(len(a) - len(b)) <= 1
+    if len(a) >= 5 and len(b) == len(a):   # 识别听错一个字母
+        return sum(x != y for x, y in zip(a, b)) <= 1
+    if len(a) >= 5 and abs(len(a) - len(b)) == 1:   # 多了或少了一个字母
+        lo, hi = sorted((a, b), key=len)
+        return any(hi[:i] + hi[i + 1:] == lo for i in range(len(hi)))
     return False
 
 
@@ -307,6 +314,22 @@ def due_chunks(user_id: int, limit: int | None = None) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def extra_chunks(user_id: int, n: int = 5) -> list[dict]:
+    """「再多说几个」：复习做完还想说，从学过的表达里抽几个（今天没碰过的、学得最不熟的先来）。自由练，不改复习节奏。"""
+    today = db.today().isoformat()
+    rows = db.q("SELECT c.*, m.box FROM speak_memory m JOIN speak_chunks c ON c.id=m.chunk_id "
+                "WHERE m.user_id=? AND (m.seen_at IS NULL OR m.seen_at<?) ORDER BY m.box, m.due LIMIT 30", user_id, today)
+    pool = [dict(r) for r in rows]
+    random.shuffle(pool)
+    return sorted(pool[:n], key=lambda c: c["box"])
+
+
+def known_chunk(user_id: int, chunk_id: int) -> dict | None:
+    r = db.one("SELECT c.*, m.box FROM speak_memory m JOIN speak_chunks c ON c.id=m.chunk_id WHERE m.user_id=? AND m.chunk_id=?",
+               user_id, chunk_id)
+    return dict(r) if r else None
+
+
 def grade(user_id: int, chunk_id: int, ok: bool) -> dict:
     m = db.one("SELECT * FROM speak_memory WHERE user_id=? AND chunk_id=?", user_id, chunk_id)
     if not m:
@@ -365,8 +388,11 @@ def marks(expect: str, said: str, assessment=None) -> list[dict]:
     a = [norm_word(w) for w in exp]
     b = [norm_word(w) for w in (said or "").split() if norm_word(w)]
     hit = set()
-    for blk in difflib.SequenceMatcher(None, a, b, autojunk=False).get_matching_blocks():
+    for blk in difflib.SequenceMatcher(None, [_stem(w) for w in a], [_stem(w) for w in b], autojunk=False).get_matching_blocks():
         hit.update(range(blk.a, blk.a + blk.size))
+    for i, w in enumerate(a):   # 识别听错一个字母、变形也算（宽松：口语练的是开口，不是逐字对答案）
+        if i not in hit and w and any(_same_word(w, x) for x in b):
+            hit.add(i)
     out = [{"w": w, "ok": i in hit or not a[i]} for i, w in enumerate(exp)]
     if assessment and assessment.words:
         aw = [norm_word(w.text) for w in assessment.words]
@@ -381,15 +407,18 @@ def marks(expect: str, said: str, assessment=None) -> list[dict]:
 
 # ------------------------------------------------------------------ 录音
 
-def _quota(user_id: int, secs: float) -> None:
+OVER_NOTE = "今天的语音识别额度用完了：录音照样存着、开口时长照样算，只是先不转文字。"
+
+
+def _quota(user_id: int, secs: float) -> bool:
+    """今天还能不能送去识别。超了不挡人：说多少都行，录音照存、时长照算，只是不转文字（识别按秒花钱）。"""
     s = engine().s
     today = db.today().isoformat()
-    mine = db.one("SELECT COALESCE(SUM(secs),0) AS n FROM speak_clips WHERE user_id=? AND day=?", user_id, today)["n"]
+    mine = db.one("SELECT COALESCE(SUM(secs),0) AS n FROM speak_clips WHERE user_id=? AND day=? AND transcript<>'{}'", user_id, today)["n"]
     if mine + secs > s.daily_seconds_per_user:
-        raise SpeakError(429, "今天说得够多啦，明天接着练")
-    allx = db.one("SELECT COALESCE(SUM(secs),0) AS n FROM speak_clips WHERE day=?", today)["n"]
-    if allx + secs > s.daily_seconds_total:
-        raise SpeakError(429, "今天全站的语音识别用量到上限了，明天再来")
+        return False
+    allx = db.one("SELECT COALESCE(SUM(secs),0) AS n FROM speak_clips WHERE day=? AND transcript<>'{}'", today)["n"]
+    return allx + secs <= s.daily_seconds_total
 
 
 def clip_file(user_id: int, clip_id: str) -> Path:
@@ -409,20 +438,22 @@ def transcribe(user, wav: bytes, step: str, session_id=None, expect: str = "", a
         secs = sp.check_wav(wav)
     except STTError as e:
         raise SpeakError(400, str(e))
-    _quota(user["id"], secs)
-    try:
-        tr = sp.transcribe(wav, [accent.split("-")[0], "zh"], expect)
-    except STTError as e:
-        record_error("transcribe", str(e), step, user["id"])
-        raise SpeakError(503, f"语音识别出错了：{e}")
+    over = not _quota(user["id"], secs)
+    tr = None
+    if not over:
+        try:
+            tr = sp.transcribe(wav, [accent.split("-")[0], "zh"], expect)
+        except STTError as e:
+            record_error("transcribe", str(e), step, user["id"])
+            raise SpeakError(503, f"语音识别出错了：{e}")
     cid = secrets.token_hex(12)
     f = clip_file(user["id"], cid)
     f.parent.mkdir(parents=True, exist_ok=True)
     f.write_bytes(wav)
-    m = metrics(tr)
+    m = metrics(tr) if tr else {"latency": None, "pauses": None, "zh": 0, "words": 0, "secs": round(secs, 1), "timed": False}
     db.run("INSERT INTO speak_clips(id,user_id,session_id,step,day,secs,transcript,metrics,created_at) VALUES(?,?,?,?,?,?,?,?,?)",
-           cid, user["id"], session_id, step, db.today().isoformat(), secs, db.jdump(tr.to_dict()), db.jdump(m), db.now())
-    return {"clip": cid, "text": tr.text, "metrics": m, "transcript": tr}
+           cid, user["id"], session_id, step, db.today().isoformat(), secs, db.jdump(tr.to_dict() if tr else {}), db.jdump(m), db.now())
+    return {"clip": cid, "text": tr.text if tr else "", "metrics": m, "transcript": tr, "over": over}
 
 
 def _assess(clip: dict, wav: bytes, accent: str, reference: str):
@@ -548,7 +579,7 @@ def clip(user, sid: int, step: str, wav: bytes) -> dict:
         d["first"] = {"clip": c["clip"], "text": c["text"], "metrics": c["metrics"]}
         d.pop("rewrite", None)
         _save(s)
-        return {"clip": c["clip"], "text": c["text"], "metrics": c["metrics"], "again": d.get("again")}
+        return {"clip": c["clip"], "text": c["text"], "metrics": c["metrics"], "again": d.get("again"), "over": OVER_NOTE if c["over"] else ""}
     if step.startswith("shadow:"):
         rw = d.get("rewrite") or {}
         i = int(step.split(":")[1])
@@ -557,13 +588,14 @@ def clip(user, sid: int, step: str, wav: bytes) -> dict:
             raise SpeakError(400, "没有这一句")
         c = transcribe(user, wav, step, s["id"], expect=sents[i], accent=acc)
         a = _assess(c, wav, acc, sents[i])
-        mk = marks(sents[i], c["text"], a)
+        mk = [{"w": w, "ok": True} for w in sents[i].split()] if c["over"] else marks(sents[i], c["text"], a)
         sh = d.setdefault("shadow", {})
         prev = sh.get(str(i)) or {"tries": 0}
         sh[str(i)] = {"tries": prev["tries"] + 1, "clip": c["clip"], "missed": sum(1 for m in mk if not m["ok"])}
         _save(s)
         return {"clip": c["clip"], "text": c["text"], "marks": mk, "tries": sh[str(i)]["tries"],
-                "scores": (a.scores if a else None), "assessed": a is not None}
+                "scores": (a.scores if a else None), "assessed": a is not None,
+                "over": OVER_NOTE if c["over"] else ""}
     if step == "retell":
         if not d.get("rewrite"):
             raise SpeakError(400, "先看地道版")
@@ -578,7 +610,7 @@ def clip(user, sid: int, step: str, wav: bytes) -> dict:
         d["compare"] = compare(d["first"]["metrics"], c["metrics"], len(chunks))
         _save(s, done=True)
         return {"clip": c["clip"], "text": c["text"], "compare": d["compare"], "learned": learned,
-                "used": used_new, "first_clip": d["first"]["clip"]}
+                "used": used_new, "first_clip": d["first"]["clip"], "over": OVER_NOTE if c["over"] else ""}
     raise SpeakError(400, "不认识这一步")
 
 
@@ -653,8 +685,13 @@ def chat_turn(user, sid: int, wav: bytes) -> dict:
         raise SpeakError(400, "这一局已经结束了")
     turns = s["data"]["turns"]
     if sum(1 for t in turns if t["who"] == "me") >= CHAT_MAX:
-        raise SpeakError(400, "这一局聊得够多了，看看学到了什么吧")
+        raise SpeakError(400, "这一局聊了很久了，看看今天学到什么，再开一局接着聊")
     c = transcribe(user, wav, "chat", s["id"], accent=accent_of(s))
+    if c["over"]:   # 没转出文字，AI 接不上话：录音和时长照算，请他接着说
+        turns.append({"who": "me", "text": "", "clip": c["clip"], "metrics": c["metrics"]})
+        turns.append({"who": "ai", "text": "Sorry, I didn't quite catch that. Go on, I'm listening."})
+        _save(s)
+        return {"me": "", "reply": turns[-1]["text"], "left": CHAT_MAX - sum(1 for t in turns if t["who"] == "me"), "used": [], "over": OVER_NOTE}
     used = used_chunks(c["text"], _known(user["id"]))
     _count_use(user["id"], used)
     turns.append({"who": "me", "text": c["text"], "clip": c["clip"], "metrics": c["metrics"]})
@@ -709,6 +746,32 @@ def today_card(user) -> dict | None:
     st = today_state(user)
     nxt = next_scene(user)
     return {"daily": prefs(user)["daily"], "scene": nxt, "state": st}
+
+
+def add_listen(user_id: int, secs: float) -> None:
+    """页面上听了多久（地道版、跟读原句、回听录音），按天累加。一次最多记 5 分钟，防止页面挂着不停地记。"""
+    secs = max(0.0, min(float(secs or 0), 300.0))
+    if secs < 0.5:
+        return
+    db.run("INSERT INTO speak_listen(user_id,day,secs) VALUES(?,?,?) ON CONFLICT (user_id, day) DO UPDATE SET secs=speak_listen.secs+excluded.secs",
+           user_id, db.today().isoformat(), round(secs, 1))
+
+
+def _milestone(secs: float) -> dict:
+    m = secs / 60
+    got = [x for x in MILESTONES if x <= m]
+    nxt = next((x for x in MILESTONES if x > m), MILESTONES[-1])
+    return {"secs": round(secs), "reached": got[-1] if got else 0, "next": nxt}
+
+
+def totals(user_id: int) -> dict:
+    """累计开口和听了多久（秒），外加今天的，和下一个里程碑（分钟）。只加不减。"""
+    today = db.today().isoformat()
+    sp_all = db.one("SELECT COALESCE(SUM(secs),0) AS n FROM speak_clips WHERE user_id=?", user_id)["n"]
+    sp_day = db.one("SELECT COALESCE(SUM(secs),0) AS n FROM speak_clips WHERE user_id=? AND day=?", user_id, today)["n"]
+    li_all = db.one("SELECT COALESCE(SUM(secs),0) AS n FROM speak_listen WHERE user_id=?", user_id)["n"]
+    li_day = db.one("SELECT COALESCE(SUM(secs),0) AS n FROM speak_listen WHERE user_id=? AND day=?", user_id, today)["n"]
+    return {"speak": {**_milestone(sp_all), "today": round(sp_day)}, "listen": {**_milestone(li_all), "today": round(li_day)}}
 
 
 def library_count(user_id: int) -> int:

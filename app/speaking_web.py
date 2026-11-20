@@ -81,17 +81,19 @@ def session_page(request: Request, sid: int):
     s = sp._session(u["id"], sid)
     accent = sp.accent_of(s)
     if s["kind"] == "chat":
-        return _render(request, "speak_chat.html", s=s, accent=accent, max_turns=sp.CHAT_MAX)
+        return _render(request, "speak_chat.html", s=s, accent=accent, max_turns=sp.CHAT_MAX, hint_turns=sp.CHAT_HINT)
     return _render(request, "speak_scene.html", s=s, sc=sp.scene_of(s), accent=accent, nxt=sp.next_scene(u),
                    plays=[x for x in sp.pack(s["pack_id"]).get("plays", [])][:2],
                    assess=sp.engine().can("scripted"), timed=sp.engine().can("word_times"))
 
 
 @router.get("/speak/review", response_class=HTMLResponse)
-def review_page(request: Request, then: str = ""):
+def review_page(request: Request, then: str = "", more: int = 0):
     u = _me(request)
-    items = [{**c, "say": sp.sentence_for(c)} for c in sp.due_chunks(u["id"])]
-    return _render(request, "speak_review.html", items=items, then=then, accent=sp.pack(sp.prefs(u)["packs"][0]).get("accent", "en-US"))
+    cs = sp.extra_chunks(u["id"]) if more else sp.due_chunks(u["id"])
+    items = [{**c, "say": sp.sentence_for(c)} for c in cs]
+    return _render(request, "speak_review.html", items=items, then="" if more else then, more=bool(more),
+                   lib=sp.library_count(u["id"]), accent=sp.pack(sp.prefs(u)["packs"][0]).get("accent", "en-US"))
 
 
 @router.get("/speak/records", response_class=HTMLResponse)
@@ -128,17 +130,32 @@ def api_rewrite(request: Request, body: dict = Body(...)):
 async def api_review_clip(request: Request, file: UploadFile = File(...), chunk: int = Form(...)):
     """复习：看中文说英文。识别出来的话里有没有这个表达，系统先帮着判一下，最后由本人点「说出来了 / 没说出来」。"""
     u = _me(request)
-    c = next((x for x in sp.due_chunks(u["id"]) if x["id"] == chunk), None)
+    c = sp.known_chunk(u["id"], chunk)   # 到期的、「再多说几个」抽到的、看完跟着再说一遍的，都是表达库里的
     if not c:
-        raise HTTPException(404, "这一个今天不用复习")
+        raise HTTPException(404, "表达库里没有这一个")
     r = sp.transcribe(u, await _wav(file), f"review:{chunk}")
-    return {"clip": r["clip"], "text": r["text"], "hit": bool(sp.used_chunks(r["text"], [c])), "say": sp.sentence_for(c)}
+    return {"clip": r["clip"], "text": r["text"], "hit": bool(sp.used_chunks(r["text"], [c])), "say": sp.sentence_for(c),
+            "over": sp.OVER_NOTE if r["over"] else ""}
 
 
 @router.post("/api/speak/review/grade")
 def api_review_grade(request: Request, body: dict = Body(...)):
     u = _me(request)
+    if body.get("free"):   # 「再多说几个」：自由练，不改复习节奏
+        return {"ok": bool(body.get("ok")), "free": True}
     return sp.grade(u["id"], int(body.get("chunk") or 0), bool(body.get("ok")))
+
+
+@router.post("/api/speak/listen")
+def api_listen(request: Request, body: dict = Body(...)):
+    u = _me(request)
+    sp.add_listen(u["id"], body.get("secs") or 0)
+    return {"ok": True}
+
+
+@router.get("/api/speak/totals")
+def api_totals(request: Request):
+    return sp.totals(_me(request)["id"])
 
 
 @router.post("/api/speak/chat/turn")

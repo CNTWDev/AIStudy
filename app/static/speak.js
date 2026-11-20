@@ -135,8 +135,58 @@ async function sendClip(url, blob, fields) {
   const r = await fetch(url, {method: 'POST', body: fd});
   const j = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(j.error || j.detail || '没传上，再说一次');
+  if (j.over) toast(j.over);
   return j;
 }
+
+/* ---------------------------------------------------------------- 累计开口 / 听（DESIGN 5.67：目标是说满、听满成百上千小时，贵在坚持）
+   听：页面上在放声音（地道版、跟读原句、回听录音）的每一秒都算，攒一会儿报给服务器。 */
+const Heard = {
+  secs: 0,
+  flush(beacon) {
+    const s = Math.round(this.secs * 10) / 10; if (s < 1) return; this.secs = 0;
+    const body = JSON.stringify({secs: s});
+    if (beacon && navigator.sendBeacon) { navigator.sendBeacon('/api/speak/listen', new Blob([body], {type: 'application/json'})); return; }
+    fetch('/api/speak/listen', {method: 'POST', headers: {'Content-Type': 'application/json'}, body}).catch(() => {});
+  },
+};
+setInterval(() => { if (Speak.playing && !document.hidden) Heard.secs += 0.5; }, 500);
+setInterval(() => Heard.flush(), 20000);
+addEventListener('pagehide', () => Heard.flush(true));
+
+/* 时长按分钟说：不满 1 小时说「37 分钟」，之后「3 小时 5 分」 */
+function dur(secs) {
+  const m = Math.floor((secs || 0) / 60);
+  if (!m) return secs > 0 ? '不到 1 分钟' : '0 分钟';
+  if (m < 60) return `${m} 分钟`;
+  const h = Math.floor(m / 60), r = m % 60;
+  return `${h.toLocaleString()} 小时${r ? ` ${r} 分` : ''}`;
+}
+const milestone = m => m >= 60 ? `${(m / 60).toLocaleString()} 小时` : `${m} 分钟`;
+/* 累计卡：开口、听各一行，今天加了多少，离下一个里程碑还差多少（一根细条）。
+   刚练完的页面传 t0（进页面时的累计）：这次跨过了里程碑就先表扬。 */
+const Totals = {
+  t0: null,
+  async load() { try { this.t0 = await api('/api/speak/totals'); } catch (e) {} },
+  html(t) {
+    const line = (k, x) => {
+      const pct = Math.min(100, Math.round(x.secs / 60 / x.next * 100));
+      return `<div class="sk-acc"><div class="row" style="justify-content:space-between;align-items:baseline"><span><span class="k">${k}</span> <b>${dur(x.secs)}</b></span>` +
+        `<span class="tiny faint">${x.today >= x.secs - 30 ? '' : x.today >= 60 ? `今天 +${dur(x.today)}` : x.today > 0 ? '今天 +不到 1 分钟' : ''}</span></div>` +
+        `<div class="bar"><i style="--w:${pct}%"></i></div><div class="tiny faint">下一站 ${milestone(x.next)}</div></div>`;
+    };
+    return line('累计开口', t.speak) + line('累计听', t.listen);
+  },
+  async show(box, after) {
+    if (!box) return;
+    Heard.flush();
+    let t; try { t = await api('/api/speak/totals'); } catch (e) { return; }
+    const up = [['开口', 'speak'], ['听', 'listen']].filter(([, k]) => this.t0 && t[k].reached > this.t0[k].reached);
+    box.innerHTML = (up.length ? cheer(up.map(([n, k]) => `累计${n}满 ${milestone(t[k].reached)}了！`).join(' '),
+      '一点一点攒起来的。口语就是这样练出来的：多说、多听、天天来。', {big: true}) : '') +
+      `<div class="card sk-rise" style="--d:${after || 0}s"><div class="sk-lbl">一点一点攒起来</div>${this.html(t)}</div>`;
+  },
+};
 
 /* ---------------------------------------------------------------- 显示 */
 function chunkRe(en) {

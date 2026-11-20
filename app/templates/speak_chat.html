@@ -14,7 +14,7 @@
 <script src="/static/speak.js?v={{ ASSET_V }}"></script>
 <script>
 const S = {id: {{ s.id }}, turns: {{ s.data.turns|tojson }}, who: {{ (pl.who or '对方')|tojson }}, accent: {{ accent|lower|tojson }},
-           done: {{ (s.done_at is not none)|tojson }}, close: {{ (s.data.close or none)|tojson }}, max: {{ max_turns }}};
+           done: {{ (s.done_at is not none)|tojson }}, close: {{ (s.data.close or none)|tojson }}, max: {{ max_turns }}, hint: {{ hint_turns }}};
 const log = $('#log');
 const bubble = t => t.who === 'ai'
   ? `<div class="sk-who">${esc(S.who)}（AI）</div><div class="sk-bub ai" style="display:flex;gap:8px;align-items:flex-start">${playBtn(t.text, S.accent)}<span>${esc(t.text)}</span></div>`
@@ -25,7 +25,7 @@ function draw() {
   $('#cnt').textContent = S.done ? '聊完了' : `第 ${mine() + 1} 轮 · 随时结束`;
   if (S.done) return closed(S.close);
   $('#tail').innerHTML = mine() < S.max ? $('#mictpl').innerHTML : '';
-  $('#tail').insertAdjacentHTML('beforeend', `<p class="sk-hint" style="min-height:0"><a href="#" id="end" style="font-weight:600">${mine() ? '聊到这里，看看今天学到什么 ›' : '不聊了'}</a></p>`);
+  $('#tail').insertAdjacentHTML('beforeend', `<p class="sk-hint" style="min-height:0">${mine() >= S.hint && mine() < S.max ? `已经聊了 ${mine()} 轮，很棒。想接着聊就接着说，` : ''}<a href="#" id="end" style="font-weight:600">${mine() ? '聊到这里，看看今天学到什么 ›' : '不聊了'}</a></p>`);
   $('#end').onclick = e => { e.preventDefault(); end(); };
   if (!$('#mic')) return;
   $('#hint').innerHTML = '按住回答 · 卡住就说中文';
@@ -49,9 +49,12 @@ function closed(c) {
     ${(c.chunks || []).length ? rise(`<div class="card"><div class="sk-lbl">今天学 ${c.chunks.length} 个表达</div>${chunkList(c.chunks)}</div>`, 1) : ''}
     ${rise(fixBox(c.fix), 2)}
     <p class="sk-note">${(c.chunks || []).length ? '这几个表达存进了「我的表达库」，明天开始回来复习。' : ''}</p>
+    <div id="totals"></div>
     <a class="sk-opt" href="/speak"><div class="oi">再</div><div><div class="n">再来一局 / 再说一件</div><div class="m">回到开口练</div></div><span class="go">›</span></a>
     <p class="sk-hint" style="min-height:0"><a href="/speak" style="color:var(--ink);font-weight:600">先到这里</a> · 多练不算任务，明天也不会变多</p>` : '';
+  if (c) Totals.show($('#totals'), 0.3);
 }
+Totals.load();
 draw();
 if (!S.done && S.turns.length === 1) setTimeout(() => Speak.play(S.turns[0].text, S.accent, 'sentence'), 400);
 </script>
