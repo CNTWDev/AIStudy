@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block width %}read{% endblock %}
 {% block body %}
 <div class="row"><h1 class="grow">{{ "抓词" if set_mode else {"words":"单词","mistakes":"错题重做","other":"复习卡片"}.get(group, "复习") }}</h1>{% if group == 'words' %}<a class="btn ghost sm" href="/words/map">🔤 {{ "抓词首页" if set_mode else "单词包" }}</a>{% endif %}<a class="btn ghost sm" href="/words">{{ "单词本" if set_mode else "生词本 / 错题本" }}</a></div>
 <p class="muted small for-grownups">{% if group == 'mistakes' %}错题原样再做一遍。隔天连续做对 2 次，会换一道同类的新题，也做对了就过关；过关 3 周后再回头看一眼。

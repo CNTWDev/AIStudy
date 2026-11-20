@@ -67,3 +67,31 @@ def test_studio_practice_screens_are_quiet():
     tpl = (ROOT / "templates" / "_speak.html").read_text(encoding="utf-8")
     assert "range(40)" in tpl
     assert "/api/speak/goals" in (ROOT / "templates" / "speak_scene.html").read_text(encoding="utf-8")
+
+
+def test_one_page_width_rule():
+    """版心只有一处：顶栏和内容都用 --page-w，开口练电脑版只改变量。"""
+    css = open("app/static/app.css", encoding="utf-8").read()
+    art = open("app/static/art.css", encoding="utf-8").read()
+    assert "--page-w:" in css and "--read-w:" in css and "--nav-room:" in css
+    assert ".wrap{max-width:var(--page-w)" in css
+    assert "calc(50% - var(--page-w) / 2 + var(--gutter))" in css
+    assert "424px" not in css and "1160px" not in art
+    assert "--page-w:1120px" in css
+    # 设置里的开关一行一个，不被通用 label 规则挤成两列
+    assert "label.sk-switch:has(>input[type=checkbox]){display:flex" in css
+
+
+def test_every_page_has_a_width():
+    """默认 1120 宽版；读和写为主的页面用 680 窄栏，顶栏不跟着变。"""
+    import glob, os
+    css = open("app/static/app.css", encoding="utf-8").read()
+    assert "body[data-width=read] .wrap{max-width:calc(var(--read-w) + 2 * var(--gutter))}" in css
+    base = open("app/templates/base.html", encoding="utf-8").read()
+    assert 'data-width="{{ width }}"' in base
+    for f in glob.glob("app/templates/*.html"):
+        x = open(f, encoding="utf-8").read()
+        assert "{% block width %}wide" not in x, f  # 宽版是默认，不用写
+        assert "max-width:880px" not in x, f
+    for name in ["login_pick", "settings", "learn", "review", "book_read", "daybook", "kid_form"]:
+        assert "{% block width %}read{% endblock %}" in open(f"app/templates/{name}.html", encoding="utf-8").read(), name

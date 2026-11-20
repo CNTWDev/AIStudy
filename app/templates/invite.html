@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block width %}read{% endblock %}
 {% block body %}
 <h1>邀请亲友</h1>
 {% if msg %}<div class="hint">{{ msg }}{% if link %}<br><input type="text" readonly value="{{ link }}" onclick="this.select()" style="margin-top:6px">{% endif %}</div>{% endif %}

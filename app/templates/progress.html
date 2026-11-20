@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block width %}read{% endblock %}
 {% block body %}
 <a href="/today" class="back">← 今天</a>
 <h1>{{ '学习进度和考试日期' if adult else '学校学到哪了' }}</h1>

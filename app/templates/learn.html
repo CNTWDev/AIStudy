@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block width %}read{% endblock %}
 {% block body %}
 {% set st = me.status if me else 'unknown' %}
 <a href="/map/{{ pack.id }}" class="small">← {{ pack.subject_name }}知识地图</a>
