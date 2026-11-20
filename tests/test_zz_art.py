@@ -67,3 +67,16 @@ def test_studio_practice_screens_are_quiet():
     tpl = (ROOT / "templates" / "_speak.html").read_text(encoding="utf-8")
     assert "range(40)" in tpl
     assert "/api/speak/goals" in (ROOT / "templates" / "speak_scene.html").read_text(encoding="utf-8")
+
+
+def test_one_page_width_rule():
+    """版心只有一处：顶栏和内容都用 --page-w，开口练电脑版只改变量。"""
+    css = open("app/static/app.css", encoding="utf-8").read()
+    art = open("app/static/art.css", encoding="utf-8").read()
+    assert "--page-w:" in css and "--read-w:" in css and "--nav-room:" in css
+    assert ".wrap{max-width:var(--page-w)" in css
+    assert "calc(50% - var(--page-w) / 2 + var(--gutter))" in css
+    assert "424px" not in css and "1160px" not in art
+    assert "--page-w:1120px" in art
+    # 设置里的开关一行一个，不被通用 label 规则挤成两列
+    assert "label.sk-switch:has(>input[type=checkbox]){display:flex" in css

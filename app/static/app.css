@@ -7,6 +7,7 @@
 --sun:#f5b301;--sun-2:#fdf3da;--sky:#2f6fdc;--sky-2:#e9f0fd;--coral:#e0573a;--coral-2:#fdeee9;--violet:#6d4fd8;--violet-2:#f0ecfd;--wing:#d6eeff;
 --radius:20px;--r-sm:12px;--shadow:0 1px 2px rgba(43,33,24,.04),0 6px 20px rgba(43,33,24,.06);--shadow-lg:0 12px 32px rgba(43,33,24,.16);
 --ring:0 0 0 4px rgba(245,186,69,.35);--heat-0:#eee8dc;--heat-1:#fbe6b4;--heat-2:#f8d27a;--heat-3:#f0b545;--heat-4:#c8932e;
+--page-w:880px;--read-w:680px;--side-w:340px;--gutter:16px;--nav-room:calc(110px + env(safe-area-inset-bottom));
 --f-round:"Fredoka",ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
 @media (prefers-color-scheme:dark){:root{--bg:#23211e;--card:#2c2926;--ink:#e6dfd2;--muted:#ada391;--faint:#8a8172;--line:#3c3732;--line-2:#322e2a;
 --brand:#e2b862;--brand-d:#eac478;--brand-2:#3a3225;--brand-3:#584a30;--brand-ink:#ddb467;--brand-ink-d:#eac888;--on-brand:#211a10;--on-warn:#2b2118;
@@ -19,9 +20,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system
 a{color:var(--brand-ink);text-decoration:none}a:hover{color:var(--brand-ink-d)}
 :focus-visible{outline:none;box-shadow:var(--ring);border-radius:8px}
 ::selection{background:var(--brand-3)}
-.wrap{max-width:880px;margin:0 auto;padding:8px 16px 120px}
+/* 版心（DESIGN 5.69）：页面宽 --page-w，顶栏和内容对齐同一条线；窄栏 --read-w；两栏 ≥1000px 主区 + --side-w */
+.wrap{max-width:var(--page-w);margin:0 auto;padding:8px var(--gutter) var(--nav-room);box-sizing:border-box}
+.narrow{max-width:var(--read-w);margin-left:auto;margin-right:auto}
 /* 顶栏 */
-header.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px max(16px,calc(50% - 424px));
+header.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px max(var(--gutter),calc(50% - var(--page-w) / 2 + var(--gutter)));
 background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid transparent}
 header.top .logo{display:inline-flex;align-items:center;gap:7px;font-weight:800;font-size:18px;color:var(--ink);letter-spacing:.2px;border-radius:12px;padding:2px 4px 2px 0}
 header.top .logo:hover{color:var(--ink)}header.top .logo:hover .mascot{transform:rotate(-8deg) scale(1.06)}header.top .logo .mascot{transition:transform .25s}
@@ -1233,7 +1236,8 @@ a.db-back{display:block;color:var(--ink)}.db-bk{display:flex;gap:10px;align-item
 .sk-metric{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line-2)}.sk-metric:first-child{border-top:0}
 .sk-metric .v{font-size:22px;font-weight:800}.sk-metric .k{font-size:13px;color:var(--muted)}.sk-metric svg{margin-left:auto;flex:none}
 .sk-tot{display:flex;text-align:center}.sk-tot div{flex:1}.sk-tot b{display:block;font-size:22px;font-weight:800}.sk-tot span{font-size:12px;color:var(--faint)}
-.sk-switch{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line-2)}.sk-switch:first-child{border-top:0}
+/* 开关一行一个：要压过通用「带勾选框的 label 是 inline-flex」那条规则 */
+.sk-switch,label.sk-switch:has(>input[type=checkbox]){display:flex;align-items:center;gap:10px;margin:0;padding:10px 0;border-top:1px solid var(--line-2)}.sk-switch:first-child{border-top:0}
 .sk-switch .grow{flex:1;min-width:0}.sk-switch small{display:block;color:var(--faint);font-size:12.5px}
 .sk-word.got{animation:skgot .4s ease-out both;animation-delay:var(--d,0s)}
 @keyframes skgot{0%{transform:translateY(0)}45%{transform:translateY(-6px);color:var(--ok)}100%{transform:none}}
