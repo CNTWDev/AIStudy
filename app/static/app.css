@@ -1210,6 +1210,10 @@ a.db-back{display:block;color:var(--ink)}.db-bk{display:flex;gap:10px;align-item
 .sk-zh{background:var(--line-2);border-radius:4px;padding:0 4px;color:var(--muted)}
 .sk-mic{width:96px;height:96px;border-radius:50%;background:var(--brand);border:0;display:flex;align-items:center;justify-content:center;margin:18px auto 0;
   box-shadow:0 6px 18px color-mix(in srgb,var(--brand-d) 45%,transparent);cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;transition:transform .1s}
+.sk-mic{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+/* 开口练页面在手机上不左右晃：不让任何东西把页面撑宽，也不让横向拖动带着整页走 */
+html:has(body[data-art=studio]),body[data-art=studio]{overflow-x:clip;overscroll-behavior-x:none}
+body.sk-holding{overscroll-behavior:none;-webkit-user-select:none;user-select:none}
 .sk-mic:active{transform:scale(.96)}.sk-mic svg{width:38px;height:38px;color:var(--on-brand)}
 .sk-mic.rec{background:var(--coral);box-shadow:0 0 0 12px color-mix(in srgb,var(--coral) 14%,transparent),0 0 0 26px color-mix(in srgb,var(--coral) 7%,transparent)}
 .sk-mic.rec svg{color:#fff}.sk-mic.busy{opacity:.6}.sk-mic.busy svg{animation:skpulse 1s infinite}.sk-mic:disabled{cursor:default}

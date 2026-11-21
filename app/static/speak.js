@@ -99,6 +99,9 @@ function micDevices(el) {
   return {refresh, open: async () => { await refresh(); open(); }};
 }
 
+/* 按着话筒时手指在屏幕上挪动，页面不跟着滚、不左右晃（iOS 上 touch-action 不总管用，再拦一道） */
+document.addEventListener('touchmove', e => { if (document.body.classList.contains('sk-holding')) e.preventDefault(); }, {passive: false});
+
 /* 话筒按钮：按住说、松开结束；轻点一下 = 开始，再点一下 = 结束（说长一点不用一直按着）。
    onClip(blob, secs) 返回 Promise；期间按钮转圈。 */
 function micButton(el, o) {
@@ -144,8 +147,11 @@ function micButton(el, o) {
     e.preventDefault();
     if (state === 'rec') { finish(); return; }
     try { el.setPointerCapture(e.pointerId); } catch (x) {}   // 手指滑出按钮也照样收到松开
+    document.body.classList.add('sk-holding');   // 手指按着的时候锁住页面；松开就能滚（轻点模式下边说边看场景）
     downAt = performance.now(); begin();
   });
+  const release = () => document.body.classList.remove('sk-holding');
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => el.addEventListener(t, release));
   el.addEventListener('pointerup', () => { if (state !== 'rec') return; if (performance.now() - downAt < 450) { o.tapMode = true; return; } if (!o.tapMode) finish(); });
   el.addEventListener('pointerleave', () => { if (state === 'rec' && !o.tapMode && performance.now() - downAt > 450) finish(); });
   el.addEventListener('pointercancel', () => { if (state === 'rec' && !o.tapMode) finish(); });   // 来电、切走：说到哪算到哪
