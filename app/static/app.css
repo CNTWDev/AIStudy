@@ -129,6 +129,8 @@ transition:border-color .15s,background .15s,transform .08s;line-height:1.3}
 .tabpane[hidden]{display:none}
 .pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;background:var(--brand-2);color:var(--brand-ink);white-space:nowrap;line-height:1.7;border:0;font-family:inherit}
 button.pill{cursor:pointer}
+/* 内容型的 pill（查过的词句、学过的表达）可能是一整句：放不下就换行，不把手机页面横向撑开 */
+.pill.long{white-space:normal;overflow-wrap:anywhere;max-width:100%;vertical-align:top}
 .st-unknown{background:#eef0f2;color:#5f6670}.st-weak{background:var(--warn-2);color:var(--warn)}.st-learning{background:var(--learn-2);color:var(--learn)}.st-mastered{background:var(--ok-2);color:var(--ok)}
 @media (prefers-color-scheme:dark){.st-unknown{background:#2a2d33;color:#aab}}
 .task{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}.task:last-child{border-bottom:0}
@@ -348,7 +350,7 @@ details.card>summary{cursor:pointer;list-style:none}details.card>summary::-webki
 .tile{display:flex;gap:10px;align-items:center;padding:14px;border-radius:16px;background:var(--card);border:1px solid var(--line);color:var(--ink);box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
 .tile:hover{transform:translateY(-2px);border-color:var(--brand-3);color:var(--ink)}.tile .e{font-size:26px}.tile b{display:block;font-size:15px}.tile span{font-size:12.5px;color:var(--muted);line-height:1.35;display:block}
 .refl{display:flex;gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px dashed var(--line);font-size:15px}.refl:last-child{border-bottom:0}
-.refl .dt{flex:0 0 52px;white-space:nowrap;font-weight:700;font-variant-numeric:tabular-nums}.refl .mood{font-size:18px}
+.refl .grow{min-width:0;overflow-wrap:anywhere}.refl .dt{flex:0 0 52px;white-space:nowrap;font-weight:700;font-variant-numeric:tabular-nums}.refl .mood{font-size:18px}
 
 /* 折叠卡片：右边有箭头，点开转向下 */
 details.card>summary{position:relative;padding-right:28px;min-height:28px}
