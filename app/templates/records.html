@@ -90,6 +90,6 @@
 {% else %}<tr><td colspan="4" class="muted">还没有记录</td></tr>{% endfor %}</table></div>
 {% if asks %}<h2>最近问{{ ASSISTANT }}的问题</h2>
 <div class="tw"><table>{% for a in asks %}<tr class="small"><td class="nw">{{ a.created_at[5:16].replace('T', ' ') }}</td><td class="tx">{{ a.text }}</td><td class="muted">{{ a.page }}</td></tr>{% endfor %}</table></div>{% endif %}
-{% if lookups %}<h2>最近查的词</h2><p>{% for l in lookups %}<span class="pill">{{ l.query }}</span> {% endfor %}</p>{% endif %}
+{% if lookups %}<h2>最近查的词</h2><p>{% for l in lookups %}<span class="pill long">{{ l.query }}</span> {% endfor %}</p>{% endif %}
 {% if simple %}</details>{% endif %}
 {% endblock %}

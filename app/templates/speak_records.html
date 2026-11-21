@@ -30,7 +30,7 @@
 {% endif %}
 
 <div class="card"><div class="sk-lbl">最近学的表达</div>
-  {% for c in r.recent %}<span class="pill" style="margin:0 6px 6px 0;display:inline-block" title="{{ c.zh }}">{{ c.en }}{% if c.used %} · 用上 {{ c.used }}{% endif %}</span>{% else %}<p class="small muted" style="margin:0">说完第一个场景，这里就有了。</p>{% endfor %}
+  {% for c in r.recent %}<span class="pill long" style="margin:0 6px 6px 0" title="{{ c.zh }}">{{ c.en }}{% if c.used %} · 用上 {{ c.used }}{% endif %}</span>{% else %}<p class="small muted" style="margin:0">说完第一个场景，这里就有了。</p>{% endfor %}
 </div>
 
 <div class="card"><div class="sk-lbl">回听录音</div>
